@@ -1,4 +1,4 @@
-package models
+package uk.gov.hmrc.securitiestransferchargefrontend.models
 
 import play.api.libs.json._
 

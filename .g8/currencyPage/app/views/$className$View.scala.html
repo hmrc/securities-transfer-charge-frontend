@@ -1,4 +1,6 @@
 @import viewmodels.InputWidth._
+@import uk.gov.hmrc.securitiestransferchargefrontend.viewmodels.LabelSize.Large
+
 
 @this(
     layout: templates.Layout,
@@ -21,7 +23,7 @@
         @govukInput(
             InputViewModel(
                 field = form("value"),
-                label = LabelViewModel(messages("$className;format="decap"$.heading")).asPageHeading()
+                label = LabelViewModel(messages("$className;format="decap"$.heading")).asPageHeading(Large)
             )
             .withPrefix(PrefixOrSuffix(content = "£"))
             .withWidth(Fixed10)

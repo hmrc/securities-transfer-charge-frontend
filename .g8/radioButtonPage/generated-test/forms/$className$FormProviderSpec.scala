@@ -1,6 +1,6 @@
 package forms
 
-import forms.behaviours.OptionFieldBehaviours
+import uk.gov.hmrc.securitiestransferchargefrontend.forms.behaviours.OptionFieldBehaviours
 import uk.gov.hmrc.securitiestransferchargefrontend.models.$className$
 import play.api.data.FormError
 

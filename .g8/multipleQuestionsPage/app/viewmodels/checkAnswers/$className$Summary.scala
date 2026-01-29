@@ -1,8 +1,8 @@
-package viewmodels.checkAnswers
+package uk.gov.hmrc.securitiestransferchargefrontend.viewmodels.checkAnswers
 
-import controllers.routes
+import uk.gov.hmrc.securitiestransferchargefrontend.controllers.routes
 import uk.gov.hmrc.securitiestransferchargefrontend.models.{CheckMode, UserAnswers}
-import pages.$className$Page
+import uk.gov.hmrc.securitiestransferchargefrontend.pages.$className$Page
 import play.api.i18n.Messages
 import play.twirl.api.HtmlFormat
 import uk.gov.hmrc.govukfrontend.views.viewmodels.content.HtmlContent

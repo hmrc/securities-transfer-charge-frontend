@@ -1,4 +1,4 @@
-package pages
+package uk.gov.hmrc.securitiestransferchargefrontend.pages
 
 import java.time.LocalDate
 

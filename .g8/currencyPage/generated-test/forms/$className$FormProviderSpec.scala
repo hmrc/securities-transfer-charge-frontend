@@ -1,7 +1,7 @@
 package forms
 
 import uk.gov.hmrc.securitiestransferchargefrontend.config.CurrencyFormatter.currencyFormat
-import forms.behaviours.CurrencyFieldBehaviours
+import uk.gov.hmrc.securitiestransferchargefrontend.forms.behaviours.CurrencyFieldBehaviours
 import org.scalacheck.Gen
 import play.api.data.FormError
 

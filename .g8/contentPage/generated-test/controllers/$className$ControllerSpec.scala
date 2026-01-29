@@ -1,9 +1,9 @@
-package controllers
+package uk.gov.hmrc.securitiestransferchargefrontend.controllers
 
 import base.SpecBase
 import play.api.test.FakeRequest
 import play.api.test.Helpers._
-import views.html.$className$View
+import uk.gov.hmrc.securitiestransferchargefrontend.views.html.$className$View
 
 class $className$ControllerSpec extends SpecBase {
 
