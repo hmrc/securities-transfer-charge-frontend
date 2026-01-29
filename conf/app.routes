@@ -1,5 +1,21 @@
 # microservice specific routes
 
-->         /hmrc-frontend           hmrcfrontend.Routes
-GET        /                        uk.gov.hmrc.securitiestransferchargefrontend.controllers.HelloWorldController.helloWorld
-GET        /assets/*file            controllers.Assets.versioned(path = "/public", file: Asset)
+->          /hmrc-frontend                               hmrcfrontend.Routes
+
+GET         /                                            uk.gov.hmrc.securitiestransferchargefrontend.controllers.IndexController.onPageLoad()
+
+GET         /assets/*file                                controllers.Assets.versioned(path="/public", file: Asset)
+
+GET         /language/:lang                              uk.gov.hmrc.securitiestransferchargefrontend.controllers.LanguageSwitchController.switchToLanguage(lang: String)
+
+GET         /refresh-session                             uk.gov.hmrc.securitiestransferchargefrontend.controllers.KeepAliveController.keepAlive()
+
+GET         /there-is-a-problem                          uk.gov.hmrc.securitiestransferchargefrontend.controllers.JourneyRecoveryController.onPageLoad(continueUrl: Option[RedirectUrl] ?= None)
+
+GET         /check-your-answers                          uk.gov.hmrc.securitiestransferchargefrontend.controllers.CheckYourAnswersController.onPageLoad()
+
+GET         /account/sign-out-survey                     uk.gov.hmrc.securitiestransferchargefrontend.controllers.auth.AuthController.signOut()
+GET         /account/sign-out                            uk.gov.hmrc.securitiestransferchargefrontend.controllers.auth.AuthController.signOutNoSurvey()
+GET         /account/signed-out                          uk.gov.hmrc.securitiestransferchargefrontend.controllers.auth.SignedOutController.onPageLoad()
+
+GET         /unauthorised                                uk.gov.hmrc.securitiestransferchargefrontend.controllers.UnauthorisedController.onPageLoad()
