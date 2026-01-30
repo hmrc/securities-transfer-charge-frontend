@@ -25,10 +25,12 @@ import play.api.Application
 import play.api.i18n.{Messages, MessagesApi}
 import play.api.inject.bind
 import play.api.inject.guice.GuiceApplicationBuilder
+import play.api.mvc.{AnyContent, AnyContentAsEmpty}
 import play.api.test.FakeRequest
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.actions.{DataRequiredAction, DataRequiredActionImpl, DataRetrievalAction, IdentifierAction}
 import uk.gov.hmrc.securitiestransferchargefrontend.models.UserAnswers
+import uk.gov.hmrc.securitiestransferchargefrontend.models.requests.DataRequest
 
 import scala.concurrent.ExecutionContext
 
@@ -43,8 +45,14 @@ trait SpecBase
   implicit val ec: ExecutionContext = ExecutionContext.global
   implicit val hc: HeaderCarrier = HeaderCarrier()
   val userAnswersId: String = "id"
+  val sessionId = "sessionId1234"
 
   def emptyUserAnswers : UserAnswers = UserAnswers(userAnswersId)
+
+  val fakeRequest: FakeRequest[AnyContentAsEmpty.type] = FakeRequest().withHeaders("sessionId" -> sessionId)
+
+  def fakeDataRequest(userAnswers: UserAnswers): DataRequest[AnyContent]
+  = DataRequest[AnyContent](FakeRequest(), "userId", userAnswers)
 
   def messages(app: Application): Messages = app.injector.instanceOf[MessagesApi].preferred(FakeRequest())
 
