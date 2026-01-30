@@ -28,8 +28,6 @@ import uk.gov.hmrc.auth.core.retrieve.Retrieval
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.securitiestransferchargefrontend.config.FrontendAppConfig
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.actions.{AuthenticatedIdentifierAction, IdentifierAction}
-
-import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.{ExecutionContext, Future}
 
 class AuthActionSpec extends SpecBase {

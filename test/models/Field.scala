@@ -16,8 +16,6 @@
 
 package models
 
-import uk.gov.hmrc.securitiestransferchargefrontend.models
-
 case class Field(name: String, errorKeys: Map[ErrorType, String])
 
 object Field {

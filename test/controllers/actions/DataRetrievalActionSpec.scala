@@ -25,8 +25,6 @@ import uk.gov.hmrc.securitiestransferchargefrontend.controllers.actions.DataRetr
 import uk.gov.hmrc.securitiestransferchargefrontend.models.UserAnswers
 import uk.gov.hmrc.securitiestransferchargefrontend.models.requests.IdentifierRequest
 import uk.gov.hmrc.securitiestransferchargefrontend.repositories.SessionRepository
-
-import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
 class DataRetrievalActionSpec extends SpecBase with MockitoSugar {
