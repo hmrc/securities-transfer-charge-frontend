@@ -47,3 +47,11 @@ signedOut.guidance = We did not save your answers.
 
 unauthorised.title = You can’t access this service with this account
 unauthorised.heading = You can’t access this service with this account
+
+howToNotifyAboutSecuritiesTransfer.title = HowToNotifyAboutSecuritiesTransfer
+howToNotifyAboutSecuritiesTransfer.heading = HowToNotifyAboutSecuritiesTransfer
+howToNotifyAboutSecuritiesTransfer.oneAtATime = One at a time
+howToNotifyAboutSecuritiesTransfer.moreThanOneAtATime = More than one at a time
+howToNotifyAboutSecuritiesTransfer.checkYourAnswersLabel = HowToNotifyAboutSecuritiesTransfer
+howToNotifyAboutSecuritiesTransfer.error.required = Select howToNotifyAboutSecuritiesTransfer
+howToNotifyAboutSecuritiesTransfer.change.hidden = HowToNotifyAboutSecuritiesTransfer

@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.securitiestransferchargefrontend.mappings
+package uk.gov.hmrc.securitiestransferchargefrontend.forms.mappings
 
 import play.api.data.FieldMapping
 import play.api.data.Forms.of

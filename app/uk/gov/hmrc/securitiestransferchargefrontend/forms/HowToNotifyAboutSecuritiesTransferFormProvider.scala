@@ -14,16 +14,18 @@
  * limitations under the License.
  */
 
-package generators
+package uk.gov.hmrc.securitiestransferchargefrontend.forms
 
-import uk.gov.hmrc.securitiestransferchargefrontend.models._
-import org.scalacheck.Arbitrary.arbitrary
-import org.scalacheck.{Arbitrary, Gen}
+import javax.inject.Inject
 
-trait ModelGenerators {
+import uk.gov.hmrc.securitiestransferchargefrontend.forms.mappings.Mappings
+import play.api.data.Form
+import uk.gov.hmrc.securitiestransferchargefrontend.models.HowToNotifyAboutSecuritiesTransfer
 
-  implicit lazy val arbitraryHowToNotifyAboutSecuritiesTransfer: Arbitrary[HowToNotifyAboutSecuritiesTransfer] =
-    Arbitrary {
-      Gen.oneOf(HowToNotifyAboutSecuritiesTransfer.values.toSeq)
-    }
+class HowToNotifyAboutSecuritiesTransferFormProvider @Inject() extends Mappings {
+
+  def apply(): Form[HowToNotifyAboutSecuritiesTransfer] =
+    Form(
+      "value" -> enumerable[HowToNotifyAboutSecuritiesTransfer]("howToNotifyAboutSecuritiesTransfer.error.required")
+    )
 }

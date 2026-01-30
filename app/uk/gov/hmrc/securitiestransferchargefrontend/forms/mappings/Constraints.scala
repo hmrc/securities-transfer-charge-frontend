@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.securitiestransferchargefrontend.mappings
+package uk.gov.hmrc.securitiestransferchargefrontend.forms.mappings
 
 import play.api.data.validation.{Constraint, Invalid, Valid}
 import uk.gov.hmrc.securitiestransferchargefrontend.config.CurrencyFormatter

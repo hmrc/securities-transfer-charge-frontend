@@ -14,16 +14,14 @@
  * limitations under the License.
  */
 
-package generators
+package uk.gov.hmrc.securitiestransferchargefrontend.pages
 
-import uk.gov.hmrc.securitiestransferchargefrontend.models._
-import org.scalacheck.Arbitrary.arbitrary
-import org.scalacheck.{Arbitrary, Gen}
+import play.api.libs.json.JsPath
+import uk.gov.hmrc.securitiestransferchargefrontend.models.HowToNotifyAboutSecuritiesTransfer
 
-trait ModelGenerators {
+case object HowToNotifyAboutSecuritiesTransferPage extends QuestionPage[HowToNotifyAboutSecuritiesTransfer] {
 
-  implicit lazy val arbitraryHowToNotifyAboutSecuritiesTransfer: Arbitrary[HowToNotifyAboutSecuritiesTransfer] =
-    Arbitrary {
-      Gen.oneOf(HowToNotifyAboutSecuritiesTransfer.values.toSeq)
-    }
+  override def path: JsPath = JsPath \ toString
+
+  override def toString: String = "howToNotifyAboutSecuritiesTransfer"
 }
