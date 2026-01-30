@@ -48,6 +48,11 @@ signedOut.guidance = We did not save your answers.
 unauthorised.title = You can’t access this service with this account
 unauthorised.heading = You can’t access this service with this account
 
+submissionsDashboard.title = Submissions
+submissionsDashboard.heading = Submissions
+submissionsDashboard.create-new-submission.button = Create new submission
+submissionsDashboard.hint = Submission dashboard
+
 howToNotifyAboutSecuritiesTransfer.title = HowToNotifyAboutSecuritiesTransfer
 howToNotifyAboutSecuritiesTransfer.heading = HowToNotifyAboutSecuritiesTransfer
 howToNotifyAboutSecuritiesTransfer.oneAtATime = One at a time
