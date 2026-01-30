@@ -27,9 +27,9 @@ import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 
 trait RegistrationClient:
-  def subscriptionDetails(stcId: String)(implicit hc: HeaderCarrier): Future[Subscription]
+  def getSubscriptionDetails(stcId: String)(implicit hc: HeaderCarrier): Future[Subscription]
 
-  def subscriptionStatus(stcId: String)(implicit hc: HeaderCarrier): Future[SubscriptionStatusResult]
+  def getSubscriptionStatus(stcId: String)(implicit hc: HeaderCarrier): Future[SubscriptionStatusResult]
 
   def updateAddress(stcId: String, address: Address)(implicit hc: HeaderCarrier): Future[SubscriptionResult]
 
@@ -48,12 +48,12 @@ class RegistrationClientImpl @Inject()(implicit ec: ExecutionContext) extends Re
     emailAddress = "some@email.com"
   )
 
-  override def subscriptionDetails(stcId: String)
-                                  (implicit hc: HeaderCarrier): Future[Subscription] =
+  override def getSubscriptionDetails(stcId: String)
+                                     (implicit hc: HeaderCarrier): Future[Subscription] =
     Future.successful(subscription)
 
-  override def subscriptionStatus(stcId: String)
-                                 (implicit hc: HeaderCarrier): Future[SubscriptionStatusResult] =
+  override def getSubscriptionStatus(stcId: String)
+                                    (implicit hc: HeaderCarrier): Future[SubscriptionStatusResult] =
     Future.successful(Right(SubscriptionActive))
 
   override def updateAddress(stcId: String, address: Address)(implicit hc: HeaderCarrier): Future[SubscriptionResult] =

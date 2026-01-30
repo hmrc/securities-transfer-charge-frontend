@@ -27,10 +27,10 @@ class RegistrationClientImplSpec extends SpecBase {
 
   private val client = new RegistrationClientImpl()
 
-  "RegistrationClientImpl.subscriptionDetails" - {
+  "RegistrationClientImpl.getSubscriptionDetails" - {
 
     "return subscription details" in {
-      whenReady(client.subscriptionDetails("STC123")) { subscription =>
+      whenReady(client.getSubscriptionDetails("STC123")) { subscription =>
         subscription.contactName mustBe "John Doe"
         subscription.addressLine1 mustBe "1 high street"
         subscription.addressLine2 mustBe Some("bobbins on sea")
@@ -43,10 +43,10 @@ class RegistrationClientImplSpec extends SpecBase {
     }
   }
 
-  "RegistrationClientImpl.subscriptionStatus" - {
+  "RegistrationClientImpl.getSubscriptionStatus" - {
 
     "return an active subscription status" in {
-      whenReady(client.subscriptionStatus("STC123")) { result =>
+      whenReady(client.getSubscriptionStatus("STC123")) { result =>
         result mustBe Right(SubscriptionActive)
       }
     }
