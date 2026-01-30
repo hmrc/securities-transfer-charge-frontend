@@ -26,8 +26,11 @@ import play.api.i18n.{Messages, MessagesApi}
 import play.api.inject.bind
 import play.api.inject.guice.GuiceApplicationBuilder
 import play.api.test.FakeRequest
+import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.actions.{DataRequiredAction, DataRequiredActionImpl, DataRetrievalAction, IdentifierAction}
 import uk.gov.hmrc.securitiestransferchargefrontend.models.UserAnswers
+
+import scala.concurrent.ExecutionContext
 
 trait SpecBase
   extends AnyFreeSpec
@@ -37,6 +40,8 @@ trait SpecBase
     with ScalaFutures
     with IntegrationPatience {
 
+  implicit val ec: ExecutionContext = ExecutionContext.global
+  implicit val hc: HeaderCarrier = HeaderCarrier()
   val userAnswersId: String = "id"
 
   def emptyUserAnswers : UserAnswers = UserAnswers(userAnswersId)
