@@ -140,6 +140,7 @@ package object models {
                 }
               }
           }
+        case _ => JsError("invalid path")
       }
     }
   }
