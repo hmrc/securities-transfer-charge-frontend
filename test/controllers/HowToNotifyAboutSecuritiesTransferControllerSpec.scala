@@ -1,17 +1,36 @@
+/*
+ * Copyright 2026 HM Revenue & Customs
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package controllers
 
 import base.SpecBase
 import uk.gov.hmrc.securitiestransferchargefrontend.forms.HowToNotifyAboutSecuritiesTransferFormProvider
-import uk.gov.hmrc.securitiestransferchargefrontend.models.{NormalMode, HowToNotifyAboutSecuritiesTransfer, UserAnswers}
-import uk.gov.hmrc.securitiestransferchargefrontend.navigation.{FakeNavigator, Navigator}
+import uk.gov.hmrc.securitiestransferchargefrontend.controllers.routes
+import uk.gov.hmrc.securitiestransferchargefrontend.models.{HowToNotifyAboutSecuritiesTransfer, NormalMode, UserAnswers}
+import uk.gov.hmrc.securitiestransferchargefrontend.navigation.Navigator
+import navigation.FakeNavigator
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.when
 import org.scalatestplus.mockito.MockitoSugar
+import play.api.data.Form
 import uk.gov.hmrc.securitiestransferchargefrontend.pages.HowToNotifyAboutSecuritiesTransferPage
 import play.api.inject.bind
 import play.api.mvc.Call
 import play.api.test.FakeRequest
-import play.api.test.Helpers._
+import play.api.test.Helpers.*
 import uk.gov.hmrc.securitiestransferchargefrontend.repositories.SessionRepository
 import uk.gov.hmrc.securitiestransferchargefrontend.views.html.HowToNotifyAboutSecuritiesTransferView
 
@@ -21,10 +40,10 @@ class HowToNotifyAboutSecuritiesTransferControllerSpec extends SpecBase with Moc
 
   def onwardRoute = Call("GET", "/foo")
 
-  lazy val howToNotifyAboutSecuritiesTransferRoute = routes.HowToNotifyAboutSecuritiesTransferController.onPageLoad(NormalMode).url
+  lazy val howToNotifyAboutSecuritiesTransferRoute: String = routes.HowToNotifyAboutSecuritiesTransferController.onPageLoad(NormalMode).url
 
   val formProvider = new HowToNotifyAboutSecuritiesTransferFormProvider()
-  val form = formProvider()
+  val form: Form[HowToNotifyAboutSecuritiesTransfer] = formProvider()
 
   "HowToNotifyAboutSecuritiesTransfer Controller" - {
 
