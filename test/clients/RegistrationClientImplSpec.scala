@@ -35,8 +35,8 @@ class RegistrationClientImplSpec extends SpecBase {
       whenReady(client.getSubscriptionDetails(subscriptionId)) { subscription =>
         subscription.contactName mustBe "John Doe"
         subscription.addressLine1 mustBe "1 high street"
-        subscription.addressLine2 mustBe Some("bobbins on sea")
-        subscription.addressLine3 mustBe Some("Town")
+        subscription.addressLine2 mustBe Some("Town")
+        subscription.addressLine3 mustBe empty
         subscription.postcode mustBe "ZZ1 1ZZ"
         subscription.countryCode mustBe "GB"
         subscription.telephoneNumber mustBe "07777777777"
