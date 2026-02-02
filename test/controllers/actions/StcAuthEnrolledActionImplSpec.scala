@@ -24,7 +24,6 @@ import play.api.test.Helpers.*
 import play.api.test.{FakeRequest, Helpers}
 import uk.gov.hmrc.auth.core.*
 import uk.gov.hmrc.auth.core.retrieve.~
-import uk.gov.hmrc.http.UnauthorizedException
 import uk.gov.hmrc.securitiestransferchargefrontend.config.FrontendAppConfig
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.actions.{StcAuthEnrolledAction, StcAuthEnrolledActionImpl}
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.routes
@@ -145,7 +144,7 @@ class StcAuthEnrolledActionImplSpec extends SpecBase {
       }
     }
 
-    "must fail with UnauthorizedException when internalId is missing" in {
+    "must redirect to unauthorised page when internalId is missing" in {
 
       val application = applicationBuilder().build()
 
@@ -154,15 +153,14 @@ class StcAuthEnrolledActionImplSpec extends SpecBase {
         val action =
           testSetup(application, buildRetrieval(maybeInternalId = None))()
 
-        val thrown =
-          intercept[UnauthorizedException] {
-            await(
-              action.invokeBlock(FakeRequest(), _ => Future.successful(Results.Ok))
-            )
-          }
+        val result =
+          action.invokeBlock(FakeRequest(), _ => Future.successful(Results.Ok))
 
-        thrown.getMessage must include("Missing internalId")
+        status(result) mustBe SEE_OTHER
+        redirectLocation(result).value mustBe
+          routes.UnauthorisedController.onPageLoad().url
       }
     }
+
   }
 }
