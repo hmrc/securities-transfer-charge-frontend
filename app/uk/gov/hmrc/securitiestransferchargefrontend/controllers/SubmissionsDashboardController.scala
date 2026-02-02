@@ -20,16 +20,18 @@ import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import uk.gov.hmrc.securitiestransferchargefrontend.views.html.SubmissionsDashboardView
+import uk.gov.hmrc.securitiestransferchargefrontend.controllers.actions.StcAuthEnrolledAction
 
 import javax.inject.Inject
 
 class SubmissionsDashboardController @Inject()(
                                        override val messagesApi: MessagesApi,
                                        val controllerComponents: MessagesControllerComponents,
+                                       stcAuthEnrolled: StcAuthEnrolledAction,
                                        view: SubmissionsDashboardView
                                      ) extends FrontendBaseController with I18nSupport {
 
-  def onPageLoad: Action[AnyContent] = Action {
+  def onPageLoad: Action[AnyContent] = stcAuthEnrolled {
     implicit request =>
       Ok(view())
   }
