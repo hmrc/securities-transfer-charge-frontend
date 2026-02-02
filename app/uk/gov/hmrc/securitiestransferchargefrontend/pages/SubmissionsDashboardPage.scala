@@ -14,23 +14,8 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.securitiestransferchargefrontend.queries
+package uk.gov.hmrc.securitiestransferchargefrontend.pages
 
-import play.api.libs.json.JsPath
-import uk.gov.hmrc.securitiestransferchargefrontend.models.UserAnswers
-
-import scala.annotation.nowarn
-import scala.util.{Success, Try}
-
-sealed trait Query {
-
-  def path: JsPath
-}
-
-trait Gettable[A] extends Query
-
-trait Settable[A] extends Query {
-
-  def cleanup(@nowarn value: Option[A], userAnswers: UserAnswers): Try[UserAnswers] =
-    Success(userAnswers)
+case object SubmissionsDashboardPage extends Page {
+  override def toString: String = "submissionsDashboard"
 }

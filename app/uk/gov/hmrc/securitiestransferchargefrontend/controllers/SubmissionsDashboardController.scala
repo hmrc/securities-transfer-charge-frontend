@@ -19,18 +19,35 @@ package uk.gov.hmrc.securitiestransferchargefrontend.controllers
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
+import uk.gov.hmrc.securitiestransferchargefrontend.clients.SubmissionIdClient
+import uk.gov.hmrc.securitiestransferchargefrontend.models.{NormalMode, UserAnswers}
+import uk.gov.hmrc.securitiestransferchargefrontend.navigation.Navigator
+import uk.gov.hmrc.securitiestransferchargefrontend.pages.SubmissionsDashboardPage
 import uk.gov.hmrc.securitiestransferchargefrontend.views.html.SubmissionsDashboardView
 
 import javax.inject.Inject
+import scala.concurrent.ExecutionContext
 
-class SubmissionsDashboardController @Inject()(
-                                       override val messagesApi: MessagesApi,
-                                       val controllerComponents: MessagesControllerComponents,
-                                       view: SubmissionsDashboardView
-                                     ) extends FrontendBaseController with I18nSupport {
+class SubmissionsDashboardController @Inject()(override val messagesApi: MessagesApi,
+                                               val controllerComponents: MessagesControllerComponents,
+                                               view: SubmissionsDashboardView,
+                                               idClient: SubmissionIdClient,
+                                               navigator: Navigator)
+                                              (implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport {
 
   def onPageLoad: Action[AnyContent] = Action {
     implicit request =>
       Ok(view())
+  }
+
+  def onSubmit(): Action[AnyContent] = Action.async {
+    implicit request =>
+      // ToDo: Future PR should add the userId to the request.
+      val userId = request.session.get("userId").getOrElse("foobar")
+      for {
+        submissionId  <- idClient.nextSubmissionId()
+        emptyAnswers  =  UserAnswers.empty(userId)(submissionId)
+        nextPage      <- navigator.nextPage(SubmissionsDashboardPage, NormalMode, emptyAnswers)
+      } yield Redirect(nextPage)
   }
 }

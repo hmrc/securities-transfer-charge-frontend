@@ -55,14 +55,14 @@ class SessionRepository @Inject()(
 
   private def byId(id: String): Bson = Filters.equal("_id", id)
 
-  def keepAlive(id: String): Future[Boolean] = {
+  def keepAlive(id: String): Future[Unit] = {
     collection
       .updateOne(
         filter = byId(id),
         update = Updates.set("lastUpdated", Instant.now(clock)),
       )
       .toFuture()
-      .map(_ => true)
+      .map(_ => ())
   }
 
   def get(id: String): Future[Option[UserAnswers]] = {
@@ -76,24 +76,24 @@ class SessionRepository @Inject()(
     }
   }
 
-  def set(answers: UserAnswers): Future[Boolean] = {
+  def set(answers: UserAnswers): Future[Unit] = {
 
     val updatedAnswers = answers copy (lastUpdated = Instant.now(clock))
 
     collection
       .replaceOne(
-        filter      = byId(updatedAnswers.id),
+        filter      = byId(updatedAnswers.userId),
         replacement = updatedAnswers,
         options     = ReplaceOptions().upsert(true)
       )
       .toFuture()
-      .map(_ => true)
+      .map(_ => ())
   }
 
-  def clear(id: String): Future[Boolean] = {
+  def clear(id: String): Future[Unit] = {
     collection
       .deleteOne(byId(id))
       .toFuture()
-      .map(_ => true)
+      .map(_ => ())
   }
 }

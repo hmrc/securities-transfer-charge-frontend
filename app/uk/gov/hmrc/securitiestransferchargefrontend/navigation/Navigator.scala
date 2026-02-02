@@ -16,28 +16,44 @@
 
 package uk.gov.hmrc.securitiestransferchargefrontend.navigation
 
-import uk.gov.hmrc.securitiestransferchargefrontend.controllers.routes
-import uk.gov.hmrc.securitiestransferchargefrontend.models.*
+import play.api.libs.json.Reads
 import play.api.mvc.Call
+import uk.gov.hmrc.securitiestransferchargefrontend.clients.SaveAndReturnClient
+import uk.gov.hmrc.securitiestransferchargefrontend.controllers.routes
+import uk.gov.hmrc.securitiestransferchargefrontend.models.{Mode, UserAnswers}
 import uk.gov.hmrc.securitiestransferchargefrontend.pages.Page
+import uk.gov.hmrc.securitiestransferchargefrontend.queries.Gettable
+import uk.gov.hmrc.securitiestransferchargefrontend.repositories.SessionRepository
 
-import javax.inject.{Inject, Singleton}
+import scala.concurrent.{ExecutionContext, Future}
 
-@Singleton
-class Navigator @Inject()() {
+trait Navigator:
+  def nextPage(page: Page, mode: Mode, userAnswers: UserAnswers): Future[Call]
+  val errorPage: Page => Call
 
-  private val normalRoutes: Page => UserAnswers => Call = {
-    case _ => _ => routes.IndexController.onPageLoad()
-  }
+abstract class AbstractNavigator(sessionRepository: SessionRepository,
+                                 saveAndReturnClient: SaveAndReturnClient)
+                                (implicit ec: ExecutionContext) extends Navigator:
 
-  private val checkRouteMap: Page => UserAnswers => Call = {
-    case _ => _ => routes.CheckYourAnswersController.onPageLoad()
-  }
+  protected[navigation] val defaultPage: Future[Call] = Future.successful(routes.JourneyRecoveryController.onPageLoad())
 
-  def nextPage(page: Page, mode: Mode, userAnswers: UserAnswers): Call = mode match {
-    case NormalMode =>
-      normalRoutes(page)(userAnswers)
-    case CheckMode =>
-      checkRouteMap(page)(userAnswers)
-  }
-}
+  private def persistUserAnswers(userAnswers: UserAnswers): Future[Unit] = for {
+    _ <- sessionRepository.set(userAnswers)
+    _ <- saveAndReturnClient.save(userAnswers)
+  } yield ()
+
+  protected[navigation] def goTo(success: Call, userAnswers: Option[UserAnswers] = None): Future[Call] =
+    userAnswers
+      .fold
+        (Future.successful(success))
+        (ua => persistUserAnswers(ua).map(_ => success))
+
+  protected[navigation] def dataRequired[A: Reads](page: Page & Gettable[A], userAnswers: UserAnswers, success: Call): Future[Call] =
+    dataDependent(page, userAnswers)(_ => success)
+
+  protected[navigation] def dataDependent[A: Reads](page: Page & Gettable[A], userAnswers: UserAnswers)(f: A => Call): Future[Call] =
+    userAnswers
+      .get(page)
+      .fold
+        (defaultPage)
+        (value => persistUserAnswers(userAnswers).map(_ => f(value)))

@@ -14,23 +14,22 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.securitiestransferchargefrontend.queries
+package uk.gov.hmrc.securitiestransferchargefrontend.clients
 
-import play.api.libs.json.JsPath
-import uk.gov.hmrc.securitiestransferchargefrontend.models.UserAnswers
+import javax.inject.Inject
+import scala.concurrent.Future
+import scala.util.Random
 
-import scala.annotation.nowarn
-import scala.util.{Success, Try}
+trait SubmissionIdClient:
+  def nextSubmissionId(): Future[String]
 
-sealed trait Query {
+class SubmissionIdClientImpl @Inject() extends SubmissionIdClient {
+  private val rnd = new Random()
 
-  def path: JsPath
-}
+  // TODO: Stubbed implementation - replace with call to S&R service.
+  override def nextSubmissionId(): Future[String] = {
+    val x = rnd.nextLong().abs
+    Future.successful(f"STC-$x%09d")
+  }
 
-trait Gettable[A] extends Query
-
-trait Settable[A] extends Query {
-
-  def cleanup(@nowarn value: Option[A], userAnswers: UserAnswers): Try[UserAnswers] =
-    Success(userAnswers)
 }
