@@ -17,8 +17,6 @@
 package uk.gov.hmrc.securitiestransferchargefrontend.utils
 
 import play.api.Logger
-import uk.gov.hmrc.securitiestransferchargefrontend.clients.registration.Subscription
-import uk.gov.hmrc.securitiestransferchargefrontend.models.{ConfirmableAddress, CountriesList, Country}
 
 import scala.concurrent.Future
 
@@ -27,19 +25,5 @@ object CommonHelpers {
   def logInfoAndFail[A, E <: Throwable](logger: Logger): E => Future[A] = e => {
     logger.info(e.getMessage)
     Future.failed(e)
-  }
-
-  def extractAddress(subscription: Subscription): ConfirmableAddress = {
-    val lines = List(
-      Some(subscription.addressLine1),
-      subscription.addressLine2,
-      subscription.addressLine3
-    ).flatten.filter(_.nonEmpty)
-
-    ConfirmableAddress(
-      lines = lines,
-      postcode = subscription.postcode,
-      country = CountriesList.fromCode(subscription.countryCode)
-    )
   }
 }

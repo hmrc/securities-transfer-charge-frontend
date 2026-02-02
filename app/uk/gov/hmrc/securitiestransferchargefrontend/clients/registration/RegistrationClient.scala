@@ -23,7 +23,7 @@ import uk.gov.hmrc.securitiestransferchargefrontend.clients.registration.{Subscr
 import uk.gov.hmrc.securitiestransferchargefrontend.domain.SubscriptionId
 import uk.gov.hmrc.securitiestransferchargefrontend.models.Address
 
-import java.time.LocalDateTime
+import java.time.LocalDate
 import javax.inject.Inject
 import scala.concurrent.Future
 
@@ -36,7 +36,7 @@ trait RegistrationClient:
 class RegistrationClientImpl @Inject() extends RegistrationClient {
 
   val subscription: Subscription = Subscription(
-    subsValidTo = LocalDateTime.now(),
+    subsValidTo = LocalDate.now().plusDays(10),
     contactName = "John Doe",
     addressLine1 = "1 high street",
     addressLine2 = Some("Town"),

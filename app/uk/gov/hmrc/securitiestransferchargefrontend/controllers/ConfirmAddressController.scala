@@ -19,9 +19,9 @@ package uk.gov.hmrc.securitiestransferchargefrontend.controllers
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
-import uk.gov.hmrc.securitiestransferchargefrontend.connectors.SubscriptionConnector
+import uk.gov.hmrc.securitiestransferchargefrontend.connectors.{SubscriptionConnector, SubscriptionStatusErrorException}
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.actions.*
-import uk.gov.hmrc.securitiestransferchargefrontend.utils.CommonHelpers.extractAddress
+import uk.gov.hmrc.securitiestransferchargefrontend.services.AddressService
 import uk.gov.hmrc.securitiestransferchargefrontend.views.html.ConfirmAddressView
 
 import javax.inject.Inject
@@ -33,18 +33,19 @@ class ConfirmAddressController @Inject()(
                                           getData: DataRetrievalAction,
                                           subscriptionConnector: SubscriptionConnector,
                                           val controllerComponents: MessagesControllerComponents,
-                                          view: ConfirmAddressView
+                                          view: ConfirmAddressView,
+                                          addressService: AddressService,
                                         )(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport {
 
-  def onPageLoad: Action[AnyContent] = (identify andThen getData).async { implicit request =>
-
-    //using the userId for now but this should be the stcId from their enrolment
-    for {
-      subscription <- subscriptionConnector.getSubscriptionDetails(request.userId)
-      address = extractAddress(subscription)
-    } yield {
-      Ok(view(address))
+  def onPageLoad: Action[AnyContent] =
+    (identify andThen getData).async { implicit request =>
+      subscriptionConnector.getValidSubscription(request.userId)
+        .map { subscription =>
+          Ok(view(addressService.extractConfirmableAddress(subscription)))
+        }
+        .recover {
+          //Need to confirm Kick out page
+          case _: SubscriptionStatusErrorException => Redirect(routes.JourneyRecoveryController.onPageLoad())
+        }
     }
-  }
-  
 }

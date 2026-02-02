@@ -23,13 +23,12 @@ import org.scalatestplus.mockito.MockitoSugar.mock
 import play.api.inject
 import play.api.test.FakeRequest
 import play.api.test.Helpers.*
-import uk.gov.hmrc.securitiestransferchargefrontend.clients.registration.Subscription
 import uk.gov.hmrc.securitiestransferchargefrontend.connectors.SubscriptionConnector
-import uk.gov.hmrc.securitiestransferchargefrontend.views.html.ConfirmAddressView
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.routes
 import uk.gov.hmrc.securitiestransferchargefrontend.models.{ConfirmableAddress, Country}
+import uk.gov.hmrc.securitiestransferchargefrontend.services.AddressService
+import uk.gov.hmrc.securitiestransferchargefrontend.views.html.ConfirmAddressView
 
-import java.time.LocalDateTime
 import scala.concurrent.Future
 
 class ConfirmAddressControllerSpec extends SpecBase {
@@ -38,26 +37,27 @@ class ConfirmAddressControllerSpec extends SpecBase {
 
     "must return OK and the correct view for a GET" in {
 
-      val mockSubscriptionConnector = mock[SubscriptionConnector]
-      val subscription = Subscription(
-        subsValidTo = LocalDateTime.now(),
-        contactName = "John Doe",
-        addressLine1 = "1 High Street",
-        addressLine2 = None,
-        addressLine3 = Some("Town"),
+      val confirmableAddress = ConfirmableAddress(
+        lines = List(
+          "1 High Street",
+          "Town"
+        ),
         postcode = "ZZ1 1ZZ",
-        countryCode = "GB",
-        telephoneNumber = "07777777777",
-        emailAddress = "test@test.com"
+        country = Some(Country("United Kingdom", "GB"))
       )
 
-      when(mockSubscriptionConnector.getSubscriptionDetails(any())(any()))
+      val mockSubscriptionConnector = mock[SubscriptionConnector]
+      val mockAddressService = mock[AddressService]
+
+      when(mockSubscriptionConnector.getValidSubscription(any())(any()))
         .thenReturn(Future.successful(subscription))
+      when(mockAddressService.extractConfirmableAddress(subscription)).thenReturn(confirmableAddress)
 
       val application =
         applicationBuilder(userAnswers = Some(emptyUserAnswers))
           .overrides(
-            inject.bind[SubscriptionConnector].toInstance(mockSubscriptionConnector)
+            inject.bind[SubscriptionConnector].toInstance(mockSubscriptionConnector),
+            inject.bind[AddressService].toInstance(mockAddressService)
           )
           .build()
 
@@ -69,17 +69,8 @@ class ConfirmAddressControllerSpec extends SpecBase {
         val view = application.injector.instanceOf[ConfirmAddressView]
 
 
-        val expectedAddress = ConfirmableAddress(
-          lines = List(
-            "1 High Street",
-            "Town"
-          ),
-          postcode = "ZZ1 1ZZ",
-          country = Some(Country("United Kingdom", "GB"))
-        )
-
         status(result) mustEqual OK
-        contentAsString(result) mustEqual view(expectedAddress)(request, messages(application)).toString
+        contentAsString(result) mustEqual view(confirmableAddress)(request, messages(application)).toString
       }
     }
   }

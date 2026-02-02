@@ -19,17 +19,27 @@ package connectors
 import base.SpecBase
 import org.mockito.ArgumentMatchers.*
 import org.mockito.Mockito.*
+import org.scalatest.BeforeAndAfterEach
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatestplus.mockito.MockitoSugar
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.securitiestransferchargefrontend.clients.registration.*
-import uk.gov.hmrc.securitiestransferchargefrontend.connectors.{SubscriptionConnectorImpl, SubscriptionDataNotFoundException, SubscriptionStatusErrorException}
-import uk.gov.hmrc.securitiestransferchargefrontend.models.Address
-import uk.gov.hmrc.securitiestransferchargefrontend.repositories.{SubscriptionData, SubscriptionDataRepository}
+import uk.gov.hmrc.securitiestransferchargefrontend.connectors.{SubscriptionConnectorImpl, SubscriptionStatusErrorException}
+import uk.gov.hmrc.securitiestransferchargefrontend.repositories.SubscriptionDataRepository
 
+import java.time.LocalDate
 import scala.concurrent.Future
 
-class SubscriptionConnectorImplSpec extends SpecBase with ScalaFutures with MockitoSugar {
+class SubscriptionConnectorImplSpec
+  extends SpecBase
+    with ScalaFutures
+    with MockitoSugar
+    with BeforeAndAfterEach {
+
+  override def beforeEach(): Unit = {
+    reset(mockRegistrationClient, mockSubscriptionRepo)
+    super.beforeEach()
+  }
 
   private val mockRegistrationClient = mock[RegistrationClient]
   private val mockSubscriptionRepo = mock[SubscriptionDataRepository]
@@ -38,65 +48,39 @@ class SubscriptionConnectorImplSpec extends SpecBase with ScalaFutures with Mock
     mockRegistrationClient,
     mockSubscriptionRepo
   )
+  
 
-  private val subscription = Subscription(
-    subsValidTo = java.time.LocalDateTime.now(),
-    contactName = "John Doe",
-    addressLine1 = "1 high street",
-    addressLine2 = Some("Bobbins on Sea"),
-    addressLine3 = Some("Town"),
-    postcode = "ZZ1 1ZZ",
-    countryCode = "GB",
-    telephoneNumber = "07777777777",
-    emailAddress = "some@email.com"
-  )
+  private val expiredSubscription =
+    subscription.copy(subsValidTo = LocalDate.now().minusDays(1))
 
-  private val subscriptionData = SubscriptionData(
-    stcId = "STC123",
-    subscriptionDetails = subscription
-  )
+  "getValidSubscription" - {
 
-  "getSubscriptionStatus" - {
+    "return the subscription and save it when the subscription is valid" in {
+      when(mockRegistrationClient.getSubscriptionDetails(any[String])(any[HeaderCarrier]))
+        .thenReturn(Future.successful(subscription))
 
-    "return SubscriptionActive when registration client returns Right(SubscriptionActive)" in {
-      when(mockRegistrationClient.getSubscriptionStatus(any[String])(any[HeaderCarrier]))
-        .thenReturn(Future.successful(Right(SubscriptionStatus.SubscriptionActive)))
+      when(mockSubscriptionRepo.saveSubscriptionData(any[String], any[Subscription]))
+        .thenReturn(Future.successful(()))
 
-      val result = connector.getSubscriptionStatus("STC123")
+      val result = connector.getValidSubscription("STC123")
 
-      whenReady(result) { status =>
-        status mustBe SubscriptionStatus.SubscriptionActive
+      whenReady(result) { sub =>
+        sub mustBe subscription
+        verify(mockSubscriptionRepo).saveSubscriptionData("STC123", subscription)
       }
     }
 
-    "fail with SubscriptionStatusErrorException when registration client returns Left" in {
+    "fail with SubscriptionStatusErrorException when the subscription has expired" in {
+      when(mockRegistrationClient.getSubscriptionDetails(any[String])(any[HeaderCarrier]))
+        .thenReturn(Future.successful(expiredSubscription))
 
-      when(mockRegistrationClient.getSubscriptionStatus(any[String])(any[HeaderCarrier]))
-        .thenReturn(Future.successful(Left(SubscriptionClientError("Some client error"))))
-
-      val result = connector.getSubscriptionStatus("STC123")
+      val result = connector.getValidSubscription("STC123")
 
       whenReady(result.failed) { ex =>
         ex mustBe a[SubscriptionStatusErrorException]
+        verify(mockSubscriptionRepo, never())
+          .saveSubscriptionData(any[String], any[Subscription])
       }
     }
-
-    "getSubscriptionDetails" - {
-
-      "return the subscription and save it to the repository" in {
-        when(mockRegistrationClient.getSubscriptionDetails(any[String])(any[HeaderCarrier]))
-          .thenReturn(Future.successful(subscription))
-        when(mockSubscriptionRepo.saveSubscriptionData(any[String], any[Subscription]))
-          .thenReturn(Future.successful(()))
-
-        val result = connector.getSubscriptionDetails("STC123")
-
-        whenReady(result) { sub =>
-          sub mustBe subscription
-          verify(mockSubscriptionRepo).saveSubscriptionData("STC123", subscription)
-        }
-      }
-    }
-    
   }
 }
