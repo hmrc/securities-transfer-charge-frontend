@@ -18,19 +18,17 @@ package uk.gov.hmrc.securitiestransferchargefrontend.repositories
 
 import org.mongodb.scala.bson.conversions.Bson
 import org.mongodb.scala.model.*
-import play.api.Logging
-import play.api.libs.json.Format
+import play.api.libs.json.{Format, Json}
 import uk.gov.hmrc.mongo.MongoComponent
 import uk.gov.hmrc.mongo.play.json.PlayMongoRepository
 import uk.gov.hmrc.mongo.play.json.formats.MongoJavatimeFormats
+import uk.gov.hmrc.securitiestransferchargefrontend.clients.registration.Subscription
 import uk.gov.hmrc.securitiestransferchargefrontend.config.FrontendAppConfig
 
 import java.time.{Clock, Instant}
 import java.util.concurrent.TimeUnit
 import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
-import play.api.libs.json.Json
-import uk.gov.hmrc.securitiestransferchargefrontend.clients.registration.Subscription
 
 case class SubscriptionData(
                             stcId:String,
@@ -66,7 +64,7 @@ class SubscriptionDataRepositoryImpl @Inject()(mongoComponent: MongoComponent,
           .expireAfter(appConfig.cacheTtl, TimeUnit.SECONDS),
       )
     )
-  ) with SubscriptionDataRepository with Logging {
+  ) with SubscriptionDataRepository {
 
   implicit val instantFormat: Format[Instant] = MongoJavatimeFormats.instantFormat
 

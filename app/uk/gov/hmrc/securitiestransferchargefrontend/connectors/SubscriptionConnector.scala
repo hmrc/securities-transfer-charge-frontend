@@ -49,15 +49,22 @@ class SubscriptionConnectorImpl @Inject()(registrationClient: RegistrationClient
     .getSubscriptionStatus(stcId)
     .flatMap(subscriptionStatusResultHandler)
 
-  private def subscriptionStatusResultHandler(subscriptionStatusResult: SubscriptionStatusResult)(implicit hc: HeaderCarrier): Future[SubscriptionStatus] = subscriptionStatusResult match {
-    case Left(error) =>
-      val msg = s"SubscriptionConnector: Error response returned, error: $error"
-      logInfoAndFail(new SubscriptionStatusErrorException(msg))
-    case Right(SubscriptionActive) => Future.successful(SubscriptionActive)
-    case Right(_) =>
-      val msg = s"SubscriptionConnector: Unsuccessful response when subscribing"
-      logInfoAndFail(new SubscriptionStatusErrorException(msg))
-  }
+  private def subscriptionStatusResultHandler(
+                                               subscriptionStatusResult: SubscriptionStatusResult
+                                             )(implicit hc: HeaderCarrier): Future[SubscriptionStatus] =
+    subscriptionStatusResult match {
+
+      case Left(error) =>
+        val msg = s"SubscriptionConnector: Failed to retrieve subscription status.Upstream service returned an error: $error"
+        logInfoAndFail(new SubscriptionStatusErrorException(msg))
+      case Right(SubscriptionActive) =>
+        Future.successful(SubscriptionActive)
+
+      case Right(otherStatus) =>
+        val msg = s"SubscriptionConnector: Subscription status was not active.Received status: $otherStatus"
+        logInfoAndFail(new SubscriptionStatusErrorException(msg))
+    }
+
 
   override def getSubscriptionDetails(stcId: String)
                                      (implicit hc: HeaderCarrier): Future[Subscription] = for {

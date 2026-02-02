@@ -83,7 +83,7 @@ class SubscriptionConnectorImplSpec extends SpecBase with ScalaFutures with Mock
 
     "getSubscriptionDetails" - {
 
-      "return the subscription and save it to repository" in {
+      "return the subscription and save it to the repository" in {
         when(mockRegistrationClient.getSubscriptionDetails(any[String])(any[HeaderCarrier]))
           .thenReturn(Future.successful(subscription))
         when(mockSubscriptionRepo.saveSubscriptionData(any[String], any[Subscription]))
