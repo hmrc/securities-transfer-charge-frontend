@@ -16,12 +16,13 @@
 
 package uk.gov.hmrc.securitiestransferchargefrontend.controllers
 
+import play.api.data.Form
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.actions.*
 import uk.gov.hmrc.securitiestransferchargefrontend.forms.HowToNotifyAboutSecuritiesTransferFormProvider
-import uk.gov.hmrc.securitiestransferchargefrontend.models.Mode
+import uk.gov.hmrc.securitiestransferchargefrontend.models.{HowToNotifyAboutSecuritiesTransfer, Mode, UserAnswers}
 import uk.gov.hmrc.securitiestransferchargefrontend.navigation.Navigator
 import uk.gov.hmrc.securitiestransferchargefrontend.pages.HowToNotifyAboutSecuritiesTransferPage
 import uk.gov.hmrc.securitiestransferchargefrontend.repositories.SessionRepository
@@ -36,18 +37,17 @@ class HowToNotifyAboutSecuritiesTransferController @Inject()(
                                        navigator: Navigator,
                                        identify: IdentifierAction,
                                        getData: DataRetrievalAction,
-                                       requireData: DataRequiredAction,
                                        formProvider: HowToNotifyAboutSecuritiesTransferFormProvider,
                                        val controllerComponents: MessagesControllerComponents,
                                        view: HowToNotifyAboutSecuritiesTransferView
                                      )(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport {
 
-  val form = formProvider()
+  val form: Form[HowToNotifyAboutSecuritiesTransfer] = formProvider()
 
-  def onPageLoad(mode: Mode): Action[AnyContent] = (identify andThen getData andThen requireData) {
+
+  def onPageLoad(mode: Mode): Action[AnyContent] = (identify andThen getData) {
     implicit request =>
-
-      val preparedForm = request.userAnswers.get(HowToNotifyAboutSecuritiesTransferPage) match {
+      val preparedForm = request.userAnswers.flatMap(_.get(HowToNotifyAboutSecuritiesTransferPage)) match {
         case None => form
         case Some(value) => form.fill(value)
       }
@@ -55,8 +55,9 @@ class HowToNotifyAboutSecuritiesTransferController @Inject()(
       Ok(view(preparedForm, mode))
   }
 
-  def onSubmit(mode: Mode): Action[AnyContent] = (identify andThen getData andThen requireData).async {
+  def onSubmit(mode: Mode): Action[AnyContent] = (identify andThen getData).async {
     implicit request =>
+      val userAnswers = request.userAnswers.getOrElse(new UserAnswers(request.userId))
 
       form.bindFromRequest().fold(
         formWithErrors =>
@@ -64,7 +65,7 @@ class HowToNotifyAboutSecuritiesTransferController @Inject()(
 
         value =>
           for {
-            updatedAnswers <- Future.fromTry(request.userAnswers.set(HowToNotifyAboutSecuritiesTransferPage, value))
+            updatedAnswers <- Future.fromTry(userAnswers.set(HowToNotifyAboutSecuritiesTransferPage, value))
             _              <- sessionRepository.set(updatedAnswers)
           } yield Redirect(navigator.nextPage(HowToNotifyAboutSecuritiesTransferPage, mode, updatedAnswers))
       )
