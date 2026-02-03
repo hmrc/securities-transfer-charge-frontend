@@ -18,13 +18,6 @@ package uk.gov.hmrc.securitiestransferchargefrontend.clients.registration
 
 import uk.gov.hmrc.securitiestransferchargefrontend.clients.registration.RegistrationServiceError
 
-enum SubscriptionStatus:
-  case SubscriptionNotFound
-  case SubscriptionExpired
-  case SubscriptionActive
-  
-type SubscriptionStatusResult = Either[RegistrationServiceError, SubscriptionStatus]
-
 enum SubscriptionResponse:
   case AddressUpdateSuccessful
   case AddressUpdateFailed

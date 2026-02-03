@@ -36,6 +36,3 @@ class CountriesList @Inject() {
   def fromCode(code: String): Option[Country] =
     countries.find(_.code.equalsIgnoreCase(code))
 }
-
-
-

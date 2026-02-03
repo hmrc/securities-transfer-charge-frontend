@@ -20,7 +20,6 @@ package clients
 import base.SpecBase
 import uk.gov.hmrc.securitiestransferchargefrontend.clients.registration.RegistrationClientImpl
 import uk.gov.hmrc.securitiestransferchargefrontend.clients.registration.SubscriptionResponse.AddressUpdateSuccessful
-import uk.gov.hmrc.securitiestransferchargefrontend.clients.registration.SubscriptionStatus.SubscriptionActive
 import uk.gov.hmrc.securitiestransferchargefrontend.models.Address
 import uk.gov.hmrc.securitiestransferchargefrontend.domain.SubscriptionId
 
@@ -28,7 +27,7 @@ class RegistrationClientImplSpec extends SpecBase {
 
   private val client = new RegistrationClientImpl()
   private val subscriptionId = SubscriptionId("XAST0123456789")
-  
+
   "RegistrationClientImpl.getSubscriptionDetails" - {
 
     "return subscription details" in {
@@ -53,6 +52,7 @@ class RegistrationClientImplSpec extends SpecBase {
       }
     }
   }
+
 
   "RegistrationClientImpl.updateAddress" - {
 

@@ -53,8 +53,6 @@ class AddressServiceSpec extends SpecBase {
       result.postcode mustBe "ZZ1 1ZZ"
       result.country mustBe None
     }
-
-
   }
 }
 

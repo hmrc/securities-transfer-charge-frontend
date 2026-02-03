@@ -79,6 +79,4 @@ class ConfirmAddressController @Inject()(
         }
       )
     }
-
-
 }
