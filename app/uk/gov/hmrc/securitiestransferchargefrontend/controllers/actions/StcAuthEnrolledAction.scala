@@ -67,10 +67,6 @@ final class StcAuthEnrolledActionImpl @Inject()(
       .retrieve(retrievals) {
         case Some(internalId) ~ enrolments ~ Some(affinityGroup) =>
 
-          logger.info(
-            s"STC auth: all enrolments = ${enrolments.enrolments.map(e => s"${e.key}:${e.state}").mkString(",")}"
-          )
-
           enrolments
             .getEnrolment(appConfig.stcEnrolmentKey)
             .filter(_.isActivated) match {
