@@ -20,6 +20,7 @@ import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.securitiestransferchargefrontend.clients.registration.SubscriptionResponse.AddressUpdateSuccessful
 import uk.gov.hmrc.securitiestransferchargefrontend.clients.registration.SubscriptionStatus.SubscriptionActive
 import uk.gov.hmrc.securitiestransferchargefrontend.clients.registration.{Subscription, SubscriptionStatusResult}
+import uk.gov.hmrc.securitiestransferchargefrontend.domain.SubscriptionId
 import uk.gov.hmrc.securitiestransferchargefrontend.models.Address
 
 import java.time.LocalDateTime
@@ -27,11 +28,9 @@ import javax.inject.Inject
 import scala.concurrent.Future
 
 trait RegistrationClient:
-  def getSubscriptionDetails(stcId: String)(implicit hc: HeaderCarrier): Future[Subscription]
-
-  def getSubscriptionStatus(stcId: String)(implicit hc: HeaderCarrier): Future[SubscriptionStatusResult]
-
-  def updateAddress(stcId: String, address: Address)(implicit hc: HeaderCarrier): Future[SubscriptionResult]
+  def getSubscriptionDetails(subscriptionId: SubscriptionId)(implicit hc: HeaderCarrier): Future[Subscription]
+  def getSubscriptionStatus(subscriptionId: SubscriptionId)(implicit hc: HeaderCarrier): Future[SubscriptionStatusResult]
+  def updateAddress(subscriptionId: SubscriptionId, address: Address)(implicit hc: HeaderCarrier): Future[SubscriptionResult]
 
 // DUMMY IMPL until we have a real BE implementation for this.
 class RegistrationClientImpl @Inject() extends RegistrationClient {
@@ -48,14 +47,14 @@ class RegistrationClientImpl @Inject() extends RegistrationClient {
     emailAddress = "some@email.com"
   )
 
-  override def getSubscriptionDetails(stcId: String)
+  override def getSubscriptionDetails(subscriptionId: SubscriptionId)
                                      (implicit hc: HeaderCarrier): Future[Subscription] =
     Future.successful(subscription)
 
-  override def getSubscriptionStatus(stcId: String)
+  override def getSubscriptionStatus(subscriptionId: SubscriptionId)
                                     (implicit hc: HeaderCarrier): Future[SubscriptionStatusResult] =
     Future.successful(Right(SubscriptionActive))
 
-  override def updateAddress(stcId: String, address: Address)(implicit hc: HeaderCarrier): Future[SubscriptionResult] =
+  override def updateAddress(subscriptionId: SubscriptionId, address: Address)(implicit hc: HeaderCarrier): Future[SubscriptionResult] =
     Future.successful(Right(AddressUpdateSuccessful))
 }
