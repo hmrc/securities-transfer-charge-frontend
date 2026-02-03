@@ -52,3 +52,9 @@ submissionsDashboard.title = Submissions
 submissionsDashboard.heading = Submissions
 submissionsDashboard.create-new-submission.button = Create new submission
 submissionsDashboard.hint = Submission dashboard
+
+inTheUkOrNt.title = inTheUkOrNt
+inTheUkOrNt.heading = inTheUkOrNt
+inTheUkOrNt.checkYourAnswersLabel = inTheUkOrNt
+inTheUkOrNt.error.required = Select yes if inTheUkOrNt
+inTheUkOrNt.change.hidden = InTheUkOrNt
