@@ -25,7 +25,7 @@ import uk.gov.hmrc.securitiestransferchargefrontend.models.*
 import uk.gov.hmrc.securitiestransferchargefrontend.navigation.StfNavigator
 import uk.gov.hmrc.securitiestransferchargefrontend.pages.Page
 
-class NavigatorSpec extends SpecBase with ScalaFutures {
+class StfNavigatorSpec extends SpecBase with ScalaFutures {
 
   val navigator = new StfNavigator(FakeSessionRepository(), FakeSaveAndReturnClient())
 
@@ -33,7 +33,7 @@ class NavigatorSpec extends SpecBase with ScalaFutures {
 
     "in Normal mode" - {
 
-      "must go from a page that doesn't exist in the route map to Index" in {
+      "must go from a page that doesn't exist in the route map to Journey Recovery" in {
 
         case object UnknownPage extends Page
         val result = navigator.nextPage(UnknownPage, NormalMode, UserAnswers("id", submissionId))

@@ -20,7 +20,7 @@ import play.api.mvc.Call
 import uk.gov.hmrc.securitiestransferchargefrontend.clients.SaveAndReturnClient
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.routes
 import uk.gov.hmrc.securitiestransferchargefrontend.models.{CheckMode, Mode, NormalMode, UserAnswers}
-import uk.gov.hmrc.securitiestransferchargefrontend.pages.Page
+import uk.gov.hmrc.securitiestransferchargefrontend.pages.*
 import uk.gov.hmrc.securitiestransferchargefrontend.queries.Gettable
 import uk.gov.hmrc.securitiestransferchargefrontend.repositories.SessionRepository
 
@@ -31,11 +31,15 @@ class StfNavigator @Inject() (sessionRepository: SessionRepository,
                               saveAndReturnClient: SaveAndReturnClient)
                              (implicit ec: ExecutionContext) extends AbstractNavigator(sessionRepository, saveAndReturnClient) {
 
-  private val checkRouteMap: Page => UserAnswers => Call = (_ => _ => routes.CheckYourAnswersController.onPageLoad())
-
   private val normalRoutes: Page => UserAnswers => Future[Call] = {
+
+    case SubmissionsDashboardPage =>
+      userAnswers => goTo(???, Some(userAnswers))
+    
     case _ => _ => defaultPage  
   }
+
+  private val checkRouteMap: Page => UserAnswers => Call = (_ => _ => routes.CheckYourAnswersController.onPageLoad())
   
   def nextPage(page: Page, mode: Mode, userAnswers: UserAnswers): Future[Call] = {
     mode match {
