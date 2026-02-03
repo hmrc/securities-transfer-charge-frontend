@@ -1,43 +1,44 @@
 package controllers
 
 import base.SpecBase
-import uk.gov.hmrc.securitiestransferchargefrontend.forms.InTheUkOrNtFormProvider
+import uk.gov.hmrc.securitiestransferchargefrontend.forms.InTheUkOrNotFormProvider
 import uk.gov.hmrc.securitiestransferchargefrontend.models.{NormalMode, UserAnswers}
 import uk.gov.hmrc.securitiestransferchargefrontend.navigation.{FakeNavigator, Navigator}
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.when
 import org.scalatestplus.mockito.MockitoSugar
-import uk.gov.hmrc.securitiestransferchargefrontend.pages.InTheUkOrNtPage
+import uk.gov.hmrc.securitiestransferchargefrontend.pages.InTheUkOrNotPage
 import play.api.inject.bind
 import play.api.mvc.Call
 import play.api.test.FakeRequest
 import play.api.test.Helpers._
+import uk.gov.hmrc.securitiestransferchargefrontend.controllers.routes
 import uk.gov.hmrc.securitiestransferchargefrontend.repositories.SessionRepository
-import uk.gov.hmrc.securitiestransferchargefrontend.views.html.InTheUkOrNtView
+import uk.gov.hmrc.securitiestransferchargefrontend.views.html.InTheUkOrNotView
 
 import scala.concurrent.Future
 
-class InTheUkOrNtControllerSpec extends SpecBase with MockitoSugar {
+class InTheUkOrNotControllerSpec extends SpecBase with MockitoSugar {
 
   def onwardRoute = Call("GET", "/foo")
 
-  val formProvider = new InTheUkOrNtFormProvider()
+  val formProvider = new InTheUkOrNotFormProvider()
   val form = formProvider()
 
-  lazy val inTheUkOrNtRoute = routes.InTheUkOrNtController.onPageLoad(NormalMode).url
+  lazy val inTheUkOrNotRoute = routes.InTheUkOrNotController.onPageLoad(NormalMode).url
 
-  "InTheUkOrNt Controller" - {
+  "InTheUkOrNot Controller" - {
 
     "must return OK and the correct view for a GET" in {
 
       val application = applicationBuilder(userAnswers = Some(emptyUserAnswers)).build()
 
       running(application) {
-        val request = FakeRequest(GET, inTheUkOrNtRoute)
+        val request = FakeRequest(GET, inTheUkOrNotRoute)
 
         val result = route(application, request).value
 
-        val view = application.injector.instanceOf[InTheUkOrNtView]
+        val view = application.injector.instanceOf[InTheUkOrNotView]
 
         status(result) mustEqual OK
         contentAsString(result) mustEqual view(form, NormalMode)(request, messages(application)).toString
@@ -46,14 +47,14 @@ class InTheUkOrNtControllerSpec extends SpecBase with MockitoSugar {
 
     "must populate the view correctly on a GET when the question has previously been answered" in {
 
-      val userAnswers = UserAnswers(userAnswersId).set(InTheUkOrNtPage, true).success.value
+      val userAnswers = UserAnswers(userAnswersId).set(InTheUkOrNotPage, true).success.value
 
       val application = applicationBuilder(userAnswers = Some(userAnswers)).build()
 
       running(application) {
-        val request = FakeRequest(GET, inTheUkOrNtRoute)
+        val request = FakeRequest(GET, inTheUkOrNotRoute)
 
-        val view = application.injector.instanceOf[InTheUkOrNtView]
+        val view = application.injector.instanceOf[InTheUkOrNotView]
 
         val result = route(application, request).value
 
@@ -78,7 +79,7 @@ class InTheUkOrNtControllerSpec extends SpecBase with MockitoSugar {
 
       running(application) {
         val request =
-          FakeRequest(POST, inTheUkOrNtRoute)
+          FakeRequest(POST, inTheUkOrNotRoute)
             .withFormUrlEncodedBody(("value", "true"))
 
         val result = route(application, request).value
@@ -94,12 +95,12 @@ class InTheUkOrNtControllerSpec extends SpecBase with MockitoSugar {
 
       running(application) {
         val request =
-          FakeRequest(POST, inTheUkOrNtRoute)
+          FakeRequest(POST, inTheUkOrNotRoute)
             .withFormUrlEncodedBody(("value", ""))
 
         val boundForm = form.bind(Map("value" -> ""))
 
-        val view = application.injector.instanceOf[InTheUkOrNtView]
+        val view = application.injector.instanceOf[InTheUkOrNotView]
 
         val result = route(application, request).value
 
@@ -113,7 +114,7 @@ class InTheUkOrNtControllerSpec extends SpecBase with MockitoSugar {
       val application = applicationBuilder(userAnswers = None).build()
 
       running(application) {
-        val request = FakeRequest(GET, inTheUkOrNtRoute)
+        val request = FakeRequest(GET, inTheUkOrNotRoute)
 
         val result = route(application, request).value
 
@@ -128,7 +129,7 @@ class InTheUkOrNtControllerSpec extends SpecBase with MockitoSugar {
 
       running(application) {
         val request =
-          FakeRequest(POST, inTheUkOrNtRoute)
+          FakeRequest(POST, inTheUkOrNotRoute)
             .withFormUrlEncodedBody(("value", "true"))
 
         val result = route(application, request).value

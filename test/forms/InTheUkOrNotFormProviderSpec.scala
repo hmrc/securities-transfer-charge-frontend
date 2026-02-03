@@ -3,12 +3,12 @@ package forms
 import uk.gov.hmrc.securitiestransferchargefrontend.forms.behaviours.BooleanFieldBehaviours
 import play.api.data.FormError
 
-class InTheUkOrNtFormProviderSpec extends BooleanFieldBehaviours {
+class InTheUkOrNotFormProviderSpec extends BooleanFieldBehaviours {
 
-  val requiredKey = "inTheUkOrNt.error.required"
+  val requiredKey = "inTheUkOrNot.error.required"
   val invalidKey = "error.boolean"
 
-  val form = new InTheUkOrNtFormProvider()()
+  val form = new InTheUkOrNotFormProvider()()
 
   ".value" - {
 

@@ -22,7 +22,7 @@ GET         /unauthorised                                uk.gov.hmrc.securitiest
 
 GET        /submissions-dashboard                       uk.gov.hmrc.securitiestransferchargefrontend.controllers.SubmissionsDashboardController.onPageLoad()
 
-GET        /inTheUkOrNt                        uk.gov.hmrc.securitiestransferchargefrontend.controllers.InTheUkOrNtController.onPageLoad(mode: Mode = NormalMode)
-POST       /inTheUkOrNt                        uk.gov.hmrc.securitiestransferchargefrontend.controllers.InTheUkOrNtController.onSubmit(mode: Mode = NormalMode)
-GET        /changeInTheUkOrNt                  uk.gov.hmrc.securitiestransferchargefrontend.controllers.InTheUkOrNtController.onPageLoad(mode: Mode = CheckMode)
-POST       /changeInTheUkOrNt                  uk.gov.hmrc.securitiestransferchargefrontend.controllers.InTheUkOrNtController.onSubmit(mode: Mode = CheckMode)
+GET        /inTheUkOrNot                        uk.gov.hmrc.securitiestransferchargefrontend.controllers.InTheUkOrNotController.onPageLoad(mode: Mode = NormalMode)
+POST       /inTheUkOrNot                        uk.gov.hmrc.securitiestransferchargefrontend.controllers.InTheUkOrNotController.onSubmit(mode: Mode = NormalMode)
+GET        /changeInTheUkOrNot                  uk.gov.hmrc.securitiestransferchargefrontend.controllers.InTheUkOrNotController.onPageLoad(mode: Mode = CheckMode)
+POST       /changeInTheUkOrNot                  uk.gov.hmrc.securitiestransferchargefrontend.controllers.InTheUkOrNotController.onSubmit(mode: Mode = CheckMode)

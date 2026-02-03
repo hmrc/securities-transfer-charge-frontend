@@ -10,9 +10,9 @@
 
 @(form: Form[_], mode: Mode)(implicit request: Request[_], messages: Messages)
 
-@layout(pageTitle = title(form, messages("inTheUkOrNt.title"))) {
+@layout(pageTitle = title(form, messages("inTheUkOrNot.title"))) {
 
-    @formHelper(action = routes.InTheUkOrNtController.onSubmit(mode), Symbol("autoComplete") -> "off") {
+    @formHelper(action = routes.InTheUkOrNotController.onSubmit(mode), Symbol("autoComplete") -> "off") {
 
         @if(form.errors.nonEmpty) {
             @govukErrorSummary(ErrorSummaryViewModel(form))
@@ -21,7 +21,7 @@
         @govukRadios(
             RadiosViewModel.yesNo(
                 field = form("value"),
-                legend = LegendViewModel(messages("inTheUkOrNt.heading")).asPageHeading(Large)
+                legend = LegendViewModel(messages("inTheUkOrNot.heading")).asPageHeading(Large)
             )
         )
 
