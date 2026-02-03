@@ -33,9 +33,9 @@ import scala.concurrent.{ExecutionContext, Future}
 
 class ConfirmAddressController @Inject()(
                                           override val messagesApi: MessagesApi,
-                                          identify: IdentifierAction,
-                                          getData: DataRetrievalAction,
-                                          requireData: DataRequiredAction,
+                                          stcAuthEnrolled: StcAuthEnrolledAction,
+                                          getData: StcDataRetrievalAction,
+                                          requireData: StcDataRequiredAction,
                                           subscriptionConnector: SubscriptionConnector,
                                           subscriptionDataRepository: SubscriptionDataRepository,
                                           val controllerComponents: MessagesControllerComponents,
@@ -46,8 +46,8 @@ class ConfirmAddressController @Inject()(
                                         )(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport {
 
   def onPageLoad: Action[AnyContent] =
-    (identify andThen getData).async { implicit request =>
-      subscriptionConnector.getValidSubscription(request.userId)
+    (stcAuthEnrolled andThen getData).async { implicit request =>
+      subscriptionConnector.getValidSubscription(request.request.stcId)
         .map { subscription =>
           Ok(view(addressService.extractConfirmableAddress(subscription)))
         }
@@ -58,9 +58,9 @@ class ConfirmAddressController @Inject()(
     }
 
   def onSubmit: Action[AnyContent] =
-    (identify andThen getData andThen requireData).async { implicit request =>
+    (stcAuthEnrolled andThen getData andThen requireData).async { implicit request =>
 
-      subscriptionDataRepository.getSubscriptionData(request.userId).flatMap(
+      subscriptionDataRepository.getSubscriptionData(request.request.stcId).flatMap(
         _.fold {
           Future.successful(Redirect(routes.JourneyRecoveryController.onPageLoad()))
         } { subscriptionData =>

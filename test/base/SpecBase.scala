@@ -30,6 +30,8 @@ import play.api.mvc.{AnyContent, AnyContentAsEmpty}
 import play.api.test.FakeRequest
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.securitiestransferchargefrontend.clients.registration.Subscription
+import uk.gov.hmrc.securitiestransferchargefrontend.controllers.actions.requests.StcOptionalDataRequest
+import uk.gov.hmrc.securitiestransferchargefrontend.controllers.actions.*
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.actions.{DataRequiredAction, DataRequiredActionImpl, DataRetrievalAction, IdentifierAction}
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.actions.*
 import uk.gov.hmrc.securitiestransferchargefrontend.domain.SubmissionId
@@ -37,7 +39,19 @@ import uk.gov.hmrc.securitiestransferchargefrontend.models.UserAnswers
 import uk.gov.hmrc.securitiestransferchargefrontend.models.requests.DataRequest
 
 import java.time.LocalDate
-import scala.concurrent.ExecutionContext
+import scala.concurrent.{ExecutionContext, Future}
+
+class FakeStcDataRetrievalAction(dataToReturn: Option[UserAnswers])
+  extends StcDataRetrievalAction {
+
+  override protected def executionContext: ExecutionContext =
+    ExecutionContext.global
+
+  override protected def transform[A](
+                                       request: StcAuthorisedRequest[A]
+                                     ): Future[StcOptionalDataRequest[A]] =
+    Future.successful(StcOptionalDataRequest(request, dataToReturn))
+}
 
 trait SpecBase
   extends AnyFreeSpec
@@ -79,6 +93,9 @@ trait SpecBase
       .overrides(
         bind[DataRequiredAction].to[DataRequiredActionImpl],
         bind[IdentifierAction].to[FakeIdentifierAction],
+        bind[DataRetrievalAction].toInstance(new FakeDataRetrievalAction(userAnswers)),
+        bind[StcDataRetrievalAction].toInstance(new FakeStcDataRetrievalAction(userAnswers))
+      )
         bind[DataRetrievalAction].toInstance(new FakeDataRetrievalAction(userAnswers)),
         bind[StcAuthEnrolledAction].to[StubStcAuthEnrolledAction],
         bind[StcDataRetrievalAction].to[StubStcDataRetrievalAction],

@@ -16,6 +16,7 @@
 
 package base
 
+import play.api.mvc.Request
 import play.api.test.FakeRequest
 import uk.gov.hmrc.auth.core.*
 import uk.gov.hmrc.auth.core.authorise.Predicate
@@ -23,6 +24,7 @@ import uk.gov.hmrc.auth.core.retrieve.Retrieval
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.securitiestransferchargefrontend.domain.SubmissionId
 import uk.gov.hmrc.securitiestransferchargefrontend.models.UserAnswers
+import uk.gov.hmrc.securitiestransferchargefrontend.controllers.actions.StcAuthorisedRequest
 
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -34,6 +36,12 @@ object Fixtures {
   val testInternalId = "test-user-808"
   val testSubmissionId: SubmissionId = SubmissionId("STC-424242424")
 
+  val stcId: String = "STC1234567890"
+  val affinityGroupIndividual: AffinityGroup.Individual.type = AffinityGroup.Individual
+
+
+  implicit val hc: HeaderCarrier = HeaderCarrier()
+
   val fakeRequest = FakeRequest()
   
   val emptyEnrolments: Enrolments =
@@ -43,7 +51,7 @@ object Fixtures {
     Enrolment(
       key = stcEnrolmentKey,
       identifiers = Seq(
-        EnrolmentIdentifier(stcIdentifierKey, testSubscriptionId)
+        EnrolmentIdentifier(stcIdentifierKey, stcId)
       ),
       state = "Activated"
     )
@@ -53,6 +61,11 @@ object Fixtures {
   
   val individualAffinity: AffinityGroup = AffinityGroup.Individual
   val organisationAffinity: AffinityGroup = AffinityGroup.Organisation
+
+  def fakeStcAuthRequest[A](request: Request[A],
+                            internalId: String = user,
+                            affinityGroup: AffinityGroup = affinityGroupIndividual,
+                            stcId: String = stcId): StcAuthorisedRequest[A] = StcAuthorisedRequest[A](request,internalId,affinityGroup,stcId)
 
   val emptyUserAnswers: UserAnswers = UserAnswers.empty(testInternalId)(testSubmissionId)
 

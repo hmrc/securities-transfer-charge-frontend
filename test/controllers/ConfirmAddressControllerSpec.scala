@@ -17,13 +17,16 @@
 package controllers
 
 import base.SpecBase
+import controllers.actions.FakeAuthAction
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.when
 import org.scalatestplus.mockito.MockitoSugar.mock
 import play.api.inject
+import play.api.mvc.PlayBodyParsers
 import play.api.test.FakeRequest
 import play.api.test.Helpers.*
 import uk.gov.hmrc.securitiestransferchargefrontend.connectors.SubscriptionConnector
+import uk.gov.hmrc.securitiestransferchargefrontend.controllers.actions.StcAuthEnrolledAction
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.routes
 import uk.gov.hmrc.securitiestransferchargefrontend.models.{ConfirmableAddress, Country}
 import uk.gov.hmrc.securitiestransferchargefrontend.repositories.{SessionRepository, SubscriptionData, SubscriptionDataRepository}
@@ -33,7 +36,7 @@ import uk.gov.hmrc.securitiestransferchargefrontend.views.html.ConfirmAddressVie
 import scala.concurrent.Future
 
 class ConfirmAddressControllerSpec extends SpecBase {
-
+  
   val subscriptionData: SubscriptionData = SubscriptionData(stcId = "STC1234", subscriptionDetails = subscription)
   val confirmableAddress: ConfirmableAddress = ConfirmableAddress(
     lines = List(
@@ -60,7 +63,12 @@ class ConfirmAddressControllerSpec extends SpecBase {
         applicationBuilder(userAnswers = Some(emptyUserAnswers))
           .overrides(
             inject.bind[SubscriptionConnector].toInstance(mockSubscriptionConnector),
-            inject.bind[AddressService].toInstance(mockAddressService)
+            inject.bind[AddressService].toInstance(mockAddressService),
+            inject.bind[StcAuthEnrolledAction].toInstance(
+              new FakeAuthAction(
+                applicationBuilder().build().injector.instanceOf[PlayBodyParsers]
+              )
+            )
           )
           .build()
 
@@ -99,7 +107,12 @@ class ConfirmAddressControllerSpec extends SpecBase {
           .overrides(
             inject.bind[SubscriptionDataRepository].toInstance(mockSubscriptionDataRepository),
             inject.bind[AddressService].toInstance(mockAddressService),
-            inject.bind[SessionRepository].toInstance(mockSessionRepository)
+            inject.bind[SessionRepository].toInstance(mockSessionRepository),
+            inject.bind[StcAuthEnrolledAction].toInstance(
+              new FakeAuthAction(
+                applicationBuilder().build().injector.instanceOf[PlayBodyParsers]
+              )
+            )
 
           )
           .build()
@@ -126,7 +139,12 @@ class ConfirmAddressControllerSpec extends SpecBase {
       val application =
         applicationBuilder(userAnswers = Some(emptyUserAnswers))
           .overrides(
-            inject.bind[SubscriptionDataRepository].toInstance(mockSubscriptionDataRepository)
+            inject.bind[SubscriptionDataRepository].toInstance(mockSubscriptionDataRepository),
+            inject.bind[StcAuthEnrolledAction].toInstance(
+              new FakeAuthAction(
+                applicationBuilder().build().injector.instanceOf[PlayBodyParsers]
+              )
+            )
           )
           .build()
 
