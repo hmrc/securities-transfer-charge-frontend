@@ -26,6 +26,7 @@ import play.api.test.Helpers.*
 import uk.gov.hmrc.securitiestransferchargefrontend.connectors.SubscriptionConnector
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.routes
 import uk.gov.hmrc.securitiestransferchargefrontend.models.{ConfirmableAddress, Country}
+import uk.gov.hmrc.securitiestransferchargefrontend.repositories.{SessionRepository, SubscriptionData, SubscriptionDataRepository}
 import uk.gov.hmrc.securitiestransferchargefrontend.services.AddressService
 import uk.gov.hmrc.securitiestransferchargefrontend.views.html.ConfirmAddressView
 
@@ -33,18 +34,20 @@ import scala.concurrent.Future
 
 class ConfirmAddressControllerSpec extends SpecBase {
 
+  val subscriptionData: SubscriptionData = SubscriptionData(stcId = "STC1234", subscriptionDetails = subscription)
+  val confirmableAddress: ConfirmableAddress = ConfirmableAddress(
+    lines = List(
+      "1 High Street",
+      "Town"
+    ),
+    postcode = "ZZ1 1ZZ",
+    country = Some(Country("United Kingdom", "GB"))
+  )
+
+
   "ConfirmAddress Controller" - {
 
     "must return OK and the correct view for a GET" in {
-
-      val confirmableAddress = ConfirmableAddress(
-        lines = List(
-          "1 High Street",
-          "Town"
-        ),
-        postcode = "ZZ1 1ZZ",
-        country = Some(Country("United Kingdom", "GB"))
-      )
 
       val mockSubscriptionConnector = mock[SubscriptionConnector]
       val mockAddressService = mock[AddressService]
@@ -71,6 +74,72 @@ class ConfirmAddressControllerSpec extends SpecBase {
 
         status(result) mustEqual OK
         contentAsString(result) mustEqual view(confirmableAddress)(request, messages(application)).toString
+      }
+    }
+
+    "must store address and redirect on successful POST" in {
+
+      val mockSubscriptionDataRepository = mock[SubscriptionDataRepository]
+      val mockAddressService = mock[AddressService]
+      val mockSessionRepository = mock[SessionRepository]
+
+      when(mockSessionRepository.set(any())) thenReturn Future.successful(true)
+
+      when(mockSubscriptionDataRepository.getSubscriptionData(any()))
+        .thenReturn(Future.successful(Some(subscriptionData)))
+
+      when(
+        mockAddressService.extractConfirmableAddress(
+          subscriptionData.subscriptionDetails
+        )
+      ).thenReturn(confirmableAddress)
+
+      val application =
+        applicationBuilder(userAnswers = Some(emptyUserAnswers))
+          .overrides(
+            inject.bind[SubscriptionDataRepository].toInstance(mockSubscriptionDataRepository),
+            inject.bind[AddressService].toInstance(mockAddressService),
+            inject.bind[SessionRepository].toInstance(mockSessionRepository)
+
+          )
+          .build()
+
+      running(application) {
+
+        val request =
+          FakeRequest(POST, routes.ConfirmAddressController.onSubmit().url)
+
+        val result = route(application, request).value
+
+        status(result) mustEqual SEE_OTHER
+
+      }
+    }
+
+    "must redirect to journey recovery when no subscription is found" in {
+
+      val mockSubscriptionDataRepository = mock[SubscriptionDataRepository]
+
+      when(mockSubscriptionDataRepository.getSubscriptionData(any()))
+        .thenReturn(Future.successful(None))
+
+      val application =
+        applicationBuilder(userAnswers = Some(emptyUserAnswers))
+          .overrides(
+            inject.bind[SubscriptionDataRepository].toInstance(mockSubscriptionDataRepository)
+          )
+          .build()
+
+      running(application) {
+
+        val request =
+          FakeRequest(POST, routes.ConfirmAddressController.onSubmit().url)
+
+        val result = route(application, request).value
+
+        status(result) mustEqual SEE_OTHER
+        redirectLocation(result).value mustEqual
+          routes.JourneyRecoveryController.onPageLoad().url
       }
     }
   }

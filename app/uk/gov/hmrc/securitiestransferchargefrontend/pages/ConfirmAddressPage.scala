@@ -14,20 +14,15 @@
  * limitations under the License.
  */
 
-package models
+package uk.gov.hmrc.securitiestransferchargefrontend.pages
 
-import org.scalatest.freespec.AnyFreeSpec
-import org.scalatest.matchers.must.Matchers
-import uk.gov.hmrc.securitiestransferchargefrontend.models.WithName
+import play.api.libs.json.JsPath
+import uk.gov.hmrc.securitiestransferchargefrontend.models.ConfirmableAddress
+import uk.gov.hmrc.securitiestransferchargefrontend.pages.QuestionPage
 
-class WithNameSpec extends AnyFreeSpec with Matchers {
+case object ConfirmAddressPage extends QuestionPage[ConfirmableAddress] {
 
-  object Foo extends WithName("bar")
+  override def path: JsPath = JsPath \ toString
 
-  ".toString" - {
-
-    "must return the correct string" in {
-      Foo.toString mustEqual "bar"
-    }
-  }
+  override def toString: String = "confirmedAddress"
 }

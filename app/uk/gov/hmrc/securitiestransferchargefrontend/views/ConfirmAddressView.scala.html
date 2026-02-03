@@ -17,16 +17,20 @@
 @import uk.gov.hmrc.securitiestransferchargefrontend.views.html.templates
 @import uk.gov.hmrc.securitiestransferchargefrontend.views.html.templates.address_confirmation_display
 @import uk.gov.hmrc.securitiestransferchargefrontend.models.ConfirmableAddress
+@import uk.gov.hmrc.securitiestransferchargefrontend.controllers.routes
+
 
 @this(
         layout: templates.Layout,
-        govukButton: GovukButton
+        govukButton: GovukButton,
+        formHelper: FormWithCSRF
 )
 
 @(address: ConfirmableAddress)(implicit request: Request[_], messages: Messages)
 
 @layout(pageTitle = titleNoForm(messages("confirmAddress.title"))) {
 
+@formHelper(action = routes.ConfirmAddressController.onSubmit()) {
     <span class="govuk-caption-l">
         <span class="govuk-visually-hidden">
             @messages("section.caption.hidden")
@@ -44,4 +48,5 @@
         ButtonViewModel(messages("confirmAddress.confirm"))
     )
     <div></div>
+}
 }

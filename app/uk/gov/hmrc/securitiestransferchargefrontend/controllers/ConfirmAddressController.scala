@@ -21,20 +21,28 @@ import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import uk.gov.hmrc.securitiestransferchargefrontend.connectors.{SubscriptionConnector, SubscriptionStatusErrorException}
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.actions.*
+import uk.gov.hmrc.securitiestransferchargefrontend.models.NormalMode
+import uk.gov.hmrc.securitiestransferchargefrontend.navigation.Navigator
+import uk.gov.hmrc.securitiestransferchargefrontend.pages.ConfirmAddressPage
+import uk.gov.hmrc.securitiestransferchargefrontend.repositories.{SessionRepository, SubscriptionDataRepository}
 import uk.gov.hmrc.securitiestransferchargefrontend.services.AddressService
 import uk.gov.hmrc.securitiestransferchargefrontend.views.html.ConfirmAddressView
 
 import javax.inject.Inject
-import scala.concurrent.ExecutionContext
+import scala.concurrent.{ExecutionContext, Future}
 
 class ConfirmAddressController @Inject()(
                                           override val messagesApi: MessagesApi,
                                           identify: IdentifierAction,
                                           getData: DataRetrievalAction,
+                                          requireData: DataRequiredAction,
                                           subscriptionConnector: SubscriptionConnector,
+                                          subscriptionDataRepository: SubscriptionDataRepository,
                                           val controllerComponents: MessagesControllerComponents,
                                           view: ConfirmAddressView,
                                           addressService: AddressService,
+                                          navigator: Navigator,
+                                          sessionRepository: SessionRepository,
                                         )(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport {
 
   def onPageLoad: Action[AnyContent] =
@@ -48,4 +56,29 @@ class ConfirmAddressController @Inject()(
           case _: SubscriptionStatusErrorException => Redirect(routes.JourneyRecoveryController.onPageLoad())
         }
     }
+
+  def onSubmit: Action[AnyContent] =
+    (identify andThen getData andThen requireData).async { implicit request =>
+
+      subscriptionDataRepository.getSubscriptionData(request.userId).flatMap(
+        _.fold {
+          Future.successful(Redirect(routes.JourneyRecoveryController.onPageLoad()))
+        } { subscriptionData =>
+
+          val address =
+            addressService.extractConfirmableAddress(subscriptionData.subscriptionDetails)
+
+          for {
+            updatedAnswers <- Future.fromTry(
+              request.userAnswers.set(ConfirmAddressPage, address)
+            )
+            _ <- sessionRepository.set(updatedAnswers)
+          } yield Redirect(
+            navigator.nextPage(ConfirmAddressPage, NormalMode, updatedAnswers)
+          )
+        }
+      )
+    }
+
+
 }

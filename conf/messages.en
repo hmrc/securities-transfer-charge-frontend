@@ -28,7 +28,7 @@ error.prefix = Error
 error.summary.title = There is a problem
 
 section.caption.hidden = This section is
-details.caption = Your  details
+details.caption = Your details
 
 index.title = securities-transfer-charge-frontend
 index.heading = securities-transfer-charge-frontend

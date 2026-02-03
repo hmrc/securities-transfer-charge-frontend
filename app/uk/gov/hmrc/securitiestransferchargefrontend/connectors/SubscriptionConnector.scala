@@ -51,13 +51,3 @@ class SubscriptionConnectorImpl @Inject()(registrationClient: RegistrationClient
       }
     } yield subscription
   }
-
-
-    
-
-
-
-
-
-
-
