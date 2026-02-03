@@ -19,17 +19,20 @@ package uk.gov.hmrc.securitiestransferchargefrontend.controllers
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
+import uk.gov.hmrc.securitiestransferchargefrontend.controllers.actions.{StcAuthEnrolledAction, StcDataRetrievalAction}
 import uk.gov.hmrc.securitiestransferchargefrontend.views.html.SubmissionsDashboardView
 
 import javax.inject.Inject
 
 class SubmissionsDashboardController @Inject()(
-                                       override val messagesApi: MessagesApi,
-                                       val controllerComponents: MessagesControllerComponents,
-                                       view: SubmissionsDashboardView
+                                                override val messagesApi: MessagesApi,
+                                                val controllerComponents: MessagesControllerComponents,
+                                                stcAuthEnrolled: StcAuthEnrolledAction,
+                                                getData: StcDataRetrievalAction,
+                                                view: SubmissionsDashboardView
                                      ) extends FrontendBaseController with I18nSupport {
 
-  def onPageLoad: Action[AnyContent] = Action {
+  def onPageLoad: Action[AnyContent] = (stcAuthEnrolled andThen getData) {
     implicit request =>
       Ok(view())
   }

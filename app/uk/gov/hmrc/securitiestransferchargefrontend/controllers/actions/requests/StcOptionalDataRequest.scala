@@ -14,16 +14,13 @@
  * limitations under the License.
  */
 
-package models
+package uk.gov.hmrc.securitiestransferchargefrontend.controllers.actions.requests
 
-case class Field(name: String, errorKeys: Map[ErrorType, String])
+import play.api.mvc.WrappedRequest
+import uk.gov.hmrc.securitiestransferchargefrontend.controllers.actions.StcAuthorisedRequest
+import uk.gov.hmrc.securitiestransferchargefrontend.models.UserAnswers
 
-object Field {
-
-  def apply(name: String, errors: (ErrorType, String)*): Field =
-    Field(name, errors.toMap)
-}
-
-sealed trait ErrorType
-case object Required extends ErrorType
-case object Invalid extends ErrorType
+case class StcOptionalDataRequest[A](
+                                      request: StcAuthorisedRequest[A],
+                                      userAnswers: Option[UserAnswers]
+                                    ) extends WrappedRequest[A](request)

@@ -35,5 +35,8 @@ class Module extends AbstractModule {
 
     bind(classOf[Clock]).toInstance(Clock.systemDefaultZone.withZone(ZoneOffset.UTC))
     bind(classOf[HttpErrorHandler]).to(classOf[ErrorHandler])
+    bind(classOf[StcAuthEnrolledAction]).to(classOf[StcAuthEnrolledActionImpl]).asEagerSingleton()
+    bind(classOf[StcDataRetrievalAction]).to(classOf[StcDataRetrievalActionImpl])
+    bind(classOf[StcDataRequiredAction]).to(classOf[StcDataRequiredActionImpl])
   }
 }

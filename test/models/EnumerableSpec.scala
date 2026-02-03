@@ -20,7 +20,6 @@ import org.scalatest.freespec.AnyFreeSpec
 import org.scalatest.matchers.must.Matchers
 import org.scalatest.{EitherValues, OptionValues}
 import play.api.libs.json.*
-import uk.gov.hmrc.securitiestransferchargefrontend
 import uk.gov.hmrc.securitiestransferchargefrontend.models.Enumerable
 
 object EnumerableSpec {

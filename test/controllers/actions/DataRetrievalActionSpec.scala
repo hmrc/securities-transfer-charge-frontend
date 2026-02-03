@@ -17,16 +17,14 @@
 package controllers.actions
 
 import base.SpecBase
-import uk.gov.hmrc.securitiestransferchargefrontend.models.requests.OptionalDataRequest
 import org.mockito.Mockito.*
 import org.scalatestplus.mockito.MockitoSugar
 import play.api.test.FakeRequest
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.actions.DataRetrievalActionImpl
 import uk.gov.hmrc.securitiestransferchargefrontend.models.UserAnswers
-import uk.gov.hmrc.securitiestransferchargefrontend.models.requests.IdentifierRequest
+import uk.gov.hmrc.securitiestransferchargefrontend.models.requests.{IdentifierRequest, OptionalDataRequest}
 import uk.gov.hmrc.securitiestransferchargefrontend.repositories.SessionRepository
 
-import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
 class DataRetrievalActionSpec extends SpecBase with MockitoSugar {
