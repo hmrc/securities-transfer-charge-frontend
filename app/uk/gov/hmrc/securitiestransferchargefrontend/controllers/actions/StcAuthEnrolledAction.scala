@@ -25,7 +25,8 @@ import uk.gov.hmrc.auth.core.retrieve.~
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.play.http.HeaderCarrierConverter
 import uk.gov.hmrc.securitiestransferchargefrontend.config.FrontendAppConfig
-import uk.gov.hmrc.securitiestransferchargefrontend.controllers.routes
+import uk.gov.hmrc.securitiestransferchargefrontend.controllers.actions.filters.RetrievalFilter
+import uk.gov.hmrc.securitiestransferchargefrontend.controllers.{Redirects, routes}
 
 import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
@@ -37,6 +38,8 @@ trait StcAuthEnrolledAction
 final class StcAuthEnrolledActionImpl @Inject()(
                                                  override val authConnector: AuthConnector,
                                                  appConfig: FrontendAppConfig,
+                                                 retrievalFilter: RetrievalFilter,
+                                                 redirects: Redirects,
                                                  val parser: BodyParsers.Default
                                                )(implicit val executionContext: ExecutionContext)
   extends StcAuthEnrolledAction
@@ -56,72 +59,31 @@ final class StcAuthEnrolledActionImpl @Inject()(
     implicit val hc: HeaderCarrier =
       HeaderCarrierConverter.fromRequestAndSession(request, request.session)
 
-    def extractStcId(enrolments: Enrolments): Option[String] =
-      for {
-        enrolment  <- enrolments.getEnrolment(appConfig.stcEnrolmentKey)
-        identifier <- enrolment.getIdentifier(appConfig.stcIdentifierKey)
-        if identifier.value.nonEmpty
-      } yield identifier.value
+    authorised().retrieve(retrievals) {
+      case maybeInternalId ~ enrolments ~ maybeAffinityGroup =>
 
-    authorised()
-      .retrieve(retrievals) {
-        case Some(internalId) ~ enrolments ~ Some(affinityGroup) =>
-
-          enrolments
-            .getEnrolment(appConfig.stcEnrolmentKey)
-            .filter(_.isActivated) match {
-
-            case None =>
-              logger.info(
-                s"STC auth: user [$internalId] not enrolled for STC"
-              )
-              Future.successful(
-                Redirect(appConfig.registrationFrontendUrl)
-              )
-
-            case Some(_) =>
-              extractStcId(enrolments) match {
-
-                case Some(stcId) =>
-                  block(
-                    StcAuthorisedRequest(
-                      request = request,
-                      internalId = internalId,
-                      affinityGroup = affinityGroup,
-                      stcId = stcId
-                    )
-                  )
-
-                case None =>
-                  logger.warn(
-                    s"STC auth: STC enrolment present but missing identifier [STCID]"
-                  )
-                  Future.successful(
-                    Redirect(routes.JourneyRecoveryController.onPageLoad())
-                  )
-              }
-          }
-
-        case _ =>
-          logger.warn(
-            s"STC auth: missing mandatory auth retrievals for request [${request.method} ${request.uri}]"
-          )
-          Future.successful(
-            Redirect(routes.UnauthorisedController.onPageLoad())
-          )
-      }
-      .recover {
-        case _: NoActiveSession =>
-          Redirect(
-            appConfig.loginUrl,
-            Map("continue" -> Seq(appConfig.loginContinueUrl))
+        val maybeRequest =
+          for {
+            internalId    <- retrievalFilter.internalIdPresent(maybeInternalId)
+            affinityGroup <- retrievalFilter.affinityGroupPresent(maybeAffinityGroup)
+            _             <- retrievalFilter.enrolledForStc(enrolments)
+            stcId         <- retrievalFilter.stcIdPresent(enrolments)
+          } yield StcAuthorisedRequest(
+            request,
+            internalId,
+            affinityGroup,
+            stcId
           )
 
-        case ae: AuthorisationException =>
-          logger.info(
-            s"STC auth: authorisation failure [${ae.getMessage}]"
-          )
-          Redirect(routes.UnauthorisedController.onPageLoad())
-      }
+        maybeRequest.fold(identity, block)
+    }.recover {
+
+      case _: NoActiveSession =>
+        redirects.redirectToLogin(appConfig.loginContinueUrl)
+
+      case ae: AuthorisationException =>
+        logger.warn(s"STC auth failed: ${ae.getMessage}")
+        Redirect(routes.UnauthorisedController.onPageLoad())
+    }
   }
 }

@@ -25,8 +25,9 @@ import play.api.test.{FakeRequest, Helpers}
 import uk.gov.hmrc.auth.core.*
 import uk.gov.hmrc.auth.core.retrieve.~
 import uk.gov.hmrc.securitiestransferchargefrontend.config.FrontendAppConfig
+import uk.gov.hmrc.securitiestransferchargefrontend.controllers.actions.filters.RetrievalFilter
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.actions.{StcAuthEnrolledAction, StcAuthEnrolledActionImpl}
-import uk.gov.hmrc.securitiestransferchargefrontend.controllers.routes
+import uk.gov.hmrc.securitiestransferchargefrontend.controllers.{Redirects, routes}
 
 import scala.concurrent.Future
 
@@ -54,15 +55,20 @@ class StcAuthEnrolledActionImplSpec extends SpecBase {
                  new FakeAuthConnectorSuccess(retrievals)
                ): StcAuthEnrolledAction = {
 
-    val appConfig   = application.injector.instanceOf[FrontendAppConfig]
+    val appConfig = application.injector.instanceOf[FrontendAppConfig]
     val bodyParsers = application.injector.instanceOf[BodyParsers.Default]
+    val redirects = application.injector.instanceOf[Redirects]
+    val retrievalFilter = application.injector.instanceOf[RetrievalFilter]
 
     new StcAuthEnrolledActionImpl(
       authConnector,
       appConfig,
+      retrievalFilter,
+      redirects,
       bodyParsers
     )
   }
+
 
   "StcAuthEnrolledActionImpl" - {
 
