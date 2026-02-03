@@ -30,6 +30,9 @@
 @(form: Form[_], mode: Mode)(implicit request: Request[_], messages: Messages)
 
 @layout(pageTitle = title(form, messages("howToNotifyAboutSecuritiesTransfer.title"))) {
+    <div id="more-detail-hint" class="govuk-hint">
+        @messages("howToNotifyAboutSecuritiesTransfer.caption")
+    </div>
 
     @formHelper(action = routes.HowToNotifyAboutSecuritiesTransferController.onSubmit(mode), Symbol("autoComplete") -> "off") {
 
