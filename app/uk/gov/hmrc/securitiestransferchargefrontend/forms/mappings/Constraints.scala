@@ -14,12 +14,13 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.securitiestransferchargefrontend.forms.mappings
+package uk.gov.hmrc.securitiestransferchargefrontend.mappings
 
 import play.api.data.validation.{Constraint, Invalid, Valid}
 import uk.gov.hmrc.securitiestransferchargefrontend.config.CurrencyFormatter
 
 import java.time.LocalDate
+import scala.annotation.nowarn
 
 trait Constraints {
 
@@ -111,7 +112,8 @@ trait Constraints {
         Invalid(errorKey)
     }
 
-  protected def minimumCurrency(minimum: BigDecimal, errorKey: String): Constraint[BigDecimal] =
+  @nowarn
+  protected def minimumCurrency(minimum: BigDecimal, errorKey: String)(implicit ev: Ordering[BigDecimal]): Constraint[BigDecimal] =
     Constraint {
       input =>
         if (input >= minimum) {
@@ -121,7 +123,8 @@ trait Constraints {
         }
     }
 
-  protected def maximumCurrency(maximum: BigDecimal, errorKey: String): Constraint[BigDecimal] =
+  @nowarn
+  protected def maximumCurrency(maximum: BigDecimal, errorKey: String)(implicit ev: Ordering[BigDecimal]): Constraint[BigDecimal] =
     Constraint {
       input =>
         if (input <= maximum) {

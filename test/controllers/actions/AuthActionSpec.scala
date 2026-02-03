@@ -18,7 +18,6 @@ package controllers.actions
 
 import base.SpecBase
 import com.google.inject.Inject
-import uk.gov.hmrc.securitiestransferchargefrontend.controllers.routes
 import play.api.mvc.{Action, AnyContent, BodyParsers, Results}
 import play.api.test.FakeRequest
 import play.api.test.Helpers.*
@@ -28,6 +27,8 @@ import uk.gov.hmrc.auth.core.retrieve.Retrieval
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.securitiestransferchargefrontend.config.FrontendAppConfig
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.actions.{AuthenticatedIdentifierAction, IdentifierAction}
+import uk.gov.hmrc.securitiestransferchargefrontend.controllers.routes
+
 import scala.concurrent.{ExecutionContext, Future}
 
 class AuthActionSpec extends SpecBase {

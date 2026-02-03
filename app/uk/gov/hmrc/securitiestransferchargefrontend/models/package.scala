@@ -18,6 +18,8 @@ package uk.gov.hmrc.securitiestransferchargefrontend
 
 import play.api.libs.json.*
 
+import scala.annotation.nowarn
+
 package object models {
 
   implicit class RichJsObject(jsObject: JsObject) {
@@ -110,6 +112,7 @@ package object models {
       }
     }
 
+    @nowarn
     def remove(path: JsPath): JsResult[JsValue] = {
 
       (path.path, jsValue) match {

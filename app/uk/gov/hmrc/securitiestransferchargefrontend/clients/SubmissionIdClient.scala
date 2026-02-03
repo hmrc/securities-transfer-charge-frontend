@@ -14,20 +14,25 @@
  * limitations under the License.
  */
 
-package navigation
+package uk.gov.hmrc.securitiestransferchargefrontend.clients
 
-import play.api.mvc.Call
-import uk.gov.hmrc.securitiestransferchargefrontend.models.{Mode, UserAnswers}
-import uk.gov.hmrc.securitiestransferchargefrontend.navigation.Navigator
-import uk.gov.hmrc.securitiestransferchargefrontend.pages.Page
+import uk.gov.hmrc.securitiestransferchargefrontend.domain.SubmissionId
 
+import javax.inject.Inject
 import scala.concurrent.Future
+import scala.util.Random
 
-class FakeNavigator(desiredRoute: Call) extends Navigator {
+trait SubmissionIdClient:
+  def nextSubmissionId(): Future[SubmissionId]
 
-  override def nextPage(page: Page, mode: Mode, userAnswers: UserAnswers): Future[Call] =
-    Future.successful(desiredRoute)
-    
-  override val errorPage: Page => Call = _ => desiredRoute
+class SubmissionIdClientImpl @Inject() extends SubmissionIdClient {
+  private val rnd = new Random()
+
+  // TODO: Stubbed implementation - replace with call to S&R service.
+  override def nextSubmissionId(): Future[SubmissionId] = {
+    val x = rnd.nextInt(1_000_000_000).abs
+    val submissionId = SubmissionId(f"STC-$x%09d")
+    Future.successful(submissionId)
+  }
 
 }

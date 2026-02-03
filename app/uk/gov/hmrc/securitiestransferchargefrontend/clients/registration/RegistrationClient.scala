@@ -24,7 +24,7 @@ import uk.gov.hmrc.securitiestransferchargefrontend.models.Address
 
 import java.time.LocalDateTime
 import javax.inject.Inject
-import scala.concurrent.{ExecutionContext, Future}
+import scala.concurrent.Future
 
 trait RegistrationClient:
   def getSubscriptionDetails(stcId: String)(implicit hc: HeaderCarrier): Future[Subscription]
@@ -34,7 +34,7 @@ trait RegistrationClient:
   def updateAddress(stcId: String, address: Address)(implicit hc: HeaderCarrier): Future[SubscriptionResult]
 
 // DUMMY IMPL until we have a real BE implementation for this.
-class RegistrationClientImpl @Inject()(implicit ec: ExecutionContext) extends RegistrationClient {
+class RegistrationClientImpl @Inject() extends RegistrationClient {
 
   val subscription: Subscription = Subscription(
     subsValidTo = LocalDateTime.now(),

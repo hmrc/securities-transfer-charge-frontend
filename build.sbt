@@ -16,6 +16,7 @@ lazy val microservice = (project in file("."))
   .settings(ThisBuild / useSuperShell := false)
   .settings(
     name := appName,
+    scalacOptions += "-Werror",
     RoutesKeys.routesImport ++= Seq(
       "uk.gov.hmrc.securitiestransferchargefrontend.models._",
       "uk.gov.hmrc.play.bootstrap.binders.RedirectUrl"
@@ -32,7 +33,7 @@ lazy val microservice = (project in file("."))
       "uk.gov.hmrc.securitiestransferchargefrontend.controllers.routes._",
       "uk.gov.hmrc.securitiestransferchargefrontend.viewmodels.govuk.all._"
     ),
-    PlayKeys.playDefaultPort := 9000,
+    PlayKeys.playDefaultPort := 30036,
     ScoverageKeys.coverageExcludedFiles := "<empty>;Reverse.*;.*handlers.*;.*components.*;" +
       ".*Routes.*;.*viewmodels.govuk.*;",
     ScoverageKeys.coverageMinimumStmtTotal := 78,
@@ -48,6 +49,9 @@ lazy val microservice = (project in file("."))
     pipelineStages := Seq(digest),
     Assets / pipelineStages := Seq(concat)
   )
+
+// Get rid of the warnings about flags being set repeatedly
+Compile / scalacOptions := (Compile / scalacOptions).value.distinct
 
 lazy val testSettings: Seq[Def.Setting[_]] = Seq(
   fork := true,

@@ -14,20 +14,14 @@
  * limitations under the License.
  */
 
-package navigation
+package uk.gov.hmrc.securitiestransferchargefrontend.controllers.actions
 
-import play.api.mvc.Call
-import uk.gov.hmrc.securitiestransferchargefrontend.models.{Mode, UserAnswers}
-import uk.gov.hmrc.securitiestransferchargefrontend.navigation.Navigator
-import uk.gov.hmrc.securitiestransferchargefrontend.pages.Page
+import play.api.mvc.{Request, WrappedRequest}
+import uk.gov.hmrc.auth.core.AffinityGroup
 
-import scala.concurrent.Future
-
-class FakeNavigator(desiredRoute: Call) extends Navigator {
-
-  override def nextPage(page: Page, mode: Mode, userAnswers: UserAnswers): Future[Call] =
-    Future.successful(desiredRoute)
-    
-  override val errorPage: Page => Call = _ => desiredRoute
-
-}
+final case class StcAuthorisedRequest[A](
+                                          request: Request[A],
+                                          internalId: String,
+                                          affinityGroup: AffinityGroup,
+                                          stcId: String
+                                        ) extends WrappedRequest[A](request)

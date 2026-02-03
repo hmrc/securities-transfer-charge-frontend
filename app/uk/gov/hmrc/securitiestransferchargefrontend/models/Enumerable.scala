@@ -18,6 +18,8 @@ package uk.gov.hmrc.securitiestransferchargefrontend.models
 
 import play.api.libs.json.*
 
+import scala.annotation.nowarn
+
 trait Enumerable[A] {
 
   def withName(str: String): Option[A]
@@ -44,7 +46,8 @@ object Enumerable {
        }
     }
 
-    implicit def writes[A]: Writes[A] = {
+    @nowarn
+    implicit def writes[A : Enumerable]: Writes[A] = {
       Writes(value => JsString(value.toString))
     }
   }

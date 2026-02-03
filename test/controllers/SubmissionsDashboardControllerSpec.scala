@@ -17,28 +17,70 @@
 package controllers
 
 import base.SpecBase
-import play.api.test.FakeRequest
-import play.api.test.Helpers._
-import uk.gov.hmrc.securitiestransferchargefrontend.views.html.SubmissionsDashboardView
+import play.api.inject.bind
+import play.api.mvc.*
+import play.api.test.Helpers.*
+import play.api.test.{FakeRequest, Helpers}
+import uk.gov.hmrc.auth.core.AffinityGroup
+import uk.gov.hmrc.securitiestransferchargefrontend.controllers.actions.*
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.routes
+import uk.gov.hmrc.securitiestransferchargefrontend.views.html.SubmissionsDashboardView
+
+import scala.concurrent.{ExecutionContext, Future}
 
 class SubmissionsDashboardControllerSpec extends SpecBase {
 
-  "SubmissionsDashboard Controller" - {
+  private implicit val ec: ExecutionContext =
+    Helpers.stubControllerComponents().executionContext
+
+  lazy val submissionsDashboardRoute: String =
+    routes.SubmissionsDashboardController.onPageLoad().url
+
+  private val fakeAuthAction: StcAuthEnrolledAction =
+    new StcAuthEnrolledAction {
+
+      override def parser: BodyParser[AnyContent] =
+        Helpers.stubBodyParser[AnyContent]()
+
+      override protected def executionContext: ExecutionContext = ec
+
+      override def invokeBlock[A](
+                                   request: Request[A],
+                                   block: StcAuthorisedRequest[A] => Future[Result]
+                                 ): Future[Result] =
+        block(
+          StcAuthorisedRequest(
+            request,
+            internalId = "user123",
+            affinityGroup = AffinityGroup.Individual,
+            stcId = "STC1234567890"
+          )
+        )
+    }
+
+  "SubmissionsDashboardController" - {
 
     "must return OK and the correct view for a GET" in {
 
-      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers)).build()
+      val application =
+        applicationBuilder()
+          .overrides(
+            bind[StcAuthEnrolledAction].toInstance(fakeAuthAction)
+          )
+          .build()
 
       running(application) {
-        val request = FakeRequest(GET, routes.SubmissionsDashboardController.onPageLoad().url)
+        val request = FakeRequest(GET, submissionsDashboardRoute)
 
         val result = route(application, request).value
-
-        val view = application.injector.instanceOf[SubmissionsDashboardView]
+        val view   = application.injector.instanceOf[SubmissionsDashboardView]
 
         status(result) mustEqual OK
-        contentAsString(result) mustEqual view()(request, messages(application)).toString
+        contentAsString(result) mustEqual
+          view()(
+            request,
+            messages(application)
+          ).toString
       }
     }
   }
