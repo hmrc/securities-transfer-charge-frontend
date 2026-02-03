@@ -71,6 +71,7 @@ class NavigatorSpec extends SpecBase with MockitoSugar with ScalaFutures {
       val result = navigator.goTo(testCall, Some(userAnswers))
       whenReady(result) { _ =>
         verify(mockSessionRepository, times(1)).set(userAnswers)
+        verify(mockSaveAndReturnClient, times(1)).save(userAnswers)
         result.futureValue mustBe testCall
       }
     }
@@ -79,6 +80,7 @@ class NavigatorSpec extends SpecBase with MockitoSugar with ScalaFutures {
       val result = navigator.dataRequired(testPage, userAnswers, testCall)
       whenReady(result) { _ =>
         verify(mockSessionRepository, times(1)).set(userAnswers)
+        verify(mockSaveAndReturnClient, times(1)).save(userAnswers)
       }
     }
     "return the success page when data is present for data required navigation" in {
