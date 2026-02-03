@@ -18,8 +18,11 @@ package uk.gov.hmrc.securitiestransferchargefrontend.config
 
 import com.google.inject.AbstractModule
 import play.api.http.HttpErrorHandler
+import uk.gov.hmrc.securitiestransferchargefrontend.clients.{SaveAndReturnClient, SaveAndReturnClientImpl, SubmissionIdClient, SubmissionIdClientImpl}
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.actions.*
 import uk.gov.hmrc.securitiestransferchargefrontend.handlers.ErrorHandler
+import uk.gov.hmrc.securitiestransferchargefrontend.navigation.{Navigator, StfNavigator}
+import uk.gov.hmrc.securitiestransferchargefrontend.repositories.{SessionRepository, SessionRepositoryImpl}
 
 import java.time.{Clock, ZoneOffset}
 
@@ -38,5 +41,10 @@ class Module extends AbstractModule {
     bind(classOf[StcAuthEnrolledAction]).to(classOf[StcAuthEnrolledActionImpl]).asEagerSingleton()
     bind(classOf[StcDataRetrievalAction]).to(classOf[StcDataRetrievalActionImpl])
     bind(classOf[StcDataRequiredAction]).to(classOf[StcDataRequiredActionImpl])
+    bind(classOf[SessionRepository]).to(classOf[SessionRepositoryImpl])
+    bind(classOf[Navigator]).to(classOf[StfNavigator])
+    bind(classOf[SubmissionIdClient]).to(classOf[SubmissionIdClientImpl])
+    bind(classOf[SaveAndReturnClient]).to(classOf[SaveAndReturnClientImpl])
+    
   }
 }

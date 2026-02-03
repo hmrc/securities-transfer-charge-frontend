@@ -14,20 +14,19 @@
  * limitations under the License.
  */
 
-package navigation
+package uk.gov.hmrc.securitiestransferchargefrontend.domain
 
-import play.api.mvc.Call
-import uk.gov.hmrc.securitiestransferchargefrontend.models.{Mode, UserAnswers}
-import uk.gov.hmrc.securitiestransferchargefrontend.navigation.Navigator
-import uk.gov.hmrc.securitiestransferchargefrontend.pages.Page
+import play.api.libs.json.{Reads, Writes}
 
-import scala.concurrent.Future
+opaque type SubmissionId = String
 
-class FakeNavigator(desiredRoute: Call) extends Navigator {
+object SubmissionId:
+  def apply(v: String): SubmissionId = v
+  extension (id: SubmissionId)
+    def value: String = id
 
-  override def nextPage(page: Page, mode: Mode, userAnswers: UserAnswers): Future[Call] =
-    Future.successful(desiredRoute)
-    
-  override val errorPage: Page => Call = _ => desiredRoute
-
-}
+  given submissionIdReads: Reads[SubmissionId] =
+    Reads.StringReads.map(SubmissionId.apply)
+  
+  given submissionIdWrites: Writes[SubmissionId] =
+    Writes.StringWrites.contramap[SubmissionId](_.value)

@@ -19,6 +19,7 @@ package uk.gov.hmrc.securitiestransferchargefrontend.queries
 import play.api.libs.json.JsPath
 import uk.gov.hmrc.securitiestransferchargefrontend.models.UserAnswers
 
+import scala.annotation.nowarn
 import scala.util.{Success, Try}
 
 sealed trait Query {
@@ -30,6 +31,6 @@ trait Gettable[A] extends Query
 
 trait Settable[A] extends Query {
 
-  def cleanup(value: Option[A], userAnswers: UserAnswers): Try[UserAnswers] =
+  def cleanup(@nowarn value: Option[A], userAnswers: UserAnswers): Try[UserAnswers] =
     Success(userAnswers)
 }

@@ -20,20 +20,37 @@ import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.actions.{StcAuthEnrolledAction, StcDataRetrievalAction}
+import uk.gov.hmrc.securitiestransferchargefrontend.clients.SubmissionIdClient
+import uk.gov.hmrc.securitiestransferchargefrontend.models.{NormalMode, UserAnswers}
+import uk.gov.hmrc.securitiestransferchargefrontend.navigation.Navigator
+import uk.gov.hmrc.securitiestransferchargefrontend.pages.SubmissionsDashboardPage
 import uk.gov.hmrc.securitiestransferchargefrontend.views.html.SubmissionsDashboardView
 
 import javax.inject.Inject
+import scala.concurrent.ExecutionContext
 
 class SubmissionsDashboardController @Inject()(
                                                 override val messagesApi: MessagesApi,
                                                 val controllerComponents: MessagesControllerComponents,
                                                 stcAuthEnrolled: StcAuthEnrolledAction,
                                                 getData: StcDataRetrievalAction,
-                                                view: SubmissionsDashboardView
-                                     ) extends FrontendBaseController with I18nSupport {
+                                                view: SubmissionsDashboardView,
+                                                idClient: SubmissionIdClient,
+                                                navigator: Navigator)
+                                              (implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport {
 
   def onPageLoad: Action[AnyContent] = (stcAuthEnrolled andThen getData) {
     implicit request =>
       Ok(view())
+  }
+
+  def onSubmit(): Action[AnyContent] = (stcAuthEnrolled andThen getData).async {
+    implicit request =>
+      val userId = request.request.internalId
+      for {
+        submissionId  <- idClient.nextSubmissionId()
+        emptyAnswers  =  UserAnswers.empty(userId)(submissionId)
+        nextPage      <- navigator.nextPage(SubmissionsDashboardPage, NormalMode, emptyAnswers)
+      } yield Redirect(nextPage)
   }
 }
