@@ -29,6 +29,7 @@ import play.api.mvc.{AnyContent, AnyContentAsEmpty}
 import play.api.test.FakeRequest
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.actions.{DataRequiredAction, DataRequiredActionImpl, DataRetrievalAction, IdentifierAction}
+import uk.gov.hmrc.securitiestransferchargefrontend.domain.SubmissionId
 import uk.gov.hmrc.securitiestransferchargefrontend.models.UserAnswers
 import uk.gov.hmrc.securitiestransferchargefrontend.models.requests.DataRequest
 
@@ -46,8 +47,9 @@ trait SpecBase
   implicit val hc: HeaderCarrier = HeaderCarrier()
   val userAnswersId: String = "id"
   val sessionId = "sessionId1234"
+  val submissionId: SubmissionId = SubmissionId("STC-123456789")
 
-  def emptyUserAnswers : UserAnswers = UserAnswers(userAnswersId)
+  def emptyUserAnswers : UserAnswers = UserAnswers.empty(userAnswersId)(submissionId)
 
   val fakeRequest: FakeRequest[AnyContentAsEmpty.type] = FakeRequest().withHeaders("sessionId" -> sessionId)
 

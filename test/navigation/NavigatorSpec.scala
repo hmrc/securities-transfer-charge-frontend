@@ -17,14 +17,17 @@
 package navigation
 
 import base.SpecBase
+import clients.FakeSaveAndReturnClient
+import org.scalatest.concurrent.ScalaFutures
+import repositories.FakeSessionRepository
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.routes
 import uk.gov.hmrc.securitiestransferchargefrontend.models.*
-import uk.gov.hmrc.securitiestransferchargefrontend.navigation.Navigator
+import uk.gov.hmrc.securitiestransferchargefrontend.navigation.StfNavigator
 import uk.gov.hmrc.securitiestransferchargefrontend.pages.Page
 
-class NavigatorSpec extends SpecBase {
+class NavigatorSpec extends SpecBase with ScalaFutures {
 
-  val navigator = new Navigator
+  val navigator = new StfNavigator(FakeSessionRepository(), FakeSaveAndReturnClient())
 
   "Navigator" - {
 
@@ -33,7 +36,11 @@ class NavigatorSpec extends SpecBase {
       "must go from a page that doesn't exist in the route map to Index" in {
 
         case object UnknownPage extends Page
-        navigator.nextPage(UnknownPage, NormalMode, UserAnswers("id")) mustBe routes.IndexController.onPageLoad()
+        val result = navigator.nextPage(UnknownPage, NormalMode, UserAnswers("id", submissionId))
+        whenReady(result) { res =>
+          res mustBe routes.JourneyRecoveryController.onPageLoad()
+        }
+
       }
     }
 
@@ -42,7 +49,10 @@ class NavigatorSpec extends SpecBase {
       "must go from a page that doesn't exist in the edit route map to CheckYourAnswers" in {
 
         case object UnknownPage extends Page
-        navigator.nextPage(UnknownPage, CheckMode, UserAnswers("id")) mustBe routes.CheckYourAnswersController.onPageLoad()
+        val result = navigator.nextPage(UnknownPage, CheckMode, UserAnswers("id", submissionId))
+        whenReady(result) { res =>
+          res mustBe routes.CheckYourAnswersController.onPageLoad()
+        }
       }
     }
   }

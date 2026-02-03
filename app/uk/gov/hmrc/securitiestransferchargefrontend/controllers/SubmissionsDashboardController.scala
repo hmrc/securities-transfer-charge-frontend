@@ -37,17 +37,16 @@ class SubmissionsDashboardController @Inject()(
                                                 view: SubmissionsDashboardView,
                                                 idClient: SubmissionIdClient,
                                                 navigator: Navigator)
-                                     ) extends FrontendBaseController with I18nSupport {
+                                              (implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport {
 
-  def onPageLoad: Action[AnyContent] = Action {
+  def onPageLoad: Action[AnyContent] = (stcAuthEnrolled andThen getData) {
     implicit request =>
       Ok(view())
   }
 
-  def onSubmit(): Action[AnyContent] = Action.async {
+  def onSubmit(): Action[AnyContent] = (stcAuthEnrolled andThen getData).async {
     implicit request =>
-      // ToDo: Future PR should add the userId to the request.
-      val userId = request.session.get("userId").getOrElse("foobar")
+      val userId = request.request.internalId
       for {
         submissionId  <- idClient.nextSubmissionId()
         emptyAnswers  =  UserAnswers.empty(userId)(submissionId)
