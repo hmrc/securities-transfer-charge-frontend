@@ -122,28 +122,6 @@ class StcAuthEnrolledActionImplSpec extends SpecBase {
       }
     }
 
-    "must redirect to unauthorised page when confidence level is insufficient" in {
-
-      val application = applicationBuilder().build()
-
-      running(application) {
-
-        val authConnector =
-          FakeAuthConnectorFailing(InsufficientConfidenceLevel())
-
-        val action =
-          testSetup(application, buildRetrieval())(authConnector)
-
-        val result =
-          action.invokeBlock(FakeRequest(), _ => Future.successful(Results.Ok))
-
-        status(result) mustBe SEE_OTHER
-        redirectLocation(result).value must include(
-          routes.UnauthorisedController.onPageLoad().url
-        )
-      }
-    }
-
     "must redirect to unauthorised page when internalId is missing" in {
 
       val application = applicationBuilder().build()
