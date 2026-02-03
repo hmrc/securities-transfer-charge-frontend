@@ -17,11 +17,10 @@
 package uk.gov.hmrc.securitiestransferchargefrontend.clients
 
 import uk.gov.hmrc.securitiestransferchargefrontend.models.UserAnswers
+import uk.gov.hmrc.securitiestransferchargefrontend.domain.SubmissionId
 
 import javax.inject.Inject
 import scala.concurrent.Future
-
-type SubmissionId = String
 
 trait SaveAndReturnClient:
   def save(userAnswers: UserAnswers): Future[Unit]
@@ -32,7 +31,7 @@ trait SaveAndReturnClient:
 class SaveAndReturnClientImpl @Inject() extends SaveAndReturnClient {
 
   private val stubUserId = "bob123"
-  private val stubSubmissionId: SubmissionId = "STC-000000001"
+  private val stubSubmissionId: SubmissionId = SubmissionId.apply("STC-000000001")
   private val stubUserAnswers: UserAnswers = UserAnswers(stubUserId, stubSubmissionId)
 
   override def save(userAnswers: UserAnswers): Future[Unit] = Future.successful(())

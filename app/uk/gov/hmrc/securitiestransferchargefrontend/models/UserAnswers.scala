@@ -18,15 +18,16 @@ package uk.gov.hmrc.securitiestransferchargefrontend.models
 
 import play.api.libs.json.*
 import uk.gov.hmrc.mongo.play.json.formats.MongoJavatimeFormats
+import uk.gov.hmrc.securitiestransferchargefrontend.domain.SubmissionId
 import uk.gov.hmrc.securitiestransferchargefrontend.queries.{Gettable, Settable}
 
 import java.time.Instant
 import scala.util.{Failure, Success, Try}
 
-final case class UserAnswers( userId: String,
-                              submissionId: String,
-                              data: JsObject = Json.obj(),
-                              lastUpdated: Instant = Instant.now
+final case class UserAnswers(userId: String,
+                             submissionId: SubmissionId,
+                             data: JsObject = Json.obj(),
+                             lastUpdated: Instant = Instant.now
                             ) {
 
   def get[A](page: Gettable[A])(implicit rds: Reads[A]): Option[A] =
@@ -67,7 +68,7 @@ final case class UserAnswers( userId: String,
 
 object UserAnswers {
 
-  val empty: String => String => UserAnswers = userId => submissionId => UserAnswers(userId, submissionId)
+  val empty: String => SubmissionId => UserAnswers = userId => submissionId => UserAnswers(userId, submissionId)
 
   val reads: Reads[UserAnswers] = {
 
@@ -75,7 +76,7 @@ object UserAnswers {
 
     (
       (__ \ "_id").read[String] and
-      (__ \ "submissionId").read[String] and
+      (__ \ "submissionId").read[SubmissionId] and
       (__ \ "data").read[JsObject] and
       (__ \ "lastUpdated").read(MongoJavatimeFormats.instantFormat)
     ) (UserAnswers.apply _)
@@ -87,10 +88,10 @@ object UserAnswers {
 
     (
       (__ \ "_id").write[String] and
-      (__ \ "submissionId").write[String] and
+      (__ \ "submissionId").write[SubmissionId] and
       (__ \ "data").write[JsObject] and
       (__ \ "lastUpdated").write(MongoJavatimeFormats.instantFormat)
-    ) (ua => (ua.submissionId, ua.userId, ua.data, ua.lastUpdated))
+    ) (ua => (ua.userId, ua.submissionId, ua.data, ua.lastUpdated))
   }
 
   implicit val format: OFormat[UserAnswers] = OFormat(reads, writes)
