@@ -98,10 +98,10 @@ final class StcAuthEnrolledActionImpl @Inject()(
 
                 case None =>
                   logger.warn(
-                    s"STC auth: STC enrolment present but missing identifier [${appConfig.stcIdentifierKey}]"
+                    s"STC auth: STC enrolment present but missing identifier [STCID]"
                   )
                   Future.successful(
-                    Redirect(routes.UnauthorisedController.onPageLoad())
+                    Redirect(routes.JourneyRecoveryController.onPageLoad())
                   )
               }
           }

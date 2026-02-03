@@ -162,5 +162,33 @@ class StcAuthEnrolledActionImplSpec extends SpecBase {
       }
     }
 
+    "must redirect to journey recovery when STC enrolment is activated but identifier is missing" in {
+
+      val enrolments =
+        Enrolments(
+          Set(
+            Enrolment(
+              enrolmentKey,
+              Seq.empty,
+              "Activated"
+            )
+          )
+        )
+
+      val application = applicationBuilder().build()
+
+      running(application) {
+
+        val action =
+          testSetup(application, buildRetrieval(enrolments = enrolments))()
+
+        val result =
+          action.invokeBlock(FakeRequest(), _ => Future.successful(Results.Ok))
+
+        status(result) mustBe SEE_OTHER
+        redirectLocation(result).value mustBe
+          routes.JourneyRecoveryController.onPageLoad().url
+      }
+    }
   }
 }
