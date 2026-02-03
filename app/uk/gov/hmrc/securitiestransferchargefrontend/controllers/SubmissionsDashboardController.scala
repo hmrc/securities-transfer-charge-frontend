@@ -19,6 +19,7 @@ package uk.gov.hmrc.securitiestransferchargefrontend.controllers
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
+import uk.gov.hmrc.securitiestransferchargefrontend.controllers.actions.{StcAuthEnrolledAction, StcDataRetrievalAction}
 import uk.gov.hmrc.securitiestransferchargefrontend.clients.SubmissionIdClient
 import uk.gov.hmrc.securitiestransferchargefrontend.models.{NormalMode, UserAnswers}
 import uk.gov.hmrc.securitiestransferchargefrontend.navigation.Navigator
@@ -28,12 +29,15 @@ import uk.gov.hmrc.securitiestransferchargefrontend.views.html.SubmissionsDashbo
 import javax.inject.Inject
 import scala.concurrent.ExecutionContext
 
-class SubmissionsDashboardController @Inject()(override val messagesApi: MessagesApi,
-                                               val controllerComponents: MessagesControllerComponents,
-                                               view: SubmissionsDashboardView,
-                                               idClient: SubmissionIdClient,
-                                               navigator: Navigator)
-                                              (implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport {
+class SubmissionsDashboardController @Inject()(
+                                                override val messagesApi: MessagesApi,
+                                                val controllerComponents: MessagesControllerComponents,
+                                                stcAuthEnrolled: StcAuthEnrolledAction,
+                                                getData: StcDataRetrievalAction,
+                                                view: SubmissionsDashboardView,
+                                                idClient: SubmissionIdClient,
+                                                navigator: Navigator)
+                                     ) extends FrontendBaseController with I18nSupport {
 
   def onPageLoad: Action[AnyContent] = Action {
     implicit request =>

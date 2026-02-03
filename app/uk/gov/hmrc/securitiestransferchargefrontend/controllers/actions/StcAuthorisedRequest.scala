@@ -14,16 +14,14 @@
  * limitations under the License.
  */
 
-package models
+package uk.gov.hmrc.securitiestransferchargefrontend.controllers.actions
 
-case class Field(name: String, errorKeys: Map[ErrorType, String])
+import play.api.mvc.{Request, WrappedRequest}
+import uk.gov.hmrc.auth.core.AffinityGroup
 
-object Field {
-
-  def apply(name: String, errors: (ErrorType, String)*): Field =
-    Field(name, errors.toMap)
-}
-
-sealed trait ErrorType
-case object Required extends ErrorType
-case object Invalid extends ErrorType
+final case class StcAuthorisedRequest[A](
+                                          request: Request[A],
+                                          internalId: String,
+                                          affinityGroup: AffinityGroup,
+                                          stcId: String
+                                        ) extends WrappedRequest[A](request)

@@ -20,7 +20,6 @@ import forms.FormSpec
 import generators.Generators
 import org.scalacheck.Gen
 import org.scalatestplus.scalacheck.ScalaCheckPropertyChecks
-import uk.gov.hmrc.securitiestransferchargefrontend.models.*
 import play.api.data.{Form, FormError}
 
 trait FormBehaviours extends FormSpec with ScalaCheckPropertyChecks with Generators {
