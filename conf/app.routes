@@ -22,7 +22,7 @@ GET         /unauthorised                                uk.gov.hmrc.securitiest
 
 GET        /submissions-dashboard                       uk.gov.hmrc.securitiestransferchargefrontend.controllers.SubmissionsDashboardController.onPageLoad()
 
-GET        /howToNotifyAboutSecuritiesTransfer           uk.gov.hmrc.securitiestransferchargefrontend.controllers.HowToNotifyAboutSecuritiesTransferController.onPageLoad(mode: Mode = NormalMode)
-POST       /howToNotifyAboutSecuritiesTransfer           uk.gov.hmrc.securitiestransferchargefrontend.controllers.HowToNotifyAboutSecuritiesTransferController.onSubmit(mode: Mode = NormalMode)
-GET        /changeHowToNotifyAboutSecuritiesTransfer     uk.gov.hmrc.securitiestransferchargefrontend.controllers.HowToNotifyAboutSecuritiesTransferController.onPageLoad(mode: Mode = CheckMode)
-POST       /changeHowToNotifyAboutSecuritiesTransfer     uk.gov.hmrc.securitiestransferchargefrontend.controllers.HowToNotifyAboutSecuritiesTransferController.onSubmit(mode: Mode = CheckMode)
+GET        /how-many-transfers                          uk.gov.hmrc.securitiestransferchargefrontend.controllers.HowToNotifyAboutSecuritiesTransferController.onPageLoad(mode: Mode = NormalMode)
+POST       /how-many-transfers                          uk.gov.hmrc.securitiestransferchargefrontend.controllers.HowToNotifyAboutSecuritiesTransferController.onSubmit(mode: Mode = NormalMode)
+GET        /change/how-many-transfers                   uk.gov.hmrc.securitiestransferchargefrontend.controllers.HowToNotifyAboutSecuritiesTransferController.onPageLoad(mode: Mode = CheckMode)
+POST       /change/how-many-transfers                   uk.gov.hmrc.securitiestransferchargefrontend.controllers.HowToNotifyAboutSecuritiesTransferController.onSubmit(mode: Mode = CheckMode)
