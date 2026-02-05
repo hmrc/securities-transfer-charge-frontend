@@ -62,6 +62,6 @@ howToNotifyAboutSecuritiesTransfer.moreThanOneAtATime = More than one at a time
 howToNotifyAboutSecuritiesTransfer.moreThanOneAtATime.hint = Download the template, complete it using one row per transfer, and upload it on the following pages. You can then find the submission on your dashboard and pay the money owed.
 howToNotifyAboutSecuritiesTransfer.save-and-continue.button = Save and continue
 howToNotifyAboutSecuritiesTransfer.checkYourAnswersLabel = HowToNotifyAboutSecuritiesTransfer
-howToNotifyAboutSecuritiesTransfer.error.required = Select howToNotifyAboutSecuritiesTransfer
+howToNotifyAboutSecuritiesTransfer.error.required = Select a way to tell us about your securities transfer
 howToNotifyAboutSecuritiesTransfer.change.hidden = HowToNotifyAboutSecuritiesTransfer
 
