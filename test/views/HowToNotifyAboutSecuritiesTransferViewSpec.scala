@@ -20,6 +20,8 @@ import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
 import play.api.Application
 import uk.gov.hmrc.securitiestransferchargefrontend.views.html.HowToNotifyAboutSecuritiesTransferView
+import uk.gov.hmrc.securitiestransferchargefrontend.forms.HowToNotifyAboutSecuritiesTransferFormProvider
+import uk.gov.hmrc.securitiestransferchargefrontend.models.NormalMode
 import views.ViewBaseSpec
 
 class HowToNotifyAboutSecuritiesTransferViewSpec extends ViewBaseSpec {
@@ -27,15 +29,19 @@ class HowToNotifyAboutSecuritiesTransferViewSpec extends ViewBaseSpec {
   override def fakeApplication(): Application = applicationBuilder().build()
   
   private val viewInstance         = app.injector.instanceOf[HowToNotifyAboutSecuritiesTransferView]
+  private val formProvider = new HowToNotifyAboutSecuritiesTransferFormProvider()
+  private val form = formProvider()
+
 
   def view(): Document = Jsoup.parse(
-    viewInstance()(fakeRequest, messages).body
+    viewInstance(form, NormalMode)(fakeRequest, messages).body
   )
 
   object ExpectedContent {
-    val title = "Submissions"
-    val heading = "Submissions"
-    val createNew = "Create new submission"
+    val title = "How do you want to tell us about your securities transfer?"
+    val captionHint = "Transfer details"
+    val heading = "How do you want to tell us about your securities transfer?"
+    val continue = "Continue"
     
   }
 
@@ -50,11 +56,7 @@ class HowToNotifyAboutSecuritiesTransferViewSpec extends ViewBaseSpec {
       "have the correct heading" in {
         HowToNotifyAboutSecuritiesTransferView.select("h1").text() mustBe ExpectedContent.heading
       }
-
-      "have a create button with the correct text" in {
-        val button = HowToNotifyAboutSecuritiesTransferView.select(".govuk-button")
-        button.text() mustBe ExpectedContent.createNew
-      }
+      ???
     }
   }
 
