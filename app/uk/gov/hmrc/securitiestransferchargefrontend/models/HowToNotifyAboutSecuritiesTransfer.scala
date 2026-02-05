@@ -17,7 +17,7 @@
 package uk.gov.hmrc.securitiestransferchargefrontend.models
 
 import play.api.i18n.Messages
-import uk.gov.hmrc.govukfrontend.views.Aliases.Text
+import uk.gov.hmrc.govukfrontend.views.Aliases.{Hint, Text}
 import uk.gov.hmrc.govukfrontend.views.viewmodels.radios.RadioItem
 
 sealed trait HowToNotifyAboutSecuritiesTransfer
@@ -31,14 +31,15 @@ object HowToNotifyAboutSecuritiesTransfer extends Enumerable.Implicits {
     Oneatatime, Morethanoneatatime
   )
 
-  def options(implicit messages: Messages): Seq[RadioItem] = values.zipWithIndex.map {
-    case (value, index) =>
-      RadioItem(
+  def options(implicit messages: Messages): Seq[RadioItem] =
+    values.zipWithIndex.map {
+      case (value, index) => RadioItem(
         content = Text(messages(s"howToNotifyAboutSecuritiesTransfer.${value.toString}")),
-        value   = Some(value.toString),
-        id      = Some(s"value_$index")
+        value = Some(value.toString),
+        id = Some(s"value_$index"),
+        hint = Some(Hint(content = Text(messages(s"howToNotifyAboutSecuritiesTransfer.${value.toString}.hint"))))
       )
-  }
+    }
 
   implicit val enumerable: Enumerable[HowToNotifyAboutSecuritiesTransfer] =
     Enumerable(values.map(v => v.toString -> v): _*)
