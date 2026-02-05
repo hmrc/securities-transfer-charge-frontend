@@ -22,7 +22,7 @@ import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.actions.*
 import uk.gov.hmrc.securitiestransferchargefrontend.forms.HowToNotifyAboutSecuritiesTransferFormProvider
-import uk.gov.hmrc.securitiestransferchargefrontend.models.{HowToNotifyAboutSecuritiesTransfer, Mode, UserAnswers}
+import uk.gov.hmrc.securitiestransferchargefrontend.models.{HowToNotifyAboutSecuritiesTransfer, Mode}
 import uk.gov.hmrc.securitiestransferchargefrontend.navigation.Navigator
 import uk.gov.hmrc.securitiestransferchargefrontend.pages.HowToNotifyAboutSecuritiesTransferPage
 import uk.gov.hmrc.securitiestransferchargefrontend.repositories.SessionRepository
@@ -30,13 +30,15 @@ import uk.gov.hmrc.securitiestransferchargefrontend.views.html.HowToNotifyAboutS
 
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
+import scala.language.postfixOps
 
 class HowToNotifyAboutSecuritiesTransferController @Inject()(
                                        override val messagesApi: MessagesApi,
                                        sessionRepository: SessionRepository,
                                        navigator: Navigator,
-                                       identify: IdentifierAction,
-                                       getData: DataRetrievalAction,
+                                       stcAuthEnrolled: StcAuthEnrolledAction,
+                                       getData: StcDataRetrievalAction,
+                                       requireData: StcDataRequiredAction,
                                        formProvider: HowToNotifyAboutSecuritiesTransferFormProvider,
                                        val controllerComponents: MessagesControllerComponents,
                                        view: HowToNotifyAboutSecuritiesTransferView
@@ -44,30 +46,28 @@ class HowToNotifyAboutSecuritiesTransferController @Inject()(
 
   val form: Form[HowToNotifyAboutSecuritiesTransfer] = formProvider()
 
-
-  def onPageLoad(mode: Mode): Action[AnyContent] = (identify andThen getData) {
+  def onPageLoad(mode: Mode): Action[AnyContent] = (stcAuthEnrolled andThen getData andThen requireData).async{
     implicit request =>
-      val preparedForm = request.userAnswers.flatMap(_.get(HowToNotifyAboutSecuritiesTransferPage)) match {
+      val preparedForm = request.userAnswers.get(HowToNotifyAboutSecuritiesTransferPage) match {
         case None => form
         case Some(value) => form.fill(value)
       }
 
-      Ok(view(preparedForm, mode))
+      Future.successful(Ok(view(preparedForm, mode)))
   }
 
-  def onSubmit(mode: Mode): Action[AnyContent] = (identify andThen getData).async {
+  def onSubmit(mode: Mode): Action[AnyContent] = (stcAuthEnrolled andThen getData andThen requireData).async {
     implicit request =>
-      val userAnswers = request.userAnswers.getOrElse(new UserAnswers(request.userId))
-
       form.bindFromRequest().fold(
         formWithErrors =>
           Future.successful(BadRequest(view(formWithErrors, mode))),
 
         value =>
           for {
-            updatedAnswers <- Future.fromTry(userAnswers.set(HowToNotifyAboutSecuritiesTransferPage, value))
+            updatedAnswers <- Future.fromTry(request.userAnswers.set(HowToNotifyAboutSecuritiesTransferPage, value))
             _              <- sessionRepository.set(updatedAnswers)
-          } yield Redirect(navigator.nextPage(HowToNotifyAboutSecuritiesTransferPage, mode, updatedAnswers))
+            nextPage       <- navigator.nextPage(HowToNotifyAboutSecuritiesTransferPage, mode, updatedAnswers)
+          } yield Redirect(nextPage)
       )
   }
 }
