@@ -53,8 +53,10 @@ submissionsDashboard.heading = Submissions
 submissionsDashboard.create-new-submission.button = Create new submission
 submissionsDashboard.hint = Submission dashboard
 
+seller-details.caption = Seller details
+
 inTheUkOrNot.title = inTheUkOrNot
 inTheUkOrNot.heading = inTheUkOrNot
 inTheUkOrNot.checkYourAnswersLabel = inTheUkOrNot
-inTheUkOrNot.error.required = Select yes if inTheUkOrNot
+inTheUkOrNot.error.required = Select yes if the seller lives in the UK
 inTheUkOrNot.change.hidden = InTheUkOrNot
