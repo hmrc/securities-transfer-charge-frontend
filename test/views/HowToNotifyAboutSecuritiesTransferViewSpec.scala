@@ -24,6 +24,8 @@ import uk.gov.hmrc.securitiestransferchargefrontend.forms.HowToNotifyAboutSecuri
 import uk.gov.hmrc.securitiestransferchargefrontend.models.NormalMode
 import views.ViewBaseSpec
 
+import scala.language.postfixOps
+
 class HowToNotifyAboutSecuritiesTransferViewSpec extends ViewBaseSpec {
 
   override def fakeApplication(): Application = applicationBuilder().build()
@@ -39,10 +41,11 @@ class HowToNotifyAboutSecuritiesTransferViewSpec extends ViewBaseSpec {
 
   object ExpectedContent {
     val title = "How do you want to tell us about your securities transfer?"
-    val captionHint = "Transfer details"
+    val caption = "Transfer details"
     val heading = "How do you want to tell us about your securities transfer?"
-    val continue = "Continue"
-    
+    val saveAndContinue = "Save and continue"
+    val saveAndReturn = "Save and return to dashboard"
+
   }
 
   "The SubmissionsDashboardView" - {
@@ -56,7 +59,20 @@ class HowToNotifyAboutSecuritiesTransferViewSpec extends ViewBaseSpec {
       "have the correct heading" in {
         HowToNotifyAboutSecuritiesTransferView.select("h1").text() mustBe ExpectedContent.heading
       }
-      ???
+
+      "display the correct caption text" in {
+        HowToNotifyAboutSecuritiesTransferView.select("#more-detail-hint").text() mustBe ExpectedContent.caption
+      }
+
+      "have a button with the text save and continue " in {
+        val button = HowToNotifyAboutSecuritiesTransferView.select("#save-and-continue.button")
+        button.text() mustBe ExpectedContent.saveAndContinue
+      }
+
+      "have a button with the text save and return to dashboard" in {
+        val button = HowToNotifyAboutSecuritiesTransferView.select("#save-and-return.button")
+        button.text() mustBe ExpectedContent.saveAndReturn
+      }
     }
   }
 
