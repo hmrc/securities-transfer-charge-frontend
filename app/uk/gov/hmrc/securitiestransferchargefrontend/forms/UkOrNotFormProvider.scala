@@ -14,12 +14,18 @@
  * limitations under the License.
  */
 
-package generators
+package uk.gov.hmrc.securitiestransferchargefrontend.forms
 
-trait ModelGenerators {
+import play.api.data.Form
+import uk.gov.hmrc.securitiestransferchargefrontend.mappings.Mappings
+import uk.gov.hmrc.securitiestransferchargefrontend.models.UkOrNot
 
-  implicit lazy val arbitraryUkOrNot: Arbitrary[UkOrNot] =
-    Arbitrary {
-      Gen.oneOf(UkOrNot.values.toSeq)
-    }
+import javax.inject.Inject
+
+class UkOrNotFormProvider @Inject() extends Mappings {
+
+  def apply(): Form[UkOrNot] =
+    Form(
+      "value" -> enumerable[UkOrNot]("ukOrNot.error.required")
+    )
 }

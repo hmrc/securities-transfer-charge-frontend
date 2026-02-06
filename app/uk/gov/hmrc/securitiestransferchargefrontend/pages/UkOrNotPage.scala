@@ -14,12 +14,14 @@
  * limitations under the License.
  */
 
-package generators
+package uk.gov.hmrc.securitiestransferchargefrontend.pages
 
-trait ModelGenerators {
+import play.api.libs.json.JsPath
+import uk.gov.hmrc.securitiestransferchargefrontend.models.UkOrNot
 
-  implicit lazy val arbitraryUkOrNot: Arbitrary[UkOrNot] =
-    Arbitrary {
-      Gen.oneOf(UkOrNot.values.toSeq)
-    }
+case object UkOrNotPage extends QuestionPage[UkOrNot] {
+
+  override def path: JsPath = JsPath \ toString
+
+  override def toString: String = "ukOrNot"
 }

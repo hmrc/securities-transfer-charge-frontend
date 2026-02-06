@@ -55,3 +55,10 @@ submissionsDashboard.hint = Submission dashboard
 
 seller-details.caption = Seller details
 
+ukOrNot.title = Does the seller live in the UK?
+ukOrNot.heading = Does the seller live in the UK?
+ukOrNot.yes = Yes
+ukOrNot.no = No
+ukOrNot.checkYourAnswersLabel = Does the seller live in the UK?
+ukOrNot.error.required = Select yes if the seller lives in the UK
+ukOrNot.change.hidden = UkOrNot

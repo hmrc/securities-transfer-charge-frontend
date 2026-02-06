@@ -33,7 +33,7 @@ class StfNavigator @Inject() (sessionRepository: SessionRepository,
 
   private val normalRoutes: Page => UserAnswers => Future[Call] = {
 
-    case SubmissionsDashboardPage => userAnswers => goTo(routes.InTheUkOrNotController.onPageLoad(NormalMode), Some(userAnswers))
+    case SubmissionsDashboardPage => userAnswers => goTo(routes.UkOrNotController.onPageLoad(NormalMode), Some(userAnswers))
     
     case _ => _ => defaultPage  
   }
