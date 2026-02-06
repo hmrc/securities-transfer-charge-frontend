@@ -52,3 +52,10 @@ submissionsDashboard.title = Submissions
 submissionsDashboard.heading = Submissions
 submissionsDashboard.create-new-submission.button = Create new submission
 submissionsDashboard.hint = Submission dashboard
+
+nameOfSeller.title = nameOfSeller
+nameOfSeller.heading = nameOfSeller
+nameOfSeller.checkYourAnswersLabel = nameOfSeller
+nameOfSeller.error.required = Enter nameOfSeller
+nameOfSeller.error.length = NameOfSeller must be 35 characters or less
+nameOfSeller.change.hidden = NameOfSeller
