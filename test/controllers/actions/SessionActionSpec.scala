@@ -24,8 +24,6 @@ import uk.gov.hmrc.http.SessionKeys
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.actions.{IdentifierAction, SessionIdentifierAction}
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.routes
 
-import scala.concurrent.ExecutionContext.Implicits.global
-
 class SessionActionSpec extends SpecBase {
 
   class Harness(action: IdentifierAction) {

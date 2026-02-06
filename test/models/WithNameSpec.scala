@@ -18,7 +18,6 @@ package securitiestransferchargefrontend.models
 
 import org.scalatest.freespec.AnyFreeSpec
 import org.scalatest.matchers.must.Matchers
-import uk.gov.hmrc.securitiestransferchargefrontend
 import uk.gov.hmrc.securitiestransferchargefrontend.models.WithName
 
 class WithNameSpec extends AnyFreeSpec with Matchers {

@@ -20,6 +20,7 @@ import play.api.data.validation.{Constraint, Invalid, Valid}
 import uk.gov.hmrc.securitiestransferchargefrontend.config.CurrencyFormatter
 
 import java.time.LocalDate
+import scala.annotation.nowarn
 
 trait Constraints {
 
@@ -111,6 +112,7 @@ trait Constraints {
         Invalid(errorKey)
     }
 
+  @nowarn
   protected def minimumCurrency(minimum: BigDecimal, errorKey: String)(implicit ev: Ordering[BigDecimal]): Constraint[BigDecimal] =
     Constraint {
       input =>
@@ -121,6 +123,7 @@ trait Constraints {
         }
     }
 
+  @nowarn
   protected def maximumCurrency(maximum: BigDecimal, errorKey: String)(implicit ev: Ordering[BigDecimal]): Constraint[BigDecimal] =
     Constraint {
       input =>

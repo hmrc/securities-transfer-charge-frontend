@@ -68,7 +68,7 @@ class SessionRepositorySpec
       val expectedResult = userAnswers copy (lastUpdated = instant)
 
       val setResult     = repository.set(userAnswers).futureValue
-      val updatedRecord = find(Filters.equal("_id", userAnswers.id)).futureValue.headOption.value
+      val updatedRecord = find(Filters.equal("_id", userAnswers.userId)).futureValue.headOption.value
 
       updatedRecord mustEqual expectedResult
     }
@@ -84,7 +84,7 @@ class SessionRepositorySpec
 
         insert(userAnswers).futureValue
 
-        val result         = repository.get(userAnswers.id).futureValue
+        val result         = repository.get(userAnswers.userId).futureValue
         val expectedResult = userAnswers copy (lastUpdated = instant)
 
         result.value mustEqual expectedResult
@@ -99,7 +99,7 @@ class SessionRepositorySpec
       }
     }
 
-    mustPreserveMdc(repository.get(userAnswers.id))
+    mustPreserveMdc(repository.get(userAnswers.userId))
   }
 
   ".clear" - {
@@ -108,9 +108,9 @@ class SessionRepositorySpec
 
       insert(userAnswers).futureValue
 
-      val result = repository.clear(userAnswers.id).futureValue
+      val result = repository.clear(userAnswers.userId).futureValue
 
-      repository.get(userAnswers.id).futureValue must not be defined
+      repository.get(userAnswers.userId).futureValue must not be defined
     }
 
     "must return true when there is no record to remove" in {
@@ -119,7 +119,7 @@ class SessionRepositorySpec
       result mustEqual true
     }
 
-    mustPreserveMdc(repository.clear(userAnswers.id))
+    mustPreserveMdc(repository.clear(userAnswers.userId))
   }
 
   ".keepAlive" - {
@@ -130,11 +130,11 @@ class SessionRepositorySpec
 
         insert(userAnswers).futureValue
 
-        val result = repository.keepAlive(userAnswers.id).futureValue
+        val result = repository.keepAlive(userAnswers.userId).futureValue
 
         val expectedUpdatedAnswers = userAnswers copy (lastUpdated = instant)
 
-        val updatedAnswers = find(Filters.equal("_id", userAnswers.id)).futureValue.headOption.value
+        val updatedAnswers = find(Filters.equal("_id", userAnswers.userId)).futureValue.headOption.value
         updatedAnswers mustEqual expectedUpdatedAnswers
       }
     }
@@ -147,7 +147,7 @@ class SessionRepositorySpec
       }
     }
 
-    mustPreserveMdc(repository.keepAlive(userAnswers.id))
+    mustPreserveMdc(repository.keepAlive(userAnswers.userId))
   }
 
   private def mustPreserveMdc[A](f: => Future[A])(implicit pos: Position): Unit =

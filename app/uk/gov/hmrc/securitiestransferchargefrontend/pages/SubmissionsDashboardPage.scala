@@ -14,16 +14,8 @@
  * limitations under the License.
  */
 
-package models
+package uk.gov.hmrc.securitiestransferchargefrontend.pages
 
-case class Field(name: String, errorKeys: Map[ErrorType, String])
-
-object Field {
-
-  def apply(name: String, errors: (ErrorType, String)*): Field =
-    Field(name, errors.toMap)
+case object SubmissionsDashboardPage extends Page {
+  override def toString: String = "submissionsDashboard"
 }
-
-sealed trait ErrorType
-case object Required extends ErrorType
-case object Invalid extends ErrorType
