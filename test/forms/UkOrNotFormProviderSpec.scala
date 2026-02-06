@@ -1,6 +1,7 @@
 package forms
 
-import uk.gov.hmrc.securitiestransferchargefrontend.forms.behaviours.OptionFieldBehaviours
+import behaviours.OptionFieldBehaviours
+import uk.gov.hmrc.securitiestransferchargefrontend.forms.UkOrNotFormProvider
 import uk.gov.hmrc.securitiestransferchargefrontend.models.UkOrNot
 import play.api.data.FormError
 

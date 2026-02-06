@@ -1,17 +1,20 @@
 package controllers
 
 import base.SpecBase
+import navigation.FakeNavigator
 import uk.gov.hmrc.securitiestransferchargefrontend.forms.UkOrNotFormProvider
+import uk.gov.hmrc.securitiestransferchargefrontend.controllers.routes
 import uk.gov.hmrc.securitiestransferchargefrontend.models.{NormalMode, UkOrNot, UserAnswers}
-import uk.gov.hmrc.securitiestransferchargefrontend.navigation.{FakeNavigator, Navigator}
+import uk.gov.hmrc.securitiestransferchargefrontend.navigation.Navigator
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.when
 import org.scalatestplus.mockito.MockitoSugar
+import play.api.data.Form
 import uk.gov.hmrc.securitiestransferchargefrontend.pages.UkOrNotPage
 import play.api.inject.bind
 import play.api.mvc.Call
 import play.api.test.FakeRequest
-import play.api.test.Helpers._
+import play.api.test.Helpers.*
 import uk.gov.hmrc.securitiestransferchargefrontend.repositories.SessionRepository
 import uk.gov.hmrc.securitiestransferchargefrontend.views.html.UkOrNotView
 
@@ -21,10 +24,10 @@ class UkOrNotControllerSpec extends SpecBase with MockitoSugar {
 
   def onwardRoute = Call("GET", "/foo")
 
-  lazy val ukOrNotRoute = routes.UkOrNotController.onPageLoad(NormalMode).url
+  lazy val ukOrNotRoute: Any = routes.UkOrNotController.onPageLoad(NormalMode).url
 
   val formProvider = new UkOrNotFormProvider()
-  val form = formProvider()
+  val form: Form[UkOrNot] = formProvider()
 
   "UkOrNot Controller" - {
 
