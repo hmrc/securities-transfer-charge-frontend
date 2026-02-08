@@ -48,8 +48,8 @@ class HowToNotifyAboutSecuritiesTransferViewSpec extends ViewBaseSpec {
 
   }
 
-  "The SubmissionsDashboardView" - {
-    "the user is an Individual" - {
+  "The HowToNotifyAboutSecuritiesTransferView" - {
+    "when the user is an Individual, should:" - {
       val HowToNotifyAboutSecuritiesTransferView = view()
 
       "have the correct title" in {
@@ -65,13 +65,13 @@ class HowToNotifyAboutSecuritiesTransferViewSpec extends ViewBaseSpec {
       }
 
       "have a button with the text save and continue " in {
-        val button = HowToNotifyAboutSecuritiesTransferView.select("#save-and-continue.button")
-        button.text() mustBe ExpectedContent.saveAndContinue
+        val buttons = HowToNotifyAboutSecuritiesTransferView.select(".govuk-button")
+        buttons.get(0).text() mustBe ExpectedContent.saveAndContinue
       }
 
       "have a button with the text save and return to dashboard" in {
-        val button = HowToNotifyAboutSecuritiesTransferView.select("#save-and-return.button")
-        button.text() mustBe ExpectedContent.saveAndReturn
+        val buttons = HowToNotifyAboutSecuritiesTransferView.select(".govuk-button")
+        buttons.get(1).text() mustBe ExpectedContent.saveAndReturn
       }
     }
   }

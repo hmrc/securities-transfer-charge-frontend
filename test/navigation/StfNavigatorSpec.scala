@@ -17,9 +17,9 @@
 package navigation
 
 import base.SpecBase
+import base.stubs.StubSessionRepository
 import clients.FakeSaveAndReturnClient
 import org.scalatest.concurrent.ScalaFutures
-import repositories.FakeSessionRepository
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.routes
 import uk.gov.hmrc.securitiestransferchargefrontend.models.*
 import uk.gov.hmrc.securitiestransferchargefrontend.navigation.StfNavigator
@@ -27,7 +27,7 @@ import uk.gov.hmrc.securitiestransferchargefrontend.pages.Page
 
 class StfNavigatorSpec extends SpecBase with ScalaFutures {
 
-  val navigator = new StfNavigator(FakeSessionRepository(), FakeSaveAndReturnClient())
+  val navigator = new StfNavigator(StubSessionRepository(), FakeSaveAndReturnClient())
 
   "Navigator" - {
 

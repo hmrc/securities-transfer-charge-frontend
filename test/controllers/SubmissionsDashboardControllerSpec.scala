@@ -17,57 +17,23 @@
 package controllers
 
 import base.SpecBase
-import play.api.inject.bind
 import play.api.mvc.*
 import play.api.test.Helpers.*
 import play.api.test.{FakeRequest, Helpers}
-import uk.gov.hmrc.auth.core.AffinityGroup
-import uk.gov.hmrc.securitiestransferchargefrontend.controllers.actions.*
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.routes
 import uk.gov.hmrc.securitiestransferchargefrontend.views.html.SubmissionsDashboardView
 
-import scala.concurrent.{ExecutionContext, Future}
-
 class SubmissionsDashboardControllerSpec extends SpecBase {
-
-  private implicit val ec: ExecutionContext =
-    Helpers.stubControllerComponents().executionContext
 
   lazy val submissionsDashboardRoute: String =
     routes.SubmissionsDashboardController.onPageLoad().url
-
-  private val fakeAuthAction: StcAuthEnrolledAction =
-    new StcAuthEnrolledAction {
-
-      override def parser: BodyParser[AnyContent] =
-        Helpers.stubBodyParser[AnyContent]()
-
-      override protected def executionContext: ExecutionContext = ec
-
-      override def invokeBlock[A](
-                                   request: Request[A],
-                                   block: StcAuthorisedRequest[A] => Future[Result]
-                                 ): Future[Result] =
-        block(
-          StcAuthorisedRequest(
-            request,
-            internalId = "user123",
-            affinityGroup = AffinityGroup.Individual,
-            stcId = "STC1234567890"
-          )
-        )
-    }
 
   "SubmissionsDashboardController" - {
 
     "must return OK and the correct view for a GET" in {
 
       val application =
-        applicationBuilder()
-          .overrides(
-            bind[StcAuthEnrolledAction].toInstance(fakeAuthAction)
-          )
-          .build()
+        applicationBuilder().build()
 
       running(application) {
         val request = FakeRequest(GET, submissionsDashboardRoute)

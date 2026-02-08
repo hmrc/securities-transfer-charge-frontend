@@ -24,11 +24,11 @@ sealed trait HowToNotifyAboutSecuritiesTransfer
 
 object HowToNotifyAboutSecuritiesTransfer extends Enumerable.Implicits {
 
-  case object Oneatatime extends WithName("oneAtATime") with HowToNotifyAboutSecuritiesTransfer
-  case object Morethanoneatatime extends WithName("moreThanOneAtATime") with HowToNotifyAboutSecuritiesTransfer
+  case object OneAtATime extends WithName("oneAtATime") with HowToNotifyAboutSecuritiesTransfer
+  case object MoreThanOneAtATime extends WithName("moreThanOneAtATime") with HowToNotifyAboutSecuritiesTransfer
 
   val values: Seq[HowToNotifyAboutSecuritiesTransfer] = Seq(
-    Oneatatime, Morethanoneatatime
+    OneAtATime, MoreThanOneAtATime
   )
 
   def options(implicit messages: Messages): Seq[RadioItem] =

@@ -14,14 +14,14 @@
  * limitations under the License.
  */
 
-package repositories
+package base.stubs
 
 import uk.gov.hmrc.securitiestransferchargefrontend.models.UserAnswers
 import uk.gov.hmrc.securitiestransferchargefrontend.repositories.SessionRepository
 
 import scala.concurrent.Future
 
-class FakeSessionRepository extends SessionRepository:
+class StubSessionRepository extends SessionRepository:
 
   override def get(id: String): Future[Option[UserAnswers]] = Future.successful(None)
 
@@ -31,10 +31,10 @@ class FakeSessionRepository extends SessionRepository:
 
   override def keepAlive(id: String): Future[Unit] = Future.successful(())
 
-object FakeSessionRepository:
-  def apply(): SessionRepository = new FakeSessionRepository
+object StubSessionRepository:
+  def apply(): SessionRepository = new StubSessionRepository
 
-class FailingSessionRepository extends SessionRepository:
+class StubFailingSessionRepository extends SessionRepository:
   val failure = new RuntimeException("FAILED")
   
   override def get(id: String): Future[Option[UserAnswers]] = Future.failed(failure)
@@ -45,5 +45,5 @@ class FailingSessionRepository extends SessionRepository:
 
   override def keepAlive(id: String): Future[Unit] = Future.successful(())
 
-object FailingSessionRepository:
-  def apply(): SessionRepository = new FailingSessionRepository
+object StubFailingSessionRepository:
+  def apply(): SessionRepository = new StubFailingSessionRepository
