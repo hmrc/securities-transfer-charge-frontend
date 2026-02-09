@@ -144,7 +144,5 @@ class SaveAndReturnClientImplSpec extends SpecBase {
         result.failed.futureValue mustBe exception
       }
     }
-
-
   }
 }

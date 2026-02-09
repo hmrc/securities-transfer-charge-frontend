@@ -60,9 +60,10 @@ class FrontendAppConfig @Inject() (configuration: Configuration, servicesConfig:
   val cacheTtl: Long = configuration.get[Int]("mongodb.timeToLiveInSeconds")
   
   lazy val saveAndReturnBaseUrl: String = servicesConfig.baseUrl("securities-transfer-charge-save-and-return")
+  lazy val saveAndReturnPath: String = configuration.get[String]("urls.saveAndReturnPath")
 
-  val saveUserAnswersUrl: String = s"$saveAndReturnBaseUrl/securities-transfer-charge-save-and-return/user-answers"
+  val saveUserAnswersUrl: String = s"$saveAndReturnBaseUrl$saveAndReturnPath"
 
-  val retrieveUserAnswersUrl: String = s"$saveAndReturnBaseUrl/securities-transfer-charge-save-and-return/user-answers/"
+  val retrieveUserAnswersUrl: String = s"$saveAndReturnBaseUrl$saveAndReturnPath"
   
 }
