@@ -16,8 +16,6 @@
 
 package repositories
 
-import uk.gov.hmrc.securitiestransferchargefrontend.config.FrontendAppConfig
-import uk.gov.hmrc.securitiestransferchargefrontend.models.UserAnswers
 import org.mockito.Mockito.when
 import org.mongodb.scala.model.Filters
 import org.scalactic.source.Position
@@ -27,14 +25,17 @@ import org.scalatest.freespec.AnyFreeSpec
 import org.scalatest.matchers.must.Matchers
 import org.scalatestplus.mockito.MockitoSugar
 import org.slf4j.MDC
-import uk.gov.hmrc.mdc.MdcExecutionContext
 import play.api.libs.json.Json
+import uk.gov.hmrc.mdc.MdcExecutionContext
 import uk.gov.hmrc.mongo.test.DefaultPlayMongoRepositorySupport
-import uk.gov.hmrc.securitiestransferchargefrontend.repositories.SessionRepository
+import uk.gov.hmrc.securitiestransferchargefrontend.config.FrontendAppConfig
+import uk.gov.hmrc.securitiestransferchargefrontend.domain.SubmissionId
+import uk.gov.hmrc.securitiestransferchargefrontend.models.UserAnswers
+import uk.gov.hmrc.securitiestransferchargefrontend.repositories.SessionRepositoryImpl
 
-import java.time.{Clock, Instant, ZoneId}
 import java.time.temporal.ChronoUnit
-import scala.concurrent.{ExecutionContext, ExecutionContextExecutorService, Future}
+import java.time.{Clock, Instant, ZoneId}
+import scala.concurrent.{ExecutionContext, Future}
 
 class SessionRepositorySpec
   extends AnyFreeSpec
@@ -48,14 +49,14 @@ class SessionRepositorySpec
   private val instant = Instant.now.truncatedTo(ChronoUnit.MILLIS)
   private val stubClock: Clock = Clock.fixed(instant, ZoneId.systemDefault)
 
-  private val userAnswers = UserAnswers("id", Json.obj("foo" -> "bar"), Instant.ofEpochSecond(1))
+  private val userAnswers = UserAnswers("id", SubmissionId("sub-01"), Json.obj("foo" -> "bar"), Instant.ofEpochSecond(1))
 
   private val mockAppConfig = mock[FrontendAppConfig]
   when(mockAppConfig.cacheTtl) thenReturn 1L
 
   implicit val productionLikeTestMdcExecutionContext: ExecutionContext = MdcExecutionContext()
 
-  protected override val repository: SessionRepository = new SessionRepository(
+  protected override val repository: SessionRepositoryImpl = new SessionRepositoryImpl(
     mongoComponent = mongoComponent,
     appConfig      = mockAppConfig,
     clock          = stubClock
@@ -67,7 +68,8 @@ class SessionRepositorySpec
 
       val expectedResult = userAnswers copy (lastUpdated = instant)
 
-      val setResult     = repository.set(userAnswers).futureValue
+      val setResult: Unit = repository.set(userAnswers).futureValue
+
       val updatedRecord = find(Filters.equal("_id", userAnswers.userId)).futureValue.headOption.value
 
       updatedRecord mustEqual expectedResult
@@ -108,15 +110,15 @@ class SessionRepositorySpec
 
       insert(userAnswers).futureValue
 
-      val result = repository.clear(userAnswers.userId).futureValue
+      val result: Unit = repository.clear(userAnswers.userId).futureValue
 
       repository.get(userAnswers.userId).futureValue must not be defined
     }
 
-    "must return true when there is no record to remove" in {
-      val result = repository.clear("id that does not exist").futureValue
+    "must return unit when there is no record to remove" in {
+      val result: Unit = repository.clear("id that does not exist").futureValue
 
-      result mustEqual true
+      result mustEqual()
     }
 
     mustPreserveMdc(repository.clear(userAnswers.userId))
@@ -130,7 +132,7 @@ class SessionRepositorySpec
 
         insert(userAnswers).futureValue
 
-        val result = repository.keepAlive(userAnswers.userId).futureValue
+        val result: Unit = repository.keepAlive(userAnswers.userId).futureValue
 
         val expectedUpdatedAnswers = userAnswers copy (lastUpdated = instant)
 
@@ -143,7 +145,7 @@ class SessionRepositorySpec
 
       "must return true" in {
 
-        repository.keepAlive("id that does not exist").futureValue mustEqual true
+        repository.keepAlive("id that does not exist").futureValue mustEqual ()
       }
     }
 
@@ -155,8 +157,8 @@ class SessionRepositorySpec
 
       MDC.put("test", "foo")
 
-      (f.map { _ =>
+      f.map { _ =>
         Option(MDC.get("test"))
-      }.futureValue) mustEqual Some("foo")
+      }.futureValue mustBe Some("foo")
     }
 }
