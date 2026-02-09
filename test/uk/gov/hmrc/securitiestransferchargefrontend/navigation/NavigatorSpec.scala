@@ -23,7 +23,7 @@ import org.mockito.Mockito.*
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatestplus.mockito.MockitoSugar
 import play.api.libs.json.JsPath
-import play.api.mvc.Call
+import play.api.mvc.{Call, Request}
 import repositories.FakeSessionRepository
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.securitiestransferchargefrontend.clients.SaveAndReturnClient
@@ -59,7 +59,7 @@ class NavigatorSpec extends SpecBase with MockitoSugar with ScalaFutures {
   class TestNavigator(mockSessionRepository: SessionRepository) extends AbstractNavigator(mockSessionRepository, mockSaveAndReturnClient) {
     override val errorPage: Page => Call = _ => testCall
 
-    override def nextPage(page: Page, mode: Mode, userAnswers: UserAnswers)(implicit hc: HeaderCarrier): Future[Call] =
+    override def nextPage(page: Page, mode: Mode, userAnswers: UserAnswers)(implicit request: Request[?]): Future[Call] =
       Future.successful(testCall)
   }
 

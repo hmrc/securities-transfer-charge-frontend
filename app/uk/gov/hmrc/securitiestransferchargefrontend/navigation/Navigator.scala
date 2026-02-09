@@ -17,7 +17,7 @@
 package uk.gov.hmrc.securitiestransferchargefrontend.navigation
 
 import play.api.libs.json.Reads
-import play.api.mvc.Call
+import play.api.mvc.{Call, Request}
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.securitiestransferchargefrontend.clients.SaveAndReturnClient
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.routes
@@ -29,7 +29,7 @@ import uk.gov.hmrc.securitiestransferchargefrontend.repositories.SessionReposito
 import scala.concurrent.{ExecutionContext, Future}
 
 trait Navigator:
-  def nextPage(page: Page, mode: Mode, userAnswers: UserAnswers)(implicit hc: HeaderCarrier): Future[Call]
+  def nextPage(page: Page, mode: Mode, userAnswers: UserAnswers)(implicit request: Request[?]): Future[Call]
   val errorPage: Page => Call
 
 abstract class AbstractNavigator(sessionRepository: SessionRepository,
