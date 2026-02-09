@@ -34,6 +34,7 @@ class StfNavigator @Inject() (sessionRepository: SessionRepository,
   private val normalRoutes: Page => UserAnswers => Future[Call] = {
 
     case SubmissionsDashboardPage => userAnswers => goTo(routes.HowToNotifyAboutSecuritiesTransferController.onPageLoad(NormalMode), Some(userAnswers))
+    case HowToNotifyAboutSecuritiesTransferPage => userAnswers => goTo(???, Some(userAnswers))
     
     case _ => _ => defaultPage  
   }
