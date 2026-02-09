@@ -16,7 +16,6 @@
 
 package models
 
-import org.scalacheck.Arbitrary.arbitrary
 import org.scalacheck.Gen
 import org.scalatestplus.scalacheck.ScalaCheckPropertyChecks
 import org.scalatest.freespec.AnyFreeSpec
@@ -41,15 +40,19 @@ class HowToNotifyAboutSecuritiesTransferSpec extends AnyFreeSpec with Matchers w
     }
 
     "must fail to deserialise invalid values" in {
+      
+      val invalidValues = Seq(
+        "invalid",
+        "foo",
+        "bar"
+      )
 
-      val gen = arbitrary[String] suchThat (!HowToNotifyAboutSecuritiesTransfer.values.map(_.toString).contains(_))
-
-      forAll(gen) {
-        invalidValue =>
-
-          JsString(invalidValue).validate[HowToNotifyAboutSecuritiesTransfer] mustEqual JsError("error.invalid")
+      invalidValues.foreach { invalidValue =>
+        JsString(invalidValue)
+          .validate[HowToNotifyAboutSecuritiesTransfer] mustEqual JsError("error.invalid")
       }
     }
+  
 
     "must serialise" in {
 

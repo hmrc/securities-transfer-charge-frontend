@@ -50,27 +50,27 @@ class HowToNotifyAboutSecuritiesTransferViewSpec extends ViewBaseSpec {
 
   "The HowToNotifyAboutSecuritiesTransferView" - {
     "when the user is an Individual, should:" - {
-      val HowToNotifyAboutSecuritiesTransferView = view()
+      val howToNotifyAboutSecuritiesTransferView = view()
 
       "have the correct title" in {
-        HowToNotifyAboutSecuritiesTransferView.title must include(ExpectedContent.title)
+        howToNotifyAboutSecuritiesTransferView.title must include(ExpectedContent.title)
       }
 
       "have the correct heading" in {
-        HowToNotifyAboutSecuritiesTransferView.select("h1").text() mustBe ExpectedContent.heading
+        howToNotifyAboutSecuritiesTransferView.select("h1").text() mustBe ExpectedContent.heading
       }
 
       "display the correct caption text" in {
-        HowToNotifyAboutSecuritiesTransferView.select("#more-detail-hint").text() mustBe ExpectedContent.caption
+        howToNotifyAboutSecuritiesTransferView.getElementsByClass("govuk-caption-l").text() mustBe ExpectedContent.caption
       }
 
       "have a button with the text save and continue " in {
-        val buttons = HowToNotifyAboutSecuritiesTransferView.select(".govuk-button")
+        val buttons = howToNotifyAboutSecuritiesTransferView.select(".govuk-button")
         buttons.get(0).text() mustBe ExpectedContent.saveAndContinue
       }
 
       "have a button with the text save and return to dashboard" in {
-        val buttons = HowToNotifyAboutSecuritiesTransferView.select(".govuk-button")
+        val buttons = howToNotifyAboutSecuritiesTransferView.select(".govuk-button")
         buttons.get(1).text() mustBe ExpectedContent.saveAndReturn
       }
     }
