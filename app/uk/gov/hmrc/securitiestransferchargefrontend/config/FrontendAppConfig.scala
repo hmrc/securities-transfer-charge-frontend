@@ -20,9 +20,10 @@ import com.google.inject.{Inject, Singleton}
 import play.api.Configuration
 import play.api.i18n.Lang
 import play.api.mvc.RequestHeader
+import uk.gov.hmrc.play.bootstrap.config.ServicesConfig
 
 @Singleton
-class FrontendAppConfig @Inject() (configuration: Configuration) {
+class FrontendAppConfig @Inject() (configuration: Configuration, servicesConfig: ServicesConfig) {
 
   val host: String    = configuration.get[String]("host")
   val appName: String = configuration.get[String]("appName")
@@ -57,4 +58,11 @@ class FrontendAppConfig @Inject() (configuration: Configuration) {
   val countdown: Int = configuration.get[Int]("timeout-dialog.countdown")
 
   val cacheTtl: Long = configuration.get[Int]("mongodb.timeToLiveInSeconds")
+  
+  lazy val saveAndReturnBaseUrl: String = servicesConfig.baseUrl("securities-transfer-charge-save-and-return")
+
+  val saveUserAnswersUrl: String = s"$saveAndReturnBaseUrl/securities-transfer-charge-save-and-return/user-answers"
+
+  val retrieveUserAnswersUrl: String = s"$saveAndReturnBaseUrl/securities-transfer-charge-save-and-return/user-answers/"
+  
 }

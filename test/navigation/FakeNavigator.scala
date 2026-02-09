@@ -17,6 +17,7 @@
 package navigation
 
 import play.api.mvc.Call
+import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.securitiestransferchargefrontend.models.{Mode, UserAnswers}
 import uk.gov.hmrc.securitiestransferchargefrontend.navigation.Navigator
 import uk.gov.hmrc.securitiestransferchargefrontend.pages.Page
@@ -25,7 +26,7 @@ import scala.concurrent.Future
 
 class FakeNavigator(desiredRoute: Call) extends Navigator {
 
-  override def nextPage(page: Page, mode: Mode, userAnswers: UserAnswers): Future[Call] =
+  override def nextPage(page: Page, mode: Mode, userAnswers: UserAnswers)(implicit hc: HeaderCarrier): Future[Call] =
     Future.successful(desiredRoute)
     
   override val errorPage: Page => Call = _ => desiredRoute

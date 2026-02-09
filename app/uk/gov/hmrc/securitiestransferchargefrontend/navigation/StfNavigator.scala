@@ -27,9 +27,9 @@ import uk.gov.hmrc.securitiestransferchargefrontend.repositories.SessionReposito
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 
-class StfNavigator @Inject() (sessionRepository: SessionRepository,
-                              saveAndReturnClient: SaveAndReturnClient)
-                             (implicit ec: ExecutionContext) extends AbstractNavigator(sessionRepository, saveAndReturnClient) {
+class StfNavigator @Inject()(sessionRepository: SessionRepository,
+                             saveAndReturnClient: SaveAndReturnClient)
+                            (implicit ec: ExecutionContext) extends AbstractNavigator(sessionRepository, saveAndReturnClient) {
 
   private val normalRoutes: Page => UserAnswers => Future[Call] = {
 
@@ -40,7 +40,7 @@ class StfNavigator @Inject() (sessionRepository: SessionRepository,
   }
 
   private val checkRouteMap: Page => UserAnswers => Call = (_ => _ => routes.CheckYourAnswersController.onPageLoad())
-
+  
   def nextPage(page: Page, mode: Mode, userAnswers: UserAnswers): Future[Call] = {
     mode match {
       case NormalMode => normalRoutes(page)(userAnswers)

@@ -18,6 +18,7 @@ package uk.gov.hmrc.securitiestransferchargefrontend.navigation
 
 import play.api.libs.json.Reads
 import play.api.mvc.Call
+import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.securitiestransferchargefrontend.clients.SaveAndReturnClient
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.routes
 import uk.gov.hmrc.securitiestransferchargefrontend.models.{Mode, UserAnswers}
@@ -28,7 +29,7 @@ import uk.gov.hmrc.securitiestransferchargefrontend.repositories.SessionReposito
 import scala.concurrent.{ExecutionContext, Future}
 
 trait Navigator:
-  def nextPage(page: Page, mode: Mode, userAnswers: UserAnswers): Future[Call]
+  def nextPage(page: Page, mode: Mode, userAnswers: UserAnswers)(implicit hc: HeaderCarrier): Future[Call]
   val errorPage: Page => Call
 
 abstract class AbstractNavigator(sessionRepository: SessionRepository,
@@ -37,21 +38,21 @@ abstract class AbstractNavigator(sessionRepository: SessionRepository,
 
   protected[navigation] val defaultPage: Future[Call] = Future.successful(routes.JourneyRecoveryController.onPageLoad())
 
-  private def persistUserAnswers(userAnswers: UserAnswers): Future[Unit] = for {
+  private def persistUserAnswers(userAnswers: UserAnswers)(implicit hc: HeaderCarrier): Future[Unit] = for {
     _ <- sessionRepository.set(userAnswers)
     _ <- saveAndReturnClient.save(userAnswers)
   } yield ()
 
-  protected[navigation] def goTo(success: Call, userAnswers: Option[UserAnswers] = None): Future[Call] =
+  protected[navigation] def goTo(success: Call, userAnswers: Option[UserAnswers] = None)(implicit hc: HeaderCarrier): Future[Call] =
     userAnswers
       .fold
         (Future.successful(success))
         (ua => persistUserAnswers(ua).map(_ => success))
 
-  protected[navigation] def dataRequired[A: Reads](page: Page & Gettable[A], userAnswers: UserAnswers, success: Call): Future[Call] =
+  protected[navigation] def dataRequired[A: Reads](page: Page & Gettable[A], userAnswers: UserAnswers, success: Call)(implicit hc: HeaderCarrier): Future[Call] =
     dataDependent(page, userAnswers)(_ => success)
 
-  protected[navigation] def dataDependent[A: Reads](page: Page & Gettable[A], userAnswers: UserAnswers)(f: A => Call): Future[Call] =
+  protected[navigation] def dataDependent[A: Reads](page: Page & Gettable[A], userAnswers: UserAnswers)(f: A => Call)(implicit hc: HeaderCarrier): Future[Call] =
     userAnswers
       .get(page)
       .fold
