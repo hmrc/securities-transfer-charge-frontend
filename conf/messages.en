@@ -57,5 +57,6 @@ nameOfSeller.title = nameOfSeller
 nameOfSeller.heading = nameOfSeller
 nameOfSeller.checkYourAnswersLabel = nameOfSeller
 nameOfSeller.error.required = Enter nameOfSeller
-nameOfSeller.error.length = NameOfSeller must be 35 characters or less
+nameOfSeller.error.length = Seller's name must be 35 characters or less
 nameOfSeller.change.hidden = NameOfSeller
+nameOfSeller.hint = This can be the name of a business, person or another entity.
