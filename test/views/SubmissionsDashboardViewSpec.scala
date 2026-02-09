@@ -55,6 +55,10 @@ class SubmissionsDashboardViewSpec extends ViewBaseSpec {
         val button = submissionsDashboardView.select(".govuk-button")
         button.text() mustBe ExpectedContent.createNew
       }
+
+      "should not have a back button" in {
+        submissionsDashboardView.hasBackLink mustBe false
+      }
     }
   }
 
