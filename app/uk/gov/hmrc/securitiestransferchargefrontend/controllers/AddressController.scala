@@ -22,32 +22,32 @@ import uk.gov.hmrc.play.http.HeaderCarrierConverter
 import uk.gov.hmrc.securitiestransferchargefrontend.config.FrontendAppConfig
 import uk.gov.hmrc.securitiestransferchargefrontend.connectors.AlfAddressConnector
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.AbstractAddressController
-import uk.gov.hmrc.securitiestransferchargefrontend.controllers.actions.StcAuthEnrolledAction
+import uk.gov.hmrc.securitiestransferchargefrontend.controllers.actions.{StcAuthEnrolledAction, StcDataRequiredAction, StcDataRetrievalAction}
 import uk.gov.hmrc.securitiestransferchargefrontend.models.NormalMode
 import uk.gov.hmrc.securitiestransferchargefrontend.navigation.Navigator
 import uk.gov.hmrc.securitiestransferchargefrontend.pages.AddressPage
-import uk.gov.hmrc.securitiestransferchargefrontend.pages.individuals.IndividualAddressPage
+import uk.gov.hmrc.securitiestransferchargefrontend.pages.IndividualAddressPage
 
-import javax.inject.{Inject, Named}
+import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 
 class AddressController @Inject()(val controllerComponents: MessagesControllerComponents,
                                   alf: AlfAddressConnector,
                                   auth: StcAuthEnrolledAction,
-                                  @Named("individuals") val navigator: Navigator,
+                                  getData: StcDataRetrievalAction,
+                                  requireData: StcDataRequiredAction,
+                                  val navigator: Navigator,
                                   config: FrontendAppConfig)
                                  (implicit ec: ExecutionContext) extends AbstractAddressController(alf):
 
-  import auth.*
-
   val addressPage: AddressPage = IndividualAddressPage
 
-  def onPageLoad: Action[AnyContent] = validIndividual.async {
+  def onPageLoad: Action[AnyContent] = auth.async {
     implicit request =>
       super.pageLoad(config.individualsAlfConfigFileLocation, config.alfIndividualsContinueUrl)
   }
 
-  def onReturn(addressId: String): Action[AnyContent] = (validIndividual andThen getData andThen requireData).async {
+  def onReturn(addressId: String): Action[AnyContent] = (auth andThen getData andThen requireData).async {
     implicit request =>
       implicit val hc: HeaderCarrier = HeaderCarrierConverter.fromRequestAndSession(request, request.session)
       for {

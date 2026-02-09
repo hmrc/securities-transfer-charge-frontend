@@ -12,11 +12,7 @@ GET         /refresh-session                             uk.gov.hmrc.securitiest
 
 GET         /there-is-a-problem                          uk.gov.hmrc.securitiestransferchargefrontend.controllers.JourneyRecoveryController.onPageLoad(continueUrl: Option[RedirectUrl] ?= None)
 
-GET        /stf/check-your-answers                          uk.gov.hmrc.securitiestransferchargefrontend.controllers.CheckYourAnswersController.onPageLoad()
-
-GET        /stf/account/sign-out-survey                     uk.gov.hmrc.securitiestransferchargefrontend.controllers.auth.AuthController.signOut()
-GET        /stf/account/sign-out                            uk.gov.hmrc.securitiestransferchargefrontend.controllers.auth.AuthController.signOutNoSurvey()
-GET        /stf/account/signed-out                          uk.gov.hmrc.securitiestransferchargefrontend.controllers.auth.SignedOutController.onPageLoad()
+GET         /check-your-answers                          uk.gov.hmrc.securitiestransferchargefrontend.controllers.CheckYourAnswersController.onPageLoad()
 
 GET        /stf/unauthorised                                uk.gov.hmrc.securitiestransferchargefrontend.controllers.UnauthorisedController.onPageLoad()
 
@@ -42,3 +38,9 @@ GET        /stf/connected-persons                        uk.gov.hmrc.securitiest
 POST       /stf/connected-persons                        uk.gov.hmrc.securitiestransferchargefrontend.controllers.ConnectedPersonsController.onSubmit(mode: Mode = NormalMode)
 GET        /stf/change/connected-persons                  uk.gov.hmrc.securitiestransferchargefrontend.controllers.ConnectedPersonsController.onPageLoad(mode: Mode = CheckMode)
 POST       /stf/change/connected-persons                  uk.gov.hmrc.securitiestransferchargefrontend.controllers.ConnectedPersonsController.onSubmit(mode: Mode = CheckMode)
+
+GET        /address                                      uk.gov.hmrc.securitiestransferchargefrontend.controllers.AddressController.onPageLoad()
+GET        /address/return                               uk.gov.hmrc.securitiestransferchargefrontend.controllers.AddressController.onReturn(id: String)
+
+GET        /org/address                                  uk.gov.hmrc.securitiestransferchargefrontend.controllers.AddressController.onPageLoad()
+GET        /org/address/return                           uk.gov.hmrc.securitiestransferchargefrontend.controllers.AddressController.onReturn(id: String)
