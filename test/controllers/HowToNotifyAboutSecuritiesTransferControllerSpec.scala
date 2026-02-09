@@ -86,5 +86,20 @@ class HowToNotifyAboutSecuritiesTransferControllerSpec extends SpecBase{
         contentAsString(result) mustEqual view(boundForm, NormalMode)(request, messages(application)).toString
       }
     }
+
+    "must redirect on valid submission" in {
+      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers)).build()
+
+      running(application) {
+        val request =
+          FakeRequest(POST, howToNotifyAboutSecuritiesTransferRoute)
+            .withFormUrlEncodedBody("value" -> HowToNotifyAboutSecuritiesTransfer.values.head.toString)
+
+        val result = route(application, request).value
+
+        status(result) mustEqual SEE_OTHER
+        redirectLocation(result).value mustEqual routes.JourneyRecoveryController.onPageLoad().url
+      }
+    }
   }
 }
