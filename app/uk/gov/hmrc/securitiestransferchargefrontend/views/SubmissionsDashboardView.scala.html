@@ -28,7 +28,7 @@
 @layout(pageTitle = titleNoForm(messages("submissionsDashboard.title")), showBackLink = false) {
     @formHelper(action = routes.SubmissionsDashboardController.onSubmit(), Symbol("autoComplete") -> "off") {
 
-        <div id="more-detail-hint" class="govuk-caption-l">
+        <div id="caption-heading" class="govuk-caption-l">
             @messages("submissionsDashboard.hint")
         </div>
 

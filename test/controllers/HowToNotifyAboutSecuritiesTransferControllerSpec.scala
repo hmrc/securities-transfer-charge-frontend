@@ -17,9 +17,7 @@
 package controllers
 
 import base.SpecBase
-import org.scalatestplus.mockito.MockitoSugar
 import play.api.data.Form
-import play.api.mvc.Call
 import play.api.test.FakeRequest
 import play.api.test.Helpers.*
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.routes
@@ -28,9 +26,7 @@ import uk.gov.hmrc.securitiestransferchargefrontend.models.{HowToNotifyAboutSecu
 import uk.gov.hmrc.securitiestransferchargefrontend.pages.HowToNotifyAboutSecuritiesTransferPage
 import uk.gov.hmrc.securitiestransferchargefrontend.views.html.HowToNotifyAboutSecuritiesTransferView
 
-class HowToNotifyAboutSecuritiesTransferControllerSpec extends SpecBase with MockitoSugar {
-
-  def onwardRoute = Call("GET", "/foo")
+class HowToNotifyAboutSecuritiesTransferControllerSpec extends SpecBase{
 
   lazy val howToNotifyAboutSecuritiesTransferRoute: String = routes.HowToNotifyAboutSecuritiesTransferController.onPageLoad(NormalMode).url
 
