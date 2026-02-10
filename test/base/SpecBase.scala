@@ -89,11 +89,11 @@ trait SpecBase
   protected def applicationBuilder(userAnswers: Option[UserAnswers] = None): GuiceApplicationBuilder =
     new GuiceApplicationBuilder()
       .overrides(
-        //bind[DataRequiredAction].to[DataRequiredActionImpl],
         bind[IdentifierAction].to[FakeIdentifierAction],
-        //bind[DataRetrievalAction].toInstance(new FakeDataRetrievalAction(userAnswers)),
         bind[StcAuthEnrolledAction].to[StubStcAuthEnrolledAction],
         bind[StcDataRetrievalAction].to[StubStcDataRetrievalAction],
-        bind[StcDataRequiredAction].toInstance(StubStcDataRequiredAction(userAnswers))
+        bind[DataRequiredAction].to[DataRequiredActionImpl],
+        bind[StcDataRequiredAction].toInstance(StubStcDataRequiredAction(userAnswers)),
+        bind[DataRetrievalAction].toInstance(new FakeDataRetrievalAction(userAnswers))
       )
 }

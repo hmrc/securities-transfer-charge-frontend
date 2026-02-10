@@ -16,10 +16,7 @@
 
 package controllers.actions
 
-import base.Fixtures
-import com.google.inject.Inject
-import play.api.mvc.{AnyContent, BodyParser, PlayBodyParsers, Request, Result}
-import uk.gov.hmrc.securitiestransferchargefrontend.controllers.actions.{DataRetrievalAction, StcAuthEnrolledAction, StcAuthorisedRequest}
+import uk.gov.hmrc.securitiestransferchargefrontend.controllers.actions.DataRetrievalAction
 import uk.gov.hmrc.securitiestransferchargefrontend.models.UserAnswers
 import uk.gov.hmrc.securitiestransferchargefrontend.models.requests.{IdentifierRequest, OptionalDataRequest}
 
@@ -32,14 +29,5 @@ class FakeDataRetrievalAction(dataToReturn: Option[UserAnswers]) extends DataRet
 
   override protected implicit val executionContext: ExecutionContext =
     scala.concurrent.ExecutionContext.Implicits.global
-}
-
-class FakeAuthAction @Inject()(bodyParsers: PlayBodyParsers) extends StcAuthEnrolledAction {
-  override def parser: BodyParser[AnyContent] = bodyParsers.default
-
-  override def invokeBlock[A](request: Request[A], block: StcAuthorisedRequest[A] => Future[Result]): Future[Result] =
-    block(Fixtures.fakeStcAuthRequest(request))
-
-  override protected def executionContext: ExecutionContext = ExecutionContext.global
 }
 
