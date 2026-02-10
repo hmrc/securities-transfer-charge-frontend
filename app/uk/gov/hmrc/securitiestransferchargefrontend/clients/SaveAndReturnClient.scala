@@ -45,7 +45,9 @@ class SaveAndReturnClientImpl @Inject(http: HttpClientV2, config: FrontendAppCon
   override def save(userAnswers: UserAnswers)
                    (implicit hc: HeaderCarrier): Future[Unit] = {
 
-    val url = url"${config.saveUserAnswersUrl}/${userAnswers.userId}"
+    val url = url"${config.saveUserAnswersUrl}"
+
+    println(Console.RED + Json.toJson(userAnswers) + Console.RESET)
 
     http.post(url)
       .withBody(Json.toJson(userAnswers))
