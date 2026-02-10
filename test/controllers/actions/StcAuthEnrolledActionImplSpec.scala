@@ -41,7 +41,7 @@ class StcAuthEnrolledActionImplSpec extends SpecBase {
   private val stcId         = "STC1234567890"
 
   def buildRetrieval(
-                      maybeInternalId: Option[String] = Some(Fixtures.user),
+                      maybeInternalId: Option[String] = Some(Fixtures.testInternalId),
                       enrolments: Enrolments = Fixtures.enrolledForStc,
                       maybeAffinityGroup: Option[AffinityGroup] = Some(AffinityGroup.Organisation)
                     ): RetrievalType =
@@ -94,7 +94,7 @@ class StcAuthEnrolledActionImplSpec extends SpecBase {
 
         val result =
           action.invokeBlock(FakeRequest(), { req =>
-            req.internalId mustBe Fixtures.user
+            req.internalId mustBe Fixtures.testInternalId
             req.affinityGroup mustBe AffinityGroup.Organisation
             req.stcId mustBe stcId
             Future.successful(Results.Ok)

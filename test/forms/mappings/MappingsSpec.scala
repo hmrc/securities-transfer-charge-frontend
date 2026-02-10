@@ -20,7 +20,7 @@ import org.scalatest.OptionValues
 import org.scalatest.freespec.AnyFreeSpec
 import org.scalatest.matchers.must.Matchers
 import play.api.data.{Form, FormError}
-import uk.gov.hmrc.securitiestransferchargefrontend.mappings.Mappings
+import uk.gov.hmrc.securitiestransferchargefrontend.forms.mappings.Mappings
 import uk.gov.hmrc.securitiestransferchargefrontend.models.Enumerable
 
 object MappingsSpec {

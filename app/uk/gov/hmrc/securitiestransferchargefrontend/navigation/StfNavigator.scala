@@ -33,14 +33,14 @@ class StfNavigator @Inject() (sessionRepository: SessionRepository,
 
   private val normalRoutes: Page => UserAnswers => Future[Call] = {
 
-    case SubmissionsDashboardPage =>
-      userAnswers => goTo(???, Some(userAnswers))
+    case SubmissionsDashboardPage => userAnswers => goTo(routes.HowToNotifyAboutSecuritiesTransferController.onPageLoad(NormalMode), Some(userAnswers))
+    case HowToNotifyAboutSecuritiesTransferPage => userAnswers => goTo(routes.JourneyRecoveryController.onPageLoad(), Some(userAnswers))
     
     case _ => _ => defaultPage  
   }
 
   private val checkRouteMap: Page => UserAnswers => Call = (_ => _ => routes.CheckYourAnswersController.onPageLoad())
-  
+
   def nextPage(page: Page, mode: Mode, userAnswers: UserAnswers): Future[Call] = {
     mode match {
       case NormalMode => normalRoutes(page)(userAnswers)

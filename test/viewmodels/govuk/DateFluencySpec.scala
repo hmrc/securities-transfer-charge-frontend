@@ -22,7 +22,7 @@ import org.scalatest.matchers.must.Matchers
 import play.api.data.Form
 import play.api.i18n.Messages
 import play.api.test.Helpers.stubMessages
-import uk.gov.hmrc.securitiestransferchargefrontend.mappings.Mappings
+import uk.gov.hmrc.securitiestransferchargefrontend.forms.mappings.Mappings
 import uk.gov.hmrc.securitiestransferchargefrontend.viewmodels
 import uk.gov.hmrc.securitiestransferchargefrontend.viewmodels.govuk
 import uk.gov.hmrc.securitiestransferchargefrontend.viewmodels.govuk.all.*

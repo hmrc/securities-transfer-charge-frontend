@@ -21,19 +21,19 @@ import uk.gov.hmrc.auth.core.*
 import uk.gov.hmrc.auth.core.authorise.Predicate
 import uk.gov.hmrc.auth.core.retrieve.Retrieval
 import uk.gov.hmrc.http.HeaderCarrier
+import uk.gov.hmrc.securitiestransferchargefrontend.domain.SubmissionId
+import uk.gov.hmrc.securitiestransferchargefrontend.models.UserAnswers
 
 import scala.concurrent.{ExecutionContext, Future}
 
 object Fixtures {
-  
-  val user: String = "user123"
 
   val stcEnrolmentKey: String = "HMRC-STC-ORG"
   val stcIdentifierKey: String = "STCID"
-  val stcId: String = "STC1234567890"
-  
-  implicit val hc: HeaderCarrier = HeaderCarrier()
-  
+  val testSubscriptionId: String = "XAST1234567890"
+  val testInternalId = "test-user-808"
+  val testSubmissionId: SubmissionId = SubmissionId("STC-424242424")
+
   val fakeRequest = FakeRequest()
   
   val emptyEnrolments: Enrolments =
@@ -43,7 +43,7 @@ object Fixtures {
     Enrolment(
       key = stcEnrolmentKey,
       identifiers = Seq(
-        EnrolmentIdentifier(stcIdentifierKey, stcId)
+        EnrolmentIdentifier(stcIdentifierKey, testSubscriptionId)
       ),
       state = "Activated"
     )
@@ -53,6 +53,8 @@ object Fixtures {
   
   val individualAffinity: AffinityGroup = AffinityGroup.Individual
   val organisationAffinity: AffinityGroup = AffinityGroup.Organisation
+
+  val emptyUserAnswers: UserAnswers = UserAnswers.empty(testInternalId)(testSubmissionId)
 
   class FakeAuthConnectorSuccess(value: Any) extends AuthConnector {
 

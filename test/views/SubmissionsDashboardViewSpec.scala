@@ -16,7 +16,6 @@
 
 package views
 
-import base.SpecBase
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
 import play.api.Application
