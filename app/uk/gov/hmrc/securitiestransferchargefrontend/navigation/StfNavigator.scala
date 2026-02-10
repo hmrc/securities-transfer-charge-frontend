@@ -34,8 +34,10 @@ class StfNavigator @Inject() (sessionRepository: SessionRepository,
   private val normalRoutes: Page => UserAnswers => Future[Call] = {
 
     case SubmissionsDashboardPage => userAnswers => goTo(routes.HowToNotifyAboutSecuritiesTransferController.onPageLoad(NormalMode), Some(userAnswers))
-    case HowToNotifyAboutSecuritiesTransferPage => userAnswers => goTo(routes.JourneyRecoveryController.onPageLoad(), Some(userAnswers))
-    
+    case HowToNotifyAboutSecuritiesTransferPage => userAnswers => goTo(routes.NameOfSellerController.onPageLoad(NormalMode), Some(userAnswers))
+
+    case NameOfSellerPage => userAnswers => goTo(routes.JourneyRecoveryController.onPageLoad(), Some(userAnswers))
+
     case _ => _ => defaultPage  
   }
 

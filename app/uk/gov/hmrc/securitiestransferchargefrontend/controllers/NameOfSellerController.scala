@@ -25,15 +25,14 @@ import uk.gov.hmrc.securitiestransferchargefrontend.forms.NameOfSellerFormProvid
 import uk.gov.hmrc.securitiestransferchargefrontend.models.Mode
 import uk.gov.hmrc.securitiestransferchargefrontend.navigation.Navigator
 import uk.gov.hmrc.securitiestransferchargefrontend.pages.NameOfSellerPage
-import uk.gov.hmrc.securitiestransferchargefrontend.repositories.SessionRepository
 import uk.gov.hmrc.securitiestransferchargefrontend.views.html.NameOfSellerView
 
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
+import scala.language.postfixOps
 
 class NameOfSellerController @Inject()(
                                         override val messagesApi: MessagesApi,
-                                        sessionRepository: SessionRepository,
                                         navigator: Navigator,
                                         stcAuthEnrolled: StcAuthEnrolledAction,
                                         getData: StcDataRetrievalAction,
@@ -47,7 +46,6 @@ class NameOfSellerController @Inject()(
 
   def onPageLoad(mode: Mode): Action[AnyContent] = (stcAuthEnrolled andThen getData andThen requireData).async{
     implicit request =>
-
       val preparedForm = request.userAnswers.get(NameOfSellerPage) match {
         case None => form
         case Some(value) => form.fill(value)
@@ -66,7 +64,6 @@ class NameOfSellerController @Inject()(
         value =>
           for {
             updatedAnswers <- Future.fromTry(request.userAnswers.set(NameOfSellerPage, value))
-            _              <- sessionRepository.set(updatedAnswers)
             nextPage       <- navigator.nextPage(NameOfSellerPage, mode, updatedAnswers)
           } yield Redirect(nextPage)
       )
