@@ -21,6 +21,7 @@ import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import uk.gov.hmrc.securitiestransferchargefrontend.connectors.{SubscriptionConnector, SubscriptionStatusErrorException}
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.actions.*
+import uk.gov.hmrc.securitiestransferchargefrontend.domain.SubscriptionId
 import uk.gov.hmrc.securitiestransferchargefrontend.models.NormalMode
 import uk.gov.hmrc.securitiestransferchargefrontend.navigation.Navigator
 import uk.gov.hmrc.securitiestransferchargefrontend.pages.ConfirmAddressPage
@@ -47,7 +48,9 @@ class ConfirmAddressController @Inject()(
 
   def onPageLoad: Action[AnyContent] =
     (stcAuthEnrolled andThen getData).async { implicit request =>
-      subscriptionConnector.getValidSubscription(request.request.stcId)
+
+      val subscriptionId = SubscriptionId(request.request.stcId)
+      subscriptionConnector.getValidSubscription(subscriptionId)
         .map { subscription =>
           Ok(view(addressService.extractConfirmableAddress(subscription)))
         }
@@ -60,7 +63,8 @@ class ConfirmAddressController @Inject()(
   def onSubmit: Action[AnyContent] =
     (stcAuthEnrolled andThen getData andThen requireData).async { implicit request =>
 
-      subscriptionDataRepository.getSubscriptionData(request.request.stcId).flatMap(
+      val subscriptionId = SubscriptionId(request.request.stcId)
+      subscriptionDataRepository.getSubscriptionData(subscriptionId).flatMap(
         _.fold {
           Future.successful(Redirect(routes.JourneyRecoveryController.onPageLoad()))
         } { subscriptionData =>
@@ -73,9 +77,8 @@ class ConfirmAddressController @Inject()(
               request.userAnswers.set(ConfirmAddressPage, address)
             )
             _ <- sessionRepository.set(updatedAnswers)
-          } yield Redirect(
-            navigator.nextPage(ConfirmAddressPage, NormalMode, updatedAnswers)
-          )
+            nextPage <- navigator.nextPage(ConfirmAddressPage, NormalMode, updatedAnswers)
+          } yield Redirect(nextPage)
         }
       )
     }

@@ -19,6 +19,7 @@ package uk.gov.hmrc.securitiestransferchargefrontend.connectors
 import play.api.Logging
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.securitiestransferchargefrontend.clients.registration.*
+import uk.gov.hmrc.securitiestransferchargefrontend.domain.SubscriptionId
 import uk.gov.hmrc.securitiestransferchargefrontend.repositories.SubscriptionDataRepository
 import uk.gov.hmrc.securitiestransferchargefrontend.utils.CommonHelpers
 
@@ -30,7 +31,7 @@ class SubscriptionStatusErrorException(msg: String) extends RuntimeException(msg
 
 trait SubscriptionConnector:
 
-  def getValidSubscription(stcId: String)(implicit hc: HeaderCarrier): Future[Subscription]
+  def getValidSubscription(subscriptionId: SubscriptionId)(implicit hc: HeaderCarrier): Future[Subscription]
 
 class SubscriptionConnectorImpl @Inject()(registrationClient: RegistrationClient,
                                           subscriptionDataRepository: SubscriptionDataRepository,
@@ -39,14 +40,14 @@ class SubscriptionConnectorImpl @Inject()(registrationClient: RegistrationClient
 
   private val logInfoAndFail = CommonHelpers.logInfoAndFail(logger)
 
-  def getValidSubscription(stcId: String)
+  def getValidSubscription(subscriptionId: SubscriptionId)
                           (implicit hc: HeaderCarrier): Future[Subscription] = {
     for {
-      subscription <- registrationClient.getSubscriptionDetails(stcId)
+      subscription <- registrationClient.getSubscriptionDetails(subscriptionId)
       _ <- if (!subscription.subsValidTo.isBefore(LocalDate.now())) {
-        subscriptionDataRepository.saveSubscriptionData(stcId, subscription)
+        subscriptionDataRepository.saveSubscriptionData(subscriptionId, subscription)
       } else {
-        val msg = s"Subscription expired for stcId=$stcId.Valid until: ${subscription.subsValidTo}"
+        val msg = s"Subscription expired for stcId=$subscriptionId.Valid until: ${subscription.subsValidTo}"
         logInfoAndFail(new SubscriptionStatusErrorException(msg))
       }
     } yield subscription

@@ -16,7 +16,7 @@
 
 package base
 
-import play.api.mvc.Request
+import play.api.mvc.{AnyContentAsEmpty, Request}
 import play.api.test.FakeRequest
 import uk.gov.hmrc.auth.core.*
 import uk.gov.hmrc.auth.core.authorise.Predicate
@@ -42,7 +42,7 @@ object Fixtures {
 
   implicit val hc: HeaderCarrier = HeaderCarrier()
 
-  val fakeRequest = FakeRequest()
+  val fakeRequest: FakeRequest[AnyContentAsEmpty.type] = FakeRequest()
   
   val emptyEnrolments: Enrolments =
     Enrolments(Set.empty)
@@ -63,7 +63,7 @@ object Fixtures {
   val organisationAffinity: AffinityGroup = AffinityGroup.Organisation
 
   def fakeStcAuthRequest[A](request: Request[A],
-                            internalId: String = user,
+                            internalId: String = testInternalId,
                             affinityGroup: AffinityGroup = affinityGroupIndividual,
                             stcId: String = stcId): StcAuthorisedRequest[A] = StcAuthorisedRequest[A](request,internalId,affinityGroup,stcId)
 

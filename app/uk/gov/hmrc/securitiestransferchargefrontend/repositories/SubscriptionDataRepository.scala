@@ -24,6 +24,7 @@ import uk.gov.hmrc.mongo.play.json.PlayMongoRepository
 import uk.gov.hmrc.mongo.play.json.formats.MongoJavatimeFormats
 import uk.gov.hmrc.securitiestransferchargefrontend.clients.registration.Subscription
 import uk.gov.hmrc.securitiestransferchargefrontend.config.FrontendAppConfig
+import uk.gov.hmrc.securitiestransferchargefrontend.domain.SubscriptionId
 
 import java.time.{Clock, Instant}
 import java.util.concurrent.TimeUnit
@@ -31,7 +32,7 @@ import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
 
 case class SubscriptionData(
-                            stcId:String,
+                             subscriptionId: SubscriptionId,
                             subscriptionDetails: Subscription,
                             lastUpdated: Instant = Instant.now,
                            )
@@ -41,9 +42,9 @@ object SubscriptionData {
 }
 
 trait SubscriptionDataRepository {
-  def getSubscriptionData(id: String): Future[Option[SubscriptionData]]
-  def saveSubscriptionData(stcId: String, subscriptionDetails: Subscription): Future[Unit]
-  def clear(id: String): Future[Unit]
+  def getSubscriptionData(subscriptionId: SubscriptionId): Future[Option[SubscriptionData]]
+  def saveSubscriptionData(subscriptionId: SubscriptionId, subscriptionDetails: Subscription): Future[Unit]
+  def clear(subscriptionId: SubscriptionId): Future[Unit]
 }
 
 
@@ -69,28 +70,28 @@ class SubscriptionDataRepositoryImpl @Inject()(mongoComponent: MongoComponent,
   implicit val instantFormat: Format[Instant] = MongoJavatimeFormats.instantFormat
 
   
-  private def byId(id: String): Bson = Filters.equal("_id", id)
+  private def byId(subscriptionId: SubscriptionId): Bson = Filters.equal("_id", subscriptionId)
 
 
-  override def getSubscriptionData(stcId: String): Future[Option[SubscriptionData]] =
+  override def getSubscriptionData(subscriptionId: SubscriptionId): Future[Option[SubscriptionData]] =
     collection
-      .find(byId(stcId))
+      .find(byId(subscriptionId))
       .headOption()
 
   override def saveSubscriptionData(
-                                     stcId: String,
+                                     subscriptionId: SubscriptionId,
                                      subscriptionDetails: Subscription
                                    ): Future[Unit] = {
 
     val data = SubscriptionData(
-      stcId = stcId,
+     subscriptionId = subscriptionId,
       subscriptionDetails = subscriptionDetails,
       lastUpdated = Instant.now(clock)
     )
     
     collection
       .replaceOne(
-        filter = byId(stcId),
+        filter = byId(subscriptionId),
         replacement = data,
         options = ReplaceOptions().upsert(true)
       )
@@ -99,9 +100,9 @@ class SubscriptionDataRepositoryImpl @Inject()(mongoComponent: MongoComponent,
   }
 
 
-  override def clear(id: String): Future[Unit] =
+  override def clear(subscriptionId: SubscriptionId): Future[Unit] =
     collection
-      .deleteOne(byId(id))
+      .deleteOne(byId(subscriptionId))
       .toFuture()
       .map(_ => ())
 }

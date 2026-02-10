@@ -43,17 +43,7 @@ class RegistrationClientImplSpec extends SpecBase {
       }
     }
   }
-
-  "RegistrationClientImpl.getSubscriptionStatus" - {
-
-    "return an active subscription status" in {
-      whenReady(client.getSubscriptionStatus(subscriptionId)) { result =>
-        result mustBe Right(SubscriptionActive)
-      }
-    }
-  }
-
-
+  
   "RegistrationClientImpl.updateAddress" - {
 
     "return AddressUpdateSuccessful when updating an address" in {

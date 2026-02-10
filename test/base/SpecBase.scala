@@ -32,8 +32,6 @@ import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.securitiestransferchargefrontend.clients.registration.Subscription
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.actions.requests.StcOptionalDataRequest
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.actions.*
-import uk.gov.hmrc.securitiestransferchargefrontend.controllers.actions.{DataRequiredAction, DataRequiredActionImpl, DataRetrievalAction, IdentifierAction}
-import uk.gov.hmrc.securitiestransferchargefrontend.controllers.actions.*
 import uk.gov.hmrc.securitiestransferchargefrontend.domain.SubmissionId
 import uk.gov.hmrc.securitiestransferchargefrontend.models.UserAnswers
 import uk.gov.hmrc.securitiestransferchargefrontend.models.requests.DataRequest
@@ -79,7 +77,7 @@ trait SpecBase
     emailAddress = "some@email.com"
   )
 
-  def emptyUserAnswers : UserAnswers = UserAnswers(userAnswersId)
+  def emptyUserAnswers: UserAnswers = UserAnswers(userAnswersId,submissionId)
 
   val fakeRequest: FakeRequest[AnyContentAsEmpty.type] = FakeRequest().withHeaders("sessionId" -> sessionId)
 
@@ -91,14 +89,11 @@ trait SpecBase
   protected def applicationBuilder(userAnswers: Option[UserAnswers] = None): GuiceApplicationBuilder =
     new GuiceApplicationBuilder()
       .overrides(
-        bind[DataRequiredAction].to[DataRequiredActionImpl],
+        //bind[DataRequiredAction].to[DataRequiredActionImpl],
         bind[IdentifierAction].to[FakeIdentifierAction],
-        bind[DataRetrievalAction].toInstance(new FakeDataRetrievalAction(userAnswers)),
-        bind[StcDataRetrievalAction].toInstance(new FakeStcDataRetrievalAction(userAnswers))
-      )
-        bind[DataRetrievalAction].toInstance(new FakeDataRetrievalAction(userAnswers)),
+        //bind[DataRetrievalAction].toInstance(new FakeDataRetrievalAction(userAnswers)),
         bind[StcAuthEnrolledAction].to[StubStcAuthEnrolledAction],
         bind[StcDataRetrievalAction].to[StubStcDataRetrievalAction],
         bind[StcDataRequiredAction].toInstance(StubStcDataRequiredAction(userAnswers))
-  )
+      )
 }
