@@ -16,6 +16,7 @@
 
 package base
 
+import base.stubs.{StubStcAuthEnrolledAction, StubStcDataRequiredAction, StubStcDataRetrievalAction}
 import controllers.actions.*
 import org.scalatest.concurrent.{IntegrationPatience, ScalaFutures}
 import org.scalatest.freespec.AnyFreeSpec
@@ -28,7 +29,7 @@ import play.api.inject.guice.GuiceApplicationBuilder
 import play.api.mvc.{AnyContent, AnyContentAsEmpty}
 import play.api.test.FakeRequest
 import uk.gov.hmrc.http.HeaderCarrier
-import uk.gov.hmrc.securitiestransferchargefrontend.controllers.actions.{DataRequiredAction, DataRequiredActionImpl, DataRetrievalAction, IdentifierAction}
+import uk.gov.hmrc.securitiestransferchargefrontend.controllers.actions.*
 import uk.gov.hmrc.securitiestransferchargefrontend.domain.SubmissionId
 import uk.gov.hmrc.securitiestransferchargefrontend.models.UserAnswers
 import uk.gov.hmrc.securitiestransferchargefrontend.models.requests.DataRequest
@@ -45,6 +46,7 @@ trait SpecBase
 
   implicit val ec: ExecutionContext = ExecutionContext.global
   implicit val hc: HeaderCarrier = HeaderCarrier()
+
   val userAnswersId: String = "id"
   val sessionId = "sessionId1234"
   val submissionId: SubmissionId = SubmissionId("STC-123456789")
@@ -53,8 +55,8 @@ trait SpecBase
 
   val fakeRequest: FakeRequest[AnyContentAsEmpty.type] = FakeRequest().withHeaders("sessionId" -> sessionId)
 
-  def fakeDataRequest(userAnswers: UserAnswers): DataRequest[AnyContent]
-  = DataRequest[AnyContent](FakeRequest(), "userId", userAnswers)
+  def fakeDataRequest(userAnswers: UserAnswers): DataRequest[AnyContent] =
+    DataRequest[AnyContent](FakeRequest(), "userId", userAnswers)
 
   def messages(app: Application): Messages = app.injector.instanceOf[MessagesApi].preferred(FakeRequest())
 
@@ -63,6 +65,9 @@ trait SpecBase
       .overrides(
         bind[DataRequiredAction].to[DataRequiredActionImpl],
         bind[IdentifierAction].to[FakeIdentifierAction],
-        bind[DataRetrievalAction].toInstance(new FakeDataRetrievalAction(userAnswers))
-      )
+        bind[DataRetrievalAction].toInstance(new FakeDataRetrievalAction(userAnswers)),
+        bind[StcAuthEnrolledAction].to[StubStcAuthEnrolledAction],
+        bind[StcDataRetrievalAction].to[StubStcDataRetrievalAction],
+        bind[StcDataRequiredAction].toInstance(StubStcDataRequiredAction(userAnswers))
+  )
 }

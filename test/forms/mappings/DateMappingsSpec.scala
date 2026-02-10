@@ -25,7 +25,7 @@ import org.scalatestplus.scalacheck.ScalaCheckPropertyChecks
 import play.api.data.{Form, FormError}
 import play.api.i18n.Messages
 import play.api.test.Helpers.stubMessages
-import uk.gov.hmrc.securitiestransferchargefrontend.mappings.Mappings
+import uk.gov.hmrc.securitiestransferchargefrontend.forms.mappings.Mappings
 
 import java.time.LocalDate
 

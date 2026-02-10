@@ -17,13 +17,13 @@
 package uk.gov.hmrc.securitiestransferchargefrontend.navigation
 
 import base.SpecBase
+import base.stubs.StubSessionRepository
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.*
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatestplus.mockito.MockitoSugar
 import play.api.libs.json.JsPath
 import play.api.mvc.Call
-import repositories.FakeSessionRepository
 import uk.gov.hmrc.securitiestransferchargefrontend.clients.SaveAndReturnClient
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.routes
 import uk.gov.hmrc.securitiestransferchargefrontend.models.{Mode, UserAnswers}
@@ -63,7 +63,7 @@ class NavigatorSpec extends SpecBase with MockitoSugar with ScalaFutures {
 
   "All navigators should" - {
     "successfully go to a page" in {
-      val result = new TestNavigator(new FakeSessionRepository()).goTo(testCall)
+      val result = new TestNavigator(new StubSessionRepository()).goTo(testCall)
       result.futureValue mustBe testCall
     }
     "store user answers if supplied when going to a page" in {
