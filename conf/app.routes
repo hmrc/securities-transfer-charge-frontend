@@ -28,7 +28,7 @@ POST       /how-many-transfers                          uk.gov.hmrc.securitiestr
 GET        /change/how-many-transfers                   uk.gov.hmrc.securitiestransferchargefrontend.controllers.HowToNotifyAboutSecuritiesTransferController.onPageLoad(mode: Mode = CheckMode)
 POST       /change/how-many-transfers                   uk.gov.hmrc.securitiestransferchargefrontend.controllers.HowToNotifyAboutSecuritiesTransferController.onSubmit(mode: Mode = CheckMode)
 
-GET        /nameOfSeller                        uk.gov.hmrc.securitiestransferchargefrontend.controllers.NameOfSellerController.onPageLoad(mode: Mode = NormalMode)
-POST       /nameOfSeller                        uk.gov.hmrc.securitiestransferchargefrontend.controllers.NameOfSellerController.onSubmit(mode: Mode = NormalMode)
-GET        /changeNameOfSeller                  uk.gov.hmrc.securitiestransferchargefrontend.controllers.NameOfSellerController.onPageLoad(mode: Mode = CheckMode)
-POST       /changeNameOfSeller                  uk.gov.hmrc.securitiestransferchargefrontend.controllers.NameOfSellerController.onSubmit(mode: Mode = CheckMode)
+GET        /seller-name                         uk.gov.hmrc.securitiestransferchargefrontend.controllers.NameOfSellerController.onPageLoad(mode: Mode = NormalMode)
+POST       /seller-name                         uk.gov.hmrc.securitiestransferchargefrontend.controllers.NameOfSellerController.onSubmit(mode: Mode = NormalMode)
+GET        /change/seller-name                  uk.gov.hmrc.securitiestransferchargefrontend.controllers.NameOfSellerController.onPageLoad(mode: Mode = CheckMode)
+POST       /change/seller-name                  uk.gov.hmrc.securitiestransferchargefrontend.controllers.NameOfSellerController.onSubmit(mode: Mode = CheckMode)
