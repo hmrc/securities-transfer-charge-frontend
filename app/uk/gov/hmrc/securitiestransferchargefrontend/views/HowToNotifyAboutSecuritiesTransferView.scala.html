@@ -31,7 +31,7 @@
 
 @layout(pageTitle = title(form, messages("howToNotifyAboutSecuritiesTransfer.title"))) {
     <div id="caption-heading" class="govuk-caption-l">
-        @messages("howToNotifyAboutSecuritiesTransfer.caption")
+        @messages("transfer.details.caption")
     </div>
 
     @formHelper(action = routes.HowToNotifyAboutSecuritiesTransferController.onSubmit(mode), Symbol("autoComplete") -> "off") {
