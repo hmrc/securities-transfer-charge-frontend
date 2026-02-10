@@ -50,27 +50,27 @@ class NameOfSellerViewSpec extends ViewBaseSpec {
 
   "The NameOfSellerView" - {
     "when the user is an Individual, should:" - {
-      val NameOfSellerView = view()
+      val nameOfSellerView = view()
 
       "have the correct title" in {
-        NameOfSellerView.title must include(ExpectedContent.title)
+        nameOfSellerView.title must include(ExpectedContent.title)
       }
 
       "have the correct heading" in {
-        NameOfSellerView.select("h1").text() mustBe ExpectedContent.heading
+        nameOfSellerView.select("h1").text() mustBe ExpectedContent.heading
       }
 
       "display the correct caption text" in {
-        NameOfSellerView.getElementsByClass("govuk-caption-l").text() mustBe ExpectedContent.caption
+        nameOfSellerView.getElementsByClass("govuk-caption-l").text() mustBe ExpectedContent.caption
       }
 
       "have a button with the text save and continue " in {
-        val buttons = NameOfSellerView.select(".govuk-button")
+        val buttons = nameOfSellerView.select(".govuk-button")
         buttons.get(0).text() mustBe ExpectedContent.saveAndContinue
       }
 
       "have a button with the text save and return to dashboard" in {
-        val buttons = NameOfSellerView.select(".govuk-button")
+        val buttons = nameOfSellerView.select(".govuk-button")
         buttons.get(1).text() mustBe ExpectedContent.saveAndReturn
       }
     }

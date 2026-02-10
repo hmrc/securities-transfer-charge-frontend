@@ -19,6 +19,7 @@ package uk.gov.hmrc.securitiestransferchargefrontend.navigation
 import play.api.mvc.Call
 import uk.gov.hmrc.securitiestransferchargefrontend.clients.SaveAndReturnClient
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.routes
+import uk.gov.hmrc.securitiestransferchargefrontend.models.HowToNotifyAboutSecuritiesTransfer.{MoreThanOneAtATime, OneAtATime}
 import uk.gov.hmrc.securitiestransferchargefrontend.models.{CheckMode, Mode, NormalMode, UserAnswers}
 import uk.gov.hmrc.securitiestransferchargefrontend.pages.*
 import uk.gov.hmrc.securitiestransferchargefrontend.queries.Gettable
@@ -34,21 +35,27 @@ class StfNavigator @Inject() (sessionRepository: SessionRepository,
   private val normalRoutes: Page => UserAnswers => Future[Call] = {
 
     case SubmissionsDashboardPage => userAnswers => goTo(routes.HowToNotifyAboutSecuritiesTransferController.onPageLoad(NormalMode), Some(userAnswers))
-    case HowToNotifyAboutSecuritiesTransferPage => userAnswers => goTo(routes.NameOfSellerController.onPageLoad(NormalMode), Some(userAnswers))
+    case HowToNotifyAboutSecuritiesTransferPage => userAnswers => {
+      userAnswers.get(HowToNotifyAboutSecuritiesTransferPage) match {
+        case Some(OneAtATime) => goTo(routes.NameOfSellerController.onPageLoad(NormalMode), Some(userAnswers))
+        case Some(MoreThanOneAtATime) => goTo(???)
+        case None => goTo(routes.JourneyRecoveryController.onPageLoad(), None)
+        }
+      }
 
     case NameOfSellerPage => userAnswers => goTo(routes.JourneyRecoveryController.onPageLoad(), Some(userAnswers))
 
     case _ => _ => defaultPage  
   }
 
-  private val checkRouteMap: Page => UserAnswers => Call = (_ => _ => routes.CheckYourAnswersController.onPageLoad())
+      val checkRouteMap: Page => UserAnswers => Call = (_ => _ => routes.CheckYourAnswersController.onPageLoad())
 
-  def nextPage(page: Page, mode: Mode, userAnswers: UserAnswers): Future[Call] = {
-    mode match {
-      case NormalMode => normalRoutes(page)(userAnswers)
-      case CheckMode => Future.successful(checkRouteMap(page)(userAnswers))
+    def nextPage(page: Page, mode: Mode, userAnswers: UserAnswers): Future[Call] = {
+      mode match {
+        case NormalMode => normalRoutes(page)(userAnswers)
+        case CheckMode => Future.successful(checkRouteMap(page)(userAnswers))
+      }
     }
-  }
 
   val errorPage: Page => Call = {
     case _: Gettable[?] => ???

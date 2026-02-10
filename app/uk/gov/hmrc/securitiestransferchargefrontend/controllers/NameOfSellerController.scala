@@ -61,9 +61,9 @@ class NameOfSellerController @Inject()(
         formWithErrors =>
           Future.successful(BadRequest(view(formWithErrors, mode))),
 
-        value =>
+        nameOfSeller =>
           for {
-            updatedAnswers <- Future.fromTry(request.userAnswers.set(NameOfSellerPage, value))
+            updatedAnswers <- Future.fromTry(request.userAnswers.set(NameOfSellerPage, nameOfSeller))
             nextPage       <- navigator.nextPage(NameOfSellerPage, mode, updatedAnswers)
           } yield Redirect(nextPage)
       )
