@@ -47,8 +47,6 @@ class SaveAndReturnClientImpl @Inject(http: HttpClientV2, config: FrontendAppCon
 
     val url = url"${config.saveUserAnswersUrl}"
 
-    println(Console.RED + Json.toJson(userAnswers) + Console.RESET)
-
     http.post(url)
       .withBody(Json.toJson(userAnswers))
       .execute[HttpResponse]
