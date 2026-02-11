@@ -39,13 +39,14 @@ class StfNavigator @Inject()(sessionRepository: SessionRepository,
     case SubmissionsDashboardPage => userAnswers => goTo(routes.HowToNotifyAboutSecuritiesTransferController.onPageLoad(NormalMode), Some(userAnswers))
     case HowToNotifyAboutSecuritiesTransferPage => userAnswers => {
       dataDependent(HowToNotifyAboutSecuritiesTransferPage, userAnswers) {
-        case OneAtATime => routes.NameOfSellerController.onPageLoad(NormalMode) // THIS IS A TEMPORARY NAVIGATION TO THE NAME OF THE SELLER PAGE AS THE CONFIRM-ADDRESS PAGE HAS NOT BEEN IMPLEMENTED.
+        case OneAtATime => routes.ConfirmAddressController.onPageLoad()
         case MoreThanOneAtATime => ???
       }
     }
-    case NameOfSellerPage => userAnswers => dataRequired(NameOfSellerPage, userAnswers, defaultPage)
+    case ConfirmAddressPage => userAnswers => dataRequired(ConfirmAddressPage, userAnswers, routes.NameOfSellerController.onPageLoad(NormalMode))
+    case NameOfSellerPage => userAnswers => dataRequired(NameOfSellerPage, userAnswers, routes.UkOrNotController.onPageLoad(NormalMode))
+    case UkOrNotPage => userAnswers => dataRequired(UkOrNotPage, userAnswers, routes.JourneyRecoveryController.onPageLoad())
 
-    case ConfirmAddressPage => userAnswers => dataRequired(ConfirmAddressPage, userAnswers, defaultPage)
     case _ => _ => defaultPageF
 
   }

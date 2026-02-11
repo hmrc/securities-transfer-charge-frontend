@@ -40,7 +40,7 @@ class UkOrNotControllerSpec extends SpecBase with MockitoSugar {
 
   def onwardRoute = Call("GET", "/foo")
 
-  lazy val ukOrNotRoute: Any = routes.UkOrNotController.onPageLoad(NormalMode).url
+  lazy val ukOrNotRoute: String = routes.UkOrNotController.onPageLoad(NormalMode).url
 
   val formProvider = new UkOrNotFormProvider()
   val form: Form[UkOrNot] = formProvider()
@@ -65,7 +65,7 @@ class UkOrNotControllerSpec extends SpecBase with MockitoSugar {
 
     "must populate the view correctly on a GET when the question has previously been answered" in {
 
-      val userAnswers = UserAnswers(userAnswersId).set(UkOrNotPage, UkOrNot.values.head).success.value
+      val userAnswers = UserAnswers(userAnswersId, submissionId).set(UkOrNotPage, UkOrNot.values.head).success.value
 
       val application = applicationBuilder(userAnswers = Some(userAnswers)).build()
 

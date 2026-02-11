@@ -14,6 +14,9 @@ GET        /stf/there-is-a-problem                          uk.gov.hmrc.securiti
 
 GET        /stf/check-your-answers                          uk.gov.hmrc.securitiestransferchargefrontend.controllers.CheckYourAnswersController.onPageLoad()
 
+GET        /stf/submissions-dashboard                       uk.gov.hmrc.securitiestransferchargefrontend.controllers.SubmissionsDashboardController.onPageLoad()
+POST       /stf/submissions-dashboard                       uk.gov.hmrc.securitiestransferchargefrontend.controllers.SubmissionsDashboardController.onSubmit()
+
 GET        /stf/account/sign-out-survey                     uk.gov.hmrc.securitiestransferchargefrontend.controllers.auth.AuthController.signOut()
 GET        /stf/account/sign-out                            uk.gov.hmrc.securitiestransferchargefrontend.controllers.auth.AuthController.signOutNoSurvey()
 GET        /stf/account/signed-out                          uk.gov.hmrc.securitiestransferchargefrontend.controllers.auth.SignedOutController.onPageLoad()
@@ -21,12 +24,7 @@ GET        /stf/account/signed-out                          uk.gov.hmrc.securiti
 GET        /stf/unauthorised                                uk.gov.hmrc.securitiestransferchargefrontend.controllers.UnauthorisedController.onPageLoad()
 
 GET        /stf/confirm-address                       uk.gov.hmrc.securitiestransferchargefrontend.controllers.ConfirmAddressController.onPageLoad()
-
 POST       /stf/confirm-address                       uk.gov.hmrc.securitiestransferchargefrontend.controllers.ConfirmAddressController.onSubmit()
-
-
-GET        /stf/submissions-dashboard                       uk.gov.hmrc.securitiestransferchargefrontend.controllers.SubmissionsDashboardController.onPageLoad()
-POST       /stf/submissions-dashboard                       uk.gov.hmrc.securitiestransferchargefrontend.controllers.SubmissionsDashboardController.onSubmit()
 
 GET        /stf/how-many-transfers                          uk.gov.hmrc.securitiestransferchargefrontend.controllers.HowToNotifyAboutSecuritiesTransferController.onPageLoad(mode: Mode = NormalMode)
 POST       /stf/how-many-transfers                          uk.gov.hmrc.securitiestransferchargefrontend.controllers.HowToNotifyAboutSecuritiesTransferController.onSubmit(mode: Mode = NormalMode)
