@@ -21,7 +21,6 @@ import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.when
 import org.scalatestplus.mockito.MockitoSugar.mock
 import play.api.data.Form
-import play.api.inject
 import play.api.test.FakeRequest
 import play.api.test.Helpers.*
 import uk.gov.hmrc.http.HeaderCarrier
@@ -98,10 +97,8 @@ class HowToNotifyAboutSecuritiesTransferControllerSpec extends SpecBase {
     "must redirect on valid submission" in {
       val saveAndReturnClient = mock[SaveAndReturnClient]
 
-      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers))
-        .overrides(
-          inject.bind[SaveAndReturnClient].toInstance(saveAndReturnClient)
-        ).build()
+      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers), saveAndReturnClient = saveAndReturnClient)
+        .build()
 
       when(saveAndReturnClient.save(any[UserAnswers]())(any[HeaderCarrier]()))
         .thenReturn(Future.successful(()))
