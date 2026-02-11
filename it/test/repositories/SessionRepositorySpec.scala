@@ -49,7 +49,7 @@ class SessionRepositorySpec
   private val instant = Instant.now.truncatedTo(ChronoUnit.MILLIS)
   private val stubClock: Clock = Clock.fixed(instant, ZoneId.systemDefault)
 
-  private val userAnswers = UserAnswers("id", SubmissionId("sub-01"), Json.obj("foo" -> "bar"), Instant.ofEpochSecond(1))
+  private val userAnswers = UserAnswers("id", SubmissionId("sub-01"),Json.obj("foo" -> "bar"), Instant.ofEpochSecond(1))
 
   private val mockAppConfig = mock[FrontendAppConfig]
   when(mockAppConfig.cacheTtl) thenReturn 1L
@@ -116,9 +116,9 @@ class SessionRepositorySpec
     }
 
     "must return unit when there is no record to remove" in {
-      val result: Unit = repository.clear("id that does not exist").futureValue
+      val result = repository.clear("id that does not exist").futureValue
 
-      result mustEqual()
+      result mustEqual ()
     }
 
     mustPreserveMdc(repository.clear(userAnswers.userId))
@@ -143,7 +143,7 @@ class SessionRepositorySpec
 
     "when there is no record for this id" - {
 
-      "must return true" in {
+      "must return unit" in {
 
         repository.keepAlive("id that does not exist").futureValue mustEqual ()
       }
@@ -157,8 +157,8 @@ class SessionRepositorySpec
 
       MDC.put("test", "foo")
 
-      f.map { _ =>
+      (f.map { _ =>
         Option(MDC.get("test"))
-      }.futureValue mustBe Some("foo")
+      }.futureValue) mustEqual Some("foo")
     }
 }
