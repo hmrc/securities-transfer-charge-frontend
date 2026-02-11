@@ -56,6 +56,7 @@ class StfNavigator @Inject()(sessionRepository: SessionRepository,
         normalRoutes(page)(hc)(userAnswers)
       case CheckMode => Future.successful(checkRouteMap(page)(userAnswers))
     }
+  }
 
   val errorPage: Page => Call = {
     case _: Gettable[?] => ???
