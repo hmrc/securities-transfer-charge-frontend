@@ -20,7 +20,6 @@ import base.SpecBase
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.when
 import org.scalatestplus.mockito.MockitoSugar
-import play.api.inject.bind
 import play.api.libs.json.Json
 import play.api.test.FakeRequest
 import play.api.test.Helpers._
@@ -46,20 +45,18 @@ class SubmissionsDashboardControllerSpec extends SpecBase with MockitoSugar {
         val mockSaveAndReturnClient = mock[SaveAndReturnClient]
 
         when(mockSaveAndReturnClient.list(any[String])(any()))
-          .thenReturn(Future.successful(Seq.empty))
+          .thenReturn(Future.successful(List.empty))
 
         val application =
-          applicationBuilder()
-            .overrides(
-              bind[SaveAndReturnClient].toInstance(mockSaveAndReturnClient)
-            )
-            .build()
+          applicationBuilder(
+            saveAndReturnClient = mockSaveAndReturnClient
+          ).build()
 
         running(application) {
           val request = FakeRequest(GET, submissionsDashboardRoute)
 
           val result = route(application, request).value
-          val view   = application.injector.instanceOf[SubmissionsDashboardView]
+          val view = application.injector.instanceOf[SubmissionsDashboardView]
 
           status(result) mustEqual OK
 
@@ -70,38 +67,35 @@ class SubmissionsDashboardControllerSpec extends SpecBase with MockitoSugar {
             ).toString
         }
       }
-
+      
       "must return OK and render submissions when they exist" in {
 
         val mockSaveAndReturnClient = mock[SaveAndReturnClient]
 
         val userAnswers =
           UserAnswers(
-            userId       = userId,
+            userId = userId,
             submissionId = submissionId,
-            data         = Json.obj(),
-            lastUpdated  = Instant.now()
+            data = Json.obj(),
+            lastUpdated = Instant.now()
           )
 
         when(mockSaveAndReturnClient.list(any[String])(any()))
-          .thenReturn(Future.successful(Seq(submissionId)))
+          .thenReturn(Future.successful(List(submissionId)))
 
-        when(
-          mockSaveAndReturnClient.retrieve(any[String], any())(any())
-        ).thenReturn(Future.successful(userAnswers))
+        when(mockSaveAndReturnClient.retrieve(any[String], any())(any()))
+          .thenReturn(Future.successful(userAnswers))
 
         val application =
-          applicationBuilder()
-            .overrides(
-              bind[SaveAndReturnClient].toInstance(mockSaveAndReturnClient)
-            )
-            .build()
+          applicationBuilder(
+            saveAndReturnClient = mockSaveAndReturnClient
+          ).build()
 
         running(application) {
           val request = FakeRequest(GET, submissionsDashboardRoute)
 
           val result = route(application, request).value
-          val view   = application.injector.instanceOf[SubmissionsDashboardView]
+          val view = application.injector.instanceOf[SubmissionsDashboardView]
 
           status(result) mustEqual OK
 

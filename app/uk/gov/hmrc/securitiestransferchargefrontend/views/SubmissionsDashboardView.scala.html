@@ -36,9 +36,7 @@
 
         <h1 class="govuk-heading-l">@messages("submissionsDashboard.heading")</h1>
 
-        @if(userAnswers.isEmpty) {
-            <p class="govuk-body">@messages("submissionsDashboard.noSubmissions")</p>
-        } else {
+        @if(userAnswers.nonEmpty) {
             @SubmissionsTable(userAnswers)
         }
 
