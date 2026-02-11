@@ -107,7 +107,6 @@ class ConfirmAddressControllerSpec extends SpecBase {
             inject.bind[SubscriptionDataRepository].toInstance(mockSubscriptionDataRepository),
             inject.bind[AddressService].toInstance(mockAddressService),
             inject.bind[SessionRepository].toInstance(mockSessionRepository),
-            inject.bind[SaveAndReturnClient].toInstance(saveAndReturnClient)
           )
           .build()
 
