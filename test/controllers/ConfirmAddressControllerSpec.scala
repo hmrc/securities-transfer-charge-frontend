@@ -23,6 +23,7 @@ import org.scalatestplus.mockito.MockitoSugar.mock
 import play.api.inject
 import play.api.test.FakeRequest
 import play.api.test.Helpers.*
+import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.securitiestransferchargefrontend.clients.SaveAndReturnClient
 import uk.gov.hmrc.securitiestransferchargefrontend.connectors.SubscriptionConnector
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.routes
@@ -97,7 +98,7 @@ class ConfirmAddressControllerSpec extends SpecBase {
         )
       ).thenReturn(confirmableAddress)
 
-      when(saveAndReturnClient.save(any[UserAnswers]()))
+      when(saveAndReturnClient.save(any[UserAnswers]())(any[HeaderCarrier]()))
         .thenReturn(Future.successful(()))
 
       val application =

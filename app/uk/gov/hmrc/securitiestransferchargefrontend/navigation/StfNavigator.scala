@@ -39,6 +39,8 @@ class StfNavigator @Inject()(sessionRepository: SessionRepository,
     case HowToNotifyAboutSecuritiesTransferPage => userAnswers => goTo(routes.JourneyRecoveryController.onPageLoad(), Some(userAnswers))
 
     case _ => _ => defaultPageF
+    case ConfirmAddressPage => userAnswers => goTo(routes.JourneyRecoveryController.onPageLoad(), Some(userAnswers))
+    case _ => _ => defaultPage
   }
 
   private val checkRouteMap: Page => UserAnswers => Call = (_ => _ => routes.CheckYourAnswersController.onPageLoad())
