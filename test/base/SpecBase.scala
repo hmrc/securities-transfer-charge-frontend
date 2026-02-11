@@ -17,6 +17,7 @@
 package base
 
 import base.stubs.{StubStcAuthEnrolledAction, StubStcDataRequiredAction, StubStcDataRetrievalAction}
+import clients.FakeSaveAndReturnClient
 import controllers.actions.*
 import org.scalatest.concurrent.{IntegrationPatience, ScalaFutures}
 import org.scalatest.freespec.AnyFreeSpec
@@ -29,6 +30,7 @@ import play.api.inject.guice.GuiceApplicationBuilder
 import play.api.mvc.{AnyContent, AnyContentAsEmpty}
 import play.api.test.FakeRequest
 import uk.gov.hmrc.http.HeaderCarrier
+import uk.gov.hmrc.securitiestransferchargefrontend.clients.SaveAndReturnClient
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.actions.*
 import uk.gov.hmrc.securitiestransferchargefrontend.domain.SubmissionId
 import uk.gov.hmrc.securitiestransferchargefrontend.models.UserAnswers
@@ -60,7 +62,8 @@ trait SpecBase
 
   def messages(app: Application): Messages = app.injector.instanceOf[MessagesApi].preferred(FakeRequest())
 
-  protected def applicationBuilder(userAnswers: Option[UserAnswers] = None): GuiceApplicationBuilder =
+  protected def applicationBuilder(userAnswers: Option[UserAnswers] = None,
+                                   saveAndReturnClient: SaveAndReturnClient = FakeSaveAndReturnClient()): GuiceApplicationBuilder =
     new GuiceApplicationBuilder()
       .overrides(
         bind[DataRequiredAction].to[DataRequiredActionImpl],
@@ -68,6 +71,7 @@ trait SpecBase
         bind[DataRetrievalAction].toInstance(new FakeDataRetrievalAction(userAnswers)),
         bind[StcAuthEnrolledAction].to[StubStcAuthEnrolledAction],
         bind[StcDataRetrievalAction].to[StubStcDataRetrievalAction],
-        bind[StcDataRequiredAction].toInstance(StubStcDataRequiredAction(userAnswers))
+        bind[StcDataRequiredAction].toInstance(StubStcDataRequiredAction(userAnswers)),
+        bind[SaveAndReturnClient].toInstance(saveAndReturnClient)
   )
 }
