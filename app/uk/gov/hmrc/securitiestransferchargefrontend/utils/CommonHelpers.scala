@@ -14,13 +14,21 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.securitiestransferchargefrontend.clients.registration
+package uk.gov.hmrc.securitiestransferchargefrontend.utils
 
-import uk.gov.hmrc.securitiestransferchargefrontend.clients.registration.RegistrationServiceError
+import play.api.Logger
 
-enum SubscriptionResponse:
-  case AddressUpdateSuccessful
-  case AddressUpdateFailed
-  case SubscriptionNotFound
+import scala.concurrent.{ExecutionContext, Future}
 
-type SubscriptionResult = Either[RegistrationServiceError, SubscriptionResponse]
+object CommonHelpers {
+
+  def logInfoAndFail[A, E <: Throwable](logger: Logger): E => Future[A] = e => {
+    logger.info(e.getMessage)
+    Future.failed(e)
+  }
+
+  implicit class FutureOptionOps[A](fo: Future[Option[A]]) {
+    def getOrFail(ex: => Throwable)(implicit ec: ExecutionContext): Future[A] =
+      fo.flatMap(_.fold[Future[A]](Future.failed(ex))(Future.successful))
+  }
+}

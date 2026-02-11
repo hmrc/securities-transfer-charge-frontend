@@ -16,18 +16,18 @@
 
 package base.stubs
 
-import base.Fixtures
-import play.api.mvc.{AnyContent, BodyParser, PlayBodyParsers, Request, Result}
+import base.Fixtures.*
+import play.api.mvc.*
+import uk.gov.hmrc.auth.core.AffinityGroup
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.actions.{StcAuthEnrolledAction, StcAuthorisedRequest}
 
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
-import Fixtures.*
-import uk.gov.hmrc.auth.core.AffinityGroup
-class StubStcAuthEnrolledAction @Inject() (playBodyParsers: PlayBodyParsers) extends StcAuthEnrolledAction {
+
+class StubStcAuthEnrolledAction @Inject()(playBodyParsers: PlayBodyParsers) extends StcAuthEnrolledAction {
 
   override def parser: BodyParser[AnyContent] = playBodyParsers.defaultBodyParser
-    
+
   override protected def executionContext: ExecutionContext = ExecutionContext.global
 
   override def invokeBlock[A](request: Request[A], block: StcAuthorisedRequest[A] => Future[Result]): Future[Result] =

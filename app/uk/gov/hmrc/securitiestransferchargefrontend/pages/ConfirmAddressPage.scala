@@ -14,13 +14,15 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.securitiestransferchargefrontend.clients.registration
+package uk.gov.hmrc.securitiestransferchargefrontend.pages
 
-import uk.gov.hmrc.securitiestransferchargefrontend.clients.registration.RegistrationServiceError
+import play.api.libs.json.JsPath
+import uk.gov.hmrc.securitiestransferchargefrontend.models.ConfirmableAddress
+import uk.gov.hmrc.securitiestransferchargefrontend.pages.QuestionPage
 
-enum SubscriptionResponse:
-  case AddressUpdateSuccessful
-  case AddressUpdateFailed
-  case SubscriptionNotFound
+case object ConfirmAddressPage extends QuestionPage[ConfirmableAddress] {
 
-type SubscriptionResult = Either[RegistrationServiceError, SubscriptionResponse]
+  override def path: JsPath = JsPath \ toString
+
+  override def toString: String = "confirmedAddress"
+}

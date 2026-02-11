@@ -18,10 +18,11 @@ package uk.gov.hmrc.securitiestransferchargefrontend.controllers.actions
 
 import play.api.mvc.{Request, WrappedRequest}
 import uk.gov.hmrc.auth.core.AffinityGroup
+import uk.gov.hmrc.securitiestransferchargefrontend.domain.SubscriptionId
 
 final case class StcAuthorisedRequest[A](
                                           request: Request[A],
                                           internalId: String,
                                           affinityGroup: AffinityGroup,
-                                          stcId: String
+                                          subscriptionId: SubscriptionId
                                         ) extends WrappedRequest[A](request)

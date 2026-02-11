@@ -20,6 +20,7 @@ import play.api.mvc.Result
 import uk.gov.hmrc.auth.core.{AffinityGroup, Enrolments}
 import uk.gov.hmrc.securitiestransferchargefrontend.config.FrontendAppConfig
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.Redirects
+import uk.gov.hmrc.securitiestransferchargefrontend.domain.SubscriptionId
 
 import javax.inject.Inject
 import scala.concurrent.Future
@@ -50,12 +51,11 @@ class RetrievalFilter @Inject()(
       .map(_ => Right(()))
       .getOrElse(Left(redirectToRegistrationF))
 
-  val stcIdPresent: RetrievalFilterFunction[Enrolments, String] = enrolments =>
+  val subscriptionIdPresent: RetrievalFilterFunction[Enrolments, SubscriptionId] = enrolments =>
     enrolments
       .getEnrolment(appConfig.stcEnrolmentKey)
       .flatMap(_.getIdentifier(appConfig.stcIdentifierKey))
-      .map(_.value)
-      .filter(_.nonEmpty)
+      .map(id  => SubscriptionId(id.value))
       .map(Right(_))
       .getOrElse(Left(redirectToJourneyRecoveryF))
 }

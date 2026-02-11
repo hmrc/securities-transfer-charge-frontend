@@ -18,9 +18,12 @@ package uk.gov.hmrc.securitiestransferchargefrontend.config
 
 import com.google.inject.AbstractModule
 import play.api.http.HttpErrorHandler
+import uk.gov.hmrc.securitiestransferchargefrontend.clients.registration.{RegistrationClient, RegistrationClientImpl}
+import uk.gov.hmrc.securitiestransferchargefrontend.connectors.{SubscriptionConnector, SubscriptionConnectorImpl}
 import uk.gov.hmrc.securitiestransferchargefrontend.clients.{SaveAndReturnClient, SaveAndReturnClientImpl, SubmissionIdClient, SubmissionIdClientImpl}
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.actions.*
 import uk.gov.hmrc.securitiestransferchargefrontend.handlers.ErrorHandler
+import uk.gov.hmrc.securitiestransferchargefrontend.repositories.{SubscriptionDataRepository, SubscriptionDataRepositoryImpl}
 import uk.gov.hmrc.securitiestransferchargefrontend.navigation.{Navigator, StfNavigator}
 import uk.gov.hmrc.securitiestransferchargefrontend.repositories.{SessionRepository, SessionRepositoryImpl}
 
@@ -45,6 +48,10 @@ class Module extends AbstractModule {
     bind(classOf[Navigator]).to(classOf[StfNavigator])
     bind(classOf[SubmissionIdClient]).to(classOf[SubmissionIdClientImpl])
     bind(classOf[SaveAndReturnClient]).to(classOf[SaveAndReturnClientImpl])
-    
+
+    bind(classOf[SubscriptionDataRepository]).to(classOf[SubscriptionDataRepositoryImpl])
+    bind(classOf[SubscriptionConnector]).to(classOf[SubscriptionConnectorImpl])
+    bind(classOf[RegistrationClient]).to(classOf[RegistrationClientImpl]).asEagerSingleton()
+
   }
 }

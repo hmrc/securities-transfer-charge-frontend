@@ -17,9 +17,8 @@
 package controllers.actions
 
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.actions.DataRetrievalAction
-import uk.gov.hmrc.securitiestransferchargefrontend.models.requests.OptionalDataRequest
 import uk.gov.hmrc.securitiestransferchargefrontend.models.UserAnswers
-import uk.gov.hmrc.securitiestransferchargefrontend.models.requests.IdentifierRequest
+import uk.gov.hmrc.securitiestransferchargefrontend.models.requests.{IdentifierRequest, OptionalDataRequest}
 
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -31,3 +30,4 @@ class FakeDataRetrievalAction(dataToReturn: Option[UserAnswers]) extends DataRet
   override protected implicit val executionContext: ExecutionContext =
     scala.concurrent.ExecutionContext.Implicits.global
 }
+

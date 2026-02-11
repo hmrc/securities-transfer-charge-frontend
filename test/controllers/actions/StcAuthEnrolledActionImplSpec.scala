@@ -38,7 +38,6 @@ class StcAuthEnrolledActionImplSpec extends SpecBase {
 
   private val enrolmentKey  = "HMRC-STC-ORG"
   private val identifierKey = "STCID"
-  private val stcId         = "STC1234567890"
 
   def buildRetrieval(
                       maybeInternalId: Option[String] = Some(Fixtures.testInternalId),
@@ -79,7 +78,7 @@ class StcAuthEnrolledActionImplSpec extends SpecBase {
           Set(
             Enrolment(
               enrolmentKey,
-              Seq(EnrolmentIdentifier(identifierKey, stcId)),
+              Seq(EnrolmentIdentifier(identifierKey, Fixtures.testSubscriptionId.toString)),
               "Activated"
             )
           )
@@ -89,14 +88,14 @@ class StcAuthEnrolledActionImplSpec extends SpecBase {
 
       running(application) {
 
-        val action =
+        val action: StcAuthEnrolledAction =
           testSetup(application, buildRetrieval(enrolments = enrolments))()
 
         val result =
           action.invokeBlock(FakeRequest(), { req =>
             req.internalId mustBe Fixtures.testInternalId
             req.affinityGroup mustBe AffinityGroup.Organisation
-            req.stcId mustBe stcId
+            req.subscriptionId  mustBe Fixtures.testSubscriptionId
             Future.successful(Results.Ok)
           })
 

@@ -64,15 +64,15 @@ final class StcAuthEnrolledActionImpl @Inject()(
 
         val maybeRequest =
           for {
-            internalId    <- retrievalFilter.internalIdPresent(maybeInternalId)
+            internalId <- retrievalFilter.internalIdPresent(maybeInternalId)
             affinityGroup <- retrievalFilter.affinityGroupPresent(maybeAffinityGroup)
-            _             <- retrievalFilter.enrolledForStc(enrolments)
-            stcId         <- retrievalFilter.stcIdPresent(enrolments)
+            _ <- retrievalFilter.enrolledForStc(enrolments)
+            subscriptionId <- retrievalFilter.subscriptionIdPresent(enrolments)
           } yield StcAuthorisedRequest(
             request,
             internalId,
             affinityGroup,
-            stcId
+            subscriptionId
           )
 
         maybeRequest.fold(identity, block)
