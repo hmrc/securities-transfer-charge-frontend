@@ -44,7 +44,6 @@ object SubscriptionData {
 trait SubscriptionDataRepository {
   def getSubscriptionData(subscriptionId: SubscriptionId): Future[Option[SubscriptionData]]
   def saveSubscriptionData(subscriptionId: SubscriptionId, subscriptionDetails: Subscription): Future[Unit]
-  def clear(subscriptionId: SubscriptionId): Future[Unit]
 }
 
 
@@ -98,11 +97,4 @@ class SubscriptionDataRepositoryImpl @Inject()(mongoComponent: MongoComponent,
       .toFuture()
       .map(_ => ())
   }
-
-
-  override def clear(subscriptionId: SubscriptionId): Future[Unit] =
-    collection
-      .deleteOne(byId(subscriptionId))
-      .toFuture()
-      .map(_ => ())
 }

@@ -30,26 +30,13 @@ import play.api.mvc.{AnyContent, AnyContentAsEmpty}
 import play.api.test.FakeRequest
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.securitiestransferchargefrontend.clients.registration.Subscription
-import uk.gov.hmrc.securitiestransferchargefrontend.controllers.actions.requests.StcOptionalDataRequest
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.actions.*
 import uk.gov.hmrc.securitiestransferchargefrontend.domain.SubmissionId
 import uk.gov.hmrc.securitiestransferchargefrontend.models.UserAnswers
 import uk.gov.hmrc.securitiestransferchargefrontend.models.requests.DataRequest
 
 import java.time.LocalDate
-import scala.concurrent.{ExecutionContext, Future}
-
-class FakeStcDataRetrievalAction(dataToReturn: Option[UserAnswers])
-  extends StcDataRetrievalAction {
-
-  override protected def executionContext: ExecutionContext =
-    ExecutionContext.global
-
-  override protected def transform[A](
-                                       request: StcAuthorisedRequest[A]
-                                     ): Future[StcOptionalDataRequest[A]] =
-    Future.successful(StcOptionalDataRequest(request, dataToReturn))
-}
+import scala.concurrent.ExecutionContext
 
 trait SpecBase
   extends AnyFreeSpec

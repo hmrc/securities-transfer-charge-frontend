@@ -47,7 +47,7 @@ class SubscriptionConnectorImpl @Inject()(registrationClient: RegistrationClient
       _ <- if (!subscription.subsValidTo.isBefore(LocalDate.now())) {
         subscriptionDataRepository.saveSubscriptionData(subscriptionId, subscription)
       } else {
-        val msg = s"Subscription expired for stcId=$subscriptionId.Valid until: ${subscription.subsValidTo}"
+        val msg = s"Subscription expired for subscriptionId=$subscriptionId.Valid until: ${subscription.subsValidTo}"
         logInfoAndFail(new SubscriptionStatusErrorException(msg))
       }
     } yield subscription
