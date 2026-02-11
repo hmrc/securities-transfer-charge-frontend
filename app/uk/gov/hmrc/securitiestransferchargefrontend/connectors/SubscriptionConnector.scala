@@ -44,11 +44,15 @@ class SubscriptionConnectorImpl @Inject()(registrationClient: RegistrationClient
                           (implicit hc: HeaderCarrier): Future[Subscription] = {
     for {
       subscription <- registrationClient.getSubscriptionDetails(subscriptionId)
-      _ <- if (!subscription.subsValidTo.isBefore(LocalDate.now())) {
-        subscriptionDataRepository.saveSubscriptionData(subscriptionId, subscription)
-      } else {
-        val msg = s"Subscription expired for subscriptionId=$subscriptionId.Valid until: ${subscription.subsValidTo}"
-        logInfoAndFail(new SubscriptionStatusErrorException(msg))
-      }
+      _ <- isValidSubscription(subscriptionId, subscription)
     } yield subscription
+  }
+
+  private def isValidSubscription(subscriptionId: SubscriptionId, subscription: Subscription) = {
+    if (LocalDate.now().isBefore(subscription.subsValidTo)) {
+      subscriptionDataRepository.saveSubscriptionData(subscriptionId, subscription)
+    } else {
+      val msg = s"Subscription expired for subscriptionId=$subscriptionId.Valid until: ${subscription.subsValidTo}"
+      logInfoAndFail(new SubscriptionStatusErrorException(msg))
+    }
   }

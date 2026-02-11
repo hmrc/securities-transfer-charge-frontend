@@ -24,12 +24,14 @@ import uk.gov.hmrc.securitiestransferchargefrontend.controllers.actions.*
 import uk.gov.hmrc.securitiestransferchargefrontend.models.NormalMode
 import uk.gov.hmrc.securitiestransferchargefrontend.navigation.Navigator
 import uk.gov.hmrc.securitiestransferchargefrontend.pages.ConfirmAddressPage
-import uk.gov.hmrc.securitiestransferchargefrontend.repositories.{SessionRepository, SubscriptionDataRepository}
+import uk.gov.hmrc.securitiestransferchargefrontend.repositories.SubscriptionDataRepository
 import uk.gov.hmrc.securitiestransferchargefrontend.services.AddressService
 import uk.gov.hmrc.securitiestransferchargefrontend.views.html.ConfirmAddressView
 
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
+
+class SubscriptionDataNotFoundException(msg: String) extends RuntimeException(msg)
 
 class ConfirmAddressController @Inject()(
                                           override val messagesApi: MessagesApi,
@@ -41,8 +43,7 @@ class ConfirmAddressController @Inject()(
                                           val controllerComponents: MessagesControllerComponents,
                                           view: ConfirmAddressView,
                                           addressService: AddressService,
-                                          navigator: Navigator,
-                                          sessionRepository: SessionRepository,
+                                          navigator: Navigator
                                         )(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport {
 
   def onPageLoad: Action[AnyContent] =
@@ -60,23 +61,21 @@ class ConfirmAddressController @Inject()(
 
   def onSubmit: Action[AnyContent] =
     (stcAuthEnrolled andThen getData andThen requireData).async { implicit request =>
-      
-      subscriptionDataRepository.getSubscriptionData(request.request.subscriptionId).flatMap(
-        _.fold {
-          Future.successful(Redirect(routes.JourneyRecoveryController.onPageLoad()))
-        } { subscriptionData =>
-
-          val address =
-            addressService.extractConfirmableAddress(subscriptionData.subscriptionDetails)
-
-          for {
-            updatedAnswers <- Future.fromTry(
-              request.userAnswers.set(ConfirmAddressPage, address)
-            )
-            _ <- sessionRepository.set(updatedAnswers)
-            nextPage <- navigator.nextPage(ConfirmAddressPage, NormalMode, updatedAnswers)
-          } yield Redirect(nextPage)
-        }
-      )
+      (
+        for {
+          subscriptionData <- subscriptionDataRepository.getSubscriptionData(request.request.subscriptionId)
+            .getOrFail(new SubscriptionDataNotFoundException("Subscription data not found"))
+          address = addressService.extractConfirmableAddress(subscriptionData.subscriptionDetails)
+          updatedAnswers <- Future.fromTry(request.userAnswers.set(ConfirmAddressPage, address))
+          nextPage <- navigator.nextPage(ConfirmAddressPage, NormalMode, updatedAnswers)
+        } yield Redirect(nextPage)
+        ).recover {
+        case _: SubscriptionDataNotFoundException => Redirect(routes.JourneyRecoveryController.onPageLoad())
+      }
     }
+
+  implicit class FutureOptionOps[A](fo: Future[Option[A]]) {
+    def getOrFail(ex: => Throwable): Future[A] =
+      fo.flatMap(_.fold[Future[A]](Future.failed(ex))(Future.successful))
+  }
 }
