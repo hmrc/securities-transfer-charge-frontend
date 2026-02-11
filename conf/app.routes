@@ -20,7 +20,7 @@ GET         /account/signed-out                          uk.gov.hmrc.securitiest
 
 GET         /unauthorised                                uk.gov.hmrc.securitiestransferchargefrontend.controllers.UnauthorisedController.onPageLoad()
 
-GET        /submissions-dashboard                       uk.gov.hmrc.securitiestransferchargefrontend.controllers.SubmissionsDashboardController.onPageLoad()
+GET        /stf/submissions-dashboard                       uk.gov.hmrc.securitiestransferchargefrontend.controllers.SubmissionsDashboardController.onPageLoad()
 
 GET        /ukOrNot                        uk.gov.hmrc.securitiestransferchargefrontend.controllers.UkOrNotController.onPageLoad(mode: Mode = NormalMode)
 POST       /ukOrNot                        uk.gov.hmrc.securitiestransferchargefrontend.controllers.UkOrNotController.onSubmit(mode: Mode = NormalMode)
