@@ -14,13 +14,13 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.securitiestransferchargefrontend.clients.registration
+package uk.gov.hmrc.securitiestransferchargefrontend.pages
 
-import uk.gov.hmrc.securitiestransferchargefrontend.clients.registration.RegistrationServiceError
+import play.api.libs.json.JsPath
 
-enum SubscriptionResponse:
-  case AddressUpdateSuccessful
-  case AddressUpdateFailed
-  case SubscriptionNotFound
+case object NameOfSellerPage extends QuestionPage[String] {
 
-type SubscriptionResult = Either[RegistrationServiceError, SubscriptionResponse]
+  override def path: JsPath = JsPath \ toString
+
+  override def toString: String = "nameOfSeller"
+}

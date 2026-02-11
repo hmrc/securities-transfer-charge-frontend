@@ -14,13 +14,18 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.securitiestransferchargefrontend.clients.registration
+package uk.gov.hmrc.securitiestransferchargefrontend.forms
 
-import uk.gov.hmrc.securitiestransferchargefrontend.clients.registration.RegistrationServiceError
+import javax.inject.Inject
 
-enum SubscriptionResponse:
-  case AddressUpdateSuccessful
-  case AddressUpdateFailed
-  case SubscriptionNotFound
+import uk.gov.hmrc.securitiestransferchargefrontend.forms.mappings.Mappings
+import play.api.data.Form
 
-type SubscriptionResult = Either[RegistrationServiceError, SubscriptionResponse]
+class NameOfSellerFormProvider @Inject() extends Mappings {
+
+  def apply(): Form[String] =
+    Form(
+      "value" -> text("nameOfSeller.error.required")
+        .verifying(maxLength(35, "nameOfSeller.error.length"))
+    )
+}

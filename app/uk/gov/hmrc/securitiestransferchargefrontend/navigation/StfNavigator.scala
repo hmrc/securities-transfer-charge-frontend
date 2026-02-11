@@ -21,6 +21,7 @@ import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.play.http.HeaderCarrierConverter
 import uk.gov.hmrc.securitiestransferchargefrontend.clients.SaveAndReturnClient
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.routes
+import uk.gov.hmrc.securitiestransferchargefrontend.models.HowToNotifyAboutSecuritiesTransfer.{MoreThanOneAtATime, OneAtATime}
 import uk.gov.hmrc.securitiestransferchargefrontend.models.{CheckMode, Mode, NormalMode, UserAnswers}
 import uk.gov.hmrc.securitiestransferchargefrontend.pages.*
 import uk.gov.hmrc.securitiestransferchargefrontend.queries.Gettable
@@ -36,12 +37,20 @@ class StfNavigator @Inject()(sessionRepository: SessionRepository,
   private def normalRoutes(page: Page)(implicit hc: HeaderCarrier): UserAnswers => Future[Call] = page match {
 
     case SubmissionsDashboardPage => userAnswers => goTo(routes.HowToNotifyAboutSecuritiesTransferController.onPageLoad(NormalMode), Some(userAnswers))
-    case HowToNotifyAboutSecuritiesTransferPage => userAnswers => goTo(routes.JourneyRecoveryController.onPageLoad(), Some(userAnswers))
+    case HowToNotifyAboutSecuritiesTransferPage => userAnswers => {
+      dataDependent(HowToNotifyAboutSecuritiesTransferPage, userAnswers) {
+        case OneAtATime => routes.NameOfSellerController.onPageLoad(NormalMode) // THIS IS A TEMPORARY NAVIGATION TO THE NAME OF THE SELLER PAGE AS THE CONFIRM-ADDRESS PAGE HAS NOT BEEN IMPLEMENTED.
+        case MoreThanOneAtATime => ???
+      }
+    }
+    case NameOfSellerPage => userAnswers => dataRequired(NameOfSellerPage, userAnswers, defaultPage)
 
-    case _ => _ => defaultPage
+    case ConfirmAddressPage => userAnswers => dataRequired(ConfirmAddressPage, userAnswers, defaultPage)
+    case _ => _ => defaultPageF
+
   }
 
-  private val checkRouteMap: Page => UserAnswers => Call = (_ => _ => routes.CheckYourAnswersController.onPageLoad())
+      val checkRouteMap: Page => UserAnswers => Call = (_ => _ => routes.CheckYourAnswersController.onPageLoad())
 
   def nextPage(page: Page, mode: Mode, userAnswers: UserAnswers)(implicit request: Request[?]): Future[Call] = {
     mode match {

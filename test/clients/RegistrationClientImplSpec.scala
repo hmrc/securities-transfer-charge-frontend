@@ -20,7 +20,6 @@ package clients
 import base.SpecBase
 import uk.gov.hmrc.securitiestransferchargefrontend.clients.registration.RegistrationClientImpl
 import uk.gov.hmrc.securitiestransferchargefrontend.clients.registration.SubscriptionResponse.AddressUpdateSuccessful
-import uk.gov.hmrc.securitiestransferchargefrontend.clients.registration.SubscriptionStatus.SubscriptionActive
 import uk.gov.hmrc.securitiestransferchargefrontend.models.Address
 import uk.gov.hmrc.securitiestransferchargefrontend.domain.SubscriptionId
 
@@ -28,15 +27,15 @@ class RegistrationClientImplSpec extends SpecBase {
 
   private val client = new RegistrationClientImpl()
   private val subscriptionId = SubscriptionId("XAST0123456789")
-  
+
   "RegistrationClientImpl.getSubscriptionDetails" - {
 
     "return subscription details" in {
       whenReady(client.getSubscriptionDetails(subscriptionId)) { subscription =>
         subscription.contactName mustBe "John Doe"
         subscription.addressLine1 mustBe "1 high street"
-        subscription.addressLine2 mustBe Some("bobbins on sea")
-        subscription.addressLine3 mustBe Some("Town")
+        subscription.addressLine2 mustBe Some("Town")
+        subscription.addressLine3 mustBe empty
         subscription.postcode mustBe "ZZ1 1ZZ"
         subscription.countryCode mustBe "GB"
         subscription.telephoneNumber mustBe "07777777777"
@@ -44,16 +43,7 @@ class RegistrationClientImplSpec extends SpecBase {
       }
     }
   }
-
-  "RegistrationClientImpl.getSubscriptionStatus" - {
-
-    "return an active subscription status" in {
-      whenReady(client.getSubscriptionStatus(subscriptionId)) { result =>
-        result mustBe Right(SubscriptionActive)
-      }
-    }
-  }
-
+  
   "RegistrationClientImpl.updateAddress" - {
 
     "return AddressUpdateSuccessful when updating an address" in {

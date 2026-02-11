@@ -17,6 +17,7 @@
 package base
 
 import base.stubs.{StubStcAuthEnrolledAction, StubStcDataRequiredAction, StubStcDataRetrievalAction}
+import clients.FakeSaveAndReturnClient
 import controllers.actions.*
 import org.scalatest.concurrent.{IntegrationPatience, ScalaFutures}
 import org.scalatest.freespec.AnyFreeSpec
@@ -29,11 +30,14 @@ import play.api.inject.guice.GuiceApplicationBuilder
 import play.api.mvc.{AnyContent, AnyContentAsEmpty}
 import play.api.test.FakeRequest
 import uk.gov.hmrc.http.HeaderCarrier
+import uk.gov.hmrc.securitiestransferchargefrontend.clients.SaveAndReturnClient
+import uk.gov.hmrc.securitiestransferchargefrontend.clients.registration.Subscription
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.actions.*
 import uk.gov.hmrc.securitiestransferchargefrontend.domain.SubmissionId
 import uk.gov.hmrc.securitiestransferchargefrontend.models.UserAnswers
 import uk.gov.hmrc.securitiestransferchargefrontend.models.requests.DataRequest
 
+import java.time.LocalDate
 import scala.concurrent.ExecutionContext
 
 trait SpecBase
@@ -46,13 +50,24 @@ trait SpecBase
 
   implicit val ec: ExecutionContext = ExecutionContext.global
   implicit val hc: HeaderCarrier = HeaderCarrier()
-
   val userAnswersId: String = "id"
   val sessionId = "sessionId1234"
   val submissionId: SubmissionId = SubmissionId("STC-123456789")
   val userId = "internalId"
 
-  def emptyUserAnswers : UserAnswers = UserAnswers.empty(userAnswersId)(submissionId)
+  val subscription: Subscription = Subscription(
+    subsValidTo = LocalDate.now().plusDays(5),
+    contactName = "John Doe",
+    addressLine1 = "1 high street",
+    addressLine2 = Some("Town"),
+    addressLine3 = None,
+    postcode = "ZZ1 1ZZ",
+    countryCode = "GB",
+    telephoneNumber = "07777777777",
+    emailAddress = "some@email.com"
+  )
+
+  def emptyUserAnswers: UserAnswers = UserAnswers(userAnswersId,submissionId)
 
   val fakeRequest: FakeRequest[AnyContentAsEmpty.type] = FakeRequest().withHeaders("sessionId" -> sessionId)
 
@@ -61,14 +76,16 @@ trait SpecBase
 
   def messages(app: Application): Messages = app.injector.instanceOf[MessagesApi].preferred(FakeRequest())
 
-  protected def applicationBuilder(userAnswers: Option[UserAnswers] = None): GuiceApplicationBuilder =
+  protected def applicationBuilder(userAnswers: Option[UserAnswers] = None,
+                                   saveAndReturnClient: SaveAndReturnClient = FakeSaveAndReturnClient()): GuiceApplicationBuilder =
     new GuiceApplicationBuilder()
       .overrides(
-        bind[DataRequiredAction].to[DataRequiredActionImpl],
         bind[IdentifierAction].to[FakeIdentifierAction],
-        bind[DataRetrievalAction].toInstance(new FakeDataRetrievalAction(userAnswers)),
         bind[StcAuthEnrolledAction].to[StubStcAuthEnrolledAction],
         bind[StcDataRetrievalAction].to[StubStcDataRetrievalAction],
-        bind[StcDataRequiredAction].toInstance(StubStcDataRequiredAction(userAnswers))
-  )
+        bind[DataRequiredAction].to[DataRequiredActionImpl],
+        bind[StcDataRequiredAction].toInstance(StubStcDataRequiredAction(userAnswers)),
+        bind[DataRetrievalAction].toInstance(new FakeDataRetrievalAction(userAnswers)),
+        bind[SaveAndReturnClient].toInstance(saveAndReturnClient)
+      )
 }

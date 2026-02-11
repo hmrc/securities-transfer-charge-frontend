@@ -6,6 +6,8 @@ site.change = Change
 site.no = No
 site.yes = Yes
 site.continue = Continue
+site.save-and-continue.button = Save and continue
+site.save-and-return.button = Save and return to dashboard
 site.start = Start now
 site.startAgain = Start again
 site.signIn = Sign in
@@ -26,6 +28,9 @@ timeout.signOut = Sign out
 error.title.prefix = Error:
 error.prefix = Error
 error.summary.title = There is a problem
+
+section.caption.hidden = This section is
+details.caption = Your details
 
 index.title = securities-transfer-charge-frontend
 index.heading = securities-transfer-charge-frontend
@@ -48,12 +53,19 @@ signedOut.guidance = We did not save your answers.
 unauthorised.title = You can’t access this service with this account
 unauthorised.heading = You can’t access this service with this account
 
+transfer.details.caption = Transfer details
+seller.details.caption = Seller details
+
+confirmAddress.title = Review and confirm your address
+confirmAddress.heading = Review and confirm your address
+confirmAddress.editLink = Edit address
+confirmAddress.confirm = Confirm address
+
 submissionsDashboard.title = Submissions
 submissionsDashboard.heading = Submissions
 submissionsDashboard.create-new-submission.button = Create new submission
 submissionsDashboard.hint = Submission dashboard
 
-howToNotifyAboutSecuritiesTransfer.caption = Transfer details
 howToNotifyAboutSecuritiesTransfer.title = How do you want to tell us about your securities transfer?
 howToNotifyAboutSecuritiesTransfer.heading = How do you want to tell us about your securities transfer?
 howToNotifyAboutSecuritiesTransfer.oneAtATime = One at a time
@@ -63,6 +75,14 @@ howToNotifyAboutSecuritiesTransfer.moreThanOneAtATime.hint = Download the templa
 howToNotifyAboutSecuritiesTransfer.checkYourAnswersLabel = HowToNotifyAboutSecuritiesTransfer
 howToNotifyAboutSecuritiesTransfer.error.required = Select a way to tell us about your securities transfer
 howToNotifyAboutSecuritiesTransfer.change.hidden = HowToNotifyAboutSecuritiesTransfer
+
+nameOfSeller.title = What’s the seller’s name?
+nameOfSeller.heading = What’s the seller’s name?
+nameOfSeller.checkYourAnswersLabel = What’s the seller’s name?
+nameOfSeller.error.required = Enter the seller’s full name
+nameOfSeller.error.length = Seller’s name must be 35 characters or less
+nameOfSeller.change.hidden = NameOfSeller
+nameOfSeller.hint = This can be the name of a business, person or another entity.
 
 submissionsDashboard.noSubmissions = No submissions
 submissionsDashboard.table.submissionId = Submission ID

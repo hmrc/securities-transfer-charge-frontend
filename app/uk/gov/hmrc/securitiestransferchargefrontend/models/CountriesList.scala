@@ -14,13 +14,25 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.securitiestransferchargefrontend.clients.registration
+package uk.gov.hmrc.securitiestransferchargefrontend.models
 
-import uk.gov.hmrc.securitiestransferchargefrontend.clients.registration.RegistrationServiceError
+import com.google.inject.Inject
+import play.api.libs.json.Json
 
-enum SubscriptionResponse:
-  case AddressUpdateSuccessful
-  case AddressUpdateFailed
-  case SubscriptionNotFound
+import scala.io.Source
 
-type SubscriptionResult = Either[RegistrationServiceError, SubscriptionResponse]
+class CountriesList @Inject() {
+
+  private val resourcePath = "/resources/countries.json"
+
+  lazy val countries: Seq[Country] = {
+    val stream = getClass.getResourceAsStream(resourcePath)
+    require(stream != null, s"Resource not found: $resourcePath")
+
+    val json = Source.fromInputStream(stream).mkString
+    Json.parse(json).as[Seq[Country]]
+  }
+
+  def fromCode(code: String): Option[Country] =
+    countries.find(_.code.equalsIgnoreCase(code))
+}

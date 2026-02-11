@@ -1,4 +1,4 @@
-/*
+@*
  * Copyright 2026 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -12,15 +12,22 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- */
+ *@
 
-package uk.gov.hmrc.securitiestransferchargefrontend.clients.registration
+@import uk.gov.hmrc.securitiestransferchargefrontend.models.ConfirmableAddress
 
-import uk.gov.hmrc.securitiestransferchargefrontend.clients.registration.RegistrationServiceError
+@(addr: ConfirmableAddress)
 
-enum SubscriptionResponse:
-  case AddressUpdateSuccessful
-  case AddressUpdateFailed
-  case SubscriptionNotFound
+<div id="address">
 
-type SubscriptionResult = Either[RegistrationServiceError, SubscriptionResponse]
+    @for((line, index) <- addr.lines.zipWithIndex) {
+    <span class="govuk-body" id="line@{index + 1}">@line</span><br>
+    }
+
+    <span class="govuk-body" id="postCode">@addr.postcode</span><br>
+
+    @addr.country.map { ctry =>
+    <span class="govuk-body" id="country">@ctry.name</span>
+    }
+
+</div>
