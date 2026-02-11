@@ -95,9 +95,8 @@ class NavigatorSpec extends SpecBase with MockitoSugar with ScalaFutures {
       val result = navigator.dataRequired(testPage, emptyUserAnswers, testCall)
       for {
         res     <- result
-        default <- navigator.defaultPage
       } yield {
-        res mustBe default
+        res mustBe navigator.defaultPage
       }
     }
     "return the success page when data is present for data dependent navigation" in {
@@ -112,9 +111,8 @@ class NavigatorSpec extends SpecBase with MockitoSugar with ScalaFutures {
       val result = navigator.dataDependent(testPage, emptyUserAnswers)(_ => testCall)
       for {
         res     <- result
-        default <- navigator.defaultPage
       } yield {
-        res mustBe default
+        res mustBe navigator.defaultPage
       }
     }
     "call the provided function when data is present for data dependent navigation" in {
@@ -126,6 +124,25 @@ class NavigatorSpec extends SpecBase with MockitoSugar with ScalaFutures {
         verify(mockMethod, times(1)).apply(true)
       }
     }
+    "return the success page when data is present for user answers dependent navigation" in {
+      val navigator = testSetup()
+      val result = navigator.userAnswersDependent(userAnswers)(_ => testCall)
+      whenReady(result) { res =>
+        res mustBe testCall
+      }
+    }
+    "call the provided function and save user answers for user answers dependent navigation" in {
+      val navigator = testSetup()
+      val mockMethod = mock[UserAnswers => Call]
+      when(mockMethod.apply(userAnswers)).thenReturn(testCall)
+      val result = navigator.userAnswersDependent(userAnswers)(mockMethod)
+      whenReady(result) { _ =>
+        verify(mockMethod, times(1)).apply(userAnswers)
+        verify(mockSessionRepository, times(1)).set(userAnswers)
+        verify(mockSaveAndReturnClient, times(1)).save(userAnswers)
+      }
+    }
+
   }
 
 }
