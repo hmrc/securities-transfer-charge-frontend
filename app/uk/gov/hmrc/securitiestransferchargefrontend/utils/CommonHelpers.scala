@@ -18,12 +18,17 @@ package uk.gov.hmrc.securitiestransferchargefrontend.utils
 
 import play.api.Logger
 
-import scala.concurrent.Future
+import scala.concurrent.{ExecutionContext, Future}
 
 object CommonHelpers {
 
   def logInfoAndFail[A, E <: Throwable](logger: Logger): E => Future[A] = e => {
     logger.info(e.getMessage)
     Future.failed(e)
+  }
+
+  implicit class FutureOptionOps[A](fo: Future[Option[A]]) {
+    def getOrFail(ex: => Throwable)(implicit ec: ExecutionContext): Future[A] =
+      fo.flatMap(_.fold[Future[A]](Future.failed(ex))(Future.successful))
   }
 }

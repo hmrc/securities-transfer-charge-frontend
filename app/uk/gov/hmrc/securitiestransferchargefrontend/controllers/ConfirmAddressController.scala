@@ -27,6 +27,7 @@ import uk.gov.hmrc.securitiestransferchargefrontend.pages.ConfirmAddressPage
 import uk.gov.hmrc.securitiestransferchargefrontend.repositories.SubscriptionDataRepository
 import uk.gov.hmrc.securitiestransferchargefrontend.services.AddressService
 import uk.gov.hmrc.securitiestransferchargefrontend.views.html.ConfirmAddressView
+import uk.gov.hmrc.securitiestransferchargefrontend.utils.CommonHelpers.FutureOptionOps
 
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
@@ -73,9 +74,4 @@ class ConfirmAddressController @Inject()(
         case _: SubscriptionDataNotFoundException => Redirect(routes.JourneyRecoveryController.onPageLoad())
       }
     }
-
-  implicit class FutureOptionOps[A](fo: Future[Option[A]]) {
-    def getOrFail(ex: => Throwable): Future[A] =
-      fo.flatMap(_.fold[Future[A]](Future.failed(ex))(Future.successful))
-  }
 }
