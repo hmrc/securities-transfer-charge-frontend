@@ -16,25 +16,70 @@
 
 package uk.gov.hmrc.securitiestransferchargefrontend.clients
 
+import play.api.Logging
+import play.api.libs.json.Json
+import uk.gov.hmrc.http.{HeaderCarrier, HttpResponse, StringContextOps}
+import uk.gov.hmrc.http.client.HttpClientV2
+import uk.gov.hmrc.securitiestransferchargefrontend.config.FrontendAppConfig
 import uk.gov.hmrc.securitiestransferchargefrontend.models.UserAnswers
 import uk.gov.hmrc.securitiestransferchargefrontend.domain.SubmissionId
+import play.api.libs.ws.JsonBodyWritables.writeableOf_JsValue
+import uk.gov.hmrc.http.HttpReads.Implicits.*
+import scala.util.Failure
 
+import scala.concurrent.ExecutionContext
 import javax.inject.Inject
 import scala.concurrent.Future
 
+
 trait SaveAndReturnClient:
-  def save(userAnswers: UserAnswers): Future[Unit]
-  def retrieve(userId: String, submissionId: SubmissionId): Future[UserAnswers]
-  def list(userId: String): Future[List[SubmissionId]]
+  def save(userAnswers: UserAnswers)(implicit hc: HeaderCarrier): Future[Unit]
+
+  def retrieve(userId: String, submissionId: SubmissionId)(implicit hc: HeaderCarrier): Future[UserAnswers]
+
+  def list(userId: String)(implicit hc: HeaderCarrier): Future[List[SubmissionId]]
 
 
-class SaveAndReturnClientImpl @Inject() extends SaveAndReturnClient {
+class SaveAndReturnClientImpl @Inject(http: HttpClientV2, config: FrontendAppConfig)(implicit ec: ExecutionContext) extends SaveAndReturnClient with Logging {
 
-  private val stubUserId = "bob123"
-  private val stubSubmissionId: SubmissionId = SubmissionId.apply("STC-000000001")
-  private val stubUserAnswers: UserAnswers = UserAnswers(stubUserId, stubSubmissionId)
+  override def save(userAnswers: UserAnswers)
+                   (implicit hc: HeaderCarrier): Future[Unit] = {
 
-  override def save(userAnswers: UserAnswers): Future[Unit] = Future.successful(())
-  override def retrieve(userId: String, submissionId: SubmissionId): Future[UserAnswers] = Future.successful(stubUserAnswers)
-  override def list(userId: String): Future[List[SubmissionId]] = Future.successful(List(stubSubmissionId))
+    val url = url"${config.saveUserAnswersUrl}"
+
+    http.post(url)
+      .withBody(Json.toJson(userAnswers))
+      .execute[HttpResponse]
+      .map(_ => ())
+      .andThen {
+        case Failure(e) => logger.error(s"Failed to save UserAnswers for userId=${userAnswers.userId}", e)
+      }
+  }
+
+  override def retrieve(
+                         userId: String,
+                         submissionId: SubmissionId
+                       )(implicit hc: HeaderCarrier): Future[UserAnswers] = {
+
+    val url = url"${config.retrieveUserAnswersUrl}/$userId/$submissionId"
+
+    http.get(url)
+      .execute[UserAnswers]
+      .andThen {
+        case Failure(e) =>
+          logger.error(s"Failed to retrieve UserAnswers for userId=$userId, submissionId=$submissionId", e)
+      }
+  }
+
+  override def list(userId: String)(implicit hc: HeaderCarrier): Future[List[SubmissionId]] = {
+
+    val url = url"${config.retrieveUserAnswersUrl}/$userId"
+
+    http.get(url)
+      .execute[List[SubmissionId]]
+      .andThen {
+        case Failure(e) =>
+          logger.error(s"Failed to retrieve submissionIds for userId=$userId", e)
+      }
+  }
 }

@@ -19,8 +19,8 @@ package uk.gov.hmrc.securitiestransferchargefrontend.controllers
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
-import uk.gov.hmrc.securitiestransferchargefrontend.controllers.actions.{StcAuthEnrolledAction, StcDataRetrievalAction}
 import uk.gov.hmrc.securitiestransferchargefrontend.clients.SubmissionIdClient
+import uk.gov.hmrc.securitiestransferchargefrontend.controllers.actions.{StcAuthEnrolledAction, StcDataRetrievalAction}
 import uk.gov.hmrc.securitiestransferchargefrontend.models.{NormalMode, UserAnswers}
 import uk.gov.hmrc.securitiestransferchargefrontend.navigation.Navigator
 import uk.gov.hmrc.securitiestransferchargefrontend.pages.SubmissionsDashboardPage

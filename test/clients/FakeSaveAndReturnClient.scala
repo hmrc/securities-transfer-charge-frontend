@@ -16,6 +16,7 @@
 
 package clients
 
+import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.securitiestransferchargefrontend.clients.SaveAndReturnClient
 import uk.gov.hmrc.securitiestransferchargefrontend.domain.SubmissionId
 import uk.gov.hmrc.securitiestransferchargefrontend.models.UserAnswers
@@ -27,11 +28,11 @@ class FakeSaveAndReturnClient extends SaveAndReturnClient:
   private val stubSubmissionId: SubmissionId = SubmissionId.apply("STC-000000001")
   private val stubUserAnswers: UserAnswers = UserAnswers(stubUserId, stubSubmissionId)
 
-  override def save(userAnswers: UserAnswers): Future[Unit] = Future.successful(())
+  override def save(userAnswers: UserAnswers)(implicit hc: HeaderCarrier): Future[Unit] = Future.successful(())
 
-  override def retrieve(userId: String, submissionId: SubmissionId): Future[UserAnswers] = Future.successful(stubUserAnswers)
+  override def retrieve(userId: String, submissionId: SubmissionId)(implicit hc: HeaderCarrier): Future[UserAnswers] = Future.successful(stubUserAnswers)
 
-  override def list(userId: String): Future[List[SubmissionId]] = Future.successful(List(stubSubmissionId))
+  override def list(userId: String)(implicit hc: HeaderCarrier): Future[List[SubmissionId]] = Future.successful(List(stubSubmissionId))
   
 object FakeSaveAndReturnClient:
   def apply(): SaveAndReturnClient = new FakeSaveAndReturnClient

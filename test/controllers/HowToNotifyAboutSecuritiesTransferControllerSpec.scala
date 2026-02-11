@@ -17,16 +17,24 @@
 package controllers
 
 import base.SpecBase
+import org.mockito.ArgumentMatchers.any
+import org.mockito.Mockito.when
+import org.scalatestplus.mockito.MockitoSugar.mock
 import play.api.data.Form
+import play.api.inject
 import play.api.test.FakeRequest
 import play.api.test.Helpers.*
+import uk.gov.hmrc.http.HeaderCarrier
+import uk.gov.hmrc.securitiestransferchargefrontend.clients.SaveAndReturnClient
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.routes
 import uk.gov.hmrc.securitiestransferchargefrontend.forms.HowToNotifyAboutSecuritiesTransferFormProvider
 import uk.gov.hmrc.securitiestransferchargefrontend.models.{HowToNotifyAboutSecuritiesTransfer, NormalMode, UserAnswers}
 import uk.gov.hmrc.securitiestransferchargefrontend.pages.HowToNotifyAboutSecuritiesTransferPage
 import uk.gov.hmrc.securitiestransferchargefrontend.views.html.HowToNotifyAboutSecuritiesTransferView
 
-class HowToNotifyAboutSecuritiesTransferControllerSpec extends SpecBase{
+import scala.concurrent.Future
+
+class HowToNotifyAboutSecuritiesTransferControllerSpec extends SpecBase {
 
   lazy val howToNotifyAboutSecuritiesTransferRoute: String = routes.HowToNotifyAboutSecuritiesTransferController.onPageLoad(NormalMode).url
 
@@ -53,7 +61,7 @@ class HowToNotifyAboutSecuritiesTransferControllerSpec extends SpecBase{
 
     "must populate the view correctly on a GET when the question has previously been answered" in {
 
-      val userAnswers = UserAnswers(userAnswersId,submissionId).set(HowToNotifyAboutSecuritiesTransferPage, HowToNotifyAboutSecuritiesTransfer.values.head).success.value
+      val userAnswers = UserAnswers(userAnswersId, submissionId).set(HowToNotifyAboutSecuritiesTransferPage, HowToNotifyAboutSecuritiesTransfer.values.head).success.value
       val application = applicationBuilder(userAnswers = Some(userAnswers)).build()
 
       running(application) {
@@ -88,7 +96,15 @@ class HowToNotifyAboutSecuritiesTransferControllerSpec extends SpecBase{
     }
 
     "must redirect on valid submission" in {
-      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers)).build()
+      val saveAndReturnClient = mock[SaveAndReturnClient]
+
+      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers))
+        .overrides(
+          inject.bind[SaveAndReturnClient].toInstance(saveAndReturnClient)
+        ).build()
+
+      when(saveAndReturnClient.save(any[UserAnswers]())(any[HeaderCarrier]()))
+        .thenReturn(Future.successful(()))
 
       running(application) {
         val request =

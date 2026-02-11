@@ -36,7 +36,7 @@ class StfNavigatorSpec extends SpecBase with ScalaFutures {
       "must go from a page that doesn't exist in the route map to Journey Recovery" in {
 
         case object UnknownPage extends Page
-        val result = navigator.nextPage(UnknownPage, NormalMode, UserAnswers("id", submissionId))
+        val result = navigator.nextPage(UnknownPage, NormalMode, UserAnswers("id", submissionId))(fakeRequest)
         whenReady(result) { res =>
           res mustBe routes.JourneyRecoveryController.onPageLoad()
         }
@@ -49,7 +49,7 @@ class StfNavigatorSpec extends SpecBase with ScalaFutures {
       "must go from a page that doesn't exist in the edit route map to CheckYourAnswers" in {
 
         case object UnknownPage extends Page
-        val result = navigator.nextPage(UnknownPage, CheckMode, UserAnswers("id", submissionId))
+        val result = navigator.nextPage(UnknownPage, CheckMode, UserAnswers("id", submissionId))(fakeRequest)
         whenReady(result) { res =>
           res mustBe routes.CheckYourAnswersController.onPageLoad()
         }
