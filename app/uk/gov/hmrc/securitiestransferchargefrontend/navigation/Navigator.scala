@@ -36,25 +36,45 @@ abstract class AbstractNavigator(sessionRepository: SessionRepository,
                                  saveAndReturnClient: SaveAndReturnClient)
                                 (implicit ec: ExecutionContext) extends Navigator:
 
-  protected[navigation] val defaultPage: Future[Call] = Future.successful(routes.JourneyRecoveryController.onPageLoad())
+  protected[navigation] val defaultPage: Call = routes.JourneyRecoveryController.onPageLoad()
+  protected[navigation] val defaultPageF: Future[Call] = Future.successful(routes.JourneyRecoveryController.onPageLoad())
 
   private def persistUserAnswers(userAnswers: UserAnswers)(implicit hc: HeaderCarrier): Future[Unit] = for {
     _ <- sessionRepository.set(userAnswers)
     _ <- saveAndReturnClient.save(userAnswers)
   } yield ()
 
+  /*
+   * Used to navigate when the destination does not depend on the UserAnswers.
+   * If UserAnswers are provided, they will be saved.
+   */
   protected[navigation] def goTo(success: Call, userAnswers: Option[UserAnswers] = None)(implicit hc: HeaderCarrier): Future[Call] =
     userAnswers
       .fold
         (Future.successful(success))
         (ua => persistUserAnswers(ua).map(_ => success))
 
+  /*
+   * Used to navigate when the destination depends on UserAnswers existing for the page,
+   * but the value doesn't matter.
+   */
   protected[navigation] def dataRequired[A: Reads](page: Page & Gettable[A], userAnswers: UserAnswers, success: Call)(implicit hc: HeaderCarrier): Future[Call] =
     dataDependent(page, userAnswers)(_ => success)
 
+  /*
+   * Used to navigate when the destination depends on the value of the UserAnswers for the page,
+   */
   protected[navigation] def dataDependent[A: Reads](page: Page & Gettable[A], userAnswers: UserAnswers)(f: A => Call)(implicit hc: HeaderCarrier): Future[Call] =
-    userAnswers
-      .get(page)
-      .fold
-        (defaultPage)
-        (value => persistUserAnswers(userAnswers).map(_ => f(value)))
+    userAnswersDependent(userAnswers) { userAnswers =>
+      userAnswers
+        .get(page)
+        .fold(defaultPage)(f)
+    }
+
+  /*
+   * Used to navigate when the destination depends on the value of the UserAnswers
+    for a different page than the current one.
+   */
+  protected[navigation] def userAnswersDependent(userAnswers: UserAnswers)(f: UserAnswers => Call)(implicit hc: HeaderCarrier): Future[Call] =
+    persistUserAnswers(userAnswers)
+      .map(_ => f(userAnswers))

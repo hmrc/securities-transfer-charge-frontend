@@ -68,7 +68,7 @@ class SessionRepositorySpec
 
       val expectedResult = userAnswers copy (lastUpdated = instant)
 
-      val setResult: Unit = repository.set(userAnswers).futureValue
+      repository.set(userAnswers).futureValue
 
       val updatedRecord = find(Filters.equal("_id", userAnswers.userId)).futureValue.headOption.value
 
@@ -110,7 +110,7 @@ class SessionRepositorySpec
 
       insert(userAnswers).futureValue
 
-      val result: Unit = repository.clear(userAnswers.userId).futureValue
+      repository.clear(userAnswers.userId).futureValue
 
       repository.get(userAnswers.userId).futureValue must not be defined
     }
@@ -132,7 +132,7 @@ class SessionRepositorySpec
 
         insert(userAnswers).futureValue
 
-        val result: Unit = repository.keepAlive(userAnswers.userId).futureValue
+        repository.keepAlive(userAnswers.userId).futureValue
 
         val expectedUpdatedAnswers = userAnswers copy (lastUpdated = instant)
 
