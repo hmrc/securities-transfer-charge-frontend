@@ -49,10 +49,10 @@ class SubscriptionConnectorImpl @Inject()(registrationClient: RegistrationClient
   }
 
   private def isValidSubscription(subscriptionId: SubscriptionId, subscription: Subscription) = {
-    if (LocalDate.now().isBefore(subscription.subsValidTo)) {
-      subscriptionDataRepository.saveSubscriptionData(subscriptionId, subscription)
-    } else {
+    if (LocalDate.now().isAfter(subscription.subsValidTo)) {
       val msg = s"Subscription expired for subscriptionId=$subscriptionId.Valid until: ${subscription.subsValidTo}"
       logInfoAndFail(new SubscriptionStatusErrorException(msg))
+    } else {
+      subscriptionDataRepository.saveSubscriptionData(subscriptionId, subscription)
     }
   }
