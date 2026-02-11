@@ -21,16 +21,21 @@ import org.jsoup.nodes.Document
 import play.api.Application
 import uk.gov.hmrc.securitiestransferchargefrontend.views.html.SubmissionsDashboardView
 import views.ViewBaseSpec
+import uk.gov.hmrc.securitiestransferchargefrontend.models.UserAnswers
+import uk.gov.hmrc.securitiestransferchargefrontend.domain.SubmissionId
+import java.time.Instant
+import play.api.libs.json.*
 
 class SubmissionsDashboardViewSpec extends ViewBaseSpec {
 
   override def fakeApplication(): Application = applicationBuilder().build()
-  
+
   private val viewInstance         = app.injector.instanceOf[SubmissionsDashboardView]
 
-  def view(): Document = Jsoup.parse(
-    viewInstance()(fakeRequest, messages).body
-  )
+  private def view(userAnswers: List[UserAnswers]): Document =
+    Jsoup.parse(
+      viewInstance(userAnswers)(fakeRequest, messages).body
+    )
 
   object ExpectedContent {
     val title = "Submissions"
@@ -39,27 +44,46 @@ class SubmissionsDashboardViewSpec extends ViewBaseSpec {
     
   }
 
-  "The SubmissionsDashboardView" - {
-    "the user is an Individual" - {
-      val submissionsDashboardView = view()
+  "SubmissionsDashboardView (empty state)" - {
 
-      "have the correct title" in {
-        submissionsDashboardView.title must include(ExpectedContent.title)
-      }
+    val submissionsDashboardView = view(List.empty)
 
-      "have the correct heading" in {
-        submissionsDashboardView.select("h1").text() mustBe ExpectedContent.heading
-      }
+    "have the correct title" in {
+      submissionsDashboardView.title must include(ExpectedContent.title)
+    }
 
-      "have a create button with the correct text" in {
-        val button = submissionsDashboardView.select(".govuk-button")
-        button.text() mustBe ExpectedContent.createNew
-      }
+    "have the correct heading" in {
+      submissionsDashboardView.select("h1").text() mustBe ExpectedContent.heading
+    }
 
-      "should not have a back button" in {
-        submissionsDashboardView.hasBackLink mustBe false
-      }
+    "have a create button with the correct text" in {
+      val button = submissionsDashboardView.select(".govuk-button")
+      button.text() mustBe ExpectedContent.createNew
+    }
+
+    "should not have a back link" in {
+      submissionsDashboardView.hasBackLink mustBe false
     }
   }
 
+  "SubmissionsDashboardView (with submissions)" - {
+
+    val userAnswers =
+      UserAnswers(
+        userId = userId,
+        submissionId   = submissionId,
+        data         = Json.obj(),
+        lastUpdated  = Instant.now()
+      )
+
+    val submissionsDashboardView = view(List(userAnswers))
+
+    "display the submissions table" in {
+      submissionsDashboardView.select(".govuk-table").size() mustBe 1
+    }
+
+    "display the submission id in the table" in {
+      submissionsDashboardView.select("tbody tr td").first().text() mustBe submissionId.value
+    }
+  }
 }

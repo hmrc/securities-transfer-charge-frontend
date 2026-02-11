@@ -17,36 +17,100 @@
 package controllers
 
 import base.SpecBase
-import play.api.mvc.*
-import play.api.test.Helpers.*
-import play.api.test.{FakeRequest, Helpers}
+import org.mockito.ArgumentMatchers.any
+import org.mockito.Mockito.when
+import org.scalatestplus.mockito.MockitoSugar
+import play.api.inject.bind
+import play.api.libs.json.Json
+import play.api.test.FakeRequest
+import play.api.test.Helpers._
+import uk.gov.hmrc.securitiestransferchargefrontend.clients.SaveAndReturnClient
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.routes
+import uk.gov.hmrc.securitiestransferchargefrontend.models.UserAnswers
 import uk.gov.hmrc.securitiestransferchargefrontend.views.html.SubmissionsDashboardView
 
-class SubmissionsDashboardControllerSpec extends SpecBase {
+import scala.concurrent.Future
+import java.time.Instant
+
+class SubmissionsDashboardControllerSpec extends SpecBase with MockitoSugar {
 
   lazy val submissionsDashboardRoute: String =
     routes.SubmissionsDashboardController.onPageLoad().url
 
   "SubmissionsDashboardController" - {
 
-    "must return OK and the correct view for a GET" in {
+    "GET onPageLoad" - {
 
-      val application =
-        applicationBuilder().build()
+      "must return OK and the correct view when no submissions exist" in {
 
-      running(application) {
-        val request = FakeRequest(GET, submissionsDashboardRoute)
+        val mockSaveAndReturnClient = mock[SaveAndReturnClient]
 
-        val result = route(application, request).value
-        val view   = application.injector.instanceOf[SubmissionsDashboardView]
+        when(mockSaveAndReturnClient.list(any[String])(any()))
+          .thenReturn(Future.successful(Seq.empty))
 
-        status(result) mustEqual OK
-        contentAsString(result) mustEqual
-          view()(
-            request,
-            messages(application)
-          ).toString
+        val application =
+          applicationBuilder()
+            .overrides(
+              bind[SaveAndReturnClient].toInstance(mockSaveAndReturnClient)
+            )
+            .build()
+
+        running(application) {
+          val request = FakeRequest(GET, submissionsDashboardRoute)
+
+          val result = route(application, request).value
+          val view   = application.injector.instanceOf[SubmissionsDashboardView]
+
+          status(result) mustEqual OK
+
+          contentAsString(result) mustEqual
+            view(List.empty)(
+              request,
+              messages(application)
+            ).toString
+        }
+      }
+
+      "must return OK and render submissions when they exist" in {
+
+        val mockSaveAndReturnClient = mock[SaveAndReturnClient]
+
+        val userAnswers =
+          UserAnswers(
+            userId       = userId,
+            submissionId = submissionId,
+            data         = Json.obj(),
+            lastUpdated  = Instant.now()
+          )
+
+        when(mockSaveAndReturnClient.list(any[String])(any()))
+          .thenReturn(Future.successful(Seq(submissionId)))
+
+        when(
+          mockSaveAndReturnClient.retrieve(any[String], any())(any())
+        ).thenReturn(Future.successful(userAnswers))
+
+        val application =
+          applicationBuilder()
+            .overrides(
+              bind[SaveAndReturnClient].toInstance(mockSaveAndReturnClient)
+            )
+            .build()
+
+        running(application) {
+          val request = FakeRequest(GET, submissionsDashboardRoute)
+
+          val result = route(application, request).value
+          val view   = application.injector.instanceOf[SubmissionsDashboardView]
+
+          status(result) mustEqual OK
+
+          contentAsString(result) mustEqual
+            view(List(userAnswers))(
+              request,
+              messages(application)
+            ).toString
+        }
       }
     }
   }

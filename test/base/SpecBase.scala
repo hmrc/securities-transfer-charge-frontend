@@ -50,6 +50,7 @@ trait SpecBase
   val userAnswersId: String = "id"
   val sessionId = "sessionId1234"
   val submissionId: SubmissionId = SubmissionId("STC-123456789")
+  val userId = "internalId"
 
   def emptyUserAnswers : UserAnswers = UserAnswers.empty(userAnswersId)(submissionId)
 
