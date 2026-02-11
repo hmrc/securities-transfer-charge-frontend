@@ -14,26 +14,32 @@
  * limitations under the License.
  *@
 
+@import uk.gov.hmrc.securitiestransferchargefrontend.controllers.routes
+
+
 @this(
-        layout: templates.Layout,
-        govukButton: GovukButton
+    layout: templates.Layout,
+    govukButton: GovukButton,
+    formHelper: FormWithCSRF
 )
 
 @()(implicit request: Request[_], messages: Messages)
 
-@layout(pageTitle = titleNoForm(messages("submissionsDashboard.title"))) {
+@layout(pageTitle = titleNoForm(messages("submissionsDashboard.title")), showBackLink = false) {
+    @formHelper(action = routes.SubmissionsDashboardController.onSubmit(), Symbol("autoComplete") -> "off") {
 
-    <div id="more-detail-hint" class="govuk-caption-l">
-        @messages("submissionsDashboard.hint")
-    </div>
+        <div id="caption-heading" class="govuk-caption-l">
+            @messages("submissionsDashboard.hint")
+        </div>
 
-    <h1 class="govuk-heading-l">@messages("submissionsDashboard.heading")</h1>
+        <h1 class="govuk-heading-l">@messages("submissionsDashboard.heading")</h1>
 
-    <p>
-        @govukButton(
-            ButtonViewModel(
-                messages("submissionsDashboard.create-new-submission.button")
+        <p>
+            @govukButton(
+                ButtonViewModel(
+                    messages("submissionsDashboard.create-new-submission.button")
+                )
             )
-        )
-    </p>
+        </p>
+    }
 }

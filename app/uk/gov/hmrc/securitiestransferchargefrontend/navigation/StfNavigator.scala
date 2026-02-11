@@ -16,9 +16,12 @@
 
 package uk.gov.hmrc.securitiestransferchargefrontend.navigation
 
-import play.api.mvc.Call
+import play.api.mvc.{Call, Request}
+import uk.gov.hmrc.http.HeaderCarrier
+import uk.gov.hmrc.play.http.HeaderCarrierConverter
 import uk.gov.hmrc.securitiestransferchargefrontend.clients.SaveAndReturnClient
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.routes
+import uk.gov.hmrc.securitiestransferchargefrontend.models.HowToNotifyAboutSecuritiesTransfer.{MoreThanOneAtATime, OneAtATime}
 import uk.gov.hmrc.securitiestransferchargefrontend.models.{CheckMode, Mode, NormalMode, UserAnswers}
 import uk.gov.hmrc.securitiestransferchargefrontend.pages.*
 import uk.gov.hmrc.securitiestransferchargefrontend.queries.Gettable
@@ -27,22 +30,33 @@ import uk.gov.hmrc.securitiestransferchargefrontend.repositories.SessionReposito
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 
-class StfNavigator @Inject() (sessionRepository: SessionRepository,
-                              saveAndReturnClient: SaveAndReturnClient)
-                             (implicit ec: ExecutionContext) extends AbstractNavigator(sessionRepository, saveAndReturnClient) {
+class StfNavigator @Inject()(sessionRepository: SessionRepository,
+                             saveAndReturnClient: SaveAndReturnClient)
+                            (implicit ec: ExecutionContext) extends AbstractNavigator(sessionRepository, saveAndReturnClient) {
 
-  private val normalRoutes: Page => UserAnswers => Future[Call] = {
+  private def normalRoutes(page: Page)(implicit hc: HeaderCarrier): UserAnswers => Future[Call] = page match {
 
-    case SubmissionsDashboardPage => userAnswers => goTo(routes.UkOrNotController.onPageLoad(NormalMode), Some(userAnswers))
-    
-    case _ => _ => defaultPage  
+    case SubmissionsDashboardPage => userAnswers => goTo(routes.HowToNotifyAboutSecuritiesTransferController.onPageLoad(NormalMode), Some(userAnswers))
+    case HowToNotifyAboutSecuritiesTransferPage => userAnswers => {
+      dataDependent(HowToNotifyAboutSecuritiesTransferPage, userAnswers) {
+        case OneAtATime => routes.NameOfSellerController.onPageLoad(NormalMode) // THIS IS A TEMPORARY NAVIGATION TO THE NAME OF THE SELLER PAGE AS THE CONFIRM-ADDRESS PAGE HAS NOT BEEN IMPLEMENTED.
+        case MoreThanOneAtATime => ???
+      }
+    }
+    case NameOfSellerPage => userAnswers => dataRequired(NameOfSellerPage, userAnswers, defaultPage)
+
+    case ConfirmAddressPage => userAnswers => dataRequired(ConfirmAddressPage, userAnswers, defaultPage)
+    case _ => _ => defaultPageF
+
   }
 
-  private val checkRouteMap: Page => UserAnswers => Call = (_ => _ => routes.CheckYourAnswersController.onPageLoad())
-  
-  def nextPage(page: Page, mode: Mode, userAnswers: UserAnswers): Future[Call] = {
+  val checkRouteMap: Page => UserAnswers => Call = (_ => _ => routes.CheckYourAnswersController.onPageLoad())
+
+  def nextPage(page: Page, mode: Mode, userAnswers: UserAnswers)(implicit request: Request[?]): Future[Call] = {
     mode match {
-      case NormalMode => normalRoutes(page)(userAnswers)
+      case NormalMode =>
+        implicit val hc: HeaderCarrier = HeaderCarrierConverter.fromRequestAndSession(request, request.session)
+        normalRoutes(page)(hc)(userAnswers)
       case CheckMode => Future.successful(checkRouteMap(page)(userAnswers))
     }
   }

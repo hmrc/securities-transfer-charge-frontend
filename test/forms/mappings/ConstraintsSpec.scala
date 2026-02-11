@@ -23,7 +23,7 @@ import org.scalatest.matchers.must.Matchers
 import org.scalatestplus.scalacheck.ScalaCheckPropertyChecks
 import play.api.data.validation.{Invalid, Valid}
 import uk.gov.hmrc.securitiestransferchargefrontend.config.CurrencyFormatter
-import uk.gov.hmrc.securitiestransferchargefrontend.mappings.Constraints
+import uk.gov.hmrc.securitiestransferchargefrontend.forms.mappings.Constraints
 
 import java.time.LocalDate
 

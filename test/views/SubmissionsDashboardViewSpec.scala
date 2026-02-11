@@ -16,7 +16,6 @@
 
 package views
 
-import base.SpecBase
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
 import play.api.Application
@@ -55,6 +54,10 @@ class SubmissionsDashboardViewSpec extends ViewBaseSpec {
       "have a create button with the correct text" in {
         val button = submissionsDashboardView.select(".govuk-button")
         button.text() mustBe ExpectedContent.createNew
+      }
+
+      "should not have a back button" in {
+        submissionsDashboardView.hasBackLink mustBe false
       }
     }
   }

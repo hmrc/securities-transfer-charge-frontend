@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package securitiestransferchargefrontend.models
+package models
 
 import org.scalatest.freespec.AnyFreeSpec
 import org.scalatest.matchers.must.Matchers

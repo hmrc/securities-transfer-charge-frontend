@@ -27,6 +27,10 @@ error.title.prefix = Error:
 error.prefix = Error
 error.summary.title = There is a problem
 
+transfer.details.caption = Transfer details
+seller.details.caption = Seller details
+details.caption = Your details
+
 index.title = securities-transfer-charge-frontend
 index.heading = securities-transfer-charge-frontend
 index.guidance = Welcome to your new frontend. Please see the README file for a guide to getting started.
@@ -53,7 +57,29 @@ submissionsDashboard.heading = Submissions
 submissionsDashboard.create-new-submission.button = Create new submission
 submissionsDashboard.hint = Submission dashboard
 
-seller-details.caption = Seller details
+section.caption.hidden = This section is
+confirmAddress.title = Review and confirm your address
+confirmAddress.heading = Review and confirm your address
+confirmAddress.editLink = Edit address
+confirmAddress.confirm = Confirm address
+
+howToNotifyAboutSecuritiesTransfer.title = How do you want to tell us about your securities transfer?
+howToNotifyAboutSecuritiesTransfer.heading = How do you want to tell us about your securities transfer?
+howToNotifyAboutSecuritiesTransfer.oneAtATime = One at a time
+howToNotifyAboutSecuritiesTransfer.oneAtATime.hint = Each transfer must be between you and one seller, and can include one kind of security or type of shares.
+howToNotifyAboutSecuritiesTransfer.moreThanOneAtATime = More than one at a time
+howToNotifyAboutSecuritiesTransfer.moreThanOneAtATime.hint = Download the template, complete it using one row per transfer, and upload it on the following pages. You can then find the submission on your dashboard and pay the money owed.
+howToNotifyAboutSecuritiesTransfer.checkYourAnswersLabel = HowToNotifyAboutSecuritiesTransfer
+howToNotifyAboutSecuritiesTransfer.error.required = Select a way to tell us about your securities transfer
+howToNotifyAboutSecuritiesTransfer.change.hidden = HowToNotifyAboutSecuritiesTransfer
+
+nameOfSeller.title = What’s the seller’s name?
+nameOfSeller.heading = What’s the seller’s name?
+nameOfSeller.checkYourAnswersLabel = What’s the seller’s name?
+nameOfSeller.error.required = Enter the seller’s full name
+nameOfSeller.error.length = Seller’s name must be 35 characters or less
+nameOfSeller.change.hidden = NameOfSeller
+nameOfSeller.hint = This can be the name of a business, person or another entity.
 
 ukOrNot.title = Does the seller live in the UK?
 ukOrNot.heading = Does the seller live in the UK?

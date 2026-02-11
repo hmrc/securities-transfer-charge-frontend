@@ -4,25 +4,41 @@
 
 GET         /                                            uk.gov.hmrc.securitiestransferchargefrontend.controllers.IndexController.onPageLoad()
 
-GET         /assets/*file                                controllers.Assets.versioned(path="/public", file: Asset)
+GET        /stf/assets/*file                                controllers.Assets.versioned(path="/public", file: Asset)
 
-GET         /language/:lang                              uk.gov.hmrc.securitiestransferchargefrontend.controllers.LanguageSwitchController.switchToLanguage(lang: String)
+GET        /stf/language/:lang                              uk.gov.hmrc.securitiestransferchargefrontend.controllers.LanguageSwitchController.switchToLanguage(lang: String)
 
-GET         /refresh-session                             uk.gov.hmrc.securitiestransferchargefrontend.controllers.KeepAliveController.keepAlive()
+GET        /stf/refresh-session                             uk.gov.hmrc.securitiestransferchargefrontend.controllers.KeepAliveController.keepAlive()
 
-GET         /there-is-a-problem                          uk.gov.hmrc.securitiestransferchargefrontend.controllers.JourneyRecoveryController.onPageLoad(continueUrl: Option[RedirectUrl] ?= None)
+GET        /stf/there-is-a-problem                          uk.gov.hmrc.securitiestransferchargefrontend.controllers.JourneyRecoveryController.onPageLoad(continueUrl: Option[RedirectUrl] ?= None)
 
-GET         /check-your-answers                          uk.gov.hmrc.securitiestransferchargefrontend.controllers.CheckYourAnswersController.onPageLoad()
+GET        /stf/check-your-answers                          uk.gov.hmrc.securitiestransferchargefrontend.controllers.CheckYourAnswersController.onPageLoad()
 
-GET         /account/sign-out-survey                     uk.gov.hmrc.securitiestransferchargefrontend.controllers.auth.AuthController.signOut()
-GET         /account/sign-out                            uk.gov.hmrc.securitiestransferchargefrontend.controllers.auth.AuthController.signOutNoSurvey()
-GET         /account/signed-out                          uk.gov.hmrc.securitiestransferchargefrontend.controllers.auth.SignedOutController.onPageLoad()
+GET        /stf/account/sign-out-survey                     uk.gov.hmrc.securitiestransferchargefrontend.controllers.auth.AuthController.signOut()
+GET        /stf/account/sign-out                            uk.gov.hmrc.securitiestransferchargefrontend.controllers.auth.AuthController.signOutNoSurvey()
+GET        /stf/account/signed-out                          uk.gov.hmrc.securitiestransferchargefrontend.controllers.auth.SignedOutController.onPageLoad()
 
-GET         /unauthorised                                uk.gov.hmrc.securitiestransferchargefrontend.controllers.UnauthorisedController.onPageLoad()
+GET        /stf/unauthorised                                uk.gov.hmrc.securitiestransferchargefrontend.controllers.UnauthorisedController.onPageLoad()
+
+GET        /stf/confirm-address                       uk.gov.hmrc.securitiestransferchargefrontend.controllers.ConfirmAddressController.onPageLoad()
+
+POST       /stf/confirm-address                       uk.gov.hmrc.securitiestransferchargefrontend.controllers.ConfirmAddressController.onSubmit()
+
 
 GET        /stf/submissions-dashboard                       uk.gov.hmrc.securitiestransferchargefrontend.controllers.SubmissionsDashboardController.onPageLoad()
+POST       /stf/submissions-dashboard                       uk.gov.hmrc.securitiestransferchargefrontend.controllers.SubmissionsDashboardController.onSubmit()
 
-GET        /ukOrNot                        uk.gov.hmrc.securitiestransferchargefrontend.controllers.UkOrNotController.onPageLoad(mode: Mode = NormalMode)
-POST       /ukOrNot                        uk.gov.hmrc.securitiestransferchargefrontend.controllers.UkOrNotController.onSubmit(mode: Mode = NormalMode)
-GET        /changeUkOrNot                  uk.gov.hmrc.securitiestransferchargefrontend.controllers.UkOrNotController.onPageLoad(mode: Mode = CheckMode)
-POST       /changeUkOrNot                  uk.gov.hmrc.securitiestransferchargefrontend.controllers.UkOrNotController.onSubmit(mode: Mode = CheckMode)
+GET        /stf/how-many-transfers                          uk.gov.hmrc.securitiestransferchargefrontend.controllers.HowToNotifyAboutSecuritiesTransferController.onPageLoad(mode: Mode = NormalMode)
+POST       /stf/how-many-transfers                          uk.gov.hmrc.securitiestransferchargefrontend.controllers.HowToNotifyAboutSecuritiesTransferController.onSubmit(mode: Mode = NormalMode)
+GET        /stf/change/how-many-transfers                   uk.gov.hmrc.securitiestransferchargefrontend.controllers.HowToNotifyAboutSecuritiesTransferController.onPageLoad(mode: Mode = CheckMode)
+POST       /stf/change/how-many-transfers                   uk.gov.hmrc.securitiestransferchargefrontend.controllers.HowToNotifyAboutSecuritiesTransferController.onSubmit(mode: Mode = CheckMode)
+
+GET        /stf/seller-name                         uk.gov.hmrc.securitiestransferchargefrontend.controllers.NameOfSellerController.onPageLoad(mode: Mode = NormalMode)
+POST       /stf/seller-name                         uk.gov.hmrc.securitiestransferchargefrontend.controllers.NameOfSellerController.onSubmit(mode: Mode = NormalMode)
+GET        /stf/change/seller-name                  uk.gov.hmrc.securitiestransferchargefrontend.controllers.NameOfSellerController.onPageLoad(mode: Mode = CheckMode)
+POST       /stf/change/seller-name                  uk.gov.hmrc.securitiestransferchargefrontend.controllers.NameOfSellerController.onSubmit(mode: Mode = CheckMode)
+
+GET        /stf/ukOrNot                        uk.gov.hmrc.securitiestransferchargefrontend.controllers.UkOrNotController.onPageLoad(mode: Mode = NormalMode)
+POST       /stf/ukOrNot                        uk.gov.hmrc.securitiestransferchargefrontend.controllers.UkOrNotController.onSubmit(mode: Mode = NormalMode)
+GET        /stf/changeUkOrNot                  uk.gov.hmrc.securitiestransferchargefrontend.controllers.UkOrNotController.onPageLoad(mode: Mode = CheckMode)
+POST       /stf/changeUkOrNot                  uk.gov.hmrc.securitiestransferchargefrontend.controllers.UkOrNotController.onSubmit(mode: Mode = CheckMode)

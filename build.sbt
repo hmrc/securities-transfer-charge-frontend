@@ -36,7 +36,7 @@ lazy val microservice = (project in file("."))
     PlayKeys.playDefaultPort := 30036,
     ScoverageKeys.coverageExcludedFiles := "<empty>;Reverse.*;.*handlers.*;.*components.*;" +
       ".*Routes.*;.*viewmodels.govuk.*;",
-    ScoverageKeys.coverageMinimumStmtTotal := 78,
+    ScoverageKeys.coverageMinimumStmtTotal := 80,
     ScoverageKeys.coverageFailOnMinimum := true,
     ScoverageKeys.coverageHighlighting := true,
     scalacOptions ++= Seq(
@@ -50,9 +50,6 @@ lazy val microservice = (project in file("."))
     Assets / pipelineStages := Seq(concat)
   )
 
-// Get rid of the warnings about flags being set repeatedly
-Compile / scalacOptions := (Compile / scalacOptions).value.distinct
-
 lazy val testSettings: Seq[Def.Setting[_]] = Seq(
   fork := true,
   unmanagedSourceDirectories += baseDirectory.value / "test-utils"
@@ -62,3 +59,8 @@ lazy val it =
   (project in file("it"))
     .enablePlugins(PlayScala)
     .dependsOn(microservice % "test->test")
+
+// Get rid of the warnings about flags being set repeatedly
+Compile / scalacOptions := (Compile / scalacOptions).value.distinct
+
+addCommandAlias("precommit", ";clean;coverage;test;it/test;coverageReport")

@@ -31,7 +31,7 @@
 
 @layout(pageTitle = title(form, messages("ukOrNot.title"))) {
     <div id="more-detail-hint" class="govuk-caption-l">
-        @messages("seller-details.caption")
+        @messages("seller.details.caption")
     </div>
 
     @formHelper(action = routes.UkOrNotController.onSubmit(mode), Symbol("autoComplete") -> "off") {

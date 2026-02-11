@@ -17,13 +17,14 @@
 package uk.gov.hmrc.securitiestransferchargefrontend.navigation
 
 import base.SpecBase
+import base.stubs.StubSessionRepository
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.*
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatestplus.mockito.MockitoSugar
 import play.api.libs.json.JsPath
-import play.api.mvc.Call
-import repositories.FakeSessionRepository
+import play.api.mvc.{Call, Request}
+import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.securitiestransferchargefrontend.clients.SaveAndReturnClient
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.routes
 import uk.gov.hmrc.securitiestransferchargefrontend.models.{Mode, UserAnswers}
@@ -49,7 +50,7 @@ class NavigatorSpec extends SpecBase with MockitoSugar with ScalaFutures {
     reset(mockSaveAndReturnClient)
 
     when(mockSessionRepository.set(any[UserAnswers]())).thenReturn(Future.successful(()))
-    when(mockSaveAndReturnClient.save(any[UserAnswers])).thenReturn(Future.successful(()))
+    when(mockSaveAndReturnClient.save(any[UserAnswers])(any[HeaderCarrier])).thenReturn(Future.successful(()))
 
     new TestNavigator(mockSessionRepository)
   }
@@ -57,13 +58,13 @@ class NavigatorSpec extends SpecBase with MockitoSugar with ScalaFutures {
   class TestNavigator(mockSessionRepository: SessionRepository) extends AbstractNavigator(mockSessionRepository, mockSaveAndReturnClient) {
     override val errorPage: Page => Call = _ => testCall
 
-    override def nextPage(page: Page, mode: Mode, userAnswers: UserAnswers): Future[Call] =
+    override def nextPage(page: Page, mode: Mode, userAnswers: UserAnswers)(implicit request: Request[?]): Future[Call] =
       Future.successful(testCall)
   }
 
   "All navigators should" - {
     "successfully go to a page" in {
-      val result = new TestNavigator(new FakeSessionRepository()).goTo(testCall)
+      val result = new TestNavigator(new StubSessionRepository()).goTo(testCall)
       result.futureValue mustBe testCall
     }
     "store user answers if supplied when going to a page" in {
@@ -95,9 +96,8 @@ class NavigatorSpec extends SpecBase with MockitoSugar with ScalaFutures {
       val result = navigator.dataRequired(testPage, emptyUserAnswers, testCall)
       for {
         res     <- result
-        default <- navigator.defaultPage
       } yield {
-        res mustBe default
+        res mustBe navigator.defaultPage
       }
     }
     "return the success page when data is present for data dependent navigation" in {
@@ -112,9 +112,8 @@ class NavigatorSpec extends SpecBase with MockitoSugar with ScalaFutures {
       val result = navigator.dataDependent(testPage, emptyUserAnswers)(_ => testCall)
       for {
         res     <- result
-        default <- navigator.defaultPage
       } yield {
-        res mustBe default
+        res mustBe navigator.defaultPage
       }
     }
     "call the provided function when data is present for data dependent navigation" in {
@@ -126,6 +125,25 @@ class NavigatorSpec extends SpecBase with MockitoSugar with ScalaFutures {
         verify(mockMethod, times(1)).apply(true)
       }
     }
+    "return the success page when data is present for user answers dependent navigation" in {
+      val navigator = testSetup()
+      val result = navigator.userAnswersDependent(userAnswers)(_ => testCall)
+      whenReady(result) { res =>
+        res mustBe testCall
+      }
+    }
+    "call the provided function and save user answers for user answers dependent navigation" in {
+      val navigator = testSetup()
+      val mockMethod = mock[UserAnswers => Call]
+      when(mockMethod.apply(userAnswers)).thenReturn(testCall)
+      val result = navigator.userAnswersDependent(userAnswers)(mockMethod)
+      whenReady(result) { _ =>
+        verify(mockMethod, times(1)).apply(userAnswers)
+        verify(mockSessionRepository, times(1)).set(userAnswers)
+        verify(mockSaveAndReturnClient, times(1)).save(userAnswers)
+      }
+    }
+
   }
 
 }

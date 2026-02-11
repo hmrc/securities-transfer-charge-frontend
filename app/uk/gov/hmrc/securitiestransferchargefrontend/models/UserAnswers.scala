@@ -22,6 +22,7 @@ import uk.gov.hmrc.securitiestransferchargefrontend.domain.SubmissionId
 import uk.gov.hmrc.securitiestransferchargefrontend.queries.{Gettable, Settable}
 
 import java.time.Instant
+import scala.language.postfixOps
 import scala.util.{Failure, Success, Try}
 
 final case class UserAnswers(userId: String,

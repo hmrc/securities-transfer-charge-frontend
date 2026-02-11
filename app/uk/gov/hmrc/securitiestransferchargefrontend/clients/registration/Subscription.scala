@@ -17,10 +17,10 @@
 package uk.gov.hmrc.securitiestransferchargefrontend.clients.registration
 
 import play.api.libs.json.{Json, OFormat}
-import java.time.LocalDateTime
+import java.time.LocalDate
 
 case class Subscription(
-                         subsValidTo: LocalDateTime,
+                         subsValidTo: LocalDate,
                          contactName:String,
                          addressLine1:String,
                          addressLine2:Option[String],
