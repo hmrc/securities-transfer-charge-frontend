@@ -14,13 +14,23 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.securitiestransferchargefrontend.clients.registration
+package uk.gov.hmrc.securitiestransferchargefrontend.models
 
-import uk.gov.hmrc.securitiestransferchargefrontend.clients.registration.RegistrationServiceError
+import play.api.libs.json.{Json, OFormat}
 
-enum SubscriptionResponse:
-  case AddressUpdateSuccessful
-  case AddressUpdateFailed
-  case SubscriptionNotFound
+case class ConfirmableAddress(
+  lines: List[String],
+  postcode: String,
+  country: Option[Country] = None
+)
 
-type SubscriptionResult = Either[RegistrationServiceError, SubscriptionResponse]
+object ConfirmableAddress {
+  implicit val format: OFormat[ConfirmableAddress] = Json.format[ConfirmableAddress]
+}
+
+case class Country( name: String,
+                    code: String)
+
+object Country {
+  implicit val format: OFormat[Country] = Json.format[Country]
+}

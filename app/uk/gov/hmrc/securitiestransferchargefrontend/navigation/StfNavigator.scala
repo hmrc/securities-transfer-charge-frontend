@@ -45,7 +45,9 @@ class StfNavigator @Inject()(sessionRepository: SessionRepository,
     }
     case NameOfSellerPage => userAnswers => dataRequired(NameOfSellerPage, userAnswers, defaultPage)
 
+    case ConfirmAddressPage => userAnswers => dataRequired(ConfirmAddressPage, userAnswers, defaultPage)
     case _ => _ => defaultPageF
+
   }
 
       val checkRouteMap: Page => UserAnswers => Call = (_ => _ => routes.CheckYourAnswersController.onPageLoad())

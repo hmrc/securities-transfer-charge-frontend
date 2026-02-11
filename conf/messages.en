@@ -29,6 +29,9 @@ error.title.prefix = Error:
 error.prefix = Error
 error.summary.title = There is a problem
 
+section.caption.hidden = This section is
+details.caption = Your details
+
 index.title = securities-transfer-charge-frontend
 index.heading = securities-transfer-charge-frontend
 index.guidance = Welcome to your new frontend. Please see the README file for a guide to getting started.
@@ -52,6 +55,11 @@ unauthorised.heading = You can’t access this service with this account
 
 transfer.details.caption = Transfer details
 seller.details.caption = Seller details
+
+confirmAddress.title = Review and confirm your address
+confirmAddress.heading = Review and confirm your address
+confirmAddress.editLink = Edit address
+confirmAddress.confirm = Confirm address
 
 submissionsDashboard.title = Submissions
 submissionsDashboard.heading = Submissions

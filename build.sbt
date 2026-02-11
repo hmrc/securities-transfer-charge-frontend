@@ -36,7 +36,7 @@ lazy val microservice = (project in file("."))
     PlayKeys.playDefaultPort := 30036,
     ScoverageKeys.coverageExcludedFiles := "<empty>;Reverse.*;.*handlers.*;.*components.*;" +
       ".*Routes.*;.*viewmodels.govuk.*;",
-    ScoverageKeys.coverageMinimumStmtTotal := 78,
+    ScoverageKeys.coverageMinimumStmtTotal := 80,
     ScoverageKeys.coverageFailOnMinimum := true,
     ScoverageKeys.coverageHighlighting := true,
     scalacOptions ++= Seq(
@@ -62,3 +62,5 @@ lazy val it =
 
 // Get rid of the warnings about flags being set repeatedly
 Compile / scalacOptions := (Compile / scalacOptions).value.distinct
+
+addCommandAlias("precommit", ";clean;coverage;test;it/test;coverageReport")
