@@ -142,6 +142,5 @@ class NameOfSellerControllerSpec extends SpecBase with MockitoSugar {
         redirectLocation(result).value mustEqual routes.JourneyRecoveryController.onPageLoad().url
       }
     }
-
   }
 }

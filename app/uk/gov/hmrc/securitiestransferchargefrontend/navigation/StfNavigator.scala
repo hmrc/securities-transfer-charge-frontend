@@ -36,13 +36,11 @@ class StfNavigator @Inject() (sessionRepository: SessionRepository,
 
     case SubmissionsDashboardPage => userAnswers => goTo(routes.HowToNotifyAboutSecuritiesTransferController.onPageLoad(NormalMode), Some(userAnswers))
     case HowToNotifyAboutSecuritiesTransferPage => userAnswers => {
-      userAnswers.get(HowToNotifyAboutSecuritiesTransferPage) match {
-        case Some(OneAtATime) => goTo(routes.NameOfSellerController.onPageLoad(NormalMode), Some(userAnswers))
-        case Some(MoreThanOneAtATime) => goTo(???)
-        case None => goTo(routes.JourneyRecoveryController.onPageLoad(), None)
-        }
+      dataDependent(HowToNotifyAboutSecuritiesTransferPage, userAnswers) {
+        case OneAtATime => routes.NameOfSellerController.onPageLoad(NormalMode)
+        case MoreThanOneAtATime => ???
       }
-
+    }
     case NameOfSellerPage => userAnswers => goTo(routes.JourneyRecoveryController.onPageLoad(), Some(userAnswers))
 
     case _ => _ => defaultPage  
