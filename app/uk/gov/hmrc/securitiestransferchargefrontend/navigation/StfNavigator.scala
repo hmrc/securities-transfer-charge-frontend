@@ -43,8 +43,9 @@ class StfNavigator @Inject()(sessionRepository: SessionRepository,
         case MoreThanOneAtATime => ???
       }
     }
-    case NameOfSellerPage => userAnswers => goTo(routes.JourneyRecoveryController.onPageLoad(), Some(userAnswers))
-    case _ => _ => defaultPage
+    case NameOfSellerPage => userAnswers => dataRequired(NameOfSellerPage, userAnswers, defaultPage)
+
+    case _ => _ => defaultPageF
   }
 
       val checkRouteMap: Page => UserAnswers => Call = (_ => _ => routes.CheckYourAnswersController.onPageLoad())
