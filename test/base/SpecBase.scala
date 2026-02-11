@@ -84,6 +84,7 @@ trait SpecBase
         bind[StcDataRetrievalAction].to[StubStcDataRetrievalAction],
         bind[DataRequiredAction].to[DataRequiredActionImpl],
         bind[StcDataRequiredAction].toInstance(StubStcDataRequiredAction(userAnswers)),
-        bind[DataRetrievalAction].toInstance(new FakeDataRetrievalAction(userAnswers))
+        bind[DataRetrievalAction].toInstance(new FakeDataRetrievalAction(userAnswers)),
+        bind[SaveAndReturnClient].toInstance(saveAndReturnClient)
       )
 }
