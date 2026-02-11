@@ -21,7 +21,6 @@ import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import uk.gov.hmrc.securitiestransferchargefrontend.connectors.{SubscriptionConnector, SubscriptionStatusErrorException}
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.actions.*
-import uk.gov.hmrc.securitiestransferchargefrontend.domain.SubscriptionId
 import uk.gov.hmrc.securitiestransferchargefrontend.models.NormalMode
 import uk.gov.hmrc.securitiestransferchargefrontend.navigation.Navigator
 import uk.gov.hmrc.securitiestransferchargefrontend.pages.ConfirmAddressPage
@@ -49,8 +48,7 @@ class ConfirmAddressController @Inject()(
   def onPageLoad: Action[AnyContent] =
     (stcAuthEnrolled andThen getData).async { implicit request =>
 
-      val subscriptionId = SubscriptionId(request.request.stcId)
-      subscriptionConnector.getValidSubscription(subscriptionId)
+      subscriptionConnector.getValidSubscription(request.request.subscriptionId)
         .map { subscription =>
           Ok(view(addressService.extractConfirmableAddress(subscription)))
         }
@@ -62,9 +60,8 @@ class ConfirmAddressController @Inject()(
 
   def onSubmit: Action[AnyContent] =
     (stcAuthEnrolled andThen getData andThen requireData).async { implicit request =>
-
-      val subscriptionId = SubscriptionId(request.request.stcId)
-      subscriptionDataRepository.getSubscriptionData(subscriptionId).flatMap(
+      
+      subscriptionDataRepository.getSubscriptionData(request.request.subscriptionId).flatMap(
         _.fold {
           Future.successful(Redirect(routes.JourneyRecoveryController.onPageLoad()))
         } { subscriptionData =>
