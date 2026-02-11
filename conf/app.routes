@@ -14,21 +14,21 @@ GET         /there-is-a-problem                          uk.gov.hmrc.securitiest
 
 GET         /check-your-answers                          uk.gov.hmrc.securitiestransferchargefrontend.controllers.CheckYourAnswersController.onPageLoad()
 
-GET         /account/sign-out-survey                     uk.gov.hmrc.securitiestransferchargefrontend.controllers.auth.AuthController.signOut()
-GET         /account/sign-out                            uk.gov.hmrc.securitiestransferchargefrontend.controllers.auth.AuthController.signOutNoSurvey()
-GET         /account/signed-out                          uk.gov.hmrc.securitiestransferchargefrontend.controllers.auth.SignedOutController.onPageLoad()
+GET         /stf/account/sign-out-survey                     uk.gov.hmrc.securitiestransferchargefrontend.controllers.auth.AuthController.signOut()
+GET         /stf/account/sign-out                            uk.gov.hmrc.securitiestransferchargefrontend.controllers.auth.AuthController.signOutNoSurvey()
+GET         /stf/account/signed-out                          uk.gov.hmrc.securitiestransferchargefrontend.controllers.auth.SignedOutController.onPageLoad()
 
 GET         /unauthorised                                uk.gov.hmrc.securitiestransferchargefrontend.controllers.UnauthorisedController.onPageLoad()
 
-GET        /submissions-dashboard                       uk.gov.hmrc.securitiestransferchargefrontend.controllers.SubmissionsDashboardController.onPageLoad()
-POST       /submissions-dashboard                       uk.gov.hmrc.securitiestransferchargefrontend.controllers.SubmissionsDashboardController.onSubmit()
+GET        /stf/submissions-dashboard                       uk.gov.hmrc.securitiestransferchargefrontend.controllers.SubmissionsDashboardController.onPageLoad()
+POST       /stf/submissions-dashboard                       uk.gov.hmrc.securitiestransferchargefrontend.controllers.SubmissionsDashboardController.onSubmit()
 
-GET        /how-many-transfers                          uk.gov.hmrc.securitiestransferchargefrontend.controllers.HowToNotifyAboutSecuritiesTransferController.onPageLoad(mode: Mode = NormalMode)
-POST       /how-many-transfers                          uk.gov.hmrc.securitiestransferchargefrontend.controllers.HowToNotifyAboutSecuritiesTransferController.onSubmit(mode: Mode = NormalMode)
-GET        /change/how-many-transfers                   uk.gov.hmrc.securitiestransferchargefrontend.controllers.HowToNotifyAboutSecuritiesTransferController.onPageLoad(mode: Mode = CheckMode)
-POST       /change/how-many-transfers                   uk.gov.hmrc.securitiestransferchargefrontend.controllers.HowToNotifyAboutSecuritiesTransferController.onSubmit(mode: Mode = CheckMode)
+GET        /stf/how-many-transfers                          uk.gov.hmrc.securitiestransferchargefrontend.controllers.HowToNotifyAboutSecuritiesTransferController.onPageLoad(mode: Mode = NormalMode)
+POST       /stf/how-many-transfers                          uk.gov.hmrc.securitiestransferchargefrontend.controllers.HowToNotifyAboutSecuritiesTransferController.onSubmit(mode: Mode = NormalMode)
+GET        /stf/change/how-many-transfers                   uk.gov.hmrc.securitiestransferchargefrontend.controllers.HowToNotifyAboutSecuritiesTransferController.onPageLoad(mode: Mode = CheckMode)
+POST       /stf/change/how-many-transfers                   uk.gov.hmrc.securitiestransferchargefrontend.controllers.HowToNotifyAboutSecuritiesTransferController.onSubmit(mode: Mode = CheckMode)
 
-GET        /seller-name                         uk.gov.hmrc.securitiestransferchargefrontend.controllers.NameOfSellerController.onPageLoad(mode: Mode = NormalMode)
-POST       /seller-name                         uk.gov.hmrc.securitiestransferchargefrontend.controllers.NameOfSellerController.onSubmit(mode: Mode = NormalMode)
-GET        /change/seller-name                  uk.gov.hmrc.securitiestransferchargefrontend.controllers.NameOfSellerController.onPageLoad(mode: Mode = CheckMode)
-POST       /change/seller-name                  uk.gov.hmrc.securitiestransferchargefrontend.controllers.NameOfSellerController.onSubmit(mode: Mode = CheckMode)
+GET        /stf/seller-name                         uk.gov.hmrc.securitiestransferchargefrontend.controllers.NameOfSellerController.onPageLoad(mode: Mode = NormalMode)
+POST       /stf/seller-name                         uk.gov.hmrc.securitiestransferchargefrontend.controllers.NameOfSellerController.onSubmit(mode: Mode = NormalMode)
+GET        /stf/change/seller-name                  uk.gov.hmrc.securitiestransferchargefrontend.controllers.NameOfSellerController.onPageLoad(mode: Mode = CheckMode)
+POST       /stf/change/seller-name                  uk.gov.hmrc.securitiestransferchargefrontend.controllers.NameOfSellerController.onSubmit(mode: Mode = CheckMode)
