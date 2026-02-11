@@ -16,7 +16,7 @@
 
 @import uk.gov.hmrc.securitiestransferchargefrontend.controllers.routes
 @import uk.gov.hmrc.securitiestransferchargefrontend.views.html.SubmissionsTable
-@import uk.gov.hmrc.securitiestransferchargefrontend.domain.SubmissionId
+@import uk.gov.hmrc.securitiestransferchargefrontend.models.UserAnswers
 
 
 @this(
@@ -25,7 +25,7 @@
     formHelper: FormWithCSRF
 )
 
-@(submissionIds: List[SubmissionId])(implicit request: Request[_], messages: Messages)
+@(userAnswers: List[UserAnswers])(implicit request: Request[_], messages: Messages)
 
 @layout(pageTitle = titleNoForm(messages("submissionsDashboard.title")), showBackLink = false) {
     @formHelper(action = routes.SubmissionsDashboardController.onSubmit(), Symbol("autoComplete") -> "off") {
@@ -36,10 +36,10 @@
 
         <h1 class="govuk-heading-l">@messages("submissionsDashboard.heading")</h1>
 
-        @if(submissionIds.isEmpty) {
+        @if(userAnswers.isEmpty) {
             <p class="govuk-body">@messages("submissionsDashboard.noSubmissions")</p>
         } else {
-            @SubmissionsTable(submissionIds)
+            @SubmissionsTable(userAnswers)
         }
 
 <p>

@@ -18,7 +18,9 @@ package uk.gov.hmrc.securitiestransferchargefrontend.controllers
 
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
+import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
+import uk.gov.hmrc.play.http.HeaderCarrierConverter
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.actions.{StcAuthEnrolledAction, StcDataRetrievalAction}
 import uk.gov.hmrc.securitiestransferchargefrontend.clients.{SaveAndReturnClient, SubmissionIdClient}
 import uk.gov.hmrc.securitiestransferchargefrontend.models.{NormalMode, UserAnswers}
@@ -27,7 +29,7 @@ import uk.gov.hmrc.securitiestransferchargefrontend.pages.SubmissionsDashboardPa
 import uk.gov.hmrc.securitiestransferchargefrontend.views.html.SubmissionsDashboardView
 
 import javax.inject.Inject
-import scala.concurrent.ExecutionContext
+import scala.concurrent.{ExecutionContext, Future}
 
 class SubmissionsDashboardController @Inject()(
                                                 override val messagesApi: MessagesApi,
@@ -43,10 +45,18 @@ class SubmissionsDashboardController @Inject()(
   def onPageLoad: Action[AnyContent] =
     (stcAuthEnrolled andThen getData).async { implicit request =>
 
+      implicit val hc: HeaderCarrier =
+        HeaderCarrierConverter.fromRequestAndSession(request, request.session)
+
       val userId = request.request.internalId
 
-      saveAndReturnClient.list(userId).map { submissionIds =>
-        Ok(view(submissionIds))
+      for {
+        submissionIds <- saveAndReturnClient.list(userId)
+        userAnswers <- Future.traverse(submissionIds) { id =>
+          saveAndReturnClient.retrieve(userId, id)
+        }
+      } yield {
+        Ok(view(userAnswers))
       }
     }
 

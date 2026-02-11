@@ -14,9 +14,9 @@
  * limitations under the License.
  *@
 
-@import uk.gov.hmrc.securitiestransferchargefrontend.domain.SubmissionId
+@import uk.gov.hmrc.securitiestransferchargefrontend.models.UserAnswers
 
-@(submissionIds: List[SubmissionId])(implicit messages: Messages)
+@(userAnswers: List[UserAnswers])(implicit messages: Messages)
 
 <table class="govuk-table">
     <thead class="govuk-table__head">
@@ -24,14 +24,38 @@
         <th scope="col" class="govuk-table__header">
             @messages("submissionsDashboard.table.submissionId")
         </th>
+        <th scope="col" class="govuk-table__header">
+            @messages("submissionsDashboard.table.moneyOwed")
+        </th>
+        <th scope="col" class="govuk-table__header">
+            @messages("submissionsDashboard.table.chargeDueBy")
+        </th>
+        <th scope="col" class="govuk-table__header">
+            @messages("submissionsDashboard.table.status")
+        </th>
+        <th scope="col" class="govuk-table__header">
+            @messages("submissionsDashboard.table.action")
+        </th>
     </tr>
     </thead>
 
     <tbody class="govuk-table__body">
-    @for(id <- submissionIds) {
+    @for(ua <- userAnswers) {
     <tr class="govuk-table__row">
         <td class="govuk-table__cell">
-            @id.value
+            @ua.submissionId.value
+        </td>
+        <td class="govuk-table__cell">
+            -
+        </td>
+        <td class="govuk-table__cell">
+            -
+        </td>
+        <td class="govuk-table__cell">
+            -
+        </td>
+        <td class="govuk-table__cell">
+            -
         </td>
     </tr>
     }
