@@ -63,6 +63,8 @@ howToNotifyAboutSecuritiesTransfer.moreThanOneAtATime.hint = Download the templa
 howToNotifyAboutSecuritiesTransfer.checkYourAnswersLabel = HowToNotifyAboutSecuritiesTransfer
 howToNotifyAboutSecuritiesTransfer.error.required = Select a way to tell us about your securities transfer
 howToNotifyAboutSecuritiesTransfer.change.hidden = HowToNotifyAboutSecuritiesTransfer
+submissionsDashboard.noSubmissions = No submissions
+submissionsDashboard.table.submissionId = Submission ID
 
 site.save-and-continue.button = Save and continue
 site.save-and-return.button = Save and return to dashboard

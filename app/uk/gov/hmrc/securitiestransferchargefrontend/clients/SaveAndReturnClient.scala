@@ -32,9 +32,10 @@ class SaveAndReturnClientImpl @Inject() extends SaveAndReturnClient {
 
   private val stubUserId = "bob123"
   private val stubSubmissionId: SubmissionId = SubmissionId.apply("STC-000000001")
+  private val stubSubmissionId2: SubmissionId = SubmissionId.apply("STC-000000002")
   private val stubUserAnswers: UserAnswers = UserAnswers(stubUserId, stubSubmissionId)
 
   override def save(userAnswers: UserAnswers): Future[Unit] = Future.successful(())
   override def retrieve(userId: String, submissionId: SubmissionId): Future[UserAnswers] = Future.successful(stubUserAnswers)
-  override def list(userId: String): Future[List[SubmissionId]] = Future.successful(List(stubSubmissionId))
+  override def list(userId: String): Future[List[SubmissionId]] = Future.successful(List(stubSubmissionId, stubSubmissionId2))
 }
