@@ -75,6 +75,6 @@ abstract class AbstractNavigator(sessionRepository: SessionRepository,
    * Used to navigate when the destination depends on the value of the UserAnswers
     for a different page than the current one.
    */
-  protected[navigation] def userAnswersDependent(userAnswers: UserAnswers)(f: UserAnswers => Call): Future[Call] =
+  protected[navigation] def userAnswersDependent(userAnswers: UserAnswers)(f: UserAnswers => Call)(implicit hc: HeaderCarrier): Future[Call] =
     persistUserAnswers(userAnswers)
       .map(_ => f(userAnswers))
