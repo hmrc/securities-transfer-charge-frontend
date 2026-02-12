@@ -32,9 +32,9 @@ class SubmissionsDashboardViewSpec extends ViewBaseSpec {
 
   private val viewInstance         = app.injector.instanceOf[SubmissionsDashboardView]
 
-  private def view(userAnswers: List[UserAnswers]): Document =
+  private def view(submissionIds: List[SubmissionId]): Document =
     Jsoup.parse(
-      viewInstance(userAnswers)(fakeRequest, messages).body
+      viewInstance(submissionIds)(fakeRequest, messages).body
     )
 
   object ExpectedContent {
@@ -68,15 +68,9 @@ class SubmissionsDashboardViewSpec extends ViewBaseSpec {
 
   "SubmissionsDashboardView (with submissions)" - {
 
-    val userAnswers =
-      UserAnswers(
-        userId = userId,
-        submissionId   = submissionId,
-        data         = Json.obj(),
-        lastUpdated  = Instant.now()
-      )
+    val submissionIds = List(submissionId)
 
-    val submissionsDashboardView = view(List(userAnswers))
+    val submissionsDashboardView = view(submissionIds)
 
     "display the submissions table" in {
       submissionsDashboardView.select(".govuk-table").size() mustBe 1

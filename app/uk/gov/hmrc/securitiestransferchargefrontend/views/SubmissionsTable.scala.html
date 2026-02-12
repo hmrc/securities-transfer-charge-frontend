@@ -14,9 +14,9 @@
  * limitations under the License.
  *@
 
-@import uk.gov.hmrc.securitiestransferchargefrontend.models.UserAnswers
+@import uk.gov.hmrc.securitiestransferchargefrontend.domain.SubmissionId
 
-@(userAnswers: List[UserAnswers])(implicit messages: Messages)
+@(submissionIds: List[SubmissionId])(implicit messages: Messages)
 
 <table class="govuk-table">
     <thead class="govuk-table__head">
@@ -40,10 +40,10 @@
     </thead>
 
     <tbody class="govuk-table__body">
-    @for(ua <- userAnswers) {
+    @for(id <- submissionIds) {
     <tr class="govuk-table__row">
         <td class="govuk-table__cell">
-            @ua.submissionId.value
+            @id.value
         </td>
         <td class="govuk-table__cell">
             -

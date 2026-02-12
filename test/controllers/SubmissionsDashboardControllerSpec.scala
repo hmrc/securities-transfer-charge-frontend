@@ -20,16 +20,14 @@ import base.SpecBase
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.when
 import org.scalatestplus.mockito.MockitoSugar
-import play.api.libs.json.Json
 import play.api.test.FakeRequest
-import play.api.test.Helpers._
+import play.api.test.Helpers.*
 import uk.gov.hmrc.securitiestransferchargefrontend.clients.SaveAndReturnClient
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.routes
-import uk.gov.hmrc.securitiestransferchargefrontend.models.UserAnswers
+import uk.gov.hmrc.securitiestransferchargefrontend.domain.SubmissionId
 import uk.gov.hmrc.securitiestransferchargefrontend.views.html.SubmissionsDashboardView
 
 import scala.concurrent.Future
-import java.time.Instant
 
 class SubmissionsDashboardControllerSpec extends SpecBase with MockitoSugar {
 
@@ -53,6 +51,7 @@ class SubmissionsDashboardControllerSpec extends SpecBase with MockitoSugar {
           ).build()
 
         running(application) {
+
           val request = FakeRequest(GET, submissionsDashboardRoute)
 
           val result = route(application, request).value
@@ -67,24 +66,18 @@ class SubmissionsDashboardControllerSpec extends SpecBase with MockitoSugar {
             ).toString
         }
       }
-      
-      "must return OK and render submissions when they exist" in {
+
+      "must return OK and render submission IDs when they exist" in {
 
         val mockSaveAndReturnClient = mock[SaveAndReturnClient]
 
-        val userAnswers =
-          UserAnswers(
-            userId = userId,
-            submissionId = submissionId,
-            data = Json.obj(),
-            lastUpdated = Instant.now()
-          )
+        val submissionIds = List(
+          SubmissionId("STC-123456789"),
+          SubmissionId("STC-987654321")
+        )
 
         when(mockSaveAndReturnClient.list(any[String])(any()))
-          .thenReturn(Future.successful(List(submissionId)))
-
-        when(mockSaveAndReturnClient.retrieve(any[String], any())(any()))
-          .thenReturn(Future.successful(userAnswers))
+          .thenReturn(Future.successful(submissionIds))
 
         val application =
           applicationBuilder(
@@ -92,6 +85,7 @@ class SubmissionsDashboardControllerSpec extends SpecBase with MockitoSugar {
           ).build()
 
         running(application) {
+
           val request = FakeRequest(GET, submissionsDashboardRoute)
 
           val result = route(application, request).value
@@ -100,7 +94,7 @@ class SubmissionsDashboardControllerSpec extends SpecBase with MockitoSugar {
           status(result) mustEqual OK
 
           contentAsString(result) mustEqual
-            view(List(userAnswers))(
+            view(submissionIds)(
               request,
               messages(application)
             ).toString
