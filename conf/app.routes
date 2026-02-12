@@ -12,7 +12,11 @@ GET         /refresh-session                             uk.gov.hmrc.securitiest
 
 GET         /there-is-a-problem                          uk.gov.hmrc.securitiestransferchargefrontend.controllers.JourneyRecoveryController.onPageLoad(continueUrl: Option[RedirectUrl] ?= None)
 
-GET         /check-your-answers                          uk.gov.hmrc.securitiestransferchargefrontend.controllers.CheckYourAnswersController.onPageLoad()
+GET        /stf/check-your-answers                          uk.gov.hmrc.securitiestransferchargefrontend.controllers.CheckYourAnswersController.onPageLoad()
+
+GET        /stf/account/sign-out-survey                     uk.gov.hmrc.securitiestransferchargefrontend.controllers.auth.AuthController.signOut()
+GET        /stf/account/sign-out                            uk.gov.hmrc.securitiestransferchargefrontend.controllers.auth.AuthController.signOutNoSurvey()
+GET        /stf/account/signed-out                          uk.gov.hmrc.securitiestransferchargefrontend.controllers.auth.SignedOutController.onPageLoad()
 
 GET        /stf/unauthorised                                uk.gov.hmrc.securitiestransferchargefrontend.controllers.UnauthorisedController.onPageLoad()
 
