@@ -111,7 +111,7 @@ class HowToNotifyAboutSecuritiesTransferControllerSpec extends SpecBase {
         val result = route(application, request).value
 
         status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual routes.NameOfSellerController.onPageLoad(NormalMode).url
+        redirectLocation(result).value mustEqual routes.ConfirmAddressController.onPageLoad().url
       }
     }
   }

@@ -19,9 +19,9 @@ package views
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
 import play.api.Application
-import uk.gov.hmrc.securitiestransferchargefrontend.forms.HowToNotifyAboutSecuritiesTransferFormProvider
+import uk.gov.hmrc.securitiestransferchargefrontend.forms.UkOrNotFormProvider
 import uk.gov.hmrc.securitiestransferchargefrontend.models.NormalMode
-import uk.gov.hmrc.securitiestransferchargefrontend.views.html.HowToNotifyAboutSecuritiesTransferView
+import uk.gov.hmrc.securitiestransferchargefrontend.views.html.UkOrNotView
 import views.ViewBaseSpec
 
 import scala.language.postfixOps
@@ -30,8 +30,8 @@ class UkOrNotViewSpec extends ViewBaseSpec {
 
   override def fakeApplication(): Application = applicationBuilder().build()
   
-  private val viewInstance         = app.injector.instanceOf[HowToNotifyAboutSecuritiesTransferView]
-  private val formProvider = new HowToNotifyAboutSecuritiesTransferFormProvider()
+  private val viewInstance         = app.injector.instanceOf[UkOrNotView]
+  private val formProvider = new UkOrNotFormProvider()
   private val form = formProvider()
 
 
