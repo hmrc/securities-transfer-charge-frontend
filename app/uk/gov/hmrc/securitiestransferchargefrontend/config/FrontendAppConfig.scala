@@ -66,4 +66,6 @@ class FrontendAppConfig @Inject() (configuration: Configuration, servicesConfig:
 
   val retrieveUserAnswersUrl: String = s"$saveAndReturnBaseUrl$saveAndReturnPath"
   
+  lazy val connectedPersonsInformationUrl: String = configuration.get[String]("urls.external.connectedPersonsInformation")
+  
 }

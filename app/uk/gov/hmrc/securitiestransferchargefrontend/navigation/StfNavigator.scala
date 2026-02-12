@@ -46,6 +46,7 @@ class StfNavigator @Inject()(sessionRepository: SessionRepository,
     case NameOfSellerPage => userAnswers => dataRequired(NameOfSellerPage, userAnswers, defaultPage)
 
     case ConfirmAddressPage => userAnswers => dataRequired(ConfirmAddressPage, userAnswers, defaultPage)
+    case ConnectedPersonsPage => userAnswers => dataRequired(ConnectedPersonsPage,userAnswers,defaultPage)
     case _ => _ => defaultPageF
 
   }
