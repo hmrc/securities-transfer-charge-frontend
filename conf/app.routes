@@ -37,3 +37,8 @@ GET        /stf/seller-name                         uk.gov.hmrc.securitiestransf
 POST       /stf/seller-name                         uk.gov.hmrc.securitiestransferchargefrontend.controllers.NameOfSellerController.onSubmit(mode: Mode = NormalMode)
 GET        /stf/change/seller-name                  uk.gov.hmrc.securitiestransferchargefrontend.controllers.NameOfSellerController.onPageLoad(mode: Mode = CheckMode)
 POST       /stf/change/seller-name                  uk.gov.hmrc.securitiestransferchargefrontend.controllers.NameOfSellerController.onSubmit(mode: Mode = CheckMode)
+
+GET        /stf/connected-persons                        uk.gov.hmrc.securitiestransferchargefrontend.controllers.ConnectedPersonsController.onPageLoad(mode: Mode = NormalMode)
+POST       /stf/connected-persons                        uk.gov.hmrc.securitiestransferchargefrontend.controllers.ConnectedPersonsController.onSubmit(mode: Mode = NormalMode)
+GET        /stf/change/connected-persons                  uk.gov.hmrc.securitiestransferchargefrontend.controllers.ConnectedPersonsController.onPageLoad(mode: Mode = CheckMode)
+POST       /stf/change/connected-persons                  uk.gov.hmrc.securitiestransferchargefrontend.controllers.ConnectedPersonsController.onSubmit(mode: Mode = CheckMode)
