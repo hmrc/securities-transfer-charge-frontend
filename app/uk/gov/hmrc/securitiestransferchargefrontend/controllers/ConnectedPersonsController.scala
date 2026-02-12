@@ -61,9 +61,9 @@ class ConnectedPersonsController @Inject()(
         formWithErrors =>
           Future.successful(BadRequest(view(formWithErrors, mode))),
 
-        value =>
+        areConnected =>
           for {
-            updatedAnswers <- Future.fromTry(request.userAnswers.set(ConnectedPersonsPage, value))
+            updatedAnswers <- Future.fromTry(request.userAnswers.set(ConnectedPersonsPage, areConnected))
             nextPage <- navigator.nextPage(ConnectedPersonsPage, mode, updatedAnswers)
           } yield Redirect(nextPage)
       )
