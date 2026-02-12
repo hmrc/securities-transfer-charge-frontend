@@ -33,10 +33,3 @@ case class AlfAddress(lines: List[String],
 object AlfAddress:
   given Reads[AlfAddress] = Json.reads[AlfAddress]
   given Writes[AlfAddress] = Json.writes[AlfAddress]
-
-case class Country( code: String,
-                    name: String)
-
-object Country:
-  given Reads[Country] = Json.reads[Country]
-  given Writes[Country] = Json.writes[Country]
