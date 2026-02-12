@@ -17,19 +17,16 @@
 package controllers
 
 import base.SpecBase
-import org.mockito.ArgumentMatchers.{any, eq as eqTo}
 import org.mockito.Mockito.{verify, when}
 import org.scalatestplus.mockito.MockitoSugar
+import org.mockito.ArgumentMatchers.any
 import play.api.inject.bind
-import play.api.mvc.Call
 import play.api.test.FakeRequest
 import play.api.test.Helpers.*
 import uk.gov.hmrc.securitiestransferchargefrontend.clients.{SaveAndReturnClient, SubmissionIdClient}
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.routes
 import uk.gov.hmrc.securitiestransferchargefrontend.domain.SubmissionId
-import uk.gov.hmrc.securitiestransferchargefrontend.models.{NormalMode, UserAnswers}
-import uk.gov.hmrc.securitiestransferchargefrontend.navigation.Navigator
-import uk.gov.hmrc.securitiestransferchargefrontend.pages.SubmissionsDashboardPage
+import uk.gov.hmrc.securitiestransferchargefrontend.models.NormalMode
 import uk.gov.hmrc.securitiestransferchargefrontend.views.html.SubmissionsDashboardView
 
 import scala.concurrent.Future
@@ -110,38 +107,30 @@ class SubmissionsDashboardControllerSpec extends SpecBase with MockitoSugar {
         }
       }
     }
-    
+
     "POST onSubmit" - {
 
       "must generate a submissionId and redirect to the next page" in {
 
         val mockSaveAndReturnClient = mock[SaveAndReturnClient]
         val mockIdClient            = mock[SubmissionIdClient]
-        val mockNavigator           = mock[Navigator]
 
         val generatedSubmissionId = SubmissionId("STC-111111111")
 
         when(mockIdClient.nextSubmissionId())
           .thenReturn(Future.successful(generatedSubmissionId))
 
-        when(
-          mockNavigator.nextPage(
-            eqTo(SubmissionsDashboardPage),
-            eqTo(NormalMode),
-            any[UserAnswers]
-          )(any())
-        ).thenReturn(Future.successful(Call("GET", "/next-page")))
+        when(mockSaveAndReturnClient.save(any())(any()))
+          .thenReturn(Future.successful(()))
 
         val application =
           applicationBuilder(
             saveAndReturnClient = mockSaveAndReturnClient
           )
             .overrides(
-              bind[SubmissionIdClient].toInstance(mockIdClient),
-              bind[Navigator].toInstance(mockNavigator)
+              bind[SubmissionIdClient].toInstance(mockIdClient)
             )
             .build()
-
 
         running(application) {
 
@@ -153,15 +142,8 @@ class SubmissionsDashboardControllerSpec extends SpecBase with MockitoSugar {
           val result = route(application, request).value
 
           status(result) mustEqual SEE_OTHER
-          redirectLocation(result).value mustEqual "/next-page"
 
-          verify(mockIdClient).nextSubmissionId()
-
-          verify(mockNavigator).nextPage(
-            eqTo(SubmissionsDashboardPage),
-            eqTo(NormalMode),
-            any[UserAnswers]
-          )(any())
+          redirectLocation(result).value mustEqual routes.HowToNotifyAboutSecuritiesTransferController.onPageLoad(NormalMode).url
         }
       }
     }
