@@ -45,10 +45,10 @@ class UkOrNotController @Inject()(
 
   val form: Form[UkOrNot] = formProvider()
 
-  def onPageLoad(mode: Mode): Action[AnyContent] = (stcAuthEnrolled andThen getData).async{
+  def onPageLoad(mode: Mode): Action[AnyContent] = (stcAuthEnrolled andThen getData andThen requireData).async{
     implicit request =>
 
-      val preparedForm = request.userAnswers.flatMap(_.get(UkOrNotPage))
+      val preparedForm = request.userAnswers.get(UkOrNotPage)
         .fold(form)(form.fill)
 
       Future.successful(Ok(view(preparedForm, mode)))

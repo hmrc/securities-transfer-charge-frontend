@@ -17,9 +17,4 @@
 package generators
 
 trait ModelGenerators {
-
-  implicit lazy val arbitraryUkOrNot: Arbitrary[UkOrNot] =
-    Arbitrary {
-      Gen.oneOf(UkOrNot.values.toSeq)
-    }
 }
