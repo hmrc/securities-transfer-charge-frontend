@@ -26,10 +26,10 @@ GET        /stf/unauthorised                                uk.gov.hmrc.securiti
 GET        /stf/confirm-address                       uk.gov.hmrc.securitiestransferchargefrontend.controllers.ConfirmAddressController.onPageLoad()
 POST       /stf/confirm-address                       uk.gov.hmrc.securitiestransferchargefrontend.controllers.ConfirmAddressController.onSubmit()
 
-GET        /stf/how-many-transfers                          uk.gov.hmrc.securitiestransferchargefrontend.controllers.HowToNotifyAboutSecuritiesTransferController.onPageLoad(mode: Mode = NormalMode)
-POST       /stf/how-many-transfers                          uk.gov.hmrc.securitiestransferchargefrontend.controllers.HowToNotifyAboutSecuritiesTransferController.onSubmit(mode: Mode = NormalMode)
-GET        /stf/change/how-many-transfers                   uk.gov.hmrc.securitiestransferchargefrontend.controllers.HowToNotifyAboutSecuritiesTransferController.onPageLoad(mode: Mode = CheckMode)
-POST       /stf/change/how-many-transfers                   uk.gov.hmrc.securitiestransferchargefrontend.controllers.HowToNotifyAboutSecuritiesTransferController.onSubmit(mode: Mode = CheckMode)
+GET        /stf/how-many-transfers                    uk.gov.hmrc.securitiestransferchargefrontend.controllers.HowToNotifyAboutSecuritiesTransferController.onPageLoad(mode: Mode = NormalMode)
+POST       /stf/how-many-transfers                    uk.gov.hmrc.securitiestransferchargefrontend.controllers.HowToNotifyAboutSecuritiesTransferController.onSubmit(mode: Mode = NormalMode)
+GET        /stf/change/how-many-transfers             uk.gov.hmrc.securitiestransferchargefrontend.controllers.HowToNotifyAboutSecuritiesTransferController.onPageLoad(mode: Mode = CheckMode)
+POST       /stf/change/how-many-transfers             uk.gov.hmrc.securitiestransferchargefrontend.controllers.HowToNotifyAboutSecuritiesTransferController.onSubmit(mode: Mode = CheckMode)
 
 GET        /stf/seller-name                         uk.gov.hmrc.securitiestransferchargefrontend.controllers.NameOfSellerController.onPageLoad(mode: Mode = NormalMode)
 POST       /stf/seller-name                         uk.gov.hmrc.securitiestransferchargefrontend.controllers.NameOfSellerController.onSubmit(mode: Mode = NormalMode)
