@@ -66,6 +66,12 @@ submissionsDashboard.heading = Submissions
 submissionsDashboard.create-new-submission.button = Create new submission
 submissionsDashboard.hint = Submission dashboard
 
+submissionsDashboard.table.submissionId = Submission ID
+submissionsDashboard.table.moneyOwed = Money owed
+submissionsDashboard.table.chargeDueBy = Charge due by
+submissionsDashboard.table.status = Status
+submissionsDashboard.table.action = Action
+
 howToNotifyAboutSecuritiesTransfer.title = How do you want to tell us about your securities transfer?
 howToNotifyAboutSecuritiesTransfer.heading = How do you want to tell us about your securities transfer?
 howToNotifyAboutSecuritiesTransfer.oneAtATime = One at a time
@@ -99,3 +105,7 @@ connectedPersons.details.content.l3 = your husband’s, wife's or civil partner'
 connectedPersons.details.content.l4 = the trustees of a settlement of which you are a settlor, or of which a person who is still alive and who is connected with you is a settlor
 connectedPersons.details.content.p2 = Relative means a brother, sister, ancestor or descendant. It does not include nephews, nieces, uncles and aunts.
 connectedPersons.details.content.link.text = Read HMRC guidance on connected persons
+
+site.save-and-continue.button = Save and continue
+site.save-and-return.button = Save and return to dashboard
+

@@ -53,6 +53,7 @@ trait SpecBase
   val userAnswersId: String = "id"
   val sessionId = "sessionId1234"
   val submissionId: SubmissionId = SubmissionId("STC-123456789")
+  val userId = "internalId"
 
   val subscription: Subscription = Subscription(
     subsValidTo = LocalDate.now().plusDays(5),
