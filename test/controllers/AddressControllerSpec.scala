@@ -17,8 +17,8 @@
 package controllers
 
 import base.SpecBase
-import org.mockito.ArgumentMatchers.any
-import org.mockito.Mockito.when
+import org.mockito.ArgumentMatchers.{any, eq as eqTo}
+import org.mockito.Mockito.{when, verify}
 import org.scalatestplus.mockito.MockitoSugar
 import play.api.inject.bind
 import play.api.test.FakeRequest
@@ -30,6 +30,7 @@ import uk.gov.hmrc.securitiestransferchargefrontend.controllers.routes
 import scala.concurrent.Future
 import play.api.mvc.Results.Redirect
 import uk.gov.hmrc.securitiestransferchargefrontend.models.Country
+import uk.gov.hmrc.securitiestransferchargefrontend.models.NormalMode
 
 class AddressControllerSpec extends SpecBase with MockitoSugar {
 
@@ -80,8 +81,10 @@ class AddressControllerSpec extends SpecBase with MockitoSugar {
         val result = route(application, request).value
 
         status(result) mustEqual SEE_OTHER
+        redirectLocation(result).value mustEqual routes.NameOfSellerController.onPageLoad(NormalMode).url
+        verify(mockAlf).alfRetrieveAddress(eqTo("addressId"))(any())
+
       }
     }
-
   }
 }

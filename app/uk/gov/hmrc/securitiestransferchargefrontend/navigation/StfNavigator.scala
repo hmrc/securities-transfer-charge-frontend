@@ -43,6 +43,8 @@ class StfNavigator @Inject()(sessionRepository: SessionRepository,
         case MoreThanOneAtATime => ???
       }
     }
+
+    case IndividualAddressPage => userAnswers => dataRequired(IndividualAddressPage, userAnswers, routes.NameOfSellerController.onPageLoad(NormalMode))
     case NameOfSellerPage => userAnswers => dataRequired(NameOfSellerPage, userAnswers, defaultPage)
 
     case ConfirmAddressPage => userAnswers => dataRequired(ConfirmAddressPage, userAnswers, defaultPage)
