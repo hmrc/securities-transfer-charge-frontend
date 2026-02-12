@@ -36,7 +36,7 @@ POST       /stf/seller-name                         uk.gov.hmrc.securitiestransf
 GET        /stf/change/seller-name                  uk.gov.hmrc.securitiestransferchargefrontend.controllers.NameOfSellerController.onPageLoad(mode: Mode = CheckMode)
 POST       /stf/change/seller-name                  uk.gov.hmrc.securitiestransferchargefrontend.controllers.NameOfSellerController.onSubmit(mode: Mode = CheckMode)
 
-GET        /stf/ukOrNot                        uk.gov.hmrc.securitiestransferchargefrontend.controllers.UkOrNotController.onPageLoad(mode: Mode = NormalMode)
-POST       /stf/ukOrNot                        uk.gov.hmrc.securitiestransferchargefrontend.controllers.UkOrNotController.onSubmit(mode: Mode = NormalMode)
-GET        /stf/changeUkOrNot                  uk.gov.hmrc.securitiestransferchargefrontend.controllers.UkOrNotController.onPageLoad(mode: Mode = CheckMode)
-POST       /stf/changeUkOrNot                  uk.gov.hmrc.securitiestransferchargefrontend.controllers.UkOrNotController.onSubmit(mode: Mode = CheckMode)
+GET        /stf/seller-country                  uk.gov.hmrc.securitiestransferchargefrontend.controllers.UkOrNotController.onPageLoad(mode: Mode = NormalMode)
+POST       /stf/seller-country                  uk.gov.hmrc.securitiestransferchargefrontend.controllers.UkOrNotController.onSubmit(mode: Mode = NormalMode)
+GET        /stf/seller-country                  uk.gov.hmrc.securitiestransferchargefrontend.controllers.UkOrNotController.onPageLoad(mode: Mode = CheckMode)
+POST       /stf/seller-country                  uk.gov.hmrc.securitiestransferchargefrontend.controllers.UkOrNotController.onSubmit(mode: Mode = CheckMode)
