@@ -25,7 +25,7 @@ import uk.gov.hmrc.auth.core.retrieve.Retrieval
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.securitiestransferchargefrontend.connectors.AlfAddressConnector
 import uk.gov.hmrc.securitiestransferchargefrontend.domain.{SubmissionId, SubscriptionId}
-import uk.gov.hmrc.securitiestransferchargefrontend.models.{AlfAddress, AlfConfirmedAddress, Country, UserAnswers}
+import uk.gov.hmrc.securitiestransferchargefrontend.models.{AlfAddress, AlfConfirmedAddress, ConfirmableAddress, Country, UserAnswers}
 
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -71,6 +71,14 @@ object Fixtures {
     "foo", Some("bar"), fakeAlfAddress
   )
 
+  val confirmableAddress: ConfirmableAddress = ConfirmableAddress(
+    lines = List(
+      "1 High Street",
+      "Town"
+    ),
+    postcode = "ZZ1 1ZZ",
+    country = Some(Country("United Kingdom", "GB"))
+  )
   class FakeAuthConnectorSuccess(value: Any) extends AuthConnector {
 
     override def authorise[A](predicate: Predicate, retrieval: Retrieval[A])(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[A] =

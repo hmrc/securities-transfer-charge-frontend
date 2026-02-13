@@ -16,6 +16,7 @@
 
 package controllers
 
+import base.Fixtures.confirmableAddress
 import base.SpecBase
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.when
@@ -28,7 +29,7 @@ import uk.gov.hmrc.securitiestransferchargefrontend.clients.SaveAndReturnClient
 import uk.gov.hmrc.securitiestransferchargefrontend.connectors.SubscriptionConnector
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.routes
 import uk.gov.hmrc.securitiestransferchargefrontend.domain.SubscriptionId
-import uk.gov.hmrc.securitiestransferchargefrontend.models.{ConfirmableAddress, Country, UserAnswers}
+import uk.gov.hmrc.securitiestransferchargefrontend.models.UserAnswers
 import uk.gov.hmrc.securitiestransferchargefrontend.repositories.{SessionRepository, SubscriptionData, SubscriptionDataRepository}
 import uk.gov.hmrc.securitiestransferchargefrontend.services.AddressService
 import uk.gov.hmrc.securitiestransferchargefrontend.views.html.ConfirmAddressView
@@ -38,14 +39,7 @@ import scala.concurrent.Future
 class ConfirmAddressControllerSpec extends SpecBase {
   
   val subscriptionData: SubscriptionData = SubscriptionData(subscriptionId = SubscriptionId("Sub-01"), subscriptionDetails = subscription)
-  val confirmableAddress: ConfirmableAddress = ConfirmableAddress(
-    lines = List(
-      "1 High Street",
-      "Town"
-    ),
-    postcode = "ZZ1 1ZZ",
-    country = Some(Country("United Kingdom", "GB"))
-  )
+  
 
 
   "ConfirmAddress Controller" - {
