@@ -16,20 +16,35 @@
 
 package base.stubs
 
-import base.Fixtures.emptyUserAnswers
 import play.api.mvc.Result
+import play.api.mvc.Results.Redirect
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.actions.StcDataRequiredAction
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.actions.requests.{StcDataRequest, StcOptionalDataRequest}
+import uk.gov.hmrc.securitiestransferchargefrontend.controllers.routes
 import uk.gov.hmrc.securitiestransferchargefrontend.models.UserAnswers
 
 import scala.concurrent.{ExecutionContext, Future}
 
-class StubStcDataRequiredAction(userAnswers: UserAnswers) extends StcDataRequiredAction {
-  override protected def executionContext: ExecutionContext = ExecutionContext.global
+class StubStcDataRequiredAction(userAnswers: Option[UserAnswers])
+  extends StcDataRequiredAction {
 
-  override protected def refine[A](request: StcOptionalDataRequest[A]): Future[Either[Result, StcDataRequest[A]]] =
-    Future.successful(Right(StcDataRequest(request.request, userAnswers)))
+  override protected def executionContext: ExecutionContext =
+    ExecutionContext.global
+
+  override protected def refine[A](
+                                    request: StcOptionalDataRequest[A]
+                                  ): Future[Either[Result, StcDataRequest[A]]] =
+    userAnswers match {
+      case Some(answers) =>
+        Future.successful(Right(StcDataRequest(request.request, answers)))
+        
+      case None =>
+        Future.successful(
+          Left(Redirect(routes.JourneyRecoveryController.onPageLoad())))
+    }
 }
+
 object StubStcDataRequiredAction {
-  def apply(userAnswers: Option[UserAnswers]): StubStcDataRequiredAction = new StubStcDataRequiredAction(userAnswers.getOrElse(emptyUserAnswers))
+  def apply(userAnswers: Option[UserAnswers]): StubStcDataRequiredAction =
+    new StubStcDataRequiredAction(userAnswers)
 }

@@ -94,7 +94,7 @@ class HowToNotifyAboutSecuritiesTransferControllerSpec extends SpecBase {
       }
     }
 
-    "must redirect on valid submission" in {
+    "must redirect to confirm your address page when one at a time is selected" in {
       val saveAndReturnClient = mock[SaveAndReturnClient]
 
       val application = applicationBuilder(userAnswers = Some(emptyUserAnswers), saveAndReturnClient = saveAndReturnClient)
@@ -111,7 +111,7 @@ class HowToNotifyAboutSecuritiesTransferControllerSpec extends SpecBase {
         val result = route(application, request).value
 
         status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual routes.NameOfSellerController.onPageLoad(NormalMode).url
+        redirectLocation(result).value mustEqual routes.ConfirmAddressController.onPageLoad().url
       }
     }
   }

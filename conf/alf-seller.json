@@ -53,14 +53,14 @@
         "phaseBannerHtml": ""
       },
       "countryPickerLabels": {
-        "title": "Buyer’s address",
-        "heading": "Buyer’s address",
-        "countryLabel": "Which country does the buyer live in?",
+        "title": "Seller’s address",
+        "heading": "Seller’s address",
+        "countryLabel": "Which country does the seller live in?",
         "submitLabel": "Continue"
       },
       "lookupPageLabels": {
-        "title": "Find the buyer’s address",
-        "heading": "Find the buyer’s address",
+        "title": "Find the seller’s address",
+        "heading": "Find the seller’s address",
         "filterLabel": "Property name or number",
         "postcodeLabel": "Postcode",
         "submitLabel": "Continue",
@@ -69,8 +69,8 @@
         "manualAddressLinkText": "Enter the address manually"
       },
       "selectPageLabels": {
-        "title": "Select the buyer’s address",
-        "heading": "Select the buyer’s address",
+        "title": "Choose the seller’s address",
+        "heading": "Choose the seller’s address",
         "headingWithPostcode": "Addresses found for postcode",
         "proposalListLabel": "Please select one of the following addresses",
         "submitLabel": "Continue",
@@ -78,15 +78,15 @@
         "editAddressLinkText": "Enter address manually"
       },
       "confirmPageLabels": {
-        "title": "Confirm the buyer’s address",
-        "heading": "Confirm the buyer’s address",
-        "infoSubheading": "The buyer’s selected address",
+        "title": "Confirm the seller’s address",
+        "heading": "Confirm the seller’s address",
+        "infoSubheading": "Your selected address",
         "submitLabel": "Confirm Address",
         "changeLinkText": "Edit address"
       },
       "editPageLabels": {
-        "title": "Enter the buyer’s address",
-        "heading": "Enter the buyer’s address",
+        "title": "What’s the seller’s address",
+        "heading": "What’s the seller’s address",
         "line1Label": "Address line 1",
         "line2Label": "Address line 2",
         "townLabel": "Town or city",

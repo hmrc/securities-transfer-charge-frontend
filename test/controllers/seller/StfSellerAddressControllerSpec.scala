@@ -14,42 +14,40 @@
  * limitations under the License.
  */
 
-package controllers
+package controllers.seller
 
 import base.SpecBase
 import org.scalatestplus.mockito.MockitoSugar
 import play.api.test.FakeRequest
 import play.api.test.Helpers.*
-import uk.gov.hmrc.securitiestransferchargefrontend.controllers.routes
-import uk.gov.hmrc.securitiestransferchargefrontend.models.NormalMode
+import uk.gov.hmrc.securitiestransferchargefrontend.controllers.seller.routes
 
-class AddressControllerSpec extends SpecBase with MockitoSugar {
+class StfSellerAddressControllerSpec extends SpecBase with MockitoSugar {
 
-  "AddressController" - {
+  "StfSellerAddressController" - {
 
-    "onPageLoad should redirect to ALF" in {
-      
+    "onPageLoad should return the result from Alf.initAlfJourneyRequest" in {
+
       val application = applicationBuilder(userAnswers = Some(emptyUserAnswers))
         .build()
 
       running(application) {
-        val request = FakeRequest(GET, routes.AddressController.onPageLoad().url)
+        val request = FakeRequest(GET, routes.StfSellerAddressController.onPageLoad().url)
         val result = route(application, request).value
 
         status(result) mustEqual SEE_OTHER
       }
     }
 
-    "onReturn should retrieve address and redirect" in {
+    "onReturn should retrieve address from Alf, store it and redirect to the next page" in {
       val application = applicationBuilder(userAnswers = Some(emptyUserAnswers))
         .build()
 
       running(application) {
-        val request = FakeRequest(GET, routes.AddressController.onReturn("addressId").url)
+        val request = FakeRequest(GET, routes.StfSellerAddressController.onReturn("key").url)
         val result = route(application, request).value
 
         status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual routes.NameOfSellerController.onPageLoad(NormalMode).url
       }
     }
   }

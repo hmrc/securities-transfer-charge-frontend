@@ -21,9 +21,10 @@ import base.stubs.StubSessionRepository
 import clients.FakeSaveAndReturnClient
 import org.scalatest.concurrent.ScalaFutures
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.routes
+import uk.gov.hmrc.securitiestransferchargefrontend.controllers.seller.routes.StfSellerAddressController
 import uk.gov.hmrc.securitiestransferchargefrontend.models.*
 import uk.gov.hmrc.securitiestransferchargefrontend.navigation.StfNavigator
-import uk.gov.hmrc.securitiestransferchargefrontend.pages.{Page, StfBuyersAddressPage}
+import uk.gov.hmrc.securitiestransferchargefrontend.pages._
 import base.Fixtures
 
 class StfNavigatorSpec extends SpecBase with ScalaFutures {
@@ -44,11 +45,43 @@ class StfNavigatorSpec extends SpecBase with ScalaFutures {
 
       }
 
-      "must go from the AddressLookup to NameOfSellerController" in {
+      "must go from the HowToNotifyAboutSecuritiesTransfer to ConfirmAddressController when one at a time is selected" in {
+        val answers = emptyUserAnswers.set(HowToNotifyAboutSecuritiesTransferPage, HowToNotifyAboutSecuritiesTransfer.OneAtATime).get
+        val result = navigator.nextPage(HowToNotifyAboutSecuritiesTransferPage, NormalMode, answers)(fakeRequest)
+        whenReady(result) { res =>
+          res mustBe routes.ConfirmAddressController.onPageLoad()
+        }
+      }
+
+      "must go from the ConfirmAddressPage to NameOfSellerController" in {
+        val answers = emptyUserAnswers.set(ConfirmAddressPage, Fixtures.confirmableAddress).get
+        val result = navigator.nextPage(ConfirmAddressPage, NormalMode, answers)(fakeRequest)
+        whenReady(result) { res =>
+          res mustBe routes.NameOfSellerController.onPageLoad(NormalMode)
+        }
+      }
+
+      "must go from the NameOfSellerPage to sellers AddressLookup" in {
+        val answers = emptyUserAnswers.set(NameOfSellerPage, "John").get
+        val result = navigator.nextPage(NameOfSellerPage, NormalMode, answers)(fakeRequest)
+        whenReady(result) { res =>
+          res mustBe StfSellerAddressController.onPageLoad()
+        }
+      }
+
+      "must go from the buyers AddressLookup to NameOfSellerController" in {
         val answers = emptyUserAnswers.set(StfBuyersAddressPage, Fixtures.fakeAlfConfirmedAddress).get
         val result = navigator.nextPage(StfBuyersAddressPage, NormalMode, answers)(fakeRequest)
         whenReady(result) { res =>
           res mustBe routes.NameOfSellerController.onPageLoad(NormalMode)
+        }
+      }
+
+      "must go from the sellers AddressLookup to ConnectedPersonsController" in {
+        val answers = emptyUserAnswers.set(SellerAddressPage, Fixtures.fakeAlfConfirmedAddress).get
+        val result = navigator.nextPage(SellerAddressPage, NormalMode, answers)(fakeRequest)
+        whenReady(result) { res =>
+          res mustBe routes.ConnectedPersonsController.onPageLoad(NormalMode)
         }
       }
     }

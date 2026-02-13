@@ -21,6 +21,8 @@ import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.play.http.HeaderCarrierConverter
 import uk.gov.hmrc.securitiestransferchargefrontend.clients.SaveAndReturnClient
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.routes
+import uk.gov.hmrc.securitiestransferchargefrontend.controllers.seller.routes as sellerRoutes
+
 import uk.gov.hmrc.securitiestransferchargefrontend.models.HowToNotifyAboutSecuritiesTransfer.{MoreThanOneAtATime, OneAtATime}
 import uk.gov.hmrc.securitiestransferchargefrontend.models.{CheckMode, Mode, NormalMode, UserAnswers}
 import uk.gov.hmrc.securitiestransferchargefrontend.pages.*
@@ -39,21 +41,21 @@ class StfNavigator @Inject()(sessionRepository: SessionRepository,
     case SubmissionsDashboardPage => userAnswers => goTo(routes.HowToNotifyAboutSecuritiesTransferController.onPageLoad(NormalMode), Some(userAnswers))
     case HowToNotifyAboutSecuritiesTransferPage => userAnswers => {
       dataDependent(HowToNotifyAboutSecuritiesTransferPage, userAnswers) {
-        case OneAtATime => routes.NameOfSellerController.onPageLoad(NormalMode) // THIS IS A TEMPORARY NAVIGATION TO THE NAME OF THE SELLER PAGE AS THE CONFIRM-ADDRESS PAGE HAS NOT BEEN IMPLEMENTED.
+        case OneAtATime => routes.ConfirmAddressController.onPageLoad()
         case MoreThanOneAtATime => ???
       }
     }
 
     case StfBuyersAddressPage => userAnswers => dataRequired(StfBuyersAddressPage, userAnswers, routes.NameOfSellerController.onPageLoad(NormalMode))
-    case NameOfSellerPage => userAnswers => dataRequired(NameOfSellerPage, userAnswers, defaultPage)
-
-    case ConfirmAddressPage => userAnswers => dataRequired(ConfirmAddressPage, userAnswers, defaultPage)
-    case ConnectedPersonsPage => userAnswers => dataRequired(ConnectedPersonsPage,userAnswers,defaultPage)
+    case NameOfSellerPage => userAnswers => dataRequired(NameOfSellerPage, userAnswers,sellerRoutes.StfSellerAddressController.onPageLoad())
+    case ConfirmAddressPage => userAnswers => dataRequired(ConfirmAddressPage, userAnswers, routes.NameOfSellerController.onPageLoad(NormalMode))
+    case ConnectedPersonsPage => userAnswers => dataRequired(ConnectedPersonsPage, userAnswers, defaultPage)
+    case SellerAddressPage => userAnswers => dataRequired(SellerAddressPage, userAnswers, routes.ConnectedPersonsController.onPageLoad(NormalMode))
     case _ => _ => defaultPageF
 
   }
 
-      val checkRouteMap: Page => UserAnswers => Call = (_ => _ => routes.CheckYourAnswersController.onPageLoad())
+  val checkRouteMap: Page => UserAnswers => Call = (_ => _ => routes.CheckYourAnswersController.onPageLoad())
 
   def nextPage(page: Page, mode: Mode, userAnswers: UserAnswers)(implicit request: Request[?]): Future[Call] = {
     mode match {

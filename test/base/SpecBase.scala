@@ -16,6 +16,7 @@
 
 package base
 
+import base.Fixtures.FakeAlfConnector
 import base.stubs.{StubStcAuthEnrolledAction, StubStcDataRequiredAction, StubStcDataRetrievalAction}
 import clients.FakeSaveAndReturnClient
 import controllers.actions.*
@@ -32,6 +33,7 @@ import play.api.test.FakeRequest
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.securitiestransferchargefrontend.clients.SaveAndReturnClient
 import uk.gov.hmrc.securitiestransferchargefrontend.clients.registration.Subscription
+import uk.gov.hmrc.securitiestransferchargefrontend.connectors.AlfAddressConnector
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.actions.*
 import uk.gov.hmrc.securitiestransferchargefrontend.domain.SubmissionId
 import uk.gov.hmrc.securitiestransferchargefrontend.models.UserAnswers
@@ -86,6 +88,7 @@ trait SpecBase
         bind[DataRequiredAction].to[DataRequiredActionImpl],
         bind[StcDataRequiredAction].toInstance(StubStcDataRequiredAction(userAnswers)),
         bind[DataRetrievalAction].toInstance(new FakeDataRetrievalAction(userAnswers)),
-        bind[SaveAndReturnClient].toInstance(saveAndReturnClient)
+        bind[SaveAndReturnClient].toInstance(saveAndReturnClient),
+        bind[AlfAddressConnector].to[FakeAlfConnector]
       )
 }
