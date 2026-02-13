@@ -16,17 +16,16 @@
 
 package base
 
-import play.api.mvc.AnyContentAsEmpty
+import play.api.mvc.Results.Redirect
+import play.api.mvc.{AnyContentAsEmpty, Result}
 import play.api.test.FakeRequest
 import uk.gov.hmrc.auth.core.*
 import uk.gov.hmrc.auth.core.authorise.Predicate
 import uk.gov.hmrc.auth.core.retrieve.Retrieval
 import uk.gov.hmrc.http.HeaderCarrier
+import uk.gov.hmrc.securitiestransferchargefrontend.connectors.AlfAddressConnector
 import uk.gov.hmrc.securitiestransferchargefrontend.domain.{SubmissionId, SubscriptionId}
-import uk.gov.hmrc.securitiestransferchargefrontend.models.UserAnswers
-import uk.gov.hmrc.securitiestransferchargefrontend.models.AlfAddress
-import uk.gov.hmrc.securitiestransferchargefrontend.models.AlfConfirmedAddress
-import uk.gov.hmrc.securitiestransferchargefrontend.models.Country
+import uk.gov.hmrc.securitiestransferchargefrontend.models.{AlfAddress, AlfConfirmedAddress, Country, UserAnswers}
 
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -82,5 +81,12 @@ object Fixtures {
 
     override def authorise[A](predicate: Predicate, retrieval: Retrieval[A])(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[A] =
       Future.failed(ex)
+  }
+
+  class FakeAlfConnector extends AlfAddressConnector {
+
+    override def alfRetrieveAddress(key: String)(implicit hc: HeaderCarrier): Future[AlfConfirmedAddress] = Future.successful(fakeAlfConfirmedAddress)
+
+    override def initAlfJourneyRequest(configFileLocation: String, returnUrl: String)(implicit hc: HeaderCarrier): Future[Result] = Future.successful(Redirect("/alf"))
   }
 }

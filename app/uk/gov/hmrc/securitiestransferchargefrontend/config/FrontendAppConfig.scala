@@ -58,6 +58,10 @@ class FrontendAppConfig @Inject() (configuration: Configuration, servicesConfig:
     s"$continueUrlBase/address/return"
 
   val buyersAlfConfigFileLocation: String = configuration.get[String]("alf.stf-buyers-config-file")
+  val alfSellerContinueUrl: String =
+    s"$continueUrlBase/seller/address/return"
+
+  val sellerAlfConfigFileLocation: String = configuration.get[String]("alf.stf-seller-config-file")
 
   private val exitSurveyBaseUrl: String = configuration.get[Service]("microservice.services.feedback-frontend").baseUrl
   val exitSurveyUrl: String             = s"$exitSurveyBaseUrl/feedback/securities-transfer-charge-frontend"

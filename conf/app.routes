@@ -45,3 +45,6 @@ POST       /stf/change/connected-persons                  uk.gov.hmrc.securities
 
 GET        /stf/address                                      uk.gov.hmrc.securitiestransferchargefrontend.controllers.AddressController.onPageLoad()
 GET        /stf/address/return                               uk.gov.hmrc.securitiestransferchargefrontend.controllers.AddressController.onReturn(id: String)
+
+GET        /stf/seller/address                                      uk.gov.hmrc.securitiestransferchargefrontend.controllers.seller.StfSellerAddressController.onPageLoad()
+GET        /stf/seller/address/return                               uk.gov.hmrc.securitiestransferchargefrontend.controllers.seller.StfSellerAddressController.onReturn(id: String)
