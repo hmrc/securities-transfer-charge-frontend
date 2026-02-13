@@ -11,7 +11,7 @@
     "showPhaseBanner": false,
     "alphaPhase": false,
     "disableTranslations": false,
-    "showBackButtons": false,
+    "showBackButtons": true,
     "includeHMRCBranding": true,
     "ukMode": false,
     "selectPageConfig": {
@@ -53,9 +53,9 @@
         "phaseBannerHtml": ""
       },
       "countryPickerLabels": {
-        "title": "Your address",
-        "heading": "Your address",
-        "countryLabel": "Which country do you live in?",
+        "title": "Buyer’s address",
+        "heading": "Buyer’s address",
+        "countryLabel": "Which country does the buyer live in?",
         "submitLabel": "Continue"
       },
       "lookupPageLabels": {
