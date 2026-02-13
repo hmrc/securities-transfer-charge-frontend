@@ -85,8 +85,8 @@
         "changeLinkText": "Edit address"
       },
       "editPageLabels": {
-        "title": "Enter the seller’s address",
-        "heading": "Enter the seller’s address",
+        "title": "What’s the seller’s address",
+        "heading": "What’s the seller’s address",
         "line1Label": "Address line 1",
         "line2Label": "Address line 2",
         "townLabel": "Town or city",
