@@ -42,6 +42,22 @@ class FrontendAppConfig @Inject() (configuration: Configuration, servicesConfig:
   val loginUrl: String         = configuration.get[String]("urls.login")
   val loginContinueUrl: String = configuration.get[String]("urls.loginContinue")
   val signOutUrl: String       = configuration.get[String]("urls.signOut")
+  val continueUrlBase: String = configuration.get[String]("urls.continue-url-base")
+  
+  // Address Lookup
+  private val addressLookupBaseUrl: String =
+    servicesConfig.baseUrl("address-lookup-frontend")
+
+  val alfInitUrl: String =
+    s"$addressLookupBaseUrl/api/init"
+
+  val alfRetrieveUrl: String =
+    s"$addressLookupBaseUrl/api/confirmed"
+
+  val alfStfBuyersContinueUrl: String =
+    s"$continueUrlBase/address/return"
+
+  val buyersAlfConfigFileLocation: String = configuration.get[String]("alf.stf-buyers-config-file")
 
   private val exitSurveyBaseUrl: String = configuration.get[Service]("microservice.services.feedback-frontend").baseUrl
   val exitSurveyUrl: String             = s"$exitSurveyBaseUrl/feedback/securities-transfer-charge-frontend"
