@@ -23,7 +23,8 @@ import org.scalatest.concurrent.ScalaFutures
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.routes
 import uk.gov.hmrc.securitiestransferchargefrontend.models.*
 import uk.gov.hmrc.securitiestransferchargefrontend.navigation.StfNavigator
-import uk.gov.hmrc.securitiestransferchargefrontend.pages.Page
+import uk.gov.hmrc.securitiestransferchargefrontend.pages.{Page, StfBuyersAddressPage}
+import base.Fixtures
 
 class StfNavigatorSpec extends SpecBase with ScalaFutures {
 
@@ -41,6 +42,14 @@ class StfNavigatorSpec extends SpecBase with ScalaFutures {
           res mustBe routes.JourneyRecoveryController.onPageLoad()
         }
 
+      }
+
+      "must go from the AddressLookup to NameOfSellerController" in {
+        val answers = emptyUserAnswers.set(StfBuyersAddressPage, Fixtures.fakeAlfConfirmedAddress).get
+        val result = navigator.nextPage(StfBuyersAddressPage, NormalMode, answers)(fakeRequest)
+        whenReady(result) { res =>
+          res mustBe routes.NameOfSellerController.onPageLoad(NormalMode)
+        }
       }
     }
 

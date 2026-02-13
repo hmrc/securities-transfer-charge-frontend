@@ -26,7 +26,7 @@ import uk.gov.hmrc.securitiestransferchargefrontend.controllers.actions.{StcAuth
 import uk.gov.hmrc.securitiestransferchargefrontend.models.NormalMode
 import uk.gov.hmrc.securitiestransferchargefrontend.navigation.Navigator
 import uk.gov.hmrc.securitiestransferchargefrontend.pages.AddressPage
-import uk.gov.hmrc.securitiestransferchargefrontend.pages.IndividualAddressPage
+import uk.gov.hmrc.securitiestransferchargefrontend.pages.StfBuyersAddressPage
 
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
@@ -40,11 +40,11 @@ class AddressController @Inject()(val controllerComponents: MessagesControllerCo
                                   config: FrontendAppConfig)
                                  (implicit ec: ExecutionContext) extends AbstractAddressController(alf):
 
-  val addressPage: AddressPage = IndividualAddressPage
+  val addressPage: AddressPage = StfBuyersAddressPage
 
   def onPageLoad: Action[AnyContent] = auth.async {
     implicit request =>
-      super.pageLoad(config.individualsAlfConfigFileLocation, config.alfIndividualsContinueUrl)
+      super.pageLoad(config.buyersAlfConfigFileLocation, config.alfStfBuyersContinueUrl)
   }
 
   def onReturn(addressId: String): Action[AnyContent] = (auth andThen getData andThen requireData).async {
@@ -52,7 +52,7 @@ class AddressController @Inject()(val controllerComponents: MessagesControllerCo
       implicit val hc: HeaderCarrier = HeaderCarrierConverter.fromRequestAndSession(request, request.session)
       for {
         address     <- super.alfReturn(addressId)
-        userAnswers <- Future.fromTry(request.userAnswers.set(IndividualAddressPage, address))
-        nextPage    <- navigator.nextPage(IndividualAddressPage, NormalMode, userAnswers)
+        userAnswers <- Future.fromTry(request.userAnswers.set(StfBuyersAddressPage, address))
+        nextPage    <- navigator.nextPage(StfBuyersAddressPage, NormalMode, userAnswers)
       } yield Redirect(nextPage)
   }

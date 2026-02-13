@@ -54,14 +54,10 @@ class FrontendAppConfig @Inject() (configuration: Configuration, servicesConfig:
   val alfRetrieveUrl: String =
     s"$addressLookupBaseUrl/api/confirmed"
 
-  val alfIndividualsContinueUrl: String =
+  val alfStfBuyersContinueUrl: String =
     s"$continueUrlBase/address/return"
 
-  val alfOrgContinueUrl: String =
-    s"$continueUrlBase/org/address/return"
-
-  val individualsAlfConfigFileLocation: String = configuration.get[String]("alf.individuals-config-file")
-  val organisationsAlfConfigFileLocation: String = configuration.get[String]("alf.organisations-config-file")
+  val buyersAlfConfigFileLocation: String = configuration.get[String]("alf.stf-buyers-config-file")
 
   private val exitSurveyBaseUrl: String = configuration.get[Service]("microservice.services.feedback-frontend").baseUrl
   val exitSurveyUrl: String             = s"$exitSurveyBaseUrl/feedback/securities-transfer-charge-frontend"

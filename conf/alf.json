@@ -44,7 +44,7 @@
       "timeoutUrl": "/there-is-a-problem",
       "timeoutKeepAliveUrl": "/refresh-session"
     },
-    "pageHeadingStyle": "govuk-heading-xl"
+    "pageHeadingStyle": "govuk-heading-l"
   },
   "labels": {
     "en": {
@@ -59,8 +59,8 @@
         "submitLabel": "Continue"
       },
       "lookupPageLabels": {
-        "title": "Find your address",
-        "heading": "Find your address",
+        "title": "Find the buyer’s address",
+        "heading": "Find the buyer’s address",
         "filterLabel": "Property name or number",
         "postcodeLabel": "Postcode",
         "submitLabel": "Continue",
@@ -69,8 +69,8 @@
         "manualAddressLinkText": "Enter the address manually"
       },
       "selectPageLabels": {
-        "title": "Select your address",
-        "heading": "Select your address",
+        "title": "Select the buyer’s address",
+        "heading": "Select the buyer’s address",
         "headingWithPostcode": "Addresses found for postcode {postcode}",
         "proposalListLabel": "Please select one of the following addresses",
         "submitLabel": "Continue",
@@ -78,15 +78,15 @@
         "editAddressLinkText": "Enter address manually"
       },
       "confirmPageLabels": {
-        "title": "Confirm your address",
-        "heading": "Confirm your address",
-        "infoSubheading": "Your selected address",
+        "title": "Confirm the buyer’s address",
+        "heading": "Confirm the buyer’s address",
+        "infoSubheading": "The buyer’s selected address",
         "submitLabel": "Confirm Address",
         "changeLinkText": "Edit address"
       },
       "editPageLabels": {
-        "title": "Enter your address",
-        "heading": "Enter your address",
+        "title": "Enter the buyer’s address",
+        "heading": "Enter the buyer’s address",
         "line1Label": "Address line 1",
         "line2Label": "Address line 2",
         "townLabel": "Town or city",

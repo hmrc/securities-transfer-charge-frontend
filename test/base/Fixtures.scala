@@ -24,6 +24,9 @@ import uk.gov.hmrc.auth.core.retrieve.Retrieval
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.securitiestransferchargefrontend.domain.{SubmissionId, SubscriptionId}
 import uk.gov.hmrc.securitiestransferchargefrontend.models.UserAnswers
+import uk.gov.hmrc.securitiestransferchargefrontend.models.AlfAddress
+import uk.gov.hmrc.securitiestransferchargefrontend.models.AlfConfirmedAddress
+import uk.gov.hmrc.securitiestransferchargefrontend.models.Country
 
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -61,6 +64,13 @@ object Fixtures {
   val organisationAffinity: AffinityGroup = AffinityGroup.Organisation
   
   val emptyUserAnswers: UserAnswers = UserAnswers.empty(testInternalId)(testSubmissionId)
+
+  val fakeAlfAddress: AlfAddress = AlfAddress(
+    List("1 high street", "bobbins on sea"), "ZZ1 1ZZ", Country("GB", "United Kingdom")
+  )
+  val fakeAlfConfirmedAddress: AlfConfirmedAddress = AlfConfirmedAddress(
+    "foo", Some("bar"), fakeAlfAddress
+  )
 
   class FakeAuthConnectorSuccess(value: Any) extends AuthConnector {
 
