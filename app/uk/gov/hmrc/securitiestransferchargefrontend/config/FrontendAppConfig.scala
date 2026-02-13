@@ -55,11 +55,11 @@ class FrontendAppConfig @Inject() (configuration: Configuration, servicesConfig:
     s"$addressLookupBaseUrl/api/confirmed"
 
   val alfStfBuyersContinueUrl: String =
-    s"$continueUrlBase/address/return"
+    s"$continueUrlBase/stf/address/return"
 
   val buyersAlfConfigFileLocation: String = configuration.get[String]("alf.stf-buyers-config-file")
   val alfSellerContinueUrl: String =
-    s"$continueUrlBase/seller/address/return"
+    s"$continueUrlBase/stf/seller/address/return"
 
   val sellerAlfConfigFileLocation: String = configuration.get[String]("alf.stf-seller-config-file")
 
