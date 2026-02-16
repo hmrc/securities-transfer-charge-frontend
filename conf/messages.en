@@ -117,3 +117,10 @@ applyingForRelief.error.required = Select yes if you are applying for a relief
 applyingForRelief.change.hidden = Change applying for a relief
 applyingForRelief.p = See a
 applyingForRelief.details.content.link.text = full list of reliefs
+
+securitiesTarget.title = securitiesTarget
+securitiesTarget.heading = securitiesTarget
+securitiesTarget.checkYourAnswersLabel = securitiesTarget
+securitiesTarget.error.required = Enter securitiesTarget
+securitiesTarget.error.length = SecuritiesTarget must be 1000 characters or less
+securitiesTarget.change.hidden = SecuritiesTarget

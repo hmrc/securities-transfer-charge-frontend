@@ -53,3 +53,8 @@ GET        /stf/apply-relief                      uk.gov.hmrc.securitiestransfer
 POST       /stf/apply-relief                         uk.gov.hmrc.securitiestransferchargefrontend.controllers.ApplyingForReliefController.onSubmit(mode: Mode = NormalMode)
 GET        /stf/change-apply-relief                  uk.gov.hmrc.securitiestransferchargefrontend.controllers.ApplyingForReliefController.onPageLoad(mode: Mode = CheckMode)
 POST       /stf/change-apply-relief                   uk.gov.hmrc.securitiestransferchargefrontend.controllers.ApplyingForReliefController.onSubmit(mode: Mode = CheckMode)
+
+GET        /securitiesTarget                        uk.gov.hmrc.securitiestransferchargefrontend.controllers.SecuritiesTargetController.onPageLoad(mode: Mode = NormalMode)
+POST       /securitiesTarget                        uk.gov.hmrc.securitiestransferchargefrontend.controllers.SecuritiesTargetController.onSubmit(mode: Mode = NormalMode)
+GET        /changeSecuritiesTarget                  uk.gov.hmrc.securitiestransferchargefrontend.controllers.SecuritiesTargetController.onPageLoad(mode: Mode = CheckMode)
+POST       /changeSecuritiesTarget                  uk.gov.hmrc.securitiestransferchargefrontend.controllers.SecuritiesTargetController.onSubmit(mode: Mode = CheckMode)
