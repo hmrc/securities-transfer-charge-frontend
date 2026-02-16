@@ -84,6 +84,14 @@ class StfNavigatorSpec extends SpecBase with ScalaFutures {
           res mustBe routes.ConnectedPersonsController.onPageLoad(NormalMode)
         }
       }
+
+      "must go from the ConnectedPersonsPage to ApplyingForReliefController" in {
+        val answers = emptyUserAnswers.set(ConnectedPersonsPage, true).get
+        val result = navigator.nextPage(ConnectedPersonsPage, NormalMode, answers)(fakeRequest)
+        whenReady(result) { res =>
+          res mustBe routes.ApplyingForReliefController.onPageLoad(NormalMode)
+        }
+      }
     }
 
     "in Check mode" - {

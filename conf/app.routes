@@ -48,3 +48,8 @@ GET        /stf/address/return                               uk.gov.hmrc.securit
 
 GET        /stf/seller/address                                      uk.gov.hmrc.securitiestransferchargefrontend.controllers.seller.StfSellerAddressController.onPageLoad()
 GET        /stf/seller/address/return                               uk.gov.hmrc.securitiestransferchargefrontend.controllers.seller.StfSellerAddressController.onReturn(id: String)
+
+GET        /stf/apply-relief                      uk.gov.hmrc.securitiestransferchargefrontend.controllers.ApplyingForReliefController.onPageLoad(mode: Mode = NormalMode)
+POST       /stf/apply-relief                         uk.gov.hmrc.securitiestransferchargefrontend.controllers.ApplyingForReliefController.onSubmit(mode: Mode = NormalMode)
+GET        /stf/change-apply-relief                  uk.gov.hmrc.securitiestransferchargefrontend.controllers.ApplyingForReliefController.onPageLoad(mode: Mode = CheckMode)
+POST       /stf/change-apply-relief                   uk.gov.hmrc.securitiestransferchargefrontend.controllers.ApplyingForReliefController.onSubmit(mode: Mode = CheckMode)

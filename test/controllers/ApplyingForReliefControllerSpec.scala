@@ -26,32 +26,32 @@ import play.api.test.Helpers.*
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.securitiestransferchargefrontend.clients.SaveAndReturnClient
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.routes
-import uk.gov.hmrc.securitiestransferchargefrontend.forms.ConnectedPersonsFormProvider
+import uk.gov.hmrc.securitiestransferchargefrontend.forms.ApplyingForReliefFormProvider
 import uk.gov.hmrc.securitiestransferchargefrontend.models.{NormalMode, UserAnswers}
-import uk.gov.hmrc.securitiestransferchargefrontend.pages.ConnectedPersonsPage
-import uk.gov.hmrc.securitiestransferchargefrontend.views.html.ConnectedPersonsView
+import uk.gov.hmrc.securitiestransferchargefrontend.pages.ApplyingForReliefPage
+import uk.gov.hmrc.securitiestransferchargefrontend.views.html.ApplyingForReliefView
 
 import scala.concurrent.Future
 
-class ConnectedPersonsControllerSpec extends SpecBase with MockitoSugar {
+class ApplyingForReliefControllerSpec extends SpecBase with MockitoSugar {
   
-  val formProvider = new ConnectedPersonsFormProvider()
+  val formProvider = new ApplyingForReliefFormProvider()
   val form: Form[Boolean] = formProvider()
 
-  lazy val connectedPersonsRoute: String = routes.ConnectedPersonsController.onPageLoad(NormalMode).url
+  lazy val applyingForReliefRoute: String = routes.ApplyingForReliefController.onPageLoad(NormalMode).url
 
-  "ConnectedPersons Controller" - {
+  "ApplyingForRelief Controller" - {
 
     "must return OK and the correct view for a GET" in {
 
       val application = applicationBuilder(userAnswers = Some(emptyUserAnswers)).build()
 
       running(application) {
-        val request = FakeRequest(GET, connectedPersonsRoute)
+        val request = FakeRequest(GET, applyingForReliefRoute)
 
         val result = route(application, request).value
 
-        val view = application.injector.instanceOf[ConnectedPersonsView]
+        val view = application.injector.instanceOf[ApplyingForReliefView]
 
         status(result) mustEqual OK
         contentAsString(result) mustEqual view(form, NormalMode)(request, messages(application)).toString
@@ -60,14 +60,14 @@ class ConnectedPersonsControllerSpec extends SpecBase with MockitoSugar {
 
     "must populate the view correctly on a GET when the question has previously been answered" in {
 
-      val userAnswers = UserAnswers(userAnswersId,submissionId).set(ConnectedPersonsPage, true).success.value
+      val userAnswers = UserAnswers(userAnswersId,submissionId).set(ApplyingForReliefPage, true).success.value
 
       val application = applicationBuilder(userAnswers = Some(userAnswers)).build()
 
       running(application) {
-        val request = FakeRequest(GET, connectedPersonsRoute)
+        val request = FakeRequest(GET, applyingForReliefRoute)
 
-        val view = application.injector.instanceOf[ConnectedPersonsView]
+        val view = application.injector.instanceOf[ApplyingForReliefView]
 
         val result = route(application, request).value
 
@@ -89,13 +89,13 @@ class ConnectedPersonsControllerSpec extends SpecBase with MockitoSugar {
 
       running(application) {
         val request =
-          FakeRequest(POST, connectedPersonsRoute)
+          FakeRequest(POST, applyingForReliefRoute)
             .withFormUrlEncodedBody(("value", "true"))
 
         val result = route(application, request).value
 
         status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual routes.ApplyingForReliefController.onPageLoad(NormalMode).url
+        redirectLocation(result).value mustEqual routes.JourneyRecoveryController.onPageLoad().url
       }
     }
 
@@ -105,12 +105,12 @@ class ConnectedPersonsControllerSpec extends SpecBase with MockitoSugar {
 
       running(application) {
         val request =
-          FakeRequest(POST, connectedPersonsRoute)
+          FakeRequest(POST, applyingForReliefRoute)
             .withFormUrlEncodedBody(("value", ""))
 
         val boundForm = form.bind(Map("value" -> ""))
 
-        val view = application.injector.instanceOf[ConnectedPersonsView]
+        val view = application.injector.instanceOf[ApplyingForReliefView]
 
         val result = route(application, request).value
 
@@ -118,14 +118,28 @@ class ConnectedPersonsControllerSpec extends SpecBase with MockitoSugar {
         contentAsString(result) mustEqual view(boundForm, NormalMode)(request, messages(application)).toString
       }
     }
-    
+
+    "must redirect to Journey Recovery for a GET if no existing data is found" in {
+
+      val application = applicationBuilder(userAnswers = None).build()
+
+      running(application) {
+        val request = FakeRequest(GET, applyingForReliefRoute)
+
+        val result = route(application, request).value
+
+        status(result) mustEqual SEE_OTHER
+        redirectLocation(result).value mustEqual routes.JourneyRecoveryController.onPageLoad().url
+      }
+    }
+
     "must redirect to Journey Recovery for a POST if no existing data is found" in {
 
       val application = applicationBuilder(userAnswers = None).build()
 
       running(application) {
         val request =
-          FakeRequest(POST, connectedPersonsRoute)
+          FakeRequest(POST, applyingForReliefRoute)
             .withFormUrlEncodedBody(("value", "true"))
 
         val result = route(application, request).value
