@@ -41,8 +41,7 @@ class ALFJsonApostropheSpec extends SpecBase {
   }
 
   "ALF test json file" - {
-
-    "should fail for incorrect apostrophes " in {
+    "should fail when ASCII apostrophes are present" in {
       val thrown = intercept[TestFailedException] {
         assertNoAsciiApostrophes("/alf-test.json")
       }
