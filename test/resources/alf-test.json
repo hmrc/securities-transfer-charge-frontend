@@ -1,0 +1,17 @@
+{
+  "version": 2,
+  "labels": {
+    "en": {
+      "appLevelLabels": {
+        "navTitle": "",
+        "phaseBannerHtml": ""
+      },
+      "countryPickerLabels": {
+        "title": "Buyer's address",
+        "heading": "Buyer's address",
+        "countryLabel": "Which country does the buyer live in?",
+        "submitLabel": "Continue"
+      }
+    }
+  }
+}
