@@ -118,9 +118,12 @@ applyingForRelief.change.hidden = Change applying for a relief
 applyingForRelief.p = See a
 applyingForRelief.details.content.link.text = full list of reliefs
 
-securitiesTarget.title = securitiesTarget
-securitiesTarget.heading = securitiesTarget
-securitiesTarget.checkYourAnswersLabel = securitiesTarget
-securitiesTarget.error.required = Enter securitiesTarget
-securitiesTarget.error.length = SecuritiesTarget must be 1000 characters or less
+securitiesTarget.title = What business are you buying these securities in?
+securitiesTarget.heading = What business are you buying these securities in?
+securitiesTarget.checkYourAnswersLabel = What business are you buying these securities in?
+securitiesTarget.error.required = Enter the name of the business you're buying securities in
+securitiesTarget.error.length = The name of the business must be 1000 characters or less
 securitiesTarget.change.hidden = SecuritiesTarget
+
+businessName.hint = Business name
+

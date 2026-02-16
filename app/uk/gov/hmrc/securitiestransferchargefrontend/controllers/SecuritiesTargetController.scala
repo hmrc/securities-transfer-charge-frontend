@@ -35,9 +35,9 @@ import scala.concurrent.{ExecutionContext, Future}
 class SecuritiesTargetController @Inject()(
                                         override val messagesApi: MessagesApi,
                                         navigator: Navigator,
-                                        identify: IdentifierAction,
-                                        getData: DataRetrievalAction,
-                                        requireData: DataRequiredAction,
+                                        stcAuthEnrolled: StcAuthEnrolledAction,
+                                        getData: StcDataRetrievalAction,
+                                        requireData: StcDataRequiredAction,
                                         formProvider: SecuritiesTargetFormProvider,
                                         val controllerComponents: MessagesControllerComponents,
                                         view: SecuritiesTargetView
@@ -45,7 +45,7 @@ class SecuritiesTargetController @Inject()(
 
   val form: Form[String] = formProvider()
 
-  def onPageLoad(mode: Mode): Action[AnyContent] = (identify andThen getData andThen requireData) {
+  def onPageLoad(mode: Mode): Action[AnyContent] = (stcAuthEnrolled andThen getData andThen requireData) {
     implicit request =>
 
       val preparedForm = request.userAnswers.get(SecuritiesTargetPage) match {
@@ -56,7 +56,7 @@ class SecuritiesTargetController @Inject()(
       Ok(view(preparedForm, mode): Html)
   }
 
-  def onSubmit(mode: Mode): Action[AnyContent] = (identify andThen getData andThen requireData).async {
+  def onSubmit(mode: Mode): Action[AnyContent] = (stcAuthEnrolled andThen getData andThen requireData).async {
     implicit request =>
 
       form.bindFromRequest().fold(
