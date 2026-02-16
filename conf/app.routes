@@ -51,5 +51,10 @@ GET        /stf/seller/address/return                               uk.gov.hmrc.
 
 GET        /stf/apply-relief                      uk.gov.hmrc.securitiestransferchargefrontend.controllers.ApplyingForReliefController.onPageLoad(mode: Mode = NormalMode)
 POST       /stf/apply-relief                         uk.gov.hmrc.securitiestransferchargefrontend.controllers.ApplyingForReliefController.onSubmit(mode: Mode = NormalMode)
-GET        /stf/change-apply-relief                  uk.gov.hmrc.securitiestransferchargefrontend.controllers.ApplyingForReliefController.onPageLoad(mode: Mode = CheckMode)
-POST       /stf/change-apply-relief                   uk.gov.hmrc.securitiestransferchargefrontend.controllers.ApplyingForReliefController.onSubmit(mode: Mode = CheckMode)
+GET        /stf/change/apply-relief                  uk.gov.hmrc.securitiestransferchargefrontend.controllers.ApplyingForReliefController.onPageLoad(mode: Mode = CheckMode)
+POST       /stf/change/apply-relief                   uk.gov.hmrc.securitiestransferchargefrontend.controllers.ApplyingForReliefController.onSubmit(mode: Mode = CheckMode)
+
+GET        /stf/select-relief                     uk.gov.hmrc.securitiestransferchargefrontend.controllers.WhatReliefAreYouApplyingForController.onPageLoad(mode: Mode = NormalMode)
+POST       /stf/select-relief                       uk.gov.hmrc.securitiestransferchargefrontend.controllers.WhatReliefAreYouApplyingForController.onSubmit(mode: Mode = NormalMode)
+GET        /stf/change/select-relief                  uk.gov.hmrc.securitiestransferchargefrontend.controllers.WhatReliefAreYouApplyingForController.onPageLoad(mode: Mode = CheckMode)
+POST       /stf/change/select-relief                  uk.gov.hmrc.securitiestransferchargefrontend.controllers.WhatReliefAreYouApplyingForController.onSubmit(mode: Mode = CheckMode)
