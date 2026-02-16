@@ -17,6 +17,7 @@
 package conf
 
 import base.SpecBase
+import org.scalatest.exceptions.TestFailedException
 import play.api.libs.json.*
 
 import scala.io.Source
@@ -35,6 +36,17 @@ class ALFJsonApostropheSpec extends SpecBase {
 
     "should not contain ASCII apostrophes (')" in {
       assertNoAsciiApostrophes("/alf-seller.json")
+    }
+
+  }
+
+  "ALF test json file" - {
+
+    "should fail for incorrect apostrophes " in {
+      val thrown = intercept[TestFailedException] {
+        assertNoAsciiApostrophes("/alf-test.json")
+      }
+      thrown.getMessage must include("Buyer's address")
     }
 
   }
@@ -67,5 +79,4 @@ class ALFJsonApostropheSpec extends SpecBase {
 
     assert(failures.isEmpty, msg)
   }
-
 }

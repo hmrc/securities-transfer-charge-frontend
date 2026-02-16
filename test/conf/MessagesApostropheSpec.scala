@@ -17,8 +17,8 @@
 package conf
 
 import base.SpecBase
+import org.scalatest.exceptions.TestFailedException
 
-import java.io.File
 import scala.io.Source
 
 class MessagesApostropheSpec extends SpecBase {
@@ -38,20 +38,26 @@ class MessagesApostropheSpec extends SpecBase {
     assert(failures.isEmpty, message)
   }
 
+  private def readFileLines(path: String): List[String] = {
+    val source = Source.fromFile(path, "UTF-8")
+    try source.getLines().toList
+    finally source.close()
+  }
+
   "Messages apostrophes check" - {
     "should check the messages.en file" in {
-      val messagesFile = new File("conf/messages.en")
-      messagesFile.exists() mustBe true
-
-      val lines: List[String] = {
-        val source = Source.fromFile(messagesFile, "UTF-8")
-        try source.getLines().toList
-        finally source.close()
-      }
-
-      checkApostrophes(lines, messagesFile.getName)
+      val fileName = "messages.en"
+      readFileLines("conf/messages.en")
+      checkApostrophes(readFileLines("conf/messages.en"),fileName)
     }
 
+    "should fail when ASCII apostrophes are present" in {
+      val fileName = "messages.en"
+      val thrown = intercept[TestFailedException] {
+        checkApostrophes(readFileLines("test/resources/messages.en"), fileName)
+      }
+      thrown.getMessage must include("This message contains incorrect 'apostrophe'")
+    }
   }
 }
 
