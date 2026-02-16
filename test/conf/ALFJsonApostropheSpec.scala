@@ -62,8 +62,6 @@ class ALFJsonApostropheSpec extends SpecBase {
     val msg =
       s"""
          |ASCII apostrophes (') found in $resourcePath.
-         |Use typographic apostrophe (’) instead:
-         |
          |${failures.mkString("\n")}
          |""".stripMargin
 
