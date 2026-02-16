@@ -41,8 +41,13 @@
     <h1 class="govuk-heading-l">@messages("confirmAddress.heading")</h1>
     @address_confirmation_display(address)
     <p class="govuk-body">
-        <a class="govuk-link" href="" id="editAddressLink">@{messages("confirmAddress.editLink")}</a>
-    </p>
+        <a class="govuk-link"
+            href="@routes.AddressController.onPageLoad().url"
+            id="editAddressLink">
+            @messages("confirmAddress.editLink")
+        </a>
+</p>
+
 
     @govukButton(
         ButtonViewModel(messages("confirmAddress.confirm"))

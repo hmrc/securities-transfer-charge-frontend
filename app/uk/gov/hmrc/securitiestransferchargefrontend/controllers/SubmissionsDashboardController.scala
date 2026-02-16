@@ -19,7 +19,7 @@ package uk.gov.hmrc.securitiestransferchargefrontend.controllers
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
-import uk.gov.hmrc.securitiestransferchargefrontend.clients.SubmissionIdClient
+import uk.gov.hmrc.securitiestransferchargefrontend.clients.{SaveAndReturnClient, SubmissionIdClient}
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.actions.{StcAuthEnrolledAction, StcDataRetrievalAction}
 import uk.gov.hmrc.securitiestransferchargefrontend.models.{NormalMode, UserAnswers}
 import uk.gov.hmrc.securitiestransferchargefrontend.navigation.Navigator
@@ -36,13 +36,20 @@ class SubmissionsDashboardController @Inject()(
                                                 getData: StcDataRetrievalAction,
                                                 view: SubmissionsDashboardView,
                                                 idClient: SubmissionIdClient,
+                                                saveAndReturnClient: SaveAndReturnClient,
                                                 navigator: Navigator)
                                               (implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport {
 
-  def onPageLoad: Action[AnyContent] = (stcAuthEnrolled andThen getData) {
-    implicit request =>
-      Ok(view())
-  }
+  def onPageLoad: Action[AnyContent] =
+    (stcAuthEnrolled andThen getData).async { implicit request =>
+
+      val userId = request.request.internalId
+
+      saveAndReturnClient.list(userId).map { submissionIds =>
+        Ok(view(submissionIds))
+      }
+    }
+
 
   def onSubmit(): Action[AnyContent] = (stcAuthEnrolled andThen getData).async {
     implicit request =>

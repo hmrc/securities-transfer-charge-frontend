@@ -66,6 +66,12 @@ submissionsDashboard.heading = Submissions
 submissionsDashboard.create-new-submission.button = Create new submission
 submissionsDashboard.hint = Submission dashboard
 
+submissionsDashboard.table.submissionId = Submission ID
+submissionsDashboard.table.moneyOwed = Money owed
+submissionsDashboard.table.chargeDueBy = Charge due by
+submissionsDashboard.table.status = Status
+submissionsDashboard.table.action = Action
+
 howToNotifyAboutSecuritiesTransfer.title = How do you want to tell us about your securities transfer?
 howToNotifyAboutSecuritiesTransfer.heading = How do you want to tell us about your securities transfer?
 howToNotifyAboutSecuritiesTransfer.oneAtATime = One at a time
@@ -83,3 +89,23 @@ nameOfSeller.error.required = Enter the seller’s full name
 nameOfSeller.error.length = Seller’s name must be 35 characters or less
 nameOfSeller.change.hidden = NameOfSeller
 nameOfSeller.hint = This can be the name of a business, person or another entity.
+
+sectionTitle.transferDetails = Transfer details
+connectedPersons.title = Connected persons
+connectedPersons.heading = Connected persons
+connectedPersons.legend = Are you and the seller of these securities connected?
+connectedPersons.checkYourAnswersLabel = Connected persons
+connectedPersons.error.required = Select yes if you and the seller are ’connected persons’
+connectedPersons.p = We need to know if you and the seller of these securities are considered ’connected persons’ for tax purposes. Connected persons include spouses, civil partners and close relatives.
+connectedPersons.details.summary = Read more about connected persons
+connectedPersons.details.content.p1 = You are considered connected with the following people:
+connectedPersons.details.content.l1 = your husband, wife or civil partner
+connectedPersons.details.content.l2 = your relatives and their husbands, wives or civil partners
+connectedPersons.details.content.l3 = your husband’s, wife's or civil partner's relatives and their husbands, wives or civil partners
+connectedPersons.details.content.l4 = the trustees of a settlement of which you are a settlor, or of which a person who is still alive and who is connected with you is a settlor
+connectedPersons.details.content.p2 = Relative means a brother, sister, ancestor or descendant. It does not include nephews, nieces, uncles and aunts.
+connectedPersons.details.content.link.text = Read HMRC guidance on connected persons
+
+site.save-and-continue.button = Save and continue
+site.save-and-return.button = Save and return to dashboard
+

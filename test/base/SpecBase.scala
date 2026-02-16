@@ -16,6 +16,7 @@
 
 package base
 
+import base.Fixtures.FakeAlfConnector
 import base.stubs.{StubSessionRepository, StubStcAuthEnrolledAction, StubStcDataRequiredAction, StubStcDataRetrievalAction}
 import clients.FakeSaveAndReturnClient
 import controllers.actions.*
@@ -32,6 +33,7 @@ import play.api.test.FakeRequest
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.securitiestransferchargefrontend.clients.SaveAndReturnClient
 import uk.gov.hmrc.securitiestransferchargefrontend.clients.registration.Subscription
+import uk.gov.hmrc.securitiestransferchargefrontend.connectors.AlfAddressConnector
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.actions.*
 import uk.gov.hmrc.securitiestransferchargefrontend.domain.SubmissionId
 import uk.gov.hmrc.securitiestransferchargefrontend.models.UserAnswers
@@ -54,6 +56,7 @@ trait SpecBase
   val userAnswersId: String = "id"
   val sessionId = "sessionId1234"
   val submissionId: SubmissionId = SubmissionId("STC-123456789")
+  val userId = "internalId"
 
   val subscription: Subscription = Subscription(
     subsValidTo = LocalDate.now().plusDays(5),
@@ -88,6 +91,7 @@ trait SpecBase
         bind[StcDataRequiredAction].toInstance(StubStcDataRequiredAction(userAnswers)),
         bind[DataRetrievalAction].toInstance(new FakeDataRetrievalAction(userAnswers)),
         bind[SaveAndReturnClient].toInstance(saveAndReturnClient),
+        bind[AlfAddressConnector].to[FakeAlfConnector],
         bind[SessionRepository].toInstance(sessionRepository)
       )
 }

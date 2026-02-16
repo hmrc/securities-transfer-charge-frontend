@@ -17,41 +17,41 @@
 package controllers
 
 import base.SpecBase
-import navigation.FakeNavigator
+import org.mockito.ArgumentMatchers.any
+import org.mockito.Mockito.when
 import org.scalatestplus.mockito.MockitoSugar
 import play.api.data.Form
-import play.api.inject.bind
-import play.api.mvc.Call
 import play.api.test.FakeRequest
 import play.api.test.Helpers.*
+import uk.gov.hmrc.http.HeaderCarrier
+import uk.gov.hmrc.securitiestransferchargefrontend.clients.SaveAndReturnClient
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.routes
-import uk.gov.hmrc.securitiestransferchargefrontend.forms.NameOfSellerFormProvider
+import uk.gov.hmrc.securitiestransferchargefrontend.forms.ConnectedPersonsFormProvider
 import uk.gov.hmrc.securitiestransferchargefrontend.models.{NormalMode, UserAnswers}
-import uk.gov.hmrc.securitiestransferchargefrontend.navigation.Navigator
-import uk.gov.hmrc.securitiestransferchargefrontend.pages.NameOfSellerPage
-import uk.gov.hmrc.securitiestransferchargefrontend.views.html.NameOfSellerView
+import uk.gov.hmrc.securitiestransferchargefrontend.pages.ConnectedPersonsPage
+import uk.gov.hmrc.securitiestransferchargefrontend.views.html.ConnectedPersonsView
 
-class NameOfSellerControllerSpec extends SpecBase with MockitoSugar {
+import scala.concurrent.Future
 
-  def onwardRoute = Call("GET", "/foo")
+class ConnectedPersonsControllerSpec extends SpecBase with MockitoSugar {
+  
+  val formProvider = new ConnectedPersonsFormProvider()
+  val form: Form[Boolean] = formProvider()
 
-  val formProvider = new NameOfSellerFormProvider()
-  val form: Form[String] = formProvider()
+  lazy val connectedPersonsRoute: String = routes.ConnectedPersonsController.onPageLoad(NormalMode).url
 
-  lazy val nameOfSellerRoute: String = routes.NameOfSellerController.onPageLoad(NormalMode).url
-
-  "NameOfSeller Controller" - {
+  "ConnectedPersons Controller" - {
 
     "must return OK and the correct view for a GET" in {
 
       val application = applicationBuilder(userAnswers = Some(emptyUserAnswers)).build()
 
       running(application) {
-        val request = FakeRequest(GET, nameOfSellerRoute)
+        val request = FakeRequest(GET, connectedPersonsRoute)
 
         val result = route(application, request).value
 
-        val view = application.injector.instanceOf[NameOfSellerView]
+        val view = application.injector.instanceOf[ConnectedPersonsView]
 
         status(result) mustEqual OK
         contentAsString(result) mustEqual view(form, NormalMode)(request, messages(application)).toString
@@ -60,39 +60,42 @@ class NameOfSellerControllerSpec extends SpecBase with MockitoSugar {
 
     "must populate the view correctly on a GET when the question has previously been answered" in {
 
-      val userAnswers = UserAnswers(userAnswersId, submissionId).set(NameOfSellerPage, "answer").success.value
+      val userAnswers = UserAnswers(userAnswersId,submissionId).set(ConnectedPersonsPage, true).success.value
 
       val application = applicationBuilder(userAnswers = Some(userAnswers)).build()
 
       running(application) {
-        val request = FakeRequest(GET, nameOfSellerRoute)
+        val request = FakeRequest(GET, connectedPersonsRoute)
 
-        val view = application.injector.instanceOf[NameOfSellerView]
+        val view = application.injector.instanceOf[ConnectedPersonsView]
 
         val result = route(application, request).value
 
         status(result) mustEqual OK
-        contentAsString(result) mustEqual view(form.fill("answer"), NormalMode)(request, messages(application)).toString
+        contentAsString(result) mustEqual view(form.fill(true), NormalMode)(request, messages(application)).toString
       }
     }
 
     "must redirect to the next page when valid data is submitted" in {
+
+      val saveAndReturnClient = mock[SaveAndReturnClient]
+
+      when(saveAndReturnClient.save(any[UserAnswers]())(any[HeaderCarrier]()))
+        .thenReturn(Future.successful(()))
+
       val application =
         applicationBuilder(userAnswers = Some(emptyUserAnswers))
-          .overrides(
-            bind[Navigator].toInstance(new FakeNavigator(onwardRoute))
-          )
           .build()
 
       running(application) {
         val request =
-          FakeRequest(POST, nameOfSellerRoute)
-            .withFormUrlEncodedBody(("value", "answer"))
+          FakeRequest(POST, connectedPersonsRoute)
+            .withFormUrlEncodedBody(("value", "true"))
 
         val result = route(application, request).value
 
         status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual onwardRoute.url
+        redirectLocation(result).value mustEqual routes.JourneyRecoveryController.onPageLoad().url
       }
     }
 
@@ -102,12 +105,12 @@ class NameOfSellerControllerSpec extends SpecBase with MockitoSugar {
 
       running(application) {
         val request =
-          FakeRequest(POST, nameOfSellerRoute)
+          FakeRequest(POST, connectedPersonsRoute)
             .withFormUrlEncodedBody(("value", ""))
 
         val boundForm = form.bind(Map("value" -> ""))
 
-        val view = application.injector.instanceOf[NameOfSellerView]
+        val view = application.injector.instanceOf[ConnectedPersonsView]
 
         val result = route(application, request).value
 
@@ -115,24 +118,21 @@ class NameOfSellerControllerSpec extends SpecBase with MockitoSugar {
         contentAsString(result) mustEqual view(boundForm, NormalMode)(request, messages(application)).toString
       }
     }
-
-
+    
     "must redirect to Journey Recovery for a POST if no existing data is found" in {
 
       val application = applicationBuilder(userAnswers = None).build()
 
       running(application) {
         val request =
-          FakeRequest(POST, nameOfSellerRoute)
-            .withFormUrlEncodedBody(("value", "answer"))
+          FakeRequest(POST, connectedPersonsRoute)
+            .withFormUrlEncodedBody(("value", "true"))
 
         val result = route(application, request).value
 
         status(result) mustEqual SEE_OTHER
-
         redirectLocation(result).value mustEqual routes.JourneyRecoveryController.onPageLoad().url
       }
     }
-
   }
 }

@@ -17,37 +17,136 @@
 package controllers
 
 import base.SpecBase
-import play.api.mvc.*
+import org.mockito.Mockito.{verify, when}
+import org.scalatestplus.mockito.MockitoSugar
+import org.mockito.ArgumentMatchers.any
+import play.api.inject.bind
+import play.api.test.FakeRequest
 import play.api.test.Helpers.*
-import play.api.test.{FakeRequest, Helpers}
+import uk.gov.hmrc.securitiestransferchargefrontend.clients.{SaveAndReturnClient, SubmissionIdClient}
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.routes
+import uk.gov.hmrc.securitiestransferchargefrontend.domain.SubmissionId
+import uk.gov.hmrc.securitiestransferchargefrontend.models.NormalMode
 import uk.gov.hmrc.securitiestransferchargefrontend.views.html.SubmissionsDashboardView
 
-class SubmissionsDashboardControllerSpec extends SpecBase {
+import scala.concurrent.Future
+
+class SubmissionsDashboardControllerSpec extends SpecBase with MockitoSugar {
 
   lazy val submissionsDashboardRoute: String =
     routes.SubmissionsDashboardController.onPageLoad().url
 
   "SubmissionsDashboardController" - {
 
-    "must return OK and the correct view for a GET" in {
+    "GET onPageLoad" - {
 
-      val application =
-        applicationBuilder().build()
+      "must return OK and the correct view when no submissions exist" in {
 
-      running(application) {
-        val request = FakeRequest(GET, submissionsDashboardRoute)
+        val mockSaveAndReturnClient = mock[SaveAndReturnClient]
 
-        val result = route(application, request).value
-        val view   = application.injector.instanceOf[SubmissionsDashboardView]
+        when(mockSaveAndReturnClient.list(any[String])(any()))
+          .thenReturn(Future.successful(List.empty))
 
-        status(result) mustEqual OK
-        contentAsString(result) mustEqual
-          view()(
-            request,
-            messages(application)
-          ).toString
+        val application =
+          applicationBuilder(
+            saveAndReturnClient = mockSaveAndReturnClient
+          ).build()
+
+        running(application) {
+
+          val request = FakeRequest(GET, submissionsDashboardRoute)
+
+          val result = route(application, request).value
+          val view = application.injector.instanceOf[SubmissionsDashboardView]
+
+          status(result) mustEqual OK
+
+          contentAsString(result) mustEqual
+            view(List.empty)(
+              request,
+              messages(application)
+            ).toString
+
+          verify(mockSaveAndReturnClient).list(any[String])(any())
+        }
+      }
+
+      "must return OK and render submission IDs when they exist" in {
+
+        val mockSaveAndReturnClient = mock[SaveAndReturnClient]
+
+        val submissionIds = List(
+          SubmissionId("STC-123456789"),
+          SubmissionId("STC-987654321")
+        )
+
+        when(mockSaveAndReturnClient.list(any[String])(any()))
+          .thenReturn(Future.successful(submissionIds))
+
+        val application =
+          applicationBuilder(
+            saveAndReturnClient = mockSaveAndReturnClient
+          ).build()
+
+        running(application) {
+
+          val request = FakeRequest(GET, submissionsDashboardRoute)
+
+          val result = route(application, request).value
+          val view = application.injector.instanceOf[SubmissionsDashboardView]
+
+          status(result) mustEqual OK
+
+          contentAsString(result) mustEqual
+            view(submissionIds)(
+              request,
+              messages(application)
+            ).toString
+
+          verify(mockSaveAndReturnClient).list(any[String])(any())
+        }
+      }
+    }
+
+    "POST onSubmit" - {
+
+      "must generate a submissionId and redirect to the next page" in {
+
+        val mockSaveAndReturnClient = mock[SaveAndReturnClient]
+        val mockIdClient            = mock[SubmissionIdClient]
+
+        val generatedSubmissionId = SubmissionId("STC-111111111")
+
+        when(mockIdClient.nextSubmissionId())
+          .thenReturn(Future.successful(generatedSubmissionId))
+
+        when(mockSaveAndReturnClient.save(any())(any()))
+          .thenReturn(Future.successful(()))
+
+        val application =
+          applicationBuilder(
+            saveAndReturnClient = mockSaveAndReturnClient
+          )
+            .overrides(
+              bind[SubmissionIdClient].toInstance(mockIdClient)
+            )
+            .build()
+
+        running(application) {
+
+          val request = FakeRequest(
+            POST,
+            routes.SubmissionsDashboardController.onSubmit().url
+          )
+
+          val result = route(application, request).value
+
+          status(result) mustEqual SEE_OTHER
+
+          redirectLocation(result).value mustEqual routes.HowToNotifyAboutSecuritiesTransferController.onPageLoad(NormalMode).url
+        }
       }
     }
   }
 }
+
