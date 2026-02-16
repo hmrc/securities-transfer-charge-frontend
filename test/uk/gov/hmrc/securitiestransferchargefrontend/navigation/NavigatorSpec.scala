@@ -17,21 +17,19 @@
 package uk.gov.hmrc.securitiestransferchargefrontend.navigation
 
 import base.SpecBase
-import base.stubs.StubSessionRepository
-import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.*
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatestplus.mockito.MockitoSugar
 import play.api.libs.json.JsPath
 import play.api.mvc.{Call, Request}
 import uk.gov.hmrc.http.HeaderCarrier
-import uk.gov.hmrc.securitiestransferchargefrontend.clients.SaveAndReturnClient
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.routes
-import uk.gov.hmrc.securitiestransferchargefrontend.models.{Mode, UserAnswers}
+import uk.gov.hmrc.securitiestransferchargefrontend.models.{Mode, NormalMode, UserAnswers}
 import uk.gov.hmrc.securitiestransferchargefrontend.navigation.AbstractNavigator
 import uk.gov.hmrc.securitiestransferchargefrontend.pages.*
 import uk.gov.hmrc.securitiestransferchargefrontend.queries.*
-import uk.gov.hmrc.securitiestransferchargefrontend.repositories.SessionRepository
+import uk.gov.hmrc.securitiestransferchargefrontend.services.AnswerPersistenceService
+import org.mockito.ArgumentMatchers.any
 
 import scala.concurrent.Future
 
@@ -41,21 +39,24 @@ class NavigatorSpec extends SpecBase with MockitoSugar with ScalaFutures {
   }
   private val emptyUserAnswers = UserAnswers.empty("test-id")(submissionId)
   private val userAnswers = emptyUserAnswers.set(testPage, true).get
-  private val mockSessionRepository = mock[SessionRepository]
-  private val testCall = routes.JourneyRecoveryController.onPageLoad()
-  private val mockSaveAndReturnClient = mock[SaveAndReturnClient]
+  //private val errorCall = routes.JourneyRecoveryController.onPageLoad()
+  private val testCall = routes.HowToNotifyAboutSecuritiesTransferController.onPageLoad(NormalMode)
+
+  private val mockAnswerPersistenceService = mock[AnswerPersistenceService]
+  when(mockAnswerPersistenceService.persistUserAnswers(any[UserAnswers], any[Call])(any[HeaderCarrier]))
+    .thenReturn(Future.unit)
+
+  private implicit val mockHeaderCarrier: HeaderCarrier = mock[HeaderCarrier]
 
   private def testSetup(): TestNavigator = {
-    reset(mockSessionRepository)
-    reset(mockSaveAndReturnClient)
+    reset(mockAnswerPersistenceService)
+    when(mockAnswerPersistenceService.persistUserAnswers(any[UserAnswers], any[Call])(any[HeaderCarrier]))
+      .thenReturn(Future.unit)
 
-    when(mockSessionRepository.set(any[UserAnswers]())).thenReturn(Future.successful(()))
-    when(mockSaveAndReturnClient.save(any[UserAnswers])(any[HeaderCarrier])).thenReturn(Future.successful(()))
-
-    new TestNavigator(mockSessionRepository)
+    new TestNavigator()
   }
 
-  class TestNavigator(mockSessionRepository: SessionRepository) extends AbstractNavigator(mockSessionRepository, mockSaveAndReturnClient) {
+  class TestNavigator extends AbstractNavigator(mockAnswerPersistenceService) {
     override val errorPage: Page => Call = _ => testCall
 
     override def nextPage(page: Page, mode: Mode, userAnswers: UserAnswers)(implicit request: Request[?]): Future[Call] =
@@ -64,15 +65,18 @@ class NavigatorSpec extends SpecBase with MockitoSugar with ScalaFutures {
 
   "All navigators should" - {
     "successfully go to a page" in {
-      val result = new TestNavigator(new StubSessionRepository()).goTo(testCall)
+      val navigator = testSetup()
+      val result = navigator.goTo(testCall)
       result.futureValue mustBe testCall
     }
-    "store user answers if supplied when going to a page" in {
+    "update and store user answers if supplied when going to a page" in {
       val navigator = testSetup()
-      val result = navigator.goTo(testCall, Some(userAnswers))
+      val mockUserAnswers = mock[UserAnswers]
+      when(mockUserAnswers.setNextPage(testCall)).thenReturn(mockUserAnswers)
+      val result = navigator.goTo(testCall, Some(mockUserAnswers))
       whenReady(result) { _ =>
-        verify(mockSessionRepository, times(1)).set(userAnswers)
-        verify(mockSaveAndReturnClient, times(1)).save(userAnswers)
+        verify(mockAnswerPersistenceService, times(1)).persistUserAnswers(mockUserAnswers, testCall)(mockHeaderCarrier)
+        verify(mockUserAnswers, times(1)).setNextPage(testCall)
         result.futureValue mustBe testCall
       }
     }
@@ -80,8 +84,7 @@ class NavigatorSpec extends SpecBase with MockitoSugar with ScalaFutures {
       val navigator = testSetup()
       val result = navigator.dataRequired(testPage, userAnswers, testCall)
       whenReady(result) { _ =>
-        verify(mockSessionRepository, times(1)).set(userAnswers)
-        verify(mockSaveAndReturnClient, times(1)).save(userAnswers)
+        verify(mockAnswerPersistenceService, times(1)).persistUserAnswers(userAnswers, testCall)(mockHeaderCarrier)
       }
     }
     "return the success page when data is present for data required navigation" in {
@@ -97,7 +100,7 @@ class NavigatorSpec extends SpecBase with MockitoSugar with ScalaFutures {
       for {
         res     <- result
       } yield {
-        res mustBe navigator.defaultPage
+        res mustBe Navigator.defaultPage
       }
     }
     "return the success page when data is present for data dependent navigation" in {
@@ -113,7 +116,7 @@ class NavigatorSpec extends SpecBase with MockitoSugar with ScalaFutures {
       for {
         res     <- result
       } yield {
-        res mustBe navigator.defaultPage
+        res mustBe Navigator.defaultPage
       }
     }
     "call the provided function when data is present for data dependent navigation" in {
@@ -139,11 +142,10 @@ class NavigatorSpec extends SpecBase with MockitoSugar with ScalaFutures {
       val result = navigator.userAnswersDependent(userAnswers)(mockMethod)
       whenReady(result) { _ =>
         verify(mockMethod, times(1)).apply(userAnswers)
-        verify(mockSessionRepository, times(1)).set(userAnswers)
-        verify(mockSaveAndReturnClient, times(1)).save(userAnswers)
+        verify(mockAnswerPersistenceService, times(1)).persistUserAnswers(userAnswers, testCall)(mockHeaderCarrier)
       }
     }
-
   }
+
 
 }

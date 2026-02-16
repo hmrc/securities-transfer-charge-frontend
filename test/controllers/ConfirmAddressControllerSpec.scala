@@ -29,7 +29,7 @@ import uk.gov.hmrc.securitiestransferchargefrontend.connectors.SubscriptionConne
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.routes
 import uk.gov.hmrc.securitiestransferchargefrontend.domain.SubscriptionId
 import uk.gov.hmrc.securitiestransferchargefrontend.models.{ConfirmableAddress, Country, UserAnswers}
-import uk.gov.hmrc.securitiestransferchargefrontend.repositories.{SessionRepository, SubscriptionData, SubscriptionDataRepository}
+import uk.gov.hmrc.securitiestransferchargefrontend.repositories.{SubscriptionData, SubscriptionDataRepository}
 import uk.gov.hmrc.securitiestransferchargefrontend.services.AddressService
 import uk.gov.hmrc.securitiestransferchargefrontend.views.html.ConfirmAddressView
 
@@ -84,11 +84,8 @@ class ConfirmAddressControllerSpec extends SpecBase {
 
       val mockSubscriptionDataRepository = mock[SubscriptionDataRepository]
       val mockAddressService = mock[AddressService]
-      val mockSessionRepository = mock[SessionRepository]
       val saveAndReturnClient = mock[SaveAndReturnClient]
-
-      when(mockSessionRepository.set(any())) thenReturn Future.successful(())
-
+      
       when(mockSubscriptionDataRepository.getSubscriptionData(any()))
         .thenReturn(Future.successful(Some(subscriptionData)))
 
@@ -106,7 +103,6 @@ class ConfirmAddressControllerSpec extends SpecBase {
           .overrides(
             inject.bind[SubscriptionDataRepository].toInstance(mockSubscriptionDataRepository),
             inject.bind[AddressService].toInstance(mockAddressService),
-            inject.bind[SessionRepository].toInstance(mockSessionRepository),
           )
           .build()
 

@@ -26,6 +26,7 @@ import uk.gov.hmrc.securitiestransferchargefrontend.handlers.ErrorHandler
 import uk.gov.hmrc.securitiestransferchargefrontend.repositories.{SubscriptionDataRepository, SubscriptionDataRepositoryImpl}
 import uk.gov.hmrc.securitiestransferchargefrontend.navigation.{Navigator, StfNavigator}
 import uk.gov.hmrc.securitiestransferchargefrontend.repositories.{SessionRepository, SessionRepositoryImpl}
+import uk.gov.hmrc.securitiestransferchargefrontend.services.*
 
 import java.time.{Clock, ZoneOffset}
 
@@ -52,6 +53,6 @@ class Module extends AbstractModule {
     bind(classOf[SubscriptionDataRepository]).to(classOf[SubscriptionDataRepositoryImpl])
     bind(classOf[SubscriptionConnector]).to(classOf[SubscriptionConnectorImpl])
     bind(classOf[RegistrationClient]).to(classOf[RegistrationClientImpl]).asEagerSingleton()
-
+    bind(classOf[AnswerPersistenceService]).to(classOf[AnswerPersistenceServiceImpl])
   }
 }

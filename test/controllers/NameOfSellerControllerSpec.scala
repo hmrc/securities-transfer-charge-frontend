@@ -18,23 +18,18 @@ package controllers
 
 import base.SpecBase
 import navigation.FakeNavigator
-import uk.gov.hmrc.securitiestransferchargefrontend.forms.NameOfSellerFormProvider
-import uk.gov.hmrc.securitiestransferchargefrontend.models.{NormalMode, UserAnswers}
-import uk.gov.hmrc.securitiestransferchargefrontend.navigation.Navigator
-import uk.gov.hmrc.securitiestransferchargefrontend.controllers.routes
-import org.mockito.ArgumentMatchers.any
-import org.mockito.Mockito.when
 import org.scalatestplus.mockito.MockitoSugar
 import play.api.data.Form
-import uk.gov.hmrc.securitiestransferchargefrontend.pages.NameOfSellerPage
 import play.api.inject.bind
 import play.api.mvc.Call
 import play.api.test.FakeRequest
 import play.api.test.Helpers.*
-import uk.gov.hmrc.securitiestransferchargefrontend.repositories.SessionRepository
+import uk.gov.hmrc.securitiestransferchargefrontend.controllers.routes
+import uk.gov.hmrc.securitiestransferchargefrontend.forms.NameOfSellerFormProvider
+import uk.gov.hmrc.securitiestransferchargefrontend.models.{NormalMode, UserAnswers}
+import uk.gov.hmrc.securitiestransferchargefrontend.navigation.Navigator
+import uk.gov.hmrc.securitiestransferchargefrontend.pages.NameOfSellerPage
 import uk.gov.hmrc.securitiestransferchargefrontend.views.html.NameOfSellerView
-
-import scala.concurrent.Future
 
 class NameOfSellerControllerSpec extends SpecBase with MockitoSugar {
 
@@ -82,16 +77,10 @@ class NameOfSellerControllerSpec extends SpecBase with MockitoSugar {
     }
 
     "must redirect to the next page when valid data is submitted" in {
-
-      val mockSessionRepository = mock[SessionRepository]
-
-      when(mockSessionRepository.set(any())) thenReturn Future.successful(true)
-
       val application =
         applicationBuilder(userAnswers = Some(emptyUserAnswers))
           .overrides(
-            bind[Navigator].toInstance(new FakeNavigator(onwardRoute)),
-            bind[SessionRepository].toInstance(mockSessionRepository)
+            bind[Navigator].toInstance(new FakeNavigator(onwardRoute))
           )
           .build()
 

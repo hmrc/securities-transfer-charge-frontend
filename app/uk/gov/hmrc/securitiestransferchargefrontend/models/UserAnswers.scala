@@ -17,6 +17,7 @@
 package uk.gov.hmrc.securitiestransferchargefrontend.models
 
 import play.api.libs.json.*
+import play.api.mvc.Call
 import uk.gov.hmrc.mongo.play.json.formats.MongoJavatimeFormats
 import uk.gov.hmrc.securitiestransferchargefrontend.domain.SubmissionId
 import uk.gov.hmrc.securitiestransferchargefrontend.queries.{Gettable, Settable}
@@ -25,11 +26,13 @@ import java.time.Instant
 import scala.language.postfixOps
 import scala.util.{Failure, Success, Try}
 
-final case class UserAnswers(userId: String,
+case class UserAnswers(userId: String,
                              submissionId: SubmissionId,
+                             nextPage: Option[Call] = None,
                              data: JsObject = Json.obj(),
-                             lastUpdated: Instant = Instant.now
-                            ) {
+                             lastUpdated: Instant = Instant.now) {
+
+  def setNextPage(call: Call): UserAnswers = this.copy(nextPage = Some(call))
 
   def get[A](page: Gettable[A])(implicit rds: Reads[A]): Option[A] =
     Reads.optionNoError(Reads.at(page.path)).reads(data).getOrElse(None)
@@ -70,6 +73,7 @@ final case class UserAnswers(userId: String,
 object UserAnswers {
 
   val empty: String => SubmissionId => UserAnswers = userId => submissionId => UserAnswers(userId, submissionId)
+  implicit val callFormat: Format[Call] = Json.format[Call]
 
   val reads: Reads[UserAnswers] = {
 
@@ -78,6 +82,7 @@ object UserAnswers {
     (
       (__ \ "_id").read[String] and
       (__ \ "submissionId").read[SubmissionId] and
+      (__ \ "nextPage").readNullable[Call] and
       (__ \ "data").read[JsObject] and
       (__ \ "lastUpdated").read(MongoJavatimeFormats.instantFormat)
     ) (UserAnswers.apply _)
@@ -90,9 +95,10 @@ object UserAnswers {
     (
       (__ \ "_id").write[String] and
       (__ \ "submissionId").write[SubmissionId] and
+      (__ \ "nextPage").writeNullable[Call] and
       (__ \ "data").write[JsObject] and
       (__ \ "lastUpdated").write(MongoJavatimeFormats.instantFormat)
-    ) (ua => (ua.userId, ua.submissionId, ua.data, ua.lastUpdated))
+    ) (ua => (ua.userId, ua.submissionId, ua.nextPage, ua.data, ua.lastUpdated))
   }
 
   implicit val format: OFormat[UserAnswers] = OFormat(reads, writes)
