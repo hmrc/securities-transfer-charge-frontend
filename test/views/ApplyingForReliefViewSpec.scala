@@ -46,7 +46,7 @@ class ApplyingForReliefViewSpec extends ViewBaseSpec {
     val saveAndReturn: String = messages("site.save-and-return.button")
   }
 
-  "The ConnectedPersonsView" - {
+  "The ApplyingForReliefView" - {
 
     "when rendered without errors" - {
 
