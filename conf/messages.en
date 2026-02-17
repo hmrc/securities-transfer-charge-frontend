@@ -128,6 +128,3 @@ securitiesTarget.error.BusinessName.length = The name of the business must be 10
 securitiesTarget.error.CRN.length = The company registration number must be 8 characters or less
 securitiesTarget.BusinessName.change.hidden = BusinessName
 securitiesTarget.CRN.change.hidden = CRN
-
-securitiesTarget.error.CRN.required = Enter CRN
-
