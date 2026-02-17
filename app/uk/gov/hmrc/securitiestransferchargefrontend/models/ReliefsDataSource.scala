@@ -44,9 +44,8 @@ class ReliefsDataSource @Inject()(
       .toSeq
 
 
-  def getRate(reliefName: String): Int =
-    reliefs
-      .find(_.name == reliefName)
-      .map(_.rate)
-      .getOrElse(throw new NoSuchElementException(s"No rate found for relief: $reliefName"))
+  lazy val getRate: PartialFunction[String, Int] = {
+    case name =>
+      reliefs.collectFirst { case Relief(`name`, rate) => rate }.get
+  }
 }
