@@ -43,9 +43,8 @@ class ReliefsDataSource @Inject()(
       }
       .toSeq
 
-
-  lazy val getRate: PartialFunction[String, Int] = {
-    case name =>
-      reliefs.collectFirst { case Relief(`name`, rate) => rate }.get
+  def getRate: PartialFunction[String, Int] = {
+    case name if reliefs.exists(_.name == name) =>
+      reliefs.find(_.name == name).get.rate
   }
 }
