@@ -31,7 +31,7 @@ class SecuritiesTargetViewSpec extends ViewBaseSpec {
   override def fakeApplication(): Application = applicationBuilder().build()
   
   private val viewInstance         = app.injector.instanceOf[SecuritiesTargetView]
-  private val formProvider = new SecuritiesTargetFormProvider()
+  private val formProvider         = new SecuritiesTargetFormProvider()
   private val form = formProvider()
 
 
@@ -49,7 +49,6 @@ class SecuritiesTargetViewSpec extends ViewBaseSpec {
     val crnHintMessage2 = "For example, SN898989 or 12345678"
     val saveAndContinue = "Save and continue"
     val saveAndReturn = "Save and return to dashboard"
-
   }
 
   "The NameOfSellerView" - {
@@ -68,8 +67,10 @@ class SecuritiesTargetViewSpec extends ViewBaseSpec {
         securitiesTargetView.getElementsByClass("govuk-caption-l").text() mustBe ExpectedContent.caption
       }
 
-      "have the correct heading" in {
-        securitiesTargetView.select("govuk-hint").text() mustBe ExpectedContent.crnHintMessage1
+      "must render CRN hint text" in {
+        val hint = securitiesTargetView.select(".govuk-hint").text()
+        hint must include(messages("securitiesTarget.CRN.hint.message1"))
+        hint must include(messages("securitiesTarget.CRN.hint.message2"))
       }
 
       "have a button with the text save and continue " in {
