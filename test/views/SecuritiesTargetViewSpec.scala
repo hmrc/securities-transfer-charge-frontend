@@ -67,6 +67,14 @@ class SecuritiesTargetViewSpec extends ViewBaseSpec {
         securitiesTargetView.getElementsByClass("govuk-caption-l").text() mustBe ExpectedContent.caption
       }
 
+      "displays the correct field name for the business name" in {
+        securitiesTargetView.select(".govuk-label").first().text()
+      }
+
+      "displays the correct field name for the CRN" in {
+        securitiesTargetView.select(".govuk-label").last().text()
+      }
+
       "must render CRN hint text" in {
         val hint = securitiesTargetView.select(".govuk-hint").text()
         hint must include(messages("securitiesTarget.CRN.hint.message1"))
