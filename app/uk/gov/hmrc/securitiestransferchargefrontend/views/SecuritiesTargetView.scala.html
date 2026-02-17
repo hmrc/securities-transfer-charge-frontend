@@ -52,11 +52,20 @@
                 field = form("CRN"),
                 label = LabelViewModel(messages("securitiesTarget.CRN"))
             )
-            .withWidth(Full)
+            .withWidth(OneThird)
+            .withHint(HintViewModel(messages("securitiesTarget.CRN.hint")))
         )
 
         @govukButton(
-            ButtonViewModel(messages("site.continue"))
+            ButtonViewModel(
+                messages("site.save-and-continue.button")
+            )
+        )
+
+        @govukButton(
+            ButtonViewModel(
+                messages("site.save-and-return.button")
+            ).asSecondaryButton()
         )
     }
 }
