@@ -40,13 +40,25 @@
             @govukErrorSummary(ErrorSummaryViewModel(form))
         }
 
+        <h1 class="govuk-label-wrapper">
+            <label class="govuk-label govuk-label--l">@messages("securitiesTarget.heading")</label>
+        </h1>
+
         @govukInput(
             InputViewModel(
                 field = form("value"),
-                label = LabelViewModel(messages("securitiesTarget.heading")).asPageHeading(Large)
+                label = LabelViewModel(messages("businessName.sub-heading"))
             )
             .withWidth(Full)
-            .withHint(HintViewModel(messages("businessName.hint")))
+        )
+
+        @govukInput(
+            InputViewModel(
+                field = form("value"),
+                label = LabelViewModel(messages("crn.sub-heading"))
+            )
+            .withWidth(OneThird)
+            .withHint(HintViewModel(messages("crn.hint")))
         )
 
         @govukButton(

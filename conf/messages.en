@@ -109,7 +109,6 @@ connectedPersons.details.content.link.text = Read HMRC guidance on connected per
 site.save-and-continue.button = Save and continue
 site.save-and-return.button = Save and return to dashboard
 
-
 applyingForRelief.title = Are you applying for a relief?
 applyingForRelief.heading = Are you applying for a relief?
 applyingForRelief.checkYourAnswersLabel = Are you applying for a relief?
@@ -124,6 +123,7 @@ securitiesTarget.checkYourAnswersLabel = What business are you buying these secu
 securitiesTarget.error.required = Enter the name of the business you're buying securities in
 securitiesTarget.error.length = The name of the business must be 1000 characters or less
 securitiesTarget.change.hidden = SecuritiesTarget
-
-businessName.hint = Business name
+businessName.sub-heading = Business name
+crn.sub-heading = Company registration number (CRN) (optional)
+crn.hint = This is also called a company number. For example, SN898989 or 12345678
 
