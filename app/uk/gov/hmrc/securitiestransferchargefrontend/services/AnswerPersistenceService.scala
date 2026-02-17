@@ -19,6 +19,7 @@ package uk.gov.hmrc.securitiestransferchargefrontend.services
 import play.api.mvc.Call
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.securitiestransferchargefrontend.clients.SaveAndReturnClient
+import uk.gov.hmrc.securitiestransferchargefrontend.domain.SubmissionId
 import uk.gov.hmrc.securitiestransferchargefrontend.models.UserAnswers
 import uk.gov.hmrc.securitiestransferchargefrontend.repositories.SessionRepository
 
@@ -26,14 +27,22 @@ import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 
 trait AnswerPersistenceService:
-  def persistUserAnswers(userAnswers: UserAnswers, nextCall: Call)(implicit hc: HeaderCarrier): Future[Unit]
+  def save(userAnswers: UserAnswers, nextCall: Call)(implicit hc: HeaderCarrier): Future[Unit]
+  def load(submissionId: SubmissionId, userId: String)(implicit hc: HeaderCarrier): Future[UserAnswers]
 
 class AnswerPersistenceServiceImpl @Inject()(sessionRepository: SessionRepository,
                                              saveAndReturnClient: SaveAndReturnClient)
                                             (implicit ec: ExecutionContext) extends AnswerPersistenceService:
 
-  override def persistUserAnswers(userAnswers: UserAnswers, nextCall: Call)(implicit hc: HeaderCarrier): Future[Unit] =
+  override def save(userAnswers: UserAnswers, nextCall: Call)(implicit hc: HeaderCarrier): Future[Unit] =
     for {
       _ <- sessionRepository.set(userAnswers)
       _ <- saveAndReturnClient.save(userAnswers)
     } yield ()
+
+  override def load(submissionId: SubmissionId, userId: String)(implicit hc: HeaderCarrier): Future[UserAnswers] =
+    for {
+      userAnswers <- saveAndReturnClient.retrieve(userId, submissionId)
+      _           <- sessionRepository.clear(userId)
+      _           <- sessionRepository.set(userAnswers)
+    } yield userAnswers

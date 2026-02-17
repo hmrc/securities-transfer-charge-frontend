@@ -51,7 +51,7 @@ class AnswerPersistenceServiceSpec extends SpecBase with MockitoSugar {
       val userAnswers = Fixtures.emptyUserAnswers
       val nextCall = routes.NameOfSellerController.onPageLoad(NormalMode)
       val service = testSetup()
-      val result = service.persistUserAnswers(userAnswers, nextCall)(mockHeaderCarrier)
+      val result = service.save(userAnswers, nextCall)(mockHeaderCarrier)
       whenReady(result) { _ =>
         verify(mockSessionRepository, times(1)).set(any[UserAnswers])
       }
@@ -60,7 +60,7 @@ class AnswerPersistenceServiceSpec extends SpecBase with MockitoSugar {
       val userAnswers = Fixtures.emptyUserAnswers
       val nextCall = routes.NameOfSellerController.onPageLoad(NormalMode)
       val service = testSetup()
-      val result = service.persistUserAnswers(userAnswers, nextCall)(mockHeaderCarrier)
+      val result = service.save(userAnswers, nextCall)(mockHeaderCarrier)
       whenReady(result) { _ =>
         verify(mockSaveAndReturnClient, times(1)).save(any[UserAnswers])(any[HeaderCarrier])
       }

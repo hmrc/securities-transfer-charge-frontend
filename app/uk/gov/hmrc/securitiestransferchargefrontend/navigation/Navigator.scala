@@ -20,8 +20,10 @@ import play.api.Logging
 import play.api.libs.json.Reads
 import play.api.mvc.{Call, Request}
 import uk.gov.hmrc.http.HeaderCarrier
+import uk.gov.hmrc.play.http.HeaderCarrierConverter
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.routes
-import uk.gov.hmrc.securitiestransferchargefrontend.models.{Mode, UserAnswers}
+import uk.gov.hmrc.securitiestransferchargefrontend.domain.SubmissionId
+import uk.gov.hmrc.securitiestransferchargefrontend.models.{Mode, NormalMode, UserAnswers}
 import uk.gov.hmrc.securitiestransferchargefrontend.pages.Page
 import uk.gov.hmrc.securitiestransferchargefrontend.queries.Gettable
 import uk.gov.hmrc.securitiestransferchargefrontend.services.AnswerPersistenceService
@@ -30,6 +32,7 @@ import scala.concurrent.{ExecutionContext, Future}
 
 trait Navigator:
   def nextPage(page: Page, mode: Mode, userAnswers: UserAnswers)(implicit request: Request[?]): Future[Call]
+  def restore(submissionId: SubmissionId, userId: String)(implicit request: Request[?]): Future[UserAnswers]
   val errorPage: Page => Call
 
 abstract class AbstractNavigator(answerPersistenceService: AnswerPersistenceService)
@@ -41,7 +44,7 @@ abstract class AbstractNavigator(answerPersistenceService: AnswerPersistenceServ
 
   protected[navigation] def updateAndPersistUserAnswers(call: Call, ua: UserAnswers)(implicit hc: HeaderCarrier):Future[Unit] = for {
     updatedAnswers <- updateUserAnswers(call)(ua)
-    _              <- answerPersistenceService.persistUserAnswers(updatedAnswers, call)
+    _              <- answerPersistenceService.save(updatedAnswers, call)
   } yield ()
 
   /*
@@ -78,11 +81,17 @@ abstract class AbstractNavigator(answerPersistenceService: AnswerPersistenceServ
   protected[navigation] def userAnswersDependent(userAnswers: UserAnswers)(f: UserAnswers => Call)(implicit hc: HeaderCarrier): Future[Call] = {
     val nextCall = f(userAnswers)
     answerPersistenceService
-      .persistUserAnswers(userAnswers, nextCall)
+      .save(userAnswers, nextCall)
       .map (_ => nextCall)
   }
 
+  def restore(submissionId: SubmissionId, userId: String)(implicit request: Request[?]): Future[UserAnswers] = {
+    implicit val hc: HeaderCarrier = HeaderCarrierConverter.fromRequestAndSession(request, request.session)
+    answerPersistenceService.load(submissionId, userId)
+  }
+  
 object Navigator:
+  val startPage: Call = routes.HowToNotifyAboutSecuritiesTransferController.onPageLoad(NormalMode)
   val defaultPage: Call = routes.JourneyRecoveryController.onPageLoad()
   val defaultPageF: Future[Call] = Future.successful(defaultPage)
   val errorPages: Seq[Call] = List(defaultPage)

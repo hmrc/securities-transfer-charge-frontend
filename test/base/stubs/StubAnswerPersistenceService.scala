@@ -24,7 +24,7 @@ import uk.gov.hmrc.securitiestransferchargefrontend.services.AnswerPersistenceSe
 import scala.concurrent.Future
 
 class StubAnswerPersistenceService extends AnswerPersistenceService:
-  def persistUserAnswers(userAnswers: UserAnswers, nextCall: Call)(implicit hc: HeaderCarrier): Future[Unit] =
+  def save(userAnswers: UserAnswers, nextCall: Call)(implicit hc: HeaderCarrier): Future[Unit] =
     Future.successful(())
 
 object StubAnswerPersistenceService:
