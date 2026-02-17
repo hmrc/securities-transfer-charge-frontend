@@ -29,8 +29,7 @@ class SecuritiesTargetFormProvider @Inject() extends Mappings {
      mapping(
       "BusinessName" -> text("securitiesTarget.error.BusinessName.required")
         .verifying(maxLength(1000, "securitiesTarget.error.BusinessName.length")),
-      "CRN" -> text("securitiesTarget.error.CRN.required")
-        .verifying(maxLength(8, "securitiesTarget.error.CRN.length"))
-    )(SecuritiesTarget.apply)(x => Some((x.BusinessName, x.CRN)))
+       "CRN" -> validatedOptionalText("securitiesTarget.error.CRN.length", 8)
+     )(SecuritiesTarget.apply)(x => Some((x.BusinessName, x.CRN)))
    )
  }
