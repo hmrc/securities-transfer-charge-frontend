@@ -117,8 +117,30 @@ applyingForRelief.change.hidden = Change applying for a relief
 applyingForRelief.p = See a
 applyingForRelief.details.content.link.text = full list of reliefs
 
-securitiesTarget.title = What business are you buying these securities in?
-securitiesTarget.heading = What business are you buying these securities in?
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 securitiesTarget.checkYourAnswersLabel = What business are you buying these securities in?
 securitiesTarget.error.required = Enter the name of the business you're buying securities in
 securitiesTarget.error.length = The name of the business must be 1000 characters or less
@@ -127,3 +149,15 @@ businessName.sub-heading = Business name
 crn.sub-heading = Company registration number (CRN) (optional)
 crn.hint = This is also called a company number. For example, SN898989 or 12345678
 
+
+securitiesTarget.title = What business are you buying these securities in?
+securitiesTarget.heading = What business are you buying these securities in?
+securitiesTarget.BusinessName = Business Name
+securitiesTarget.CRN = CRN
+securitiesTarget.checkYourAnswersLabel = SecuritiesTarget
+securitiesTarget.error.BusinessName.required = Enter BusinessName
+securitiesTarget.error.CRN.required = Enter CRN
+securitiesTarget.error.BusinessName.length = BusinessName must be 1000 characters or less
+securitiesTarget.error.CRN.length = CRN must be 8 characters or less
+securitiesTarget.BusinessName.change.hidden = BusinessName
+securitiesTarget.CRN.change.hidden = CRN
