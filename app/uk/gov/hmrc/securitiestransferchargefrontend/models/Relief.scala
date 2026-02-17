@@ -14,17 +14,6 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.securitiestransferchargefrontend.forms
+package uk.gov.hmrc.securitiestransferchargefrontend.models
 
-import play.api.data.Form
-import uk.gov.hmrc.securitiestransferchargefrontend.forms.mappings.Mappings
-
-import javax.inject.Inject
-
-class WhatReliefAreYouApplyingForFormProvider @Inject() extends Mappings {
-
-  def apply(): Form[String] =
-    Form(
-      "reliefs" -> text("whatReliefAreYouApplyingFor.error.required")
-    )
-}
+case class Relief(name: String, rate: Int)

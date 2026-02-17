@@ -22,6 +22,8 @@ import play.api.Application
 import uk.gov.hmrc.securitiestransferchargefrontend.forms.WhatReliefAreYouApplyingForFormProvider
 import uk.gov.hmrc.securitiestransferchargefrontend.models.NormalMode
 import uk.gov.hmrc.securitiestransferchargefrontend.views.html.WhatReliefAreYouApplyingForView
+import uk.gov.hmrc.securitiestransferchargefrontend.models.ReliefsDataSource.reliefs
+
 
 class WhatReliefAreYouApplyingForViewSpec extends ViewBaseSpec {
 
@@ -34,7 +36,7 @@ class WhatReliefAreYouApplyingForViewSpec extends ViewBaseSpec {
   private val form = formProvider()
 
   def view(): Document = Jsoup.parse(
-    viewInstance(form, NormalMode)(fakeRequest, messages).body
+    viewInstance(form, NormalMode,reliefs)(fakeRequest, messages).body
   )
 
   object ExpectedContent {

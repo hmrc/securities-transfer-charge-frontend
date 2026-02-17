@@ -14,53 +14,57 @@
  * limitations under the License.
  *@
 
-@import uk.gov.hmrc.securitiestransferchargefrontend.viewmodels.InputWidth._
 @import uk.gov.hmrc.securitiestransferchargefrontend.viewmodels.LabelSize.Large
 @import uk.gov.hmrc.securitiestransferchargefrontend.controllers.routes.WhatReliefAreYouApplyingForController
 @import uk.gov.hmrc.hmrcfrontend.views.html.helpers.HmrcNewTabLinkHelper
 @import uk.gov.hmrc.hmrcfrontend.views.viewmodels.newtablinkhelper.NewTabLinkHelper
+@import uk.gov.hmrc.securitiestransferchargefrontend.views.ViewHelper
 
+@import uk.gov.hmrc.govukfrontend.views.viewmodels.errormessage._
+@import uk.gov.hmrc.govukfrontend.views.Implicits.RichSelect
+@import uk.gov.hmrc.securitiestransferchargefrontend.models.Relief
 
 
 @this(
-    layout: templates.Layout,
-    formHelper: FormWithCSRF,
-    govukErrorSummary: GovukErrorSummary,
-    govukInput: GovukInput,
-    govukButton: GovukButton,
-    hmrcNewTabLinkHelper: HmrcNewTabLinkHelper
+  layout: templates.Layout,
+  formHelper: FormWithCSRF,
+  govukErrorSummary: GovukErrorSummary,
+  govukSelect: GovukSelect,
+  govukButton: GovukButton,
+  hmrcNewTabLinkHelper: HmrcNewTabLinkHelper
 )
 
-@(form: Form[_], mode: Mode)(implicit request: Request[_], messages: Messages)
+@(form: Form[_], mode: Mode, reliefs: Seq[Relief])(implicit request: Request[_], messages: Messages)
 
 @link = @{ hmrcNewTabLinkHelper(NewTabLinkHelper(
 text = messages("whatReliefAreYouApplyingFor.details.content.link.text")
 )) }
 
-@layout(pageTitle = title(form, messages("whatReliefAreYouApplyingFor.title"),Some(messages("sectionTitle.transferDetails")))) {
+@layout(
+  pageTitle = title(
+    form,
+    messages("whatReliefAreYouApplyingFor.title"),
+    Some(messages("sectionTitle.transferDetails"))
+  )
+) {
 
-    @formHelper(action = WhatReliefAreYouApplyingForController.onSubmit(mode)) {
+  @formHelper(action = WhatReliefAreYouApplyingForController.onSubmit(mode)) {
 
-        @if(form.errors.nonEmpty) {
-            @govukErrorSummary(ErrorSummaryViewModel(form))
-        }
-
-        <span class="govuk-caption-l">@messages("transfer.details.caption")</span>
-        @govukInput(
-            InputViewModel(
-                field = form("value"),
-                label = LabelViewModel(messages("whatReliefAreYouApplyingFor.heading")).asPageHeading(Large)
-            )
-            .withWidth(Full)
-            .withHint(Hint(content = HtmlContent(
-                HtmlFormat.raw(s"""
-                <p class="govuk-hint">${messages("whatReliefAreYouApplyingFor.p")} $link.</p>
-            """))))
-            )
-
-
-        @govukButton(ButtonViewModel(messages("site.save-and-continue.button")))
-
-        @govukButton(ButtonViewModel(messages("site.save-and-return.button")).asSecondaryButton())
+    @if(form.errors.nonEmpty) {
+      @govukErrorSummary(ErrorSummaryViewModel(form))
     }
+    <span  class="govuk-caption-l">@messages("transfer.details.caption")</span>
+    @govukSelect(Select(
+          id = form("reliefs").id,
+          name = form("reliefs").name,
+          label = Label(content = HtmlContent(messages("whatReliefAreYouApplyingFor.heading"))).asPageHeading(Large),
+          items = ViewHelper.reliefsToSelectItems(reliefs, form),
+    hint = Some(Hint(content = HtmlContent(s"<p class='govuk-hint'>${messages("whatReliefAreYouApplyingFor.p")} $link</p>")))
+      ).asAccessibleAutocomplete().withFormField(form("reliefs")))
+
+    @govukButton(ButtonViewModel(messages("site.save-and-continue.button")))
+
+    @govukButton(ButtonViewModel(messages("site.save-and-return.button")).asSecondaryButton())
+
+  }
 }

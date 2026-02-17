@@ -25,9 +25,9 @@ class WhatReliefAreYouApplyingForFormProviderSpec extends StringFieldBehaviours 
   val requiredKey = "whatReliefAreYouApplyingFor.error.required"
   val form = new WhatReliefAreYouApplyingForFormProvider()()
 
-  ".value" - {
+  ".reliefs" - {
 
-    val fieldName = "value"
+    val fieldName = "reliefs"
 
     behave like fieldThatBindsValidData(
       form,

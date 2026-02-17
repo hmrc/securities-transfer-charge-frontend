@@ -30,6 +30,7 @@ import uk.gov.hmrc.securitiestransferchargefrontend.forms.WhatReliefAreYouApplyi
 import uk.gov.hmrc.securitiestransferchargefrontend.models.{NormalMode, UserAnswers}
 import uk.gov.hmrc.securitiestransferchargefrontend.pages.WhatReliefAreYouApplyingForPage
 import uk.gov.hmrc.securitiestransferchargefrontend.views.html.WhatReliefAreYouApplyingForView
+import uk.gov.hmrc.securitiestransferchargefrontend.models.ReliefsDataSource.reliefs
 
 import scala.concurrent.Future
 
@@ -54,7 +55,7 @@ class WhatReliefAreYouApplyingForControllerSpec extends SpecBase with MockitoSug
         val view = application.injector.instanceOf[WhatReliefAreYouApplyingForView]
 
         status(result) mustEqual OK
-        contentAsString(result) mustEqual view(form, NormalMode)(request, messages(application)).toString
+        contentAsString(result) mustEqual view(form, NormalMode,reliefs)(request, messages(application)).toString
       }
     }
 
@@ -72,7 +73,7 @@ class WhatReliefAreYouApplyingForControllerSpec extends SpecBase with MockitoSug
         val result = route(application, request).value
 
         status(result) mustEqual OK
-        contentAsString(result) mustEqual view(form.fill("answer"), NormalMode)(request, messages(application)).toString
+        contentAsString(result) mustEqual view(form.fill("answer"), NormalMode,reliefs)(request, messages(application)).toString
       }
     }
 
@@ -82,7 +83,6 @@ class WhatReliefAreYouApplyingForControllerSpec extends SpecBase with MockitoSug
       when(saveAndReturnClient.save(any[UserAnswers]())(any[HeaderCarrier]()))
         .thenReturn(Future.successful(()))
 
-     
       val application =
         applicationBuilder(userAnswers = Some(emptyUserAnswers))
           .build()
@@ -90,7 +90,7 @@ class WhatReliefAreYouApplyingForControllerSpec extends SpecBase with MockitoSug
       running(application) {
         val request =
           FakeRequest(POST, whatReliefAreYouApplyingForRoute)
-            .withFormUrlEncodedBody(("value", "answer"))
+            .withFormUrlEncodedBody(("reliefs", "test-relief"))
 
         val result = route(application, request).value
 
@@ -106,16 +106,16 @@ class WhatReliefAreYouApplyingForControllerSpec extends SpecBase with MockitoSug
       running(application) {
         val request =
           FakeRequest(POST, whatReliefAreYouApplyingForRoute)
-            .withFormUrlEncodedBody(("value", ""))
+            .withFormUrlEncodedBody(("reliefs", ""))
 
-        val boundForm = form.bind(Map("value" -> ""))
+        val boundForm = form.bind(Map("reliefs" -> ""))
 
         val view = application.injector.instanceOf[WhatReliefAreYouApplyingForView]
 
         val result = route(application, request).value
 
         status(result) mustEqual BAD_REQUEST
-        contentAsString(result) mustEqual view(boundForm, NormalMode)(request, messages(application)).toString
+        contentAsString(result) mustEqual view(boundForm, NormalMode,reliefs)(request, messages(application)).toString
       }
     }
 
@@ -140,7 +140,7 @@ class WhatReliefAreYouApplyingForControllerSpec extends SpecBase with MockitoSug
       running(application) {
         val request =
           FakeRequest(POST, whatReliefAreYouApplyingForRoute)
-            .withFormUrlEncodedBody(("value", "answer"))
+            .withFormUrlEncodedBody(("reliefs", "answer"))
 
         val result = route(application, request).value
 
