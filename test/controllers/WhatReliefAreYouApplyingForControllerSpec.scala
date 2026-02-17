@@ -27,10 +27,9 @@ import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.securitiestransferchargefrontend.clients.SaveAndReturnClient
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.routes
 import uk.gov.hmrc.securitiestransferchargefrontend.forms.WhatReliefAreYouApplyingForFormProvider
-import uk.gov.hmrc.securitiestransferchargefrontend.models.{NormalMode, UserAnswers}
+import uk.gov.hmrc.securitiestransferchargefrontend.models.{NormalMode, ReliefsDataSource, UserAnswers}
 import uk.gov.hmrc.securitiestransferchargefrontend.pages.WhatReliefAreYouApplyingForPage
 import uk.gov.hmrc.securitiestransferchargefrontend.views.html.WhatReliefAreYouApplyingForView
-import uk.gov.hmrc.securitiestransferchargefrontend.models.ReliefsDataSource.reliefs
 
 import scala.concurrent.Future
 
@@ -54,8 +53,10 @@ class WhatReliefAreYouApplyingForControllerSpec extends SpecBase with MockitoSug
 
         val view = application.injector.instanceOf[WhatReliefAreYouApplyingForView]
 
+        val reliefsDataSource = application.injector.instanceOf[ReliefsDataSource]
+
         status(result) mustEqual OK
-        contentAsString(result) mustEqual view(form, NormalMode,reliefs)(request, messages(application)).toString
+        contentAsString(result) mustEqual view(form, NormalMode,reliefsDataSource.reliefs)(request, messages(application)).toString
       }
     }
 
@@ -70,10 +71,12 @@ class WhatReliefAreYouApplyingForControllerSpec extends SpecBase with MockitoSug
 
         val view = application.injector.instanceOf[WhatReliefAreYouApplyingForView]
 
+        val reliefsDataSource = application.injector.instanceOf[ReliefsDataSource]
+
         val result = route(application, request).value
 
         status(result) mustEqual OK
-        contentAsString(result) mustEqual view(form.fill("answer"), NormalMode,reliefs)(request, messages(application)).toString
+        contentAsString(result) mustEqual view(form.fill("answer"), NormalMode,reliefsDataSource.reliefs)(request, messages(application)).toString
       }
     }
 
@@ -111,11 +114,13 @@ class WhatReliefAreYouApplyingForControllerSpec extends SpecBase with MockitoSug
         val boundForm = form.bind(Map("reliefs" -> ""))
 
         val view = application.injector.instanceOf[WhatReliefAreYouApplyingForView]
+        val reliefsDataSource = application.injector.instanceOf[ReliefsDataSource]
+
 
         val result = route(application, request).value
 
         status(result) mustEqual BAD_REQUEST
-        contentAsString(result) mustEqual view(boundForm, NormalMode,reliefs)(request, messages(application)).toString
+        contentAsString(result) mustEqual view(boundForm, NormalMode,reliefsDataSource.reliefs)(request, messages(application)).toString
       }
     }
 

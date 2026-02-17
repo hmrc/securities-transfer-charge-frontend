@@ -22,11 +22,10 @@ import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.actions.*
 import uk.gov.hmrc.securitiestransferchargefrontend.forms.WhatReliefAreYouApplyingForFormProvider
-import uk.gov.hmrc.securitiestransferchargefrontend.models.Mode
+import uk.gov.hmrc.securitiestransferchargefrontend.models.{Mode, ReliefsDataSource}
 import uk.gov.hmrc.securitiestransferchargefrontend.navigation.Navigator
 import uk.gov.hmrc.securitiestransferchargefrontend.pages.WhatReliefAreYouApplyingForPage
 import uk.gov.hmrc.securitiestransferchargefrontend.views.html.WhatReliefAreYouApplyingForView
-import uk.gov.hmrc.securitiestransferchargefrontend.models.ReliefsDataSource.reliefs
 
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
@@ -40,6 +39,7 @@ class WhatReliefAreYouApplyingForController @Inject()(
                                         formProvider: WhatReliefAreYouApplyingForFormProvider,
                                         val controllerComponents: MessagesControllerComponents,
                                         view: WhatReliefAreYouApplyingForView,
+                                        reliefsDataSource:ReliefsDataSource
                                     )(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport {
 
   val form: Form[String] = formProvider()
@@ -52,7 +52,7 @@ class WhatReliefAreYouApplyingForController @Inject()(
         case Some(value) => form.fill(value)
       }
 
-      Ok(view(preparedForm, mode,reliefs))
+      Ok(view(preparedForm, mode,reliefsDataSource.reliefs))
   }
 
   def onSubmit(mode: Mode): Action[AnyContent] = (stcAuthEnrolled andThen getData andThen requireData).async {
@@ -60,7 +60,7 @@ class WhatReliefAreYouApplyingForController @Inject()(
 
       form.bindFromRequest().fold(
         formWithErrors =>
-          Future.successful(BadRequest(view(formWithErrors, mode,reliefs))),
+          Future.successful(BadRequest(view(formWithErrors, mode,reliefsDataSource.reliefs))),
 
         relief =>
           for {

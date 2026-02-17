@@ -16,35 +16,30 @@
 
 package uk.gov.hmrc.securitiestransferchargefrontend.models
 
-import scala.io.Source
-import scala.util.Using
+import uk.gov.hmrc.securitiestransferchargefrontend.config.FrontendAppConfig
+import uk.gov.hmrc.securitiestransferchargefrontend.utils.ResourceLoader
 
-object ReliefsDataSource {
+import javax.inject.Inject
 
-  private val resourcePath = "/resources/reliefs.txt"
+class ReliefsDataSource @Inject()(
+                                   resourceLoader: ResourceLoader,
+                                   appConfig: FrontendAppConfig
+                                 ) {
 
-  lazy val reliefs: Seq[Relief] = {
-    val stream = Option(getClass.getResourceAsStream(resourcePath))
-      .getOrElse(
-        throw new IllegalStateException(s"Resource not found: $resourcePath")
-      )
+  private lazy val reliefsFileContent: String = resourceLoader.loadString(appConfig.reliefsFileLocation)
 
-    Using.resource(Source.fromInputStream(stream)) { source =>
-      source
-        .getLines()
-        .map(_.trim)
-        .filter(_.nonEmpty)
-        .map { line =>
-          line.split(",", 2) match {
-            case Array(name, rateStr) =>
-              Relief(name.trim, rateStr.trim.toInt)
-            case _ =>
-              throw new IllegalArgumentException(s"Invalid relief line: $line")
-          }
+  lazy val reliefs: Seq[Relief] =
+    reliefsFileContent
+      .linesIterator
+      .map(_.trim)
+      .filter(_.nonEmpty)
+      .map { line =>
+        line.split(",", 2) match {
+          case Array(name, rateStr) =>
+            Relief(name.trim, rateStr.trim.toInt)
+          case _ =>
+            throw new IllegalArgumentException(s"Invalid relief line: $line")
         }
-        .toSeq
-    }
-  }
-
+      }
+      .toSeq
 }
-
