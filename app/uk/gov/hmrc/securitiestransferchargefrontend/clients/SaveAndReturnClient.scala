@@ -77,9 +77,11 @@ class SaveAndReturnClientImpl @Inject(http: HttpClientV2, config: FrontendAppCon
 
     http.get(url)
       .execute[List[SubmissionId]]
-      .andThen {
-        case Failure(e) =>
-          logger.error(s"Failed to retrieve submissionIds for userId=$userId", e)
+      .recover {
+        _ =>
+          logger.info(s"No submission Ids available for user ${userId}")
+          List.empty[SubmissionId]
       }
+
   }
 }
