@@ -42,7 +42,7 @@ class StfNavigator @Inject()(sessionRepository: SessionRepository,
     case HowToNotifyAboutSecuritiesTransferPage => userAnswers => {
       dataDependent(HowToNotifyAboutSecuritiesTransferPage, userAnswers) {
         case OneAtATime => routes.ConfirmAddressController.onPageLoad()
-        case MoreThanOneAtATime => ???
+        case MoreThanOneAtATime => routes.ChargingPointController.onPageLoad(NormalMode)
       }
     }
     case StfBuyersAddressPage => userAnswers => dataRequired(StfBuyersAddressPage, userAnswers, routes.NameOfSellerController.onPageLoad(NormalMode))
