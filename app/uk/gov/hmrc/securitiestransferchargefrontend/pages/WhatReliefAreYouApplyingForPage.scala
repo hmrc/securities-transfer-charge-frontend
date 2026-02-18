@@ -14,24 +14,13 @@
  * limitations under the License.
  */
 
-package forms.behaviours
+package uk.gov.hmrc.securitiestransferchargefrontend.pages
 
-import play.api.data.{Form, FormError}
+import play.api.libs.json.JsPath
 
-trait StringFieldBehaviours extends FieldBehaviours {
+case object WhatReliefAreYouApplyingForPage extends QuestionPage[String] {
 
-  def fieldWithMaxLength(form: Form[_],
-                         fieldName: String,
-                         maxLength: Int,
-                         lengthError: FormError): Unit = {
+  override def path: JsPath = JsPath \ toString
 
-    s"not bind strings longer than $maxLength characters" in {
-
-      forAll(stringsLongerThan(maxLength) -> "longString") {
-        (string: String) =>
-          val result = form.bind(Map(fieldName -> string)).apply(fieldName)
-          result.errors must contain only lengthError
-      }
-    }
-  }
+  override def toString: String = "whatReliefAreYouApplyingFor"
 }

@@ -21,13 +21,17 @@
 @import uk.gov.hmrc.govukfrontend.views.html.components._
 @import uk.gov.hmrc.hmrcfrontend.views.viewmodels.hmrcstandardpage._
 @import uk.gov.hmrc.securitiestransferchargefrontend.controllers.auth.{routes => authRoutes}
+@import uk.gov.hmrc.hmrcfrontend.views.html.helpers.{HmrcAccessibleAutocompleteCss, HmrcAccessibleAutocompleteJavascript}
+
 
 @this(
     appConfig: FrontendAppConfig,
     hmrcTimeoutDialog: HmrcTimeoutDialog,
     hmrcReportTechnicalIssueHelper: HmrcReportTechnicalIssueHelper,
     alphaBanner: StandardAlphaBanner,
-    hmrcStandardPage: HmrcStandardPage
+    hmrcStandardPage: HmrcStandardPage,
+    autocompleteCss: HmrcAccessibleAutocompleteCss,
+    autocompleteJavascript: HmrcAccessibleAutocompleteJavascript
 )
 
 @(pageTitle: String, showBackLink: Boolean = true, timeout: Boolean = true, showSignOut: Boolean = true, showHmrcBanner: Boolean = false)(contentBlock: Html)(implicit rh: RequestHeader, messages: Messages)
@@ -54,15 +58,22 @@
     @hmrcReportTechnicalIssueHelper()
 }
 
+@combinedAdditionalHead = {
+    @head
+    @autocompleteCss()
+}
+
 @hmrcStandardPage(HmrcStandardPageParams(
     pageTitle = Some(pageTitle),
     templateOverrides = TemplateOverrides(
-        additionalHeadBlock = Some(head)
+        additionalHeadBlock = Some(combinedAdditionalHead),
+        additionalScriptsBlock = Some(autocompleteJavascript())
     ),
     serviceURLs = ServiceURLs(
         serviceUrl = Some(IndexController.onPageLoad().url),
         signOutUrl = if(showSignOut) Some(authRoutes.AuthController.signOut().url) else None
     ),
+    serviceName = Some(""),
     banners = Banners(
         displayHmrcBanner = showHmrcBanner,
         phaseBanner = Some(alphaBanner(appConfig.feedbackUrl))
