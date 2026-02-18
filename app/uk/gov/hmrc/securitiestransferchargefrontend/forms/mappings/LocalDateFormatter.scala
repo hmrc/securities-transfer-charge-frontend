@@ -1,5 +1,5 @@
 /*
- * Copyright 2026 HM Revenue & Customs
+ * Copyright 2025 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,6 +19,8 @@ package uk.gov.hmrc.securitiestransferchargefrontend.forms.mappings
 import play.api.data.FormError
 import play.api.data.format.Formatter
 import play.api.i18n.Messages
+import uk.gov.hmrc.securitiestransferchargefrontend.models.DateHelper
+import uk.gov.hmrc.securitiestransferchargefrontend.models.DateHelper.formatDateToString
 
 import java.time.{LocalDate, Month}
 import scala.util.{Failure, Success, Try}
@@ -28,6 +30,7 @@ private[mappings] class LocalDateFormatter(
                                             allRequiredKey: String,
                                             twoRequiredKey: String,
                                             requiredKey: String,
+                                            futureDateKey: String,
                                             args: Seq[String] = Seq.empty
                                           )(implicit messages: Messages) extends Formatter[LocalDate] with Formatters {
 
@@ -38,11 +41,23 @@ private[mappings] class LocalDateFormatter(
       case Success(date) =>
         Right(date)
       case Failure(_) =>
-        Left(Seq(FormError(key, invalidKey, args)))
+        Left(Seq(FormError(key, invalidKey, getErrorArgs(day, month))))
     }
+
+  private def getErrorArgs(day: Int, month: Int): Seq[String] = {
+    val isDayError   = day < 1 || day > 31
+    val isMonthError = month < 1 || month > 12
+
+    (isDayError, isMonthError) match {
+      case (true, false) => Seq("day")
+      case (false, true) => Seq("month")
+      case (_, _)        => Seq("day", "month", "year")
+    }
+  }
 
   private def formatDate(key: String, data: Map[String, String]): Either[Seq[FormError], LocalDate] = {
 
+    val monthVal = s"$key.month"
     val int = intFormatter(
       requiredKey = invalidKey,
       wholeNumberKey = invalidKey,
@@ -54,18 +69,25 @@ private[mappings] class LocalDateFormatter(
 
     for {
       day   <- int.bind(s"$key.day", data)
-      month <- month.bind(s"$key.month", data)
+      month <- data(monthVal).toIntOption match {
+        case Some(_) => int.bind(monthVal, data)
+        case _       => month.bind(monthVal, data)
+      }
       year  <- int.bind(s"$key.year", data)
       date  <- toDate(key, day, month, year)
     } yield date
   }
 
   override def bind(key: String, data: Map[String, String]): Either[Seq[FormError], LocalDate] = {
+    val cleanedData = data.map {
+      case (k, v) => k -> v.replaceAll("[\\s-]", "")
+    }
 
-    val fields = fieldKeys.map {
-      field =>
-        field -> data.get(s"$key.$field").filter(_.nonEmpty)
-    }.toMap
+    val fields = fieldKeys
+      .map(
+        field => field -> cleanedData.get(s"$key.$field").filter(_.nonEmpty)
+      )
+      .toMap
 
     lazy val missingFields = fields
       .withFilter(_._2.isEmpty)
@@ -74,10 +96,7 @@ private[mappings] class LocalDateFormatter(
       .map(field => messages(s"date.error.$field"))
 
     fields.count(_._2.isDefined) match {
-      case 3 =>
-        formatDate(key, data).left.map {
-          _.map(_.copy(key = key, args = args))
-        }
+      case 3 => noMissingField(key, cleanedData)
       case 2 =>
         Left(List(FormError(key, requiredKey, missingFields ++ args)))
       case 1 =>
@@ -85,6 +104,25 @@ private[mappings] class LocalDateFormatter(
       case _ =>
         Left(List(FormError(key, allRequiredKey, args)))
     }
+  }
+
+  private def noMissingField(
+                              key: String,
+                              data: Map[String, String]
+                            ): Either[List[FormError], LocalDate] = {
+
+    val today = DateHelper.today
+
+    formatDate(key, data)
+      .left
+      .map(_.toList.map(e => e.copy(key = key, args = e.args ++ args)))
+      .flatMap { dob =>
+
+        List(
+          Option.when(dob.isAfter(today))(FormError(key, futureDateKey, List(formatDateToString(today)))),
+        ).collectFirst { case Some(err) => Left(List(err)) }
+          .getOrElse(Right(dob))
+      }
   }
 
   override def unbind(key: String, value: LocalDate): Map[String, String] =

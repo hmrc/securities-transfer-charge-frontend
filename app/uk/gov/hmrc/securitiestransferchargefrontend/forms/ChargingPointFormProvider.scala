@@ -31,7 +31,8 @@ class ChargingPointFormProvider @Inject() extends Mappings {
         invalidKey     = "chargingPoint.error.invalid",
         allRequiredKey = "chargingPoint.error.required.all",
         twoRequiredKey = "chargingPoint.error.required.two",
-        requiredKey    = "chargingPoint.error.required"
+        requiredKey    = "chargingPoint.error.required",
+        futureDateKey = "chargingPoint.error.futureDate"
       )
     )
 }

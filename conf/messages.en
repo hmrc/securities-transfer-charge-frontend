@@ -146,4 +146,5 @@ chargingPoint.error.required.all = Enter the date you bought the securities
 chargingPoint.error.required.two = The date must include {0} and {1}
 chargingPoint.error.required = The date must include a {0}
 chargingPoint.error.invalid = The date you bought the securities must be a real date
+chargingPoint.error.futureDate = The day you bought the securities must be today’s date or a date in the past
 chargingPoint.change.hidden = ChargingPoint
