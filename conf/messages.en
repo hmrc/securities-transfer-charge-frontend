@@ -109,6 +109,7 @@ connectedPersons.details.content.link.text = Read HMRC guidance on connected per
 site.save-and-continue.button = Save and continue
 site.save-and-return.button = Save and return to dashboard
 
+
 applyingForRelief.title = Are you applying for a relief?
 applyingForRelief.heading = Are you applying for a relief?
 applyingForRelief.checkYourAnswersLabel = Are you applying for a relief?
@@ -116,6 +117,14 @@ applyingForRelief.error.required = Select yes if you are applying for a relief
 applyingForRelief.change.hidden = Change applying for a relief
 applyingForRelief.p = See a
 applyingForRelief.details.content.link.text = full list of reliefs
+
+whatReliefAreYouApplyingFor.title = What relief are you applying for?
+whatReliefAreYouApplyingFor.heading = What relief are you applying for?
+whatReliefAreYouApplyingFor.checkYourAnswersLabel = What relief are you applying for?
+whatReliefAreYouApplyingFor.error.required = Enter the type of relief you’re applying for
+whatReliefAreYouApplyingFor.change.hidden = Change what relief are you applying for
+whatReliefAreYouApplyingFor.p = Start typing the name of the relief and select from the list.
+whatReliefAreYouApplyingFor.details.content.link.text = See a full list of reliefs
 
 securitiesTarget.title = What business are you buying these securities in?
 securitiesTarget.heading = What business are you buying these securities in?
