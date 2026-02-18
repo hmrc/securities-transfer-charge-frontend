@@ -103,6 +103,7 @@ trait Formatters {
         data.get(key) match {
           case Some(str) if str.trim.length == 0 => Right(None)
           case Some(str) if str.length > length => Left(Seq(FormError(key, lengthKey)))
+          case Some(str) if str.length < length => Left(Seq(FormError(key, lengthKey)))
           case Some(str) => Right(Some(str))
           case _ => Right(None)
         }
