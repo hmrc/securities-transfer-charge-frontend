@@ -45,7 +45,6 @@ class StfNavigator @Inject()(sessionRepository: SessionRepository,
         case MoreThanOneAtATime => ???
       }
     }
-
     case StfBuyersAddressPage => userAnswers => dataRequired(StfBuyersAddressPage, userAnswers, routes.NameOfSellerController.onPageLoad(NormalMode))
     case NameOfSellerPage => userAnswers => dataRequired(NameOfSellerPage, userAnswers,sellerRoutes.StfSellerAddressController.onPageLoad())
     case ConfirmAddressPage => userAnswers => dataRequired(ConfirmAddressPage, userAnswers, routes.NameOfSellerController.onPageLoad(NormalMode))
@@ -53,9 +52,10 @@ class StfNavigator @Inject()(sessionRepository: SessionRepository,
     case SellerAddressPage => userAnswers => dataRequired(SellerAddressPage, userAnswers, routes.ConnectedPersonsController.onPageLoad(NormalMode))
     case ApplyingForReliefPage => userAnswers => dataDependent(ApplyingForReliefPage,userAnswers){
       case true => routes.WhatReliefAreYouApplyingForController.onPageLoad(NormalMode)
-      case false => ???
+      case false => routes.SecuritiesTargetController.onPageLoad(NormalMode)
     }
-    case WhatReliefAreYouApplyingForPage => userAnswers => dataRequired(WhatReliefAreYouApplyingForPage, userAnswers, defaultPage)
+    case WhatReliefAreYouApplyingForPage => userAnswers => dataRequired(WhatReliefAreYouApplyingForPage, userAnswers, routes.SecuritiesTargetController.onPageLoad(NormalMode))
+    case SecuritiesTargetPage => userAnswers => dataRequired(SecuritiesTargetPage, userAnswers, routes.JourneyRecoveryController.onPageLoad())
     case _ => _ => defaultPageF
 
   }

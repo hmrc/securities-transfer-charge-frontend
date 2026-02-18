@@ -99,6 +99,29 @@ class ApplyingForReliefControllerSpec extends SpecBase with MockitoSugar {
       }
     }
 
+    "must redirect to the SecuritiesTarget page when no is selected" in {
+
+      val saveAndReturnClient = mock[SaveAndReturnClient]
+
+      when(saveAndReturnClient.save(any[UserAnswers]())(any[HeaderCarrier]()))
+        .thenReturn(Future.successful(()))
+
+      val application =
+        applicationBuilder(userAnswers = Some(emptyUserAnswers))
+          .build()
+
+      running(application) {
+        val request =
+          FakeRequest(POST, applyingForReliefRoute)
+            .withFormUrlEncodedBody(("value", "false"))
+
+        val result = route(application, request).value
+
+        status(result) mustEqual SEE_OTHER
+        redirectLocation(result).value mustEqual routes.SecuritiesTargetController.onPageLoad(NormalMode).url
+      }
+    }
+
     "must return a Bad Request and errors when invalid data is submitted" in {
 
       val application = applicationBuilder(userAnswers = Some(emptyUserAnswers)).build()
