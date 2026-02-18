@@ -19,7 +19,8 @@ lazy val microservice = (project in file("."))
     scalacOptions += "-Werror",
     RoutesKeys.routesImport ++= Seq(
       "uk.gov.hmrc.securitiestransferchargefrontend.models._",
-      "uk.gov.hmrc.play.bootstrap.binders.RedirectUrl"
+      "uk.gov.hmrc.play.bootstrap.binders.RedirectUrl",
+      "uk.gov.hmrc.securitiestransferchargefrontend.domain.SubmissionId"
     ),
     TwirlKeys.templateImports ++= Seq(
       "play.twirl.api.HtmlFormat",

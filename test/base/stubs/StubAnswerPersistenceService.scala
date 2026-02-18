@@ -18,6 +18,7 @@ package base.stubs
 
 import play.api.mvc.Call
 import uk.gov.hmrc.http.HeaderCarrier
+import uk.gov.hmrc.securitiestransferchargefrontend.domain.SubmissionId
 import uk.gov.hmrc.securitiestransferchargefrontend.models.UserAnswers
 import uk.gov.hmrc.securitiestransferchargefrontend.services.AnswerPersistenceService
 
@@ -26,6 +27,9 @@ import scala.concurrent.Future
 class StubAnswerPersistenceService extends AnswerPersistenceService:
   def save(userAnswers: UserAnswers, nextCall: Call)(implicit hc: HeaderCarrier): Future[Unit] =
     Future.successful(())
+
+  override def load(submissionId: SubmissionId, userId: String)(implicit hc: HeaderCarrier): Future[UserAnswers] =
+    Future.successful(UserAnswers.empty(userId)(submissionId))
 
 object StubAnswerPersistenceService:
   def apply(): StubAnswerPersistenceService = new StubAnswerPersistenceService

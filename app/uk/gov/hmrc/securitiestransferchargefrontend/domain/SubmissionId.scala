@@ -25,6 +25,7 @@ opaque type SubmissionId = String
 
 object SubmissionId:
   def apply(v: String): SubmissionId = v
+
   extension (id: SubmissionId)
     def value: String = id
 
