@@ -68,11 +68,11 @@ class SecuritiesTargetViewSpec extends ViewBaseSpec {
       }
 
       "displays the correct field name for the business name" in {
-        securitiesTargetView.select(".govuk-label").first().text()
+        securitiesTargetView.select(".govuk-label").first().text() mustBe ExpectedContent.field1
       }
 
       "displays the correct field name for the CRN" in {
-        securitiesTargetView.select(".govuk-label").last().text()
+        securitiesTargetView.select(".govuk-label").last().text() mustBe ExpectedContent.field2
       }
 
       "must render CRN hint text" in {
