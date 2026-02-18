@@ -66,5 +66,5 @@ POST       /stf/change/securities-target                  uk.gov.hmrc.securities
 
 GET        /stf/charging-point                  uk.gov.hmrc.securitiestransferchargefrontend.controllers.ChargingPointController.onPageLoad(mode: Mode = NormalMode)
 POST       /stf/charging-point                  uk.gov.hmrc.securitiestransferchargefrontend.controllers.ChargingPointController.onSubmit(mode: Mode = NormalMode)
-GET        /stf/change/charging-point                       uk.gov.hmrc.securitiestransferchargefrontend.controllers.ChargingPointController.onPageLoad(mode: Mode = CheckMode)
-POST       /stf/change/charging-point                        uk.gov.hmrc.securitiestransferchargefrontend.controllers.ChargingPointController.onSubmit(mode: Mode = CheckMode)
+GET        /stf/change/charging-point           uk.gov.hmrc.securitiestransferchargefrontend.controllers.ChargingPointController.onPageLoad(mode: Mode = CheckMode)
+POST       /stf/change/charging-point           uk.gov.hmrc.securitiestransferchargefrontend.controllers.ChargingPointController.onSubmit(mode: Mode = CheckMode)
