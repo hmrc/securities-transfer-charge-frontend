@@ -42,7 +42,7 @@ class StfNavigator @Inject()(sessionRepository: SessionRepository,
     case HowToNotifyAboutSecuritiesTransferPage => userAnswers => {
       dataDependent(HowToNotifyAboutSecuritiesTransferPage, userAnswers) {
         case OneAtATime => routes.ConfirmAddressController.onPageLoad()
-        case MoreThanOneAtATime => routes.SecuritiesTargetController.onPageLoad(NormalMode)
+        case MoreThanOneAtATime => ???
       }
     }
     case StfBuyersAddressPage => userAnswers => dataRequired(StfBuyersAddressPage, userAnswers, routes.NameOfSellerController.onPageLoad(NormalMode))
@@ -50,7 +50,13 @@ class StfNavigator @Inject()(sessionRepository: SessionRepository,
     case ConfirmAddressPage => userAnswers => dataRequired(ConfirmAddressPage, userAnswers, routes.NameOfSellerController.onPageLoad(NormalMode))
     case ConnectedPersonsPage => userAnswers => dataRequired(ConnectedPersonsPage, userAnswers, routes.ApplyingForReliefController.onPageLoad(NormalMode))
     case SellerAddressPage => userAnswers => dataRequired(SellerAddressPage, userAnswers, routes.ConnectedPersonsController.onPageLoad(NormalMode))
-    case ApplyingForReliefPage => userAnswers => dataRequired(ApplyingForReliefPage, userAnswers, defaultPage)
+    case ApplyingForReliefPage => userAnswers => {
+      dataDependent(ApplyingForReliefPage, userAnswers) {applyingFor =>
+        if (applyingFor) routes.JourneyRecoveryController.onPageLoad()
+        else routes.SecuritiesTargetController.onPageLoad(NormalMode)
+      }
+    }
+    case SecuritiesTargetPage => userAnswers => dataRequired(SecuritiesTargetPage, userAnswers, ???)
     case _ => _ => defaultPageF
 
   }
