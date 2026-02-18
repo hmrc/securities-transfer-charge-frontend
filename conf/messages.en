@@ -137,3 +137,13 @@ securitiesTarget.error.BusinessName.required = Enter the name of the business yo
 securitiesTarget.error.CRN.length = The company registration number must be 8 characters
 securitiesTarget.BusinessName.change.hidden = BusinessName
 securitiesTarget.CRN.change.hidden = CRN
+
+chargingPoint.title = When did you buy the securities?
+chargingPoint.heading = When did you buy the securities?
+chargingPoint.hint = This is also called the charging point. For example, 12 11 2007
+chargingPoint.checkYourAnswersLabel = When did you buy the securities?
+chargingPoint.error.required.all = Enter the date you bought the securities
+chargingPoint.error.required.two = The date must include {0} and {1}
+chargingPoint.error.required = The date must include a {0}
+chargingPoint.error.invalid = The date you bought the securities must be a real date
+chargingPoint.change.hidden = ChargingPoint
