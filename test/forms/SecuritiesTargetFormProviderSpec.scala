@@ -67,7 +67,7 @@ class SecuritiesTargetFormProviderSpec extends StringFieldBehaviours {
       form,
       fieldName,
       maxLength,
-      lengthError = FormError(fieldName, lengthKey, Seq(maxLength))
+      lengthError = FormError(fieldName, lengthKey)
     )
 
   }
