@@ -27,8 +27,7 @@ class SecuritiesTargetFormProvider @Inject() extends Mappings {
 
    def apply(): Form[SecuritiesTarget] = Form(
      mapping(
-      "BusinessName" -> text("securitiesTarget.error.BusinessName.required")
-        .verifying(maxLength(1000, "securitiesTarget.error.BusinessName.length")),
+      "BusinessName" -> text("securitiesTarget.error.BusinessName.required"),
        "CRN" -> validatedOptionalText("securitiesTarget.error.CRN.length", 8)
      )(SecuritiesTarget.apply)(x => Some((x.BusinessName, x.CRN)))
    )
