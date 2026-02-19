@@ -81,10 +81,13 @@ class FrontendAppConfig @Inject() (configuration: Configuration, servicesConfig:
   
   lazy val saveAndReturnBaseUrl: String = servicesConfig.baseUrl("securities-transfer-charge-save-and-return")
   lazy val saveAndReturnPath: String = configuration.get[String]("urls.saveAndReturnPath")
+  lazy val generateSubmissionIdPath: String = configuration.get[String]("urls.generateSubmissionIdPath")
 
   val saveUserAnswersUrl: String = s"$saveAndReturnBaseUrl$saveAndReturnPath"
 
   val retrieveUserAnswersUrl: String = s"$saveAndReturnBaseUrl$saveAndReturnPath"
+  
+  val generateSubmissionIdUrl: String = s"$saveAndReturnBaseUrl$generateSubmissionIdPath"
   
   lazy val connectedPersonsInformationUrl: String = configuration.get[String]("urls.external.connectedPersonsInformation")
   
