@@ -42,10 +42,10 @@ abstract class AbstractNavigator(answerPersistenceService: AnswerPersistenceServ
     val updatedUserAnswers = if (Navigator.errorPages.contains(call)) ua else ua.setNextPage(call)
     Future.successful(updatedUserAnswers)
 
-  protected[navigation] def updateAndPersistUserAnswers(call: Call, ua: UserAnswers)(implicit hc: HeaderCarrier):Future[Unit] = for {
+  protected[navigation] def updateAndPersistUserAnswers(call: Call, ua: UserAnswers)(implicit hc: HeaderCarrier):Future[Call] = for {
     updatedAnswers <- updateUserAnswers(call)(ua)
     _              <- answerPersistenceService.save(updatedAnswers, call)
-  } yield ()
+  } yield call
 
   /*
    * Used to navigate when the destination does not depend on the UserAnswers.
@@ -55,7 +55,7 @@ abstract class AbstractNavigator(answerPersistenceService: AnswerPersistenceServ
     userAnswers
       .fold
         (Future.successful(success))
-        (ua => updateAndPersistUserAnswers(success, ua)).map(_ => success)
+        (ua => updateAndPersistUserAnswers(success, ua))
 
   /*
    * Used to navigate when the destination depends on UserAnswers existing for the page,
@@ -79,10 +79,7 @@ abstract class AbstractNavigator(answerPersistenceService: AnswerPersistenceServ
     for a different page than the current one.
    */
   protected[navigation] def userAnswersDependent(userAnswers: UserAnswers)(f: UserAnswers => Call)(implicit hc: HeaderCarrier): Future[Call] = {
-    val nextCall = f(userAnswers)
-    answerPersistenceService
-      .save(userAnswers, nextCall)
-      .map (_ => nextCall)
+    updateAndPersistUserAnswers(nextCall, f(userAnswers))
   }
 
   def restore(submissionId: SubmissionId, userId: String)(implicit request: Request[?]): Future[UserAnswers] = {

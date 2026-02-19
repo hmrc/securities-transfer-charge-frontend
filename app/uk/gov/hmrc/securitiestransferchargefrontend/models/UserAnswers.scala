@@ -73,8 +73,38 @@ case class UserAnswers(userId: String,
 object UserAnswers {
 
   val empty: String => SubmissionId => UserAnswers = userId => submissionId => UserAnswers(userId, submissionId)
-  implicit val callFormat: Format[Call] = Json.format[Call]
+  
+  implicit val callFormat: Format[Call] = new Format[Call] {
 
+    /* The Call constructor defaults its fragment attribute to null
+     * which causes the default serDes to fail. We get around this here
+     * by swapping null for a space. Since spaces are not allowed in fragments
+     * this ought not to clash with and real fragments.
+     */
+    
+    override def writes(call: Call): JsValue = {
+      val fragmentEncoded: String =
+        if (call.fragment == null) " " else call.fragment
+
+      Json.obj(
+        "method" -> call.method,
+        "url" -> call.url,
+        "fragment" -> fragmentEncoded
+      )
+    }
+
+    override def reads(json: JsValue): JsResult[Call] = for {
+      method <- (json \ "method").validate[String]
+      url <- (json \ "url").validate[String]
+      fragment <- (json \ "fragment").validate[String]
+    } yield {
+      val fragmentDecoded: String =
+        if (fragment == " ") null else fragment
+
+      Call(method, url, fragmentDecoded)
+    }
+  }
+  
   val reads: Reads[UserAnswers] = {
 
     import play.api.libs.functional.syntax.*

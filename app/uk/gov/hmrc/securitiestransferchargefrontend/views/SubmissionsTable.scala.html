@@ -42,10 +42,10 @@
 
     <tbody class="govuk-table__body">
     @for(id <- submissionIds) {
-
+        @defining(routes.SaveAndReturnController.restore(id.value).url) {link =>
             <tr class="govuk-table__row">
                 <td class="govuk-table__cell">
-                    <a href="@id.value">@id.value</a>
+                    <a href="@link">@id.value</a>
                 </td>
                 <td class="govuk-table__cell">
                     -
@@ -60,7 +60,7 @@
                     -
                 </td>
             </tr>
-
+        }
     }
     </tbody>
 </table>
