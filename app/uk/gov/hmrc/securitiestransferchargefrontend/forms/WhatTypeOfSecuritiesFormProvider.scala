@@ -14,15 +14,18 @@
  * limitations under the License.
  */
 
-package generators
+package uk.gov.hmrc.securitiestransferchargefrontend.forms
 
-import org.scalacheck.{Arbitrary, Gen}
+import play.api.data.Form
+import uk.gov.hmrc.securitiestransferchargefrontend.forms.mappings.Mappings
 import uk.gov.hmrc.securitiestransferchargefrontend.models.WhatTypeOfSecurities
 
-trait ModelGenerators {
+import javax.inject.Inject
 
-  implicit lazy val arbitraryWhatTypeOfSecurities: Arbitrary[WhatTypeOfSecurities] =
-    Arbitrary {
-      Gen.oneOf(WhatTypeOfSecurities.values.toSeq)
-    }
+class WhatTypeOfSecuritiesFormProvider @Inject() extends Mappings {
+
+  def apply(): Form[WhatTypeOfSecurities] =
+    Form(
+      "value" -> enumerable[WhatTypeOfSecurities]("whatTypeOfSecurities.error.required")
+    )
 }
