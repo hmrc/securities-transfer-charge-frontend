@@ -79,14 +79,22 @@ class FrontendAppConfig @Inject() (configuration: Configuration, servicesConfig:
   val countdown: Int = configuration.get[Int]("timeout-dialog.countdown")
 
   val cacheTtl: Long = configuration.get[Int]("mongodb.timeToLiveInSeconds")
-  
-  lazy val saveAndReturnBaseUrl: String = servicesConfig.baseUrl("securities-transfer-charge-save-and-return")
-  lazy val saveAndReturnPath: String = configuration.get[String]("urls.saveAndReturnPath")
 
-  val saveUserAnswersUrl: String = s"$saveAndReturnBaseUrl$saveAndReturnPath"
+  private val saveAndReturnService =
+    configuration.get[Service]("microservice.services.securities-transfer-charge-save-and-return")
 
-  val retrieveUserAnswersUrl: String = s"$saveAndReturnBaseUrl$saveAndReturnPath"
-  
+  lazy val saveAndReturnBaseUrl: String =
+    saveAndReturnService.baseUrl
+
+  lazy val saveAndReturnBasePath: String =
+    configuration.get[String](
+      "microservice.services.securities-transfer-charge-save-and-return.path"
+    )
+
+  lazy val saveAndReturnUrl: String =
+    s"$saveAndReturnBaseUrl$saveAndReturnBasePath"
+
+
   lazy val connectedPersonsInformationUrl: String = configuration.get[String]("urls.external.connectedPersonsInformation")
   
 }

@@ -16,23 +16,30 @@
 
 package uk.gov.hmrc.securitiestransferchargefrontend.clients
 
+import uk.gov.hmrc.http.{HeaderCarrier, StringContextOps}
+import uk.gov.hmrc.http.client.HttpClientV2
+import uk.gov.hmrc.securitiestransferchargefrontend.config.FrontendAppConfig
 import uk.gov.hmrc.securitiestransferchargefrontend.domain.SubmissionId
+import uk.gov.hmrc.http.HttpReads.Implicits.*
 
-import javax.inject.Inject
-import scala.concurrent.Future
-import scala.util.Random
+
+import javax.inject.{Inject, Singleton}
+import scala.concurrent.{ExecutionContext, Future}
 
 trait SubmissionIdClient:
-  def nextSubmissionId(): Future[SubmissionId]
+  def nextSubmissionId()(implicit hc: HeaderCarrier): Future[SubmissionId]
 
-class SubmissionIdClientImpl @Inject() extends SubmissionIdClient {
-  private val rnd = new Random()
+@Singleton
+class SubmissionIdClientImpl @Inject()(
+                                        httpClient: HttpClientV2,
+                                        appConfig: FrontendAppConfig
+                                      )(implicit ec: ExecutionContext)
+  extends SubmissionIdClient {
 
-  // TODO: Stubbed implementation - replace with call to S&R service.
-  override def nextSubmissionId(): Future[SubmissionId] = {
-    val x = rnd.nextInt(1_000_000_000).abs
-    val submissionId = SubmissionId(f"STC-$x%09d")
-    Future.successful(submissionId)
+  override def nextSubmissionId()(implicit hc: HeaderCarrier): Future[SubmissionId] = {
+
+    httpClient
+      .post(url"${appConfig.saveAndReturnUrl}/submission-id") 
+      .execute[SubmissionId]
   }
-
 }
