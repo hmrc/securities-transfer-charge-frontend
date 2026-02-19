@@ -39,7 +39,7 @@ class SubmissionIdClientImpl @Inject()(
   override def nextSubmissionId()(implicit hc: HeaderCarrier): Future[SubmissionId] = {
 
     httpClient
-      .post(url"${appConfig.generateSubmissionIdUrl}/submission-id")
+      .post(url"${appConfig.saveAndReturnUrl}/submission-id") 
       .execute[SubmissionId]
   }
 }
