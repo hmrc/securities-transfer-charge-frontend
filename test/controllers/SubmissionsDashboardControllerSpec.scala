@@ -117,7 +117,7 @@ class SubmissionsDashboardControllerSpec extends SpecBase with MockitoSugar {
 
         val generatedSubmissionId = SubmissionId("STC-111111111")
 
-        when(mockIdClient.nextSubmissionId())
+        when(mockIdClient.nextSubmissionId()(any()))
           .thenReturn(Future.successful(generatedSubmissionId))
 
         when(mockSaveAndReturnClient.save(any())(any()))
@@ -144,6 +144,36 @@ class SubmissionsDashboardControllerSpec extends SpecBase with MockitoSugar {
           status(result) mustEqual SEE_OTHER
 
           redirectLocation(result).value mustEqual routes.HowToNotifyAboutSecuritiesTransferController.onPageLoad(NormalMode).url
+        }
+      }
+
+      "must fail when submission ID generation fails" in {
+
+        val mockSaveAndReturnClient = mock[SaveAndReturnClient]
+        val mockIdClient = mock[SubmissionIdClient]
+
+        when(mockIdClient.nextSubmissionId()(any()))
+          .thenReturn(Future.failed(new RuntimeException("exception")))
+
+        val application =
+          applicationBuilder(
+            saveAndReturnClient = mockSaveAndReturnClient
+          )
+            .overrides(bind[SubmissionIdClient].toInstance(mockIdClient))
+            .build()
+
+        running(application) {
+
+          val request = FakeRequest(
+            POST,
+            routes.SubmissionsDashboardController.onSubmit().url
+          )
+
+          val thrown = intercept[RuntimeException] {
+            await(route(application, request).value)
+          }
+
+          thrown.getMessage mustBe "exception"
         }
       }
     }
