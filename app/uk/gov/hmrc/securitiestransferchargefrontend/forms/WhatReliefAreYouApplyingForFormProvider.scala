@@ -14,24 +14,17 @@
  * limitations under the License.
  */
 
-package forms.behaviours
+package uk.gov.hmrc.securitiestransferchargefrontend.forms
 
-import play.api.data.{Form, FormError}
+import play.api.data.Form
+import uk.gov.hmrc.securitiestransferchargefrontend.forms.mappings.Mappings
 
-trait StringFieldBehaviours extends FieldBehaviours {
+import javax.inject.Inject
 
-  def fieldWithMaxLength(form: Form[_],
-                         fieldName: String,
-                         maxLength: Int,
-                         lengthError: FormError): Unit = {
+class WhatReliefAreYouApplyingForFormProvider @Inject() extends Mappings {
 
-    s"not bind strings longer than $maxLength characters" in {
-
-      forAll(stringsLongerThan(maxLength) -> "longString") {
-        (string: String) =>
-          val result = form.bind(Map(fieldName -> string)).apply(fieldName)
-          result.errors must contain only lengthError
-      }
-    }
-  }
+  def apply(): Form[String] =
+    Form(
+      "reliefs" -> text("whatReliefAreYouApplyingFor.error.required")
+    )
 }

@@ -92,6 +92,14 @@ class StfNavigatorSpec extends SpecBase with ScalaFutures {
           res mustBe routes.ApplyingForReliefController.onPageLoad(NormalMode)
         }
       }
+
+      "must go from the ApplyingForReliefPage to WhatReliefAreYouApplyingForController when yes is selected" in {
+        val answers = emptyUserAnswers.set(ApplyingForReliefPage, true).get
+        val result = navigator.nextPage(ApplyingForReliefPage, NormalMode, answers)(fakeRequest)
+        whenReady(result) { res =>
+          res mustBe routes.WhatReliefAreYouApplyingForController.onPageLoad(NormalMode)
+        }
+      }
     }
 
     "in Check mode" - {
