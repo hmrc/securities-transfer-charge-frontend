@@ -27,10 +27,10 @@ import scala.language.postfixOps
 import scala.util.{Failure, Success, Try}
 
 case class UserAnswers(userId: String,
-                             submissionId: SubmissionId,
-                             nextPage: Option[Call] = None,
-                             data: JsObject = Json.obj(),
-                             lastUpdated: Instant = Instant.now) {
+                       submissionId: SubmissionId,
+                       nextPage: Option[Call] = None,
+                       data: JsObject = Json.obj(),
+                       lastUpdated: Instant = Instant.now) {
 
   def setNextPage(call: Call): UserAnswers = this.copy(nextPage = Some(call))
 

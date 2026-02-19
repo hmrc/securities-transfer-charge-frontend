@@ -16,6 +16,7 @@
 
 package uk.gov.hmrc.securitiestransferchargefrontend.clients
 
+import play.api.Logging
 import uk.gov.hmrc.securitiestransferchargefrontend.domain.SubmissionId
 
 import javax.inject.Inject
@@ -25,13 +26,14 @@ import scala.util.Random
 trait SubmissionIdClient:
   def nextSubmissionId(): Future[SubmissionId]
 
-class SubmissionIdClientImpl @Inject() extends SubmissionIdClient {
+class SubmissionIdClientImpl @Inject() extends SubmissionIdClient with Logging {
   private val rnd = new Random()
 
   // TODO: Stubbed implementation - replace with call to S&R service.
   override def nextSubmissionId(): Future[SubmissionId] = {
     val x = rnd.nextInt(1_000_000_000).abs
     val submissionId = SubmissionId(f"STC-$x%09d")
+    logger.info(s"Created new submission id $submissionId")
     Future.successful(submissionId)
   }
 

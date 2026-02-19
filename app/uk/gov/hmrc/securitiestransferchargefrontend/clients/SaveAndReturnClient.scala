@@ -17,19 +17,19 @@
 package uk.gov.hmrc.securitiestransferchargefrontend.clients
 
 import play.api.Logging
-import play.api.libs.json.Json
-import uk.gov.hmrc.http.{HeaderCarrier, HttpResponse, StringContextOps}
-import uk.gov.hmrc.http.client.HttpClientV2
-import uk.gov.hmrc.securitiestransferchargefrontend.config.FrontendAppConfig
-import uk.gov.hmrc.securitiestransferchargefrontend.models.UserAnswers
-import uk.gov.hmrc.securitiestransferchargefrontend.domain.SubmissionId
+import play.api.http.Status.{NOT_FOUND, OK}
+import play.api.libs.json.*
 import play.api.libs.ws.JsonBodyWritables.writeableOf_JsValue
 import uk.gov.hmrc.http.HttpReads.Implicits.*
-import scala.util.Failure
+import uk.gov.hmrc.http.client.HttpClientV2
+import uk.gov.hmrc.http.{HeaderCarrier, HttpResponse, StringContextOps}
+import uk.gov.hmrc.securitiestransferchargefrontend.config.FrontendAppConfig
+import uk.gov.hmrc.securitiestransferchargefrontend.domain.SubmissionId
+import uk.gov.hmrc.securitiestransferchargefrontend.models.UserAnswers
 
-import scala.concurrent.ExecutionContext
 import javax.inject.Inject
-import scala.concurrent.Future
+import scala.concurrent.{ExecutionContext, Future}
+import scala.util.Failure
 
 
 trait SaveAndReturnClient:
@@ -75,13 +75,20 @@ class SaveAndReturnClientImpl @Inject(http: HttpClientV2, config: FrontendAppCon
 
     val url = url"${config.retrieveUserAnswersUrl}/$userId"
 
-    http.get(url)
-      .execute[List[SubmissionId]]
-      .recover {
-        _ =>
-          logger.info(s"No submission Ids available for user ${userId}")
-          List.empty[SubmissionId]
+    http
+      .get(url)
+      .execute[HttpResponse]
+      .map { resp => resp.status match {
+        case NOT_FOUND => List.empty[SubmissionId]
+        case OK => 
+          resp.json.validate[List[SubmissionId]] match {
+            case JsSuccess(value, path) => value
+            case JsError(e) => throw new RuntimeException(s"Failed to parse response to list of submission IDs: $e")
+          }
+        case status =>
+          throw new RuntimeException(s"Failed to retrieve submissionIds for userId=$userId; status=$status")
       }
-
+    }
   }
+  
 }
