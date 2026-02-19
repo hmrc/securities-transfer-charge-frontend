@@ -73,18 +73,21 @@ class NavigatorSpec extends SpecBase with MockitoSugar with ScalaFutures {
       val navigator = testSetup()
       val mockUserAnswers = mock[UserAnswers]
       when(mockUserAnswers.setNextPage(testCall)).thenReturn(mockUserAnswers)
+      val updatedUserAnswers = mockUserAnswers.setNextPage(testCall)
       val result = navigator.goTo(testCall, Some(mockUserAnswers))
       whenReady(result) { _ =>
-        verify(mockAnswerPersistenceService, times(1)).save(mockUserAnswers, testCall)(mockHeaderCarrier)
-        verify(mockUserAnswers, times(1)).setNextPage(testCall)
+        verify(mockAnswerPersistenceService, times(1)).save(updatedUserAnswers, testCall)(mockHeaderCarrier)
+        // Look for 2 calls here because there's one above in the test setup.
+        verify(mockUserAnswers, times(2)).setNextPage(testCall)
         result.futureValue mustBe testCall
       }
     }
     "store user answers when navigating from a page that requires data" in {
       val navigator = testSetup()
       val result = navigator.dataRequired(testPage, userAnswers, testCall)
+      val updatedUserAnswers = userAnswers.setNextPage(testCall)
       whenReady(result) { _ =>
-        verify(mockAnswerPersistenceService, times(1)).save(userAnswers, testCall)(mockHeaderCarrier)
+        verify(mockAnswerPersistenceService, times(1)).save(updatedUserAnswers, testCall)(mockHeaderCarrier)
       }
     }
     "return the success page when data is present for data required navigation" in {
@@ -139,10 +142,11 @@ class NavigatorSpec extends SpecBase with MockitoSugar with ScalaFutures {
       val navigator = testSetup()
       val mockMethod = mock[UserAnswers => Call]
       when(mockMethod.apply(userAnswers)).thenReturn(testCall)
+      val updatedUserAnswers = userAnswers.setNextPage(testCall)
       val result = navigator.userAnswersDependent(userAnswers)(mockMethod)
       whenReady(result) { _ =>
         verify(mockMethod, times(1)).apply(userAnswers)
-        verify(mockAnswerPersistenceService, times(1)).save(userAnswers, testCall)(mockHeaderCarrier)
+        verify(mockAnswerPersistenceService, times(1)).save(updatedUserAnswers, testCall)(mockHeaderCarrier)
       }
     }
   }

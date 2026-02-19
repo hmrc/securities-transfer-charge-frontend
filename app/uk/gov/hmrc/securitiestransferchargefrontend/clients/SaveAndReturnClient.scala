@@ -17,7 +17,6 @@
 package uk.gov.hmrc.securitiestransferchargefrontend.clients
 
 import play.api.Logging
-import play.api.http.Status.{NOT_FOUND, OK}
 import play.api.libs.json.*
 import play.api.libs.ws.JsonBodyWritables.writeableOf_JsValue
 import uk.gov.hmrc.http.HttpReads.Implicits.*
@@ -42,12 +41,13 @@ trait SaveAndReturnClient:
 
 class SaveAndReturnClientImpl @Inject(http: HttpClientV2, config: FrontendAppConfig)(implicit ec: ExecutionContext) extends SaveAndReturnClient with Logging {
 
+  private val baseUrl = config.saveAndReturnUrl
+  private val userAnswersPath = s"$baseUrl/user-answers"
+
   override def save(userAnswers: UserAnswers)
                    (implicit hc: HeaderCarrier): Future[Unit] = {
 
-    val url = url"${config.saveUserAnswersUrl}"
-
-    http.post(url)
+    http.post(url"$userAnswersPath")
       .withBody(Json.toJson(userAnswers))
       .execute[HttpResponse]
       .map(_ => ())
@@ -61,9 +61,7 @@ class SaveAndReturnClientImpl @Inject(http: HttpClientV2, config: FrontendAppCon
                          submissionId: SubmissionId
                        )(implicit hc: HeaderCarrier): Future[UserAnswers] = {
 
-    val url = url"${config.retrieveUserAnswersUrl}/$userId/$submissionId"
-
-    http.get(url)
+    http.get(url"$userAnswersPath/$userId/$submissionId")
       .execute[UserAnswers]
       .andThen {
         case Failure(e) =>
@@ -73,22 +71,13 @@ class SaveAndReturnClientImpl @Inject(http: HttpClientV2, config: FrontendAppCon
 
   override def list(userId: String)(implicit hc: HeaderCarrier): Future[List[SubmissionId]] = {
 
-    val url = url"${config.retrieveUserAnswersUrl}/$userId"
-
     http
-      .get(url)
-      .execute[HttpResponse]
-      .map { resp => resp.status match {
-        case NOT_FOUND => List.empty[SubmissionId]
-        case OK => 
-          resp.json.validate[List[SubmissionId]] match {
-            case JsSuccess(value, path) => value
-            case JsError(e) => throw new RuntimeException(s"Failed to parse response to list of submission IDs: $e")
-          }
-        case status =>
-          throw new RuntimeException(s"Failed to retrieve submissionIds for userId=$userId; status=$status")
+      .get(url"$userAnswersPath/$userId")
+      .execute[List[SubmissionId]]
+      .andThen {
+        case Failure(e) =>
+          logger.error(s"Failed to retrieve submissionIds for userId=$userId", e)
       }
-    }
   }
-  
+
 }

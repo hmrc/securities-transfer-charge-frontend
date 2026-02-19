@@ -79,7 +79,7 @@ abstract class AbstractNavigator(answerPersistenceService: AnswerPersistenceServ
     for a different page than the current one.
    */
   protected[navigation] def userAnswersDependent(userAnswers: UserAnswers)(f: UserAnswers => Call)(implicit hc: HeaderCarrier): Future[Call] = {
-    updateAndPersistUserAnswers(nextCall, f(userAnswers))
+    updateAndPersistUserAnswers(f(userAnswers), userAnswers)
   }
 
   def restore(submissionId: SubmissionId, userId: String)(implicit request: Request[?]): Future[UserAnswers] = {
