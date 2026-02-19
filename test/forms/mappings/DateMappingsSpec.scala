@@ -39,7 +39,8 @@ class DateMappingsSpec extends AnyFreeSpec with Matchers with ScalaCheckProperty
       requiredKey    = "error.required",
       allRequiredKey = "error.required.all",
       twoRequiredKey = "error.required.two",
-      invalidKey     = "error.invalid"
+      invalidKey     = "error.invalid",
+      futureDateKey = "dateOfBirthReg.error.futureDate"
     )
   )
 
