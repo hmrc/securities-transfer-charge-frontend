@@ -55,7 +55,7 @@ class StfNavigator @Inject()(sessionRepository: SessionRepository,
     }
     case WhatReliefAreYouApplyingForPage => userAnswers => dataRequired(WhatReliefAreYouApplyingForPage, userAnswers, routes.SecuritiesTargetController.onPageLoad(NormalMode))
     case SecuritiesTargetPage => userAnswers => dataRequired(SecuritiesTargetPage, userAnswers, routes.JourneyRecoveryController.onPageLoad())
-    case OtherSecuritiesTypePage  => userAnswers => dataRequired(OtherSecuritiesTypePage,userAnswers,defaultPage)
+    case OtherSecuritiesTypePage  => userAnswers => dataRequired(OtherSecuritiesTypePage, userAnswers, routes.AmountPaidForSecuritiesController.onPageLoad(NormalMode))
     case WhatTypeOfSecuritiesPage => userAnswers => dataDependent(WhatTypeOfSecuritiesPage, userAnswers) {
       case WhatTypeOfSecurities.Shares => defaultPage
       case WhatTypeOfSecurities.Other => defaultPage

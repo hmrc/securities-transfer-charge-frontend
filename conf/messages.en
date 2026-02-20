@@ -151,3 +151,17 @@ whatTypeOfSecurities.other = Other
 whatTypeOfSecurities.checkYourAnswersLabel = What type of securities are you buying?
 whatTypeOfSecurities.error.required = Select a the type of securities you are buying
 whatTypeOfSecurities.change.hidden = Change what type of securities are you buying
+
+amountPaidForSecurities.caption = Transfer details
+amountPaidForSecurities.title = How much did you pay for these securities?
+amountPaidForSecurities.heading = How much did you pay for these securities?
+amountPaidForSecurities.checkYourAnswersLabel = How much did you pay for these securities?
+amountPaidForSecurities.p1 = Enter the total amount of consideration given in exchange for these securities as a cash amount.
+amountPaidForSecurities.p2 = You do not need to provide details about conversion or exchange rates, or how valuations of non-monetary items were reached.
+amountPaidForSecurities.hint = For example, £600 or £193.54
+amountPaidForSecurities.error.nonNumeric = Enter your amountPaidForSecurities using numbers and a decimal point
+amountPaidForSecurities.error.required = Enter your amountPaidForSecurities
+amountPaidForSecurities.error.invalidNumeric = Enter your amountPaidForSecurities using up to two decimal places
+amountPaidForSecurities.error.aboveMaximum = amountPaidForSecurities must be {0} or less
+amountPaidForSecurities.error.belowMinimum = amountPaidForSecurities must be {0} or more
+amountPaidForSecurities.change.hidden = amountPaidForSecurities
