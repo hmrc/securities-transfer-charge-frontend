@@ -145,3 +145,14 @@ whatTypeOfSecurities.other = Other
 whatTypeOfSecurities.checkYourAnswersLabel = What type of securities are you buying?
 whatTypeOfSecurities.error.required = Select a the type of securities you are buying
 whatTypeOfSecurities.change.hidden = Change what type of securities are you buying
+
+taxRate.title = Tax rate
+taxRate.heading = Tax rate
+taxRate.p1 = For most securities transfers, you will be charged a tax rate of 0.5% of the consideration.
+taxRate.p2 = If the securities are being transferred into a 'depository receipt scheme' or a 'clearance service', you will need to pay the 1.5% tax rate in most circumstances. This is usually where the transfer is not integral to capital raising or where the clearance service has elected to remain in the 0.5% regime.
+taxRate.legend = What is the tax rate for this transfer?
+taxRate.half = 0.5%
+taxRate.oneAndHalf = 1.5%
+taxRate.checkYourAnswersLabel = Tax rate
+taxRate.error.required = Select a tax rate
+taxRate.change.hidden = TaxRate

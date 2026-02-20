@@ -38,16 +38,32 @@
             @govukErrorSummary(ErrorSummaryViewModel(form,  errorLinkOverrides = Map("value" -> "value_0")))
         }
 
+        <h1 class="govuk-heading-l">
+            <span class="govuk-caption-l">@messages("transfer.details.caption")</span>
+            @messages("taxRate.heading")
+        </h1>
+
+        <p class="govuk-body">@messages("taxRate.p1")</p>
+        <p class="govuk-body">@messages("taxRate.p2")</p>
+
         @govukRadios(
             RadiosViewModel(
                 field  = form("value"),
-                legend = LegendViewModel(messages("taxRate.heading")).asPageHeading(Large),
+                legend = LegendViewModel(messages("taxRate.legend")).asPageHeading(Large),
                 items  = TaxRate.options
             )
         )
 
         @govukButton(
-            ButtonViewModel(messages("site.continue"))
+            ButtonViewModel(
+                messages("site.save-and-continue.button")
+            )
+        )
+
+        @govukButton(
+            ButtonViewModel(
+                messages("site.save-and-return.button")
+            ).asSecondaryButton()
         )
     }
 }
