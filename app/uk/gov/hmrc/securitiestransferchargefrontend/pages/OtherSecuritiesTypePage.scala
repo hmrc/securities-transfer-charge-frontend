@@ -14,15 +14,13 @@
  * limitations under the License.
  */
 
-package generators
+package uk.gov.hmrc.securitiestransferchargefrontend.pages
 
-import org.scalacheck.{Arbitrary, Gen}
-import uk.gov.hmrc.securitiestransferchargefrontend.models.WhatTypeOfSecurities
+import play.api.libs.json.JsPath
 
-trait ModelGenerators {
+case object OtherSecuritiesTypePage extends QuestionPage[String] {
 
-  implicit lazy val arbitraryWhatTypeOfSecurities: Arbitrary[WhatTypeOfSecurities] =
-    Arbitrary {
-      Gen.oneOf(WhatTypeOfSecurities.values.toSeq)
-    }
+  override def path: JsPath = JsPath \ toString
+
+  override def toString: String = "otherSecuritiesType"
 }

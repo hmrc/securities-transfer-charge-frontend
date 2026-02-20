@@ -14,7 +14,7 @@
  * limitations under the License.
  *@
 
-@import uk.gov.hmrc.securitiestransferchargefrontend.viewmodels.LegendSize.Large
+@import uk.gov.hmrc.securitiestransferchargefrontend.viewmodels.LegendSize.Medium
 @import uk.gov.hmrc.hmrcfrontend.views.html.helpers.HmrcNewTabLinkHelper
 @import uk.gov.hmrc.hmrcfrontend.views.viewmodels.newtablinkhelper.NewTabLinkHelper
 @import uk.gov.hmrc.securitiestransferchargefrontend.config.FrontendAppConfig
@@ -74,7 +74,7 @@ href = Some(config.connectedPersonsInformationUrl)
         @govukRadios(
             RadiosViewModel.yesNo(
                 field = form("value"),
-                legend = LegendViewModel(messages("connectedPersons.legend")).asPageHeading(Large)
+                legend = LegendViewModel(messages("connectedPersons.legend")).asPageHeading(Medium)
             )
         )
 
