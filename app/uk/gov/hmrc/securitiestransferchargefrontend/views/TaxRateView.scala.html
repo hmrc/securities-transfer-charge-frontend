@@ -14,7 +14,7 @@
  * limitations under the License.
  *@
 
-@import uk.gov.hmrc.securitiestransferchargefrontend.viewmodels.LegendSize.Large
+@import uk.gov.hmrc.securitiestransferchargefrontend.viewmodels.LegendSize.Medium
 @import uk.gov.hmrc.securitiestransferchargefrontend.controllers.routes
 @import uk.gov.hmrc.securitiestransferchargefrontend.views.html.templates
 @import uk.gov.hmrc.securitiestransferchargefrontend.models.TaxRate
@@ -49,7 +49,7 @@
         @govukRadios(
             RadiosViewModel(
                 field  = form("value"),
-                legend = LegendViewModel(messages("taxRate.legend")).asPageHeading(Large),
+                legend = LegendViewModel(messages("taxRate.legend")).asPageHeading(Medium),
                 items  = TaxRate.options
             )
         )
