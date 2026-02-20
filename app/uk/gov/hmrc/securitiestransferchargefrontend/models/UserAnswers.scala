@@ -71,65 +71,48 @@ case class UserAnswers(userId: String,
 }
 
 object UserAnswers {
+  import play.api.libs.functional.syntax.*
 
   val empty: String => SubmissionId => UserAnswers = userId => submissionId => UserAnswers(userId, submissionId)
-  
+
   implicit val callFormat: Format[Call] = new Format[Call] {
 
     /* The Call constructor defaults its fragment attribute to null
      * which causes the default serDes to fail. We get around this here
-     * by swapping null for a space. Since spaces are not allowed in fragments
-     * this ought not to clash with and real fragments.
+     * by using an Option.
      */
-    
-    override def writes(call: Call): JsValue = {
-      val fragmentEncoded: String =
-        if (call.fragment == null) " " else call.fragment
 
+    override def writes(call: Call): JsValue = {
       Json.obj(
-        "method" -> call.method,
-        "url" -> call.url,
-        "fragment" -> fragmentEncoded
+        "method"    -> call.method,
+        "url"       -> call.url,
+        "fragment"  -> Option(call.fragment)
       )
     }
 
     override def reads(json: JsValue): JsResult[Call] = for {
-      method <- (json \ "method").validate[String]
-      url <- (json \ "url").validate[String]
-      fragment <- (json \ "fragment").validate[String]
-    } yield {
-      val fragmentDecoded: String =
-        if (fragment == " ") null else fragment
+      method    <- (json \ "method").validate[String]
+      url       <- (json \ "url").validate[String]
+      fragment  <- (json \ "fragment").validateOpt[String]
+    } yield Call(method, url, fragment.orNull)
 
-      Call(method, url, fragmentDecoded)
-    }
   }
-  
-  val reads: Reads[UserAnswers] = {
 
-    import play.api.libs.functional.syntax.*
-
-    (
+  val reads: Reads[UserAnswers] = (
       (__ \ "_id").read[String] and
       (__ \ "submissionId").read[SubmissionId] and
       (__ \ "nextPage").readNullable[Call] and
       (__ \ "data").read[JsObject] and
       (__ \ "lastUpdated").read(MongoJavatimeFormats.instantFormat)
     ) (UserAnswers.apply _)
-  }
 
-  val writes: OWrites[UserAnswers] = {
-
-    import play.api.libs.functional.syntax.*
-
-    (
+  val writes: OWrites[UserAnswers] = (
       (__ \ "_id").write[String] and
       (__ \ "submissionId").write[SubmissionId] and
       (__ \ "nextPage").writeNullable[Call] and
       (__ \ "data").write[JsObject] and
       (__ \ "lastUpdated").write(MongoJavatimeFormats.instantFormat)
     ) (ua => (ua.userId, ua.submissionId, ua.nextPage, ua.data, ua.lastUpdated))
-  }
 
   implicit val format: OFormat[UserAnswers] = OFormat(reads, writes)
 }

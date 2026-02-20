@@ -70,7 +70,7 @@ class SaveAndReturnClientImplSpec extends SpecBase {
 
       "returns Unit on successful call" in new TestSetup {
         when(mockRequestBuilder.execute[HttpResponse])
-          .thenReturn(Future.successful(HttpResponse(200, "")))
+          .thenReturn(Future.successful(HttpResponse(204, "")))
 
         client.save(testUserAnswers).futureValue shouldBe()
       }

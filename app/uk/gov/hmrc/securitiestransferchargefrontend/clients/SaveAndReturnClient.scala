@@ -17,6 +17,7 @@
 package uk.gov.hmrc.securitiestransferchargefrontend.clients
 
 import play.api.Logging
+import play.api.http.Status.NO_CONTENT
 import play.api.libs.json.*
 import play.api.libs.ws.JsonBodyWritables.writeableOf_JsValue
 import uk.gov.hmrc.http.HttpReads.Implicits.*
@@ -50,9 +51,15 @@ class SaveAndReturnClientImpl @Inject(http: HttpClientV2, config: FrontendAppCon
     http.post(url"$userAnswersPath")
       .withBody(Json.toJson(userAnswers))
       .execute[HttpResponse]
-      .map(_ => ())
+      .map {
+        case response if response.status == NO_CONTENT => ()
+        case otherResponse =>
+          logger.error(s"Failed to save UserAnswers for userId=${userAnswers.userId}. Received status ${otherResponse.status}")
+          throw new RuntimeException(s"Failed to save UserAnswers. Status: ${otherResponse.status}")
+        }
       .andThen {
-        case Failure(e) => logger.error(s"Failed to save UserAnswers for userId=${userAnswers.userId}", e)
+        case Failure(e) =>
+          logger.error(s"Failed to save UserAnswers for userId=${userAnswers.userId}, submissionId=${userAnswers.submissionId}", e)
       }
   }
 
