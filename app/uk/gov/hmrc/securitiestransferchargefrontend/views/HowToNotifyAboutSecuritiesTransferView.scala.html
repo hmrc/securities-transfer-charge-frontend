@@ -18,13 +18,16 @@
 @import uk.gov.hmrc.securitiestransferchargefrontend.viewmodels.LegendSize.Large
 @import uk.gov.hmrc.securitiestransferchargefrontend.views.html.templates
 @import uk.gov.hmrc.securitiestransferchargefrontend.controllers.routes
+@import uk.gov.hmrc.securitiestransferchargefrontend.views.html.components.SaveAndReturnButton
+
 
 @this(
     layout: templates.Layout,
     formHelper: FormWithCSRF,
     govukErrorSummary: GovukErrorSummary,
     govukRadios: GovukRadios,
-    govukButton: GovukButton
+    govukButton: GovukButton,
+    saveAndReturnButton:SaveAndReturnButton
 )
 
 @(form: Form[_], mode: Mode)(implicit request: Request[_], messages: Messages)
@@ -54,11 +57,7 @@
             )
         )
 
-        @govukButton(
-            ButtonViewModel(
-                messages("site.save-and-return.button")
-            ).asSecondaryButton()
-        )
+        @saveAndReturnButton()
 
     }
 }
