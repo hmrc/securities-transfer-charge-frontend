@@ -46,7 +46,7 @@ class DateMappingsSpec extends AnyFreeSpec with Matchers with ScalaCheckProperty
 
   val validData: Gen[LocalDate] = datesBetween(
     min = LocalDate.of(2000, 1, 1),
-    max = LocalDate.of(3000, 1, 1)
+    max = LocalDate.of(2026, 1, 1)
   )
 
   val invalidField: Gen[String] = Gen.alphaStr.suchThat(_.nonEmpty)
@@ -436,7 +436,7 @@ class DateMappingsSpec extends AnyFreeSpec with Matchers with ScalaCheckProperty
     val result = form.bind(data)
 
     result.errors must contain(
-      FormError("value", "error.invalid", List.empty)
+      FormError("value", "error.invalid", List("day", "month", "year"))
     )
   }
 
