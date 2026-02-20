@@ -21,7 +21,7 @@
 @(implicit messages: Messages)
 
 @govukButton(
-ButtonViewModel(messages("site.save-and-return.button"))
-.asSecondaryButton()
-.asLink(routes.SubmissionsDashboardController.onPageLoad().url)
+  ButtonViewModel(messages("site.save-and-return.button"))
+    .asSecondaryButton()
+    .asLink(routes.SubmissionsDashboardController.onPageLoad().url)
 )
