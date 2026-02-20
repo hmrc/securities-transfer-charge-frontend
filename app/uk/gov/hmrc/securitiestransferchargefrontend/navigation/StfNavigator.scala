@@ -22,9 +22,8 @@ import uk.gov.hmrc.play.http.HeaderCarrierConverter
 import uk.gov.hmrc.securitiestransferchargefrontend.clients.SaveAndReturnClient
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.routes
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.seller.routes as sellerRoutes
-
 import uk.gov.hmrc.securitiestransferchargefrontend.models.HowToNotifyAboutSecuritiesTransfer.{MoreThanOneAtATime, OneAtATime}
-import uk.gov.hmrc.securitiestransferchargefrontend.models.{CheckMode, Mode, NormalMode, UserAnswers}
+import uk.gov.hmrc.securitiestransferchargefrontend.models.{CheckMode, Mode, NormalMode, UserAnswers, WhatTypeOfSecurities}
 import uk.gov.hmrc.securitiestransferchargefrontend.pages.*
 import uk.gov.hmrc.securitiestransferchargefrontend.queries.Gettable
 import uk.gov.hmrc.securitiestransferchargefrontend.repositories.SessionRepository
@@ -56,6 +55,10 @@ class StfNavigator @Inject()(sessionRepository: SessionRepository,
     }
     case WhatReliefAreYouApplyingForPage => userAnswers => dataRequired(WhatReliefAreYouApplyingForPage, userAnswers, routes.SecuritiesTargetController.onPageLoad(NormalMode))
     case SecuritiesTargetPage => userAnswers => dataRequired(SecuritiesTargetPage, userAnswers, routes.JourneyRecoveryController.onPageLoad())
+    case WhatTypeOfSecuritiesPage => userAnswers => dataDependent(WhatTypeOfSecuritiesPage, userAnswers) {
+      case WhatTypeOfSecurities.Shares => defaultPage
+      case WhatTypeOfSecurities.Other => defaultPage
+    }
     case _ => _ => defaultPageF
 
   }
