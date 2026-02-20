@@ -43,14 +43,14 @@ class NavigatorSpec extends SpecBase with MockitoSugar with ScalaFutures {
   private val testCall = routes.HowToNotifyAboutSecuritiesTransferController.onPageLoad(NormalMode)
 
   private val mockAnswerPersistenceService = mock[AnswerPersistenceService]
-  when(mockAnswerPersistenceService.save(any[UserAnswers], any[Call])(any[HeaderCarrier]))
+  when(mockAnswerPersistenceService.save(any[UserAnswers])(any[HeaderCarrier]))
     .thenReturn(Future.unit)
 
   private implicit val mockHeaderCarrier: HeaderCarrier = mock[HeaderCarrier]
 
   private def testSetup(): TestNavigator = {
     reset(mockAnswerPersistenceService)
-    when(mockAnswerPersistenceService.save(any[UserAnswers], any[Call])(any[HeaderCarrier]))
+    when(mockAnswerPersistenceService.save(any[UserAnswers])(any[HeaderCarrier]))
       .thenReturn(Future.unit)
 
     new TestNavigator()
@@ -76,7 +76,7 @@ class NavigatorSpec extends SpecBase with MockitoSugar with ScalaFutures {
       val updatedUserAnswers = mockUserAnswers.setNextPage(testCall)
       val result = navigator.goTo(testCall, Some(mockUserAnswers))
       whenReady(result) { _ =>
-        verify(mockAnswerPersistenceService, times(1)).save(updatedUserAnswers, testCall)(mockHeaderCarrier)
+        verify(mockAnswerPersistenceService, times(1)).save(updatedUserAnswers)(mockHeaderCarrier)
         // Look for 2 calls here because there's one above in the test setup.
         verify(mockUserAnswers, times(2)).setNextPage(testCall)
         result.futureValue mustBe testCall
@@ -87,7 +87,7 @@ class NavigatorSpec extends SpecBase with MockitoSugar with ScalaFutures {
       val result = navigator.dataRequired(testPage, userAnswers, testCall)
       val updatedUserAnswers = userAnswers.setNextPage(testCall)
       whenReady(result) { _ =>
-        verify(mockAnswerPersistenceService, times(1)).save(updatedUserAnswers, testCall)(mockHeaderCarrier)
+        verify(mockAnswerPersistenceService, times(1)).save(updatedUserAnswers)(mockHeaderCarrier)
       }
     }
     "return the success page when data is present for data required navigation" in {
@@ -146,7 +146,7 @@ class NavigatorSpec extends SpecBase with MockitoSugar with ScalaFutures {
       val result = navigator.userAnswersDependent(userAnswers)(mockMethod)
       whenReady(result) { _ =>
         verify(mockMethod, times(1)).apply(userAnswers)
-        verify(mockAnswerPersistenceService, times(1)).save(updatedUserAnswers, testCall)(mockHeaderCarrier)
+        verify(mockAnswerPersistenceService, times(1)).save(updatedUserAnswers)(mockHeaderCarrier)
       }
     }
   }

@@ -22,8 +22,7 @@ import org.mockito.Mockito.{reset, times, verify, when}
 import org.scalatestplus.mockito.MockitoSugar
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.securitiestransferchargefrontend.clients.SaveAndReturnClient
-import uk.gov.hmrc.securitiestransferchargefrontend.controllers.*
-import uk.gov.hmrc.securitiestransferchargefrontend.models.{NormalMode, UserAnswers}
+import uk.gov.hmrc.securitiestransferchargefrontend.models.UserAnswers
 import uk.gov.hmrc.securitiestransferchargefrontend.repositories.SessionRepository
 import uk.gov.hmrc.securitiestransferchargefrontend.services.*
 
@@ -49,18 +48,16 @@ class AnswerPersistenceServiceSpec extends SpecBase with MockitoSugar {
 
     "store the user answers in the session" in {
       val userAnswers = Fixtures.emptyUserAnswers
-      val nextCall = routes.NameOfSellerController.onPageLoad(NormalMode)
       val service = testSetup()
-      val result = service.save(userAnswers, nextCall)(mockHeaderCarrier)
+      val result = service.save(userAnswers)(mockHeaderCarrier)
       whenReady(result) { _ =>
         verify(mockSessionRepository, times(1)).set(any[UserAnswers])
       }
     }
     "store the user answers in the save and return repo" in {
       val userAnswers = Fixtures.emptyUserAnswers
-      val nextCall = routes.NameOfSellerController.onPageLoad(NormalMode)
       val service = testSetup()
-      val result = service.save(userAnswers, nextCall)(mockHeaderCarrier)
+      val result = service.save(userAnswers)(mockHeaderCarrier)
       whenReady(result) { _ =>
         verify(mockSaveAndReturnClient, times(1)).save(any[UserAnswers])(any[HeaderCarrier])
       }

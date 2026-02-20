@@ -44,7 +44,7 @@ abstract class AbstractNavigator(answerPersistenceService: AnswerPersistenceServ
 
   protected[navigation] def updateAndPersistUserAnswers(call: Call, ua: UserAnswers)(implicit hc: HeaderCarrier):Future[Call] = for {
     updatedAnswers <- updateUserAnswers(call)(ua)
-    _              <- answerPersistenceService.save(updatedAnswers, call)
+    _              <- answerPersistenceService.save(updatedAnswers)
   } yield call
 
   /*

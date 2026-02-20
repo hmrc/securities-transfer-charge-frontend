@@ -17,20 +17,24 @@
 package uk.gov.hmrc.securitiestransferchargefrontend.connectors
 
 import play.api.Logging
-import play.api.http.Status.ACCEPTED
+import play.api.http.Status.{ACCEPTED, OK}
 import play.api.libs.json.*
 import play.api.libs.ws.*
 import play.api.mvc.*
 import play.api.mvc.Results.Redirect
-import uk.gov.hmrc.http.{HeaderCarrier, HttpResponse, StringContextOps}
-import uk.gov.hmrc.http.client.HttpClientV2
 import uk.gov.hmrc.http.HttpReads.Implicits.*
+import uk.gov.hmrc.http.client.HttpClientV2
+import uk.gov.hmrc.http.{HeaderCarrier, HttpResponse, StringContextOps}
 import uk.gov.hmrc.securitiestransferchargefrontend.config.FrontendAppConfig
 import uk.gov.hmrc.securitiestransferchargefrontend.models.AlfConfirmedAddress
 import uk.gov.hmrc.securitiestransferchargefrontend.utils.ResourceLoader
 
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
+import scala.util.Try
+trait AlfConfigLoader {
+  def loadConfig(configFileLocation: String, returnUrl: String): JsValue
+}
 
 trait AlfAddressConnector {
   def initAlfJourneyRequest(configFileLocation: String, returnUrl: String)(implicit hc: HeaderCarrier): Future[Result]
@@ -39,11 +43,12 @@ trait AlfAddressConnector {
 
 class AlfAddressConnectorImpl @Inject() ( http: HttpClientV2,
                                           config: FrontendAppConfig,
-                                          resourceLoader: ResourceLoader)
+                                          configLoader: AlfConfigLoader)
                                         ( implicit ec: ExecutionContext) extends AlfAddressConnector with Logging {
 
   private type ResponseHandler = PartialFunction[HttpResponse, Result]
-  private[connectors] final class AlfException(msg: String) extends RuntimeException(msg)
+
+  final class AlfException(msg: String) extends RuntimeException(msg)
 
   def initAlfJourneyRequest(configFileLocation: String, returnUrl: String)(implicit hc: HeaderCarrier): Future[Result] = {
     callAlfInit(configFileLocation, returnUrl).map(journeySuccess.orElse(journeyFailure)(_))
@@ -56,7 +61,7 @@ class AlfAddressConnectorImpl @Inject() ( http: HttpClientV2,
   private def callAlfInit(configFileLocation: String, returnUrl: String)(implicit hc: HeaderCarrier): Future[HttpResponse] = {
     http
       .post(url"${config.alfInitUrl}")
-      .withBody(payload(configFileLocation, returnUrl))
+      .withBody(configLoader.loadConfig(configFileLocation, returnUrl))
       .setHeader("Content-Type" -> "application/json")
       .execute[HttpResponse]
   }
@@ -68,7 +73,7 @@ class AlfAddressConnectorImpl @Inject() ( http: HttpClientV2,
         failure(s"Address lookup initiation did not return a Location header - ${resp.status}")
       }
   }
-  
+
   private val failure: String => Nothing = { fullMessage =>
     logger.error(fullMessage)
     throw new AlfException(fullMessage)
@@ -77,7 +82,7 @@ class AlfAddressConnectorImpl @Inject() ( http: HttpClientV2,
   private val journeyFailure: ResponseHandler = { _ =>
     failure("Address lookup initiation failed")
   }
-  
+
   private def callAlfRetrieve(key: String)(implicit hc: HeaderCarrier): Future[HttpResponse] = {
     val retrieveAddress = s"${config.alfRetrieveUrl}?id=$key"
     http
@@ -86,13 +91,20 @@ class AlfAddressConnectorImpl @Inject() ( http: HttpClientV2,
   }
 
   private def retrievalSuccess[A](resp: HttpResponse): AlfConfirmedAddress = {
-    resp.json.validate[AlfConfirmedAddress].getOrElse {
-      failure("Could not retrieve the address from ALF")
+    if (resp.status != OK) {
+      failure(s"Address retrieval failed with status ${resp.status}")
     }
+    Try(resp.json)
+      .map(_.validate[AlfConfirmedAddress]).getOrElse {
+        failure("Could not retrieve the address from ALF")
+      }.getOrElse {
+        failure("Invalid JSON response received from ALF")
+      }
   }
+}
 
-
-  private def payload(configFileLocation: String, returnUrl: String): JsValue = {
+class AlfConfigLoaderImpl @Inject() (resourceLoader: ResourceLoader) extends AlfConfigLoader:
+  def loadConfig(configFileLocation: String, returnUrl: String): JsValue = {
     val raw = resourceLoader.loadString(configFileLocation)
     val parsed = Json.parse(raw).as[JsObject]
     
@@ -104,6 +116,5 @@ class AlfAddressConnectorImpl @Inject() ( http: HttpClientV2,
     parsed.deepMerge(overrideJson)
   }
 
-}
 
 
