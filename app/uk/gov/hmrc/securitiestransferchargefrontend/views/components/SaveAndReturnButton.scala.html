@@ -22,6 +22,6 @@
 
 @govukButton(
   ButtonViewModel(messages("site.save-and-return.button"))
+    .withName("saveAndReturn")
     .asSecondaryButton()
-    .asLink(routes.SubmissionsDashboardController.onPageLoad().url)
 )

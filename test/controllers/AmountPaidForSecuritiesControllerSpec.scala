@@ -108,6 +108,28 @@ class AmountPaidForSecuritiesControllerSpec extends SpecBase with MockitoSugar {
       }
     }
 
+    "must redirect to Submissions Dashboard when save and return is selected" in {
+
+      val userAnswers = emptyUserAnswers
+      val application = applicationBuilder(userAnswers = Some(userAnswers)).build()
+
+      running(application) {
+        val request =
+          FakeRequest(POST, amountPaidForSecuritiesRoute)
+            .withFormUrlEncodedBody(
+              "value" -> validAnswer.toString,
+              "saveAndReturn" -> "true"
+            )
+
+        val result = route(application, request).value
+
+        status(result) mustEqual SEE_OTHER
+        redirectLocation(result).value mustEqual
+          routes.SubmissionsDashboardController.onPageLoad().url
+      }
+    }
+
+
     "must redirect to Journey Recovery for a POST if no existing data is found" in {
 
       val application = applicationBuilder(userAnswers = None).build()
@@ -122,6 +144,24 @@ class AmountPaidForSecuritiesControllerSpec extends SpecBase with MockitoSugar {
         status(result) mustEqual SEE_OTHER
 
         redirectLocation(result).value mustEqual routes.JourneyRecoveryController.onPageLoad().url
+      }
+    }
+
+    "must redirect to next page when save and continue is selected" in {
+
+      val userAnswers = emptyUserAnswers
+      val application = applicationBuilder(userAnswers = Some(userAnswers)).build()
+
+      running(application) {
+        val request =
+          FakeRequest(POST, amountPaidForSecuritiesRoute)
+            .withFormUrlEncodedBody(
+              "value" -> validAnswer.toString
+            )
+
+        val result = route(application, request).value
+
+        status(result) mustEqual SEE_OTHER
       }
     }
   }
