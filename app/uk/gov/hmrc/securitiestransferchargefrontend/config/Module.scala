@@ -19,14 +19,14 @@ package uk.gov.hmrc.securitiestransferchargefrontend.config
 import com.google.inject.AbstractModule
 import play.api.http.HttpErrorHandler
 import uk.gov.hmrc.securitiestransferchargefrontend.clients.registration.{RegistrationClient, RegistrationClientImpl}
-import uk.gov.hmrc.securitiestransferchargefrontend.connectors.{SubscriptionConnector, SubscriptionConnectorImpl}
+import uk.gov.hmrc.securitiestransferchargefrontend.connectors.{AlfAddressConnector, AlfAddressConnectorImpl, AlfConfigLoader, AlfConfigLoaderImpl, SubscriptionConnector, SubscriptionConnectorImpl}
 import uk.gov.hmrc.securitiestransferchargefrontend.clients.{SaveAndReturnClient, SaveAndReturnClientImpl, SubmissionIdClient, SubmissionIdClientImpl}
-import uk.gov.hmrc.securitiestransferchargefrontend.connectors.{AlfAddressConnector, AlfAddressConnectorImpl}
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.actions.*
 import uk.gov.hmrc.securitiestransferchargefrontend.handlers.ErrorHandler
 import uk.gov.hmrc.securitiestransferchargefrontend.repositories.{SubscriptionDataRepository, SubscriptionDataRepositoryImpl}
 import uk.gov.hmrc.securitiestransferchargefrontend.navigation.{Navigator, StfNavigator}
 import uk.gov.hmrc.securitiestransferchargefrontend.repositories.{SessionRepository, SessionRepositoryImpl}
+import uk.gov.hmrc.securitiestransferchargefrontend.services.*
 
 import java.time.{Clock, ZoneOffset}
 
@@ -51,10 +51,11 @@ class Module extends AbstractModule {
     bind(classOf[SaveAndReturnClient]).to(classOf[SaveAndReturnClientImpl])
     bind(classOf[AlfAddressConnector]).to(classOf[AlfAddressConnectorImpl])
 
+    bind(classOf[AlfConfigLoader]).to(classOf[AlfConfigLoaderImpl])
 
     bind(classOf[SubscriptionDataRepository]).to(classOf[SubscriptionDataRepositoryImpl])
     bind(classOf[SubscriptionConnector]).to(classOf[SubscriptionConnectorImpl])
     bind(classOf[RegistrationClient]).to(classOf[RegistrationClientImpl]).asEagerSingleton()
-
+    bind(classOf[AnswerPersistenceService]).to(classOf[AnswerPersistenceServiceImpl])
   }
 }

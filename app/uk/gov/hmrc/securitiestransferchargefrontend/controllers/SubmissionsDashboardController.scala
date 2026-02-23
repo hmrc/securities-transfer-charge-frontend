@@ -16,6 +16,7 @@
 
 package uk.gov.hmrc.securitiestransferchargefrontend.controllers
 
+import play.api.Logging
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
@@ -38,7 +39,7 @@ class SubmissionsDashboardController @Inject()(
                                                 idClient: SubmissionIdClient,
                                                 saveAndReturnClient: SaveAndReturnClient,
                                                 navigator: Navigator)
-                                              (implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport {
+                                              (implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport with Logging {
 
   def onPageLoad: Action[AnyContent] =
     (stcAuthEnrolled andThen getData).async { implicit request =>
@@ -57,7 +58,9 @@ class SubmissionsDashboardController @Inject()(
       for {
         submissionId  <- idClient.nextSubmissionId()
         emptyAnswers  =  UserAnswers.empty(userId)(submissionId)
+        _              = logger.info(s"** Created user answers **")
         nextPage      <- navigator.nextPage(SubmissionsDashboardPage, NormalMode, emptyAnswers)
+        _              = logger.info(s"Redirecting to $nextPage")
       } yield Redirect(nextPage)
   }
 }

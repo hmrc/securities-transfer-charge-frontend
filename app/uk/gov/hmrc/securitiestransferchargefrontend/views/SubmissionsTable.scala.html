@@ -15,6 +15,7 @@
  *@
 
 @import uk.gov.hmrc.securitiestransferchargefrontend.domain.SubmissionId
+@import uk.gov.hmrc.securitiestransferchargefrontend.controllers.routes
 
 @(submissionIds: List[SubmissionId])(implicit messages: Messages)
 
@@ -41,23 +42,25 @@
 
     <tbody class="govuk-table__body">
     @for(id <- submissionIds) {
-    <tr class="govuk-table__row">
-        <td class="govuk-table__cell">
-            @id.value
-        </td>
-        <td class="govuk-table__cell">
-            -
-        </td>
-        <td class="govuk-table__cell">
-            -
-        </td>
-        <td class="govuk-table__cell">
-            -
-        </td>
-        <td class="govuk-table__cell">
-            -
-        </td>
-    </tr>
+        @defining(routes.SaveAndReturnController.restore(id.value).url) {link =>
+            <tr class="govuk-table__row">
+                <td class="govuk-table__cell">
+                    <a href="@link">@id.value</a>
+                </td>
+                <td class="govuk-table__cell">
+                    -
+                </td>
+                <td class="govuk-table__cell">
+                    -
+                </td>
+                <td class="govuk-table__cell">
+                    -
+                </td>
+                <td class="govuk-table__cell">
+                    -
+                </td>
+            </tr>
+        }
     }
     </tbody>
 </table>
