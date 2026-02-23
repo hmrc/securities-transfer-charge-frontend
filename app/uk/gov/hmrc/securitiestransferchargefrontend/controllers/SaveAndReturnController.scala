@@ -36,6 +36,6 @@ class SaveAndReturnController @Inject()( override val messagesApi: MessagesApi,
     stcAuthEnrolled.async { implicit request =>
       for {
         userAnswers <- navigator.restore(SubmissionId(submissionId), request.internalId)
-        nextPage = userAnswers.nextPage.getOrElse(Navigator.startPage)
+        nextPage     = userAnswers.nextPage.getOrElse(Navigator.startPage)
       } yield Redirect(nextPage)
     }
