@@ -20,6 +20,8 @@
 @import uk.gov.hmrc.securitiestransferchargefrontend.config.FrontendAppConfig
 @import uk.gov.hmrc.securitiestransferchargefrontend.controllers.routes.ConnectedPersonsController
 @import play.twirl.api.StringInterpolation
+@import uk.gov.hmrc.securitiestransferchargefrontend.views.html.components.SaveAndReturnButton
+
 
 
 @this(
@@ -31,6 +33,7 @@
     hmrcNewTabLinkHelper: HmrcNewTabLinkHelper,
     config: FrontendAppConfig,
     govukDetails: GovukDetails,
+    saveAndReturnButton:SaveAndReturnButton
 )
 
 @(form: Form[_], mode: Mode)(implicit request: Request[_], messages: Messages)
@@ -82,8 +85,6 @@ href = Some(config.connectedPersonsInformationUrl)
             ButtonViewModel(messages("site.save-and-continue.button"))
         )
 
-        @govukButton(
-            ButtonViewModel(messages("site.save-and-return.button")).asSecondaryButton()
-        )
+        @saveAndReturnButton()
     }
 }

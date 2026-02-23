@@ -16,22 +16,19 @@
 
 package base.stubs
 
-import play.api.mvc.{Call, Request}
+import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.securitiestransferchargefrontend.domain.SubmissionId
-import uk.gov.hmrc.securitiestransferchargefrontend.models.{Mode, UserAnswers}
-import uk.gov.hmrc.securitiestransferchargefrontend.navigation.Navigator
-import uk.gov.hmrc.securitiestransferchargefrontend.pages.Page
+import uk.gov.hmrc.securitiestransferchargefrontend.models.UserAnswers
+import uk.gov.hmrc.securitiestransferchargefrontend.services.AnswerPersistenceService
 
 import scala.concurrent.Future
 
-class StubNavigator(desiredCall: Call) extends Navigator {
+class StubAnswerPersistenceService extends AnswerPersistenceService:
+  def save(userAnswers: UserAnswers)(implicit hc: HeaderCarrier): Future[Unit] =
+    Future.successful(())
 
-  override def nextPage(page: Page, mode: Mode, userAnswers: UserAnswers)(implicit request: Request[_]): Future[Call] =
-    Future.successful(desiredCall)
-
-
-  val errorPage: Page => Call = _ => desiredCall
-
-  override def restore(submissionId: SubmissionId, userId: String)(implicit request: Request[_]): Future[UserAnswers] =
+  override def load(submissionId: SubmissionId, userId: String)(implicit hc: HeaderCarrier): Future[UserAnswers] =
     Future.successful(UserAnswers.empty(userId)(submissionId))
-}
+
+object StubAnswerPersistenceService:
+  def apply(): StubAnswerPersistenceService = new StubAnswerPersistenceService
