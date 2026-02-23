@@ -72,13 +72,13 @@ submissionsDashboard.table.chargeDueBy = Charge due by
 submissionsDashboard.table.status = Status
 submissionsDashboard.table.action = Action
 
-howToNotifyAboutSecuritiesTransfer.title = How do you want to tell us about your securities transfer?
-howToNotifyAboutSecuritiesTransfer.heading = How do you want to tell us about your securities transfer?
+howToNotifyAboutSecuritiesTransfer.title = How do you want to tell us about your securities transfers?
+howToNotifyAboutSecuritiesTransfer.heading = How do you want to tell us about your securities transfers?
 howToNotifyAboutSecuritiesTransfer.oneAtATime = One at a time
 howToNotifyAboutSecuritiesTransfer.oneAtATime.hint = Each transfer must be between you and one seller, and can include one kind of security or type of shares.
 howToNotifyAboutSecuritiesTransfer.moreThanOneAtATime = More than one at a time
 howToNotifyAboutSecuritiesTransfer.moreThanOneAtATime.hint = Download the template, complete it using one row per transfer, and upload it on the following pages. You can then find the submission on your dashboard and pay the money owed.
-howToNotifyAboutSecuritiesTransfer.checkYourAnswersLabel = HowToNotifyAboutSecuritiesTransfer
+howToNotifyAboutSecuritiesTransfer.checkYourAnswersLabel = How do you want to tell us about your securities transfers?
 howToNotifyAboutSecuritiesTransfer.error.required = Select a way to tell us about your securities transfer
 howToNotifyAboutSecuritiesTransfer.change.hidden = HowToNotifyAboutSecuritiesTransfer
 

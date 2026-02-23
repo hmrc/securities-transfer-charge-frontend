@@ -40,9 +40,9 @@ class HowToNotifyAboutSecuritiesTransferViewSpec extends ViewBaseSpec {
   )
 
   object ExpectedContent {
-    val title = "How do you want to tell us about your securities transfer?"
+    val title = "How do you want to tell us about your securities transfers?"
     val caption = "Transfer details"
-    val heading = "How do you want to tell us about your securities transfer?"
+    val heading = "How do you want to tell us about your securities transfers?"
     val saveAndContinue = "Save and continue"
     val saveAndReturn = "Save and return to dashboard"
 

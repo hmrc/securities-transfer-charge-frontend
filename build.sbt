@@ -2,24 +2,49 @@ import play.sbt.routes.RoutesKeys
 import scoverage.ScoverageKeys
 import uk.gov.hmrc.versioning.SbtGitVersioning.autoImport.majorVersion
 
-import scala.collection.immutable.Seq
-
 lazy val appName: String = "securities-transfer-charge-frontend"
 
 ThisBuild / majorVersion := 0
 ThisBuild / scalaVersion := "3.3.7"
+
+lazy val scoverageSettings = {
+
+  val ScoverageExclusionPatterns = List(
+    "app",
+    "prod",
+    "uk.gov.hmrc.securitiestransferchargefrontend.mappings",
+    "uk.gov.hmrc.securitiestransferchargefrontend.config",
+    "uk.gov.hmrc.securitiestransferchargefrontend.viewmodels.govuk",
+    "uk.gov.hmrc.securitiestransferchargefrontend.pages",
+    "uk.gov.hmrc.securitiestransferchargefrontend.queries",
+    "uk.gov.hmrc.securitiestransferchargefrontend.viewmodels",
+    "uk.gov.hmrc.securitiestransferchargefrontend.models",
+    "uk.gov.hmrc.securitiestransferchargefrontend.handlers",
+    "uk.gov.hmrc.BuildInfo",
+    "<empty>",
+    "testOnlyDoNotUseInAppConf.*")
+
+  Seq(
+    ScoverageKeys.coverageExcludedPackages := ScoverageExclusionPatterns.mkString("", ";", ""),
+    ScoverageKeys.coverageMinimumStmtTotal := 80,
+    ScoverageKeys.coverageFailOnMinimum := true,
+    ScoverageKeys.coverageHighlighting := true
+  )
+}
 
 lazy val microservice = (project in file("."))
   .enablePlugins(PlayScala, SbtDistributablesPlugin)
   .disablePlugins(JUnitXmlReportPlugin) //Required to prevent https://github.com/scalatest/scalatest/issues/1427
   .settings(inConfig(Test)(testSettings): _*)
   .settings(ThisBuild / useSuperShell := false)
+  .settings(scoverageSettings: _*)
   .settings(
     name := appName,
     scalacOptions += "-Werror",
     RoutesKeys.routesImport ++= Seq(
       "uk.gov.hmrc.securitiestransferchargefrontend.models._",
-      "uk.gov.hmrc.play.bootstrap.binders.RedirectUrl"
+      "uk.gov.hmrc.play.bootstrap.binders.RedirectUrl",
+      "uk.gov.hmrc.securitiestransferchargefrontend.domain.SubmissionId"
     ),
     TwirlKeys.templateImports ++= Seq(
       "play.twirl.api.HtmlFormat",
@@ -34,11 +59,6 @@ lazy val microservice = (project in file("."))
       "uk.gov.hmrc.securitiestransferchargefrontend.viewmodels.govuk.all._"
     ),
     PlayKeys.playDefaultPort := 30036,
-    ScoverageKeys.coverageExcludedFiles := "<empty>;Reverse.*;.*handlers.*;.*components.*;" +
-      ".*Routes.*;.*viewmodels.govuk.*;",
-    ScoverageKeys.coverageMinimumStmtTotal := 80,
-    ScoverageKeys.coverageFailOnMinimum := true,
-    ScoverageKeys.coverageHighlighting := true,
     scalacOptions ++= Seq(
       "-feature",
       "-Wconf:src=routes/.*:silent",

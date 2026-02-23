@@ -19,21 +19,19 @@ package uk.gov.hmrc.securitiestransferchargefrontend.navigation
 import play.api.mvc.{Call, Request}
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.play.http.HeaderCarrierConverter
-import uk.gov.hmrc.securitiestransferchargefrontend.clients.SaveAndReturnClient
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.routes
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.seller.routes as sellerRoutes
 import uk.gov.hmrc.securitiestransferchargefrontend.models.HowToNotifyAboutSecuritiesTransfer.{MoreThanOneAtATime, OneAtATime}
 import uk.gov.hmrc.securitiestransferchargefrontend.models.{CheckMode, Mode, NormalMode, UserAnswers, WhatTypeOfSecurities}
 import uk.gov.hmrc.securitiestransferchargefrontend.pages.*
 import uk.gov.hmrc.securitiestransferchargefrontend.queries.Gettable
-import uk.gov.hmrc.securitiestransferchargefrontend.repositories.SessionRepository
+import uk.gov.hmrc.securitiestransferchargefrontend.services.AnswerPersistenceService
 
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 
-class StfNavigator @Inject()(sessionRepository: SessionRepository,
-                             saveAndReturnClient: SaveAndReturnClient)
-                            (implicit ec: ExecutionContext) extends AbstractNavigator(sessionRepository, saveAndReturnClient) {
+class StfNavigator @Inject()(answerPersistenceService: AnswerPersistenceService)
+                            (implicit ec: ExecutionContext) extends AbstractNavigator(answerPersistenceService) {
 
   private def normalRoutes(page: Page)(implicit hc: HeaderCarrier): UserAnswers => Future[Call] = page match {
 
@@ -57,10 +55,10 @@ class StfNavigator @Inject()(sessionRepository: SessionRepository,
     case SecuritiesTargetPage => userAnswers => dataRequired(SecuritiesTargetPage, userAnswers, routes.JourneyRecoveryController.onPageLoad())
     case OtherSecuritiesTypePage  => userAnswers => dataRequired(OtherSecuritiesTypePage, userAnswers, routes.AmountPaidForSecuritiesController.onPageLoad(NormalMode))
     case WhatTypeOfSecuritiesPage => userAnswers => dataDependent(WhatTypeOfSecuritiesPage, userAnswers) {
-      case WhatTypeOfSecurities.Shares => defaultPage
-      case WhatTypeOfSecurities.Other => defaultPage
+      case WhatTypeOfSecurities.Shares => Navigator.defaultPage
+      case WhatTypeOfSecurities.Other => Navigator.defaultPage
     }
-    case _ => _ => defaultPageF
+    case _ => _ => Navigator.defaultPageF
 
   }
 

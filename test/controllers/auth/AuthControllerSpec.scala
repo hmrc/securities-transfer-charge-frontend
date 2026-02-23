@@ -20,12 +20,11 @@ import base.SpecBase
 import org.mockito.ArgumentMatchers.{any, eq as eqTo}
 import org.mockito.Mockito.{times, verify, when}
 import org.scalatestplus.mockito.MockitoSugar
-import play.api.inject.bind
 import play.api.test.FakeRequest
 import play.api.test.Helpers.*
 import uk.gov.hmrc.securitiestransferchargefrontend.config.FrontendAppConfig
-import uk.gov.hmrc.securitiestransferchargefrontend.repositories.SessionRepository
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.auth.routes
+import uk.gov.hmrc.securitiestransferchargefrontend.repositories.SessionRepository
 
 import java.net.URLEncoder
 import scala.concurrent.Future
@@ -40,8 +39,7 @@ class AuthControllerSpec extends SpecBase with MockitoSugar {
       when(mockSessionRepository.clear(any())) thenReturn Future.successful(())
 
       val application =
-        applicationBuilder(None)
-          .overrides(bind[SessionRepository].toInstance(mockSessionRepository))
+        applicationBuilder(sessionRepository = mockSessionRepository)
           .build()
 
       running(application) {
@@ -69,8 +67,7 @@ class AuthControllerSpec extends SpecBase with MockitoSugar {
       when(mockSessionRepository.clear(any())) thenReturn Future.successful(())
 
       val application =
-        applicationBuilder(None)
-          .overrides(bind[SessionRepository].toInstance(mockSessionRepository))
+        applicationBuilder(sessionRepository = mockSessionRepository)
           .build()
 
       running(application) {
