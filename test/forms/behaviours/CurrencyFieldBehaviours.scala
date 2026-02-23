@@ -63,4 +63,19 @@ trait CurrencyFieldBehaviours extends FieldBehaviours {
       result.errors mustEqual Seq(expectedError)
     }
   }
+
+  def currencyFieldWithRange(
+                              form: Form[_],
+                              fieldName: String,
+                              maximum: Int,
+                              expectedError: FormError,
+                              defaultFields: (String, String)*
+                            ): Unit = {
+
+    s"not bind values above $maximum" in {
+      val data = Map(fieldName -> (maximum + 1).toString) ++ defaultFields
+      val result = form.bind(data).apply(fieldName)
+      result.errors must contain only expectedError
+    }
+  }
 }
