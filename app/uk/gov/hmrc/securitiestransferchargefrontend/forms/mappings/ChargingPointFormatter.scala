@@ -1,0 +1,136 @@
+/*
+ * Copyright 2026 HM Revenue & Customs
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+package uk.gov.hmrc.securitiestransferchargefrontend.forms.mappings
+
+import play.api.data.FormError
+import play.api.data.format.Formatter
+import play.api.i18n.Messages
+import uk.gov.hmrc.securitiestransferchargefrontend.models.DateHelper
+import uk.gov.hmrc.securitiestransferchargefrontend.models.DateHelper.formatDateToString
+
+import java.time.LocalDate
+import scala.util.{Failure, Success, Try}
+
+
+private[mappings] class ChargingPointFormatter (
+                                            invalidKey: String,
+                                            allRequiredKey: String,
+                                            twoRequiredKey: String,
+                                            requiredKey: String,
+                                            futureDateKey: String,
+                                            args: Seq[String] = Seq.empty
+                                          )(implicit messages: Messages) extends Formatter[LocalDate] with Formatters {
+
+  private val fieldKeys: List[String] = List("day", "month", "year")
+
+  private def toDate(key: String, day: Int, month: Int, year: Int): Either[Seq[FormError], LocalDate] =
+    Try(LocalDate.of(year, month, day)) match {
+      case Success(date) =>
+        Right(date)
+      case Failure(_) =>
+        Left(Seq(FormError(key, invalidKey, getErrorArgs(day, month))))
+    }
+
+  private def getErrorArgs(day: Int, month: Int): Seq[String] = {
+    val isDayError   = day < 1 || day > 31
+    val isMonthError = month < 1 || month > 12
+
+    (isDayError, isMonthError) match {
+      case (true, false) => Seq("day")
+      case (false, true) => Seq("month")
+      case (_, _)        => Seq("day", "month", "year")
+    }
+  }
+
+  private def formatDate(key: String, data: Map[String, String]): Either[Seq[FormError], LocalDate] = {
+    val monthVal = s"$key.month"
+
+    val int = intFormatter(
+      requiredKey = invalidKey,
+      wholeNumberKey = invalidKey,
+      nonNumericKey = invalidKey,
+      args
+    )
+
+    val month = new MonthFormatter(invalidKey, args)
+
+    for {
+      day <- int.bind(s"$key.day", data)
+      month <- data(monthVal).toIntOption match {
+        case Some(_) => int.bind(monthVal, data)
+        case _       => month.bind(monthVal, data)
+      }
+      year <- int.bind(s"$key.year", data)
+      date <- toDate(key, day, month, year)
+    } yield date
+  }
+
+  override def bind(key: String, data: Map[String, String]): Either[Seq[FormError], LocalDate] = {
+
+    val cleanedData = data.map {
+      case (k, v) => k -> v.replaceAll("[\\s-]", "")
+    }
+
+    val fields = fieldKeys
+      .map(
+        field => field -> cleanedData.get(s"$key.$field").filter(_.nonEmpty)
+      )
+      .toMap
+
+    lazy val missingFields = fields
+      .withFilter(_._2.isEmpty)
+      .map(_._1)
+      .toList
+      .map(field => messages(s"date.error.$field"))
+
+    fields.count(_._2.isDefined) match {
+      case 3 => noMissingField(key, cleanedData)
+      case 2 =>
+        Left(List(FormError(key, requiredKey, missingFields ++ args)))
+      case 1 =>
+        Left(List(FormError(key, twoRequiredKey, missingFields ++ args)))
+      case _ =>
+        Left(List(FormError(key, allRequiredKey, args)))
+    }
+  }
+
+  private def noMissingField(
+                              key: String,
+                              data: Map[String, String]
+                            ): Either[List[FormError], LocalDate] = {
+
+    val today = DateHelper.today
+
+    formatDate(key, data)
+      .left
+      .map(_.toList.map(e => e.copy(key = key, args = e.args ++ args)))
+      .flatMap { dob =>
+
+        List(
+          Option.when(dob.isAfter(today))(FormError(key, futureDateKey, List(formatDateToString(today)))),
+        ).collectFirst { case Some(err) => Left(List(err)) }
+          .getOrElse(Right(dob))
+      }
+  }
+
+  override def unbind(key: String, value: LocalDate): Map[String, String] =
+    Map(
+      s"$key.day" -> value.getDayOfMonth.toString,
+      s"$key.month" -> value.getMonthValue.toString,
+      s"$key.year" -> value.getYear.toString
+    )
+}

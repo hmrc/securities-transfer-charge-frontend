@@ -53,7 +53,7 @@ trait Mappings extends Formatters with Constraints {
                            requiredKey: String,
                            futureDateKey: String,
                            args: Seq[String] = Seq.empty)(implicit messages: Messages): FieldMapping[LocalDate] =
-    of(new LocalDateFormatter(invalidKey, allRequiredKey, twoRequiredKey, requiredKey, futureDateKey, args))
+    of(new ChargingPointFormatter(invalidKey, allRequiredKey, twoRequiredKey, requiredKey, futureDateKey, args))
     
   protected def validatedOptionalText(lengthKey: String, length: Int): FieldMapping[Option[String]] =
     of(validatedOptionalTextFormatter(lengthKey, length))

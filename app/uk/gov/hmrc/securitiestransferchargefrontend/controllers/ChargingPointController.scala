@@ -40,7 +40,7 @@ class ChargingPointController @Inject()(
                                         view: ChargingPointView
                                       )(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport {
 
-  def onPageLoad(mode: Mode): Action[AnyContent] = (stcAuthEnrolled andThen getData andThen requireData) {
+  def onPageLoad(mode: Mode): Action[AnyContent] = (stcAuthEnrolled andThen getData andThen requireData).async {
     implicit request =>
 
       val form = formProvider()
@@ -50,7 +50,7 @@ class ChargingPointController @Inject()(
         case Some(value) => form.fill(value)
       }
 
-      Ok(view(preparedForm, mode))
+      Future.successful(Ok(view(preparedForm, mode)))
   }
 
   def onSubmit(mode: Mode): Action[AnyContent] = (stcAuthEnrolled andThen getData andThen requireData).async {
