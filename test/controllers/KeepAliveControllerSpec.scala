@@ -20,11 +20,10 @@ import base.SpecBase
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.{never, times, verify, when}
 import org.scalatestplus.mockito.MockitoSugar
-import play.api.inject.bind
 import play.api.test.FakeRequest
 import play.api.test.Helpers.*
-import uk.gov.hmrc.securitiestransferchargefrontend.repositories.SessionRepository
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.routes
+import uk.gov.hmrc.securitiestransferchargefrontend.repositories.SessionRepository
 
 import scala.concurrent.Future
 
@@ -40,9 +39,10 @@ class KeepAliveControllerSpec extends SpecBase with MockitoSugar {
         when(mockSessionRepository.keepAlive(any())) thenReturn Future.successful(())
 
         val application =
-          applicationBuilder(Some(emptyUserAnswers))
-            .overrides(bind[SessionRepository].toInstance(mockSessionRepository))
-            .build()
+          applicationBuilder(
+            userAnswers = Some(emptyUserAnswers),
+            sessionRepository = mockSessionRepository
+          ).build()
 
         running(application) {
 
@@ -64,8 +64,7 @@ class KeepAliveControllerSpec extends SpecBase with MockitoSugar {
         when(mockSessionRepository.keepAlive(any())) thenReturn Future.successful(())
 
         val application =
-          applicationBuilder(None)
-            .overrides(bind[SessionRepository].toInstance(mockSessionRepository))
+          applicationBuilder(sessionRepository = mockSessionRepository)
             .build()
 
         running(application) {

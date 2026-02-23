@@ -73,3 +73,5 @@ GET        /stf/securities-type                      uk.gov.hmrc.securitiestrans
 POST       /stf/securities-type                     uk.gov.hmrc.securitiestransferchargefrontend.controllers.WhatTypeOfSecuritiesController.onSubmit(mode: Mode = NormalMode)
 GET        /stf/change/securities-type               uk.gov.hmrc.securitiestransferchargefrontend.controllers.WhatTypeOfSecuritiesController.onPageLoad(mode: Mode = CheckMode)
 POST       /stf/change/securities-type                uk.gov.hmrc.securitiestransferchargefrontend.controllers.WhatTypeOfSecuritiesController.onSubmit(mode: Mode = CheckMode)
+
+GET       /drafts/return/:submissionId               uk.gov.hmrc.securitiestransferchargefrontend.controllers.SaveAndReturnController.restore(submissionId: String)
