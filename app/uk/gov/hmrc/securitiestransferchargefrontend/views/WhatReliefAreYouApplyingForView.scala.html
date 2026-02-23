@@ -23,6 +23,8 @@
 @import uk.gov.hmrc.govukfrontend.views.viewmodels.errormessage._
 @import uk.gov.hmrc.govukfrontend.views.Implicits.RichSelect
 @import uk.gov.hmrc.securitiestransferchargefrontend.models.Relief
+@import uk.gov.hmrc.securitiestransferchargefrontend.views.html.components.SaveAndReturnButton
+
 
 
 @this(
@@ -31,7 +33,8 @@
   govukErrorSummary: GovukErrorSummary,
   govukSelect: GovukSelect,
   govukButton: GovukButton,
-  hmrcNewTabLinkHelper: HmrcNewTabLinkHelper
+  hmrcNewTabLinkHelper: HmrcNewTabLinkHelper,
+  saveAndReturnButton:SaveAndReturnButton
 )
 
 @(form: Form[_], mode: Mode, reliefs: Seq[Relief])(implicit request: Request[_], messages: Messages)
@@ -64,7 +67,7 @@ text = messages("whatReliefAreYouApplyingFor.details.content.link.text")
 
     @govukButton(ButtonViewModel(messages("site.save-and-continue.button")))
 
-    @govukButton(ButtonViewModel(messages("site.save-and-return.button")).asSecondaryButton())
+    @saveAndReturnButton()
 
   }
 }
