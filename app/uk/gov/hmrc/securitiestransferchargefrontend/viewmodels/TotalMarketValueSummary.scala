@@ -25,18 +25,18 @@ import uk.gov.hmrc.securitiestransferchargefrontend.pages.TotalMarketValuePage
 import uk.gov.hmrc.securitiestransferchargefrontend.viewmodels.govuk.summarylist.*
 import uk.gov.hmrc.securitiestransferchargefrontend.viewmodels.implicits.*
 
-object TotalMarketValuePageSummary  {
+object TotalMarketValueSummary  {
 
   def row(answers: UserAnswers)(implicit messages: Messages): Option[SummaryListRow] =
     answers.get(TotalMarketValuePage).map {
       answer =>
 
         SummaryListRowViewModel(
-          key     = "totalMarketValuePage.checkYourAnswersLabel",
+          key     = "totalMarketValue.checkYourAnswersLabel",
           value   = ValueViewModel(currencyFormat(answer)),
           actions = Seq(
             ActionItemViewModel("site.change", routes.TotalMarketValueController.onPageLoad(CheckMode).url)
-              .withVisuallyHiddenText(messages("totalMarketValuePage.change.hidden"))
+              .withVisuallyHiddenText(messages("totalMarketValue.change.hidden"))
           )
         )
     }

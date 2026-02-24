@@ -30,7 +30,7 @@
 
 @(form: Form[_], mode: Mode)(implicit request: Request[_], messages: Messages)
 
-@layout(pageTitle = title(form, messages("totalMarketValuePage.title"))) {
+@layout(pageTitle = title(form, messages("totalMarketValue.title"))) {
 
     @formHelper(action = routes.TotalMarketValueController.onSubmit(mode), Symbol("autoComplete") -> "off") {
 
@@ -42,11 +42,11 @@
         @govukInput(
             InputViewModel(
                 field = form("value"),
-                label = LabelViewModel(messages("totalMarketValuePage.heading")).asPageHeading(Large)
+                label = LabelViewModel(messages("totalMarketValue.heading")).asPageHeading(Large)
             )
             .withPrefix(PrefixOrSuffix(content = "£"))
             .withWidth(Fixed10)
-            .withHint(HintViewModel(messages("totalMarketValuePage.hint")))
+            .withHint(HintViewModel(messages("totalMarketValue.hint")))
 
         )
 

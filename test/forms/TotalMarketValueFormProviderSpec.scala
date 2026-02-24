@@ -17,15 +17,16 @@
 package forms
 
 import uk.gov.hmrc.securitiestransferchargefrontend.config.CurrencyFormatter.currencyFormat
-import uk.gov.hmrc.securitiestransferchargefrontend.forms.behaviours.CurrencyFieldBehaviours
+import forms.behaviours.CurrencyFieldBehaviours
 import org.scalacheck.Gen
 import play.api.data.FormError
+import uk.gov.hmrc.securitiestransferchargefrontend.forms.TotalMarketValueFormProvider
 
 import scala.math.BigDecimal.RoundingMode
 
-class TotalMarketValuePageFormProviderSpec extends CurrencyFieldBehaviours {
+class TotalMarketValueFormProviderSpec extends CurrencyFieldBehaviours {
 
-  val form = new TotalMarketValuePageFormProvider()()
+  val form = new TotalMarketValueFormProvider()()
 
   ".value" - {
 
@@ -48,21 +49,21 @@ class TotalMarketValuePageFormProviderSpec extends CurrencyFieldBehaviours {
     behave like currencyField(
       form,
       fieldName,
-      nonNumericError     = FormError(fieldName, "totalMarketValuePage.error.nonNumeric"),
-      invalidNumericError = FormError(fieldName, "totalMarketValuePage.error.invalidNumeric")
+      nonNumericError     = FormError(fieldName, "totalMarketValue.error.nonNumeric"),
+      invalidNumericError = FormError(fieldName, "totalMarketValue.error.invalidNumeric")
     )
 
     behave like currencyFieldWithMaximum(
       form,
       fieldName,
       maximum,
-      FormError(fieldName, "totalMarketValuePage.error.aboveMaximum", Seq(currencyFormat(maximum)))
+      FormError(fieldName, "totalMarketValue.error.aboveMaximum", Seq(currencyFormat(maximum)))
     )
 
     behave like mandatoryField(
       form,
       fieldName,
-      requiredError = FormError(fieldName, "totalMarketValuePage.error.required")
+      requiredError = FormError(fieldName, "totalMarketValue.error.required")
     )
   }
 }

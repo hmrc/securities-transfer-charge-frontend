@@ -17,9 +17,10 @@
 package controllers
 
 import base.SpecBase
+import navigation.FakeNavigator
 import uk.gov.hmrc.securitiestransferchargefrontend.forms.TotalMarketValueFormProvider
 import uk.gov.hmrc.securitiestransferchargefrontend.models.{NormalMode, UserAnswers}
-import uk.gov.hmrc.securitiestransferchargefrontend.navigation.{FakeNavigator, Navigator}
+import uk.gov.hmrc.securitiestransferchargefrontend.navigation.Navigator
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.when
 import org.scalatestplus.mockito.MockitoSugar
@@ -27,13 +28,15 @@ import uk.gov.hmrc.securitiestransferchargefrontend.pages.TotalMarketValuePage
 import play.api.inject.bind
 import play.api.mvc.Call
 import play.api.test.FakeRequest
-import play.api.test.Helpers._
+import play.api.test.Helpers.*
+import uk.gov.hmrc.securitiestransferchargefrontend.views.html.TotalMarketValueView
+import uk.gov.hmrc.securitiestransferchargefrontend.controllers.routes
+import uk.gov.hmrc.securitiestransferchargefrontend.domain.SubmissionId
 import uk.gov.hmrc.securitiestransferchargefrontend.repositories.SessionRepository
-import uk.gov.hmrc.securitiestransferchargefrontend.views.html.TotalMarketValuePageView
 
 import scala.concurrent.Future
 
-class TotalMarketValuePageControllerSpec extends SpecBase with MockitoSugar {
+class TotalMarketValueControllerSpec extends SpecBase with MockitoSugar {
 
   val formProvider = new TotalMarketValueFormProvider()
   val form = formProvider()
@@ -41,8 +44,9 @@ class TotalMarketValuePageControllerSpec extends SpecBase with MockitoSugar {
   def onwardRoute = Call("GET", "/foo")
 
   val validAnswer = 0
+  val testSubmissionId = SubmissionId("STC-009")
 
-  lazy val totalMarketValuePageRoute = routes.TotalMarketValuePageController.onPageLoad(NormalMode).url
+  lazy val totalMarketValuePageRoute = routes.TotalMarketValueController.onPageLoad(NormalMode).url
 
   "TotalMarketValuePage Controller" - {
 
@@ -55,7 +59,7 @@ class TotalMarketValuePageControllerSpec extends SpecBase with MockitoSugar {
 
         val result = route(application, request).value
 
-        val view = application.injector.instanceOf[TotalMarketValuePageView]
+        val view = application.injector.instanceOf[TotalMarketValueView]
 
         status(result) mustEqual OK
         contentAsString(result) mustEqual view(form, NormalMode)(request, messages(application)).toString
@@ -64,14 +68,14 @@ class TotalMarketValuePageControllerSpec extends SpecBase with MockitoSugar {
 
     "must populate the view correctly on a GET when the question has previously been answered" in {
 
-      val userAnswers = UserAnswers(userAnswersId).set(TotalMarketValuePage, validAnswer).success.value
+      val userAnswers = UserAnswers.empty(userAnswersId)(testSubmissionId).set(TotalMarketValuePage, validAnswer).success.value
 
       val application = applicationBuilder(userAnswers = Some(userAnswers)).build()
 
       running(application) {
         val request = FakeRequest(GET, totalMarketValuePageRoute)
 
-        val view = application.injector.instanceOf[TotalMarketValuePageView]
+        val view = application.injector.instanceOf[TotalMarketValueView]
 
         val result = route(application, request).value
 
@@ -87,10 +91,9 @@ class TotalMarketValuePageControllerSpec extends SpecBase with MockitoSugar {
       when(mockSessionRepository.set(any())) thenReturn Future.successful(true)
 
       val application =
-        applicationBuilder(userAnswers = Some(emptyUserAnswers))
+        applicationBuilder(userAnswers = Some(emptyUserAnswers), sessionRepository = mockSessionRepository)
           .overrides(
             bind[Navigator].toInstance(new FakeNavigator(onwardRoute)),
-            bind[SessionRepository].toInstance(mockSessionRepository)
           )
           .build()
 
@@ -117,7 +120,7 @@ class TotalMarketValuePageControllerSpec extends SpecBase with MockitoSugar {
 
         val boundForm = form.bind(Map("value" -> "invalid value"))
 
-        val view = application.injector.instanceOf[TotalMarketValuePageView]
+        val view = application.injector.instanceOf[TotalMarketValueView]
 
         val result = route(application, request).value
 

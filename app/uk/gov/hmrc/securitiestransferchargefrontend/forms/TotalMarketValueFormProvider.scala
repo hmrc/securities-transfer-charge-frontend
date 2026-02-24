@@ -26,10 +26,10 @@ class TotalMarketValueFormProvider @Inject() extends Mappings {
   def apply(): Form[BigDecimal] =
     Form(
       "value" -> currency(
-        "totalMarketValuePage.error.required",
-        "totalMarketValuePage.error.invalidNumeric",
-        "totalMarketValuePage.error.nonNumeric"
+        "totalMarketValue.error.required",
+        "totalMarketValue.error.invalidNumeric",
+        "totalMarketValue.error.nonNumeric"
       )
-      .verifying(maximumCurrency(Int.MaxValue, "totalMarketValuePage.error.aboveMaximum"))
+      .verifying(maximumCurrency(Int.MaxValue, "totalMarketValue.error.aboveMaximum"))
     )
 }

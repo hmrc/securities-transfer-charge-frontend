@@ -24,7 +24,7 @@ import uk.gov.hmrc.securitiestransferchargefrontend.forms.TotalMarketValueFormPr
 import uk.gov.hmrc.securitiestransferchargefrontend.models.Mode
 import uk.gov.hmrc.securitiestransferchargefrontend.navigation.Navigator
 import uk.gov.hmrc.securitiestransferchargefrontend.pages.TotalMarketValuePage
-import uk.gov.hmrc.securitiestransferchargefrontend.views.html.TotalMarketValuePageView
+import uk.gov.hmrc.securitiestransferchargefrontend.views.html.TotalMarketValueView
 
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
@@ -36,7 +36,7 @@ class TotalMarketValueController @Inject()( override val messagesApi: MessagesAp
                                             requireData: StcDataRequiredAction,
                                             formProvider: TotalMarketValueFormProvider,
                                             val controllerComponents: MessagesControllerComponents,
-                                            view: TotalMarketValuePageView)
+                                            view: TotalMarketValueView)
                                           ( implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport:
 
   private val form = formProvider()
