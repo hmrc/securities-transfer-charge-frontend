@@ -165,3 +165,25 @@ amountPaidForSecurities.error.invalidNumeric = Enter your amountPaidForSecuritie
 amountPaidForSecurities.error.aboveMaximum = amountPaidForSecurities must be {0} or less
 amountPaidForSecurities.error.belowMinimum = amountPaidForSecurities must be {0} or more
 amountPaidForSecurities.change.hidden = amountPaidForSecurities
+
+detailsOfThisTransfer.title = What are the details of this transfer?
+detailsOfThisTransfer.heading = What are the details of this transfer?
+detailsOfThisTransfer.numberOfShares = Number of shares
+detailsOfThisTransfer.typeOfShares = Type or class of shares
+detailsOfThisTransfer.checkYourAnswersLabel = What are the details of this transfer?
+detailsOfThisTransfer.error.numberOfShares.required = Enter the number of shares you are buying
+detailsOfThisTransfer.error.typeOfShares.required = Enter the type or class of shares you are buying
+detailsOfThisTransfer.amountPaid = Amount paid for the shares
+detailsOfThisTransfer.error.amountPaid.required = Enter the amount you paid for the shares
+detailsOfThisTransfer.error.amountPaid.invalidNumeric = Amount can only include pounds and pence, for example £600 or £600.20
+detailsOfThisTransfer.error.amountPaid.nonNumeric = Amount can only include pounds and pence, for example £600 or £600.20
+detailsOfThisTransfer.error.amountPaid.outOfRange = Enter an amount between £{0} and £{1}
+detailsOfThisTransfer.marketValue = Market value of the shares
+detailsOfThisTransfer.error.marketValue.required = Enter the market value of the shares
+detailsOfThisTransfer.error.marketValue.invalidNumeric = Amount can only include pounds and pence, for example £600 or £600.20
+detailsOfThisTransfer.error.marketValue.nonNumeric = Amount can only include pounds and pence, for example £600 or £600.20
+detailsOfThisTransfer.error.marketValue.outOfRange = Enter an amount between £{0} and £{1}
+detailsOfThisTransfer.error.numberOfShares.length = Number of shares must be 100 characters or less
+detailsOfThisTransfer.error.typeOfShares.length = Type or class of shares must be 100 characters or less
+detailsOfThisTransfer.change.hidden = Change what are the details of this transfer
+
