@@ -24,7 +24,6 @@ import uk.gov.hmrc.securitiestransferchargefrontend.forms.AmountPaidForSecuritie
 import uk.gov.hmrc.securitiestransferchargefrontend.models.Mode
 import uk.gov.hmrc.securitiestransferchargefrontend.navigation.StfNavigator
 import uk.gov.hmrc.securitiestransferchargefrontend.pages.AmountPaidForSecuritiesPage
-import uk.gov.hmrc.securitiestransferchargefrontend.repositories.SessionRepository
 import uk.gov.hmrc.securitiestransferchargefrontend.views.html.AmountPaidForSecuritiesView
 
 import javax.inject.Inject
@@ -32,7 +31,6 @@ import scala.concurrent.{ExecutionContext, Future}
 
 class AmountPaidForSecuritiesController @Inject()(
                                                    override val messagesApi: MessagesApi,
-                                                   sessionRepository: SessionRepository,
                                                    navigator: StfNavigator,
                                                    stcAuthEnrolled: StcAuthEnrolledAction,
                                                    getData: StcDataRetrievalAction,
