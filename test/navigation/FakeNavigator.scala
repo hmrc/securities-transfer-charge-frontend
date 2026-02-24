@@ -28,6 +28,10 @@ class FakeNavigator(desiredRoute: Call) extends Navigator {
 
   override def nextPage(page: Page, mode: Mode, userAnswers: UserAnswers)(implicit request: Request[?]): Future[Call] =
     Future.successful(desiredRoute)
+
+  override def goTo(call: Call, userAnswers: UserAnswers)
+                   (implicit request: Request[?]): Future[Call] =
+    Future.successful(desiredRoute)  
     
   override val errorPage: Page => Call = _ => desiredRoute
 

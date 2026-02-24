@@ -56,15 +56,23 @@ class AmountPaidForSecuritiesController @Inject()(
   def onSubmit(mode: Mode): Action[AnyContent] = (stcAuthEnrolled andThen getData andThen requireData).async {
     implicit request =>
 
-      form.bindFromRequest().fold(
-        formWithErrors =>
-          Future.successful(BadRequest(view(formWithErrors, mode))),
+        val isSaveAndReturn = request.body.asFormUrlEncoded.exists(_.contains("saveAndReturn"))
 
-        value =>
-          for {
-            updatedAnswers <- Future.fromTry(request.userAnswers.set(AmountPaidForSecuritiesPage, value))
-            nextPage       <- navigator.nextPage(AmountPaidForSecuritiesPage, mode, updatedAnswers)
-          } yield Redirect(nextPage)
-      )
-  }
+        form.bindFromRequest().fold(
+          formWithErrors =>
+            Future.successful(BadRequest(view(formWithErrors, mode))),
+
+          value =>
+            for {
+              updatedAnswers <- Future.fromTry(request.userAnswers.set(AmountPaidForSecuritiesPage, value))
+
+              nextPage <-
+                if (isSaveAndReturn)
+                  navigator.goTo(routes.SubmissionsDashboardController.onPageLoad(), updatedAnswers)
+                else
+                  navigator.nextPage(AmountPaidForSecuritiesPage, mode, updatedAnswers)
+
+            } yield Redirect(nextPage)
+        )
+    }
 }

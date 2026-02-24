@@ -29,7 +29,10 @@ class StubNavigator(desiredCall: Call) extends Navigator {
   override def nextPage(page: Page, mode: Mode, userAnswers: UserAnswers)(implicit request: Request[_]): Future[Call] =
     Future.successful(desiredCall)
 
-
+  override def goTo(call: Call, userAnswers: UserAnswers)
+                   (implicit request: Request[?]): Future[Call] =
+    Future.successful(desiredCall)  
+  
   val errorPage: Page => Call = _ => desiredCall
 
   override def restore(submissionId: SubmissionId, userId: String)(implicit request: Request[_]): Future[UserAnswers] =

@@ -32,6 +32,7 @@ import scala.concurrent.{ExecutionContext, Future}
 
 trait Navigator:
   def nextPage(page: Page, mode: Mode, userAnswers: UserAnswers)(implicit request: Request[?]): Future[Call]
+  def goTo(call: Call, userAnswers: UserAnswers)(implicit request: Request[?]): Future[Call]
   def restore(submissionId: SubmissionId, userId: String)(implicit request: Request[?]): Future[UserAnswers]
   val errorPage: Page => Call
 
@@ -56,6 +57,11 @@ abstract class AbstractNavigator(answerPersistenceService: AnswerPersistenceServ
       .fold
         (Future.successful(success))
         (ua => updateAndPersistUserAnswers(success, ua))
+
+  override def goTo(call: Call, userAnswers: UserAnswers)(implicit request: Request[?]): Future[Call] = {
+    implicit val hc: HeaderCarrier = HeaderCarrierConverter.fromRequestAndSession(request, request.session)
+    goTo(call, Some(userAnswers))
+  }
 
   /*
    * Used to navigate when the destination depends on UserAnswers existing for the page,
