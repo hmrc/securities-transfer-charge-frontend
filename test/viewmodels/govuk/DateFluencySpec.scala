@@ -44,7 +44,6 @@ class DateFluencySpec extends AnyFreeSpec with Matchers with Mappings with Optio
           allRequiredKey = "fieldName.error.required.all",
           twoRequiredKey = "fieldName.error.required.two",
           requiredKey = "fieldName.error.required",
-          futureDateKey = "dateOfBirthReg.error.futureDate"
         )
       )
 

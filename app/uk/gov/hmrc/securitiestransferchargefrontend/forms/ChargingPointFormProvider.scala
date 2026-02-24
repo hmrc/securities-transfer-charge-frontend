@@ -32,7 +32,8 @@ class ChargingPointFormProvider @Inject() extends Mappings {
         allRequiredKey = "chargingPoint.error.required.all",
         twoRequiredKey = "chargingPoint.error.required.two",
         requiredKey    = "chargingPoint.error.required",
-        futureDateKey = "chargingPoint.error.futureDate"
+      ).verifying(
+        maxDate(LocalDate.now(), "chargingPoint.error.futureDate")
       )
     )
 }
