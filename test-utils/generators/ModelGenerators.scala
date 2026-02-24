@@ -17,9 +17,19 @@
 package generators
 
 import org.scalacheck.{Arbitrary, Gen}
-import uk.gov.hmrc.securitiestransferchargefrontend.models.WhatTypeOfSecurities
+import uk.gov.hmrc.securitiestransferchargefrontend.models.{DetailsOfThisTransfer, WhatTypeOfSecurities}
 
 trait ModelGenerators {
+
+  implicit lazy val arbitraryDetailsOfThisTransfer: Arbitrary[DetailsOfThisTransfer] =
+    Arbitrary {
+      for {
+        numberOfShares <- Gen.alphaStr.suchThat(_.nonEmpty)
+        typeOfShares <- Gen.alphaStr.suchThat(_.nonEmpty)
+        amountPaid <- Gen.choose(BigDecimal(0), BigDecimal(1000000))
+        marketValue <- Gen.choose(BigDecimal(0), BigDecimal(1000000))
+      } yield DetailsOfThisTransfer(numberOfShares, typeOfShares, amountPaid, marketValue)
+    }
 
   implicit lazy val arbitraryWhatTypeOfSecurities: Arbitrary[WhatTypeOfSecurities] =
     Arbitrary {
