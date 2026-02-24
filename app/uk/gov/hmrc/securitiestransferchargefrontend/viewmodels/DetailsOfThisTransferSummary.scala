@@ -25,7 +25,7 @@ import uk.gov.hmrc.securitiestransferchargefrontend.models.{CheckMode, UserAnswe
 import uk.gov.hmrc.securitiestransferchargefrontend.pages.DetailsOfThisTransferPage
 import uk.gov.hmrc.securitiestransferchargefrontend.viewmodels.govuk.summarylist.*
 import uk.gov.hmrc.securitiestransferchargefrontend.viewmodels.implicits.*
-import uk.gov.hmrc.securitiestransferchargefrontend.viewmodels.FormatUtils.bigDecimalCurrency
+import uk.gov.hmrc.securitiestransferchargefrontend.config.CurrencyFormatter.currencyFormat
 
 object DetailsOfThisTransferSummary {
 
@@ -37,8 +37,8 @@ object DetailsOfThisTransferSummary {
           s"""
              |${HtmlFormat.escape(answer.numberOfShares).body}<br/>
              |${HtmlFormat.escape(answer.typeOfShares).body}<br/>
-             |${HtmlFormat.escape(bigDecimalCurrency(answer.amountPaid)).body}<br/>
-             |${HtmlFormat.escape(bigDecimalCurrency(answer.marketValue)).body}
+             |${HtmlFormat.escape(currencyFormat(answer.amountPaid)).body}<br/>
+             |${HtmlFormat.escape(currencyFormat(answer.marketValue)).body}
              |""".stripMargin
         )
 
