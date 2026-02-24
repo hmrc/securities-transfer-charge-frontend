@@ -105,7 +105,7 @@ class ChargingPointControllerSpec extends SpecBase with MockitoSugar {
         val result = route(application, postRequest()).value
 
         status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual routes.WhatTypeOfSecuritiesController.onPageLoad(NormalMode).url
+        redirectLocation(result).value mustEqual routes.TaxRateController.onPageLoad(NormalMode).url
       }
     }
 
