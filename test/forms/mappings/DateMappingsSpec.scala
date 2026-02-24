@@ -26,6 +26,7 @@ import play.api.data.{Form, FormError}
 import play.api.i18n.Messages
 import play.api.test.Helpers.stubMessages
 import uk.gov.hmrc.securitiestransferchargefrontend.forms.mappings.Mappings
+import uk.gov.hmrc.securitiestransferchargefrontend.models.DateHelper.today
 
 import java.time.LocalDate
 
@@ -39,13 +40,13 @@ class DateMappingsSpec extends AnyFreeSpec with Matchers with ScalaCheckProperty
       requiredKey    = "error.required",
       allRequiredKey = "error.required.all",
       twoRequiredKey = "error.required.two",
-      invalidKey     = "error.invalid"
+      invalidKey     = "error.invalid",
     )
   )
 
   val validData: Gen[LocalDate] = datesBetween(
     min = LocalDate.of(2000, 1, 1),
-    max = LocalDate.of(3000, 1, 1)
+    max = today
   )
 
   val invalidField: Gen[String] = Gen.alphaStr.suchThat(_.nonEmpty)
