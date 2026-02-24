@@ -54,7 +54,7 @@ class StfNavigator @Inject()(answerPersistenceService: AnswerPersistenceService)
     case WhatReliefAreYouApplyingForPage => userAnswers => dataRequired(WhatReliefAreYouApplyingForPage, userAnswers, routes.SecuritiesTargetController.onPageLoad(NormalMode))
     case SecuritiesTargetPage => userAnswers => dataRequired(SecuritiesTargetPage, userAnswers, routes.ChargingPointController.onPageLoad(NormalMode))
     case ChargingPointPage => userAnswers => dataRequired(ChargingPointPage, userAnswers, routes.TaxRateController.onPageLoad(NormalMode))
-    case TaxRatePage => userAnswers => dataRequired(SecuritiesTargetPage, userAnswers, routes.WhatTypeOfSecuritiesController.onPageLoad(NormalMode))
+    case TaxRatePage => userAnswers => dataRequired(TaxRatePage, userAnswers, routes.WhatTypeOfSecuritiesController.onPageLoad(NormalMode))
     case OtherSecuritiesTypePage  => userAnswers => dataRequired(OtherSecuritiesTypePage, userAnswers, routes.AmountPaidForSecuritiesController.onPageLoad(NormalMode))
 
     case WhatTypeOfSecuritiesPage => userAnswers => dataDependent(WhatTypeOfSecuritiesPage, userAnswers) {

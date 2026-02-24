@@ -79,13 +79,14 @@ class TaxRateControllerSpec extends SpecBase with MockitoSugar {
     }
 
     "must redirect to the next page when valid data is submitted" in {
+      val userAnswers = UserAnswers(userAnswersId, submissionId).set(TaxRatePage, TaxRate.values.head).success.value
 
       val mockSessionRepository = mock[SessionRepository]
 
-      when(mockSessionRepository.set(any())) thenReturn Future.successful(true)
+      when(mockSessionRepository.set(any())) thenReturn Future.successful(())
 
       val application =
-        applicationBuilder(userAnswers = Some(emptyUserAnswers))
+        applicationBuilder(userAnswers = Some(userAnswers), sessionRepository = mockSessionRepository)
           .build()
 
       running(application) {
