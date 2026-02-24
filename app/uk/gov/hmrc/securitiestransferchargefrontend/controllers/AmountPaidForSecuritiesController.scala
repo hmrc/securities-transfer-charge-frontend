@@ -65,7 +65,7 @@ class AmountPaidForSecuritiesController @Inject()(
         value =>
           for {
             updatedAnswers <- Future.fromTry(request.userAnswers.set(AmountPaidForSecuritiesPage, value))
-            nextPage <- navigator.nextPage(AmountPaidForSecuritiesPage, mode, updatedAnswers)
+            nextPage       <- navigator.nextPage(AmountPaidForSecuritiesPage, mode, updatedAnswers)
             _              <- sessionRepository.set(updatedAnswers)
           } yield Redirect((nextPage))
       )
