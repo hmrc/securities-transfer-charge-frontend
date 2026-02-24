@@ -109,7 +109,6 @@ connectedPersons.details.content.link.text = Read HMRC guidance on connected per
 site.save-and-continue.button = Save and continue
 site.save-and-return.button = Save and return to dashboard
 
-
 applyingForRelief.title = Are you applying for a relief?
 applyingForRelief.heading = Are you applying for a relief?
 applyingForRelief.checkYourAnswersLabel = Are you applying for a relief?
@@ -148,6 +147,17 @@ chargingPoint.error.required = The date must include a {0}
 chargingPoint.error.invalid = The date you bought the securities must be a real date
 chargingPoint.error.futureDate = The day you bought the securities must be today’s date or a date in the past
 chargingPoint.change.hidden = ChargingPoint
+
+taxRate.title = Tax rate
+taxRate.heading = Tax rate
+taxRate.p1 = For most securities transfers, you will be charged a tax rate of 0.5% of the consideration.
+taxRate.p2 = If the securities are being transferred into a ‘depository receipt scheme’ or a ‘clearance service’, you will need to pay the 1.5% tax rate in most circumstances. This is usually where the transfer is not integral to capital raising or where the clearance service has elected to remain in the 0.5% regime.
+taxRate.legend = What is the tax rate for this transfer?
+taxRate.half = 0.5%
+taxRate.oneAndHalf = 1.5%
+taxRate.checkYourAnswersLabel = Tax rate
+taxRate.error.required = Select a tax rate
+taxRate.change.hidden = TaxRate
 
 otherSecuritiesType.title = What type of securities are you buying?
 otherSecuritiesType.heading = What type of securities are you buying?
