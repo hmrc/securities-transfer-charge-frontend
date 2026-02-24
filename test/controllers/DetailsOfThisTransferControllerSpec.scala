@@ -17,42 +17,46 @@
 package controllers
 
 import base.SpecBase
-import org.mockito.ArgumentMatchers.any
-import org.mockito.Mockito.when
 import org.scalatestplus.mockito.MockitoSugar
 import play.api.data.Form
 import play.api.test.FakeRequest
 import play.api.test.Helpers.*
-import uk.gov.hmrc.http.HeaderCarrier
-import uk.gov.hmrc.securitiestransferchargefrontend.clients.SaveAndReturnClient
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.routes
-import uk.gov.hmrc.securitiestransferchargefrontend.forms.WhatTypeOfSecuritiesFormProvider
-import uk.gov.hmrc.securitiestransferchargefrontend.models.{NormalMode, UserAnswers, WhatTypeOfSecurities}
-import uk.gov.hmrc.securitiestransferchargefrontend.pages.WhatTypeOfSecuritiesPage
-import uk.gov.hmrc.securitiestransferchargefrontend.views.html.WhatTypeOfSecuritiesView
+import uk.gov.hmrc.securitiestransferchargefrontend.forms.DetailsOfThisTransferFormProvider
+import uk.gov.hmrc.securitiestransferchargefrontend.models.{DetailsOfThisTransfer, NormalMode, UserAnswers}
+import uk.gov.hmrc.securitiestransferchargefrontend.pages.DetailsOfThisTransferPage
+import uk.gov.hmrc.securitiestransferchargefrontend.views.html.DetailsOfThisTransferView
 
-import scala.concurrent.Future
-
-class WhatTypeOfSecuritiesControllerSpec extends SpecBase with MockitoSugar {
+class DetailsOfThisTransferControllerSpec extends SpecBase with MockitoSugar {
 
 
-  lazy val whatTypeOfSecuritiesRoute: String = routes.WhatTypeOfSecuritiesController.onPageLoad(NormalMode).url
+  val formProvider = new DetailsOfThisTransferFormProvider()
+  val form: Form[DetailsOfThisTransfer] = formProvider()
 
-  val formProvider = new WhatTypeOfSecuritiesFormProvider()
-  val form: Form[WhatTypeOfSecurities] = formProvider()
+  lazy val detailsOfThisTransferRoute: String = routes.DetailsOfThisTransferController.onPageLoad(NormalMode).url
 
-  "WhatTypeOfSecurities Controller" - {
+  val amount: BigDecimal = BigDecimal(500)
+
+
+  val detailsOfThisTransfer: DetailsOfThisTransfer = DetailsOfThisTransfer(numberOfShares = "25",
+    typeOfShares = "stocks",
+    amountPaid = BigDecimal(100),
+    marketValue = BigDecimal(10000))
+
+  val userAnswers: UserAnswers = UserAnswers(userAnswersId, submissionId)
+
+  "DetailsOfThisTransfer Controller" - {
 
     "must return OK and the correct view for a GET" in {
 
       val application = applicationBuilder(userAnswers = Some(emptyUserAnswers)).build()
 
       running(application) {
-        val request = FakeRequest(GET, whatTypeOfSecuritiesRoute)
+        val request = FakeRequest(GET, detailsOfThisTransferRoute)
+
+        val view = application.injector.instanceOf[DetailsOfThisTransferView]
 
         val result = route(application, request).value
-
-        val view = application.injector.instanceOf[WhatTypeOfSecuritiesView]
 
         status(result) mustEqual OK
         contentAsString(result) mustEqual view(form, NormalMode)(request, messages(application)).toString
@@ -61,42 +65,43 @@ class WhatTypeOfSecuritiesControllerSpec extends SpecBase with MockitoSugar {
 
     "must populate the view correctly on a GET when the question has previously been answered" in {
 
-      val userAnswers = UserAnswers(userAnswersId,submissionId).set(WhatTypeOfSecuritiesPage, WhatTypeOfSecurities.values.head).success.value
+      val updatedAnswers = userAnswers.set(DetailsOfThisTransferPage, detailsOfThisTransfer).success.value
 
-      val application = applicationBuilder(userAnswers = Some(userAnswers)).build()
+      val application = applicationBuilder(userAnswers = Some(updatedAnswers)).build()
 
       running(application) {
-        val request = FakeRequest(GET, whatTypeOfSecuritiesRoute)
+        val request = FakeRequest(GET, detailsOfThisTransferRoute)
 
-        val view = application.injector.instanceOf[WhatTypeOfSecuritiesView]
+        val view = application.injector.instanceOf[DetailsOfThisTransferView]
 
         val result = route(application, request).value
 
         status(result) mustEqual OK
-        contentAsString(result) mustEqual view(form.fill(WhatTypeOfSecurities.values.head), NormalMode)(request, messages(application)).toString
+        contentAsString(result) mustEqual view(form.fill(detailsOfThisTransfer), NormalMode)(request, messages(application)).toString
       }
     }
 
     "must redirect to the next page when valid data is submitted" in {
-
-      val saveAndReturnClient = mock[SaveAndReturnClient]
-
-      when(saveAndReturnClient.save(any[UserAnswers]())(any[HeaderCarrier]()))
-        .thenReturn(Future.successful(()))
 
       val application =
         applicationBuilder(userAnswers = Some(emptyUserAnswers))
           .build()
 
       running(application) {
-        val request =
-          FakeRequest(POST, whatTypeOfSecuritiesRoute)
-            .withFormUrlEncodedBody(("value", WhatTypeOfSecurities.values.head.toString))
+        val request = {
+          FakeRequest(POST, detailsOfThisTransferRoute)
+            .withFormUrlEncodedBody(
+              "numberOfShares" -> "15",
+              "typeOfShares" -> "stocks",
+              "amountPaid" -> amount.toString,
+              "marketValue" -> amount.toString
+            )
+        }
 
         val result = route(application, request).value
 
         status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual routes.DetailsOfThisTransferController.onPageLoad(NormalMode).url
+        redirectLocation(result).value mustEqual routes.JourneyRecoveryController.onPageLoad().url
       }
     }
 
@@ -106,12 +111,12 @@ class WhatTypeOfSecuritiesControllerSpec extends SpecBase with MockitoSugar {
 
       running(application) {
         val request =
-          FakeRequest(POST, whatTypeOfSecuritiesRoute)
+          FakeRequest(POST, detailsOfThisTransferRoute)
             .withFormUrlEncodedBody(("value", "invalid value"))
 
         val boundForm = form.bind(Map("value" -> "invalid value"))
 
-        val view = application.injector.instanceOf[WhatTypeOfSecuritiesView]
+        val view = application.injector.instanceOf[DetailsOfThisTransferView]
 
         val result = route(application, request).value
 
@@ -125,7 +130,7 @@ class WhatTypeOfSecuritiesControllerSpec extends SpecBase with MockitoSugar {
       val application = applicationBuilder(userAnswers = None).build()
 
       running(application) {
-        val request = FakeRequest(GET, whatTypeOfSecuritiesRoute)
+        val request = FakeRequest(GET, detailsOfThisTransferRoute)
 
         val result = route(application, request).value
 
@@ -134,19 +139,18 @@ class WhatTypeOfSecuritiesControllerSpec extends SpecBase with MockitoSugar {
       }
     }
 
-    "redirect to Journey Recovery for a POST if no existing data is found" in {
+    "must redirect to Journey Recovery for a POST if no existing data is found" in {
 
       val application = applicationBuilder(userAnswers = None).build()
 
       running(application) {
         val request =
-          FakeRequest(POST, whatTypeOfSecuritiesRoute)
-            .withFormUrlEncodedBody(("value", WhatTypeOfSecurities.values.head.toString))
+          FakeRequest(POST, detailsOfThisTransferRoute)
+            .withFormUrlEncodedBody(("numberOfShares", "1"), ("typeOfShares", "stocks"))
 
         val result = route(application, request).value
 
         status(result) mustEqual SEE_OTHER
-
         redirectLocation(result).value mustEqual routes.JourneyRecoveryController.onPageLoad().url
       }
     }

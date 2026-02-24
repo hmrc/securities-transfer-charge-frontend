@@ -70,7 +70,7 @@ trait SpecBase
     emailAddress = "some@email.com"
   )
 
-  def emptyUserAnswers: UserAnswers = UserAnswers(userAnswersId,submissionId)
+  def emptyUserAnswers: UserAnswers = UserAnswers.empty(userAnswersId)(submissionId)
 
   val fakeRequest: FakeRequest[AnyContentAsEmpty.type] = FakeRequest().withHeaders("sessionId" -> sessionId)
 
