@@ -43,7 +43,7 @@ class DateFluencySpec extends AnyFreeSpec with Matchers with Mappings with Optio
           invalidKey = "fieldName.error.invalid",
           allRequiredKey = "fieldName.error.required.all",
           twoRequiredKey = "fieldName.error.required.two",
-          requiredKey = "fieldName.error.required",
+          requiredKey = "fieldName.error.required"
         )
       )
 

@@ -19,8 +19,6 @@ package views
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
 import play.api.Application
-import play.api.mvc.Call
-import uk.gov.hmrc.securitiestransferchargefrontend.controllers.routes
 import uk.gov.hmrc.securitiestransferchargefrontend.forms.ChargingPointFormProvider
 import uk.gov.hmrc.securitiestransferchargefrontend.models.NormalMode
 import uk.gov.hmrc.securitiestransferchargefrontend.views.html.ChargingPointView
@@ -33,7 +31,6 @@ class ChargingPointViewSpec extends ViewBaseSpec {
   private val viewInstance = app.injector.instanceOf[ChargingPointView]
   private val formProvider = new ChargingPointFormProvider()
   private val form = formProvider()
-  val backLinkRoute: Call = routes.SecuritiesTargetController.onPageLoad(NormalMode)
 
   def view(): Document = Jsoup.parse(
     viewInstance(form, NormalMode)(fakeRequest, messages).body

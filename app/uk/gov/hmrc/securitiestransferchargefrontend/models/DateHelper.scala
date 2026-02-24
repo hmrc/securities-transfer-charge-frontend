@@ -16,14 +16,11 @@
 
 package uk.gov.hmrc.securitiestransferchargefrontend.models
 
-import java.time.{LocalDate, LocalDateTime};
+import java.time.LocalDate;
 
 object DateHelper {
 
   def today: LocalDate             = LocalDate.now()
-  def yesterday: LocalDate         = LocalDate.now().minusDays(1)
-  def todayDateTime: LocalDateTime = LocalDateTime.now()
-
   
   
 }
