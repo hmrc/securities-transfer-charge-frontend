@@ -152,6 +152,17 @@ whatTypeOfSecurities.checkYourAnswersLabel = What type of securities are you buy
 whatTypeOfSecurities.error.required = Select a the type of securities you are buying
 whatTypeOfSecurities.change.hidden = Change what type of securities are you buying
 
+totalMarketValue.title = What is the total market value of these securities?
+totalMarketValue.heading = What is the total market value of these securities?
+totalMarketValue.hint = For example, £600 or £193.54
+totalMarketValue.checkYourAnswersLabel = What is the total market value of these securities?
+totalMarketValue.error.nonNumeric = The market value of the securities must be a number
+totalMarketValue.error.required = Enter the total market value of the securities
+totalMarketValue.error.invalidNumeric = Enter the market value of the securities using up to two decimal places
+totalMarketValue.error.aboveMaximum = The market value of the securities must be {0} or less
+totalMarketValue.error.belowMinimum = The market value of the securities must be greater than zero
+totalMarketValue.change.hidden = Change the market value of the securities
+
 amountPaidForSecurities.caption = Transfer details
 amountPaidForSecurities.title = How much did you pay for these securities?
 amountPaidForSecurities.heading = How much did you pay for these securities?
@@ -186,4 +197,3 @@ detailsOfThisTransfer.error.marketValue.outOfRange = Enter an amount between £{
 detailsOfThisTransfer.error.numberOfShares.length = Number of shares must be 100 characters or less
 detailsOfThisTransfer.error.typeOfShares.length = Type or class of shares must be 100 characters or less
 detailsOfThisTransfer.change.hidden = Change what are the details of this transfer
-
