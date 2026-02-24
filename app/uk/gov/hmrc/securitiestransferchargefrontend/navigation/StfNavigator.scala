@@ -39,7 +39,7 @@ class StfNavigator @Inject()(answerPersistenceService: AnswerPersistenceService)
     case HowToNotifyAboutSecuritiesTransferPage => userAnswers => {
       dataDependent(HowToNotifyAboutSecuritiesTransferPage, userAnswers) {
         case OneAtATime => routes.ConfirmAddressController.onPageLoad()
-        case MoreThanOneAtATime => routes.ChargingPointController.onPageLoad(NormalMode)
+        case MoreThanOneAtATime => ???
       }
     }
     case StfBuyersAddressPage => userAnswers => dataRequired(StfBuyersAddressPage, userAnswers, routes.NameOfSellerController.onPageLoad(NormalMode))
