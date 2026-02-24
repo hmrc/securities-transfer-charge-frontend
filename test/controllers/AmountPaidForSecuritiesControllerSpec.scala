@@ -17,42 +17,39 @@
 package controllers
 
 import base.SpecBase
-import org.mockito.ArgumentMatchers.any
-import org.mockito.Mockito.when
 import org.scalatestplus.mockito.MockitoSugar
-import play.api.data.Form
+import play.api.mvc.Call
 import play.api.test.FakeRequest
 import play.api.test.Helpers.*
-import uk.gov.hmrc.http.HeaderCarrier
-import uk.gov.hmrc.securitiestransferchargefrontend.clients.SaveAndReturnClient
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.routes
-import uk.gov.hmrc.securitiestransferchargefrontend.forms.OtherSecuritiesTypeFormProvider
+import uk.gov.hmrc.securitiestransferchargefrontend.forms.AmountPaidForSecuritiesFormProvider
 import uk.gov.hmrc.securitiestransferchargefrontend.models.{NormalMode, UserAnswers}
-import uk.gov.hmrc.securitiestransferchargefrontend.pages.OtherSecuritiesTypePage
-import uk.gov.hmrc.securitiestransferchargefrontend.views.html.OtherSecuritiesTypeView
+import uk.gov.hmrc.securitiestransferchargefrontend.pages.AmountPaidForSecuritiesPage
+import uk.gov.hmrc.securitiestransferchargefrontend.views.html.AmountPaidForSecuritiesView
 
-import scala.concurrent.Future
+class AmountPaidForSecuritiesControllerSpec extends SpecBase with MockitoSugar {
 
-class OtherSecuritiesTypeControllerSpec extends SpecBase with MockitoSugar {
+  val formProvider = new AmountPaidForSecuritiesFormProvider()
+  val form = formProvider()
 
+  def onwardRoute = Call("GET", "/foo")
 
-  val formProvider = new OtherSecuritiesTypeFormProvider()
-  val form: Form[String] = formProvider()
+  val validAnswer = 100
 
-  lazy val otherSecuritiesTypeRoute: String = routes.OtherSecuritiesTypeController.onPageLoad(NormalMode).url
+  lazy val amountPaidForSecuritiesRoute: String = routes.AmountPaidForSecuritiesController.onPageLoad(NormalMode).url
 
-  "OtherSecuritiesType Controller" - {
+  "AmountPaidForSecurities Controller" - {
 
     "must return OK and the correct view for a GET" in {
 
       val application = applicationBuilder(userAnswers = Some(emptyUserAnswers)).build()
 
       running(application) {
-        val request = FakeRequest(GET, otherSecuritiesTypeRoute)
+        val request = FakeRequest(GET, amountPaidForSecuritiesRoute)
 
         val result = route(application, request).value
 
-        val view = application.injector.instanceOf[OtherSecuritiesTypeView]
+        val view = application.injector.instanceOf[AmountPaidForSecuritiesView]
 
         status(result) mustEqual OK
         contentAsString(result) mustEqual view(form, NormalMode)(request, messages(application)).toString
@@ -61,44 +58,19 @@ class OtherSecuritiesTypeControllerSpec extends SpecBase with MockitoSugar {
 
     "must populate the view correctly on a GET when the question has previously been answered" in {
 
-      val userAnswers = UserAnswers(userAnswersId,submissionId).set(OtherSecuritiesTypePage, "answer").success.value
+      val userAnswers = UserAnswers(userAnswersId, submissionId).set(AmountPaidForSecuritiesPage, validAnswer).success.value
 
       val application = applicationBuilder(userAnswers = Some(userAnswers)).build()
 
       running(application) {
-        val request = FakeRequest(GET, otherSecuritiesTypeRoute)
+        val request = FakeRequest(GET, amountPaidForSecuritiesRoute)
 
-        val view = application.injector.instanceOf[OtherSecuritiesTypeView]
+        val view = application.injector.instanceOf[AmountPaidForSecuritiesView]
 
         val result = route(application, request).value
 
         status(result) mustEqual OK
-        contentAsString(result) mustEqual view(form.fill("answer"), NormalMode)(request, messages(application)).toString
-      }
-    }
-
-    "must redirect to the next page when valid data is submitted" in {
-
-      val saveAndReturnClient = mock[SaveAndReturnClient]
-
-      when(saveAndReturnClient.save(any[UserAnswers]())(any[HeaderCarrier]()))
-        .thenReturn(Future.successful(()))
-
-    
-
-      val application =
-        applicationBuilder(userAnswers = Some(emptyUserAnswers))
-          .build()
-
-      running(application) {
-        val request =
-          FakeRequest(POST, otherSecuritiesTypeRoute)
-            .withFormUrlEncodedBody(("value", "answer"))
-
-        val result = route(application, request).value
-
-        status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual routes.AmountPaidForSecuritiesController.onPageLoad(NormalMode).url
+        contentAsString(result) mustEqual view(form.fill(validAnswer), NormalMode)(request, messages(application)).toString
       }
     }
 
@@ -108,12 +80,12 @@ class OtherSecuritiesTypeControllerSpec extends SpecBase with MockitoSugar {
 
       running(application) {
         val request =
-          FakeRequest(POST, otherSecuritiesTypeRoute)
+          FakeRequest(POST, amountPaidForSecuritiesRoute)
             .withFormUrlEncodedBody(("value", ""))
 
         val boundForm = form.bind(Map("value" -> ""))
 
-        val view = application.injector.instanceOf[OtherSecuritiesTypeView]
+        val view = application.injector.instanceOf[AmountPaidForSecuritiesView]
 
         val result = route(application, request).value
 
@@ -127,7 +99,7 @@ class OtherSecuritiesTypeControllerSpec extends SpecBase with MockitoSugar {
       val application = applicationBuilder(userAnswers = None).build()
 
       running(application) {
-        val request = FakeRequest(GET, otherSecuritiesTypeRoute)
+        val request = FakeRequest(GET, amountPaidForSecuritiesRoute)
 
         val result = route(application, request).value
 
@@ -142,12 +114,13 @@ class OtherSecuritiesTypeControllerSpec extends SpecBase with MockitoSugar {
 
       running(application) {
         val request =
-          FakeRequest(POST, otherSecuritiesTypeRoute)
-            .withFormUrlEncodedBody(("value", "answer"))
+          FakeRequest(POST, amountPaidForSecuritiesRoute)
+            .withFormUrlEncodedBody(("value", validAnswer.toString))
 
         val result = route(application, request).value
 
         status(result) mustEqual SEE_OTHER
+
         redirectLocation(result).value mustEqual routes.JourneyRecoveryController.onPageLoad().url
       }
     }
