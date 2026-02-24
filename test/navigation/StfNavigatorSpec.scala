@@ -99,6 +99,14 @@ class StfNavigatorSpec extends SpecBase with ScalaFutures {
           res mustBe routes.WhatReliefAreYouApplyingForController.onPageLoad(NormalMode)
         }
       }
+
+      "must go from the OtherSecuritiesTypePage to AmountPaidForSecuritiesController" in {
+        val answers = emptyUserAnswers.set(OtherSecuritiesTypePage, "OtherSecurities").get
+        val result = navigator.nextPage(OtherSecuritiesTypePage, NormalMode, answers)(fakeRequest)
+        whenReady(result) { res =>
+          res mustBe routes.AmountPaidForSecuritiesController.onPageLoad(NormalMode)
+        }
+      }
     }
 
     "in Check mode" - {
