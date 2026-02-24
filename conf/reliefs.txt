@@ -1,4 +1,15 @@
-A fancy relief, 100
-Be relieved, 20
-Can be a relief, 60
-Decidedly relieved, 80
+Charities Relief, 100
+Demutualisation of Insurance Companies, 100
+Financial Institutions in Resolution Exemption, 100
+Group Relief, 100
+Growth Market Exemption, 100
+Hybrid Capital Instruments, 100
+Intermediary Relief, 100
+Insolvency/Bankruptcy Relief, 100
+Maintenance Funds for Historic Buildings, 100
+PISCES, 100
+Qualifying Asset Holding Companies Relief, 100
+Reconstruction & Acquisition Relief, 100
+Stock borrowing and repurchase arrangements, 100
+Share Incentive Plans, 100
+UK Listing Relief, 100
