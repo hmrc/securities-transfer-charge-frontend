@@ -39,7 +39,7 @@ class StfNavigator @Inject()(answerPersistenceService: AnswerPersistenceService)
     case HowToNotifyAboutSecuritiesTransferPage => userAnswers => {
       dataDependent(HowToNotifyAboutSecuritiesTransferPage, userAnswers) {
         case OneAtATime => routes.ConfirmAddressController.onPageLoad()
-        case MoreThanOneAtATime => routes.TaxRateController.onPageLoad(NormalMode)
+        case MoreThanOneAtATime => ???
       }
     }
     case StfBuyersAddressPage => userAnswers => dataRequired(StfBuyersAddressPage, userAnswers, routes.NameOfSellerController.onPageLoad(NormalMode))
@@ -52,6 +52,8 @@ class StfNavigator @Inject()(answerPersistenceService: AnswerPersistenceService)
       case false => routes.SecuritiesTargetController.onPageLoad(NormalMode)
     }
     case WhatReliefAreYouApplyingForPage => userAnswers => dataRequired(WhatReliefAreYouApplyingForPage, userAnswers, routes.SecuritiesTargetController.onPageLoad(NormalMode))
+    case SecuritiesTargetPage => userAnswers => dataRequired(SecuritiesTargetPage, userAnswers, routes.JourneyRecoveryController.onPageLoad())
+    case OtherSecuritiesTypePage  => userAnswers => dataRequired(OtherSecuritiesTypePage, userAnswers, routes.AmountPaidForSecuritiesController.onPageLoad(NormalMode))
     case SecuritiesTargetPage => userAnswers => dataRequired(SecuritiesTargetPage, userAnswers, routes.TaxRateController.onPageLoad(NormalMode))
 
     case TaxRatePage => userAnswers => dataRequired(SecuritiesTargetPage, userAnswers, routes.WhatTypeOfSecuritiesController.onPageLoad(NormalMode))
@@ -61,6 +63,7 @@ class StfNavigator @Inject()(answerPersistenceService: AnswerPersistenceService)
       case WhatTypeOfSecurities.Shares => Navigator.defaultPage
       case WhatTypeOfSecurities.Other => Navigator.defaultPage
     }
+    case AmountPaidForSecuritiesPage => userAnswers => dataRequired(AmountPaidForSecuritiesPage, userAnswers, routes.JourneyRecoveryController.onPageLoad())
     case _ => _ => Navigator.defaultPageF
 
   }
