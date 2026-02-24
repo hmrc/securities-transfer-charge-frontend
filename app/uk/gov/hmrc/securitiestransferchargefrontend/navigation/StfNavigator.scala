@@ -58,7 +58,6 @@ class StfNavigator @Inject()(answerPersistenceService: AnswerPersistenceService)
       case WhatTypeOfSecurities.Shares => Navigator.defaultPage
       case WhatTypeOfSecurities.Other => Navigator.defaultPage
     }
-    case AmountPaidForSecuritiesPage => userAnswers => dataRequired(AmountPaidForSecuritiesPage, userAnswers, routes.JourneyRecoveryController.onPageLoad())
     case _ => _ => Navigator.defaultPageF
 
   }

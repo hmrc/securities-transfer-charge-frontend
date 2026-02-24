@@ -75,10 +75,9 @@ class AmountPaidForSecuritiesViewSpec extends ViewBaseSpec {
         buttons.get(0).text() mustBe ExpectedContent.saveAndContinue
       }
 
-      "have a button with the text save and return to dashboard with correct attribute" in {
+      "have a button with the text save and return to dashboard" in {
         val buttons = amountPaidForSecuritiesView.select(".govuk-button")
         buttons.get(1).text() mustBe ExpectedContent.saveAndReturn
-        buttons.get(1).attr("name") mustBe "saveAndReturn"
       }
     }
   }

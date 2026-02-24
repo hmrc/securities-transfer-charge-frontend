@@ -24,6 +24,7 @@ import uk.gov.hmrc.securitiestransferchargefrontend.forms.AmountPaidForSecuritie
 import uk.gov.hmrc.securitiestransferchargefrontend.models.Mode
 import uk.gov.hmrc.securitiestransferchargefrontend.navigation.StfNavigator
 import uk.gov.hmrc.securitiestransferchargefrontend.pages.AmountPaidForSecuritiesPage
+import uk.gov.hmrc.securitiestransferchargefrontend.repositories.SessionRepository
 import uk.gov.hmrc.securitiestransferchargefrontend.views.html.AmountPaidForSecuritiesView
 
 import javax.inject.Inject
@@ -31,6 +32,7 @@ import scala.concurrent.{ExecutionContext, Future}
 
 class AmountPaidForSecuritiesController @Inject()(
                                                    override val messagesApi: MessagesApi,
+                                                   sessionRepository: SessionRepository,
                                                    navigator: StfNavigator,
                                                    stcAuthEnrolled: StcAuthEnrolledAction,
                                                    getData: StcDataRetrievalAction,
@@ -53,28 +55,19 @@ class AmountPaidForSecuritiesController @Inject()(
       Ok(view(preparedForm, mode))
   }
 
-  def onSubmit(mode: Mode): Action[AnyContent] =
-    (stcAuthEnrolled andThen getData andThen requireData).async {
-      implicit request =>
+  def onSubmit(mode: Mode): Action[AnyContent] = (stcAuthEnrolled andThen getData andThen requireData).async {
+    implicit request =>
 
-        val isSaveAndReturn =
-          request.body.asFormUrlEncoded.exists(_.contains("saveAndReturn"))
+      form.bindFromRequest().fold(
+        formWithErrors =>
+          Future.successful(BadRequest(view(formWithErrors, mode))),
 
-        form.bindFromRequest().fold(
-          formWithErrors =>
-            Future.successful(BadRequest(view(formWithErrors, mode))),
-
-          value =>
-            for {
-              updatedAnswers <- Future.fromTry(request.userAnswers.set(AmountPaidForSecuritiesPage, value))
-              nextCall       <- navigator.nextPage(AmountPaidForSecuritiesPage, mode, updatedAnswers)
-            } yield {
-              if (isSaveAndReturn) {
-                Redirect(routes.SubmissionsDashboardController.onPageLoad())
-              } else {
-                Redirect(nextCall)
-              }
-            }
-        )
-    }
+        value =>
+          for {
+            updatedAnswers <- Future.fromTry(request.userAnswers.set(AmountPaidForSecuritiesPage, value))
+            nextPage <- navigator.nextPage(AmountPaidForSecuritiesPage, mode, updatedAnswers)
+            _              <- sessionRepository.set(updatedAnswers)
+          } yield Redirect((nextPage))
+      )
+  }
 }
