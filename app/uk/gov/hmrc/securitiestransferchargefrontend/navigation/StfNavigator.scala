@@ -16,15 +16,13 @@
 
 package uk.gov.hmrc.securitiestransferchargefrontend.navigation
 
-import play.api.mvc.{Call, Request}
+import play.api.mvc.Call
 import uk.gov.hmrc.http.HeaderCarrier
-import uk.gov.hmrc.play.http.HeaderCarrierConverter
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.routes
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.seller.routes as sellerRoutes
 import uk.gov.hmrc.securitiestransferchargefrontend.models.HowToNotifyAboutSecuritiesTransfer.{MoreThanOneAtATime, OneAtATime}
-import uk.gov.hmrc.securitiestransferchargefrontend.models.{CheckMode, Mode, NormalMode, ReturnMode, UserAnswers, WhatTypeOfSecurities}
+import uk.gov.hmrc.securitiestransferchargefrontend.models.{NormalMode, UserAnswers, WhatTypeOfSecurities}
 import uk.gov.hmrc.securitiestransferchargefrontend.pages.*
-import uk.gov.hmrc.securitiestransferchargefrontend.queries.Gettable
 import uk.gov.hmrc.securitiestransferchargefrontend.services.AnswerPersistenceService
 
 import javax.inject.Inject
@@ -33,7 +31,7 @@ import scala.concurrent.{ExecutionContext, Future}
 class StfNavigator @Inject()(answerPersistenceService: AnswerPersistenceService)
                             (implicit ec: ExecutionContext) extends AbstractNavigator(answerPersistenceService) {
 
-  private def normalRoutes(page: Page)(implicit hc: HeaderCarrier): UserAnswers => Future[Call] = page match {
+  override def normalRoutes(page: Page)(implicit hc: HeaderCarrier): UserAnswers => Future[Call] = page match {
 
     case SubmissionsDashboardPage => userAnswers => goTo(routes.HowToNotifyAboutSecuritiesTransferController.onPageLoad(NormalMode), Some(userAnswers))
     case HowToNotifyAboutSecuritiesTransferPage => userAnswers => {
@@ -56,13 +54,13 @@ class StfNavigator @Inject()(answerPersistenceService: AnswerPersistenceService)
     case SecuritiesTargetPage => userAnswers => dataRequired(SecuritiesTargetPage, userAnswers, routes.ChargingPointController.onPageLoad(NormalMode))
     case ChargingPointPage => userAnswers => dataRequired(ChargingPointPage, userAnswers, routes.TaxRateController.onPageLoad(NormalMode))
     case TaxRatePage => userAnswers => dataRequired(TaxRatePage, userAnswers, routes.WhatTypeOfSecuritiesController.onPageLoad(NormalMode))
-    case OtherSecuritiesTypePage => userAnswers => dataRequired(OtherSecuritiesTypePage, userAnswers, routes.AmountPaidForSecuritiesController.onPageLoad(NormalMode))
-
     case WhatTypeOfSecuritiesPage => userAnswers =>
       dataDependent(WhatTypeOfSecuritiesPage, userAnswers) {
         case WhatTypeOfSecurities.Shares => routes.DetailsOfThisTransferController.onPageLoad(NormalMode)
         case WhatTypeOfSecurities.Other => routes.OtherSecuritiesTypeController.onPageLoad(NormalMode)
       }
+    case DetailsOfThisTransferPage => userAnswers => dataRequired(DetailsOfThisTransferPage, userAnswers, routes.CheckYourAnswersController.onPageLoad())
+    case OtherSecuritiesTypePage => userAnswers => dataRequired(OtherSecuritiesTypePage, userAnswers, routes.AmountPaidForSecuritiesController.onPageLoad(NormalMode))
     case AmountPaidForSecuritiesPage => userAnswers =>
       userAnswersDependent(userAnswers) {
         userAnswers =>
@@ -72,29 +70,11 @@ class StfNavigator @Inject()(answerPersistenceService: AnswerPersistenceService)
               else routes.CheckYourAnswersController.onPageLoad()
           }
       }
-    case DetailsOfThisTransferPage => userAnswers => dataRequired(DetailsOfThisTransferPage, userAnswers, routes.CheckYourAnswersController.onPageLoad())
     case TotalMarketValuePage => userAnswers => dataRequired(TotalMarketValuePage, userAnswers, routes.CheckYourAnswersController.onPageLoad())
     case _ => _ => Navigator.defaultPageF
 
   }
 
-  val checkRouteMap: Page => UserAnswers => Call = (_ => _ => routes.CheckYourAnswersController.onPageLoad())
-
-  def nextPage(page: Page, mode: Mode, userAnswers: UserAnswers)(implicit request: Request[?]): Future[Call] = {
-    lazy implicit val hc: HeaderCarrier = HeaderCarrierConverter.fromRequestAndSession(request, request.session)
-    mode match {
-      case NormalMode => normalRoutes(page)(hc)(userAnswers)
-      case CheckMode  => goTo(checkRouteMap(page)(userAnswers), Some(userAnswers))
-      case ReturnMode => for {
-        nextPage      <- normalRoutes(page)(hc)(userAnswers)
-        updatedAnswers = userAnswers.setNextPage(nextPage)
-        _             <- answerPersistenceService.save(updatedAnswers)
-      } yield Navigator.dashboardPage
-    }
-  }
-
-  val errorPage: Page => Call = {
-    case _: Gettable[?] => ???
-    case _ => routes.JourneyRecoveryController.onPageLoad()
-  }
+  override val checkRouteMap: Page => UserAnswers => Call = (_ => _ => routes.CheckYourAnswersController.onPageLoad())
+  
 }

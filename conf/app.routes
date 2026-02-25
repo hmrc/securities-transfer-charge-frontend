@@ -74,11 +74,13 @@ GET        /stf/charging-point                  uk.gov.hmrc.securitiestransferch
 POST       /stf/charging-point                  uk.gov.hmrc.securitiestransferchargefrontend.controllers.ChargingPointController.onSubmit(mode: Mode = NormalMode)
 GET        /stf/change/charging-point           uk.gov.hmrc.securitiestransferchargefrontend.controllers.ChargingPointController.onPageLoad(mode: Mode = CheckMode)
 POST       /stf/change/charging-point           uk.gov.hmrc.securitiestransferchargefrontend.controllers.ChargingPointController.onSubmit(mode: Mode = CheckMode)
+POST       /stf/save/charging-point           uk.gov.hmrc.securitiestransferchargefrontend.controllers.ChargingPointController.onSubmit(mode: Mode = ReturnMode)
 
 GET        /stf/tax-rate                        uk.gov.hmrc.securitiestransferchargefrontend.controllers.TaxRateController.onPageLoad(mode: Mode = NormalMode)
 POST       /stf/tax-rate                        uk.gov.hmrc.securitiestransferchargefrontend.controllers.TaxRateController.onSubmit(mode: Mode = NormalMode)
 GET        /stf/change/tax-rate                  uk.gov.hmrc.securitiestransferchargefrontend.controllers.TaxRateController.onPageLoad(mode: Mode = CheckMode)
 POST       /stf/change/tax-rate                  uk.gov.hmrc.securitiestransferchargefrontend.controllers.TaxRateController.onSubmit(mode: Mode = CheckMode)
+POST       /stf/save/tax-rate                  uk.gov.hmrc.securitiestransferchargefrontend.controllers.TaxRateController.onSubmit(mode: Mode = ReturnMode)
 
 GET        /stf/security-type                       uk.gov.hmrc.securitiestransferchargefrontend.controllers.OtherSecuritiesTypeController.onPageLoad(mode: Mode = NormalMode)
 POST       /stf/security-type                       uk.gov.hmrc.securitiestransferchargefrontend.controllers.OtherSecuritiesTypeController.onSubmit(mode: Mode = NormalMode)

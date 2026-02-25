@@ -1,15 +1,32 @@
+/*
+ * Copyright 2026 HM Revenue & Customs
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package forms
 
 import uk.gov.hmrc.securitiestransferchargefrontend.config.CurrencyFormatter.currencyFormat
-import uk.gov.hmrc.securitiestransferchargefrontend.forms.behaviours.CurrencyFieldBehaviours
+import forms.behaviours.CurrencyFieldBehaviours
 import org.scalacheck.Gen
 import play.api.data.FormError
+import uk.gov.hmrc.securitiestransferchargefrontend.forms.TotalMarketValueFormProvider
 
 import scala.math.BigDecimal.RoundingMode
 
 class TotalMarketValuePageFormProviderSpec extends CurrencyFieldBehaviours {
 
-  val form = new TotalMarketValuePageFormProvider()()
+  val form = new TotalMarketValueFormProvider()()
 
   ".value" - {
 
@@ -32,21 +49,21 @@ class TotalMarketValuePageFormProviderSpec extends CurrencyFieldBehaviours {
     behave like currencyField(
       form,
       fieldName,
-      nonNumericError     = FormError(fieldName, "totalMarketValuePage.error.nonNumeric"),
-      invalidNumericError = FormError(fieldName, "totalMarketValuePage.error.invalidNumeric")
+      nonNumericError     = FormError(fieldName, "totalMarketValue.error.nonNumeric"),
+      invalidNumericError = FormError(fieldName, "totalMarketValue.error.invalidNumeric")
     )
 
     behave like currencyFieldWithMaximum(
       form,
       fieldName,
       maximum,
-      FormError(fieldName, "totalMarketValuePage.error.aboveMaximum", Seq(currencyFormat(maximum)))
+      FormError(fieldName, "totalMarketValue.error.aboveMaximum", Seq(currencyFormat(maximum)))
     )
 
     behave like mandatoryField(
       form,
       fieldName,
-      requiredError = FormError(fieldName, "totalMarketValuePage.error.required")
+      requiredError = FormError(fieldName, "totalMarketValue.error.required")
     )
   }
 }

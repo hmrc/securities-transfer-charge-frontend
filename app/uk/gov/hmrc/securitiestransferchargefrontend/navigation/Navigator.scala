@@ -23,7 +23,7 @@ import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.play.http.HeaderCarrierConverter
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.routes
 import uk.gov.hmrc.securitiestransferchargefrontend.domain.SubmissionId
-import uk.gov.hmrc.securitiestransferchargefrontend.models.{Mode, NormalMode, UserAnswers}
+import uk.gov.hmrc.securitiestransferchargefrontend.models.{CheckMode, Mode, NormalMode, ReturnMode, UserAnswers}
 import uk.gov.hmrc.securitiestransferchargefrontend.pages.Page
 import uk.gov.hmrc.securitiestransferchargefrontend.queries.Gettable
 import uk.gov.hmrc.securitiestransferchargefrontend.services.AnswerPersistenceService
@@ -82,6 +82,28 @@ abstract class AbstractNavigator(answerPersistenceService: AnswerPersistenceServ
     updateAndPersistUserAnswers(f(userAnswers), userAnswers)
   }
 
+  protected def normalRoutes(page: Page)(implicit hc: HeaderCarrier): UserAnswers => Future[Call]
+  protected val checkRouteMap: Page => UserAnswers => Call
+  private def returnRoutes(page: Page)(implicit hc: HeaderCarrier): UserAnswers => Future[Call] = userAnswers =>
+    for {
+      nextPage      <- normalRoutes(page)(hc)(userAnswers)
+      updatedAnswers = userAnswers.setNextPage(nextPage)
+      _             <- answerPersistenceService.save(updatedAnswers)
+    } yield Navigator.dashboardPage
+
+  def nextPage(page: Page, mode: Mode, userAnswers: UserAnswers)(implicit request: Request[?]): Future[Call] = {
+    lazy implicit val hc: HeaderCarrier = HeaderCarrierConverter.fromRequestAndSession(request, request.session)
+    mode match {
+      case NormalMode => normalRoutes(page)(hc)(userAnswers)
+      case CheckMode  => goTo(checkRouteMap(page)(userAnswers), Some(userAnswers))
+      case ReturnMode => returnRoutes(page)(hc)(userAnswers)
+    }
+  }
+
+  val errorPage: Page => Call = {
+    case _: Gettable[?] => ???
+    case _ => routes.JourneyRecoveryController.onPageLoad()
+  }
   def restore(submissionId: SubmissionId, userId: String)(implicit request: Request[?]): Future[UserAnswers] = {
     implicit val hc: HeaderCarrier = HeaderCarrierConverter.fromRequestAndSession(request, request.session)
     answerPersistenceService.load(submissionId, userId)
@@ -91,5 +113,5 @@ object Navigator:
   val startPage: Call = routes.HowToNotifyAboutSecuritiesTransferController.onPageLoad(NormalMode)
   val defaultPage: Call = routes.JourneyRecoveryController.onPageLoad()
   val defaultPageF: Future[Call] = Future.successful(defaultPage)
-  val dashboardPage = routes.SubmissionsDashboardController.onPageLoad()
+  val dashboardPage: Call = routes.SubmissionsDashboardController.onPageLoad()
   val errorPages: Seq[Call] = List(defaultPage)

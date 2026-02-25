@@ -61,6 +61,10 @@ class NavigatorSpec extends SpecBase with MockitoSugar with ScalaFutures {
 
     override def nextPage(page: Page, mode: Mode, userAnswers: UserAnswers)(implicit request: Request[?]): Future[Call] =
       Future.successful(testCall)
+
+    override protected def normalRoutes(page: Page)(implicit hc: HeaderCarrier): UserAnswers => Future[Call] = _ => Future.successful(testCall)
+
+    override protected val checkRouteMap: Page => UserAnswers => Call = _ => _ => testCall
   }
 
   "All navigators should" - {
