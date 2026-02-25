@@ -85,11 +85,7 @@ abstract class AbstractNavigator(answerPersistenceService: AnswerPersistenceServ
   protected def normalRoutes(page: Page)(implicit hc: HeaderCarrier): UserAnswers => Future[Call]
   protected val checkRouteMap: Page => UserAnswers => Call
   private def returnRoutes(page: Page)(implicit hc: HeaderCarrier): UserAnswers => Future[Call] = userAnswers =>
-    for {
-      nextPage      <- normalRoutes(page)(hc)(userAnswers)
-      updatedAnswers = userAnswers.setNextPage(nextPage)
-      _             <- answerPersistenceService.save(updatedAnswers)
-    } yield Navigator.dashboardPage
+    normalRoutes(page)(hc)(userAnswers).map(_ => Navigator.dashboardPage)
 
   def nextPage(page: Page, mode: Mode, userAnswers: UserAnswers)(implicit request: Request[?]): Future[Call] = {
     lazy implicit val hc: HeaderCarrier = HeaderCarrierConverter.fromRequestAndSession(request, request.session)
