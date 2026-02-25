@@ -110,7 +110,7 @@ class StfNavigatorSpec extends SpecBase with ScalaFutures {
         }
       }
 
-      "must go from the SecuritiesTargetPage to ChargingPointController when no is selected" in {
+      "must go from the SecuritiesTargetPage to ChargingPointController" in {
         val answers = emptyUserAnswers.set(SecuritiesTargetPage, SecuritiesTarget("Business 1",Some("12345678"))).get
         val result = navigator.nextPage(SecuritiesTargetPage, NormalMode, answers)(fakeRequest)
         whenReady(result) { res =>
