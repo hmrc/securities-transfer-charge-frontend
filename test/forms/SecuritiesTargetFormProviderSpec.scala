@@ -27,7 +27,7 @@ class SecuritiesTargetFormProviderSpec extends StringFieldBehaviours {
   ".BusinessName" - {
 
     val fieldName = "BusinessName"
-    val requiredKey = "securitiesTarget.error.BusinessName.required"
+    val requiredKey = "securitiesTarget.error.businessName.required"
 
     behave like mandatoryField(
       form,
