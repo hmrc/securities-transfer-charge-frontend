@@ -134,6 +134,7 @@ securitiesTarget.CRN.hint.message1 = This is also called a company number.
 securitiesTarget.CRN.hint.message2 = For example, SN898989 or 12345678
 securitiesTarget.checkYourAnswersLabel = What business are you buying these securities in?
 securitiesTarget.error.BusinessName.required = Enter the name of the business you’re buying securities in
+securitiesTarget.error.BusinessName.length = Business name must be 160 characters or fewer
 securitiesTarget.error.CRN.length = The company registration number must be 8 characters
 securitiesTarget.BusinessName.change.hidden = BusinessName
 securitiesTarget.CRN.change.hidden = CRN
