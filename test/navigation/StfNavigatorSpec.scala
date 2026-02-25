@@ -158,7 +158,7 @@ class StfNavigatorSpec extends SpecBase with ScalaFutures {
         }
       }
 
-      "must go from the AmountPaidForSecuritiesPage to TotalMarketValueController when is connected person is true" in {
+      "must go from the AmountPaidForSecuritiesPage to TotalMarketValueController when connected persons is true" in {
         val answers = emptyUserAnswers.set(AmountPaidForSecuritiesPage, BigDecimal(500)).get
         val updated = answers.set(ConnectedPersonsPage,true).get
         val result = navigator.nextPage(AmountPaidForSecuritiesPage, NormalMode, updated)(fakeRequest)
@@ -167,7 +167,7 @@ class StfNavigatorSpec extends SpecBase with ScalaFutures {
         }
       }
 
-      "must go from the AmountPaidForSecuritiesPage to CheckYourAnswersController when is connected persons is false" in {
+      "must go from the AmountPaidForSecuritiesPage to CheckYourAnswersController when connected persons is false" in {
         val answers = emptyUserAnswers.set(AmountPaidForSecuritiesPage, BigDecimal(500)).get
         val updated = answers.set(ConnectedPersonsPage, false).get
         val result = navigator.nextPage(AmountPaidForSecuritiesPage, NormalMode, updated)(fakeRequest)
