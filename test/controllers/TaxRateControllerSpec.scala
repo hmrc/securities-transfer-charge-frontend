@@ -17,73 +17,87 @@
 package controllers
 
 import base.SpecBase
-import uk.gov.hmrc.securitiestransferchargefrontend.forms.SecuritiesTargetFormProvider
-import uk.gov.hmrc.securitiestransferchargefrontend.models.{NormalMode, SecuritiesTarget}
-import uk.gov.hmrc.securitiestransferchargefrontend.navigation.Navigator
-import uk.gov.hmrc.securitiestransferchargefrontend.controllers.routes
-import navigation.FakeNavigator
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.when
 import org.scalatestplus.mockito.MockitoSugar
 import play.api.data.Form
-import play.api.inject.bind
 import play.api.mvc.Call
 import play.api.test.FakeRequest
 import play.api.test.Helpers.*
+import uk.gov.hmrc.securitiestransferchargefrontend.controllers.routes
+import uk.gov.hmrc.securitiestransferchargefrontend.forms.TaxRateFormProvider
+import uk.gov.hmrc.securitiestransferchargefrontend.models.{NormalMode, TaxRate, UserAnswers}
+import uk.gov.hmrc.securitiestransferchargefrontend.pages.TaxRatePage
 import uk.gov.hmrc.securitiestransferchargefrontend.repositories.SessionRepository
-import uk.gov.hmrc.securitiestransferchargefrontend.views.html.SecuritiesTargetView
+import uk.gov.hmrc.securitiestransferchargefrontend.views.html.TaxRateView
 
 import scala.concurrent.Future
 
-class SecuritiesTargetControllerSpec extends SpecBase with MockitoSugar {
+class TaxRateControllerSpec extends SpecBase with MockitoSugar {
 
   def onwardRoute = Call("GET", "/foo")
 
-  val formProvider = new SecuritiesTargetFormProvider()
-  val form: Form[SecuritiesTarget] = formProvider()
+  lazy val taxRateRoute: String = routes.TaxRateController.onPageLoad(NormalMode).url
 
-  lazy val securitiesTargetRoute: String = routes.SecuritiesTargetController.onPageLoad(NormalMode).url
-  
-  "SecuritiesTarget Controller" - {
+  val formProvider = new TaxRateFormProvider()
+  val form: Form[TaxRate] = formProvider()
+
+  "TaxRate Controller" - {
 
     "must return OK and the correct view for a GET" in {
 
       val application = applicationBuilder(userAnswers = Some(emptyUserAnswers)).build()
 
       running(application) {
-        val request = FakeRequest(GET, securitiesTargetRoute)
-
-        val view = application.injector.instanceOf[SecuritiesTargetView]
+        val request = FakeRequest(GET, taxRateRoute)
 
         val result = route(application, request).value
+
+        val view = application.injector.instanceOf[TaxRateView]
 
         status(result) mustEqual OK
         contentAsString(result) mustEqual view(form, NormalMode)(request, messages(application)).toString
       }
     }
-    
+
+    "must populate the view correctly on a GET when the question has previously been answered" in {
+
+      val userAnswers = UserAnswers(userAnswersId, submissionId).set(TaxRatePage, TaxRate.values.head).success.value
+
+      val application = applicationBuilder(userAnswers = Some(userAnswers)).build()
+
+      running(application) {
+        val request = FakeRequest(GET, taxRateRoute)
+
+        val view = application.injector.instanceOf[TaxRateView]
+
+        val result = route(application, request).value
+
+        status(result) mustEqual OK
+        contentAsString(result) mustEqual view(form.fill(TaxRate.values.head), NormalMode)(request, messages(application)).toString
+      }
+    }
+
     "must redirect to the next page when valid data is submitted" in {
+      val userAnswers = UserAnswers(userAnswersId, submissionId).set(TaxRatePage, TaxRate.values.head).success.value
 
       val mockSessionRepository = mock[SessionRepository]
 
-      when(mockSessionRepository.set(any())) thenReturn Future.successful(true)
+      when(mockSessionRepository.set(any())) thenReturn Future.successful(())
 
       val application =
-        applicationBuilder(userAnswers = Some(emptyUserAnswers), sessionRepository = mockSessionRepository)
-          .overrides(
-            bind[Navigator].toInstance(new FakeNavigator(onwardRoute))
-          )
+        applicationBuilder(userAnswers = Some(userAnswers), sessionRepository = mockSessionRepository)
           .build()
 
       running(application) {
         val request =
-          FakeRequest(POST, securitiesTargetRoute)
-            .withFormUrlEncodedBody(("BusinessName", "value 1"), ("CRN", "12345678"))
+          FakeRequest(POST, taxRateRoute)
+            .withFormUrlEncodedBody(("value", TaxRate.values.head.toString))
 
         val result = route(application, request).value
 
         status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual onwardRoute.url
+        redirectLocation(result).value mustEqual routes.WhatTypeOfSecuritiesController.onPageLoad(NormalMode).url
       }
     }
 
@@ -93,12 +107,12 @@ class SecuritiesTargetControllerSpec extends SpecBase with MockitoSugar {
 
       running(application) {
         val request =
-          FakeRequest(POST, securitiesTargetRoute)
+          FakeRequest(POST, taxRateRoute)
             .withFormUrlEncodedBody(("value", "invalid value"))
 
         val boundForm = form.bind(Map("value" -> "invalid value"))
 
-        val view = application.injector.instanceOf[SecuritiesTargetView]
+        val view = application.injector.instanceOf[TaxRateView]
 
         val result = route(application, request).value
 
@@ -112,7 +126,7 @@ class SecuritiesTargetControllerSpec extends SpecBase with MockitoSugar {
       val application = applicationBuilder(userAnswers = None).build()
 
       running(application) {
-        val request = FakeRequest(GET, securitiesTargetRoute)
+        val request = FakeRequest(GET, taxRateRoute)
 
         val result = route(application, request).value
 
@@ -121,18 +135,19 @@ class SecuritiesTargetControllerSpec extends SpecBase with MockitoSugar {
       }
     }
 
-    "must redirect to Journey Recovery for a POST if no existing data is found" in {
+    "redirect to Journey Recovery for a POST if no existing data is found" in {
 
       val application = applicationBuilder(userAnswers = None).build()
 
       running(application) {
         val request =
-          FakeRequest(POST, securitiesTargetRoute)
-            .withFormUrlEncodedBody(("BusinessName", "value 1"), ("CRN", "value 2"))
+          FakeRequest(POST, taxRateRoute)
+            .withFormUrlEncodedBody(("value", TaxRate.values.head.toString))
 
         val result = route(application, request).value
 
         status(result) mustEqual SEE_OTHER
+
         redirectLocation(result).value mustEqual routes.JourneyRecoveryController.onPageLoad().url
       }
     }

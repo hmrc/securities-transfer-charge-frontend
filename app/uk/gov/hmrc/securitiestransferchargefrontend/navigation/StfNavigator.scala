@@ -44,22 +44,35 @@ class StfNavigator @Inject()(answerPersistenceService: AnswerPersistenceService)
     }
     case ConfirmAddressPage => userAnswers => dataRequired(ConfirmAddressPage, userAnswers, routes.NameOfSellerController.onPageLoad(NormalMode))
     case StfBuyersAddressPage => userAnswers => dataRequired(StfBuyersAddressPage, userAnswers, routes.NameOfSellerController.onPageLoad(NormalMode))
-    case NameOfSellerPage => userAnswers => dataRequired(NameOfSellerPage, userAnswers,sellerRoutes.StfSellerAddressController.onPageLoad())
+    case NameOfSellerPage => userAnswers => dataRequired(NameOfSellerPage, userAnswers, sellerRoutes.StfSellerAddressController.onPageLoad())
     case SellerAddressPage => userAnswers => dataRequired(SellerAddressPage, userAnswers, routes.ConnectedPersonsController.onPageLoad(NormalMode))
     case ConnectedPersonsPage => userAnswers => dataRequired(ConnectedPersonsPage, userAnswers, routes.ApplyingForReliefController.onPageLoad(NormalMode))
-    case ApplyingForReliefPage => userAnswers => dataDependent(ApplyingForReliefPage,userAnswers){
-      case true => routes.WhatReliefAreYouApplyingForController.onPageLoad(NormalMode)
-      case false => routes.SecuritiesTargetController.onPageLoad(NormalMode)
-    }
+    case ApplyingForReliefPage => userAnswers =>
+      dataDependent(ApplyingForReliefPage, userAnswers) {
+        case true => routes.WhatReliefAreYouApplyingForController.onPageLoad(NormalMode)
+        case false => routes.SecuritiesTargetController.onPageLoad(NormalMode)
+      }
     case WhatReliefAreYouApplyingForPage => userAnswers => dataRequired(WhatReliefAreYouApplyingForPage, userAnswers, routes.SecuritiesTargetController.onPageLoad(NormalMode))
-    case SecuritiesTargetPage => userAnswers => dataRequired(SecuritiesTargetPage, userAnswers, routes.JourneyRecoveryController.onPageLoad())
-    case OtherSecuritiesTypePage  => userAnswers => dataRequired(OtherSecuritiesTypePage, userAnswers, routes.AmountPaidForSecuritiesController.onPageLoad(NormalMode))
-    case WhatTypeOfSecuritiesPage => userAnswers => dataDependent(WhatTypeOfSecuritiesPage, userAnswers) {
-      case WhatTypeOfSecurities.Shares => routes.DetailsOfThisTransferController.onPageLoad(NormalMode)
-      case WhatTypeOfSecurities.Other => Navigator.defaultPage
-    }
-    case AmountPaidForSecuritiesPage => userAnswers => dataRequired(AmountPaidForSecuritiesPage, userAnswers, routes.JourneyRecoveryController.onPageLoad())
-    case DetailsOfThisTransferPage => userAnswers => dataRequired(DetailsOfThisTransferPage, userAnswers, routes.JourneyRecoveryController.onPageLoad())
+    case SecuritiesTargetPage => userAnswers => dataRequired(SecuritiesTargetPage, userAnswers, routes.ChargingPointController.onPageLoad(NormalMode))
+    case ChargingPointPage => userAnswers => dataRequired(ChargingPointPage, userAnswers, routes.TaxRateController.onPageLoad(NormalMode))
+    case TaxRatePage => userAnswers => dataRequired(TaxRatePage, userAnswers, routes.WhatTypeOfSecuritiesController.onPageLoad(NormalMode))
+    case OtherSecuritiesTypePage => userAnswers => dataRequired(OtherSecuritiesTypePage, userAnswers, routes.AmountPaidForSecuritiesController.onPageLoad(NormalMode))
+
+    case WhatTypeOfSecuritiesPage => userAnswers =>
+      dataDependent(WhatTypeOfSecuritiesPage, userAnswers) {
+        case WhatTypeOfSecurities.Shares => routes.DetailsOfThisTransferController.onPageLoad(NormalMode)
+        case WhatTypeOfSecurities.Other => routes.OtherSecuritiesTypeController.onPageLoad(NormalMode)
+      }
+    case AmountPaidForSecuritiesPage => userAnswers =>
+      userAnswersDependent(userAnswers) {
+        userAnswers =>
+          userAnswers.get(ConnectedPersonsPage).fold(Navigator.defaultPage) {
+            isConnected =>
+              if (isConnected) routes.TotalMarketValueController.onPageLoad(NormalMode)
+              else routes.CheckYourAnswersController.onPageLoad()
+          }
+      }
+    case DetailsOfThisTransferPage => userAnswers => dataRequired(DetailsOfThisTransferPage, userAnswers, routes.CheckYourAnswersController.onPageLoad())
     case TotalMarketValuePage => userAnswers => dataRequired(TotalMarketValuePage, userAnswers, routes.CheckYourAnswersController.onPageLoad())
     case _ => _ => Navigator.defaultPageF
 
