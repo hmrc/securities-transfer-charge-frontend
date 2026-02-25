@@ -85,7 +85,11 @@ class StfNavigator @Inject()(answerPersistenceService: AnswerPersistenceService)
     mode match {
       case NormalMode => normalRoutes(page)(hc)(userAnswers)
       case CheckMode  => goTo(checkRouteMap(page)(userAnswers), Some(userAnswers))
-      case ReturnMode => goTo(Navigator.dashboardPage, Some(userAnswers))
+      case ReturnMode => for {
+        nextPage      <- normalRoutes(page)(hc)(userAnswers)
+        updatedAnswers = userAnswers.setNextPage(nextPage)
+        _             <- answerPersistenceService.save(updatedAnswers)
+      } yield Navigator.dashboardPage
     }
   }
 
