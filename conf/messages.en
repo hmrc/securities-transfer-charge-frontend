@@ -127,7 +127,7 @@ whatReliefAreYouApplyingFor.details.content.link.text = See a full list of relie
 
 securitiesTarget.title = What business are you buying these securities in?
 securitiesTarget.heading = What business are you buying these securities in?
-securitiesTarget.BusinessName = Business Name
+securitiesTarget.BusinessName = Business name
 securitiesTarget.CRN = Company registration number (CRN) (optional)
 securitiesTarget.CRN.hint.message1 = This is also called a company number.
 securitiesTarget.CRN.hint.message2 = For example, SN898989 or 12345678
