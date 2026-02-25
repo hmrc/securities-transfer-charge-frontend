@@ -15,12 +15,13 @@
  *@
 
 @import uk.gov.hmrc.securitiestransferchargefrontend.viewmodels.LegendSize.Large
-@import uk.gov.hmrc.securitiestransferchargefrontend.controllers.routes.ApplyingForReliefController
+@import uk.gov.hmrc.securitiestransferchargefrontend.controllers.routes
 @import uk.gov.hmrc.hmrcfrontend.views.html.helpers.HmrcNewTabLinkHelper
 @import uk.gov.hmrc.hmrcfrontend.views.viewmodels.newtablinkhelper.NewTabLinkHelper
 @import uk.gov.hmrc.securitiestransferchargefrontend.views.html.components.SaveAndReturnButton
 @import uk.gov.hmrc.securitiestransferchargefrontend.models.Mode
 @import uk.gov.hmrc.securitiestransferchargefrontend.models.ReturnMode
+@import uk.gov.hmrc.securitiestransferchargefrontend.views.html.components.SaveAndReturnButton
 
 
 @this(
@@ -41,7 +42,7 @@ text = messages("applyingForRelief.details.content.link.text")
 
 @layout(pageTitle = title(form, messages("applyingForRelief.title"),Some(messages("sectionTitle.transferDetails")))) {
 
-    @formHelper(action = ApplyingForReliefController.onSubmit(mode), Symbol("autoComplete") -> "off") {
+    @formHelper(action = routes.ApplyingForReliefController.onSubmit(mode), Symbol("autoComplete") -> "off") {
 
         @if(form.errors.nonEmpty) {
             @govukErrorSummary(ErrorSummaryViewModel(form))
@@ -58,6 +59,7 @@ text = messages("applyingForRelief.details.content.link.text")
         """))))
         )
         @govukButton(ButtonViewModel(messages("site.save-and-continue.button")))
+        @saveAndReturnButton(action = routes.ApplyingForReliefController.onSubmit(ReturnMode))
 
     }
 }

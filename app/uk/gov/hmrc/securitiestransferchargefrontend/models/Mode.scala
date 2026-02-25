@@ -33,4 +33,9 @@ object Mode {
       case ReturnMode => "ReturnMode"
     }
   }
+  
+  val submitErrorModeFilter: Mode => Mode = {
+    case ReturnMode => NormalMode
+    case mode => mode
+  }
 }

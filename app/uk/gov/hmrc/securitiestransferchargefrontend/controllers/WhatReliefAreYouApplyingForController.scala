@@ -22,6 +22,7 @@ import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.actions.*
 import uk.gov.hmrc.securitiestransferchargefrontend.forms.WhatReliefAreYouApplyingForFormProvider
+import uk.gov.hmrc.securitiestransferchargefrontend.models.Mode.submitErrorModeFilter
 import uk.gov.hmrc.securitiestransferchargefrontend.models.{Mode, ReliefsDataSource}
 import uk.gov.hmrc.securitiestransferchargefrontend.navigation.Navigator
 import uk.gov.hmrc.securitiestransferchargefrontend.pages.WhatReliefAreYouApplyingForPage
@@ -60,7 +61,7 @@ class WhatReliefAreYouApplyingForController @Inject()(
 
       form.bindFromRequest().fold(
         formWithErrors =>
-          Future.successful(BadRequest(view(formWithErrors, mode,reliefsDataSource.reliefs))),
+          Future.successful(BadRequest(view(formWithErrors, submitErrorModeFilter(mode), reliefsDataSource.reliefs))),
 
         relief =>
           for {

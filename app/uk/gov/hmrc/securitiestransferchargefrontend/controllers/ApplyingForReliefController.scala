@@ -22,6 +22,7 @@ import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.actions.*
 import uk.gov.hmrc.securitiestransferchargefrontend.forms.ApplyingForReliefFormProvider
 import uk.gov.hmrc.securitiestransferchargefrontend.models.Mode
+import uk.gov.hmrc.securitiestransferchargefrontend.models.Mode.submitErrorModeFilter
 import uk.gov.hmrc.securitiestransferchargefrontend.navigation.Navigator
 import uk.gov.hmrc.securitiestransferchargefrontend.pages.ApplyingForReliefPage
 import uk.gov.hmrc.securitiestransferchargefrontend.views.html.ApplyingForReliefView
@@ -58,7 +59,7 @@ class ApplyingForReliefController @Inject()(
 
       form.bindFromRequest().fold(
         formWithErrors =>
-          Future.successful(BadRequest(view(formWithErrors, mode))),
+          Future.successful(BadRequest(view(formWithErrors, submitErrorModeFilter(mode)))),
 
         applyingForRelief =>
           for {

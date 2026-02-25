@@ -18,10 +18,10 @@
 @import uk.gov.hmrc.hmrcfrontend.views.html.helpers.HmrcNewTabLinkHelper
 @import uk.gov.hmrc.hmrcfrontend.views.viewmodels.newtablinkhelper.NewTabLinkHelper
 @import uk.gov.hmrc.securitiestransferchargefrontend.config.FrontendAppConfig
-@import uk.gov.hmrc.securitiestransferchargefrontend.controllers.routes.ConnectedPersonsController
+@import uk.gov.hmrc.securitiestransferchargefrontend.controllers.routes
 @import play.twirl.api.StringInterpolation
 @import uk.gov.hmrc.securitiestransferchargefrontend.views.html.components.SaveAndReturnButton
-@import uk.gov.hmrc.securitiestransferchargefrontend.models.Mode
+@import uk.gov.hmrc.securitiestransferchargefrontend.models.ReturnMode
 
 
 
@@ -46,7 +46,7 @@ href = Some(config.connectedPersonsInformationUrl)
 
 @layout(pageTitle = title(form, messages("connectedPersons.title"),Some(messages("sectionTitle.transferDetails")))) {
 
-    @formHelper(action = ConnectedPersonsController.onSubmit(mode), Symbol("autoComplete") -> "off") {
+    @formHelper(action = routes.ConnectedPersonsController.onSubmit(mode), Symbol("autoComplete") -> "off") {
 
         @if(form.errors.nonEmpty) {
             @govukErrorSummary(ErrorSummaryViewModel(form))
@@ -86,5 +86,6 @@ href = Some(config.connectedPersonsInformationUrl)
             ButtonViewModel(messages("site.save-and-continue.button"))
         )
 
+        @saveAndReturnButton(action = routes.ConnectedPersonsController.onSubmit(ReturnMode))
     }
 }

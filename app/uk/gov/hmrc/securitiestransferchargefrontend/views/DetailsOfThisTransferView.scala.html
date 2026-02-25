@@ -18,6 +18,7 @@
 @import uk.gov.hmrc.securitiestransferchargefrontend.controllers.routes
 @import uk.gov.hmrc.securitiestransferchargefrontend.views.html.components.SaveAndReturnButton
 @import uk.gov.hmrc.securitiestransferchargefrontend.models.Mode
+@import uk.gov.hmrc.securitiestransferchargefrontend.models.ReturnMode
 
 
 
@@ -82,5 +83,7 @@
         @govukButton(
             ButtonViewModel(messages("site.save-and-continue.button"))
         )
+
+        @saveAndReturnButton(action = routes.DetailsOfThisTransferController.onSubmit(ReturnMode))
     }
 }

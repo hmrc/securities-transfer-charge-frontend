@@ -28,6 +28,7 @@ import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import play.twirl.api.Html
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
+import uk.gov.hmrc.securitiestransferchargefrontend.models.Mode.submitErrorModeFilter
 import uk.gov.hmrc.securitiestransferchargefrontend.views.html.SecuritiesTargetView
 
 import scala.concurrent.{ExecutionContext, Future}
@@ -61,7 +62,7 @@ class SecuritiesTargetController @Inject()(
 
       form.bindFromRequest().fold(
         formWithErrors =>
-          Future.successful(BadRequest(view(formWithErrors, mode): Html)),
+          Future.successful(BadRequest(view(formWithErrors, submitErrorModeFilter(mode)): Html)),
 
         value =>
           for {

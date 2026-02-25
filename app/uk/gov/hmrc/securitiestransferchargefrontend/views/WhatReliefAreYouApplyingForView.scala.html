@@ -15,7 +15,7 @@
  *@
 
 @import uk.gov.hmrc.securitiestransferchargefrontend.viewmodels.LabelSize.Large
-@import uk.gov.hmrc.securitiestransferchargefrontend.controllers.routes.WhatReliefAreYouApplyingForController
+@import uk.gov.hmrc.securitiestransferchargefrontend.controllers.routes
 @import uk.gov.hmrc.hmrcfrontend.views.html.helpers.HmrcNewTabLinkHelper
 @import uk.gov.hmrc.hmrcfrontend.views.viewmodels.newtablinkhelper.NewTabLinkHelper
 @import uk.gov.hmrc.securitiestransferchargefrontend.views.ViewHelper
@@ -53,12 +53,12 @@
   )
 ) {
 
-  @formHelper(action = WhatReliefAreYouApplyingForController.onSubmit(mode)) {
+  @formHelper(action = routes.WhatReliefAreYouApplyingForController.onSubmit(mode)) {
 
     @if(form.errors.nonEmpty) {
       @govukErrorSummary(ErrorSummaryViewModel(form))
     }
-    <span  class="govuk-caption-l">@messages("transfer.details.caption")</span>
+    <span class="govuk-caption-l">@messages("transfer.details.caption")</span>
     @govukSelect(Select(
           id = form("reliefs").id,
           name = form("reliefs").name,
@@ -69,6 +69,6 @@
 
     @govukButton(ButtonViewModel(messages("site.save-and-continue.button")))
 
-
+    @saveAndReturnButton(action = routes.WhatReliefAreYouApplyingForController.onSubmit(ReturnMode))
   }
 }
