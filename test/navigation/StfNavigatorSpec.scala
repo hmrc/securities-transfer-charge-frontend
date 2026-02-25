@@ -23,8 +23,10 @@ import uk.gov.hmrc.securitiestransferchargefrontend.controllers.routes
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.seller.routes.StfSellerAddressController
 import uk.gov.hmrc.securitiestransferchargefrontend.models.*
 import uk.gov.hmrc.securitiestransferchargefrontend.navigation.StfNavigator
-import uk.gov.hmrc.securitiestransferchargefrontend.pages._
+import uk.gov.hmrc.securitiestransferchargefrontend.pages.*
 import base.Fixtures
+
+import java.time.LocalDate
 
 class StfNavigatorSpec extends SpecBase with ScalaFutures {
 
@@ -100,11 +102,86 @@ class StfNavigatorSpec extends SpecBase with ScalaFutures {
         }
       }
 
+      "must go from the ApplyingForReliefPage to SecuritiesTargetController when no is selected" in {
+        val answers = emptyUserAnswers.set(ApplyingForReliefPage, false).get
+        val result = navigator.nextPage(ApplyingForReliefPage, NormalMode, answers)(fakeRequest)
+        whenReady(result) { res =>
+          res mustBe routes.SecuritiesTargetController.onPageLoad(NormalMode)
+        }
+      }
+
+      "must go from the SecuritiesTargetPage to ChargingPointController when no is selected" in {
+        val answers = emptyUserAnswers.set(SecuritiesTargetPage, SecuritiesTarget("Business 1",Some("12345678"))).get
+        val result = navigator.nextPage(SecuritiesTargetPage, NormalMode, answers)(fakeRequest)
+        whenReady(result) { res =>
+          res mustBe routes.ChargingPointController.onPageLoad(NormalMode)
+        }
+      }
+
+      "must go from the ChargingPointPage to TaxRateController" in {
+        val answers = emptyUserAnswers.set(ChargingPointPage, LocalDate.now()).get
+        val result = navigator.nextPage(ChargingPointPage, NormalMode, answers)(fakeRequest)
+        whenReady(result) { res =>
+          res mustBe routes.TaxRateController.onPageLoad(NormalMode)
+        }
+      }
+
+      "must go from the TaxRatePage to WhatTypeOfSecuritiesController" in {
+        val answers = emptyUserAnswers.set(TaxRatePage, TaxRate.Half).get
+        val result = navigator.nextPage(TaxRatePage, NormalMode, answers)(fakeRequest)
+        whenReady(result) { res =>
+          res mustBe routes.WhatTypeOfSecuritiesController.onPageLoad(NormalMode)
+        }
+      }
+
+      "must go from the WhatTypeOfSecuritiesPage to DetailsOfThisTransferController when shares is selected" in {
+        val answers = emptyUserAnswers.set(WhatTypeOfSecuritiesPage, WhatTypeOfSecurities.Shares).get
+        val result = navigator.nextPage(WhatTypeOfSecuritiesPage, NormalMode, answers)(fakeRequest)
+        whenReady(result) { res =>
+          res mustBe routes.DetailsOfThisTransferController.onPageLoad(NormalMode)
+        }
+      }
+
+      "must go from the WhatTypeOfSecuritiesPage to OtherSecuritiesTypeController when other is selected" in {
+        val answers = emptyUserAnswers.set(WhatTypeOfSecuritiesPage, WhatTypeOfSecurities.Other).get
+        val result = navigator.nextPage(WhatTypeOfSecuritiesPage, NormalMode, answers)(fakeRequest)
+        whenReady(result) { res =>
+          res mustBe routes.OtherSecuritiesTypeController.onPageLoad(NormalMode)
+        }
+      }
+
       "must go from the OtherSecuritiesTypePage to AmountPaidForSecuritiesController" in {
-        val answers = emptyUserAnswers.set(OtherSecuritiesTypePage, "OtherSecurities").get
+        val answers = emptyUserAnswers.set(OtherSecuritiesTypePage, "bonds").get
         val result = navigator.nextPage(OtherSecuritiesTypePage, NormalMode, answers)(fakeRequest)
         whenReady(result) { res =>
           res mustBe routes.AmountPaidForSecuritiesController.onPageLoad(NormalMode)
+        }
+      }
+
+      "must go from the AmountPaidForSecuritiesPage to TotalMarketValueController when is connected person is true" in {
+        val answers = emptyUserAnswers.set(AmountPaidForSecuritiesPage, BigDecimal(500)).get
+        val updated = answers.set(ConnectedPersonsPage,true).get
+        val result = navigator.nextPage(AmountPaidForSecuritiesPage, NormalMode, updated)(fakeRequest)
+        whenReady(result) { res =>
+          res mustBe routes.TotalMarketValueController.onPageLoad(NormalMode)
+        }
+      }
+
+      "must go from the AmountPaidForSecuritiesPage to CheckYourAnswersController when is connected persons is false" in {
+        val answers = emptyUserAnswers.set(AmountPaidForSecuritiesPage, BigDecimal(500)).get
+        val updated = answers.set(ConnectedPersonsPage, false).get
+        val result = navigator.nextPage(AmountPaidForSecuritiesPage, NormalMode, updated)(fakeRequest)
+        whenReady(result) { res =>
+          res mustBe routes.CheckYourAnswersController.onPageLoad()
+        }
+      }
+
+      "must go from the DetailsOfThisTransferPage to CheckYourAnswersController" in {
+        val answers = emptyUserAnswers.set(DetailsOfThisTransferPage, DetailsOfThisTransfer(numberOfShares = "200",
+          typeOfShares = "ordinary share", amountPaid = BigDecimal(500), marketValue = BigDecimal(1500))).get
+        val result = navigator.nextPage(DetailsOfThisTransferPage, NormalMode, answers)(fakeRequest)
+        whenReady(result) { res =>
+          res mustBe routes.CheckYourAnswersController.onPageLoad()
         }
       }
     }
