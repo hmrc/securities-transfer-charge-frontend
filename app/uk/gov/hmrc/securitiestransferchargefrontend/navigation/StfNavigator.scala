@@ -19,22 +19,19 @@ package uk.gov.hmrc.securitiestransferchargefrontend.navigation
 import play.api.mvc.{Call, Request}
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.play.http.HeaderCarrierConverter
-import uk.gov.hmrc.securitiestransferchargefrontend.clients.SaveAndReturnClient
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.routes
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.seller.routes as sellerRoutes
-
 import uk.gov.hmrc.securitiestransferchargefrontend.models.HowToNotifyAboutSecuritiesTransfer.{MoreThanOneAtATime, OneAtATime}
-import uk.gov.hmrc.securitiestransferchargefrontend.models.{CheckMode, Mode, NormalMode, UserAnswers}
+import uk.gov.hmrc.securitiestransferchargefrontend.models.{CheckMode, Mode, NormalMode, UserAnswers, WhatTypeOfSecurities}
 import uk.gov.hmrc.securitiestransferchargefrontend.pages.*
 import uk.gov.hmrc.securitiestransferchargefrontend.queries.Gettable
-import uk.gov.hmrc.securitiestransferchargefrontend.repositories.SessionRepository
+import uk.gov.hmrc.securitiestransferchargefrontend.services.AnswerPersistenceService
 
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 
-class StfNavigator @Inject()(sessionRepository: SessionRepository,
-                             saveAndReturnClient: SaveAndReturnClient)
-                            (implicit ec: ExecutionContext) extends AbstractNavigator(sessionRepository, saveAndReturnClient) {
+class StfNavigator @Inject()(answerPersistenceService: AnswerPersistenceService)
+                            (implicit ec: ExecutionContext) extends AbstractNavigator(answerPersistenceService) {
 
   private def normalRoutes(page: Page)(implicit hc: HeaderCarrier): UserAnswers => Future[Call] = page match {
 
@@ -42,21 +39,42 @@ class StfNavigator @Inject()(sessionRepository: SessionRepository,
     case HowToNotifyAboutSecuritiesTransferPage => userAnswers => {
       dataDependent(HowToNotifyAboutSecuritiesTransferPage, userAnswers) {
         case OneAtATime => routes.ConfirmAddressController.onPageLoad()
-        case MoreThanOneAtATime => ???
+        case MoreThanOneAtATime => Navigator.defaultPage
       }
     }
-    case StfBuyersAddressPage => userAnswers => dataRequired(StfBuyersAddressPage, userAnswers, routes.NameOfSellerController.onPageLoad(NormalMode))
-    case NameOfSellerPage => userAnswers => dataRequired(NameOfSellerPage, userAnswers,sellerRoutes.StfSellerAddressController.onPageLoad())
     case ConfirmAddressPage => userAnswers => dataRequired(ConfirmAddressPage, userAnswers, routes.NameOfSellerController.onPageLoad(NormalMode))
-    case ConnectedPersonsPage => userAnswers => dataRequired(ConnectedPersonsPage, userAnswers, routes.ApplyingForReliefController.onPageLoad(NormalMode))
+    case StfBuyersAddressPage => userAnswers => dataRequired(StfBuyersAddressPage, userAnswers, routes.NameOfSellerController.onPageLoad(NormalMode))
+    case NameOfSellerPage => userAnswers => dataRequired(NameOfSellerPage, userAnswers, sellerRoutes.StfSellerAddressController.onPageLoad())
     case SellerAddressPage => userAnswers => dataRequired(SellerAddressPage, userAnswers, routes.ConnectedPersonsController.onPageLoad(NormalMode))
-    case ApplyingForReliefPage => userAnswers => dataDependent(ApplyingForReliefPage,userAnswers){
-      case true => routes.WhatReliefAreYouApplyingForController.onPageLoad(NormalMode)
-      case false => routes.SecuritiesTargetController.onPageLoad(NormalMode)
-    }
+    case ConnectedPersonsPage => userAnswers => dataRequired(ConnectedPersonsPage, userAnswers, routes.ApplyingForReliefController.onPageLoad(NormalMode))
+    case ApplyingForReliefPage => userAnswers =>
+      dataDependent(ApplyingForReliefPage, userAnswers) {
+        case true => routes.WhatReliefAreYouApplyingForController.onPageLoad(NormalMode)
+        case false => routes.SecuritiesTargetController.onPageLoad(NormalMode)
+      }
     case WhatReliefAreYouApplyingForPage => userAnswers => dataRequired(WhatReliefAreYouApplyingForPage, userAnswers, routes.SecuritiesTargetController.onPageLoad(NormalMode))
-    case SecuritiesTargetPage => userAnswers => dataRequired(SecuritiesTargetPage, userAnswers, routes.JourneyRecoveryController.onPageLoad())
-    case _ => _ => defaultPageF
+    case SecuritiesTargetPage => userAnswers => dataRequired(SecuritiesTargetPage, userAnswers, routes.ChargingPointController.onPageLoad(NormalMode))
+    case ChargingPointPage => userAnswers => dataRequired(ChargingPointPage, userAnswers, routes.TaxRateController.onPageLoad(NormalMode))
+    case TaxRatePage => userAnswers => dataRequired(TaxRatePage, userAnswers, routes.WhatTypeOfSecuritiesController.onPageLoad(NormalMode))
+    case OtherSecuritiesTypePage => userAnswers => dataRequired(OtherSecuritiesTypePage, userAnswers, routes.AmountPaidForSecuritiesController.onPageLoad(NormalMode))
+
+    case WhatTypeOfSecuritiesPage => userAnswers =>
+      dataDependent(WhatTypeOfSecuritiesPage, userAnswers) {
+        case WhatTypeOfSecurities.Shares => routes.DetailsOfThisTransferController.onPageLoad(NormalMode)
+        case WhatTypeOfSecurities.Other => routes.OtherSecuritiesTypeController.onPageLoad(NormalMode)
+      }
+    case AmountPaidForSecuritiesPage => userAnswers =>
+      userAnswersDependent(userAnswers) {
+        userAnswers =>
+          userAnswers.get(ConnectedPersonsPage).fold(Navigator.defaultPage) {
+            isConnected =>
+              if (isConnected) routes.TotalMarketValueController.onPageLoad(NormalMode)
+              else routes.CheckYourAnswersController.onPageLoad()
+          }
+      }
+    case DetailsOfThisTransferPage => userAnswers => dataRequired(DetailsOfThisTransferPage, userAnswers, routes.CheckYourAnswersController.onPageLoad())
+    case TotalMarketValuePage => userAnswers => dataRequired(TotalMarketValuePage, userAnswers, routes.CheckYourAnswersController.onPageLoad())
+    case _ => _ => Navigator.defaultPageF
 
   }
 

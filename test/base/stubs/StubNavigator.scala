@@ -17,6 +17,7 @@
 package base.stubs
 
 import play.api.mvc.{Call, Request}
+import uk.gov.hmrc.securitiestransferchargefrontend.domain.SubmissionId
 import uk.gov.hmrc.securitiestransferchargefrontend.models.{Mode, UserAnswers}
 import uk.gov.hmrc.securitiestransferchargefrontend.navigation.Navigator
 import uk.gov.hmrc.securitiestransferchargefrontend.pages.Page
@@ -30,4 +31,7 @@ class StubNavigator(desiredCall: Call) extends Navigator {
 
 
   val errorPage: Page => Call = _ => desiredCall
+
+  override def restore(submissionId: SubmissionId, userId: String)(implicit request: Request[_]): Future[UserAnswers] =
+    Future.successful(UserAnswers.empty(userId)(submissionId))
 }

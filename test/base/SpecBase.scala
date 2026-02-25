@@ -17,7 +17,7 @@
 package base
 
 import base.Fixtures.FakeAlfConnector
-import base.stubs.{StubStcAuthEnrolledAction, StubStcDataRequiredAction, StubStcDataRetrievalAction}
+import base.stubs.{StubSessionRepository, StubStcAuthEnrolledAction, StubStcDataRequiredAction, StubStcDataRetrievalAction}
 import clients.FakeSaveAndReturnClient
 import controllers.actions.*
 import org.scalatest.concurrent.{IntegrationPatience, ScalaFutures}
@@ -38,6 +38,7 @@ import uk.gov.hmrc.securitiestransferchargefrontend.controllers.actions.*
 import uk.gov.hmrc.securitiestransferchargefrontend.domain.SubmissionId
 import uk.gov.hmrc.securitiestransferchargefrontend.models.UserAnswers
 import uk.gov.hmrc.securitiestransferchargefrontend.models.requests.DataRequest
+import uk.gov.hmrc.securitiestransferchargefrontend.repositories.SessionRepository
 
 import java.time.LocalDate
 import scala.concurrent.ExecutionContext
@@ -69,7 +70,7 @@ trait SpecBase
     emailAddress = "some@email.com"
   )
 
-  def emptyUserAnswers: UserAnswers = UserAnswers(userAnswersId,submissionId)
+  def emptyUserAnswers: UserAnswers = UserAnswers.empty(userAnswersId)(submissionId)
 
   val fakeRequest: FakeRequest[AnyContentAsEmpty.type] = FakeRequest().withHeaders("sessionId" -> sessionId)
 
@@ -79,7 +80,8 @@ trait SpecBase
   def messages(app: Application): Messages = app.injector.instanceOf[MessagesApi].preferred(FakeRequest())
 
   protected def applicationBuilder(userAnswers: Option[UserAnswers] = None,
-                                   saveAndReturnClient: SaveAndReturnClient = FakeSaveAndReturnClient()): GuiceApplicationBuilder =
+                                   saveAndReturnClient: SaveAndReturnClient = FakeSaveAndReturnClient(),
+                                   sessionRepository: SessionRepository = StubSessionRepository()): GuiceApplicationBuilder =
     new GuiceApplicationBuilder()
       .overrides(
         bind[IdentifierAction].to[FakeIdentifierAction],
@@ -89,6 +91,7 @@ trait SpecBase
         bind[StcDataRequiredAction].toInstance(StubStcDataRequiredAction(userAnswers)),
         bind[DataRetrievalAction].toInstance(new FakeDataRetrievalAction(userAnswers)),
         bind[SaveAndReturnClient].toInstance(saveAndReturnClient),
-        bind[AlfAddressConnector].to[FakeAlfConnector]
+        bind[AlfAddressConnector].to[FakeAlfConnector],
+        bind[SessionRepository].toInstance(sessionRepository)
       )
 }

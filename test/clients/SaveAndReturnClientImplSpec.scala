@@ -18,21 +18,20 @@ package clients
 
 
 import base.SpecBase
-import uk.gov.hmrc.http.{HeaderCarrier, HttpResponse}
-import uk.gov.hmrc.securitiestransferchargefrontend.domain.SubmissionId
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.when
 import org.scalatest.matchers.should.Matchers.*
 import org.scalatestplus.mockito.MockitoSugar.mock
 import uk.gov.hmrc.http.HttpReads.Implicits.*
-
-import scala.concurrent.Future
 import uk.gov.hmrc.http.client.{HttpClientV2, RequestBuilder}
+import uk.gov.hmrc.http.{HeaderCarrier, HttpResponse}
 import uk.gov.hmrc.securitiestransferchargefrontend.clients.SaveAndReturnClientImpl
 import uk.gov.hmrc.securitiestransferchargefrontend.config.FrontendAppConfig
+import uk.gov.hmrc.securitiestransferchargefrontend.domain.SubmissionId
 import uk.gov.hmrc.securitiestransferchargefrontend.models.UserAnswers
 
 import java.net.URL
+import scala.concurrent.Future
 
 
 class SaveAndReturnClientImplSpec extends SpecBase {
@@ -44,29 +43,26 @@ class SaveAndReturnClientImplSpec extends SpecBase {
     val mockConfig: FrontendAppConfig = mock[FrontendAppConfig]
     val mockRequestBuilder: RequestBuilder = mock[RequestBuilder]
 
+    val baseUrl = "http://localhost:1201/securities-transfer-charge-save-and-return"
+
+    when(mockConfig.saveAndReturnUrl).thenReturn(baseUrl)
+
     val client = new SaveAndReturnClientImpl(mockHttp, mockConfig)
 
     val testUserId = "user1"
     val testSubmissionId: SubmissionId = SubmissionId("sub1")
     val testUserAnswers: UserAnswers = UserAnswers(testUserId, testSubmissionId)
 
-    val testUrl = "http://localhost:1201"
-    val saveUrl = s"$testUrl/securities-transfer-charge-save-and-return/user-answers"
-    val retrieveUrl = s"$testUrl/securities-transfer-charge-save-and-return/user-answers"
-
-    when(mockConfig.saveUserAnswersUrl).thenReturn(saveUrl)
-    when(mockConfig.retrieveUserAnswersUrl).thenReturn(retrieveUrl)
-
     when(mockHttp.post(any[URL])(any[HeaderCarrier]))
       .thenReturn(mockRequestBuilder)
 
-    when(mockHttp.get(any)(any[HeaderCarrier]))
+    when(mockHttp.get(any[URL])(any[HeaderCarrier]))
       .thenReturn(mockRequestBuilder)
 
     when(mockRequestBuilder.withBody(any())(any(), any(), any()))
       .thenReturn(mockRequestBuilder)
-
   }
+
 
   "SaveAndReturnClientImpl" - {
 
@@ -74,7 +70,7 @@ class SaveAndReturnClientImplSpec extends SpecBase {
 
       "returns Unit on successful call" in new TestSetup {
         when(mockRequestBuilder.execute[HttpResponse])
-          .thenReturn(Future.successful(HttpResponse(200, "")))
+          .thenReturn(Future.successful(HttpResponse(204, "")))
 
         client.save(testUserAnswers).futureValue shouldBe()
       }

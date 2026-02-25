@@ -17,19 +17,19 @@
 package uk.gov.hmrc.securitiestransferchargefrontend.clients
 
 import play.api.Logging
-import play.api.libs.json.Json
-import uk.gov.hmrc.http.{HeaderCarrier, HttpResponse, StringContextOps}
-import uk.gov.hmrc.http.client.HttpClientV2
-import uk.gov.hmrc.securitiestransferchargefrontend.config.FrontendAppConfig
-import uk.gov.hmrc.securitiestransferchargefrontend.models.UserAnswers
-import uk.gov.hmrc.securitiestransferchargefrontend.domain.SubmissionId
+import play.api.http.Status.NO_CONTENT
+import play.api.libs.json.*
 import play.api.libs.ws.JsonBodyWritables.writeableOf_JsValue
 import uk.gov.hmrc.http.HttpReads.Implicits.*
-import scala.util.Failure
+import uk.gov.hmrc.http.client.HttpClientV2
+import uk.gov.hmrc.http.{HeaderCarrier, HttpResponse, StringContextOps}
+import uk.gov.hmrc.securitiestransferchargefrontend.config.FrontendAppConfig
+import uk.gov.hmrc.securitiestransferchargefrontend.domain.SubmissionId
+import uk.gov.hmrc.securitiestransferchargefrontend.models.UserAnswers
 
-import scala.concurrent.ExecutionContext
 import javax.inject.Inject
-import scala.concurrent.Future
+import scala.concurrent.{ExecutionContext, Future}
+import scala.util.Failure
 
 
 trait SaveAndReturnClient:
@@ -42,17 +42,24 @@ trait SaveAndReturnClient:
 
 class SaveAndReturnClientImpl @Inject(http: HttpClientV2, config: FrontendAppConfig)(implicit ec: ExecutionContext) extends SaveAndReturnClient with Logging {
 
+  private val baseUrl = config.saveAndReturnUrl
+  private val userAnswersPath = s"$baseUrl/user-answers"
+
   override def save(userAnswers: UserAnswers)
                    (implicit hc: HeaderCarrier): Future[Unit] = {
 
-    val url = url"${config.saveUserAnswersUrl}"
-
-    http.post(url)
+    http.post(url"$userAnswersPath")
       .withBody(Json.toJson(userAnswers))
       .execute[HttpResponse]
-      .map(_ => ())
+      .map {
+        case response if response.status == NO_CONTENT => ()
+        case otherResponse =>
+          logger.error(s"Failed to save UserAnswers for userId=${userAnswers.userId}. Received status ${otherResponse.status}")
+          throw new RuntimeException(s"Failed to save UserAnswers. Status: ${otherResponse.status}")
+        }
       .andThen {
-        case Failure(e) => logger.error(s"Failed to save UserAnswers for userId=${userAnswers.userId}", e)
+        case Failure(e) =>
+          logger.error(s"Failed to save UserAnswers for userId=${userAnswers.userId}, submissionId=${userAnswers.submissionId}", e)
       }
   }
 
@@ -61,9 +68,7 @@ class SaveAndReturnClientImpl @Inject(http: HttpClientV2, config: FrontendAppCon
                          submissionId: SubmissionId
                        )(implicit hc: HeaderCarrier): Future[UserAnswers] = {
 
-    val url = url"${config.retrieveUserAnswersUrl}/$userId/$submissionId"
-
-    http.get(url)
+    http.get(url"$userAnswersPath/$userId/$submissionId")
       .execute[UserAnswers]
       .andThen {
         case Failure(e) =>
@@ -73,13 +78,13 @@ class SaveAndReturnClientImpl @Inject(http: HttpClientV2, config: FrontendAppCon
 
   override def list(userId: String)(implicit hc: HeaderCarrier): Future[List[SubmissionId]] = {
 
-    val url = url"${config.retrieveUserAnswersUrl}/$userId"
-
-    http.get(url)
+    http
+      .get(url"$userAnswersPath/$userId")
       .execute[List[SubmissionId]]
       .andThen {
         case Failure(e) =>
           logger.error(s"Failed to retrieve submissionIds for userId=$userId", e)
       }
   }
+
 }

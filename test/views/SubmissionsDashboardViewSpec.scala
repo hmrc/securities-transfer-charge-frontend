@@ -19,12 +19,9 @@ package views
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
 import play.api.Application
+import uk.gov.hmrc.securitiestransferchargefrontend.domain.SubmissionId
 import uk.gov.hmrc.securitiestransferchargefrontend.views.html.SubmissionsDashboardView
 import views.ViewBaseSpec
-import uk.gov.hmrc.securitiestransferchargefrontend.models.UserAnswers
-import uk.gov.hmrc.securitiestransferchargefrontend.domain.SubmissionId
-import java.time.Instant
-import play.api.libs.json.*
 
 class SubmissionsDashboardViewSpec extends ViewBaseSpec {
 
