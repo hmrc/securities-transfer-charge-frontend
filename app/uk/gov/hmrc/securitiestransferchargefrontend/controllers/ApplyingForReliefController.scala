@@ -39,7 +39,7 @@ class ApplyingForReliefController @Inject()(
                                          val controllerComponents: MessagesControllerComponents,
                                          view: ApplyingForReliefView
                                  )(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport {
-
+  
   val form = formProvider()
 
   def onPageLoad(mode: Mode): Action[AnyContent] = (stcAuthEnrolled andThen getData andThen requireData) {
@@ -63,7 +63,7 @@ class ApplyingForReliefController @Inject()(
         applyingForRelief =>
           for {
             updatedAnswers <- Future.fromTry(request.userAnswers.set(ApplyingForReliefPage, applyingForRelief))
-            nextPage <- navigator.nextPage(ApplyingForReliefPage, mode, updatedAnswers)
+            nextPage       <- navigator.nextPage(ApplyingForReliefPage, mode, updatedAnswers)
           } yield Redirect(nextPage)
       )
   }

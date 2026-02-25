@@ -91,4 +91,5 @@ object Navigator:
   val startPage: Call = routes.HowToNotifyAboutSecuritiesTransferController.onPageLoad(NormalMode)
   val defaultPage: Call = routes.JourneyRecoveryController.onPageLoad()
   val defaultPageF: Future[Call] = Future.successful(defaultPage)
+  val dashboardPage = routes.SubmissionsDashboardController.onPageLoad()
   val errorPages: Seq[Call] = List(defaultPage)

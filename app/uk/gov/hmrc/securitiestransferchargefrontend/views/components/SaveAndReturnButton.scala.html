@@ -15,13 +15,14 @@
  *@
 
 @import uk.gov.hmrc.securitiestransferchargefrontend.controllers.routes
+@import play.api.mvc.Call
 
 @this(govukButton: GovukButton)
 
-@(implicit messages: Messages)
+@(action: Call)(implicit messages: Messages)
 
 @govukButton(
   ButtonViewModel(messages("site.save-and-return.button"))
+    .withAttribute("formaction", action.url)
     .asSecondaryButton()
-    .asLink(routes.SubmissionsDashboardController.onPageLoad().url)
 )

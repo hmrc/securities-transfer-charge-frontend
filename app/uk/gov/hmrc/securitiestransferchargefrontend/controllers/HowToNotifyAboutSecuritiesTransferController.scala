@@ -22,14 +22,14 @@ import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.actions.*
 import uk.gov.hmrc.securitiestransferchargefrontend.forms.HowToNotifyAboutSecuritiesTransferFormProvider
-import uk.gov.hmrc.securitiestransferchargefrontend.models.{HowToNotifyAboutSecuritiesTransfer, Mode}
+import uk.gov.hmrc.securitiestransferchargefrontend.models.{HowToNotifyAboutSecuritiesTransfer, Mode, ReturnMode}
 import uk.gov.hmrc.securitiestransferchargefrontend.navigation.Navigator
 import uk.gov.hmrc.securitiestransferchargefrontend.pages.HowToNotifyAboutSecuritiesTransferPage
 import uk.gov.hmrc.securitiestransferchargefrontend.views.html.HowToNotifyAboutSecuritiesTransferView
 
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
-import scala.language.postfixOps
+import scala.language.{postfixOps, reflectiveCalls}
 
 class HowToNotifyAboutSecuritiesTransferController @Inject()(
                                        override val messagesApi: MessagesApi,
@@ -54,6 +54,12 @@ class HowToNotifyAboutSecuritiesTransferController @Inject()(
       Future.successful(Ok(view(preparedForm, mode)))
   }
 
+  val isSaveAndReturn: StcAuthorisedRequest[AnyContent] => Boolean = request =>
+    request.body.asFormUrlEncoded.exists(_.get("saveAndReturn").exists(_.contains("true")))
+
+  val updateMode: StcAuthorisedRequest[AnyContent] => Mode => Mode = request => mode =>
+    if (isSaveAndReturn(request)) ReturnMode else mode
+
   def onSubmit(mode: Mode): Action[AnyContent] = (stcAuthEnrolled andThen getData andThen requireData).async {
     implicit request =>
       form.bindFromRequest().fold(
@@ -63,7 +69,8 @@ class HowToNotifyAboutSecuritiesTransferController @Inject()(
         howToNotify =>
           for {
             updatedAnswers <- Future.fromTry(request.userAnswers.set(HowToNotifyAboutSecuritiesTransferPage, howToNotify))
-            nextPage       <- navigator.nextPage(HowToNotifyAboutSecuritiesTransferPage, mode, updatedAnswers)
+            updatedMode     = updateMode(request.request)(mode)
+            nextPage       <- navigator.nextPage(HowToNotifyAboutSecuritiesTransferPage, updatedMode, updatedAnswers)
           } yield Redirect(nextPage)
       )
   }

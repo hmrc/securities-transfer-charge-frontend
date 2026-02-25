@@ -32,11 +32,13 @@ GET        /stf/how-many-transfers                          uk.gov.hmrc.securiti
 POST       /stf/how-many-transfers                          uk.gov.hmrc.securitiestransferchargefrontend.controllers.HowToNotifyAboutSecuritiesTransferController.onSubmit(mode: Mode = NormalMode)
 GET        /stf/change/how-many-transfers                   uk.gov.hmrc.securitiestransferchargefrontend.controllers.HowToNotifyAboutSecuritiesTransferController.onPageLoad(mode: Mode = CheckMode)
 POST       /stf/change/how-many-transfers                   uk.gov.hmrc.securitiestransferchargefrontend.controllers.HowToNotifyAboutSecuritiesTransferController.onSubmit(mode: Mode = CheckMode)
+POST       /stf/save/how-many-transfers                   uk.gov.hmrc.securitiestransferchargefrontend.controllers.HowToNotifyAboutSecuritiesTransferController.onSubmit(mode: Mode = ReturnMode)
 
 GET        /stf/seller-name                         uk.gov.hmrc.securitiestransferchargefrontend.controllers.NameOfSellerController.onPageLoad(mode: Mode = NormalMode)
 POST       /stf/seller-name                         uk.gov.hmrc.securitiestransferchargefrontend.controllers.NameOfSellerController.onSubmit(mode: Mode = NormalMode)
 GET        /stf/change/seller-name                  uk.gov.hmrc.securitiestransferchargefrontend.controllers.NameOfSellerController.onPageLoad(mode: Mode = CheckMode)
 POST       /stf/change/seller-name                  uk.gov.hmrc.securitiestransferchargefrontend.controllers.NameOfSellerController.onSubmit(mode: Mode = CheckMode)
+POST       /stf/save/seller-name                  uk.gov.hmrc.securitiestransferchargefrontend.controllers.NameOfSellerController.onSubmit(mode: Mode = ReturnMode)
 
 GET        /stf/connected-persons                        uk.gov.hmrc.securitiestransferchargefrontend.controllers.ConnectedPersonsController.onPageLoad(mode: Mode = NormalMode)
 POST       /stf/connected-persons                        uk.gov.hmrc.securitiestransferchargefrontend.controllers.ConnectedPersonsController.onSubmit(mode: Mode = NormalMode)
