@@ -17,10 +17,10 @@
 package forms
 
 import uk.gov.hmrc.securitiestransferchargefrontend.config.CurrencyFormatter.currencyFormat
-import uk.gov.hmrc.securitiestransferchargefrontend.forms.AmountPaidForSecuritiesFormProvider
 import forms.behaviours.CurrencyFieldBehaviours
 import org.scalacheck.Gen
 import play.api.data.FormError
+import uk.gov.hmrc.securitiestransferchargefrontend.forms.individuals.AmountPaidForSecuritiesFormProvider
 
 import scala.math.BigDecimal.RoundingMode
 

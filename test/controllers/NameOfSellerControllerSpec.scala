@@ -25,11 +25,12 @@ import play.api.mvc.Call
 import play.api.test.FakeRequest
 import play.api.test.Helpers.*
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.routes
-import uk.gov.hmrc.securitiestransferchargefrontend.forms.NameOfSellerFormProvider
+import uk.gov.hmrc.securitiestransferchargefrontend.controllers.individuals.routes as individualRoutes
+import uk.gov.hmrc.securitiestransferchargefrontend.forms.individuals.NameOfSellerFormProvider
 import uk.gov.hmrc.securitiestransferchargefrontend.models.{NormalMode, UserAnswers}
 import uk.gov.hmrc.securitiestransferchargefrontend.navigation.Navigator
-import uk.gov.hmrc.securitiestransferchargefrontend.pages.NameOfSellerPage
-import uk.gov.hmrc.securitiestransferchargefrontend.views.html.NameOfSellerView
+import uk.gov.hmrc.securitiestransferchargefrontend.pages.individuals.NameOfSellerPage
+import uk.gov.hmrc.securitiestransferchargefrontend.views.html.individuals.NameOfSellerView
 
 class NameOfSellerControllerSpec extends SpecBase with MockitoSugar {
 
@@ -38,7 +39,7 @@ class NameOfSellerControllerSpec extends SpecBase with MockitoSugar {
   val formProvider = new NameOfSellerFormProvider()
   val form: Form[String] = formProvider()
 
-  lazy val nameOfSellerRoute: String = routes.NameOfSellerController.onPageLoad(NormalMode).url
+  lazy val nameOfSellerRoute: String = individualRoutes.NameOfSellerController.onPageLoad(NormalMode).url
 
   "NameOfSeller Controller" - {
 

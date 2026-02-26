@@ -26,10 +26,11 @@ import play.api.test.Helpers.*
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.securitiestransferchargefrontend.clients.SaveAndReturnClient
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.routes
-import uk.gov.hmrc.securitiestransferchargefrontend.forms.ApplyingForReliefFormProvider
+import uk.gov.hmrc.securitiestransferchargefrontend.controllers.individuals.routes as individualRoutes
+import uk.gov.hmrc.securitiestransferchargefrontend.forms.individuals.ApplyingForReliefFormProvider
 import uk.gov.hmrc.securitiestransferchargefrontend.models.{NormalMode, UserAnswers}
-import uk.gov.hmrc.securitiestransferchargefrontend.pages.ApplyingForReliefPage
-import uk.gov.hmrc.securitiestransferchargefrontend.views.html.ApplyingForReliefView
+import uk.gov.hmrc.securitiestransferchargefrontend.pages.individuals.ApplyingForReliefPage
+import uk.gov.hmrc.securitiestransferchargefrontend.views.html.individuals.ApplyingForReliefView
 
 import scala.concurrent.Future
 
@@ -38,7 +39,7 @@ class ApplyingForReliefControllerSpec extends SpecBase with MockitoSugar {
   val formProvider = new ApplyingForReliefFormProvider()
   val form: Form[Boolean] = formProvider()
 
-  lazy val applyingForReliefRoute: String = routes.ApplyingForReliefController.onPageLoad(NormalMode).url
+  lazy val applyingForReliefRoute: String = individualRoutes.ApplyingForReliefController.onPageLoad(NormalMode).url
 
   "ApplyingForRelief Controller" - {
 
@@ -95,7 +96,7 @@ class ApplyingForReliefControllerSpec extends SpecBase with MockitoSugar {
         val result = route(application, request).value
 
         status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual routes.WhatReliefAreYouApplyingForController.onPageLoad(NormalMode).url
+        redirectLocation(result).value mustEqual individualRoutes.WhatReliefAreYouApplyingForController.onPageLoad(NormalMode).url
       }
     }
 
@@ -118,7 +119,7 @@ class ApplyingForReliefControllerSpec extends SpecBase with MockitoSugar {
         val result = route(application, request).value
 
         status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual routes.SecuritiesTargetController.onPageLoad(NormalMode).url
+        redirectLocation(result).value mustEqual individualRoutes.SecuritiesTargetController.onPageLoad(NormalMode).url
       }
     }
 

@@ -17,19 +17,19 @@
 package uk.gov.hmrc.securitiestransferchargefrontend.navigation
 
 import base.SpecBase
+import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.*
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatestplus.mockito.MockitoSugar
 import play.api.libs.json.JsPath
 import play.api.mvc.{Call, Request}
 import uk.gov.hmrc.http.HeaderCarrier
-import uk.gov.hmrc.securitiestransferchargefrontend.controllers.routes
+import uk.gov.hmrc.securitiestransferchargefrontend.controllers.individuals.routes as individualRoutes
 import uk.gov.hmrc.securitiestransferchargefrontend.models.{Mode, NormalMode, UserAnswers}
 import uk.gov.hmrc.securitiestransferchargefrontend.navigation.AbstractNavigator
 import uk.gov.hmrc.securitiestransferchargefrontend.pages.*
 import uk.gov.hmrc.securitiestransferchargefrontend.queries.*
 import uk.gov.hmrc.securitiestransferchargefrontend.services.AnswerPersistenceService
-import org.mockito.ArgumentMatchers.any
 
 import scala.concurrent.Future
 
@@ -40,7 +40,7 @@ class NavigatorSpec extends SpecBase with MockitoSugar with ScalaFutures {
   private val emptyUserAnswers = UserAnswers.empty("test-id")(submissionId)
   private val userAnswers = emptyUserAnswers.set(testPage, true).get
   //private val errorCall = routes.JourneyRecoveryController.onPageLoad()
-  private val testCall = routes.HowToNotifyAboutSecuritiesTransferController.onPageLoad(NormalMode)
+  private val testCall = individualRoutes.HowToNotifyAboutSecuritiesTransferController.onPageLoad(NormalMode)
 
   private val mockAnswerPersistenceService = mock[AnswerPersistenceService]
   when(mockAnswerPersistenceService.save(any[UserAnswers])(any[HeaderCarrier]))

@@ -19,9 +19,9 @@ package views
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
 import play.api.Application
-import uk.gov.hmrc.securitiestransferchargefrontend.forms.NameOfSellerFormProvider
+import uk.gov.hmrc.securitiestransferchargefrontend.forms.individuals.NameOfSellerFormProvider
 import uk.gov.hmrc.securitiestransferchargefrontend.models.NormalMode
-import uk.gov.hmrc.securitiestransferchargefrontend.views.html.NameOfSellerView
+import uk.gov.hmrc.securitiestransferchargefrontend.views.html.individuals.NameOfSellerView
 import views.ViewBaseSpec
 
 import scala.language.postfixOps

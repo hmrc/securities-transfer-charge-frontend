@@ -25,17 +25,17 @@ import play.api.test.FakeRequest
 import play.api.test.Helpers.*
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.securitiestransferchargefrontend.clients.SaveAndReturnClient
-import uk.gov.hmrc.securitiestransferchargefrontend.controllers.routes
-import uk.gov.hmrc.securitiestransferchargefrontend.forms.HowToNotifyAboutSecuritiesTransferFormProvider
+import uk.gov.hmrc.securitiestransferchargefrontend.controllers.individuals.routes as individualRoutes
+import uk.gov.hmrc.securitiestransferchargefrontend.forms.individuals.HowToNotifyAboutSecuritiesTransferFormProvider
 import uk.gov.hmrc.securitiestransferchargefrontend.models.{HowToNotifyAboutSecuritiesTransfer, NormalMode, UserAnswers}
-import uk.gov.hmrc.securitiestransferchargefrontend.pages.HowToNotifyAboutSecuritiesTransferPage
-import uk.gov.hmrc.securitiestransferchargefrontend.views.html.HowToNotifyAboutSecuritiesTransferView
+import uk.gov.hmrc.securitiestransferchargefrontend.pages.individuals.HowToNotifyAboutSecuritiesTransferPage
+import uk.gov.hmrc.securitiestransferchargefrontend.views.html.individuals.HowToNotifyAboutSecuritiesTransferView
 
 import scala.concurrent.Future
 
 class HowToNotifyAboutSecuritiesTransferControllerSpec extends SpecBase {
 
-  lazy val howToNotifyAboutSecuritiesTransferRoute: String = routes.HowToNotifyAboutSecuritiesTransferController.onPageLoad(NormalMode).url
+  lazy val howToNotifyAboutSecuritiesTransferRoute: String = individualRoutes.HowToNotifyAboutSecuritiesTransferController.onPageLoad(NormalMode).url
 
   val formProvider = new HowToNotifyAboutSecuritiesTransferFormProvider()
   val form: Form[HowToNotifyAboutSecuritiesTransfer] = formProvider()
@@ -111,7 +111,7 @@ class HowToNotifyAboutSecuritiesTransferControllerSpec extends SpecBase {
         val result = route(application, request).value
 
         status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual routes.ConfirmAddressController.onPageLoad().url
+        redirectLocation(result).value mustEqual individualRoutes.ConfirmAddressController.onPageLoad().url
       }
     }
   }

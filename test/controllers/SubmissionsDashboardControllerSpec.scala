@@ -25,6 +25,7 @@ import play.api.test.FakeRequest
 import play.api.test.Helpers.*
 import uk.gov.hmrc.securitiestransferchargefrontend.clients.{SaveAndReturnClient, SubmissionIdClient}
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.routes
+import uk.gov.hmrc.securitiestransferchargefrontend.controllers.individuals.routes as individualRoutes
 import uk.gov.hmrc.securitiestransferchargefrontend.domain.SubmissionId
 import uk.gov.hmrc.securitiestransferchargefrontend.models.NormalMode
 import uk.gov.hmrc.securitiestransferchargefrontend.views.html.SubmissionsDashboardView
@@ -143,7 +144,7 @@ class SubmissionsDashboardControllerSpec extends SpecBase with MockitoSugar {
 
           status(result) mustEqual SEE_OTHER
 
-          redirectLocation(result).value mustEqual routes.HowToNotifyAboutSecuritiesTransferController.onPageLoad(NormalMode).url
+          redirectLocation(result).value mustEqual individualRoutes.HowToNotifyAboutSecuritiesTransferController.onPageLoad(NormalMode).url
         }
       }
 

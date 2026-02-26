@@ -19,9 +19,9 @@ package views
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
 import play.api.Application
-import uk.gov.hmrc.securitiestransferchargefrontend.forms.ChargingPointFormProvider
+import uk.gov.hmrc.securitiestransferchargefrontend.forms.individuals.ChargingPointFormProvider
 import uk.gov.hmrc.securitiestransferchargefrontend.models.NormalMode
-import uk.gov.hmrc.securitiestransferchargefrontend.views.html.ChargingPointView
+import uk.gov.hmrc.securitiestransferchargefrontend.views.html.individuals.ChargingPointView
 import views.ViewBaseSpec
 
 class ChargingPointViewSpec extends ViewBaseSpec {

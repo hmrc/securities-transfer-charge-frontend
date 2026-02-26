@@ -19,9 +19,9 @@ package views
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
 import play.api.Application
-import uk.gov.hmrc.securitiestransferchargefrontend.forms.TaxRateFormProvider
+import uk.gov.hmrc.securitiestransferchargefrontend.forms.individuals.TaxRateFormProvider
 import uk.gov.hmrc.securitiestransferchargefrontend.models.NormalMode
-import uk.gov.hmrc.securitiestransferchargefrontend.views.html.TaxRateView
+import uk.gov.hmrc.securitiestransferchargefrontend.views.html.individuals.TaxRateView
 
 class TaxRateViewSpec extends ViewBaseSpec {
 

@@ -26,17 +26,18 @@ import play.api.test.Helpers.*
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.securitiestransferchargefrontend.clients.SaveAndReturnClient
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.routes
-import uk.gov.hmrc.securitiestransferchargefrontend.forms.WhatTypeOfSecuritiesFormProvider
+import uk.gov.hmrc.securitiestransferchargefrontend.controllers.individuals.routes as individualRoutes
+import uk.gov.hmrc.securitiestransferchargefrontend.forms.individuals.WhatTypeOfSecuritiesFormProvider
 import uk.gov.hmrc.securitiestransferchargefrontend.models.{NormalMode, UserAnswers, WhatTypeOfSecurities}
-import uk.gov.hmrc.securitiestransferchargefrontend.pages.WhatTypeOfSecuritiesPage
-import uk.gov.hmrc.securitiestransferchargefrontend.views.html.WhatTypeOfSecuritiesView
+import uk.gov.hmrc.securitiestransferchargefrontend.pages.individuals.WhatTypeOfSecuritiesPage
+import uk.gov.hmrc.securitiestransferchargefrontend.views.html.individuals.WhatTypeOfSecuritiesView
 
 import scala.concurrent.Future
 
 class WhatTypeOfSecuritiesControllerSpec extends SpecBase with MockitoSugar {
 
 
-  lazy val whatTypeOfSecuritiesRoute: String = routes.WhatTypeOfSecuritiesController.onPageLoad(NormalMode).url
+  lazy val whatTypeOfSecuritiesRoute: String = individualRoutes.WhatTypeOfSecuritiesController.onPageLoad(NormalMode).url
 
   val formProvider = new WhatTypeOfSecuritiesFormProvider()
   val form: Form[WhatTypeOfSecurities] = formProvider()
@@ -96,7 +97,7 @@ class WhatTypeOfSecuritiesControllerSpec extends SpecBase with MockitoSugar {
         val result = route(application, request).value
 
         status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual routes.DetailsOfThisTransferController.onPageLoad(NormalMode).url
+        redirectLocation(result).value mustEqual individualRoutes.DetailsOfThisTransferController.onPageLoad(NormalMode).url
       }
     }
 

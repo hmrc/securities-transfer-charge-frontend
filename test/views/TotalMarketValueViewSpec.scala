@@ -35,9 +35,9 @@ package views
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
 import play.api.Application
-import uk.gov.hmrc.securitiestransferchargefrontend.forms.TotalMarketValueFormProvider
+import uk.gov.hmrc.securitiestransferchargefrontend.forms.individuals.TotalMarketValueFormProvider
 import uk.gov.hmrc.securitiestransferchargefrontend.models.NormalMode
-import uk.gov.hmrc.securitiestransferchargefrontend.views.html.TotalMarketValueView
+import uk.gov.hmrc.securitiestransferchargefrontend.views.html.individuals.TotalMarketValueView
 
 
 class TotalMarketValueViewSpec extends ViewBaseSpec {

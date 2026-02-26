@@ -18,20 +18,21 @@ package controllers
 
 import base.SpecBase
 import navigation.FakeNavigator
-import uk.gov.hmrc.securitiestransferchargefrontend.forms.TotalMarketValueFormProvider
 import uk.gov.hmrc.securitiestransferchargefrontend.models.{NormalMode, UserAnswers}
 import uk.gov.hmrc.securitiestransferchargefrontend.navigation.Navigator
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.when
 import org.scalatestplus.mockito.MockitoSugar
-import uk.gov.hmrc.securitiestransferchargefrontend.pages.TotalMarketValuePage
 import play.api.inject.bind
 import play.api.mvc.Call
 import play.api.test.FakeRequest
 import play.api.test.Helpers.*
-import uk.gov.hmrc.securitiestransferchargefrontend.views.html.TotalMarketValueView
+import uk.gov.hmrc.securitiestransferchargefrontend.views.html.individuals.TotalMarketValueView
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.routes
+import uk.gov.hmrc.securitiestransferchargefrontend.controllers.individuals.routes as individualRoutes
 import uk.gov.hmrc.securitiestransferchargefrontend.domain.SubmissionId
+import uk.gov.hmrc.securitiestransferchargefrontend.forms.individuals.TotalMarketValueFormProvider
+import uk.gov.hmrc.securitiestransferchargefrontend.pages.individuals.TotalMarketValuePage
 import uk.gov.hmrc.securitiestransferchargefrontend.repositories.SessionRepository
 
 import scala.concurrent.Future
@@ -46,7 +47,7 @@ class TotalMarketValueControllerSpec extends SpecBase with MockitoSugar {
   val validAnswer = 0
   val testSubmissionId = SubmissionId("STC-009")
 
-  lazy val totalMarketValuePageRoute = routes.TotalMarketValueController.onPageLoad(NormalMode).url
+  lazy val totalMarketValuePageRoute = individualRoutes.TotalMarketValueController.onPageLoad(NormalMode).url
 
   "TotalMarketValuePage Controller" - {
 

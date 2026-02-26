@@ -25,11 +25,12 @@ import play.api.mvc.Call
 import play.api.test.FakeRequest
 import play.api.test.Helpers.*
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.routes
-import uk.gov.hmrc.securitiestransferchargefrontend.forms.TaxRateFormProvider
+import uk.gov.hmrc.securitiestransferchargefrontend.controllers.individuals.routes as individualRoutes
+import uk.gov.hmrc.securitiestransferchargefrontend.forms.individuals.TaxRateFormProvider
 import uk.gov.hmrc.securitiestransferchargefrontend.models.{NormalMode, TaxRate, UserAnswers}
-import uk.gov.hmrc.securitiestransferchargefrontend.pages.TaxRatePage
+import uk.gov.hmrc.securitiestransferchargefrontend.pages.individuals.TaxRatePage
 import uk.gov.hmrc.securitiestransferchargefrontend.repositories.SessionRepository
-import uk.gov.hmrc.securitiestransferchargefrontend.views.html.TaxRateView
+import uk.gov.hmrc.securitiestransferchargefrontend.views.html.individuals.TaxRateView
 
 import scala.concurrent.Future
 
@@ -37,7 +38,7 @@ class TaxRateControllerSpec extends SpecBase with MockitoSugar {
 
   def onwardRoute = Call("GET", "/foo")
 
-  lazy val taxRateRoute: String = routes.TaxRateController.onPageLoad(NormalMode).url
+  lazy val taxRateRoute: String = individualRoutes.TaxRateController.onPageLoad(NormalMode).url
 
   val formProvider = new TaxRateFormProvider()
   val form: Form[TaxRate] = formProvider()
@@ -97,7 +98,7 @@ class TaxRateControllerSpec extends SpecBase with MockitoSugar {
         val result = route(application, request).value
 
         status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual routes.WhatTypeOfSecuritiesController.onPageLoad(NormalMode).url
+        redirectLocation(result).value mustEqual individualRoutes.WhatTypeOfSecuritiesController.onPageLoad(NormalMode).url
       }
     }
 

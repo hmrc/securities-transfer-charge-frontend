@@ -22,10 +22,11 @@ import play.api.data.Form
 import play.api.test.FakeRequest
 import play.api.test.Helpers.*
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.routes
-import uk.gov.hmrc.securitiestransferchargefrontend.forms.DetailsOfThisTransferFormProvider
+import uk.gov.hmrc.securitiestransferchargefrontend.controllers.individuals.routes as individualRoutes
+import uk.gov.hmrc.securitiestransferchargefrontend.forms.individuals.DetailsOfThisTransferFormProvider
 import uk.gov.hmrc.securitiestransferchargefrontend.models.{DetailsOfThisTransfer, NormalMode, UserAnswers}
-import uk.gov.hmrc.securitiestransferchargefrontend.pages.DetailsOfThisTransferPage
-import uk.gov.hmrc.securitiestransferchargefrontend.views.html.DetailsOfThisTransferView
+import uk.gov.hmrc.securitiestransferchargefrontend.pages.individuals.DetailsOfThisTransferPage
+import uk.gov.hmrc.securitiestransferchargefrontend.views.html.individuals.DetailsOfThisTransferView
 
 class DetailsOfThisTransferControllerSpec extends SpecBase with MockitoSugar {
 
@@ -33,7 +34,7 @@ class DetailsOfThisTransferControllerSpec extends SpecBase with MockitoSugar {
   val formProvider = new DetailsOfThisTransferFormProvider()
   val form: Form[DetailsOfThisTransfer] = formProvider()
 
-  lazy val detailsOfThisTransferRoute: String = routes.DetailsOfThisTransferController.onPageLoad(NormalMode).url
+  lazy val detailsOfThisTransferRoute: String = individualRoutes.DetailsOfThisTransferController.onPageLoad(NormalMode).url
 
   val amount: BigDecimal = BigDecimal(500)
 

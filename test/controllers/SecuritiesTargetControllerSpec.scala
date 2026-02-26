@@ -17,10 +17,10 @@
 package controllers
 
 import base.SpecBase
-import uk.gov.hmrc.securitiestransferchargefrontend.forms.SecuritiesTargetFormProvider
 import uk.gov.hmrc.securitiestransferchargefrontend.models.{NormalMode, SecuritiesTarget}
 import uk.gov.hmrc.securitiestransferchargefrontend.navigation.Navigator
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.routes
+import uk.gov.hmrc.securitiestransferchargefrontend.controllers.individuals.routes as individualRoutes
 import navigation.FakeNavigator
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.when
@@ -30,8 +30,9 @@ import play.api.inject.bind
 import play.api.mvc.Call
 import play.api.test.FakeRequest
 import play.api.test.Helpers.*
+import uk.gov.hmrc.securitiestransferchargefrontend.forms.individuals.SecuritiesTargetFormProvider
 import uk.gov.hmrc.securitiestransferchargefrontend.repositories.SessionRepository
-import uk.gov.hmrc.securitiestransferchargefrontend.views.html.SecuritiesTargetView
+import uk.gov.hmrc.securitiestransferchargefrontend.views.html.individuals.SecuritiesTargetView
 
 import scala.concurrent.Future
 
@@ -42,7 +43,7 @@ class SecuritiesTargetControllerSpec extends SpecBase with MockitoSugar {
   val formProvider = new SecuritiesTargetFormProvider()
   val form: Form[SecuritiesTarget] = formProvider()
 
-  lazy val securitiesTargetRoute: String = routes.SecuritiesTargetController.onPageLoad(NormalMode).url
+  lazy val securitiesTargetRoute: String = individualRoutes.SecuritiesTargetController.onPageLoad(NormalMode).url
   
   "SecuritiesTarget Controller" - {
 

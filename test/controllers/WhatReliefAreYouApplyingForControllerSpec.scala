@@ -26,10 +26,11 @@ import play.api.test.Helpers.*
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.securitiestransferchargefrontend.clients.SaveAndReturnClient
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.routes
-import uk.gov.hmrc.securitiestransferchargefrontend.forms.WhatReliefAreYouApplyingForFormProvider
+import uk.gov.hmrc.securitiestransferchargefrontend.controllers.individuals.routes as individualRoutes
+import uk.gov.hmrc.securitiestransferchargefrontend.forms.individuals.WhatReliefAreYouApplyingForFormProvider
 import uk.gov.hmrc.securitiestransferchargefrontend.models.{NormalMode, ReliefsDataSource, UserAnswers}
-import uk.gov.hmrc.securitiestransferchargefrontend.pages.WhatReliefAreYouApplyingForPage
-import uk.gov.hmrc.securitiestransferchargefrontend.views.html.WhatReliefAreYouApplyingForView
+import uk.gov.hmrc.securitiestransferchargefrontend.pages.individuals.WhatReliefAreYouApplyingForPage
+import uk.gov.hmrc.securitiestransferchargefrontend.views.html.individuals.WhatReliefAreYouApplyingForView
 
 import scala.concurrent.Future
 
@@ -38,7 +39,7 @@ class WhatReliefAreYouApplyingForControllerSpec extends SpecBase with MockitoSug
   val formProvider = new WhatReliefAreYouApplyingForFormProvider()
   val form: Form[String] = formProvider()
 
-  lazy val whatReliefAreYouApplyingForRoute: String = routes.WhatReliefAreYouApplyingForController.onPageLoad(NormalMode).url
+  lazy val whatReliefAreYouApplyingForRoute: String = individualRoutes.WhatReliefAreYouApplyingForController.onPageLoad(NormalMode).url
 
   "WhatReliefAreYouApplyingFor Controller" - {
 
@@ -98,7 +99,7 @@ class WhatReliefAreYouApplyingForControllerSpec extends SpecBase with MockitoSug
         val result = route(application, request).value
 
         status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual routes.SecuritiesTargetController.onPageLoad(NormalMode).url
+        redirectLocation(result).value mustEqual individualRoutes.SecuritiesTargetController.onPageLoad(NormalMode).url
       }
     }
 

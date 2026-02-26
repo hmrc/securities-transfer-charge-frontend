@@ -25,11 +25,12 @@ import play.api.mvc.{AnyContentAsEmpty, AnyContentAsFormUrlEncoded, Call}
 import play.api.test.FakeRequest
 import play.api.test.Helpers.*
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.routes
-import uk.gov.hmrc.securitiestransferchargefrontend.forms.ChargingPointFormProvider
+import uk.gov.hmrc.securitiestransferchargefrontend.controllers.individuals.routes as individualRoutes
+import uk.gov.hmrc.securitiestransferchargefrontend.forms.individuals.ChargingPointFormProvider
 import uk.gov.hmrc.securitiestransferchargefrontend.models.{NormalMode, UserAnswers}
-import uk.gov.hmrc.securitiestransferchargefrontend.pages.ChargingPointPage
+import uk.gov.hmrc.securitiestransferchargefrontend.pages.individuals.ChargingPointPage
 import uk.gov.hmrc.securitiestransferchargefrontend.repositories.SessionRepository
-import uk.gov.hmrc.securitiestransferchargefrontend.views.html.ChargingPointView
+import uk.gov.hmrc.securitiestransferchargefrontend.views.html.individuals.ChargingPointView
 
 import java.time.{LocalDate, ZoneOffset}
 import scala.concurrent.Future
@@ -45,7 +46,7 @@ class ChargingPointControllerSpec extends SpecBase with MockitoSugar {
 
   val validAnswer: LocalDate = LocalDate.now(ZoneOffset.UTC)
 
-  lazy val chargingPointRoute: String = routes.ChargingPointController.onPageLoad(NormalMode).url
+  lazy val chargingPointRoute: String = individualRoutes.ChargingPointController.onPageLoad(NormalMode).url
 
   override val emptyUserAnswers = UserAnswers(userAnswersId, submissionId)
 
@@ -105,7 +106,7 @@ class ChargingPointControllerSpec extends SpecBase with MockitoSugar {
         val result = route(application, postRequest()).value
 
         status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual routes.TaxRateController.onPageLoad(NormalMode).url
+        redirectLocation(result).value mustEqual individualRoutes.TaxRateController.onPageLoad(NormalMode).url
       }
     }
 

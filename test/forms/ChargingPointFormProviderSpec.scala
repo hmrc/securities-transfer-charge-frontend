@@ -19,7 +19,7 @@ package forms
 import forms.behaviours.DateBehaviours
 import play.api.i18n.Messages
 import play.api.test.Helpers.stubMessages
-import uk.gov.hmrc.securitiestransferchargefrontend.forms.ChargingPointFormProvider
+import uk.gov.hmrc.securitiestransferchargefrontend.forms.individuals.ChargingPointFormProvider
 
 import java.time.{LocalDate, ZoneOffset}
 

@@ -22,10 +22,11 @@ import play.api.mvc.Call
 import play.api.test.FakeRequest
 import play.api.test.Helpers.*
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.routes
-import uk.gov.hmrc.securitiestransferchargefrontend.forms.AmountPaidForSecuritiesFormProvider
+import uk.gov.hmrc.securitiestransferchargefrontend.controllers.individuals.routes as individualRoutes
+import uk.gov.hmrc.securitiestransferchargefrontend.forms.individuals.AmountPaidForSecuritiesFormProvider
 import uk.gov.hmrc.securitiestransferchargefrontend.models.{NormalMode, UserAnswers}
-import uk.gov.hmrc.securitiestransferchargefrontend.pages.AmountPaidForSecuritiesPage
-import uk.gov.hmrc.securitiestransferchargefrontend.views.html.AmountPaidForSecuritiesView
+import uk.gov.hmrc.securitiestransferchargefrontend.pages.individuals.AmountPaidForSecuritiesPage
+import uk.gov.hmrc.securitiestransferchargefrontend.views.html.individuals.AmountPaidForSecuritiesView
 
 class AmountPaidForSecuritiesControllerSpec extends SpecBase with MockitoSugar {
 
@@ -36,7 +37,7 @@ class AmountPaidForSecuritiesControllerSpec extends SpecBase with MockitoSugar {
 
   val validAnswer = 100
 
-  lazy val amountPaidForSecuritiesRoute: String = routes.AmountPaidForSecuritiesController.onPageLoad(NormalMode).url
+  lazy val amountPaidForSecuritiesRoute: String = individualRoutes.AmountPaidForSecuritiesController.onPageLoad(NormalMode).url
 
   "AmountPaidForSecurities Controller" - {
 

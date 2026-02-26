@@ -18,7 +18,7 @@ package forms
 
 import forms.behaviours.BooleanFieldBehaviours
 import play.api.data.FormError
-import uk.gov.hmrc.securitiestransferchargefrontend.forms.ApplyingForReliefFormProvider
+import uk.gov.hmrc.securitiestransferchargefrontend.forms.individuals.ApplyingForReliefFormProvider
 
 class ApplyingForReliefFormProviderSpec extends BooleanFieldBehaviours {
 

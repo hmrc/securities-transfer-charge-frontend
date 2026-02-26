@@ -18,7 +18,7 @@ package forms
 
 import forms.behaviours.StringFieldBehaviours
 import play.api.data.FormError
-import uk.gov.hmrc.securitiestransferchargefrontend.forms.WhatReliefAreYouApplyingForFormProvider
+import uk.gov.hmrc.securitiestransferchargefrontend.forms.individuals.WhatReliefAreYouApplyingForFormProvider
 
 class WhatReliefAreYouApplyingForFormProviderSpec extends StringFieldBehaviours {
 

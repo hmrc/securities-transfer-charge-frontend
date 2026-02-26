@@ -28,11 +28,12 @@ import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.securitiestransferchargefrontend.clients.SaveAndReturnClient
 import uk.gov.hmrc.securitiestransferchargefrontend.connectors.SubscriptionConnector
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.routes
+import uk.gov.hmrc.securitiestransferchargefrontend.controllers.individuals.routes as individualRoutes
 import uk.gov.hmrc.securitiestransferchargefrontend.domain.SubscriptionId
 import uk.gov.hmrc.securitiestransferchargefrontend.models.UserAnswers
 import uk.gov.hmrc.securitiestransferchargefrontend.repositories.{SubscriptionData, SubscriptionDataRepository}
 import uk.gov.hmrc.securitiestransferchargefrontend.services.AddressService
-import uk.gov.hmrc.securitiestransferchargefrontend.views.html.ConfirmAddressView
+import uk.gov.hmrc.securitiestransferchargefrontend.views.html.individuals.ConfirmAddressView
 
 import scala.concurrent.Future
 
@@ -62,7 +63,7 @@ class ConfirmAddressControllerSpec extends SpecBase {
           .build()
 
       running(application) {
-        val request = FakeRequest(GET, routes.ConfirmAddressController.onPageLoad().url)
+        val request = FakeRequest(GET, individualRoutes.ConfirmAddressController.onPageLoad().url)
 
         val result = route(application, request).value
 
@@ -103,7 +104,7 @@ class ConfirmAddressControllerSpec extends SpecBase {
       running(application) {
 
         val request =
-          FakeRequest(POST, routes.ConfirmAddressController.onSubmit().url)
+          FakeRequest(POST, individualRoutes.ConfirmAddressController.onSubmit().url)
 
         val result = route(application, request).value
 
@@ -129,7 +130,7 @@ class ConfirmAddressControllerSpec extends SpecBase {
       running(application) {
 
         val request =
-          FakeRequest(POST, routes.ConfirmAddressController.onSubmit().url)
+          FakeRequest(POST, individualRoutes.ConfirmAddressController.onSubmit().url)
 
         val result = route(application, request).value
 
