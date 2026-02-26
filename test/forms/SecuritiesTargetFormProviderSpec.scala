@@ -26,20 +26,36 @@ class SecuritiesTargetFormProviderSpec extends StringFieldBehaviours {
 
   ".BusinessName" - {
 
-    val fieldName = "BusinessName"
-    val requiredKey = "securitiesTarget.error.BusinessName.required"
+    val fieldName = "businessName"
+    val requiredKey = "securitiesTarget.error.businessName.required"
+    val lengthKey = "securitiesTarget.error.businessName.length"
+    val maxLength = 160
+
 
     behave like mandatoryField(
       form,
       fieldName,
       requiredError = FormError(fieldName, requiredKey)
     )
+
+    behave like fieldThatBindsValidData(
+      form,
+      fieldName,
+      stringsWithMaxLength(maxLength)
+    )
+
+    behave like fieldWithMaxLength(
+      form,
+      fieldName,
+      maxLength = maxLength,
+      lengthError = FormError(fieldName, lengthKey, Seq(maxLength))
+    )
   }
 
   ".CRN" - {
 
-    val fieldName = "CRN"
-    val lengthKey = "securitiesTarget.error.CRN.length"
+    val fieldName = "crn"
+    val lengthKey = "securitiesTarget.error.crn.length"
     val maxLength = 8
 
     behave like fieldThatBindsValidData(

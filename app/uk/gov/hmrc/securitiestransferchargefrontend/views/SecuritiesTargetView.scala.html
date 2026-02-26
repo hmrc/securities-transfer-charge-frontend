@@ -47,8 +47,8 @@
 
         @govukInput(
             InputViewModel(
-                field = form("BusinessName"),
-                label = LabelViewModel(messages("securitiesTarget.BusinessName"))
+                field = form("businessName"),
+                label = LabelViewModel(messages("securitiesTarget.businessName"))
             )
             .withWidth(Full)
         )
@@ -56,14 +56,14 @@
         @govukInput(
             InputViewModel(
                 field = form("CRN"),
-                label = LabelViewModel(messages("securitiesTarget.CRN"))
+                label = LabelViewModel(messages("securitiesTarget.crn"))
             )
             .withWidth(OneThird)
             .withHint(Hint(content = HtmlContent(HtmlFormat.raw(s"""
-                <p class="govuk-hint">
-                    ${messages("securitiesTarget.CRN.hint.message1")}<br>
-                    ${messages("securitiesTarget.CRN.hint.message2")}
-                </p>
+                <span class="govuk-hint">
+                    ${messages("securitiesTarget.crn.hint.message1")}<br>
+                    ${messages("securitiesTarget.crn.hint.message2")}
+                </span>
             """)
             )))
         )

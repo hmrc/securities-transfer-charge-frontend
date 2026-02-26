@@ -43,7 +43,7 @@ class SecuritiesTargetViewSpec extends ViewBaseSpec {
     val title = "What business are you buying these securities in?"
     val heading = "What business are you buying these securities in?"
     val caption = "Transfer details"
-    val field1 = "Business Name"
+    val field1 = "Business name"
     val field2 = "Company registration number (CRN) (optional)"
     val crnHintMessage1 = "This is also called a company number."
     val crnHintMessage2 = "For example, SN898989 or 12345678"
@@ -77,8 +77,8 @@ class SecuritiesTargetViewSpec extends ViewBaseSpec {
 
       "must render CRN hint text" in {
         val hint = securitiesTargetView.select(".govuk-hint").text()
-        hint must include(messages("securitiesTarget.CRN.hint.message1"))
-        hint must include(messages("securitiesTarget.CRN.hint.message2"))
+        hint must include(messages("securitiesTarget.crn.hint.message1"))
+        hint must include(messages("securitiesTarget.crn.hint.message2"))
       }
 
       "have a button with the text save and continue " in {
