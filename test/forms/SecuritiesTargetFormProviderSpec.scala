@@ -54,8 +54,8 @@ class SecuritiesTargetFormProviderSpec extends StringFieldBehaviours {
 
   ".CRN" - {
 
-    val fieldName = "CRN"
-    val lengthKey = "securitiesTarget.error.CRN.length"
+    val fieldName = "crn"
+    val lengthKey = "securitiesTarget.error.crn.length"
     val maxLength = 8
 
     behave like fieldThatBindsValidData(

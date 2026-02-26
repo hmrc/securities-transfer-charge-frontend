@@ -77,8 +77,8 @@ class SecuritiesTargetViewSpec extends ViewBaseSpec {
 
       "must render CRN hint text" in {
         val hint = securitiesTargetView.select(".govuk-hint").text()
-        hint must include(messages("securitiesTarget.CRN.hint.message1"))
-        hint must include(messages("securitiesTarget.CRN.hint.message2"))
+        hint must include(messages("securitiesTarget.crn.hint.message1"))
+        hint must include(messages("securitiesTarget.crn.hint.message2"))
       }
 
       "have a button with the text save and continue " in {
