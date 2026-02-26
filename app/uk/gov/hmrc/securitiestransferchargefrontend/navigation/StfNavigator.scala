@@ -65,7 +65,6 @@ class StfNavigator @Inject()(answerPersistenceService: AnswerPersistenceService)
         case WhatTypeOfSecurities.Other => individualRoutes.OtherSecuritiesTypeController.onPageLoad(NormalMode)
       }
     case DetailsOfThisTransferPage => userAnswers => dataRequired(DetailsOfThisTransferPage, userAnswers, routes.CheckYourAnswersController.onPageLoad())
-    case OtherSecuritiesTypePage => userAnswers => dataRequired(OtherSecuritiesTypePage, userAnswers, routes.AmountPaidForSecuritiesController.onPageLoad(NormalMode))
     case AmountPaidForSecuritiesPage => userAnswers =>
       userAnswersDependent(userAnswers) {
         userAnswers =>
