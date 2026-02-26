@@ -14,30 +14,36 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.securitiestransferchargefrontend.viewmodels
+package uk.gov.hmrc.securitiestransferchargefrontend.viewmodels.stf.individuals
 
 import play.api.i18n.Messages
+import play.twirl.api.HtmlFormat
+import uk.gov.hmrc.govukfrontend.views.viewmodels.content.HtmlContent
 import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.SummaryListRow
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.individuals.routes
 import uk.gov.hmrc.securitiestransferchargefrontend.models.{CheckMode, UserAnswers}
-import uk.gov.hmrc.securitiestransferchargefrontend.pages.stf.individuals.ApplyingForReliefPage
+import uk.gov.hmrc.securitiestransferchargefrontend.pages.stf.individuals.HowToNotifyAboutSecuritiesTransferPage
 import uk.gov.hmrc.securitiestransferchargefrontend.viewmodels.govuk.summarylist.*
 import uk.gov.hmrc.securitiestransferchargefrontend.viewmodels.implicits.*
 
-object ApplyingForReliefSummary  {
+object HowToNotifyAboutSecuritiesTransferSummary  {
 
   def row(answers: UserAnswers)(implicit messages: Messages): Option[SummaryListRow] =
-    answers.get(ApplyingForReliefPage).map {
+    answers.get(HowToNotifyAboutSecuritiesTransferPage).map {
       answer =>
 
-        val value = if (answer) "site.yes" else "site.no"
+        val value = ValueViewModel(
+          HtmlContent(
+            HtmlFormat.escape(messages(s"howToNotifyAboutSecuritiesTransfer.$answer"))
+          )
+        )
 
         SummaryListRowViewModel(
-          key     = "applyingForRelief.checkYourAnswersLabel",
-          value   = ValueViewModel(value),
+          key     = "howToNotifyAboutSecuritiesTransfer.checkYourAnswersLabel",
+          value   = value,
           actions = Seq(
-            ActionItemViewModel("site.change", routes.ApplyingForReliefController.onPageLoad(CheckMode).url)
-              .withVisuallyHiddenText(messages("applyingForRelief.change.hidden"))
+            ActionItemViewModel("site.change", routes.HowToNotifyAboutSecuritiesTransferController.onPageLoad(CheckMode).url)
+              .withVisuallyHiddenText(messages("howToNotifyAboutSecuritiesTransfer.change.hidden"))
           )
         )
     }

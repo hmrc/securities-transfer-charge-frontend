@@ -14,29 +14,40 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.securitiestransferchargefrontend.viewmodels
+package uk.gov.hmrc.securitiestransferchargefrontend.viewmodels.stf.individuals
 
 import play.api.i18n.Messages
-import play.twirl.api.HtmlFormat
+import play.twirl.api.{Html, HtmlFormat}
+import uk.gov.hmrc.govukfrontend.views.viewmodels.content.HtmlContent
 import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.SummaryListRow
+import uk.gov.hmrc.securitiestransferchargefrontend.config.CurrencyFormatter.currencyFormat
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.individuals.routes
 import uk.gov.hmrc.securitiestransferchargefrontend.models.{CheckMode, UserAnswers}
-import uk.gov.hmrc.securitiestransferchargefrontend.pages.stf.individuals.NameOfSellerPage
+import uk.gov.hmrc.securitiestransferchargefrontend.pages.stf.individuals.DetailsOfThisTransferPage
 import uk.gov.hmrc.securitiestransferchargefrontend.viewmodels.govuk.summarylist.*
 import uk.gov.hmrc.securitiestransferchargefrontend.viewmodels.implicits.*
 
-object NameOfSellerSummary  {
+object DetailsOfThisTransferSummary {
 
   def row(answers: UserAnswers)(implicit messages: Messages): Option[SummaryListRow] =
-    answers.get(NameOfSellerPage).map {
+    answers.get(DetailsOfThisTransferPage).map {
       answer =>
 
+        val value = Html(
+          s"""
+             |${HtmlFormat.escape(answer.numberOfShares).body}<br/>
+             |${HtmlFormat.escape(answer.typeOfShares).body}<br/>
+             |${HtmlFormat.escape(currencyFormat(answer.amountPaid)).body}<br/>
+             |${HtmlFormat.escape(currencyFormat(answer.marketValue)).body}
+             |""".stripMargin
+        )
+
         SummaryListRowViewModel(
-          key     = "nameOfSeller.checkYourAnswersLabel",
-          value   = ValueViewModel(HtmlFormat.escape(answer).toString),
+          key = "detailsOfThisTransfer.checkYourAnswersLabel",
+          value = ValueViewModel(HtmlContent(value)),
           actions = Seq(
-            ActionItemViewModel("site.change", routes.NameOfSellerController.onPageLoad(CheckMode).url)
-              .withVisuallyHiddenText(messages("nameOfSeller.change.hidden"))
+            ActionItemViewModel("site.change", routes.DetailsOfThisTransferController.onPageLoad(CheckMode).url)
+              .withVisuallyHiddenText(messages("detailsOfThisTransfer.change.hidden"))
           )
         )
     }

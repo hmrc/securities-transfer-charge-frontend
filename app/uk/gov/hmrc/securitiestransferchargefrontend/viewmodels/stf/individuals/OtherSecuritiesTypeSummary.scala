@@ -14,31 +14,29 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.securitiestransferchargefrontend.viewmodels
+package uk.gov.hmrc.securitiestransferchargefrontend.viewmodels.stf.individuals
 
-import play.api.i18n.{Lang, Messages}
+import play.api.i18n.Messages
+import play.twirl.api.HtmlFormat
 import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.SummaryListRow
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.individuals.routes
 import uk.gov.hmrc.securitiestransferchargefrontend.models.{CheckMode, UserAnswers}
-import uk.gov.hmrc.securitiestransferchargefrontend.pages.stf.individuals.ChargingPointPage
-import uk.gov.hmrc.securitiestransferchargefrontend.utils.DateTimeFormats.dateTimeFormat
+import uk.gov.hmrc.securitiestransferchargefrontend.pages.stf.individuals.OtherSecuritiesTypePage
 import uk.gov.hmrc.securitiestransferchargefrontend.viewmodels.govuk.summarylist.*
 import uk.gov.hmrc.securitiestransferchargefrontend.viewmodels.implicits.*
 
-object ChargingPointSummary  {
+object OtherSecuritiesTypeSummary  {
 
   def row(answers: UserAnswers)(implicit messages: Messages): Option[SummaryListRow] =
-    answers.get(ChargingPointPage).map {
+    answers.get(OtherSecuritiesTypePage).map {
       answer =>
 
-        implicit val lang: Lang = messages.lang
-
         SummaryListRowViewModel(
-          key     = "chargingPoint.checkYourAnswersLabel",
-          value   = ValueViewModel(answer.format(dateTimeFormat())),
+          key     = "otherSecuritiesType.checkYourAnswersLabel",
+          value   = ValueViewModel(HtmlFormat.escape(answer).toString),
           actions = Seq(
-            ActionItemViewModel("site.change", routes.ChargingPointController.onPageLoad(CheckMode).url)
-              .withVisuallyHiddenText(messages("chargingPoint.change.hidden"))
+            ActionItemViewModel("site.change", routes.OtherSecuritiesTypeController.onPageLoad(CheckMode).url)
+              .withVisuallyHiddenText(messages("otherSecuritiesType.change.hidden"))
           )
         )
     }

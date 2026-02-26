@@ -14,36 +14,31 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.securitiestransferchargefrontend.viewmodels
+package uk.gov.hmrc.securitiestransferchargefrontend.viewmodels.stf.individuals
 
-import play.api.i18n.Messages
-import play.twirl.api.HtmlFormat
-import uk.gov.hmrc.govukfrontend.views.viewmodels.content.HtmlContent
+import play.api.i18n.{Lang, Messages}
 import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.SummaryListRow
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.individuals.routes
 import uk.gov.hmrc.securitiestransferchargefrontend.models.{CheckMode, UserAnswers}
-import uk.gov.hmrc.securitiestransferchargefrontend.pages.stf.individuals.HowToNotifyAboutSecuritiesTransferPage
+import uk.gov.hmrc.securitiestransferchargefrontend.pages.stf.individuals.ChargingPointPage
+import uk.gov.hmrc.securitiestransferchargefrontend.utils.DateTimeFormats.dateTimeFormat
 import uk.gov.hmrc.securitiestransferchargefrontend.viewmodels.govuk.summarylist.*
 import uk.gov.hmrc.securitiestransferchargefrontend.viewmodels.implicits.*
 
-object HowToNotifyAboutSecuritiesTransferSummary  {
+object ChargingPointSummary  {
 
   def row(answers: UserAnswers)(implicit messages: Messages): Option[SummaryListRow] =
-    answers.get(HowToNotifyAboutSecuritiesTransferPage).map {
+    answers.get(ChargingPointPage).map {
       answer =>
 
-        val value = ValueViewModel(
-          HtmlContent(
-            HtmlFormat.escape(messages(s"howToNotifyAboutSecuritiesTransfer.$answer"))
-          )
-        )
+        implicit val lang: Lang = messages.lang
 
         SummaryListRowViewModel(
-          key     = "howToNotifyAboutSecuritiesTransfer.checkYourAnswersLabel",
-          value   = value,
+          key     = "chargingPoint.checkYourAnswersLabel",
+          value   = ValueViewModel(answer.format(dateTimeFormat())),
           actions = Seq(
-            ActionItemViewModel("site.change", routes.HowToNotifyAboutSecuritiesTransferController.onPageLoad(CheckMode).url)
-              .withVisuallyHiddenText(messages("howToNotifyAboutSecuritiesTransfer.change.hidden"))
+            ActionItemViewModel("site.change", routes.ChargingPointController.onPageLoad(CheckMode).url)
+              .withVisuallyHiddenText(messages("chargingPoint.change.hidden"))
           )
         )
     }

@@ -14,29 +14,29 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.securitiestransferchargefrontend.viewmodels
+package uk.gov.hmrc.securitiestransferchargefrontend.viewmodels.stf.individuals
 
 import play.api.i18n.Messages
-import play.twirl.api.HtmlFormat
 import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.SummaryListRow
+import uk.gov.hmrc.securitiestransferchargefrontend.config.CurrencyFormatter.currencyFormat
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.individuals.routes
 import uk.gov.hmrc.securitiestransferchargefrontend.models.{CheckMode, UserAnswers}
-import uk.gov.hmrc.securitiestransferchargefrontend.pages.stf.individuals.OtherSecuritiesTypePage
+import uk.gov.hmrc.securitiestransferchargefrontend.pages.stf.individuals.TotalMarketValuePage
 import uk.gov.hmrc.securitiestransferchargefrontend.viewmodels.govuk.summarylist.*
 import uk.gov.hmrc.securitiestransferchargefrontend.viewmodels.implicits.*
 
-object OtherSecuritiesTypeSummary  {
+object TotalMarketValueSummary  {
 
   def row(answers: UserAnswers)(implicit messages: Messages): Option[SummaryListRow] =
-    answers.get(OtherSecuritiesTypePage).map {
+    answers.get(TotalMarketValuePage).map {
       answer =>
 
         SummaryListRowViewModel(
-          key     = "otherSecuritiesType.checkYourAnswersLabel",
-          value   = ValueViewModel(HtmlFormat.escape(answer).toString),
+          key     = "totalMarketValue.checkYourAnswersLabel",
+          value   = ValueViewModel(currencyFormat(answer)),
           actions = Seq(
-            ActionItemViewModel("site.change", routes.OtherSecuritiesTypeController.onPageLoad(CheckMode).url)
-              .withVisuallyHiddenText(messages("otherSecuritiesType.change.hidden"))
+            ActionItemViewModel("site.change", routes.TotalMarketValueController.onPageLoad(CheckMode).url)
+              .withVisuallyHiddenText(messages("totalMarketValue.change.hidden"))
           )
         )
     }

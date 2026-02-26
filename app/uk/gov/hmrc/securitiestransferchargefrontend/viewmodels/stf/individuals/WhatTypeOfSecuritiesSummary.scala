@@ -14,29 +14,36 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.securitiestransferchargefrontend.viewmodels
+package uk.gov.hmrc.securitiestransferchargefrontend.viewmodels.stf.individuals
 
 import play.api.i18n.Messages
+import play.twirl.api.HtmlFormat
+import uk.gov.hmrc.govukfrontend.views.viewmodels.content.HtmlContent
 import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.SummaryListRow
-import uk.gov.hmrc.securitiestransferchargefrontend.config.CurrencyFormatter.currencyFormat
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.individuals.routes
 import uk.gov.hmrc.securitiestransferchargefrontend.models.{CheckMode, UserAnswers}
-import uk.gov.hmrc.securitiestransferchargefrontend.pages.stf.individuals.AmountPaidForSecuritiesPage
+import uk.gov.hmrc.securitiestransferchargefrontend.pages.stf.individuals.WhatTypeOfSecuritiesPage
 import uk.gov.hmrc.securitiestransferchargefrontend.viewmodels.govuk.summarylist.*
 import uk.gov.hmrc.securitiestransferchargefrontend.viewmodels.implicits.*
 
-object AmountPaidForSecuritiesSummary  {
+object WhatTypeOfSecuritiesSummary  {
 
   def row(answers: UserAnswers)(implicit messages: Messages): Option[SummaryListRow] =
-    answers.get(AmountPaidForSecuritiesPage).map {
+    answers.get(WhatTypeOfSecuritiesPage).map {
       answer =>
 
+        val value = ValueViewModel(
+          HtmlContent(
+            HtmlFormat.escape(messages(s"whatTypeOfSecurities.$answer"))
+          )
+        )
+
         SummaryListRowViewModel(
-          key     = "amountPaidForSecurities.checkYourAnswersLabel",
-          value   = ValueViewModel(currencyFormat(answer)),
+          key     = "whatTypeOfSecurities.checkYourAnswersLabel",
+          value   = value,
           actions = Seq(
-            ActionItemViewModel("site.change", routes.AmountPaidForSecuritiesController.onPageLoad(CheckMode).url)
-              .withVisuallyHiddenText(messages("amountPaidForSecurities.change.hidden"))
+            ActionItemViewModel("site.change", routes.WhatTypeOfSecuritiesController.onPageLoad(CheckMode).url)
+              .withVisuallyHiddenText(messages("whatTypeOfSecurities.change.hidden"))
           )
         )
     }
