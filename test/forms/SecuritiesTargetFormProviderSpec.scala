@@ -26,7 +26,7 @@ class SecuritiesTargetFormProviderSpec extends StringFieldBehaviours {
 
   ".BusinessName" - {
 
-    val fieldName = "BusinessName"
+    val fieldName = "businessName"
     val requiredKey = "securitiesTarget.error.businessName.required"
     val lengthKey = "securitiesTarget.error.businessName.length"
     val maxLength = 160
