@@ -21,25 +21,31 @@ import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.play.http.HeaderCarrierConverter
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.routes
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.seller.routes as sellerRoutes
+import uk.gov.hmrc.securitiestransferchargefrontend.domain.SubmissionId
 import uk.gov.hmrc.securitiestransferchargefrontend.models.HowToNotifyAboutSecuritiesTransfer.{MoreThanOneAtATime, OneAtATime}
-import uk.gov.hmrc.securitiestransferchargefrontend.models.{CheckMode, Mode, NormalMode, UserAnswers, WhatTypeOfSecurities}
+import uk.gov.hmrc.securitiestransferchargefrontend.models.{NormalMode, UserAnswers, WhatTypeOfSecurities}
 import uk.gov.hmrc.securitiestransferchargefrontend.pages.*
-import uk.gov.hmrc.securitiestransferchargefrontend.queries.Gettable
 import uk.gov.hmrc.securitiestransferchargefrontend.services.AnswerPersistenceService
 
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 
+trait PersistentNavigator extends Navigator:
+  def restore(submissionId: SubmissionId, userId: String)(implicit request: Request[?]): Future[UserAnswers]
+  
 class StfNavigator @Inject()(answerPersistenceService: AnswerPersistenceService)
-                            (implicit ec: ExecutionContext) extends AbstractNavigator(answerPersistenceService) {
+                            (implicit ec: ExecutionContext) extends AbstractModeNavigator with PersistentNavigator {
 
-  private def normalRoutes(page: Page)(implicit hc: HeaderCarrier): UserAnswers => Future[Call] = page match {
+  val helper = new PersistentNavigationHelper(answerPersistenceService, StfNavigator.defaultPage, StfNavigator.errorPages)
+  import helper.*
+  
+  override def normalRoutes(page: Page)(implicit hc: HeaderCarrier): UserAnswers => Future[Call] = page match {
 
     case SubmissionsDashboardPage => userAnswers => goTo(routes.HowToNotifyAboutSecuritiesTransferController.onPageLoad(NormalMode), Some(userAnswers))
     case HowToNotifyAboutSecuritiesTransferPage => userAnswers => {
       dataDependent(HowToNotifyAboutSecuritiesTransferPage, userAnswers) {
         case OneAtATime => routes.ConfirmAddressController.onPageLoad()
-        case MoreThanOneAtATime => Navigator.defaultPage
+        case MoreThanOneAtATime => StfNavigator.defaultPage
       }
     }
     case ConfirmAddressPage => userAnswers => dataRequired(ConfirmAddressPage, userAnswers, routes.NameOfSellerController.onPageLoad(NormalMode))
@@ -66,30 +72,30 @@ class StfNavigator @Inject()(answerPersistenceService: AnswerPersistenceService)
     case AmountPaidForSecuritiesPage => userAnswers =>
       userAnswersDependent(userAnswers) {
         userAnswers =>
-          userAnswers.get(ConnectedPersonsPage).fold(Navigator.defaultPage) {
+          userAnswers.get(ConnectedPersonsPage).fold(StfNavigator.defaultPage) {
             isConnected =>
               if (isConnected) routes.TotalMarketValueController.onPageLoad(NormalMode)
               else routes.CheckYourAnswersController.onPageLoad()
           }
       }
     case TotalMarketValuePage => userAnswers => dataRequired(TotalMarketValuePage, userAnswers, routes.CheckYourAnswersController.onPageLoad())
-    case _ => _ => Navigator.defaultPageF
-
+    case _ => _ => StfNavigator.defaultPageF
   }
 
-  val checkRouteMap: Page => UserAnswers => Call = (_ => _ => routes.CheckYourAnswersController.onPageLoad())
-
-  def nextPage(page: Page, mode: Mode, userAnswers: UserAnswers)(implicit request: Request[?]): Future[Call] = {
-    mode match {
-      case NormalMode =>
-        implicit val hc: HeaderCarrier = HeaderCarrierConverter.fromRequestAndSession(request, request.session)
-        normalRoutes(page)(hc)(userAnswers)
-      case CheckMode => Future.successful(checkRouteMap(page)(userAnswers))
-    }
+  def errorPage(forPage: Page): Call = forPage match {
+    case _ => StfNavigator.defaultPage
   }
 
-  val errorPage: Page => Call = {
-    case _: Gettable[?] => ???
-    case _ => routes.JourneyRecoveryController.onPageLoad()
+  val checkRouteMap: Page => UserAnswers => Call = _ => _ => routes.CheckYourAnswersController.onPageLoad()
+
+  def restore(submissionId: SubmissionId, userId: String)(implicit request: Request[?]): Future[UserAnswers] = {
+    implicit val hc: HeaderCarrier = HeaderCarrierConverter.fromRequestAndSession(request, request.session)
+    answerPersistenceService.load(submissionId, userId)
   }
 }
+object StfNavigator:
+  val startPage: Call = routes.HowToNotifyAboutSecuritiesTransferController.onPageLoad(NormalMode)
+  val defaultPage: Call = routes.JourneyRecoveryController.onPageLoad()
+  val defaultPageF: Future[Call] = Future.successful(defaultPage)
+  val errorPages: Seq[Call] = List(defaultPage)
+  

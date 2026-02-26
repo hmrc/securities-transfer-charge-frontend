@@ -24,7 +24,7 @@ import uk.gov.hmrc.securitiestransferchargefrontend.clients.{SaveAndReturnClient
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.actions.*
 import uk.gov.hmrc.securitiestransferchargefrontend.handlers.ErrorHandler
 import uk.gov.hmrc.securitiestransferchargefrontend.repositories.{SubscriptionDataRepository, SubscriptionDataRepositoryImpl}
-import uk.gov.hmrc.securitiestransferchargefrontend.navigation.{Navigator, StfNavigator}
+import uk.gov.hmrc.securitiestransferchargefrontend.navigation.{Navigator, PersistentNavigator, StfNavigator}
 import uk.gov.hmrc.securitiestransferchargefrontend.repositories.{SessionRepository, SessionRepositoryImpl}
 import uk.gov.hmrc.securitiestransferchargefrontend.services.*
 
@@ -47,6 +47,7 @@ class Module extends AbstractModule {
     bind(classOf[StcDataRequiredAction]).to(classOf[StcDataRequiredActionImpl])
     bind(classOf[SessionRepository]).to(classOf[SessionRepositoryImpl])
     bind(classOf[Navigator]).to(classOf[StfNavigator])
+    bind(classOf[PersistentNavigator]).to(classOf[StfNavigator])
     bind(classOf[SubmissionIdClient]).to(classOf[SubmissionIdClientImpl])
     bind(classOf[SaveAndReturnClient]).to(classOf[SaveAndReturnClientImpl])
     bind(classOf[AlfAddressConnector]).to(classOf[AlfAddressConnectorImpl])

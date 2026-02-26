@@ -36,12 +36,12 @@ class StfNavigatorSpec extends SpecBase with ScalaFutures {
 
     "in Normal mode" - {
 
-      "must go from a page that doesn't exist in the route map to Journey Recovery" in {
+      "must go from a page that doesn't exist in the route map to default page" in {
 
         case object UnknownPage extends Page
         val result = navigator.nextPage(UnknownPage, NormalMode, UserAnswers("id", submissionId))(fakeRequest)
         whenReady(result) { res =>
-          res mustBe routes.JourneyRecoveryController.onPageLoad()
+          res mustBe StfNavigator.defaultPage
         }
 
       }
