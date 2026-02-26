@@ -20,12 +20,12 @@ import base.SpecBase
 import base.stubs.StubAnswerPersistenceService
 import org.scalatest.concurrent.ScalaFutures
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.routes
-import uk.gov.hmrc.securitiestransferchargefrontend.controllers.individuals.routes as individualRoutes
+import uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.individuals.routes as individualRoutes
 import uk.gov.hmrc.securitiestransferchargefrontend.models.*
 import uk.gov.hmrc.securitiestransferchargefrontend.navigation.StfNavigator
 import uk.gov.hmrc.securitiestransferchargefrontend.pages.*
 import base.Fixtures
-import uk.gov.hmrc.securitiestransferchargefrontend.pages.individuals.{AmountPaidForSecuritiesPage, ApplyingForReliefPage, ChargingPointPage, ConfirmAddressPage, ConnectedPersonsPage, DetailsOfThisTransferPage, HowToNotifyAboutSecuritiesTransferPage, NameOfSellerPage, OtherSecuritiesTypePage, SecuritiesTargetPage, SellerAddressPage, StfBuyersAddressPage, TaxRatePage, WhatTypeOfSecuritiesPage}
+import uk.gov.hmrc.securitiestransferchargefrontend.pages.stf.individuals.{AmountPaidForSecuritiesPage, ApplyingForReliefPage, ChargingPointPage, ConfirmAddressPage, ConnectedPersonsPage, DetailsOfThisTransferPage, HowToNotifyAboutSecuritiesTransferPage, NameOfSellerPage, OtherSecuritiesTypePage, SecuritiesTargetPage, SellerAddressPage, StfBuyersAddressPage, TaxRatePage, WhatTypeOfSecuritiesPage}
 
 import java.time.LocalDate
 

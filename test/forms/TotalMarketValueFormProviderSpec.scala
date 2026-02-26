@@ -20,7 +20,7 @@ import uk.gov.hmrc.securitiestransferchargefrontend.config.CurrencyFormatter.cur
 import forms.behaviours.CurrencyFieldBehaviours
 import org.scalacheck.Gen
 import play.api.data.FormError
-import uk.gov.hmrc.securitiestransferchargefrontend.forms.individuals.TotalMarketValueFormProvider
+import uk.gov.hmrc.securitiestransferchargefrontend.forms.stf.individuals.TotalMarketValueFormProvider
 
 import scala.math.BigDecimal.RoundingMode
 

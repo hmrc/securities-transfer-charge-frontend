@@ -25,12 +25,12 @@ import play.api.mvc.{AnyContentAsEmpty, AnyContentAsFormUrlEncoded, Call}
 import play.api.test.FakeRequest
 import play.api.test.Helpers.*
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.routes
-import uk.gov.hmrc.securitiestransferchargefrontend.controllers.individuals.routes as individualRoutes
-import uk.gov.hmrc.securitiestransferchargefrontend.forms.individuals.ChargingPointFormProvider
+import uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.individuals.routes as individualRoutes
+import uk.gov.hmrc.securitiestransferchargefrontend.forms.stf.individuals.ChargingPointFormProvider
 import uk.gov.hmrc.securitiestransferchargefrontend.models.{NormalMode, UserAnswers}
-import uk.gov.hmrc.securitiestransferchargefrontend.pages.individuals.ChargingPointPage
+import uk.gov.hmrc.securitiestransferchargefrontend.pages.stf.individuals.ChargingPointPage
 import uk.gov.hmrc.securitiestransferchargefrontend.repositories.SessionRepository
-import uk.gov.hmrc.securitiestransferchargefrontend.views.html.individuals.ChargingPointView
+import uk.gov.hmrc.securitiestransferchargefrontend.views.html.stf.individuals.ChargingPointView
 
 import java.time.{LocalDate, ZoneOffset}
 import scala.concurrent.Future

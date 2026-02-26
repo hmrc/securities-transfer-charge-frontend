@@ -22,11 +22,11 @@ import play.api.mvc.Call
 import play.api.test.FakeRequest
 import play.api.test.Helpers.*
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.routes
-import uk.gov.hmrc.securitiestransferchargefrontend.controllers.individuals.routes as individualRoutes
-import uk.gov.hmrc.securitiestransferchargefrontend.forms.individuals.AmountPaidForSecuritiesFormProvider
+import uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.individuals.routes as individualRoutes
+import uk.gov.hmrc.securitiestransferchargefrontend.forms.stf.individuals.AmountPaidForSecuritiesFormProvider
 import uk.gov.hmrc.securitiestransferchargefrontend.models.{NormalMode, UserAnswers}
-import uk.gov.hmrc.securitiestransferchargefrontend.pages.individuals.AmountPaidForSecuritiesPage
-import uk.gov.hmrc.securitiestransferchargefrontend.views.html.individuals.AmountPaidForSecuritiesView
+import uk.gov.hmrc.securitiestransferchargefrontend.pages.stf.individuals.AmountPaidForSecuritiesPage
+import uk.gov.hmrc.securitiestransferchargefrontend.views.html.stf.individuals.AmountPaidForSecuritiesView
 
 class AmountPaidForSecuritiesControllerSpec extends SpecBase with MockitoSugar {
 

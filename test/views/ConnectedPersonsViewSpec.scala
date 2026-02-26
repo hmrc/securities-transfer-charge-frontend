@@ -19,9 +19,9 @@ package views
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
 import play.api.Application
-import uk.gov.hmrc.securitiestransferchargefrontend.forms.individuals.ConnectedPersonsFormProvider
+import uk.gov.hmrc.securitiestransferchargefrontend.forms.stf.individuals.ConnectedPersonsFormProvider
 import uk.gov.hmrc.securitiestransferchargefrontend.models.NormalMode
-import uk.gov.hmrc.securitiestransferchargefrontend.views.html.individuals.ConnectedPersonsView
+import uk.gov.hmrc.securitiestransferchargefrontend.views.html.stf.individuals.ConnectedPersonsView
 
 class ConnectedPersonsViewSpec extends ViewBaseSpec {
 

@@ -18,9 +18,9 @@ package uk.gov.hmrc.securitiestransferchargefrontend.viewmodels
 
 import play.api.i18n.{Lang, Messages}
 import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.SummaryListRow
-import uk.gov.hmrc.securitiestransferchargefrontend.controllers.individuals.routes
+import uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.individuals.routes
 import uk.gov.hmrc.securitiestransferchargefrontend.models.{CheckMode, UserAnswers}
-import uk.gov.hmrc.securitiestransferchargefrontend.pages.individuals.ChargingPointPage
+import uk.gov.hmrc.securitiestransferchargefrontend.pages.stf.individuals.ChargingPointPage
 import uk.gov.hmrc.securitiestransferchargefrontend.utils.DateTimeFormats.dateTimeFormat
 import uk.gov.hmrc.securitiestransferchargefrontend.viewmodels.govuk.summarylist.*
 import uk.gov.hmrc.securitiestransferchargefrontend.viewmodels.implicits.*

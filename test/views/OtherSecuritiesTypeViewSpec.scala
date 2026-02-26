@@ -19,9 +19,9 @@ package views
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
 import play.api.Application
-import uk.gov.hmrc.securitiestransferchargefrontend.forms.individuals.OtherSecuritiesTypeFormProvider
+import uk.gov.hmrc.securitiestransferchargefrontend.forms.stf.individuals.OtherSecuritiesTypeFormProvider
 import uk.gov.hmrc.securitiestransferchargefrontend.models.NormalMode
-import uk.gov.hmrc.securitiestransferchargefrontend.views.html.individuals.OtherSecuritiesTypeView
+import uk.gov.hmrc.securitiestransferchargefrontend.views.html.stf.individuals.OtherSecuritiesTypeView
 
 
 class OtherSecuritiesTypeViewSpec extends ViewBaseSpec {

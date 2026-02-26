@@ -19,9 +19,9 @@ package views
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
 import play.api.Application
-import uk.gov.hmrc.securitiestransferchargefrontend.forms.individuals.WhatReliefAreYouApplyingForFormProvider
+import uk.gov.hmrc.securitiestransferchargefrontend.forms.stf.individuals.WhatReliefAreYouApplyingForFormProvider
 import uk.gov.hmrc.securitiestransferchargefrontend.models.{NormalMode, ReliefsDataSource}
-import uk.gov.hmrc.securitiestransferchargefrontend.views.html.individuals.WhatReliefAreYouApplyingForView
+import uk.gov.hmrc.securitiestransferchargefrontend.views.html.stf.individuals.WhatReliefAreYouApplyingForView
 
 
 class WhatReliefAreYouApplyingForViewSpec extends ViewBaseSpec {
