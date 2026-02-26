@@ -20,11 +20,12 @@ import base.SpecBase
 import base.stubs.StubAnswerPersistenceService
 import org.scalatest.concurrent.ScalaFutures
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.routes
-import uk.gov.hmrc.securitiestransferchargefrontend.controllers.seller.routes.StfSellerAddressController
+import uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.individuals.routes as individualRoutes
 import uk.gov.hmrc.securitiestransferchargefrontend.models.*
 import uk.gov.hmrc.securitiestransferchargefrontend.navigation.StfNavigator
 import uk.gov.hmrc.securitiestransferchargefrontend.pages.*
 import base.Fixtures
+import uk.gov.hmrc.securitiestransferchargefrontend.pages.stf.individuals.{AmountPaidForSecuritiesPage, ApplyingForReliefPage, ChargingPointPage, ConfirmAddressPage, ConnectedPersonsPage, DetailsOfThisTransferPage, HowToNotifyAboutSecuritiesTransferPage, NameOfSellerPage, OtherSecuritiesTypePage, SecuritiesTargetPage, SellerAddressPage, StfBuyersAddressPage, TaxRatePage, WhatTypeOfSecuritiesPage}
 
 import java.time.LocalDate
 
@@ -50,7 +51,7 @@ class StfNavigatorSpec extends SpecBase with ScalaFutures {
         val answers = emptyUserAnswers.set(HowToNotifyAboutSecuritiesTransferPage, HowToNotifyAboutSecuritiesTransfer.OneAtATime).get
         val result = navigator.nextPage(HowToNotifyAboutSecuritiesTransferPage, NormalMode, answers)(fakeRequest)
         whenReady(result) { res =>
-          res mustBe routes.ConfirmAddressController.onPageLoad()
+          res mustBe individualRoutes.ConfirmAddressController.onPageLoad()
         }
       }
 
@@ -58,7 +59,7 @@ class StfNavigatorSpec extends SpecBase with ScalaFutures {
         val answers = emptyUserAnswers.set(ConfirmAddressPage, Fixtures.confirmableAddress).get
         val result = navigator.nextPage(ConfirmAddressPage, NormalMode, answers)(fakeRequest)
         whenReady(result) { res =>
-          res mustBe routes.NameOfSellerController.onPageLoad(NormalMode)
+          res mustBe individualRoutes.NameOfSellerController.onPageLoad(NormalMode)
         }
       }
 
@@ -66,7 +67,7 @@ class StfNavigatorSpec extends SpecBase with ScalaFutures {
         val answers = emptyUserAnswers.set(NameOfSellerPage, "John").get
         val result = navigator.nextPage(NameOfSellerPage, NormalMode, answers)(fakeRequest)
         whenReady(result) { res =>
-          res mustBe StfSellerAddressController.onPageLoad()
+          res mustBe individualRoutes.StfSellerAddressController.onPageLoad()
         }
       }
 
@@ -74,7 +75,7 @@ class StfNavigatorSpec extends SpecBase with ScalaFutures {
         val answers = emptyUserAnswers.set(StfBuyersAddressPage, Fixtures.fakeAlfConfirmedAddress).get
         val result = navigator.nextPage(StfBuyersAddressPage, NormalMode, answers)(fakeRequest)
         whenReady(result) { res =>
-          res mustBe routes.NameOfSellerController.onPageLoad(NormalMode)
+          res mustBe individualRoutes.NameOfSellerController.onPageLoad(NormalMode)
         }
       }
 
@@ -82,7 +83,7 @@ class StfNavigatorSpec extends SpecBase with ScalaFutures {
         val answers = emptyUserAnswers.set(SellerAddressPage, Fixtures.fakeAlfConfirmedAddress).get
         val result = navigator.nextPage(SellerAddressPage, NormalMode, answers)(fakeRequest)
         whenReady(result) { res =>
-          res mustBe routes.ConnectedPersonsController.onPageLoad(NormalMode)
+          res mustBe individualRoutes.ConnectedPersonsController.onPageLoad(NormalMode)
         }
       }
 
@@ -90,7 +91,7 @@ class StfNavigatorSpec extends SpecBase with ScalaFutures {
         val answers = emptyUserAnswers.set(ConnectedPersonsPage, true).get
         val result = navigator.nextPage(ConnectedPersonsPage, NormalMode, answers)(fakeRequest)
         whenReady(result) { res =>
-          res mustBe routes.ApplyingForReliefController.onPageLoad(NormalMode)
+          res mustBe individualRoutes.ApplyingForReliefController.onPageLoad(NormalMode)
         }
       }
 
@@ -98,7 +99,7 @@ class StfNavigatorSpec extends SpecBase with ScalaFutures {
         val answers = emptyUserAnswers.set(ApplyingForReliefPage, true).get
         val result = navigator.nextPage(ApplyingForReliefPage, NormalMode, answers)(fakeRequest)
         whenReady(result) { res =>
-          res mustBe routes.WhatReliefAreYouApplyingForController.onPageLoad(NormalMode)
+          res mustBe individualRoutes.WhatReliefAreYouApplyingForController.onPageLoad(NormalMode)
         }
       }
 
@@ -106,7 +107,7 @@ class StfNavigatorSpec extends SpecBase with ScalaFutures {
         val answers = emptyUserAnswers.set(ApplyingForReliefPage, false).get
         val result = navigator.nextPage(ApplyingForReliefPage, NormalMode, answers)(fakeRequest)
         whenReady(result) { res =>
-          res mustBe routes.SecuritiesTargetController.onPageLoad(NormalMode)
+          res mustBe individualRoutes.SecuritiesTargetController.onPageLoad(NormalMode)
         }
       }
 
@@ -114,7 +115,7 @@ class StfNavigatorSpec extends SpecBase with ScalaFutures {
         val answers = emptyUserAnswers.set(SecuritiesTargetPage, SecuritiesTarget("Business 1",Some("12345678"))).get
         val result = navigator.nextPage(SecuritiesTargetPage, NormalMode, answers)(fakeRequest)
         whenReady(result) { res =>
-          res mustBe routes.ChargingPointController.onPageLoad(NormalMode)
+          res mustBe individualRoutes.ChargingPointController.onPageLoad(NormalMode)
         }
       }
 
@@ -122,7 +123,7 @@ class StfNavigatorSpec extends SpecBase with ScalaFutures {
         val answers = emptyUserAnswers.set(ChargingPointPage, LocalDate.now()).get
         val result = navigator.nextPage(ChargingPointPage, NormalMode, answers)(fakeRequest)
         whenReady(result) { res =>
-          res mustBe routes.TaxRateController.onPageLoad(NormalMode)
+          res mustBe individualRoutes.TaxRateController.onPageLoad(NormalMode)
         }
       }
 
@@ -130,7 +131,7 @@ class StfNavigatorSpec extends SpecBase with ScalaFutures {
         val answers = emptyUserAnswers.set(TaxRatePage, TaxRate.Half).get
         val result = navigator.nextPage(TaxRatePage, NormalMode, answers)(fakeRequest)
         whenReady(result) { res =>
-          res mustBe routes.WhatTypeOfSecuritiesController.onPageLoad(NormalMode)
+          res mustBe individualRoutes.WhatTypeOfSecuritiesController.onPageLoad(NormalMode)
         }
       }
 
@@ -138,7 +139,7 @@ class StfNavigatorSpec extends SpecBase with ScalaFutures {
         val answers = emptyUserAnswers.set(WhatTypeOfSecuritiesPage, WhatTypeOfSecurities.Shares).get
         val result = navigator.nextPage(WhatTypeOfSecuritiesPage, NormalMode, answers)(fakeRequest)
         whenReady(result) { res =>
-          res mustBe routes.DetailsOfThisTransferController.onPageLoad(NormalMode)
+          res mustBe individualRoutes.DetailsOfThisTransferController.onPageLoad(NormalMode)
         }
       }
 
@@ -146,7 +147,7 @@ class StfNavigatorSpec extends SpecBase with ScalaFutures {
         val answers = emptyUserAnswers.set(WhatTypeOfSecuritiesPage, WhatTypeOfSecurities.Other).get
         val result = navigator.nextPage(WhatTypeOfSecuritiesPage, NormalMode, answers)(fakeRequest)
         whenReady(result) { res =>
-          res mustBe routes.OtherSecuritiesTypeController.onPageLoad(NormalMode)
+          res mustBe individualRoutes.OtherSecuritiesTypeController.onPageLoad(NormalMode)
         }
       }
 
@@ -154,7 +155,7 @@ class StfNavigatorSpec extends SpecBase with ScalaFutures {
         val answers = emptyUserAnswers.set(OtherSecuritiesTypePage, "bonds").get
         val result = navigator.nextPage(OtherSecuritiesTypePage, NormalMode, answers)(fakeRequest)
         whenReady(result) { res =>
-          res mustBe routes.AmountPaidForSecuritiesController.onPageLoad(NormalMode)
+          res mustBe individualRoutes.AmountPaidForSecuritiesController.onPageLoad(NormalMode)
         }
       }
 
@@ -163,7 +164,7 @@ class StfNavigatorSpec extends SpecBase with ScalaFutures {
         val updated = answers.set(ConnectedPersonsPage,true).get
         val result = navigator.nextPage(AmountPaidForSecuritiesPage, NormalMode, updated)(fakeRequest)
         whenReady(result) { res =>
-          res mustBe routes.TotalMarketValueController.onPageLoad(NormalMode)
+          res mustBe individualRoutes.TotalMarketValueController.onPageLoad(NormalMode)
         }
       }
 

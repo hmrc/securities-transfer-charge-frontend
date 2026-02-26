@@ -22,6 +22,7 @@ import play.api.mvc.{Call, Request}
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.play.http.HeaderCarrierConverter
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.routes
+import uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.individuals.{routes => individualRoutes}
 import uk.gov.hmrc.securitiestransferchargefrontend.domain.SubmissionId
 import uk.gov.hmrc.securitiestransferchargefrontend.models.{Mode, NormalMode, UserAnswers}
 import uk.gov.hmrc.securitiestransferchargefrontend.pages.Page
@@ -88,7 +89,7 @@ abstract class AbstractNavigator(answerPersistenceService: AnswerPersistenceServ
   }
   
 object Navigator:
-  val startPage: Call = routes.HowToNotifyAboutSecuritiesTransferController.onPageLoad(NormalMode)
+  val startPage: Call = individualRoutes.HowToNotifyAboutSecuritiesTransferController.onPageLoad(NormalMode)
   val defaultPage: Call = routes.JourneyRecoveryController.onPageLoad()
   val defaultPageF: Future[Call] = Future.successful(defaultPage)
   val errorPages: Seq[Call] = List(defaultPage)
