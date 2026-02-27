@@ -107,3 +107,7 @@ POST       /stf/org/confirm-address                       uk.gov.hmrc.securities
 
 GET        /stf/org/address                                      uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.organisations.AddressController.onPageLoad()
 GET        /stf/org/address/return                               uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.organisations.AddressController.onReturn(id: String)
+GET        /stf/org/connected-persons                        uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.organisations.ConnectedPersonsController.onPageLoad(mode: Mode = NormalMode)
+POST       /stf/org/connected-persons                        uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.organisations.ConnectedPersonsController.onSubmit(mode: Mode = NormalMode)
+GET        /stf/org/change/connected-persons                  uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.organisations.ConnectedPersonsController.onPageLoad(mode: Mode = CheckMode)
+POST       /stf/org/change/connected-persons                  uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.organisations.ConnectedPersonsController.onSubmit(mode: Mode = CheckMode)
