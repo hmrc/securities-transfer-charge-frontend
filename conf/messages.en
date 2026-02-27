@@ -219,3 +219,13 @@ detailsOfThisTransfer.error.marketValue.outOfRange = Enter an amount between £{
 detailsOfThisTransfer.error.numberOfShares.length = Number of shares must be 100 characters or less
 detailsOfThisTransfer.error.typeOfShares.length = Type or class of shares must be 100 characters or less
 detailsOfThisTransfer.change.hidden = Change what are the details of this transfer
+
+orgs.howToNotifyAboutSecuritiesTransfer.title = How do you want to tell us about your securities transfers?
+orgs.howToNotifyAboutSecuritiesTransfer.heading = How do you want to tell us about your securities transfers?
+orgs.howToNotifyAboutSecuritiesTransfer.oneAtATime = One at a time
+orgs.howToNotifyAboutSecuritiesTransfer.oneAtATime.hint = Each transfer can have one seller, and can include one type of security or type of shares.
+orgs.howToNotifyAboutSecuritiesTransfer.moreThanOneAtATime = More than one at a time
+orgs.howToNotifyAboutSecuritiesTransfer.moreThanOneAtATime.hint = Download the template, complete it using one row per transfer, and upload it on the following pages. You can then find the submission on your dashboard and pay the charges due.
+orgs.howToNotifyAboutSecuritiesTransfer.checkYourAnswersLabel = How do you want to tell us about your securities transfers?
+orgs.howToNotifyAboutSecuritiesTransfer.error.required = Select a way to tell us about your securities transfer
+orgs.howToNotifyAboutSecuritiesTransfer.change.hidden = HowToNotifyAboutSecuritiesTransfer

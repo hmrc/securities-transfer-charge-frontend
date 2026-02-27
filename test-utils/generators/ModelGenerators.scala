@@ -21,6 +21,11 @@ import uk.gov.hmrc.securitiestransferchargefrontend.models.{DetailsOfThisTransfe
 
 trait ModelGenerators {
 
+  implicit lazy val arbitraryHowToNotifyAboutSecuritiesTransfer: Arbitrary[HowToNotifyAboutSecuritiesTransfer] =
+    Arbitrary {
+      Gen.oneOf(HowToNotifyAboutSecuritiesTransfer.values.toSeq)
+    }
+
   implicit lazy val arbitraryDetailsOfThisTransfer: Arbitrary[DetailsOfThisTransfer] =
     Arbitrary {
       for {
