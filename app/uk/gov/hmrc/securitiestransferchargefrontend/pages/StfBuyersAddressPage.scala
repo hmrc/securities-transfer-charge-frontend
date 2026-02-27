@@ -14,15 +14,9 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.securitiestransferchargefrontend.pages.stf.individuals
+package uk.gov.hmrc.securitiestransferchargefrontend.pages
 
-import play.api.libs.json.JsPath
-import uk.gov.hmrc.securitiestransferchargefrontend.models.WhatTypeOfSecurities
-import uk.gov.hmrc.securitiestransferchargefrontend.pages.QuestionPage
+import uk.gov.hmrc.securitiestransferchargefrontend.pages.AddressPage
 
-case object WhatTypeOfSecuritiesPage extends QuestionPage[WhatTypeOfSecurities] {
-
-  override def path: JsPath = JsPath \ toString
-
-  override def toString: String = "whatTypeOfSecurities"
-}
+case object StfBuyersAddressPage extends AddressPage
+ 

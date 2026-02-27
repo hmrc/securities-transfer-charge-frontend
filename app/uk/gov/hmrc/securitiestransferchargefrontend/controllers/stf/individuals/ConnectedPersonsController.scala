@@ -24,15 +24,15 @@ import uk.gov.hmrc.securitiestransferchargefrontend.controllers.actions.*
 import uk.gov.hmrc.securitiestransferchargefrontend.forms.stf.individuals.ConnectedPersonsFormProvider
 import uk.gov.hmrc.securitiestransferchargefrontend.models.Mode
 import uk.gov.hmrc.securitiestransferchargefrontend.navigation.Navigator
-import uk.gov.hmrc.securitiestransferchargefrontend.pages.stf.individuals.ConnectedPersonsPage
+import uk.gov.hmrc.securitiestransferchargefrontend.pages.ConnectedPersonsPage
 import uk.gov.hmrc.securitiestransferchargefrontend.views.html.stf.individuals.ConnectedPersonsView
 
-import javax.inject.Inject
+import javax.inject.{Inject, Named}
 import scala.concurrent.{ExecutionContext, Future}
 
 class ConnectedPersonsController @Inject()(
                                             override val messagesApi: MessagesApi,
-                                            navigator: Navigator,
+                                            @Named("individuals") navigator: Navigator,
                                             stcAuthEnrolled: StcAuthEnrolledAction,
                                             getData: StcDataRetrievalAction,
                                             requireData: StcDataRequiredAction,

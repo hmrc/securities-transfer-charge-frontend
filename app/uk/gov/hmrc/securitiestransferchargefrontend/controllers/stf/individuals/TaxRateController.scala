@@ -24,15 +24,15 @@ import uk.gov.hmrc.securitiestransferchargefrontend.controllers.actions.*
 import uk.gov.hmrc.securitiestransferchargefrontend.forms.stf.individuals.TaxRateFormProvider
 import uk.gov.hmrc.securitiestransferchargefrontend.models.{Mode, TaxRate}
 import uk.gov.hmrc.securitiestransferchargefrontend.navigation.Navigator
-import uk.gov.hmrc.securitiestransferchargefrontend.pages.stf.individuals.TaxRatePage
+import uk.gov.hmrc.securitiestransferchargefrontend.pages.TaxRatePage
 import uk.gov.hmrc.securitiestransferchargefrontend.views.html.stf.individuals.TaxRateView
 
-import javax.inject.Inject
+import javax.inject.{Inject, Named}
 import scala.concurrent.{ExecutionContext, Future}
 
 class TaxRateController @Inject()(
                                        override val messagesApi: MessagesApi,
-                                       navigator: Navigator,
+                                       @Named("individuals") navigator: Navigator,
                                        stcAuthEnrolled: StcAuthEnrolledAction,
                                        getData: StcDataRetrievalAction,
                                        requireData: StcDataRequiredAction,
