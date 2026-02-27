@@ -17,16 +17,17 @@
 package uk.gov.hmrc.securitiestransferchargefrontend.config
 
 import com.google.inject.AbstractModule
+import com.google.inject.name.Names
 import play.api.http.HttpErrorHandler
 import uk.gov.hmrc.securitiestransferchargefrontend.clients.registration.{RegistrationClient, RegistrationClientImpl}
-import uk.gov.hmrc.securitiestransferchargefrontend.connectors.{AlfAddressConnector, AlfAddressConnectorImpl, AlfConfigLoader, AlfConfigLoaderImpl, SubscriptionConnector, SubscriptionConnectorImpl}
 import uk.gov.hmrc.securitiestransferchargefrontend.clients.{SaveAndReturnClient, SaveAndReturnClientImpl, SubmissionIdClient, SubmissionIdClientImpl}
+import uk.gov.hmrc.securitiestransferchargefrontend.connectors.*
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.actions.*
 import uk.gov.hmrc.securitiestransferchargefrontend.handlers.ErrorHandler
 import uk.gov.hmrc.securitiestransferchargefrontend.navigation.stf.individuals.StfNavigator
-import uk.gov.hmrc.securitiestransferchargefrontend.repositories.{SubscriptionDataRepository, SubscriptionDataRepositoryImpl}
+import uk.gov.hmrc.securitiestransferchargefrontend.navigation.stf.organisations.StfOrgNavigator
 import uk.gov.hmrc.securitiestransferchargefrontend.navigation.{Navigator, PersistentNavigator}
-import uk.gov.hmrc.securitiestransferchargefrontend.repositories.{SessionRepository, SessionRepositoryImpl}
+import uk.gov.hmrc.securitiestransferchargefrontend.repositories.{SessionRepository, SessionRepositoryImpl, SubscriptionDataRepository, SubscriptionDataRepositoryImpl}
 import uk.gov.hmrc.securitiestransferchargefrontend.services.*
 
 import java.time.{Clock, ZoneOffset}
@@ -47,8 +48,6 @@ class Module extends AbstractModule {
     bind(classOf[StcDataRetrievalAction]).to(classOf[StcDataRetrievalActionImpl])
     bind(classOf[StcDataRequiredAction]).to(classOf[StcDataRequiredActionImpl])
     bind(classOf[SessionRepository]).to(classOf[SessionRepositoryImpl])
-    bind(classOf[Navigator]).to(classOf[StfNavigator])
-    bind(classOf[PersistentNavigator]).to(classOf[StfNavigator])
     bind(classOf[SubmissionIdClient]).to(classOf[SubmissionIdClientImpl])
     bind(classOf[SaveAndReturnClient]).to(classOf[SaveAndReturnClientImpl])
     bind(classOf[AlfAddressConnector]).to(classOf[AlfAddressConnectorImpl])
@@ -59,5 +58,17 @@ class Module extends AbstractModule {
     bind(classOf[SubscriptionConnector]).to(classOf[SubscriptionConnectorImpl])
     bind(classOf[RegistrationClient]).to(classOf[RegistrationClientImpl]).asEagerSingleton()
     bind(classOf[AnswerPersistenceService]).to(classOf[AnswerPersistenceServiceImpl])
+    bind(classOf[Navigator])
+      .annotatedWith(Names.named("organisations"))
+      .to(classOf[StfOrgNavigator])
+    bind(classOf[PersistentNavigator])
+      .annotatedWith(Names.named("organisations"))
+      .to(classOf[StfOrgNavigator])
+    bind(classOf[Navigator])
+      .annotatedWith(Names.named("individuals"))
+      .to(classOf[StfNavigator])
+    bind(classOf[PersistentNavigator])
+      .annotatedWith(Names.named("individuals"))
+      .to(classOf[StfNavigator])
   }
 }

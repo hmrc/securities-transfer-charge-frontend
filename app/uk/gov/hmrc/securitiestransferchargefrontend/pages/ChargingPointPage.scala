@@ -16,9 +16,10 @@
 
 package uk.gov.hmrc.securitiestransferchargefrontend.pages
 
-import java.time.LocalDate
-
 import play.api.libs.json.JsPath
+import uk.gov.hmrc.securitiestransferchargefrontend.pages.QuestionPage
+
+import java.time.LocalDate
 
 case object ChargingPointPage extends QuestionPage[LocalDate] {
 

@@ -24,13 +24,13 @@ import uk.gov.hmrc.securitiestransferchargefrontend.domain.SubmissionId
 import uk.gov.hmrc.securitiestransferchargefrontend.navigation.PersistentNavigator
 import uk.gov.hmrc.securitiestransferchargefrontend.navigation.stf.individuals.StfNavigator
 
-import javax.inject.Inject
+import javax.inject.{Inject, Named}
 import scala.concurrent.ExecutionContext
 
 class SaveAndReturnController @Inject()( override val messagesApi: MessagesApi,
                                          val controllerComponents: MessagesControllerComponents,
                                          stcAuthEnrolled: StcAuthEnrolledAction,
-                                         navigator: PersistentNavigator)
+                                         @Named("individuals") navigator: PersistentNavigator)
                                        ( implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport:
 
   def restore(submissionId: String): Action[AnyContent] =

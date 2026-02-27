@@ -19,7 +19,7 @@ package uk.gov.hmrc.securitiestransferchargefrontend.navigation.stf.individuals
 import play.api.mvc.Call
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.routes
-import uk.gov.hmrc.securitiestransferchargefrontend.controllers.seller.routes as sellerRoutes
+import uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.individuals.routes as individualRoutes
 import uk.gov.hmrc.securitiestransferchargefrontend.models.HowToNotifyAboutSecuritiesTransfer.{MoreThanOneAtATime, OneAtATime}
 import uk.gov.hmrc.securitiestransferchargefrontend.models.{NormalMode, UserAnswers, WhatTypeOfSecurities}
 import uk.gov.hmrc.securitiestransferchargefrontend.navigation.*
@@ -37,40 +37,41 @@ class ForwardRoutes(answerPersistenceService: AnswerPersistenceService)
 
   def forwardRoutes(page: Page)(implicit hc: HeaderCarrier): UserAnswers => Future[Call] = page match {
 
-    case SubmissionsDashboardPage => userAnswers => goTo(routes.HowToNotifyAboutSecuritiesTransferController.onPageLoad(NormalMode), Some(userAnswers))
+    case SubmissionsDashboardPage => userAnswers => goTo(individualRoutes.HowToNotifyAboutSecuritiesTransferController.onPageLoad(NormalMode), Some(userAnswers))
     case HowToNotifyAboutSecuritiesTransferPage => userAnswers => {
       dataDependent(HowToNotifyAboutSecuritiesTransferPage, userAnswers) {
-        case OneAtATime => routes.ConfirmAddressController.onPageLoad()
+        case OneAtATime => individualRoutes.ConfirmAddressController.onPageLoad()
         case MoreThanOneAtATime => StfNavigator.defaultPage
       }
     }
-    case ConfirmAddressPage => userAnswers => dataRequired(ConfirmAddressPage, userAnswers, routes.NameOfSellerController.onPageLoad(NormalMode))
-    case StfBuyersAddressPage => userAnswers => dataRequired(StfBuyersAddressPage, userAnswers, routes.NameOfSellerController.onPageLoad(NormalMode))
-    case NameOfSellerPage => userAnswers => dataRequired(NameOfSellerPage, userAnswers, sellerRoutes.StfSellerAddressController.onPageLoad())
-    case SellerAddressPage => userAnswers => dataRequired(SellerAddressPage, userAnswers, routes.ConnectedPersonsController.onPageLoad(NormalMode))
-    case ConnectedPersonsPage => userAnswers => dataRequired(ConnectedPersonsPage, userAnswers, routes.ApplyingForReliefController.onPageLoad(NormalMode))
+    case ConfirmAddressPage => userAnswers => dataRequired(ConfirmAddressPage, userAnswers, individualRoutes.NameOfSellerController.onPageLoad(NormalMode))
+    case StfBuyersAddressPage => userAnswers => dataRequired(StfBuyersAddressPage, userAnswers, individualRoutes.NameOfSellerController.onPageLoad(NormalMode))
+    case NameOfSellerPage => userAnswers => dataRequired(NameOfSellerPage, userAnswers, individualRoutes.StfSellerAddressController.onPageLoad())
+    case SellerAddressPage => userAnswers => dataRequired(SellerAddressPage, userAnswers, individualRoutes.ConnectedPersonsController.onPageLoad(NormalMode))
+    case ConnectedPersonsPage => userAnswers => dataRequired(ConnectedPersonsPage, userAnswers, individualRoutes.ApplyingForReliefController.onPageLoad(NormalMode))
     case ApplyingForReliefPage => userAnswers =>
       dataDependent(ApplyingForReliefPage, userAnswers) {
-        case true => routes.WhatReliefAreYouApplyingForController.onPageLoad(NormalMode)
-        case false => routes.SecuritiesTargetController.onPageLoad(NormalMode)
+        case true => individualRoutes.WhatReliefAreYouApplyingForController.onPageLoad(NormalMode)
+        case false => individualRoutes.SecuritiesTargetController.onPageLoad(NormalMode)
       }
-    case WhatReliefAreYouApplyingForPage => userAnswers => dataRequired(WhatReliefAreYouApplyingForPage, userAnswers, routes.SecuritiesTargetController.onPageLoad(NormalMode))
-    case SecuritiesTargetPage => userAnswers => dataRequired(SecuritiesTargetPage, userAnswers, routes.ChargingPointController.onPageLoad(NormalMode))
-    case ChargingPointPage => userAnswers => dataRequired(ChargingPointPage, userAnswers, routes.TaxRateController.onPageLoad(NormalMode))
-    case TaxRatePage => userAnswers => dataRequired(TaxRatePage, userAnswers, routes.WhatTypeOfSecuritiesController.onPageLoad(NormalMode))
+    case WhatReliefAreYouApplyingForPage => userAnswers => dataRequired(WhatReliefAreYouApplyingForPage, userAnswers, individualRoutes.SecuritiesTargetController.onPageLoad(NormalMode))
+    case SecuritiesTargetPage => userAnswers => dataRequired(SecuritiesTargetPage, userAnswers, individualRoutes.ChargingPointController.onPageLoad(NormalMode))
+    case ChargingPointPage => userAnswers => dataRequired(ChargingPointPage, userAnswers, individualRoutes.TaxRateController.onPageLoad(NormalMode))
+    case TaxRatePage => userAnswers => dataRequired(TaxRatePage, userAnswers, individualRoutes.WhatTypeOfSecuritiesController.onPageLoad(NormalMode))
+    case OtherSecuritiesTypePage => userAnswers => dataRequired(OtherSecuritiesTypePage, userAnswers, individualRoutes.AmountPaidForSecuritiesController.onPageLoad(NormalMode))
+
     case WhatTypeOfSecuritiesPage => userAnswers =>
       dataDependent(WhatTypeOfSecuritiesPage, userAnswers) {
-        case WhatTypeOfSecurities.Shares => routes.DetailsOfThisTransferController.onPageLoad(NormalMode)
-        case WhatTypeOfSecurities.Other => routes.OtherSecuritiesTypeController.onPageLoad(NormalMode)
+        case WhatTypeOfSecurities.Shares => individualRoutes.DetailsOfThisTransferController.onPageLoad(NormalMode)
+        case WhatTypeOfSecurities.Other => individualRoutes.OtherSecuritiesTypeController.onPageLoad(NormalMode)
       }
     case DetailsOfThisTransferPage => userAnswers => dataRequired(DetailsOfThisTransferPage, userAnswers, routes.CheckYourAnswersController.onPageLoad())
-    case OtherSecuritiesTypePage => userAnswers => dataRequired(OtherSecuritiesTypePage, userAnswers, routes.AmountPaidForSecuritiesController.onPageLoad(NormalMode))
     case AmountPaidForSecuritiesPage => userAnswers =>
       userAnswersDependent(userAnswers) {
         userAnswers =>
           userAnswers.get(ConnectedPersonsPage).fold(StfNavigator.defaultPage) {
             isConnected =>
-              if (isConnected) routes.TotalMarketValueController.onPageLoad(NormalMode)
+              if (isConnected) individualRoutes.TotalMarketValueController.onPageLoad(NormalMode)
               else routes.CheckYourAnswersController.onPageLoad()
           }
       }

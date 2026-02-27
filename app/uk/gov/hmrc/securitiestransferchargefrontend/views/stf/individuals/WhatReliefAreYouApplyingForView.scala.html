@@ -1,0 +1,70 @@
+@*
+ * Copyright 2026 HM Revenue & Customs
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *@
+
+@import uk.gov.hmrc.securitiestransferchargefrontend.viewmodels.LabelSize.Large
+@import uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.individuals.routes.WhatReliefAreYouApplyingForController
+@import uk.gov.hmrc.hmrcfrontend.views.html.helpers.HmrcNewTabLinkHelper
+@import uk.gov.hmrc.hmrcfrontend.views.viewmodels.newtablinkhelper.NewTabLinkHelper
+@import uk.gov.hmrc.securitiestransferchargefrontend.views.ViewHelper
+@import uk.gov.hmrc.securitiestransferchargefrontend.views.html.templates
+@import uk.gov.hmrc.govukfrontend.views.viewmodels.errormessage._
+@import uk.gov.hmrc.govukfrontend.views.Implicits.RichSelect
+@import uk.gov.hmrc.securitiestransferchargefrontend.models.Relief
+@import uk.gov.hmrc.securitiestransferchargefrontend.views.html.components.SaveAndReturnButton
+
+
+
+@this(
+  layout: templates.Layout,
+  formHelper: FormWithCSRF,
+  govukErrorSummary: GovukErrorSummary,
+  govukSelect: GovukSelect,
+  govukButton: GovukButton,
+  hmrcNewTabLinkHelper: HmrcNewTabLinkHelper,
+  saveAndReturnButton:SaveAndReturnButton
+)
+
+@(form: Form[_], mode: Mode, reliefs: Seq[Relief], backLinkCall: Call)(implicit request: Request[_], messages: Messages)
+
+@link = @{ hmrcNewTabLinkHelper(NewTabLinkHelper(
+    text = messages("whatReliefAreYouApplyingFor.details.content.link.text")
+)) }
+
+@layout(
+    pageTitle = title(form, messages("whatReliefAreYouApplyingFor.title"), Some(messages("sectionTitle.transferDetails"))),
+    backLinkUrl = Some(backLinkCall.url)
+) {
+
+  @formHelper(action = WhatReliefAreYouApplyingForController.onSubmit(mode)) {
+
+    @if(form.errors.nonEmpty) {
+      @govukErrorSummary(ErrorSummaryViewModel(form))
+    }
+    <span  class="govuk-caption-l">@messages("transfer.details.caption")</span>
+    @govukSelect(Select(
+          id = form("reliefs").id,
+          name = form("reliefs").name,
+          label = Label(content = HtmlContent(messages("whatReliefAreYouApplyingFor.heading"))).asPageHeading(Large),
+          items = ViewHelper.reliefsToSelectItems(reliefs, form),
+    hint = Some(Hint(content = HtmlContent(s"<p class='govuk-hint'>${messages("whatReliefAreYouApplyingFor.p")} $link</p>")))
+      ).asAccessibleAutocomplete().withFormField(form("reliefs")))
+
+    @govukButton(ButtonViewModel(messages("site.save-and-continue.button")))
+
+    @saveAndReturnButton()
+
+  }
+}

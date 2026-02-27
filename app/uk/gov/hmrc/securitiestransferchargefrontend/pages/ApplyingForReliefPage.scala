@@ -17,6 +17,7 @@
 package uk.gov.hmrc.securitiestransferchargefrontend.pages
 
 import play.api.libs.json.JsPath
+import uk.gov.hmrc.securitiestransferchargefrontend.pages.QuestionPage
 
 case object ApplyingForReliefPage extends QuestionPage[Boolean] {
 

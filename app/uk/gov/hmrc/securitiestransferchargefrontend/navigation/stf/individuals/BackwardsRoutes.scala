@@ -18,7 +18,7 @@ package uk.gov.hmrc.securitiestransferchargefrontend.navigation.stf.individuals
 
 import play.api.mvc.Call
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.routes
-import uk.gov.hmrc.securitiestransferchargefrontend.controllers.seller.routes as sellerRoutes
+import uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.individuals.routes as individualsRoutes
 import uk.gov.hmrc.securitiestransferchargefrontend.models.{NormalMode, UserAnswers}
 import uk.gov.hmrc.securitiestransferchargefrontend.navigation.NavigationHelper
 import uk.gov.hmrc.securitiestransferchargefrontend.pages.*
@@ -30,24 +30,24 @@ object BackwardsRoutes:
   
   def predecessorRoutes(page: Page): UserAnswers => Call = page match {
     case HowToNotifyAboutSecuritiesTransferPage => _ => routes.SubmissionsDashboardController.onPageLoad()
-    case ConfirmAddressPage => _ => routes.HowToNotifyAboutSecuritiesTransferController.onPageLoad(NormalMode)
-    case StfBuyersAddressPage => _ => routes.HowToNotifyAboutSecuritiesTransferController.onPageLoad(NormalMode)
-    case NameOfSellerPage => _ => routes.ConfirmAddressController.onPageLoad()
-    case SellerAddressPage => _ => routes.NameOfSellerController.onPageLoad(NormalMode)
-    case ConnectedPersonsPage => _ => sellerRoutes.StfSellerAddressController.onPageLoad()
-    case ApplyingForReliefPage => _ => routes.ConnectedPersonsController.onPageLoad(NormalMode)
-    case WhatReliefAreYouApplyingForPage => _ => routes.ApplyingForReliefController.onPageLoad(NormalMode)
+    case ConfirmAddressPage => _ => individualsRoutes.HowToNotifyAboutSecuritiesTransferController.onPageLoad(NormalMode)
+    case StfBuyersAddressPage => _ => individualsRoutes.HowToNotifyAboutSecuritiesTransferController.onPageLoad(NormalMode)
+    case NameOfSellerPage => _ => individualsRoutes.ConfirmAddressController.onPageLoad()
+    case SellerAddressPage => _ => individualsRoutes.NameOfSellerController.onPageLoad(NormalMode)
+    case ConnectedPersonsPage => _ => individualsRoutes.StfSellerAddressController.onPageLoad()
+    case ApplyingForReliefPage => _ => individualsRoutes.ConnectedPersonsController.onPageLoad(NormalMode)
+    case WhatReliefAreYouApplyingForPage => _ => individualsRoutes.ApplyingForReliefController.onPageLoad(NormalMode)
     case SecuritiesTargetPage => userAnswers => dataDependent(ApplyingForReliefPage, userAnswers) {
-      case true => routes.WhatReliefAreYouApplyingForController.onPageLoad(NormalMode)
-      case false => routes.ApplyingForReliefController.onPageLoad(NormalMode)
+      case true => individualsRoutes.WhatReliefAreYouApplyingForController.onPageLoad(NormalMode)
+      case false => individualsRoutes.ApplyingForReliefController.onPageLoad(NormalMode)
     }
-    case ChargingPointPage => _ => routes.SecuritiesTargetController.onPageLoad(NormalMode)
-    case TaxRatePage => _ => routes.ChargingPointController.onPageLoad(NormalMode)
-    case WhatTypeOfSecuritiesPage => _ => routes.TaxRateController.onPageLoad(NormalMode)
-    case DetailsOfThisTransferPage => _ => routes.WhatTypeOfSecuritiesController.onPageLoad(NormalMode)
-    case OtherSecuritiesTypePage => _ => routes.WhatTypeOfSecuritiesController.onPageLoad(NormalMode)
-    case AmountPaidForSecuritiesPage => _ => routes.OtherSecuritiesTypeController.onPageLoad(NormalMode)
-    case TotalMarketValuePage => _ => routes.AmountPaidForSecuritiesController.onPageLoad(NormalMode)
+    case ChargingPointPage => _ => individualsRoutes.SecuritiesTargetController.onPageLoad(NormalMode)
+    case TaxRatePage => _ => individualsRoutes.ChargingPointController.onPageLoad(NormalMode)
+    case WhatTypeOfSecuritiesPage => _ => individualsRoutes.TaxRateController.onPageLoad(NormalMode)
+    case DetailsOfThisTransferPage => _ => individualsRoutes.WhatTypeOfSecuritiesController.onPageLoad(NormalMode)
+    case OtherSecuritiesTypePage => _ => individualsRoutes.WhatTypeOfSecuritiesController.onPageLoad(NormalMode)
+    case AmountPaidForSecuritiesPage => _ => individualsRoutes.OtherSecuritiesTypeController.onPageLoad(NormalMode)
+    case TotalMarketValuePage => _ => individualsRoutes.AmountPaidForSecuritiesController.onPageLoad(NormalMode)
     case _ => _ => StfNavigator.defaultPage
   }
       
