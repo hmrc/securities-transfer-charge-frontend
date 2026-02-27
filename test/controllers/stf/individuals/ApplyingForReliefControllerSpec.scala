@@ -29,7 +29,7 @@ import uk.gov.hmrc.securitiestransferchargefrontend.controllers.routes
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.individuals.routes as individualRoutes
 import uk.gov.hmrc.securitiestransferchargefrontend.forms.stf.individuals.ApplyingForReliefFormProvider
 import uk.gov.hmrc.securitiestransferchargefrontend.models.{NormalMode, UserAnswers}
-import uk.gov.hmrc.securitiestransferchargefrontend.pages.stf.individuals.ApplyingForReliefPage
+import uk.gov.hmrc.securitiestransferchargefrontend.pages.ApplyingForReliefPage
 import uk.gov.hmrc.securitiestransferchargefrontend.views.html.stf.individuals.ApplyingForReliefView
 
 import scala.concurrent.Future

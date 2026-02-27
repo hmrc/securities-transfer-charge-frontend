@@ -55,6 +55,7 @@ unauthorised.heading = You can’t access this service with this account
 
 transfer.details.caption = Transfer details
 seller.details.caption = Seller details
+org.details.caption = Business details
 
 confirmAddress.title = Review and confirm your address
 confirmAddress.heading = Review and confirm your address
@@ -229,3 +230,10 @@ orgs.howToNotifyAboutSecuritiesTransfer.moreThanOneAtATime.hint = Download the t
 orgs.howToNotifyAboutSecuritiesTransfer.checkYourAnswersLabel = How do you want to tell us about your securities transfers?
 orgs.howToNotifyAboutSecuritiesTransfer.error.required = Select a way to tell us about your securities transfer
 orgs.howToNotifyAboutSecuritiesTransfer.change.hidden = HowToNotifyAboutSecuritiesTransfer
+
+sectionTitle.businessDetails = Business details
+
+org.confirmAddress.title = Confirm business address
+org.confirmAddress.heading = Confirm business address
+org.confirmAddress.editLink = Edit address
+org.confirmAddress.confirm = Confirm and continue

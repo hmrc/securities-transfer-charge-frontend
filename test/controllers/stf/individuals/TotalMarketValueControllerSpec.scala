@@ -17,12 +17,10 @@
 package controllers.stf.individuals
 
 import base.SpecBase
-import navigation.FakeNavigator
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.when
 import org.scalatestplus.mockito.MockitoSugar
-import play.api.inject.bind
-import play.api.mvc.Call
+import play.api.data.Form
 import play.api.test.FakeRequest
 import play.api.test.Helpers.*
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.routes
@@ -30,8 +28,7 @@ import uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.individuals.
 import uk.gov.hmrc.securitiestransferchargefrontend.domain.SubmissionId
 import uk.gov.hmrc.securitiestransferchargefrontend.forms.stf.individuals.TotalMarketValueFormProvider
 import uk.gov.hmrc.securitiestransferchargefrontend.models.{NormalMode, UserAnswers}
-import uk.gov.hmrc.securitiestransferchargefrontend.navigation.Navigator
-import uk.gov.hmrc.securitiestransferchargefrontend.pages.stf.individuals.TotalMarketValuePage
+import uk.gov.hmrc.securitiestransferchargefrontend.pages.TotalMarketValuePage
 import uk.gov.hmrc.securitiestransferchargefrontend.repositories.SessionRepository
 import uk.gov.hmrc.securitiestransferchargefrontend.views.html.stf.individuals.TotalMarketValueView
 
@@ -40,14 +37,12 @@ import scala.concurrent.Future
 class TotalMarketValueControllerSpec extends SpecBase with MockitoSugar {
 
   val formProvider = new TotalMarketValueFormProvider()
-  val form = formProvider()
-
-  def onwardRoute = Call("GET", "/foo")
+  val form: Form[BigDecimal] = formProvider()
 
   val validAnswer = 0
-  val testSubmissionId = SubmissionId("STC-009")
+  val testSubmissionId: SubmissionId = SubmissionId("STC-009")
 
-  lazy val totalMarketValuePageRoute = individualRoutes.TotalMarketValueController.onPageLoad(NormalMode).url
+  lazy val totalMarketValuePageRoute: String = individualRoutes.TotalMarketValueController.onPageLoad(NormalMode).url
 
   "TotalMarketValuePage Controller" - {
 
@@ -89,13 +84,10 @@ class TotalMarketValueControllerSpec extends SpecBase with MockitoSugar {
 
       val mockSessionRepository = mock[SessionRepository]
 
-      when(mockSessionRepository.set(any())) thenReturn Future.successful(true)
+      when(mockSessionRepository.set(any())) thenReturn Future.successful(())
 
       val application =
         applicationBuilder(userAnswers = Some(emptyUserAnswers), sessionRepository = mockSessionRepository)
-          .overrides(
-            bind[Navigator].toInstance(new FakeNavigator(onwardRoute)),
-          )
           .build()
 
       running(application) {
@@ -106,7 +98,7 @@ class TotalMarketValueControllerSpec extends SpecBase with MockitoSugar {
         val result = route(application, request).value
 
         status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual onwardRoute.url
+        redirectLocation(result).value mustEqual routes.CheckYourAnswersController.onPageLoad().url
       }
     }
 

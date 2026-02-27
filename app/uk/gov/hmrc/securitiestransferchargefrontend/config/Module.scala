@@ -17,6 +17,7 @@
 package uk.gov.hmrc.securitiestransferchargefrontend.config
 
 import com.google.inject.AbstractModule
+import com.google.inject.name.Names
 import play.api.http.HttpErrorHandler
 import uk.gov.hmrc.securitiestransferchargefrontend.clients.registration.{RegistrationClient, RegistrationClientImpl}
 import uk.gov.hmrc.securitiestransferchargefrontend.connectors.{AlfAddressConnector, AlfAddressConnectorImpl, AlfConfigLoader, AlfConfigLoaderImpl, SubscriptionConnector, SubscriptionConnectorImpl}
@@ -24,7 +25,7 @@ import uk.gov.hmrc.securitiestransferchargefrontend.clients.{SaveAndReturnClient
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.actions.*
 import uk.gov.hmrc.securitiestransferchargefrontend.handlers.ErrorHandler
 import uk.gov.hmrc.securitiestransferchargefrontend.repositories.{SubscriptionDataRepository, SubscriptionDataRepositoryImpl}
-import uk.gov.hmrc.securitiestransferchargefrontend.navigation.{Navigator, StfNavigator}
+import uk.gov.hmrc.securitiestransferchargefrontend.navigation.{Navigator, StfNavigator, StfOrgNavigator}
 import uk.gov.hmrc.securitiestransferchargefrontend.repositories.{SessionRepository, SessionRepositoryImpl}
 import uk.gov.hmrc.securitiestransferchargefrontend.services.*
 
@@ -57,5 +58,11 @@ class Module extends AbstractModule {
     bind(classOf[SubscriptionConnector]).to(classOf[SubscriptionConnectorImpl])
     bind(classOf[RegistrationClient]).to(classOf[RegistrationClientImpl]).asEagerSingleton()
     bind(classOf[AnswerPersistenceService]).to(classOf[AnswerPersistenceServiceImpl])
+    bind(classOf[Navigator])
+      .annotatedWith(Names.named("organisations"))
+      .to(classOf[StfOrgNavigator])
+    bind(classOf[Navigator])
+      .annotatedWith(Names.named("individuals"))
+      .to(classOf[StfNavigator])
   }
 }
