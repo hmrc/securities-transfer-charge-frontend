@@ -104,3 +104,6 @@ POST       /stf/change/consideration                    uk.gov.hmrc.securitiestr
 GET        /stf/org/confirm-address                       uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.organisations.ConfirmAddressController.onPageLoad()
 
 POST       /stf/org/confirm-address                       uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.organisations.ConfirmAddressController.onSubmit()
+
+GET        /stf/org/address                                      uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.organisations.AddressController.onPageLoad()
+GET        /stf/org/address/return                               uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.organisations.AddressController.onReturn(id: String)
