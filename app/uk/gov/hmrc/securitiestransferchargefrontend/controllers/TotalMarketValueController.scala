@@ -17,13 +17,13 @@
 package uk.gov.hmrc.securitiestransferchargefrontend.controllers
 
 import play.api.i18n.{I18nSupport, MessagesApi}
-import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
+import play.api.mvc.{Action, AnyContent, Call, MessagesControllerComponents}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.actions.*
 import uk.gov.hmrc.securitiestransferchargefrontend.forms.TotalMarketValueFormProvider
-import uk.gov.hmrc.securitiestransferchargefrontend.models.Mode
+import uk.gov.hmrc.securitiestransferchargefrontend.models.{Mode, UserAnswers}
 import uk.gov.hmrc.securitiestransferchargefrontend.navigation.Navigator
-import uk.gov.hmrc.securitiestransferchargefrontend.pages.TotalMarketValuePage
+import uk.gov.hmrc.securitiestransferchargefrontend.pages.{TotalMarketValuePage, WhatReliefAreYouApplyingForPage}
 import uk.gov.hmrc.securitiestransferchargefrontend.views.html.TotalMarketValueView
 
 import javax.inject.Inject
@@ -41,6 +41,9 @@ class TotalMarketValueController @Inject()( override val messagesApi: MessagesAp
 
   private val form = formProvider()
 
+  lazy val backLinkCall: Mode => UserAnswers => Call =
+    mode => userAnswers => navigator.previousPage(WhatReliefAreYouApplyingForPage, mode, userAnswers)
+    
   def onPageLoad(mode: Mode): Action[AnyContent] = (stcAuthEnrolled andThen getData andThen requireData) {
     implicit request =>
 
@@ -48,7 +51,7 @@ class TotalMarketValueController @Inject()( override val messagesApi: MessagesAp
         request.userAnswers.get(TotalMarketValuePage)
           .fold(form)(value => form.fill(value))
 
-      Ok(view(preparedForm, mode))
+      Ok(view(preparedForm, mode, backLinkCall(mode)(request.userAnswers)))
   }
 
   def onSubmit(mode: Mode): Action[AnyContent] = (stcAuthEnrolled andThen getData andThen requireData).async {
@@ -56,7 +59,7 @@ class TotalMarketValueController @Inject()( override val messagesApi: MessagesAp
 
       form.bindFromRequest().fold(
         formWithErrors =>
-          Future.successful(BadRequest(view(formWithErrors, mode))),
+          Future.successful(BadRequest(view(formWithErrors, mode, backLinkCall(mode)(request.userAnswers)))),
 
         value =>
           for {

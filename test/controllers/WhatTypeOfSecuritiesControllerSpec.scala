@@ -21,6 +21,7 @@ import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.when
 import org.scalatestplus.mockito.MockitoSugar
 import play.api.data.Form
+import play.api.inject.bind
 import play.api.test.FakeRequest
 import play.api.test.Helpers.*
 import uk.gov.hmrc.http.HeaderCarrier
@@ -28,6 +29,7 @@ import uk.gov.hmrc.securitiestransferchargefrontend.clients.SaveAndReturnClient
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.routes
 import uk.gov.hmrc.securitiestransferchargefrontend.forms.WhatTypeOfSecuritiesFormProvider
 import uk.gov.hmrc.securitiestransferchargefrontend.models.{NormalMode, UserAnswers, WhatTypeOfSecurities}
+import uk.gov.hmrc.securitiestransferchargefrontend.navigation.Navigator
 import uk.gov.hmrc.securitiestransferchargefrontend.pages.WhatTypeOfSecuritiesPage
 import uk.gov.hmrc.securitiestransferchargefrontend.views.html.WhatTypeOfSecuritiesView
 
@@ -45,7 +47,9 @@ class WhatTypeOfSecuritiesControllerSpec extends SpecBase with MockitoSugar {
 
     "must return OK and the correct view for a GET" in {
 
-      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers)).build()
+      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers))
+        .overrides(bind[Navigator].toInstance(getNavigator))
+        .build()
 
       running(application) {
         val request = FakeRequest(GET, whatTypeOfSecuritiesRoute)
@@ -55,7 +59,7 @@ class WhatTypeOfSecuritiesControllerSpec extends SpecBase with MockitoSugar {
         val view = application.injector.instanceOf[WhatTypeOfSecuritiesView]
 
         status(result) mustEqual OK
-        contentAsString(result) mustEqual view(form, NormalMode)(request, messages(application)).toString
+        contentAsString(result) mustEqual view(form, NormalMode, testBackLinkRoute)(request, messages(application)).toString
       }
     }
 
@@ -63,7 +67,9 @@ class WhatTypeOfSecuritiesControllerSpec extends SpecBase with MockitoSugar {
 
       val userAnswers = UserAnswers(userAnswersId,submissionId).set(WhatTypeOfSecuritiesPage, WhatTypeOfSecurities.values.head).success.value
 
-      val application = applicationBuilder(userAnswers = Some(userAnswers)).build()
+      val application = applicationBuilder(userAnswers = Some(userAnswers))
+        .overrides(bind[Navigator].toInstance(getNavigator))
+        .build()
 
       running(application) {
         val request = FakeRequest(GET, whatTypeOfSecuritiesRoute)
@@ -73,7 +79,7 @@ class WhatTypeOfSecuritiesControllerSpec extends SpecBase with MockitoSugar {
         val result = route(application, request).value
 
         status(result) mustEqual OK
-        contentAsString(result) mustEqual view(form.fill(WhatTypeOfSecurities.values.head), NormalMode)(request, messages(application)).toString
+        contentAsString(result) mustEqual view(form.fill(WhatTypeOfSecurities.values.head), NormalMode, testBackLinkRoute)(request, messages(application)).toString
       }
     }
 
@@ -102,7 +108,9 @@ class WhatTypeOfSecuritiesControllerSpec extends SpecBase with MockitoSugar {
 
     "must return a Bad Request and errors when invalid data is submitted" in {
 
-      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers)).build()
+      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers))
+        .overrides(bind[Navigator].toInstance(getNavigator))
+        .build()
 
       running(application) {
         val request =
@@ -116,7 +124,7 @@ class WhatTypeOfSecuritiesControllerSpec extends SpecBase with MockitoSugar {
         val result = route(application, request).value
 
         status(result) mustEqual BAD_REQUEST
-        contentAsString(result) mustEqual view(boundForm, NormalMode)(request, messages(application)).toString
+        contentAsString(result) mustEqual view(boundForm, NormalMode, testBackLinkRoute)(request, messages(application)).toString
       }
     }
 

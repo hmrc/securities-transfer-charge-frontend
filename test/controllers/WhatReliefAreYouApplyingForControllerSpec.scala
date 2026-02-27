@@ -21,6 +21,7 @@ import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.when
 import org.scalatestplus.mockito.MockitoSugar
 import play.api.data.Form
+import play.api.inject.bind
 import play.api.test.FakeRequest
 import play.api.test.Helpers.*
 import uk.gov.hmrc.http.HeaderCarrier
@@ -28,6 +29,7 @@ import uk.gov.hmrc.securitiestransferchargefrontend.clients.SaveAndReturnClient
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.routes
 import uk.gov.hmrc.securitiestransferchargefrontend.forms.WhatReliefAreYouApplyingForFormProvider
 import uk.gov.hmrc.securitiestransferchargefrontend.models.{NormalMode, ReliefsDataSource, UserAnswers}
+import uk.gov.hmrc.securitiestransferchargefrontend.navigation.Navigator
 import uk.gov.hmrc.securitiestransferchargefrontend.pages.WhatReliefAreYouApplyingForPage
 import uk.gov.hmrc.securitiestransferchargefrontend.views.html.WhatReliefAreYouApplyingForView
 
@@ -44,7 +46,9 @@ class WhatReliefAreYouApplyingForControllerSpec extends SpecBase with MockitoSug
 
     "must return OK and the correct view for a GET" in {
 
-      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers)).build()
+      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers))
+        .overrides(bind[Navigator].toInstance(getNavigator))
+        .build()
 
       running(application) {
         val request = FakeRequest(GET, whatReliefAreYouApplyingForRoute)
@@ -56,7 +60,7 @@ class WhatReliefAreYouApplyingForControllerSpec extends SpecBase with MockitoSug
         val reliefsDataSource = application.injector.instanceOf[ReliefsDataSource]
 
         status(result) mustEqual OK
-        contentAsString(result) mustEqual view(form, NormalMode,reliefsDataSource.reliefs)(request, messages(application)).toString
+        contentAsString(result) mustEqual view(form, NormalMode,reliefsDataSource.reliefs, testBackLinkRoute)(request, messages(application)).toString
       }
     }
 
@@ -64,7 +68,9 @@ class WhatReliefAreYouApplyingForControllerSpec extends SpecBase with MockitoSug
 
       val userAnswers = UserAnswers(userAnswersId,submissionId).set(WhatReliefAreYouApplyingForPage, "answer").success.value
 
-      val application = applicationBuilder(userAnswers = Some(userAnswers)).build()
+      val application = applicationBuilder(userAnswers = Some(userAnswers))
+        .overrides(bind[Navigator].toInstance(getNavigator))
+        .build()
 
       running(application) {
         val request = FakeRequest(GET, whatReliefAreYouApplyingForRoute)
@@ -76,7 +82,7 @@ class WhatReliefAreYouApplyingForControllerSpec extends SpecBase with MockitoSug
         val result = route(application, request).value
 
         status(result) mustEqual OK
-        contentAsString(result) mustEqual view(form.fill("answer"), NormalMode,reliefsDataSource.reliefs)(request, messages(application)).toString
+        contentAsString(result) mustEqual view(form.fill("answer"), NormalMode,reliefsDataSource.reliefs, testBackLinkRoute)(request, messages(application)).toString
       }
     }
 
@@ -104,7 +110,9 @@ class WhatReliefAreYouApplyingForControllerSpec extends SpecBase with MockitoSug
 
     "must return a Bad Request and errors when invalid data is submitted" in {
 
-      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers)).build()
+      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers))
+      .overrides(bind[Navigator].toInstance(getNavigator))
+      .build()
 
       running(application) {
         val request =
@@ -120,7 +128,7 @@ class WhatReliefAreYouApplyingForControllerSpec extends SpecBase with MockitoSug
         val result = route(application, request).value
 
         status(result) mustEqual BAD_REQUEST
-        contentAsString(result) mustEqual view(boundForm, NormalMode,reliefsDataSource.reliefs)(request, messages(application)).toString
+        contentAsString(result) mustEqual view(boundForm, NormalMode,reliefsDataSource.reliefs, testBackLinkRoute)(request, messages(application)).toString
       }
     }
 

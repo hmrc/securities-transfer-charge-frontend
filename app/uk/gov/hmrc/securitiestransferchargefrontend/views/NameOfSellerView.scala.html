@@ -31,9 +31,9 @@
     saveAndReturnButton:SaveAndReturnButton
 )
 
-@(form: Form[_], mode: Mode)(implicit request: Request[_], messages: Messages)
+@(form: Form[_], mode: Mode, backLinkCall: Call)(implicit request: Request[_], messages: Messages)
 
-@layout(pageTitle = title(form, messages("nameOfSeller.title"))) {
+@layout(pageTitle = title(form, messages("nameOfSeller.title")), backLinkUrl = Some(backLinkCall.url)) {
     <div id="caption-heading" class="govuk-caption-l">
         @messages("seller.details.caption")
     </div>

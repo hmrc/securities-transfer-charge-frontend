@@ -19,6 +19,7 @@ package views
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
 import play.api.Application
+import play.api.mvc.Call
 import uk.gov.hmrc.securitiestransferchargefrontend.views.html.HowToNotifyAboutSecuritiesTransferView
 import uk.gov.hmrc.securitiestransferchargefrontend.forms.HowToNotifyAboutSecuritiesTransferFormProvider
 import uk.gov.hmrc.securitiestransferchargefrontend.models.NormalMode
@@ -33,10 +34,11 @@ class HowToNotifyAboutSecuritiesTransferViewSpec extends ViewBaseSpec {
   private val viewInstance         = app.injector.instanceOf[HowToNotifyAboutSecuritiesTransferView]
   private val formProvider = new HowToNotifyAboutSecuritiesTransferFormProvider()
   private val form = formProvider()
+  private val testBackLinkRoute: Call = Call("GET", "/back-link")
 
 
   def view(): Document = Jsoup.parse(
-    viewInstance(form, NormalMode)(fakeRequest, messages).body
+    viewInstance(form, NormalMode, testBackLinkRoute)(fakeRequest, messages).body
   )
 
   object ExpectedContent {

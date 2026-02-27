@@ -18,11 +18,11 @@ package uk.gov.hmrc.securitiestransferchargefrontend.controllers
 
 import play.api.data.Form
 import play.api.i18n.{I18nSupport, MessagesApi}
-import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
+import play.api.mvc.{Action, AnyContent, Call, MessagesControllerComponents}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.actions.*
 import uk.gov.hmrc.securitiestransferchargefrontend.forms.OtherSecuritiesTypeFormProvider
-import uk.gov.hmrc.securitiestransferchargefrontend.models.Mode
+import uk.gov.hmrc.securitiestransferchargefrontend.models.{Mode, UserAnswers}
 import uk.gov.hmrc.securitiestransferchargefrontend.navigation.Navigator
 import uk.gov.hmrc.securitiestransferchargefrontend.pages.OtherSecuritiesTypePage
 import uk.gov.hmrc.securitiestransferchargefrontend.views.html.OtherSecuritiesTypeView
@@ -43,6 +43,9 @@ class OtherSecuritiesTypeController @Inject()(
 
   val form: Form[String] = formProvider()
 
+  lazy val backLinkCall: Mode => UserAnswers => Call =
+    mode => userAnswers => navigator.previousPage(OtherSecuritiesTypePage, mode, userAnswers)
+    
   def onPageLoad(mode: Mode): Action[AnyContent] = (stcAuthEnrolled andThen getData andThen requireData) {
     implicit request =>
 
@@ -51,7 +54,7 @@ class OtherSecuritiesTypeController @Inject()(
         case Some(value) => form.fill(value)
       }
 
-      Ok(view(preparedForm, mode))
+      Ok(view(preparedForm, mode, backLinkCall(mode)(request.userAnswers)))
   }
 
   def onSubmit(mode: Mode): Action[AnyContent] = (stcAuthEnrolled andThen getData andThen requireData).async {
@@ -59,7 +62,7 @@ class OtherSecuritiesTypeController @Inject()(
 
       form.bindFromRequest().fold(
         formWithErrors =>
-          Future.successful(BadRequest(view(formWithErrors, mode))),
+          Future.successful(BadRequest(view(formWithErrors, mode, backLinkCall(mode)(request.userAnswers)))),
 
         securitiesType =>
           for {

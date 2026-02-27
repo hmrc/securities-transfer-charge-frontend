@@ -17,12 +17,12 @@
 package uk.gov.hmrc.securitiestransferchargefrontend.controllers
 
 import play.api.i18n.{I18nSupport, MessagesApi}
-import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
+import play.api.mvc.{Action, AnyContent, Call, MessagesControllerComponents}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.actions.*
 import uk.gov.hmrc.securitiestransferchargefrontend.forms.AmountPaidForSecuritiesFormProvider
-import uk.gov.hmrc.securitiestransferchargefrontend.models.Mode
-import uk.gov.hmrc.securitiestransferchargefrontend.navigation.stf.individuals.StfNavigator
+import uk.gov.hmrc.securitiestransferchargefrontend.models.{Mode, UserAnswers}
+import uk.gov.hmrc.securitiestransferchargefrontend.navigation.Navigator
 import uk.gov.hmrc.securitiestransferchargefrontend.pages.AmountPaidForSecuritiesPage
 import uk.gov.hmrc.securitiestransferchargefrontend.views.html.AmountPaidForSecuritiesView
 
@@ -31,7 +31,7 @@ import scala.concurrent.{ExecutionContext, Future}
 
 class AmountPaidForSecuritiesController @Inject()(
                                                    override val messagesApi: MessagesApi,
-                                                   navigator: StfNavigator,
+                                                   navigator: Navigator,
                                                    stcAuthEnrolled: StcAuthEnrolledAction,
                                                    getData: StcDataRetrievalAction,
                                                    requireData: StcDataRequiredAction,
@@ -42,6 +42,9 @@ class AmountPaidForSecuritiesController @Inject()(
 
   val form = formProvider()
 
+  lazy val backLinkCall: Mode => UserAnswers => Call =
+    mode => userAnswers => navigator.previousPage(AmountPaidForSecuritiesPage, mode, userAnswers)
+    
   def onPageLoad(mode: Mode): Action[AnyContent] = (stcAuthEnrolled andThen getData andThen requireData) {
     implicit request =>
 
@@ -50,7 +53,7 @@ class AmountPaidForSecuritiesController @Inject()(
         case Some(value) => form.fill(value)
       }
 
-      Ok(view(preparedForm, mode))
+      Ok(view(preparedForm, mode, backLinkCall(mode)(request.userAnswers)))
   }
 
   def onSubmit(mode: Mode): Action[AnyContent] = (stcAuthEnrolled andThen getData andThen requireData).async {
@@ -58,7 +61,7 @@ class AmountPaidForSecuritiesController @Inject()(
 
       form.bindFromRequest().fold(
         formWithErrors =>
-          Future.successful(BadRequest(view(formWithErrors, mode))),
+          Future.successful(BadRequest(view(formWithErrors, mode, backLinkCall(mode)(request.userAnswers)))),
 
         value =>
           for {

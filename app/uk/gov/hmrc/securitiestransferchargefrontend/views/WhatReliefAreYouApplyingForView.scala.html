@@ -37,18 +37,15 @@
   saveAndReturnButton:SaveAndReturnButton
 )
 
-@(form: Form[_], mode: Mode, reliefs: Seq[Relief])(implicit request: Request[_], messages: Messages)
+@(form: Form[_], mode: Mode, reliefs: Seq[Relief], backLinkCall: Call)(implicit request: Request[_], messages: Messages)
 
 @link = @{ hmrcNewTabLinkHelper(NewTabLinkHelper(
-text = messages("whatReliefAreYouApplyingFor.details.content.link.text")
+    text = messages("whatReliefAreYouApplyingFor.details.content.link.text")
 )) }
 
 @layout(
-  pageTitle = title(
-    form,
-    messages("whatReliefAreYouApplyingFor.title"),
-    Some(messages("sectionTitle.transferDetails"))
-  )
+    pageTitle = title(form, messages("whatReliefAreYouApplyingFor.title"), Some(messages("sectionTitle.transferDetails"))),
+    backLinkUrl = Some(backLinkCall.url)
 ) {
 
   @formHelper(action = WhatReliefAreYouApplyingForController.onSubmit(mode)) {

@@ -19,11 +19,13 @@ package controllers
 import base.SpecBase
 import org.scalatestplus.mockito.MockitoSugar
 import play.api.data.Form
+import play.api.inject.bind
 import play.api.test.FakeRequest
 import play.api.test.Helpers.*
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.routes
 import uk.gov.hmrc.securitiestransferchargefrontend.forms.DetailsOfThisTransferFormProvider
 import uk.gov.hmrc.securitiestransferchargefrontend.models.{DetailsOfThisTransfer, NormalMode, UserAnswers}
+import uk.gov.hmrc.securitiestransferchargefrontend.navigation.Navigator
 import uk.gov.hmrc.securitiestransferchargefrontend.pages.DetailsOfThisTransferPage
 import uk.gov.hmrc.securitiestransferchargefrontend.views.html.DetailsOfThisTransferView
 
@@ -37,7 +39,6 @@ class DetailsOfThisTransferControllerSpec extends SpecBase with MockitoSugar {
 
   val amount: BigDecimal = BigDecimal(500)
 
-
   val detailsOfThisTransfer: DetailsOfThisTransfer = DetailsOfThisTransfer(numberOfShares = "25",
     typeOfShares = "stocks",
     amountPaid = BigDecimal(100),
@@ -49,7 +50,10 @@ class DetailsOfThisTransferControllerSpec extends SpecBase with MockitoSugar {
 
     "must return OK and the correct view for a GET" in {
 
-      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers)).build()
+      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers))
+        .overrides(bind[Navigator].toInstance(getNavigator))
+        .build()
+
 
       running(application) {
         val request = FakeRequest(GET, detailsOfThisTransferRoute)
@@ -59,7 +63,7 @@ class DetailsOfThisTransferControllerSpec extends SpecBase with MockitoSugar {
         val result = route(application, request).value
 
         status(result) mustEqual OK
-        contentAsString(result) mustEqual view(form, NormalMode)(request, messages(application)).toString
+        contentAsString(result) mustEqual view(form, NormalMode, testBackLinkRoute)(request, messages(application)).toString
       }
     }
 
@@ -67,7 +71,9 @@ class DetailsOfThisTransferControllerSpec extends SpecBase with MockitoSugar {
 
       val updatedAnswers = userAnswers.set(DetailsOfThisTransferPage, detailsOfThisTransfer).success.value
 
-      val application = applicationBuilder(userAnswers = Some(updatedAnswers)).build()
+      val application = applicationBuilder(userAnswers = Some(updatedAnswers))
+        .overrides(bind[Navigator].toInstance(getNavigator))
+        .build()
 
       running(application) {
         val request = FakeRequest(GET, detailsOfThisTransferRoute)
@@ -77,7 +83,7 @@ class DetailsOfThisTransferControllerSpec extends SpecBase with MockitoSugar {
         val result = route(application, request).value
 
         status(result) mustEqual OK
-        contentAsString(result) mustEqual view(form.fill(detailsOfThisTransfer), NormalMode)(request, messages(application)).toString
+        contentAsString(result) mustEqual view(form.fill(detailsOfThisTransfer), NormalMode, testBackLinkRoute)(request, messages(application)).toString
       }
     }
 
@@ -107,7 +113,9 @@ class DetailsOfThisTransferControllerSpec extends SpecBase with MockitoSugar {
 
     "must return a Bad Request and errors when invalid data is submitted" in {
 
-      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers)).build()
+      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers))
+        .overrides(bind[Navigator].toInstance(getNavigator))
+        .build()
 
       running(application) {
         val request =
@@ -121,7 +129,7 @@ class DetailsOfThisTransferControllerSpec extends SpecBase with MockitoSugar {
         val result = route(application, request).value
 
         status(result) mustEqual BAD_REQUEST
-        contentAsString(result) mustEqual view(boundForm, NormalMode)(request, messages(application)).toString
+        contentAsString(result) mustEqual view(boundForm, NormalMode, testBackLinkRoute)(request, messages(application)).toString
       }
     }
 

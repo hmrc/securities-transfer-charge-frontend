@@ -19,6 +19,7 @@ package views
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
 import play.api.Application
+import play.api.mvc.Call
 import uk.gov.hmrc.securitiestransferchargefrontend.forms.ConnectedPersonsFormProvider
 import uk.gov.hmrc.securitiestransferchargefrontend.models.NormalMode
 import uk.gov.hmrc.securitiestransferchargefrontend.views.html.ConnectedPersonsView
@@ -30,11 +31,12 @@ class ConnectedPersonsViewSpec extends ViewBaseSpec {
 
   private val viewInstance = app.injector.instanceOf[ConnectedPersonsView]
   private val formProvider = new ConnectedPersonsFormProvider()
+  private val testBackLinkRoute: Call = Call("GET", "/back-link")
 
   private val form = formProvider()
 
   def view(): Document = Jsoup.parse(
-    viewInstance(form, NormalMode)(fakeRequest, messages).body
+    viewInstance(form, NormalMode, testBackLinkRoute)(fakeRequest, messages).body
   )
 
   object ExpectedContent {
