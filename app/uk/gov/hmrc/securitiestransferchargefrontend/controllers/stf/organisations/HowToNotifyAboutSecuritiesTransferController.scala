@@ -27,12 +27,12 @@ import uk.gov.hmrc.securitiestransferchargefrontend.navigation.Navigator
 import uk.gov.hmrc.securitiestransferchargefrontend.pages.stf.organisations.HowToNotifyAboutSecuritiesTransferPage
 import uk.gov.hmrc.securitiestransferchargefrontend.views.html.stf.organisations.HowToNotifyAboutSecuritiesTransferView
 
-import javax.inject.Inject
+import javax.inject.{Inject, Named}
 import scala.concurrent.{ExecutionContext, Future}
 
 class HowToNotifyAboutSecuritiesTransferController @Inject()(
                                        override val messagesApi: MessagesApi,
-                                       navigator: Navigator,
+                                       @Named("organisations") navigator: Navigator,
                                        stcAuthEnrolled: StcAuthEnrolledAction,
                                        getData: StcDataRetrievalAction,
                                        requireData: StcDataRequiredAction,

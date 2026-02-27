@@ -17,7 +17,7 @@
 package generators
 
 import org.scalacheck.{Arbitrary, Gen}
-import uk.gov.hmrc.securitiestransferchargefrontend.models.{DetailsOfThisTransfer, WhatTypeOfSecurities}
+import uk.gov.hmrc.securitiestransferchargefrontend.models.{DetailsOfThisTransfer, HowToNotifyAboutSecuritiesTransfer, WhatTypeOfSecurities}
 
 trait ModelGenerators {
 

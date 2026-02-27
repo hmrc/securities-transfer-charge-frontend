@@ -23,14 +23,12 @@ import uk.gov.hmrc.auth.core.AffinityGroup
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import uk.gov.hmrc.securitiestransferchargefrontend.clients.{SaveAndReturnClient, SubmissionIdClient}
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.actions.{StcAuthEnrolledAction, StcDataRetrievalAction}
-import uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.organisations.routes as orgRoutes
 import uk.gov.hmrc.securitiestransferchargefrontend.models.{NormalMode, UserAnswers}
 import uk.gov.hmrc.securitiestransferchargefrontend.navigation.Navigator
 import uk.gov.hmrc.securitiestransferchargefrontend.pages.SubmissionsDashboardPage
 import uk.gov.hmrc.securitiestransferchargefrontend.views.html.SubmissionsDashboardView
-import uk.gov.hmrc.securitiestransferchargefrontend.services.AnswerPersistenceService
 
-import javax.inject.Inject
+import javax.inject.{Inject, Named}
 import scala.concurrent.ExecutionContext
 
 class SubmissionsDashboardController @Inject()(
@@ -41,8 +39,9 @@ class SubmissionsDashboardController @Inject()(
                                                 view: SubmissionsDashboardView,
                                                 idClient: SubmissionIdClient,
                                                 saveAndReturnClient: SaveAndReturnClient,
-                                                answerPersistenceService: AnswerPersistenceService,
-                                                navigator: Navigator)
+                                                @Named("individuals") individualNavigator: Navigator,
+                                                @Named("organisations") orgNavigator: Navigator
+                                              )
                                               (implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport with Logging {
 
   def onPageLoad: Action[AnyContent] =
@@ -58,19 +57,21 @@ class SubmissionsDashboardController @Inject()(
 
   def onSubmit(): Action[AnyContent] = (stcAuthEnrolled andThen getData).async {
     implicit request =>
-      val userId = request.request.internalId
+
+      val innerRequest = request.request
+      val userId = innerRequest.internalId
+
       for {
-        submissionId  <- idClient.nextSubmissionId()
-        emptyAnswers  =  UserAnswers.empty(userId)(submissionId)
-        _              = logger.info(s"** Created user answers **")
-        call      <- request.request.affinityGroup match {
-          case AffinityGroup.Organisation =>
-            val start = orgRoutes.HowToNotifyAboutSecuritiesTransferController.onPageLoad(NormalMode)
-            answerPersistenceService.save(emptyAnswers).map(_ => start)
-            
-          case _ => navigator.nextPage(SubmissionsDashboardPage, NormalMode, emptyAnswers)
+        submissionId <- idClient.nextSubmissionId()
+        emptyAnswers  = UserAnswers.empty(userId)(submissionId)
+        _             = logger.info(s"** Created user answers **")
+
+        call         <- innerRequest.affinityGroup match {
+          case AffinityGroup.Organisation => orgNavigator.nextPage(SubmissionsDashboardPage, NormalMode, emptyAnswers)
+
+          case _ => individualNavigator.nextPage(SubmissionsDashboardPage, NormalMode, emptyAnswers)
         }
-        _              = logger.info(s"Redirecting to $call")
+        _ = logger.info(s"Redirecting to $call")
       } yield Redirect(call)
-  }
+    }
 }

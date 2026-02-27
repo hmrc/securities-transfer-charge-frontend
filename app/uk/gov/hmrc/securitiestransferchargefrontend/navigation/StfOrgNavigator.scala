@@ -22,8 +22,9 @@ import play.api.mvc.{Call, Request}
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.play.http.HeaderCarrierConverter
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.routes
+import uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.organisations.routes as orgRoutes
 import uk.gov.hmrc.securitiestransferchargefrontend.models.{CheckMode, Mode, NormalMode, UserAnswers}
-import uk.gov.hmrc.securitiestransferchargefrontend.pages._
+import uk.gov.hmrc.securitiestransferchargefrontend.pages.*
 import uk.gov.hmrc.securitiestransferchargefrontend.services.AnswerPersistenceService
 
 import javax.inject.Inject
@@ -34,6 +35,7 @@ class StfOrgNavigator @Inject()(answerPersistenceService: AnswerPersistenceServi
                                (implicit ec: ExecutionContext) extends AbstractNavigator(answerPersistenceService) {
 
   private def normalRoutes(page: Page)(implicit hc: HeaderCarrier): UserAnswers => Future[Call] = page match {
+    case SubmissionsDashboardPage => userAnswers => goTo(orgRoutes.HowToNotifyAboutSecuritiesTransferController.onPageLoad(NormalMode), Some(userAnswers))
     case ConfirmAddressPage => userAnswers => dataRequired(ConfirmAddressPage, userAnswers, routes.JourneyRecoveryController.onPageLoad())
     case _ => _ => Navigator.defaultPageF
 
