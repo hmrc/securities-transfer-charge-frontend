@@ -48,6 +48,7 @@ object BackwardsRoutes:
     case OtherSecuritiesTypePage => _ => routes.WhatTypeOfSecuritiesController.onPageLoad(NormalMode)
     case AmountPaidForSecuritiesPage => _ => routes.OtherSecuritiesTypeController.onPageLoad(NormalMode)
     case TotalMarketValuePage => _ => routes.AmountPaidForSecuritiesController.onPageLoad(NormalMode)
+    case _ => _ => StfNavigator.defaultPage
   }
       
 
