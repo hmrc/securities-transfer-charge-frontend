@@ -22,7 +22,7 @@ import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.actions.*
 import uk.gov.hmrc.securitiestransferchargefrontend.forms.AmountPaidForSecuritiesFormProvider
 import uk.gov.hmrc.securitiestransferchargefrontend.models.Mode
-import uk.gov.hmrc.securitiestransferchargefrontend.navigation.StfNavigator
+import uk.gov.hmrc.securitiestransferchargefrontend.navigation.stf.individuals.StfNavigator
 import uk.gov.hmrc.securitiestransferchargefrontend.pages.AmountPaidForSecuritiesPage
 import uk.gov.hmrc.securitiestransferchargefrontend.views.html.AmountPaidForSecuritiesView
 

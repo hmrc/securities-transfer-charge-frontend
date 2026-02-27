@@ -26,18 +26,26 @@ import scala.concurrent.Future
 
 trait Navigator:
   def nextPage(page: Page, mode: Mode, userAnswers: UserAnswers)(implicit request: Request[?]): Future[Call]
+  def previousPage(page: Page, mode: Mode, userAnswers: UserAnswers): Call
   def errorPage(forPage: Page): Call
 
 abstract class AbstractModeNavigator extends Navigator:
 
-  def normalRoutes(page: Page)(implicit hc: HeaderCarrier): UserAnswers => Future[Call]
+  def forwardRoutes(page: Page)(implicit hc: HeaderCarrier): UserAnswers => Future[Call]
+  def predecessorRoutes(page: Page): UserAnswers => Call
   
   val checkRouteMap: Page => UserAnswers => Call
 
   def nextPage(page: Page, mode: Mode, userAnswers: UserAnswers)(implicit request: Request[?]): Future[Call] = {
     implicit lazy val hc: HeaderCarrier = HeaderCarrierConverter.fromRequestAndSession(request, request.session)
     mode match {
-      case NormalMode => normalRoutes(page)(hc)(userAnswers)
+      case NormalMode => forwardRoutes(page)(hc)(userAnswers)
       case CheckMode  => Future.successful(checkRouteMap(page)(userAnswers))
     }
   }
+
+  def previousPage(page: Page, mode: Mode, userAnswers: UserAnswers): Call =
+    mode match {
+      case NormalMode => predecessorRoutes(page)(userAnswers)
+      case CheckMode  => checkRouteMap(page)(userAnswers)
+    }

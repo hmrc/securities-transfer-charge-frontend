@@ -30,7 +30,7 @@ import uk.gov.hmrc.securitiestransferchargefrontend.controllers.SaveAndReturnCon
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.actions.StcAuthEnrolledAction
 import uk.gov.hmrc.securitiestransferchargefrontend.domain.SubmissionId
 import uk.gov.hmrc.securitiestransferchargefrontend.models.UserAnswers
-import uk.gov.hmrc.securitiestransferchargefrontend.navigation.StfNavigator
+import uk.gov.hmrc.securitiestransferchargefrontend.navigation.stf.individuals.StfNavigator
 
 import scala.concurrent.*
 

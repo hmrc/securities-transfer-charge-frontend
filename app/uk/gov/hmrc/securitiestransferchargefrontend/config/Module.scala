@@ -23,8 +23,9 @@ import uk.gov.hmrc.securitiestransferchargefrontend.connectors.{AlfAddressConnec
 import uk.gov.hmrc.securitiestransferchargefrontend.clients.{SaveAndReturnClient, SaveAndReturnClientImpl, SubmissionIdClient, SubmissionIdClientImpl}
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.actions.*
 import uk.gov.hmrc.securitiestransferchargefrontend.handlers.ErrorHandler
+import uk.gov.hmrc.securitiestransferchargefrontend.navigation.stf.individuals.StfNavigator
 import uk.gov.hmrc.securitiestransferchargefrontend.repositories.{SubscriptionDataRepository, SubscriptionDataRepositoryImpl}
-import uk.gov.hmrc.securitiestransferchargefrontend.navigation.{Navigator, PersistentNavigator, StfNavigator}
+import uk.gov.hmrc.securitiestransferchargefrontend.navigation.{Navigator, PersistentNavigator}
 import uk.gov.hmrc.securitiestransferchargefrontend.repositories.{SessionRepository, SessionRepositoryImpl}
 import uk.gov.hmrc.securitiestransferchargefrontend.services.*
 

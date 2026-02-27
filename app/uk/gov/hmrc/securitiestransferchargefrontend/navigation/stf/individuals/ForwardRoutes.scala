@@ -14,32 +14,28 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.securitiestransferchargefrontend.navigation
+package uk.gov.hmrc.securitiestransferchargefrontend.navigation.stf.individuals
 
-import play.api.mvc.{Call, Request}
+import play.api.mvc.Call
 import uk.gov.hmrc.http.HeaderCarrier
-import uk.gov.hmrc.play.http.HeaderCarrierConverter
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.routes
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.seller.routes as sellerRoutes
-import uk.gov.hmrc.securitiestransferchargefrontend.domain.SubmissionId
 import uk.gov.hmrc.securitiestransferchargefrontend.models.HowToNotifyAboutSecuritiesTransfer.{MoreThanOneAtATime, OneAtATime}
 import uk.gov.hmrc.securitiestransferchargefrontend.models.{NormalMode, UserAnswers, WhatTypeOfSecurities}
+import uk.gov.hmrc.securitiestransferchargefrontend.navigation.*
 import uk.gov.hmrc.securitiestransferchargefrontend.pages.*
 import uk.gov.hmrc.securitiestransferchargefrontend.services.AnswerPersistenceService
 
-import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 
-trait PersistentNavigator extends Navigator:
-  def restore(submissionId: SubmissionId, userId: String)(implicit request: Request[?]): Future[UserAnswers]
-  
-class StfNavigator @Inject()(answerPersistenceService: AnswerPersistenceService)
-                            (implicit ec: ExecutionContext) extends AbstractModeNavigator with PersistentNavigator {
+
+class ForwardRoutes(answerPersistenceService: AnswerPersistenceService)
+                   (implicit ec: ExecutionContext):
 
   val helper = new PersistentNavigationHelper(answerPersistenceService, StfNavigator.defaultPage, StfNavigator.errorPages)
   import helper.*
-  
-  override def normalRoutes(page: Page)(implicit hc: HeaderCarrier): UserAnswers => Future[Call] = page match {
+
+  def forwardRoutes(page: Page)(implicit hc: HeaderCarrier): UserAnswers => Future[Call] = page match {
 
     case SubmissionsDashboardPage => userAnswers => goTo(routes.HowToNotifyAboutSecuritiesTransferController.onPageLoad(NormalMode), Some(userAnswers))
     case HowToNotifyAboutSecuritiesTransferPage => userAnswers => {
@@ -81,21 +77,3 @@ class StfNavigator @Inject()(answerPersistenceService: AnswerPersistenceService)
     case TotalMarketValuePage => userAnswers => dataRequired(TotalMarketValuePage, userAnswers, routes.CheckYourAnswersController.onPageLoad())
     case _ => _ => StfNavigator.defaultPageF
   }
-
-  def errorPage(forPage: Page): Call = forPage match {
-    case _ => StfNavigator.defaultPage
-  }
-
-  val checkRouteMap: Page => UserAnswers => Call = _ => _ => routes.CheckYourAnswersController.onPageLoad()
-
-  def restore(submissionId: SubmissionId, userId: String)(implicit request: Request[?]): Future[UserAnswers] = {
-    implicit val hc: HeaderCarrier = HeaderCarrierConverter.fromRequestAndSession(request, request.session)
-    answerPersistenceService.load(submissionId, userId)
-  }
-}
-object StfNavigator:
-  val startPage: Call = routes.HowToNotifyAboutSecuritiesTransferController.onPageLoad(NormalMode)
-  val defaultPage: Call = routes.JourneyRecoveryController.onPageLoad()
-  val defaultPageF: Future[Call] = Future.successful(defaultPage)
-  val errorPages: Seq[Call] = List(defaultPage)
-  

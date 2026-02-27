@@ -21,7 +21,8 @@ import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.actions.StcAuthEnrolledAction
 import uk.gov.hmrc.securitiestransferchargefrontend.domain.SubmissionId
-import uk.gov.hmrc.securitiestransferchargefrontend.navigation.{PersistentNavigator, StfNavigator}
+import uk.gov.hmrc.securitiestransferchargefrontend.navigation.PersistentNavigator
+import uk.gov.hmrc.securitiestransferchargefrontend.navigation.stf.individuals.StfNavigator
 
 import javax.inject.Inject
 import scala.concurrent.ExecutionContext

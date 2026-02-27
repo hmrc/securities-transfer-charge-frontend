@@ -22,9 +22,9 @@ import org.scalatest.concurrent.ScalaFutures
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.routes
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.seller.routes.StfSellerAddressController
 import uk.gov.hmrc.securitiestransferchargefrontend.models.*
-import uk.gov.hmrc.securitiestransferchargefrontend.navigation.StfNavigator
 import uk.gov.hmrc.securitiestransferchargefrontend.pages.*
 import base.Fixtures
+import uk.gov.hmrc.securitiestransferchargefrontend.navigation.stf.individuals.StfNavigator
 
 import java.time.LocalDate
 
