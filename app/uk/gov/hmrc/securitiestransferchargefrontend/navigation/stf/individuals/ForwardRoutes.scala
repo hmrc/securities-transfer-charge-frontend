@@ -14,32 +14,34 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.securitiestransferchargefrontend.navigation
+package uk.gov.hmrc.securitiestransferchargefrontend.navigation.stf.individuals
 
-import play.api.mvc.{Call, Request}
+import play.api.mvc.Call
 import uk.gov.hmrc.http.HeaderCarrier
-import uk.gov.hmrc.play.http.HeaderCarrierConverter
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.routes
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.individuals.routes as individualRoutes
 import uk.gov.hmrc.securitiestransferchargefrontend.models.HowToNotifyAboutSecuritiesTransfer.{MoreThanOneAtATime, OneAtATime}
-import uk.gov.hmrc.securitiestransferchargefrontend.models.{CheckMode, Mode, NormalMode, UserAnswers, WhatTypeOfSecurities}
+import uk.gov.hmrc.securitiestransferchargefrontend.models.{NormalMode, UserAnswers, WhatTypeOfSecurities}
+import uk.gov.hmrc.securitiestransferchargefrontend.navigation.*
 import uk.gov.hmrc.securitiestransferchargefrontend.pages.*
-import uk.gov.hmrc.securitiestransferchargefrontend.queries.Gettable
 import uk.gov.hmrc.securitiestransferchargefrontend.services.AnswerPersistenceService
 
-import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 
-class StfNavigator @Inject()(answerPersistenceService: AnswerPersistenceService)
-                            (implicit ec: ExecutionContext) extends AbstractNavigator(answerPersistenceService) {
 
-  private def normalRoutes(page: Page)(implicit hc: HeaderCarrier): UserAnswers => Future[Call] = page match {
+class ForwardRoutes(answerPersistenceService: AnswerPersistenceService)
+                   (implicit ec: ExecutionContext):
+
+  val helper = new PersistentNavigationHelper(answerPersistenceService, StfNavigator.defaultPage, StfNavigator.errorPages)
+  import helper.*
+
+  def forwardRoutes(page: Page)(implicit hc: HeaderCarrier): UserAnswers => Future[Call] = page match {
 
     case SubmissionsDashboardPage => userAnswers => goTo(individualRoutes.HowToNotifyAboutSecuritiesTransferController.onPageLoad(NormalMode), Some(userAnswers))
     case HowToNotifyAboutSecuritiesTransferPage => userAnswers => {
       dataDependent(HowToNotifyAboutSecuritiesTransferPage, userAnswers) {
         case OneAtATime => individualRoutes.ConfirmAddressController.onPageLoad()
-        case MoreThanOneAtATime => Navigator.defaultPage
+        case MoreThanOneAtATime => StfNavigator.defaultPage
       }
     }
     case ConfirmAddressPage => userAnswers => dataRequired(ConfirmAddressPage, userAnswers, individualRoutes.NameOfSellerController.onPageLoad(NormalMode))
@@ -67,30 +69,12 @@ class StfNavigator @Inject()(answerPersistenceService: AnswerPersistenceService)
     case AmountPaidForSecuritiesPage => userAnswers =>
       userAnswersDependent(userAnswers) {
         userAnswers =>
-          userAnswers.get(ConnectedPersonsPage).fold(Navigator.defaultPage) {
+          userAnswers.get(ConnectedPersonsPage).fold(StfNavigator.defaultPage) {
             isConnected =>
               if (isConnected) individualRoutes.TotalMarketValueController.onPageLoad(NormalMode)
               else routes.CheckYourAnswersController.onPageLoad()
           }
       }
     case TotalMarketValuePage => userAnswers => dataRequired(TotalMarketValuePage, userAnswers, routes.CheckYourAnswersController.onPageLoad())
-    case _ => _ => Navigator.defaultPageF
-
+    case _ => _ => StfNavigator.defaultPageF
   }
-
-  val checkRouteMap: Page => UserAnswers => Call = (_ => _ => routes.CheckYourAnswersController.onPageLoad())
-
-  def nextPage(page: Page, mode: Mode, userAnswers: UserAnswers)(implicit request: Request[?]): Future[Call] = {
-    mode match {
-      case NormalMode =>
-        implicit val hc: HeaderCarrier = HeaderCarrierConverter.fromRequestAndSession(request, request.session)
-        normalRoutes(page)(hc)(userAnswers)
-      case CheckMode => Future.successful(checkRouteMap(page)(userAnswers))
-    }
-  }
-
-  val errorPage: Page => Call = {
-    case _: Gettable[?] => ???
-    case _ => routes.JourneyRecoveryController.onPageLoad()
-  }
-}

@@ -17,7 +17,6 @@
 package base.stubs
 
 import play.api.mvc.{Call, Request}
-import uk.gov.hmrc.securitiestransferchargefrontend.domain.SubmissionId
 import uk.gov.hmrc.securitiestransferchargefrontend.models.{Mode, UserAnswers}
 import uk.gov.hmrc.securitiestransferchargefrontend.navigation.Navigator
 import uk.gov.hmrc.securitiestransferchargefrontend.pages.Page
@@ -26,12 +25,12 @@ import scala.concurrent.Future
 
 class StubNavigator(desiredCall: Call) extends Navigator {
 
-  override def nextPage(page: Page, mode: Mode, userAnswers: UserAnswers)(implicit request: Request[_]): Future[Call] =
+  override def nextPage(page: Page, mode: Mode, userAnswers: UserAnswers)(implicit request: Request[_]): Future[Call] = {
     Future.successful(desiredCall)
 
+  }
 
-  val errorPage: Page => Call = _ => desiredCall
+  override def errorPage(forPage: Page): Call = desiredCall
 
-  override def restore(submissionId: SubmissionId, userId: String)(implicit request: Request[_]): Future[UserAnswers] =
-    Future.successful(UserAnswers.empty(userId)(submissionId))
+  override def previousPage(page: Page, mode: Mode, userAnswers: UserAnswers): Call = desiredCall
 }

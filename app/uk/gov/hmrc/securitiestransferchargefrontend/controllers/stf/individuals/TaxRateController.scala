@@ -18,11 +18,11 @@ package uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.individuals
 
 import play.api.data.Form
 import play.api.i18n.{I18nSupport, MessagesApi}
-import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
+import play.api.mvc.{Action, AnyContent, Call, MessagesControllerComponents}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.actions.*
 import uk.gov.hmrc.securitiestransferchargefrontend.forms.stf.individuals.TaxRateFormProvider
-import uk.gov.hmrc.securitiestransferchargefrontend.models.{Mode, TaxRate}
+import uk.gov.hmrc.securitiestransferchargefrontend.models.{Mode, TaxRate, UserAnswers}
 import uk.gov.hmrc.securitiestransferchargefrontend.navigation.Navigator
 import uk.gov.hmrc.securitiestransferchargefrontend.pages.TaxRatePage
 import uk.gov.hmrc.securitiestransferchargefrontend.views.html.stf.individuals.TaxRateView
@@ -43,6 +43,9 @@ class TaxRateController @Inject()(
 
   val form: Form[TaxRate] = formProvider()
 
+  lazy val backLinkCall: Mode => UserAnswers => Call =
+    mode => userAnswers => navigator.previousPage(TaxRatePage, mode, userAnswers)
+
   def onPageLoad(mode: Mode): Action[AnyContent] = (stcAuthEnrolled andThen getData andThen requireData).async {
     implicit request =>
 
@@ -51,7 +54,7 @@ class TaxRateController @Inject()(
         case Some(value) => form.fill(value)
       }
 
-      Future.successful(Ok(view(preparedForm, mode)))
+      Future.successful(Ok(view(preparedForm, mode, backLinkCall(mode)(request.userAnswers))))
   }
 
   def onSubmit(mode: Mode): Action[AnyContent] = (stcAuthEnrolled andThen getData andThen requireData).async {
@@ -59,7 +62,7 @@ class TaxRateController @Inject()(
 
       form.bindFromRequest().fold(
         formWithErrors =>
-          Future.successful(BadRequest(view(formWithErrors, mode))),
+          Future.successful(BadRequest(view(formWithErrors, mode, backLinkCall(mode)(request.userAnswers)))),
 
         value =>
           for {

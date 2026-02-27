@@ -29,6 +29,8 @@ import uk.gov.hmrc.securitiestransferchargefrontend.forms.stf.individuals.Securi
 import uk.gov.hmrc.securitiestransferchargefrontend.models.{NormalMode, SecuritiesTarget}
 import uk.gov.hmrc.securitiestransferchargefrontend.repositories.SessionRepository
 import uk.gov.hmrc.securitiestransferchargefrontend.views.html.stf.individuals.SecuritiesTargetView
+import play.api.inject.bind
+import uk.gov.hmrc.securitiestransferchargefrontend.navigation.Navigator
 
 import scala.concurrent.Future
 
@@ -43,7 +45,9 @@ class SecuritiesTargetControllerSpec extends SpecBase with MockitoSugar {
 
     "must return OK and the correct view for a GET" in {
 
-      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers)).build()
+      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers))
+        .overrides(bind[Navigator].qualifiedWith("individuals").toInstance(getNavigator))
+        .build()
 
       running(application) {
         val request = FakeRequest(GET, securitiesTargetRoute)
@@ -53,7 +57,7 @@ class SecuritiesTargetControllerSpec extends SpecBase with MockitoSugar {
         val result = route(application, request).value
 
         status(result) mustEqual OK
-        contentAsString(result) mustEqual view(form, NormalMode)(request, messages(application)).toString
+        contentAsString(result) mustEqual view(form, NormalMode, testBackLinkRoute)(request, messages(application)).toString
       }
     }
     
@@ -81,7 +85,9 @@ class SecuritiesTargetControllerSpec extends SpecBase with MockitoSugar {
 
     "must return a Bad Request and errors when invalid data is submitted" in {
 
-      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers)).build()
+      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers))
+        .overrides(bind[Navigator].qualifiedWith("individuals").toInstance(getNavigator))
+        .build()
 
       running(application) {
         val request =
@@ -95,7 +101,7 @@ class SecuritiesTargetControllerSpec extends SpecBase with MockitoSugar {
         val result = route(application, request).value
 
         status(result) mustEqual BAD_REQUEST
-        contentAsString(result) mustEqual view(boundForm, NormalMode)(request, messages(application)).toString
+        contentAsString(result) mustEqual view(boundForm, NormalMode, testBackLinkRoute)(request, messages(application)).toString
       }
     }
 

@@ -21,9 +21,9 @@ import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import uk.gov.hmrc.securitiestransferchargefrontend.connectors.{SubscriptionConnector, SubscriptionStatusErrorException}
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.actions.*
-import uk.gov.hmrc.securitiestransferchargefrontend.controllers.routes
 import uk.gov.hmrc.securitiestransferchargefrontend.models.NormalMode
 import uk.gov.hmrc.securitiestransferchargefrontend.navigation.Navigator
+import uk.gov.hmrc.securitiestransferchargefrontend.navigation.stf.individuals.StfNavigator
 import uk.gov.hmrc.securitiestransferchargefrontend.pages.ConfirmAddressPage
 import uk.gov.hmrc.securitiestransferchargefrontend.repositories.SubscriptionDataRepository
 import uk.gov.hmrc.securitiestransferchargefrontend.services.AddressService
@@ -57,7 +57,7 @@ class ConfirmAddressController @Inject()(
         }
         .recover {
           //Need to confirm Kick out page
-          case _: SubscriptionStatusErrorException => Redirect(routes.JourneyRecoveryController.onPageLoad())
+          case _: SubscriptionStatusErrorException => Redirect(StfNavigator.defaultPage)
         }
     }
 
@@ -72,7 +72,7 @@ class ConfirmAddressController @Inject()(
           nextPage <- navigator.nextPage(ConfirmAddressPage, NormalMode, updatedAnswers)
         } yield Redirect(nextPage)
         ).recover {
-        case _: SubscriptionDataNotFoundException => Redirect(routes.JourneyRecoveryController.onPageLoad())
+        case _: SubscriptionDataNotFoundException => Redirect(StfNavigator.defaultPage)
       }
     }
 }

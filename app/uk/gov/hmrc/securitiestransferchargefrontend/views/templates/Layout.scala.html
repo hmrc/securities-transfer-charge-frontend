@@ -34,7 +34,7 @@
     autocompleteJavascript: HmrcAccessibleAutocompleteJavascript
 )
 
-@(pageTitle: String, showBackLink: Boolean = true, timeout: Boolean = true, showSignOut: Boolean = true, showHmrcBanner: Boolean = false)(contentBlock: Html)(implicit rh: RequestHeader, messages: Messages)
+@(pageTitle: String, showBackLink: Boolean = true, backLinkUrl: Option[String] = None, timeout: Boolean = true, showSignOut: Boolean = true, showHmrcBanner: Boolean = false)(contentBlock: Html)(implicit rh: RequestHeader, messages: Messages)
 
 @head = {
 
@@ -79,5 +79,11 @@
         phaseBanner = Some(alphaBanner(appConfig.feedbackUrl))
     ),
     isWelshTranslationAvailable = appConfig.languageTranslationEnabled,
-    backLink = if (showBackLink) Some(BackLink.mimicsBrowserBackButtonViaJavaScript) else None
+    backLink =
+    if (!showBackLink) None
+    else {
+        backLinkUrl
+            .map(url => BackLink(url))
+            .orElse(Some(BackLink.mimicsBrowserBackButtonViaJavaScript))
+    }
 ))(content)

@@ -21,6 +21,7 @@ import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.when
 import org.scalatestplus.mockito.MockitoSugar
 import play.api.data.Form
+import play.api.inject.bind
 import play.api.mvc.Call
 import play.api.test.FakeRequest
 import play.api.test.Helpers.*
@@ -28,6 +29,7 @@ import uk.gov.hmrc.securitiestransferchargefrontend.controllers.routes
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.individuals.routes as individualRoutes
 import uk.gov.hmrc.securitiestransferchargefrontend.forms.stf.individuals.TaxRateFormProvider
 import uk.gov.hmrc.securitiestransferchargefrontend.models.{NormalMode, TaxRate, UserAnswers}
+import uk.gov.hmrc.securitiestransferchargefrontend.navigation.Navigator
 import uk.gov.hmrc.securitiestransferchargefrontend.pages.TaxRatePage
 import uk.gov.hmrc.securitiestransferchargefrontend.repositories.SessionRepository
 import uk.gov.hmrc.securitiestransferchargefrontend.views.html.stf.individuals.TaxRateView
@@ -47,7 +49,9 @@ class TaxRateControllerSpec extends SpecBase with MockitoSugar {
 
     "must return OK and the correct view for a GET" in {
 
-      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers)).build()
+      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers))
+        .overrides(bind[Navigator].qualifiedWith("individuals").toInstance(getNavigator))
+        .build()
 
       running(application) {
         val request = FakeRequest(GET, taxRateRoute)
@@ -57,7 +61,7 @@ class TaxRateControllerSpec extends SpecBase with MockitoSugar {
         val view = application.injector.instanceOf[TaxRateView]
 
         status(result) mustEqual OK
-        contentAsString(result) mustEqual view(form, NormalMode)(request, messages(application)).toString
+        contentAsString(result) mustEqual view(form, NormalMode, testBackLinkRoute)(request, messages(application)).toString
       }
     }
 
@@ -65,7 +69,9 @@ class TaxRateControllerSpec extends SpecBase with MockitoSugar {
 
       val userAnswers = UserAnswers(userAnswersId, submissionId).set(TaxRatePage, TaxRate.values.head).success.value
 
-      val application = applicationBuilder(userAnswers = Some(userAnswers)).build()
+      val application = applicationBuilder(userAnswers = Some(userAnswers))
+        .overrides(bind[Navigator].qualifiedWith("individuals").toInstance(getNavigator))
+        .build()
 
       running(application) {
         val request = FakeRequest(GET, taxRateRoute)
@@ -75,7 +81,7 @@ class TaxRateControllerSpec extends SpecBase with MockitoSugar {
         val result = route(application, request).value
 
         status(result) mustEqual OK
-        contentAsString(result) mustEqual view(form.fill(TaxRate.values.head), NormalMode)(request, messages(application)).toString
+        contentAsString(result) mustEqual view(form.fill(TaxRate.values.head), NormalMode, testBackLinkRoute)(request, messages(application)).toString
       }
     }
 
@@ -104,7 +110,9 @@ class TaxRateControllerSpec extends SpecBase with MockitoSugar {
 
     "must return a Bad Request and errors when invalid data is submitted" in {
 
-      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers)).build()
+      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers))
+        .overrides(bind[Navigator].qualifiedWith("individuals").toInstance(getNavigator))
+        .build()
 
       running(application) {
         val request =
@@ -118,7 +126,7 @@ class TaxRateControllerSpec extends SpecBase with MockitoSugar {
         val result = route(application, request).value
 
         status(result) mustEqual BAD_REQUEST
-        contentAsString(result) mustEqual view(boundForm, NormalMode)(request, messages(application)).toString
+        contentAsString(result) mustEqual view(boundForm, NormalMode, testBackLinkRoute)(request, messages(application)).toString
       }
     }
 

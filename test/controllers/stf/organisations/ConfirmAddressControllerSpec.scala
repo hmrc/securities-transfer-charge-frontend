@@ -25,9 +25,9 @@ import play.api.inject
 import play.api.test.FakeRequest
 import play.api.test.Helpers.*
 import uk.gov.hmrc.securitiestransferchargefrontend.connectors.SubscriptionConnector
-import uk.gov.hmrc.securitiestransferchargefrontend.controllers.routes
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.organisations.routes as orgRoutes
 import uk.gov.hmrc.securitiestransferchargefrontend.domain.SubscriptionId
+import uk.gov.hmrc.securitiestransferchargefrontend.navigation.stf.organisations.StfOrgNavigator
 import uk.gov.hmrc.securitiestransferchargefrontend.repositories.{SubscriptionData, SubscriptionDataRepository}
 import uk.gov.hmrc.securitiestransferchargefrontend.services.AddressService
 import uk.gov.hmrc.securitiestransferchargefrontend.views.html.stf.organisations.ConfirmAddressView
@@ -129,7 +129,7 @@ class ConfirmAddressControllerSpec extends SpecBase {
 
         status(result) mustEqual SEE_OTHER
         redirectLocation(result).value mustEqual
-          routes.JourneyRecoveryController.onPageLoad().url
+          StfOrgNavigator.defaultPage.url
       }
     }
   }

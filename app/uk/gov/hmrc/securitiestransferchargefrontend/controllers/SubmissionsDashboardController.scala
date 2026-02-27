@@ -27,7 +27,7 @@ import uk.gov.hmrc.securitiestransferchargefrontend.navigation.Navigator
 import uk.gov.hmrc.securitiestransferchargefrontend.pages.SubmissionsDashboardPage
 import uk.gov.hmrc.securitiestransferchargefrontend.views.html.SubmissionsDashboardView
 
-import javax.inject.Inject
+import javax.inject.{Inject, Named}
 import scala.concurrent.ExecutionContext
 
 class SubmissionsDashboardController @Inject()(
@@ -38,7 +38,7 @@ class SubmissionsDashboardController @Inject()(
                                                 view: SubmissionsDashboardView,
                                                 idClient: SubmissionIdClient,
                                                 saveAndReturnClient: SaveAndReturnClient,
-                                                navigator: Navigator)
+                                                @Named("individuals") navigator: Navigator)
                                               (implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport with Logging {
 
   def onPageLoad: Action[AnyContent] =

@@ -22,25 +22,26 @@ import org.mockito.Mockito.*
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatestplus.mockito.MockitoSugar
 import play.api.libs.json.JsPath
-import play.api.mvc.{Call, Request}
+import play.api.mvc.Call
 import uk.gov.hmrc.http.HeaderCarrier
-import uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.individuals.routes as individualRoutes
-import uk.gov.hmrc.securitiestransferchargefrontend.models.{Mode, NormalMode, UserAnswers}
-import uk.gov.hmrc.securitiestransferchargefrontend.navigation.AbstractNavigator
+import uk.gov.hmrc.securitiestransferchargefrontend.controllers.routes
+import uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.individuals.routes as individualsRoutes
+import uk.gov.hmrc.securitiestransferchargefrontend.models.{NormalMode, UserAnswers}
+import uk.gov.hmrc.securitiestransferchargefrontend.navigation.stf.individuals.StfNavigator
 import uk.gov.hmrc.securitiestransferchargefrontend.pages.*
 import uk.gov.hmrc.securitiestransferchargefrontend.queries.*
 import uk.gov.hmrc.securitiestransferchargefrontend.services.AnswerPersistenceService
 
 import scala.concurrent.Future
 
-class NavigatorSpec extends SpecBase with MockitoSugar with ScalaFutures {
+class PersistentNavigationHelperSpec extends SpecBase with MockitoSugar with ScalaFutures {
   val testPage: Page & Gettable[Boolean] & Settable[Boolean] = new Page with Gettable[Boolean] with Settable[Boolean] {
     override def path: JsPath = JsPath \ "test"
   }
   private val emptyUserAnswers = UserAnswers.empty("test-id")(submissionId)
   private val userAnswers = emptyUserAnswers.set(testPage, true).get
-  //private val errorCall = routes.JourneyRecoveryController.onPageLoad()
-  private val testCall = individualRoutes.HowToNotifyAboutSecuritiesTransferController.onPageLoad(NormalMode)
+  private val errorCall = routes.JourneyRecoveryController.onPageLoad()
+  private val testCall = individualsRoutes.HowToNotifyAboutSecuritiesTransferController.onPageLoad(NormalMode)
 
   private val mockAnswerPersistenceService = mock[AnswerPersistenceService]
   when(mockAnswerPersistenceService.save(any[UserAnswers])(any[HeaderCarrier]))
@@ -48,19 +49,12 @@ class NavigatorSpec extends SpecBase with MockitoSugar with ScalaFutures {
 
   private implicit val mockHeaderCarrier: HeaderCarrier = mock[HeaderCarrier]
 
-  private def testSetup(): TestNavigator = {
+  private def testSetup(): PersistentNavigationHelper = {
     reset(mockAnswerPersistenceService)
     when(mockAnswerPersistenceService.save(any[UserAnswers])(any[HeaderCarrier]))
       .thenReturn(Future.unit)
 
-    new TestNavigator()
-  }
-
-  class TestNavigator extends AbstractNavigator(mockAnswerPersistenceService) {
-    override val errorPage: Page => Call = _ => testCall
-
-    override def nextPage(page: Page, mode: Mode, userAnswers: UserAnswers)(implicit request: Request[?]): Future[Call] =
-      Future.successful(testCall)
+    new PersistentNavigationHelper(mockAnswerPersistenceService, errorCall, List(errorCall))
   }
 
   "All navigators should" - {
@@ -103,7 +97,7 @@ class NavigatorSpec extends SpecBase with MockitoSugar with ScalaFutures {
       for {
         res     <- result
       } yield {
-        res mustBe Navigator.defaultPage
+        res mustBe StfNavigator.defaultPage
       }
     }
     "return the success page when data is present for data dependent navigation" in {
@@ -119,7 +113,7 @@ class NavigatorSpec extends SpecBase with MockitoSugar with ScalaFutures {
       for {
         res     <- result
       } yield {
-        res mustBe Navigator.defaultPage
+        res mustBe StfNavigator.defaultPage
       }
     }
     "call the provided function when data is present for data dependent navigation" in {
