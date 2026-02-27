@@ -24,10 +24,8 @@ import uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.individuals.
 import uk.gov.hmrc.securitiestransferchargefrontend.models.HowToNotifyAboutSecuritiesTransfer.{MoreThanOneAtATime, OneAtATime}
 import uk.gov.hmrc.securitiestransferchargefrontend.models.{CheckMode, Mode, NormalMode, UserAnswers, WhatTypeOfSecurities}
 import uk.gov.hmrc.securitiestransferchargefrontend.pages.*
-import uk.gov.hmrc.securitiestransferchargefrontend.pages.stf.individuals.{AmountPaidForSecuritiesPage, ApplyingForReliefPage, ChargingPointPage, ConfirmAddressPage, ConnectedPersonsPage, DetailsOfThisTransferPage, HowToNotifyAboutSecuritiesTransferPage, NameOfSellerPage, OtherSecuritiesTypePage, SecuritiesTargetPage, SellerAddressPage, StfBuyersAddressPage, TaxRatePage, TotalMarketValuePage, WhatReliefAreYouApplyingForPage, WhatTypeOfSecuritiesPage}
 import uk.gov.hmrc.securitiestransferchargefrontend.queries.Gettable
 import uk.gov.hmrc.securitiestransferchargefrontend.services.AnswerPersistenceService
-import uk.gov.hmrc.securitiestransferchargefrontend.pages.stf.organisations as organisationsPages
 
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
@@ -76,7 +74,6 @@ class StfNavigator @Inject()(answerPersistenceService: AnswerPersistenceService)
           }
       }
     case TotalMarketValuePage => userAnswers => dataRequired(TotalMarketValuePage, userAnswers, routes.CheckYourAnswersController.onPageLoad())
-    case organisationsPages.ConfirmAddressPage => userAnswers => dataRequired(organisationsPages.ConfirmAddressPage, userAnswers, routes.JourneyRecoveryController.onPageLoad())
     case _ => _ => Navigator.defaultPageF
 
   }

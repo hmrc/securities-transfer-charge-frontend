@@ -21,16 +21,15 @@ import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import uk.gov.hmrc.securitiestransferchargefrontend.connectors.{SubscriptionConnector, SubscriptionStatusErrorException}
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.actions.*
-import uk.gov.hmrc.securitiestransferchargefrontend.controllers.routes
 import uk.gov.hmrc.securitiestransferchargefrontend.models.NormalMode
 import uk.gov.hmrc.securitiestransferchargefrontend.navigation.Navigator
-import uk.gov.hmrc.securitiestransferchargefrontend.pages.stf.organisations.ConfirmAddressPage
+import uk.gov.hmrc.securitiestransferchargefrontend.pages.ConfirmAddressPage
 import uk.gov.hmrc.securitiestransferchargefrontend.repositories.SubscriptionDataRepository
 import uk.gov.hmrc.securitiestransferchargefrontend.services.AddressService
 import uk.gov.hmrc.securitiestransferchargefrontend.utils.CommonHelpers.FutureOptionOps
 import uk.gov.hmrc.securitiestransferchargefrontend.views.html.stf.organisations.ConfirmAddressView
 
-import javax.inject.Inject
+import javax.inject.{Inject, Named}
 import scala.concurrent.{ExecutionContext, Future}
 
 class SubscriptionDataNotFoundException(msg: String) extends RuntimeException(msg)
@@ -45,7 +44,7 @@ class ConfirmAddressController @Inject()(
                                           val controllerComponents: MessagesControllerComponents,
                                           view: ConfirmAddressView,
                                           addressService: AddressService,
-                                          navigator: Navigator
+                                          @Named("organisations") navigator: Navigator
                                         )(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport {
 
   def onPageLoad: Action[AnyContent] =
@@ -57,7 +56,7 @@ class ConfirmAddressController @Inject()(
         }
         .recover {
           //Need to confirm Kick out page
-          case _: SubscriptionStatusErrorException => Redirect(routes.JourneyRecoveryController.onPageLoad())
+          case _: SubscriptionStatusErrorException => Redirect(navigator.errorPage(ConfirmAddressPage))
         }
     }
 
@@ -72,7 +71,7 @@ class ConfirmAddressController @Inject()(
           nextPage <- navigator.nextPage(ConfirmAddressPage, NormalMode, updatedAnswers)
         } yield Redirect(nextPage)
         ).recover {
-        case _: SubscriptionDataNotFoundException => Redirect(routes.JourneyRecoveryController.onPageLoad())
+        case _: SubscriptionDataNotFoundException => Redirect(navigator.errorPage(ConfirmAddressPage))
       }
     }
 }

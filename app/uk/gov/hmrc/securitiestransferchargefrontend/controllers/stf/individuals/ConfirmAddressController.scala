@@ -24,13 +24,13 @@ import uk.gov.hmrc.securitiestransferchargefrontend.controllers.actions.*
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.routes
 import uk.gov.hmrc.securitiestransferchargefrontend.models.NormalMode
 import uk.gov.hmrc.securitiestransferchargefrontend.navigation.Navigator
-import uk.gov.hmrc.securitiestransferchargefrontend.pages.stf.individuals.ConfirmAddressPage
+import uk.gov.hmrc.securitiestransferchargefrontend.pages.ConfirmAddressPage
 import uk.gov.hmrc.securitiestransferchargefrontend.repositories.SubscriptionDataRepository
 import uk.gov.hmrc.securitiestransferchargefrontend.services.AddressService
 import uk.gov.hmrc.securitiestransferchargefrontend.utils.CommonHelpers.FutureOptionOps
 import uk.gov.hmrc.securitiestransferchargefrontend.views.html.stf.individuals.ConfirmAddressView
 
-import javax.inject.Inject
+import javax.inject.{Inject, Named}
 import scala.concurrent.{ExecutionContext, Future}
 
 class SubscriptionDataNotFoundException(msg: String) extends RuntimeException(msg)
@@ -45,7 +45,7 @@ class ConfirmAddressController @Inject()(
                                           val controllerComponents: MessagesControllerComponents,
                                           view: ConfirmAddressView,
                                           addressService: AddressService,
-                                          navigator: Navigator
+                                          @Named("individuals") navigator: Navigator
                                         )(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport {
 
   def onPageLoad: Action[AnyContent] =

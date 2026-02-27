@@ -24,15 +24,15 @@ import uk.gov.hmrc.securitiestransferchargefrontend.controllers.actions.*
 import uk.gov.hmrc.securitiestransferchargefrontend.forms.stf.individuals.WhatTypeOfSecuritiesFormProvider
 import uk.gov.hmrc.securitiestransferchargefrontend.models.{Mode, WhatTypeOfSecurities}
 import uk.gov.hmrc.securitiestransferchargefrontend.navigation.Navigator
-import uk.gov.hmrc.securitiestransferchargefrontend.pages.stf.individuals.WhatTypeOfSecuritiesPage
+import uk.gov.hmrc.securitiestransferchargefrontend.pages.WhatTypeOfSecuritiesPage
 import uk.gov.hmrc.securitiestransferchargefrontend.views.html.stf.individuals.WhatTypeOfSecuritiesView
 
-import javax.inject.Inject
+import javax.inject.{Inject, Named}
 import scala.concurrent.{ExecutionContext, Future}
 
 class WhatTypeOfSecuritiesController @Inject()(
                                        override val messagesApi: MessagesApi,
-                                       navigator: Navigator,
+                                       @Named("individuals") navigator: Navigator,
                                        stcAuthEnrolled: StcAuthEnrolledAction,
                                        getData: StcDataRetrievalAction,
                                        requireData: StcDataRequiredAction,
