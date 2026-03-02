@@ -17,7 +17,7 @@
 @import uk.gov.hmrc.securitiestransferchargefrontend.models.HowToNotifyAboutSecuritiesTransfer
 @import uk.gov.hmrc.securitiestransferchargefrontend.viewmodels.LegendSize.Large
 @import uk.gov.hmrc.securitiestransferchargefrontend.views.html.templates
-@import uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.individuals.routes
+@import uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.organisations.routes
 @import uk.gov.hmrc.securitiestransferchargefrontend.views.html.components.SaveAndReturnButton
 
 
@@ -27,12 +27,12 @@
     govukErrorSummary: GovukErrorSummary,
     govukRadios: GovukRadios,
     govukButton: GovukButton,
-    saveAndReturnButton:SaveAndReturnButton
+    saveAndReturnButton: SaveAndReturnButton
 )
 
 @(form: Form[_], mode: Mode, backLinkCall: Call)(implicit request: Request[_], messages: Messages)
 
-@layout(pageTitle = title(form, messages("howToNotifyAboutSecuritiesTransfer.title")), backLinkUrl = Some(backLinkCall.url)) {
+@layout(pageTitle = title(form, messages("orgs.howToNotifyAboutSecuritiesTransfer.title")), backLinkUrl = Some(backLinkCall.url)) {
     <div id="caption-heading" class="govuk-caption-l">
         @messages("transfer.details.caption")
     </div>
@@ -46,8 +46,8 @@
         @govukRadios(
             RadiosViewModel(
                 field  = form("value"),
-                legend = LegendViewModel(messages("howToNotifyAboutSecuritiesTransfer.heading")).asPageHeading(Large),
-                items  = HowToNotifyAboutSecuritiesTransfer.options()
+                legend = LegendViewModel(messages("orgs.howToNotifyAboutSecuritiesTransfer.heading")).asPageHeading(Large),
+                items  = HowToNotifyAboutSecuritiesTransfer.options(isOrg = true)
             )
         )
 

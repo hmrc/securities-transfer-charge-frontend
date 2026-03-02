@@ -26,6 +26,7 @@ import uk.gov.hmrc.securitiestransferchargefrontend.models.{NormalMode, UserAnsw
 import uk.gov.hmrc.securitiestransferchargefrontend.navigation.Navigator
 import uk.gov.hmrc.securitiestransferchargefrontend.pages.SubmissionsDashboardPage
 import uk.gov.hmrc.securitiestransferchargefrontend.views.html.SubmissionsDashboardView
+import uk.gov.hmrc.auth.core.AffinityGroup
 
 import javax.inject.{Inject, Named}
 import scala.concurrent.ExecutionContext
@@ -38,7 +39,8 @@ class SubmissionsDashboardController @Inject()(
                                                 view: SubmissionsDashboardView,
                                                 idClient: SubmissionIdClient,
                                                 saveAndReturnClient: SaveAndReturnClient,
-                                                @Named("individuals") navigator: Navigator)
+                                                @Named("individuals") individualsNavigator: Navigator,
+                                                @Named("organisations") orgNavigator: Navigator)
                                               (implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport with Logging {
 
   def onPageLoad: Action[AnyContent] =
@@ -54,13 +56,23 @@ class SubmissionsDashboardController @Inject()(
 
   def onSubmit(): Action[AnyContent] = (stcAuthEnrolled andThen getData).async {
     implicit request =>
-      val userId = request.request.internalId
+
+      val innerRequest = request.request
+      val userId = innerRequest.internalId
+
       for {
-        submissionId  <- idClient.nextSubmissionId()
-        emptyAnswers  =  UserAnswers.empty(userId)(submissionId)
-        _              = logger.info(s"** Created user answers **")
-        nextPage      <- navigator.nextPage(SubmissionsDashboardPage, NormalMode, emptyAnswers)
-        _              = logger.info(s"Redirecting to $nextPage")
-      } yield Redirect(nextPage)
+        submissionId <- idClient.nextSubmissionId()
+        emptyAnswers = UserAnswers.empty(userId)(submissionId)
+
+        call <- innerRequest.affinityGroup match {
+          case AffinityGroup.Organisation =>
+            orgNavigator.nextPage(SubmissionsDashboardPage, NormalMode, emptyAnswers)
+
+          case _ =>
+            individualsNavigator.nextPage(SubmissionsDashboardPage, NormalMode, emptyAnswers)
+        }
+      } yield {
+        Redirect(call)
+      }
   }
 }

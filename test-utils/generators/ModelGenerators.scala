@@ -17,9 +17,14 @@
 package generators
 
 import org.scalacheck.{Arbitrary, Gen}
-import uk.gov.hmrc.securitiestransferchargefrontend.models.{DetailsOfThisTransfer, WhatTypeOfSecurities}
+import uk.gov.hmrc.securitiestransferchargefrontend.models.{DetailsOfThisTransfer, WhatTypeOfSecurities, HowToNotifyAboutSecuritiesTransfer}
 
 trait ModelGenerators {
+
+  implicit lazy val arbitraryHowToNotifyAboutSecuritiesTransfer: Arbitrary[HowToNotifyAboutSecuritiesTransfer] =
+    Arbitrary {
+      Gen.oneOf(HowToNotifyAboutSecuritiesTransfer.values.toSeq)
+    }
 
   implicit lazy val arbitraryDetailsOfThisTransfer: Arbitrary[DetailsOfThisTransfer] =
     Arbitrary {

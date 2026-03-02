@@ -227,3 +227,13 @@ org.confirmAddress.title = Confirm business address
 org.confirmAddress.heading = Confirm business address
 org.confirmAddress.editLink = Edit address
 org.confirmAddress.confirm = Confirm and continue
+
+orgs.howToNotifyAboutSecuritiesTransfer.title = How do you want to tell us about your securities transfers?
+orgs.howToNotifyAboutSecuritiesTransfer.heading = How do you want to tell us about your securities transfers?
+orgs.howToNotifyAboutSecuritiesTransfer.oneAtATime = One at a time
+orgs.howToNotifyAboutSecuritiesTransfer.oneAtATime.hint = Each transfer can have one seller, and can include one type of security or type of shares.
+orgs.howToNotifyAboutSecuritiesTransfer.moreThanOneAtATime = More than one at a time
+orgs.howToNotifyAboutSecuritiesTransfer.moreThanOneAtATime.hint = Download the template, complete it using one row per transfer, and upload it on the following pages. You can then find the submission on your dashboard and pay the charges due.
+orgs.howToNotifyAboutSecuritiesTransfer.checkYourAnswersLabel = howToNotifyAboutSecuritiesTransfer
+orgs.howToNotifyAboutSecuritiesTransfer.error.required = Select a way to tell us about these securities transfers
+orgs.howToNotifyAboutSecuritiesTransfer.change.hidden = HowToNotifyAboutSecuritiesTransfer
