@@ -38,9 +38,8 @@ class StfOrgNavigator @Inject()(answerPersistenceService: AnswerPersistenceServi
 
   val forwardRoutes: ForwardRoutes = new ForwardRoutes(answerPersistenceService)
 
-  override def forwardRoutes(page: Page)(implicit hc: HeaderCarrier): UserAnswers => Future[Call] = {
+  override def forwardRoutes(page: Page)(implicit hc: HeaderCarrier): UserAnswers => Future[Call] =
     forwardRoutes.forwardRoutes(page)(hc)
-  }
 
   override def predecessorRoutes(page: Page): UserAnswers => Call =
     BackwardsRoutes.predecessorRoutes(page)
