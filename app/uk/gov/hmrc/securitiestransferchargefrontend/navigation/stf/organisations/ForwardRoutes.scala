@@ -22,7 +22,6 @@ import uk.gov.hmrc.securitiestransferchargefrontend.controllers.routes
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.organisations.routes as orgRoutes
 import uk.gov.hmrc.securitiestransferchargefrontend.models.{NormalMode, UserAnswers}
 import uk.gov.hmrc.securitiestransferchargefrontend.navigation.PersistentNavigationHelper
-import uk.gov.hmrc.securitiestransferchargefrontend.navigation.stf.individuals.StfNavigator
 import uk.gov.hmrc.securitiestransferchargefrontend.pages.{ConfirmAddressPage, Page, StfBuyersAddressPage}
 import uk.gov.hmrc.securitiestransferchargefrontend.services.AnswerPersistenceService
 import uk.gov.hmrc.securitiestransferchargefrontend.pages.SubmissionsDashboardPage
