@@ -19,10 +19,9 @@ package uk.gov.hmrc.securitiestransferchargefrontend.navigation.stf.individuals
 import play.api.mvc.{Call, Request}
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.play.http.HeaderCarrierConverter
-import uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.individuals.routes as individualsRoutes
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.routes
 import uk.gov.hmrc.securitiestransferchargefrontend.domain.SubmissionId
-import uk.gov.hmrc.securitiestransferchargefrontend.models.{NormalMode, UserAnswers}
+import uk.gov.hmrc.securitiestransferchargefrontend.models.UserAnswers
 import uk.gov.hmrc.securitiestransferchargefrontend.navigation.{AbstractModeNavigator, PersistentNavigator}
 import uk.gov.hmrc.securitiestransferchargefrontend.pages.*
 import uk.gov.hmrc.securitiestransferchargefrontend.services.AnswerPersistenceService
@@ -34,16 +33,21 @@ import scala.concurrent.{ExecutionContext, Future}
 class StfNavigator @Inject()(answerPersistenceService: AnswerPersistenceService)
                             (implicit ec: ExecutionContext) extends AbstractModeNavigator with PersistentNavigator {
 
-  val forwardRoutes: ForwardRoutes = new ForwardRoutes(answerPersistenceService)
+  override lazy val dashboardPage: Call = routes.SubmissionsDashboardController.onPageLoad()
+  val defaultPage: Call = routes.JourneyRecoveryController.onPageLoad()
+  val errorPages: List[Call] = List(defaultPage)
+  
+  val forwardRoutes: ForwardRoutes = new ForwardRoutes(answerPersistenceService, defaultPage, errorPages)
+  val backwardsRoutes: BackwardsRoutes = new BackwardsRoutes(defaultPage)
 
   override def forwardRoutes(page: Page)(implicit hc: HeaderCarrier): UserAnswers => Future[Call] =
     forwardRoutes.forwardRoutes(page)(hc)
 
   override def predecessorRoutes(page: Page): UserAnswers => Call =
-    BackwardsRoutes.predecessorRoutes(page)
+    backwardsRoutes.predecessorRoutes(page)
   
   def errorPage(forPage: Page): Call = forPage match {
-    case _ => StfNavigator.defaultPage
+    case _ => routes.JourneyRecoveryController.onPageLoad()
   }
 
   val checkRouteMap: Page => UserAnswers => Call = _ => _ => routes.CheckYourAnswersController.onPageLoad()
@@ -53,10 +57,3 @@ class StfNavigator @Inject()(answerPersistenceService: AnswerPersistenceService)
     answerPersistenceService.load(submissionId, userId)
   }
 }
-object StfNavigator:
-  val startPage: Call = individualsRoutes.HowToNotifyAboutSecuritiesTransferController.onPageLoad(NormalMode)
-  val defaultPage: Call = routes.JourneyRecoveryController.onPageLoad()
-  val defaultPageF: Future[Call] = Future.successful(defaultPage)
-  val errorPages: Seq[Call] = List(defaultPage)
-  //val dashboardPage: Call = routes.SubmissionsDashboardController.onPageLoad()
-  val dashboardPage: Call = Call("GET", "/securities-transfer-charge/submissions-dashboard")

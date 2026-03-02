@@ -40,7 +40,7 @@ class StfNavigatorSpec extends SpecBase with ScalaFutures {
         case object UnknownPage extends Page
         val result = navigator.nextPage(UnknownPage, NormalMode, UserAnswers("id", submissionId))(fakeRequest)
         whenReady(result) { res =>
-          res mustBe StfNavigator.defaultPage
+          res mustBe navigator.defaultPage
         }
       }
 
@@ -48,7 +48,7 @@ class StfNavigatorSpec extends SpecBase with ScalaFutures {
         case object AnyPage extends Page
         val result = navigator.nextPage(AnyPage, NormalMode, UserAnswers("id", submissionId), true)(fakeRequest)
         whenReady(result) { res =>
-          res mustBe StfNavigator.dashboardPage
+          res mustBe navigator.dashboardPage
         }
       }
 
@@ -209,7 +209,7 @@ class StfNavigatorSpec extends SpecBase with ScalaFutures {
       "must go from a page that doesn't exist in the previous route map to Journey Recovery" in {
         case object UnknownPage extends Page
         val result = navigator.previousPage(UnknownPage, NormalMode, emptyUserAnswers)
-        result mustBe StfNavigator.defaultPage
+        result mustBe navigator.defaultPage
       }
 
       "must go from the TotalMarketValuePage to AmountPaidForSecurities" in {
@@ -294,8 +294,6 @@ class StfNavigatorSpec extends SpecBase with ScalaFutures {
         result mustBe routes.SubmissionsDashboardController.onPageLoad()
       }
       
-      
-
     }
 
   }
