@@ -20,8 +20,8 @@ import play.api.mvc.{Call, Request}
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.play.http.HeaderCarrierConverter
 import uk.gov.hmrc.securitiestransferchargefrontend.models.{CheckMode, Mode, NormalMode, UserAnswers}
+import uk.gov.hmrc.securitiestransferchargefrontend.navigation.stf.individuals.StfNavigator
 import uk.gov.hmrc.securitiestransferchargefrontend.pages.Page
-import uk.gov.hmrc.securitiestransferchargefrontend.controllers.routes
 
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -34,14 +34,12 @@ abstract class AbstractModeNavigator(implicit ex: ExecutionContext) extends Navi
 
   def forwardRoutes(page: Page)(implicit hc: HeaderCarrier): UserAnswers => Future[Call]
   def predecessorRoutes(page: Page): UserAnswers => Call
-  
   val checkRouteMap: Page => UserAnswers => Call
-  val dashboardPage: Call = routes.SubmissionsDashboardController.onPageLoad()
-  
+
   def nextPage(page: Page, mode: Mode, userAnswers: UserAnswers, isReturn: Boolean)(implicit request: Request[?]): Future[Call] = {
     implicit lazy val hc: HeaderCarrier = HeaderCarrierConverter.fromRequestAndSession(request, request.session)
     mode match {
-      case NormalMode if isReturn => forwardRoutes(page)(hc)(userAnswers).map(_ => dashboardPage)
+      case NormalMode if isReturn => forwardRoutes(page)(hc)(userAnswers).map(_ => StfNavigator.dashboardPage)
       case NormalMode             => forwardRoutes(page)(hc)(userAnswers)
       case CheckMode              => Future.successful(checkRouteMap(page)(userAnswers))
     }

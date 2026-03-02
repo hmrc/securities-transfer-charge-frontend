@@ -37,13 +37,19 @@ class StfNavigatorSpec extends SpecBase with ScalaFutures {
     "in Normal mode" - {
 
       "must go from a page that doesn't exist in the route map to default page" in {
-
         case object UnknownPage extends Page
         val result = navigator.nextPage(UnknownPage, NormalMode, UserAnswers("id", submissionId))(fakeRequest)
         whenReady(result) { res =>
           res mustBe StfNavigator.defaultPage
         }
+      }
 
+      "must go from any page to the dashboard page if isReturn is true" in {
+        case object AnyPage extends Page
+        val result = navigator.nextPage(AnyPage, NormalMode, UserAnswers("id", submissionId), true)(fakeRequest)
+        whenReady(result) { res =>
+          res mustBe StfNavigator.dashboardPage
+        }
       }
 
       "must go from the HowToNotifyAboutSecuritiesTransfer to ConfirmAddressController when one at a time is selected" in {
@@ -287,6 +293,8 @@ class StfNavigatorSpec extends SpecBase with ScalaFutures {
         val result = navigator.previousPage(HowToNotifyAboutSecuritiesTransferPage, NormalMode, emptyUserAnswers)
         result mustBe routes.SubmissionsDashboardController.onPageLoad()
       }
+      
+      
 
     }
 

@@ -58,3 +58,5 @@ object StfNavigator:
   val defaultPage: Call = routes.JourneyRecoveryController.onPageLoad()
   val defaultPageF: Future[Call] = Future.successful(defaultPage)
   val errorPages: Seq[Call] = List(defaultPage)
+  //val dashboardPage: Call = routes.SubmissionsDashboardController.onPageLoad()
+  val dashboardPage: Call = Call("GET", "/securities-transfer-charge/submissions-dashboard")
