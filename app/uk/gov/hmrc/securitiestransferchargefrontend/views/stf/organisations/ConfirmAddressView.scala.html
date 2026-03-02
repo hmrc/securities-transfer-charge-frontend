@@ -38,9 +38,10 @@
     <span class="govuk-caption-l">@messages("org.details.caption")</span>
     <h1 class="govuk-heading-l">@messages("org.confirmAddress.heading")</h1>
     @address_confirmation_display(address)
+    <br>
     <p class="govuk-body">
         <a class="govuk-link"
-            href=""
+            href="@routes.AddressController.onPageLoad().url"
             id="editAddressLink">
             @messages("confirmAddress.editLink")
         </a>
