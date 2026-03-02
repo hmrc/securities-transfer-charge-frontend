@@ -26,6 +26,6 @@ class HowToNotifyAboutSecuritiesTransferFormProvider @Inject() extends Mappings 
 
   def apply(): Form[HowToNotifyAboutSecuritiesTransfer] =
     Form(
-      "value" -> enumerable[HowToNotifyAboutSecuritiesTransfer]("howToNotifyAboutSecuritiesTransfer.error.required")
+      "value" -> enumerable[HowToNotifyAboutSecuritiesTransfer]("orgs.howToNotifyAboutSecuritiesTransfer.error.required")
     )
 }

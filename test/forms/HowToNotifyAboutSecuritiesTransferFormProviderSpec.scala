@@ -28,7 +28,7 @@ class HowToNotifyAboutSecuritiesTransferFormProviderSpec extends OptionFieldBeha
   ".value" - {
 
     val fieldName = "value"
-    val requiredKey = "howToNotifyAboutSecuritiesTransfer.error.required"
+    val requiredKey = "orgs.howToNotifyAboutSecuritiesTransfer.error.required"
 
     behave like optionsField[HowToNotifyAboutSecuritiesTransfer](
       form,
