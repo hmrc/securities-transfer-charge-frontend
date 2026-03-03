@@ -21,15 +21,40 @@ import play.api.mvc.*
 import uk.gov.hmrc.auth.core.AffinityGroup
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.actions.{StcAuthEnrolledAction, StcAuthorisedRequest}
 
-import javax.inject.Inject
+import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
 
-class StubStcAuthEnrolledAction @Inject()(playBodyParsers: PlayBodyParsers) extends StcAuthEnrolledAction {
+@Singleton
+class StubStcAuthEnrolledAction @Inject() (
+                                            playBodyParsers: PlayBodyParsers
+                                          ) extends StcAuthEnrolledAction {
+  
+  protected val affinityGroup: AffinityGroup =
+    AffinityGroup.Individual
 
-  override def parser: BodyParser[AnyContent] = playBodyParsers.defaultBodyParser
+  override val parser: BodyParser[AnyContent] =
+    playBodyParsers.defaultBodyParser
 
-  override protected def executionContext: ExecutionContext = ExecutionContext.global
+  override protected val executionContext: ExecutionContext =
+    ExecutionContext.global
 
-  override def invokeBlock[A](request: Request[A], block: StcAuthorisedRequest[A] => Future[Result]): Future[Result] =
-    block(StcAuthorisedRequest(request, testInternalId, AffinityGroup.Individual, testSubscriptionId))
+  override def invokeBlock[A](
+                               request: Request[A],
+                               block: StcAuthorisedRequest[A] => Future[Result]
+                             ): Future[Result] =
+    block(
+      StcAuthorisedRequest(
+        request,
+        testInternalId,
+        affinityGroup,
+        testSubscriptionId
+      )
+    )
+}
+class OrganisationStubStcAuthEnrolledAction @Inject() (
+                                                        playBodyParsers: PlayBodyParsers
+                                                      ) extends StubStcAuthEnrolledAction(playBodyParsers) {
+
+  override protected val affinityGroup: AffinityGroup =
+    AffinityGroup.Organisation
 }

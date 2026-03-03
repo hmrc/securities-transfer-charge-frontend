@@ -28,6 +28,7 @@ import uk.gov.hmrc.securitiestransferchargefrontend.views.html.stf.organisations
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.organisations.routes as orgRoutes
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.routes
 import uk.gov.hmrc.securitiestransferchargefrontend.navigation.Navigator
+import uk.gov.hmrc.auth.core.AffinityGroup
 
 class HowToNotifyAboutSecuritiesTransferControllerSpec extends SpecBase {
 
@@ -40,9 +41,13 @@ class HowToNotifyAboutSecuritiesTransferControllerSpec extends SpecBase {
 
     "must return OK and the correct view for a GET" in {
 
-      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers))
-        .overrides(bind[Navigator].qualifiedWith("organisations").toInstance(getNavigator))
-        .build()
+      val application =
+        applicationBuilder(
+          userAnswers = Some(emptyUserAnswers),
+          affinityGroup = AffinityGroup.Organisation
+        )
+          .overrides(bind[Navigator].qualifiedWith("organisations").toInstance(getNavigator))
+          .build()
 
       running(application) {
         val request = FakeRequest(GET, howToNotifyAboutSecuritiesTransferRoute)
@@ -52,16 +57,20 @@ class HowToNotifyAboutSecuritiesTransferControllerSpec extends SpecBase {
         val view = application.injector.instanceOf[HowToNotifyAboutSecuritiesTransferView]
 
         status(result) mustEqual OK
-        contentAsString(result) mustEqual view(form, NormalMode, testBackLinkRoute)(request, messages(application)).toString
+        contentAsString(result) mustEqual view(form, NormalMode, affinityGroupKeyOrg, testBackLinkRoute)(request, messages(application)).toString
       }
     }
 
     "must populate the view correctly on a GET when the question has previously been answered" in {
 
       val userAnswers = UserAnswers(userAnswersId, submissionId).set(HowToNotifyAboutSecuritiesTransferPage, HowToNotifyAboutSecuritiesTransfer.values.head).success.value
-      val application = applicationBuilder(userAnswers = Some(userAnswers))
-        .overrides(bind[Navigator].qualifiedWith("organisations").toInstance(getNavigator))
-        .build()
+      val application =
+        applicationBuilder(
+          userAnswers = Some(userAnswers),
+          affinityGroup = AffinityGroup.Organisation
+        )
+          .overrides(bind[Navigator].qualifiedWith("organisations").toInstance(getNavigator))
+          .build()
 
       running(application) {
         val request = FakeRequest(GET, howToNotifyAboutSecuritiesTransferRoute)
@@ -71,15 +80,19 @@ class HowToNotifyAboutSecuritiesTransferControllerSpec extends SpecBase {
         val result = route(application, request).value
 
         status(result) mustEqual OK
-        contentAsString(result) mustEqual view(form.fill(HowToNotifyAboutSecuritiesTransfer.values.head), NormalMode, testBackLinkRoute)(request, messages(application)).toString
+        contentAsString(result) mustEqual view(form.fill(HowToNotifyAboutSecuritiesTransfer.values.head), NormalMode, affinityGroupKeyOrg, testBackLinkRoute)(request, messages(application)).toString
       }
     }
 
     "must return a Bad Request and errors when invalid data is submitted" in {
 
-      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers))
-        .overrides(bind[Navigator].qualifiedWith("organisations").toInstance(getNavigator))
-        .build()
+      val application =
+        applicationBuilder(
+          userAnswers = Some(emptyUserAnswers),
+          affinityGroup = AffinityGroup.Organisation
+        )
+          .overrides(bind[Navigator].qualifiedWith("organisations").toInstance(getNavigator))
+          .build()
 
       running(application) {
         val request =
@@ -92,12 +105,18 @@ class HowToNotifyAboutSecuritiesTransferControllerSpec extends SpecBase {
         val result = route(application, request).value
 
         status(result) mustEqual BAD_REQUEST
-        contentAsString(result) mustEqual view(boundForm, NormalMode, testBackLinkRoute)(request, messages(application)).toString
+        contentAsString(result) mustEqual view(boundForm, NormalMode, affinityGroupKeyOrg, testBackLinkRoute)(request, messages(application)).toString
       }
     }
 
     "must redirect to Journey Recovery when no existing data is found on GET" in {
-      val application = applicationBuilder(userAnswers = None).build()
+      val application =
+        applicationBuilder(
+          userAnswers = None,
+          affinityGroup = AffinityGroup.Organisation
+        )
+          .overrides(bind[Navigator].qualifiedWith("organisations").toInstance(getNavigator))
+          .build()
 
       running(application) {
         val request = FakeRequest(GET, howToNotifyAboutSecuritiesTransferRoute)
@@ -111,7 +130,11 @@ class HowToNotifyAboutSecuritiesTransferControllerSpec extends SpecBase {
     "must redirect after valid submission" in {
 
       val application =
-        applicationBuilder(userAnswers = Some(emptyUserAnswers))
+        applicationBuilder(
+          userAnswers = Some(emptyUserAnswers),
+          affinityGroup = AffinityGroup.Organisation
+        )
+          .overrides(bind[Navigator].qualifiedWith("organisations").toInstance(getNavigator))
           .build()
 
       running(application) {

@@ -36,7 +36,7 @@ class HowToNotifyAboutSecuritiesTransferViewSpec extends ViewBaseSpec {
 
 
   def view(): Document = Jsoup.parse(
-    viewInstance(form, NormalMode, testBackLinkRoute)(fakeRequest, messages).body
+    viewInstance(form, NormalMode, affinityGroupKeyOrg, testBackLinkRoute)(fakeRequest, messages).body
   )
 
   object ExpectedContent {

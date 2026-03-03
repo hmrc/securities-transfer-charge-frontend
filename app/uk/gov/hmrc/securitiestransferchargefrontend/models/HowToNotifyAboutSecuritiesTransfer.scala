@@ -31,19 +31,15 @@ object HowToNotifyAboutSecuritiesTransfer extends Enumerable.Implicits {
     OneAtATime, MoreThanOneAtATime
   )
 
-  def options(isOrg: Boolean = false)(implicit messages: Messages): Seq[RadioItem] = {
-
-    val prefix =
-      if (isOrg) "orgs.howToNotifyAboutSecuritiesTransfer"
-      else "howToNotifyAboutSecuritiesTransfer"
+  def options(affinityGroupKey: String)(implicit messages: Messages): Seq[RadioItem] = {
 
     values.zipWithIndex.map { case (value, index) =>
       RadioItem(
-        content = Text(messages(s"$prefix.${value.toString}")),
+        content = Text(messages(s"$affinityGroupKey.howToNotifyAboutSecuritiesTransfer.${value.toString}")),
         value = Some(value.toString),
         id = Some(s"value_$index"),
         hint = Some(
-          Hint(content = Text(messages(s"$prefix.${value.toString}.hint")))
+          Hint(content = Text(messages(s"$affinityGroupKey.howToNotifyAboutSecuritiesTransfer.${value.toString}.hint")))
         )
       )
     }
