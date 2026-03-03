@@ -22,7 +22,7 @@ import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.actions.StcAuthEnrolledAction
 import uk.gov.hmrc.securitiestransferchargefrontend.domain.SubmissionId
 import uk.gov.hmrc.securitiestransferchargefrontend.navigation.PersistentNavigator
-import uk.gov.hmrc.securitiestransferchargefrontend.navigation.stf.individuals.StfNavigator
+import uk.gov.hmrc.securitiestransferchargefrontend.pages.SaveAndReturnPage
 
 import javax.inject.{Inject, Named}
 import scala.concurrent.ExecutionContext
@@ -37,6 +37,6 @@ class SaveAndReturnController @Inject()( override val messagesApi: MessagesApi,
     stcAuthEnrolled.async { implicit request =>
       for {
         userAnswers <- navigator.restore(SubmissionId(submissionId), request.internalId)
-        nextPage     = userAnswers.nextPage.getOrElse(StfNavigator.startPage)
+        nextPage     = userAnswers.nextPage.getOrElse(navigator.errorPage(SaveAndReturnPage))
       } yield Redirect(nextPage)
     }

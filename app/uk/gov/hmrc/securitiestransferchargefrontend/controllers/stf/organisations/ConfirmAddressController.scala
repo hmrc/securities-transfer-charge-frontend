@@ -31,6 +31,7 @@ import uk.gov.hmrc.securitiestransferchargefrontend.views.html.stf.organisations
 
 import javax.inject.{Inject, Named}
 import scala.concurrent.{ExecutionContext, Future}
+import uk.gov.hmrc.securitiestransferchargefrontend.controllers.SaveAndReturnButton.isReturn
 
 class SubscriptionDataNotFoundException(msg: String) extends RuntimeException(msg)
 
@@ -68,7 +69,7 @@ class ConfirmAddressController @Inject()(
             .getOrFail(new SubscriptionDataNotFoundException("Subscription data not found"))
           address = addressService.extractConfirmableAddress(subscriptionData.subscriptionDetails)
           updatedAnswers <- Future.fromTry(request.userAnswers.set(ConfirmAddressPage, address))
-          nextPage <- navigator.nextPage(ConfirmAddressPage, NormalMode, updatedAnswers)
+          nextPage <- navigator.nextPage(ConfirmAddressPage, NormalMode, updatedAnswers, isReturn(request))
         } yield Redirect(nextPage)
         ).recover {
         case _: SubscriptionDataNotFoundException => Redirect(navigator.errorPage(ConfirmAddressPage))

@@ -25,7 +25,7 @@ import scala.concurrent.Future
 
 class StubNavigator(desiredCall: Call) extends Navigator {
 
-  override def nextPage(page: Page, mode: Mode, userAnswers: UserAnswers)(implicit request: Request[_]): Future[Call] = {
+  override def nextPage(page: Page, mode: Mode, userAnswers: UserAnswers, isReturn: Boolean = false)(implicit request: Request[_]): Future[Call] = {
     Future.successful(desiredCall)
 
   }

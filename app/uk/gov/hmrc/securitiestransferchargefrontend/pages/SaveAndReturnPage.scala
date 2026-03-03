@@ -1,4 +1,4 @@
-@*
+/*
  * Copyright 2026 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -12,17 +12,9 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- *@
+ */
 
-@import uk.gov.hmrc.securitiestransferchargefrontend.controllers.routes
-@import uk.gov.hmrc.securitiestransferchargefrontend.controllers.SaveAndReturnButton.saveAndReturnButtonName
+package uk.gov.hmrc.securitiestransferchargefrontend.pages
 
-@this(govukButton: GovukButton)
+case object SaveAndReturnPage extends Page
 
-@(implicit messages: Messages)
-
-@govukButton(
-  ButtonViewModel(messages("site.save-and-return.button"))
-    .asSecondaryButton()
-    .withName(saveAndReturnButtonName)
-)

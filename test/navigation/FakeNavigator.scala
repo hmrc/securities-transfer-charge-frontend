@@ -25,7 +25,7 @@ import scala.concurrent.Future
 
 class FakeNavigator(desiredRoute: Call) extends Navigator {
 
-  override def nextPage(page: Page, mode: Mode, userAnswers: UserAnswers)(implicit request: Request[?]): Future[Call] =
+  override def nextPage(page: Page, mode: Mode, userAnswers: UserAnswers, isReturn: Boolean = false)(implicit request: Request[?]): Future[Call] =
     Future.successful(desiredRoute)
     
   override def errorPage(forPage: Page): Call = desiredRoute

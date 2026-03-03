@@ -23,7 +23,6 @@ import uk.gov.hmrc.securitiestransferchargefrontend.connectors.{SubscriptionConn
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.actions.*
 import uk.gov.hmrc.securitiestransferchargefrontend.models.NormalMode
 import uk.gov.hmrc.securitiestransferchargefrontend.navigation.Navigator
-import uk.gov.hmrc.securitiestransferchargefrontend.navigation.stf.individuals.StfNavigator
 import uk.gov.hmrc.securitiestransferchargefrontend.pages.ConfirmAddressPage
 import uk.gov.hmrc.securitiestransferchargefrontend.repositories.SubscriptionDataRepository
 import uk.gov.hmrc.securitiestransferchargefrontend.services.AddressService
@@ -48,6 +47,8 @@ class ConfirmAddressController @Inject()(
                                           @Named("individuals") navigator: Navigator
                                         )(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport {
 
+  private lazy val kickOutPage = navigator.errorPage(ConfirmAddressPage)
+  
   def onPageLoad: Action[AnyContent] =
     (stcAuthEnrolled andThen getData).async { implicit request =>
 
@@ -57,7 +58,7 @@ class ConfirmAddressController @Inject()(
         }
         .recover {
           //Need to confirm Kick out page
-          case _: SubscriptionStatusErrorException => Redirect(StfNavigator.defaultPage)
+          case _: SubscriptionStatusErrorException => Redirect(kickOutPage)
         }
     }
 
@@ -72,7 +73,7 @@ class ConfirmAddressController @Inject()(
           nextPage <- navigator.nextPage(ConfirmAddressPage, NormalMode, updatedAnswers)
         } yield Redirect(nextPage)
         ).recover {
-        case _: SubscriptionDataNotFoundException => Redirect(StfNavigator.defaultPage)
+        case _: SubscriptionDataNotFoundException => Redirect(kickOutPage)
       }
     }
 }

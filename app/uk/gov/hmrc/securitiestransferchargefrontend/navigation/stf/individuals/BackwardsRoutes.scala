@@ -23,9 +23,9 @@ import uk.gov.hmrc.securitiestransferchargefrontend.models.{NormalMode, UserAnsw
 import uk.gov.hmrc.securitiestransferchargefrontend.navigation.NavigationHelper
 import uk.gov.hmrc.securitiestransferchargefrontend.pages.*
 
-object BackwardsRoutes:
+class BackwardsRoutes(defaultPage: Call):
 
-  val navHelper: NavigationHelper = new NavigationHelper(StfNavigator.defaultPage)
+  val navHelper: NavigationHelper = new NavigationHelper(defaultPage)
   import navHelper.*
   
   def predecessorRoutes(page: Page): UserAnswers => Call = page match {
@@ -48,7 +48,7 @@ object BackwardsRoutes:
     case OtherSecuritiesTypePage => _ => individualsRoutes.WhatTypeOfSecuritiesController.onPageLoad(NormalMode)
     case AmountPaidForSecuritiesPage => _ => individualsRoutes.OtherSecuritiesTypeController.onPageLoad(NormalMode)
     case TotalMarketValuePage => _ => individualsRoutes.AmountPaidForSecuritiesController.onPageLoad(NormalMode)
-    case _ => _ => StfNavigator.defaultPage
+    case _ => _ => defaultPage
   }
       
 
