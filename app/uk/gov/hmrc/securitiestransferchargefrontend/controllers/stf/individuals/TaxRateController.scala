@@ -29,6 +29,7 @@ import uk.gov.hmrc.securitiestransferchargefrontend.views.html.stf.individuals.T
 
 import javax.inject.{Inject, Named}
 import scala.concurrent.{ExecutionContext, Future}
+import uk.gov.hmrc.securitiestransferchargefrontend.controllers.SaveAndReturnButton.isReturn
 
 class TaxRateController @Inject()(
                                        override val messagesApi: MessagesApi,
@@ -67,7 +68,7 @@ class TaxRateController @Inject()(
         value =>
           for {
             updatedAnswers <- Future.fromTry(request.userAnswers.set(TaxRatePage, value))
-            nextPage       <- navigator.nextPage(TaxRatePage, mode, updatedAnswers)
+            nextPage       <- navigator.nextPage(TaxRatePage, mode, updatedAnswers, isReturn(request))
           } yield Redirect(nextPage)
       )
   }
