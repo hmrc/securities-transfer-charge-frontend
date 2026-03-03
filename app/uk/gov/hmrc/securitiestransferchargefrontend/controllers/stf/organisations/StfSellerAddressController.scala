@@ -23,7 +23,7 @@ import uk.gov.hmrc.securitiestransferchargefrontend.controllers.AbstractAddressC
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.actions.{StcAuthEnrolledAction, StcDataRequiredAction, StcDataRetrievalAction}
 import uk.gov.hmrc.securitiestransferchargefrontend.models.NormalMode
 import uk.gov.hmrc.securitiestransferchargefrontend.navigation.Navigator
-import uk.gov.hmrc.securitiestransferchargefrontend.pages.{AddressPage, SellerAddressPage}
+import uk.gov.hmrc.securitiestransferchargefrontend.pages.{AddressPage, StfSellerAddressPage}
 
 import javax.inject.{Inject, Named}
 import scala.concurrent.{ExecutionContext, Future}
@@ -37,7 +37,7 @@ class StfSellerAddressController @Inject()(val controllerComponents: MessagesCon
                                            config: FrontendAppConfig)
                                           (implicit ec: ExecutionContext) extends AbstractAddressController(alf):
 
-  val addressPage: AddressPage = SellerAddressPage
+  val addressPage: AddressPage = StfSellerAddressPage
 
   def onPageLoad: Action[AnyContent] = auth.async {
     implicit request =>
@@ -48,7 +48,7 @@ class StfSellerAddressController @Inject()(val controllerComponents: MessagesCon
     implicit request =>
       for {
         address <- super.alfReturn(addressId)
-        userAnswers <- Future.fromTry(request.userAnswers.set(SellerAddressPage, address))
-        nextPage <- navigator.nextPage(SellerAddressPage, NormalMode, userAnswers)
+        userAnswers <- Future.fromTry(request.userAnswers.set(StfSellerAddressPage, address))
+        nextPage <- navigator.nextPage(StfSellerAddressPage, NormalMode, userAnswers)
       } yield Redirect(nextPage)
   }
