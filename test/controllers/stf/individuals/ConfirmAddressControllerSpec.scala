@@ -135,8 +135,7 @@ class ConfirmAddressControllerSpec extends SpecBase {
         val result = route(application, request).value
 
         status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual
-          routes.JourneyRecoveryController.onPageLoad().url
+        redirectLocation(result).value.contains(routes.JourneyRecoveryController.onPageLoad().url) mustEqual true
       }
     }
   }

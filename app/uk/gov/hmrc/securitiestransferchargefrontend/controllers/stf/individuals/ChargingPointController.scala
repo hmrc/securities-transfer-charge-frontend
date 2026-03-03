@@ -17,21 +17,22 @@
 package uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.individuals
 
 import play.api.i18n.{I18nSupport, MessagesApi}
-import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
+import play.api.mvc.{Action, AnyContent, Call, MessagesControllerComponents}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.actions.*
 import uk.gov.hmrc.securitiestransferchargefrontend.forms.stf.individuals.ChargingPointFormProvider
-import uk.gov.hmrc.securitiestransferchargefrontend.models.Mode
+import uk.gov.hmrc.securitiestransferchargefrontend.models.{Mode, UserAnswers}
 import uk.gov.hmrc.securitiestransferchargefrontend.navigation.Navigator
-import uk.gov.hmrc.securitiestransferchargefrontend.pages.stf.individuals.ChargingPointPage
+import uk.gov.hmrc.securitiestransferchargefrontend.pages.ChargingPointPage
 import uk.gov.hmrc.securitiestransferchargefrontend.views.html.stf.individuals.ChargingPointView
 
-import javax.inject.Inject
+import javax.inject.{Inject, Named}
 import scala.concurrent.{ExecutionContext, Future}
+import uk.gov.hmrc.securitiestransferchargefrontend.controllers.SaveAndReturnButton.isReturn
 
 class ChargingPointController @Inject()(
                                         override val messagesApi: MessagesApi,
-                                        navigator: Navigator,
+                                        @Named("individuals") navigator: Navigator,
                                         stcAuthEnrolled: StcAuthEnrolledAction,
                                         getData: StcDataRetrievalAction,
                                         requireData: StcDataRequiredAction,
@@ -39,6 +40,9 @@ class ChargingPointController @Inject()(
                                         val controllerComponents: MessagesControllerComponents,
                                         view: ChargingPointView
                                       )(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport {
+
+  lazy val backLinkCall: Mode => UserAnswers => Call =
+    mode => userAnswers => navigator.previousPage(ChargingPointPage, mode, userAnswers)
 
   def onPageLoad(mode: Mode): Action[AnyContent] = (stcAuthEnrolled andThen getData andThen requireData).async {
     implicit request =>
@@ -50,7 +54,7 @@ class ChargingPointController @Inject()(
         case Some(value) => form.fill(value)
       }
 
-      Future.successful(Ok(view(preparedForm, mode)))
+      Future.successful(Ok(view(preparedForm, mode, backLinkCall(mode)(request.userAnswers))))
   }
 
   def onSubmit(mode: Mode): Action[AnyContent] = (stcAuthEnrolled andThen getData andThen requireData).async {
@@ -60,12 +64,12 @@ class ChargingPointController @Inject()(
 
       form.bindFromRequest().fold(
         formWithErrors =>
-          Future.successful(BadRequest(view(formWithErrors, mode))),
+          Future.successful(BadRequest(view(formWithErrors, mode, backLinkCall(mode)(request.userAnswers)))),
 
         value =>
           for {
             updatedAnswers <- Future.fromTry(request.userAnswers.set(ChargingPointPage, value))
-            nextPage       <- navigator.nextPage(ChargingPointPage, mode, updatedAnswers)
+            nextPage       <- navigator.nextPage(ChargingPointPage, mode, updatedAnswers, isReturn(request))
           } yield Redirect(nextPage)
       )
   }

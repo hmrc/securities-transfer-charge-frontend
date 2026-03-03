@@ -22,10 +22,9 @@ import org.scalatest.concurrent.ScalaFutures
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.routes
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.individuals.routes as individualRoutes
 import uk.gov.hmrc.securitiestransferchargefrontend.models.*
-import uk.gov.hmrc.securitiestransferchargefrontend.navigation.StfNavigator
 import uk.gov.hmrc.securitiestransferchargefrontend.pages.*
 import base.Fixtures
-import uk.gov.hmrc.securitiestransferchargefrontend.pages.stf.individuals.{AmountPaidForSecuritiesPage, ApplyingForReliefPage, ChargingPointPage, ConfirmAddressPage, ConnectedPersonsPage, DetailsOfThisTransferPage, HowToNotifyAboutSecuritiesTransferPage, NameOfSellerPage, OtherSecuritiesTypePage, SecuritiesTargetPage, SellerAddressPage, StfBuyersAddressPage, TaxRatePage, WhatTypeOfSecuritiesPage}
+import uk.gov.hmrc.securitiestransferchargefrontend.navigation.stf.individuals.StfNavigator
 
 import java.time.LocalDate
 
@@ -37,14 +36,20 @@ class StfNavigatorSpec extends SpecBase with ScalaFutures {
 
     "in Normal mode" - {
 
-      "must go from a page that doesn't exist in the route map to Journey Recovery" in {
-
+      "must go from a page that doesn't exist in the route map to default page" in {
         case object UnknownPage extends Page
         val result = navigator.nextPage(UnknownPage, NormalMode, UserAnswers("id", submissionId))(fakeRequest)
         whenReady(result) { res =>
-          res mustBe routes.JourneyRecoveryController.onPageLoad()
+          res mustBe navigator.defaultPage
         }
+      }
 
+      "must go from any page to the dashboard page if isReturn is true" in {
+        case object AnyPage extends Page
+        val result = navigator.nextPage(AnyPage, NormalMode, UserAnswers("id", submissionId), true)(fakeRequest)
+        whenReady(result) { res =>
+          res mustBe navigator.dashboardPage
+        }
       }
 
       "must go from the HowToNotifyAboutSecuritiesTransfer to ConfirmAddressController when one at a time is selected" in {
@@ -80,8 +85,8 @@ class StfNavigatorSpec extends SpecBase with ScalaFutures {
       }
 
       "must go from the sellers AddressLookup to ConnectedPersonsController" in {
-        val answers = emptyUserAnswers.set(SellerAddressPage, Fixtures.fakeAlfConfirmedAddress).get
-        val result = navigator.nextPage(SellerAddressPage, NormalMode, answers)(fakeRequest)
+        val answers = emptyUserAnswers.set(StfSellerAddressPage, Fixtures.fakeAlfConfirmedAddress).get
+        val result = navigator.nextPage(StfSellerAddressPage, NormalMode, answers)(fakeRequest)
         whenReady(result) { res =>
           res mustBe individualRoutes.ConnectedPersonsController.onPageLoad(NormalMode)
         }
@@ -198,5 +203,98 @@ class StfNavigatorSpec extends SpecBase with ScalaFutures {
         }
       }
     }
+
+    "Previous Pages" - {
+
+      "must go from a page that doesn't exist in the previous route map to Journey Recovery" in {
+        case object UnknownPage extends Page
+        val result = navigator.previousPage(UnknownPage, NormalMode, emptyUserAnswers)
+        result mustBe navigator.defaultPage
+      }
+
+      "must go from the TotalMarketValuePage to AmountPaidForSecurities" in {
+        val result = navigator.previousPage(TotalMarketValuePage, NormalMode, emptyUserAnswers)
+        result mustBe individualRoutes.AmountPaidForSecuritiesController.onPageLoad(NormalMode)
+      }
+
+      "must go from the AmountPaidForSecuritiesPage to OtherSecuritiesType" in {
+        val result = navigator.previousPage(AmountPaidForSecuritiesPage, NormalMode, emptyUserAnswers)
+        result mustBe individualRoutes.OtherSecuritiesTypeController.onPageLoad(NormalMode)
+      }
+
+      "must go from the OtherSecuritiesTypePage to WhatTypeOfSecurities" in {
+        val result = navigator.previousPage(OtherSecuritiesTypePage, NormalMode, emptyUserAnswers)
+        result mustBe individualRoutes.WhatTypeOfSecuritiesController.onPageLoad(NormalMode)
+      }
+
+      "must go from the DetailsOfThisTransferPage to WhatTypeOfSecurities" in {
+        val result = navigator.previousPage(DetailsOfThisTransferPage, NormalMode, emptyUserAnswers)
+        result mustBe individualRoutes.WhatTypeOfSecuritiesController.onPageLoad(NormalMode)
+      }
+
+      "must go from the WhatTypeOfSecuritiesPage to TaxRate" in {
+        val result = navigator.previousPage(WhatTypeOfSecuritiesPage, NormalMode, emptyUserAnswers)
+        result mustBe individualRoutes.TaxRateController.onPageLoad(NormalMode)
+      }
+
+      "must go from the TaxRatePage to ChargingPoint" in {
+        val result = navigator.previousPage(TaxRatePage, NormalMode, emptyUserAnswers)
+        result mustBe individualRoutes.ChargingPointController.onPageLoad(NormalMode)
+      }
+
+      "must go from the ChargingPointPage to SecuritiesTarget" in {
+        val result = navigator.previousPage(ChargingPointPage, NormalMode, emptyUserAnswers)
+        result mustBe individualRoutes.SecuritiesTargetController.onPageLoad(NormalMode)
+      }
+
+      "must go from the SecuritiesTarget to WhatReliefAreYouApplyingFor if applying for a relief" in {
+        val answers = emptyUserAnswers.set(ApplyingForReliefPage, true).get
+        val result = navigator.previousPage(SecuritiesTargetPage, NormalMode, answers)
+        result mustBe individualRoutes.WhatReliefAreYouApplyingForController.onPageLoad(NormalMode)
+      }
+
+      "must go from the SecuritiesTarget to ApplyingForRelief if not applying for a relief" in {
+        val answers = emptyUserAnswers.set(ApplyingForReliefPage, false).get
+        val result = navigator.previousPage(SecuritiesTargetPage, NormalMode, answers)
+        result mustBe individualRoutes.ApplyingForReliefController.onPageLoad(NormalMode)
+      }
+
+      "must go from the WhatReliefAreYouApplyingForPage to ApplyingForRelief" in {
+        val result = navigator.previousPage(WhatReliefAreYouApplyingForPage, NormalMode, emptyUserAnswers)
+        result mustBe individualRoutes.ApplyingForReliefController.onPageLoad(NormalMode)
+      }
+
+      "must go from the ApplyingForReliefPage to ConnectedPersons" in {
+        val result = navigator.previousPage(ApplyingForReliefPage, NormalMode, emptyUserAnswers)
+        result mustBe individualRoutes.ConnectedPersonsController.onPageLoad(NormalMode)
+      }
+
+      "must go from the ConnectedPersonsPage to StfSellerAddress" in {
+        val result = navigator.previousPage(ConnectedPersonsPage, NormalMode, emptyUserAnswers)
+        result mustBe individualRoutes.StfSellerAddressController.onPageLoad()
+      }
+
+      "must go from the StfSellerAddressPage to NameOfSeller" in {
+        val result = navigator.previousPage(StfSellerAddressPage, NormalMode, emptyUserAnswers)
+        result mustBe individualRoutes.NameOfSellerController.onPageLoad(NormalMode)
+      }
+
+      "must go from the NameOfSellerPage to ConfirmAddress" in {
+        val result = navigator.previousPage(NameOfSellerPage, NormalMode, emptyUserAnswers)
+        result mustBe individualRoutes.ConfirmAddressController.onPageLoad()
+      }
+
+      "must go from the ConfirmAddressPage to HowToNotifyAboutSecuritiesTransfer" in {
+        val result = navigator.previousPage(ConfirmAddressPage, NormalMode, emptyUserAnswers)
+        result mustBe individualRoutes.HowToNotifyAboutSecuritiesTransferController.onPageLoad(NormalMode)
+      }
+
+      "must go from the HowToNotifyAboutSecuritiesTransferPage to SubmissionsDashboard" in {
+        val result = navigator.previousPage(HowToNotifyAboutSecuritiesTransferPage, NormalMode, emptyUserAnswers)
+        result mustBe routes.SubmissionsDashboardController.onPageLoad()
+      }
+      
+    }
+
   }
 }

@@ -15,6 +15,7 @@
  *@
 
 @import uk.gov.hmrc.securitiestransferchargefrontend.controllers.routes
+@import uk.gov.hmrc.securitiestransferchargefrontend.controllers.SaveAndReturnButton.saveAndReturnButtonName
 
 @this(govukButton: GovukButton)
 
@@ -23,5 +24,5 @@
 @govukButton(
   ButtonViewModel(messages("site.save-and-return.button"))
     .asSecondaryButton()
-    .asLink(routes.SubmissionsDashboardController.onPageLoad().url)
+    .withName(saveAndReturnButtonName)
 )

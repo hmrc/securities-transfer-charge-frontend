@@ -19,6 +19,7 @@ package views.stf.individuals
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
 import play.api.Application
+import play.api.mvc.Call
 import uk.gov.hmrc.securitiestransferchargefrontend.forms.stf.individuals.ChargingPointFormProvider
 import uk.gov.hmrc.securitiestransferchargefrontend.models.NormalMode
 import uk.gov.hmrc.securitiestransferchargefrontend.views.html.stf.individuals.ChargingPointView
@@ -31,16 +32,17 @@ class ChargingPointViewSpec extends ViewBaseSpec {
   private val viewInstance = app.injector.instanceOf[ChargingPointView]
   private val formProvider = new ChargingPointFormProvider()
   private val form = formProvider()
+  private val testBackLinkRoute: Call = Call("GET", "/back-link")
 
   def view(): Document = Jsoup.parse(
-    viewInstance(form, NormalMode)(fakeRequest, messages).body
+    viewInstance(form, NormalMode, testBackLinkRoute)(fakeRequest, messages).body
   )
 
   object ExpectedContent {
-    val title = "When did you buy the securities?"
+    val title = "When did you buy these securities?"
     val caption = "Transfer details"
-    val heading = "When did you buy the securities?"
-    val hint = "This is also called the charging point. For example, 12 11 2007"
+    val heading = "When did you buy these securities?"
+    val hint = "This is also called the charging point. For example, 27 3 2024"
     val saveAndContinue = "Save and continue"
     val saveAndReturn = "Save and return to dashboard"
   }

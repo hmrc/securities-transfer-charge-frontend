@@ -18,22 +18,23 @@ package uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.individuals
 
 import play.api.data.Form
 import play.api.i18n.{I18nSupport, MessagesApi}
-import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
+import play.api.mvc.{Action, AnyContent, Call, MessagesControllerComponents}
 import play.twirl.api.Html
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.actions.*
 import uk.gov.hmrc.securitiestransferchargefrontend.forms.stf.individuals.SecuritiesTargetFormProvider
-import uk.gov.hmrc.securitiestransferchargefrontend.models.{Mode, SecuritiesTarget}
+import uk.gov.hmrc.securitiestransferchargefrontend.models.{Mode, SecuritiesTarget, UserAnswers}
 import uk.gov.hmrc.securitiestransferchargefrontend.navigation.Navigator
-import uk.gov.hmrc.securitiestransferchargefrontend.pages.stf.individuals.SecuritiesTargetPage
+import uk.gov.hmrc.securitiestransferchargefrontend.pages.SecuritiesTargetPage
 import uk.gov.hmrc.securitiestransferchargefrontend.views.html.stf.individuals.SecuritiesTargetView
 
-import javax.inject.Inject
+import javax.inject.{Inject, Named}
 import scala.concurrent.{ExecutionContext, Future}
+import uk.gov.hmrc.securitiestransferchargefrontend.controllers.SaveAndReturnButton.isReturn
 
 class SecuritiesTargetController @Inject()(
                                       override val messagesApi: MessagesApi,
-                                      navigator: Navigator,
+                                      @Named("individuals") navigator: Navigator,
                                       stcAuthEnrolled: StcAuthEnrolledAction,
                                       getData: StcDataRetrievalAction,
                                       requireData: StcDataRequiredAction,
@@ -44,6 +45,9 @@ class SecuritiesTargetController @Inject()(
 
   val form: Form[SecuritiesTarget] = formProvider()
 
+  lazy val backLinkCall: Mode => UserAnswers => Call =
+    mode => userAnswers => navigator.previousPage(SecuritiesTargetPage, mode, userAnswers)
+
   def onPageLoad(mode: Mode): Action[AnyContent] = (stcAuthEnrolled andThen getData andThen requireData) {
     implicit request =>
 
@@ -52,7 +56,7 @@ class SecuritiesTargetController @Inject()(
         case Some(value) => form.fill(value)
       }
 
-      Ok(view(preparedForm, mode): Html)
+      Ok(view(preparedForm, mode, backLinkCall(mode)(request.userAnswers)): Html)
   }
 
   def onSubmit(mode: Mode): Action[AnyContent] = (stcAuthEnrolled andThen getData andThen requireData).async {
@@ -60,12 +64,12 @@ class SecuritiesTargetController @Inject()(
 
       form.bindFromRequest().fold(
         formWithErrors =>
-          Future.successful(BadRequest(view(formWithErrors, mode): Html)),
+          Future.successful(BadRequest(view(formWithErrors, mode, backLinkCall(mode)(request.userAnswers)): Html)),
 
         value =>
           for {
             updatedAnswers <- Future.fromTry(request.userAnswers.set(SecuritiesTargetPage, value))
-            nextPage       <- navigator.nextPage(SecuritiesTargetPage, mode, updatedAnswers)
+            nextPage       <- navigator.nextPage(SecuritiesTargetPage, mode, updatedAnswers, isReturn(request))
           } yield Redirect(nextPage)
       )
   }

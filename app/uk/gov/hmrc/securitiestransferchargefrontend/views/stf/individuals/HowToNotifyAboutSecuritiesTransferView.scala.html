@@ -30,9 +30,9 @@
     saveAndReturnButton:SaveAndReturnButton
 )
 
-@(form: Form[_], mode: Mode)(implicit request: Request[_], messages: Messages)
+@(form: Form[_], mode: Mode, affinityGroupKey: String, backLinkCall: Call)(implicit request: Request[_], messages: Messages)
 
-@layout(pageTitle = title(form, messages("howToNotifyAboutSecuritiesTransfer.title"))) {
+@layout(pageTitle = title(form, messages("individual.howToNotifyAboutSecuritiesTransfer.title")), backLinkUrl = Some(backLinkCall.url)) {
     <div id="caption-heading" class="govuk-caption-l">
         @messages("transfer.details.caption")
     </div>
@@ -46,8 +46,8 @@
         @govukRadios(
             RadiosViewModel(
                 field  = form("value"),
-                legend = LegendViewModel(messages("howToNotifyAboutSecuritiesTransfer.heading")).asPageHeading(Large),
-                items  = HowToNotifyAboutSecuritiesTransfer.options
+                legend = LegendViewModel(messages("individual.howToNotifyAboutSecuritiesTransfer.heading")).asPageHeading(Large),
+                items  = HowToNotifyAboutSecuritiesTransfer.options(affinityGroupKey)
             )
         )
 

@@ -17,21 +17,22 @@
 package uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.individuals
 
 import play.api.i18n.{I18nSupport, MessagesApi}
-import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
+import play.api.mvc.{Action, AnyContent, Call, MessagesControllerComponents}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.actions.*
 import uk.gov.hmrc.securitiestransferchargefrontend.forms.stf.individuals.ApplyingForReliefFormProvider
-import uk.gov.hmrc.securitiestransferchargefrontend.models.Mode
+import uk.gov.hmrc.securitiestransferchargefrontend.models.{Mode, UserAnswers}
 import uk.gov.hmrc.securitiestransferchargefrontend.navigation.Navigator
-import uk.gov.hmrc.securitiestransferchargefrontend.pages.stf.individuals.ApplyingForReliefPage
+import uk.gov.hmrc.securitiestransferchargefrontend.pages.ApplyingForReliefPage
 import uk.gov.hmrc.securitiestransferchargefrontend.views.html.stf.individuals.ApplyingForReliefView
 
-import javax.inject.Inject
+import javax.inject.{Inject, Named}
 import scala.concurrent.{ExecutionContext, Future}
+import uk.gov.hmrc.securitiestransferchargefrontend.controllers.SaveAndReturnButton.isReturn
 
 class ApplyingForReliefController @Inject()(
                                          override val messagesApi: MessagesApi,
-                                         navigator: Navigator,
+                                         @Named("individuals") navigator: Navigator,
                                          stcAuthEnrolled: StcAuthEnrolledAction,
                                          getData: StcDataRetrievalAction,
                                          requireData: StcDataRequiredAction,
@@ -42,6 +43,9 @@ class ApplyingForReliefController @Inject()(
 
   val form = formProvider()
 
+  lazy val backLinkCall: Mode => UserAnswers => Call =
+    mode => userAnswers => navigator.previousPage(ApplyingForReliefPage, mode, userAnswers)
+
   def onPageLoad(mode: Mode): Action[AnyContent] = (stcAuthEnrolled andThen getData andThen requireData) {
     implicit request =>
 
@@ -50,7 +54,7 @@ class ApplyingForReliefController @Inject()(
         case Some(value) => form.fill(value)
       }
 
-      Ok(view(preparedForm, mode))
+      Ok(view(preparedForm, mode, backLinkCall(mode)(request.userAnswers)))
   }
 
   def onSubmit(mode: Mode): Action[AnyContent] = (stcAuthEnrolled andThen getData andThen requireData).async {
@@ -58,12 +62,12 @@ class ApplyingForReliefController @Inject()(
 
       form.bindFromRequest().fold(
         formWithErrors =>
-          Future.successful(BadRequest(view(formWithErrors, mode))),
+          Future.successful(BadRequest(view(formWithErrors, mode, backLinkCall(mode)(request.userAnswers)))),
 
         applyingForRelief =>
           for {
             updatedAnswers <- Future.fromTry(request.userAnswers.set(ApplyingForReliefPage, applyingForRelief))
-            nextPage <- navigator.nextPage(ApplyingForReliefPage, mode, updatedAnswers)
+            nextPage <- navigator.nextPage(ApplyingForReliefPage, mode, updatedAnswers, isReturn(request))
           } yield Redirect(nextPage)
       )
   }

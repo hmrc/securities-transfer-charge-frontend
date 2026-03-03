@@ -25,9 +25,8 @@ import play.api.test.FakeRequest
 import play.api.test.Helpers.*
 import uk.gov.hmrc.securitiestransferchargefrontend.clients.{SaveAndReturnClient, SubmissionIdClient}
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.routes
-import uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.individuals.routes as individualRoutes
 import uk.gov.hmrc.securitiestransferchargefrontend.domain.SubmissionId
-import uk.gov.hmrc.securitiestransferchargefrontend.models.NormalMode
+import uk.gov.hmrc.securitiestransferchargefrontend.navigation.Navigator
 import uk.gov.hmrc.securitiestransferchargefrontend.views.html.SubmissionsDashboardView
 
 import scala.concurrent.Future
@@ -36,6 +35,9 @@ class SubmissionsDashboardControllerSpec extends SpecBase with MockitoSugar {
 
   lazy val submissionsDashboardRoute: String =
     routes.SubmissionsDashboardController.onPageLoad().url
+
+  lazy val submissionsDashboardSubmitRoute: String =
+    routes.SubmissionsDashboardController.onSubmit().url
 
   "SubmissionsDashboardController" - {
 
@@ -111,23 +113,81 @@ class SubmissionsDashboardControllerSpec extends SpecBase with MockitoSugar {
 
     "POST onSubmit" - {
 
-      "must generate a submissionId and redirect to the next page" in {
+      "must generate a submissionId and redirect using navigator" in {
 
-        val mockSaveAndReturnClient = mock[SaveAndReturnClient]
-        val mockIdClient            = mock[SubmissionIdClient]
+        val mockIdClient = mock[SubmissionIdClient]
 
         val generatedSubmissionId = SubmissionId("STC-111111111")
 
         when(mockIdClient.nextSubmissionId()(any()))
           .thenReturn(Future.successful(generatedSubmissionId))
 
-        when(mockSaveAndReturnClient.save(any())(any()))
-          .thenReturn(Future.successful(()))
+        val application =
+          applicationBuilder()
+            .overrides(
+              bind[SubmissionIdClient].toInstance(mockIdClient),
+              bind[Navigator].qualifiedWith("individuals").toInstance(getNavigator),
+              bind[Navigator].qualifiedWith("organisations").toInstance(getNavigator)
+            )
+            .build()
+
+        running(application) {
+
+          val request = FakeRequest(POST, submissionsDashboardSubmitRoute)
+
+          val result = route(application, request).value
+
+          status(result) mustEqual SEE_OTHER
+
+          redirectLocation(result).value mustEqual testNextPage.url
+
+          verify(mockIdClient).nextSubmissionId()(any())
+        }
+      }
+
+
+      "must generate a submissionId and redirect when affinity group is Organisation" in {
+
+        val mockIdClient = mock[SubmissionIdClient]
+
+        val generatedSubmissionId = SubmissionId("STC-222222222")
+
+        when(mockIdClient.nextSubmissionId()(any()))
+          .thenReturn(Future.successful(generatedSubmissionId))
 
         val application =
-          applicationBuilder(
-            saveAndReturnClient = mockSaveAndReturnClient
-          )
+          applicationBuilder()
+            .configure("test.affinityGroup" -> "Organisation")
+            .overrides(
+              bind[SubmissionIdClient].toInstance(mockIdClient),
+              bind[Navigator].qualifiedWith("individuals").toInstance(getNavigator),
+              bind[Navigator].qualifiedWith("organisations").toInstance(getNavigator)
+            )
+            .build()
+
+        running(application) {
+
+          val request = FakeRequest(POST, submissionsDashboardSubmitRoute)
+
+          val result = route(application, request).value
+
+          status(result) mustEqual SEE_OTHER
+          redirectLocation(result).value mustEqual testNextPage.url
+
+          verify(mockIdClient).nextSubmissionId()(any())
+        }
+      }
+
+
+      "must fail when submission ID generation fails" in {
+
+        val mockIdClient = mock[SubmissionIdClient]
+
+        when(mockIdClient.nextSubmissionId()(any()))
+          .thenReturn(Future.failed(new RuntimeException("exception")))
+
+        val application =
+          applicationBuilder()
             .overrides(
               bind[SubmissionIdClient].toInstance(mockIdClient)
             )
@@ -135,40 +195,7 @@ class SubmissionsDashboardControllerSpec extends SpecBase with MockitoSugar {
 
         running(application) {
 
-          val request = FakeRequest(
-            POST,
-            routes.SubmissionsDashboardController.onSubmit().url
-          )
-
-          val result = route(application, request).value
-
-          status(result) mustEqual SEE_OTHER
-
-          redirectLocation(result).value mustEqual individualRoutes.HowToNotifyAboutSecuritiesTransferController.onPageLoad(NormalMode).url
-        }
-      }
-
-      "must fail when submission ID generation fails" in {
-
-        val mockSaveAndReturnClient = mock[SaveAndReturnClient]
-        val mockIdClient = mock[SubmissionIdClient]
-
-        when(mockIdClient.nextSubmissionId()(any()))
-          .thenReturn(Future.failed(new RuntimeException("exception")))
-
-        val application =
-          applicationBuilder(
-            saveAndReturnClient = mockSaveAndReturnClient
-          )
-            .overrides(bind[SubmissionIdClient].toInstance(mockIdClient))
-            .build()
-
-        running(application) {
-
-          val request = FakeRequest(
-            POST,
-            routes.SubmissionsDashboardController.onSubmit().url
-          )
+          val request = FakeRequest(POST, submissionsDashboardSubmitRoute)
 
           val thrown = intercept[RuntimeException] {
             await(route(application, request).value)
@@ -180,4 +207,3 @@ class SubmissionsDashboardControllerSpec extends SpecBase with MockitoSugar {
     }
   }
 }
-

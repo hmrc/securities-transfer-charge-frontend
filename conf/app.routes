@@ -100,3 +100,28 @@ GET        /stf/consideration                           uk.gov.hmrc.securitiestr
 POST       /stf/consideration                           uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.individuals.AmountPaidForSecuritiesController.onSubmit(mode: Mode = NormalMode)
 GET        /stf/change/consideration                    uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.individuals.AmountPaidForSecuritiesController.onPageLoad(mode: Mode = CheckMode)
 POST       /stf/change/consideration                    uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.individuals.AmountPaidForSecuritiesController.onSubmit(mode: Mode = CheckMode)
+
+GET        /stf/org/confirm-address                       uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.organisations.ConfirmAddressController.onPageLoad()
+
+POST       /stf/org/confirm-address                       uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.organisations.ConfirmAddressController.onSubmit()
+
+GET        /stf/org/address                                      uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.organisations.AddressController.onPageLoad()
+GET        /stf/org/address/return                               uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.organisations.AddressController.onReturn(id: String)
+
+GET        /stf/org/seller/address                                      uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.organisations.StfSellerAddressController.onPageLoad()
+GET        /stf/org/seller/address/return                               uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.organisations.StfSellerAddressController.onReturn(id: String)
+
+GET        /stf/org/how-many-transfers                        uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.organisations.HowToNotifyAboutSecuritiesTransferController.onPageLoad(mode: Mode = NormalMode)
+POST       /stf/org/how-many-transfers                        uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.organisations.HowToNotifyAboutSecuritiesTransferController.onSubmit(mode: Mode = NormalMode)
+GET        /stf/org/how-many-transfers                        uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.organisations.HowToNotifyAboutSecuritiesTransferController.onPageLoad(mode: Mode = CheckMode)
+POST       /stf/org/how-many-transfers                        uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.organisations.HowToNotifyAboutSecuritiesTransferController.onSubmit(mode: Mode = CheckMode)
+
+GET        /stf/org/connected-persons                        uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.organisations.ConnectedPersonsController.onPageLoad(mode: Mode = NormalMode)
+POST       /stf/org/connected-persons                        uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.organisations.ConnectedPersonsController.onSubmit(mode: Mode = NormalMode)
+GET        /stf/org/change/connected-persons                  uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.organisations.ConnectedPersonsController.onPageLoad(mode: Mode = CheckMode)
+POST       /stf/org/change/connected-persons                  uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.organisations.ConnectedPersonsController.onSubmit(mode: Mode = CheckMode)
+
+GET        /stf/org/seller-name                        uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.organisations.NameOfSellerController.onPageLoad(mode: Mode = NormalMode)
+POST       /stf/org/seller-name                        uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.organisations.NameOfSellerController.onSubmit(mode: Mode = NormalMode)
+GET        /stf/org/change/seller-name                 uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.organisations.NameOfSellerController.onPageLoad(mode: Mode = CheckMode)
+POST       /stf/org/change/seller-name                 uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.organisations.NameOfSellerController.onSubmit(mode: Mode = CheckMode)

@@ -55,6 +55,7 @@ unauthorised.heading = You can’t access this service with this account
 
 transfer.details.caption = Transfer details
 seller.details.caption = Seller details
+org.details.caption = Business details
 
 confirmAddress.title = Review and confirm your address
 confirmAddress.heading = Review and confirm your address
@@ -72,15 +73,15 @@ submissionsDashboard.table.chargeDueBy = Charge due by
 submissionsDashboard.table.status = Status
 submissionsDashboard.table.action = Action
 
-howToNotifyAboutSecuritiesTransfer.title = How do you want to tell us about your securities transfers?
-howToNotifyAboutSecuritiesTransfer.heading = How do you want to tell us about your securities transfers?
-howToNotifyAboutSecuritiesTransfer.oneAtATime = One at a time
-howToNotifyAboutSecuritiesTransfer.oneAtATime.hint = Each transfer must be between you and one seller, and can include one kind of security or type of shares.
-howToNotifyAboutSecuritiesTransfer.moreThanOneAtATime = More than one at a time
-howToNotifyAboutSecuritiesTransfer.moreThanOneAtATime.hint = Download the template, complete it using one row per transfer, and upload it on the following pages. You can then find the submission on your dashboard and pay the money owed.
-howToNotifyAboutSecuritiesTransfer.checkYourAnswersLabel = How do you want to tell us about your securities transfers?
-howToNotifyAboutSecuritiesTransfer.error.required = Select a way to tell us about your securities transfer
-howToNotifyAboutSecuritiesTransfer.change.hidden = HowToNotifyAboutSecuritiesTransfer
+individual.howToNotifyAboutSecuritiesTransfer.title = How do you want to tell us about your securities transfers?
+individual.howToNotifyAboutSecuritiesTransfer.heading = How do you want to tell us about your securities transfers?
+individual.howToNotifyAboutSecuritiesTransfer.oneAtATime = One at a time
+individual.howToNotifyAboutSecuritiesTransfer.oneAtATime.hint = Each transfer must be between you and one seller, and can include one kind of security or type of shares.
+individual.howToNotifyAboutSecuritiesTransfer.moreThanOneAtATime = More than one at a time
+individual.howToNotifyAboutSecuritiesTransfer.moreThanOneAtATime.hint = Download the template, complete it using one row per transfer, and upload it on the following pages. You can then find the submission on your dashboard and pay the money owed.
+individual.howToNotifyAboutSecuritiesTransfer.checkYourAnswersLabel = How do you want to tell us about your securities transfers?
+individual.howToNotifyAboutSecuritiesTransfer.error.required = Select a way to tell us about your securities transfer
+individual.howToNotifyAboutSecuritiesTransfer.change.hidden = HowToNotifyAboutSecuritiesTransfer
 
 nameOfSeller.title = What’s the seller’s name?
 nameOfSeller.heading = What’s the seller’s name?
@@ -129,8 +130,7 @@ securitiesTarget.title = What business are you buying these securities in?
 securitiesTarget.heading = What business are you buying these securities in?
 securitiesTarget.businessName = Business name
 securitiesTarget.crn = Company registration number (CRN) (optional)
-securitiesTarget.crn.hint.message1 = This is also called a company number.
-securitiesTarget.crn.hint.message2 = For example, SN898989 or 12345678
+securitiesTarget.crn.hint = This is also called a company number. For example, SN898989 or 12345678
 securitiesTarget.checkYourAnswersLabel = What business are you buying these securities in?
 securitiesTarget.error.businessName.required = Enter the name of the business you’re buying securities in
 securitiesTarget.error.businessName.length = Business name must be 160 characters or fewer
@@ -138,13 +138,13 @@ securitiesTarget.error.crn.length = The company registration number must be 8 ch
 securitiesTarget.businessName.change.hidden = BusinessName
 securitiesTarget.crn.change.hidden = CRN
 
-chargingPoint.title = When did you buy the securities?
-chargingPoint.heading = When did you buy the securities?
-chargingPoint.hint = This is also called the charging point. For example, 12 11 2007
+chargingPoint.title = When did you buy these securities?
+chargingPoint.heading = When did you buy these securities?
+chargingPoint.hint = This is also called the charging point. For example, 27 3 2024
 chargingPoint.checkYourAnswersLabel = When did you buy the securities?
-chargingPoint.error.required.all = Enter the date you bought the securities
-chargingPoint.error.required.two = The date must include {0} and {1}
-chargingPoint.error.required = The date must include a {0}
+chargingPoint.error.required.all = Enter the date you bought these securities
+chargingPoint.error.required.two = The date you bought the securities must include {0} and {1}
+chargingPoint.error.required = The date you bought the securities must include a {0}
 chargingPoint.error.invalid = The date you bought the securities must be a real date
 chargingPoint.error.futureDate = The day you bought the securities must be today’s date or a date in the past
 chargingPoint.change.hidden = ChargingPoint
@@ -160,8 +160,8 @@ taxRate.checkYourAnswersLabel = Tax rate
 taxRate.error.required = Select a tax rate
 taxRate.change.hidden = TaxRate
 
-otherSecuritiesType.title = What type of securities are you buying?
-otherSecuritiesType.heading = What type of securities are you buying?
+otherSecuritiesType.title = Enter the type of securities you are buying
+otherSecuritiesType.heading = Enter the type of securities you are buying
 otherSecuritiesType.checkYourAnswersLabel = What type of securities are you buying?
 otherSecuritiesType.error.required = Enter the type of securities you’re buying
 otherSecuritiesType.change.hidden = Change what type of securities are you buying
@@ -171,7 +171,7 @@ whatTypeOfSecurities.heading = What type of securities are you buying?
 whatTypeOfSecurities.shares = Shares
 whatTypeOfSecurities.other = Other
 whatTypeOfSecurities.checkYourAnswersLabel = What type of securities are you buying?
-whatTypeOfSecurities.error.required = Select a the type of securities you are buying
+whatTypeOfSecurities.error.required = Select the type of securities you are buying
 whatTypeOfSecurities.change.hidden = Change what type of securities are you buying
 
 totalMarketValue.title = What is the total market value of these securities?
@@ -219,3 +219,26 @@ detailsOfThisTransfer.error.marketValue.outOfRange = Enter an amount between £{
 detailsOfThisTransfer.error.numberOfShares.length = Number of shares must be 100 characters or less
 detailsOfThisTransfer.error.typeOfShares.length = Type or class of shares must be 100 characters or less
 detailsOfThisTransfer.change.hidden = Change what are the details of this transfer
+
+sectionTitle.businessDetails = Business details
+sectionTitle.sellerDetails = Seller details
+
+org.confirmAddress.title = Confirm business address
+org.confirmAddress.heading = Confirm business address
+org.confirmAddress.editLink = Edit address
+org.confirmAddress.confirm = Confirm and continue
+
+orgs.howToNotifyAboutSecuritiesTransfer.title = How do you want to tell us about your securities transfers?
+orgs.howToNotifyAboutSecuritiesTransfer.heading = How do you want to tell us about your securities transfers?
+orgs.howToNotifyAboutSecuritiesTransfer.oneAtATime = One at a time
+orgs.howToNotifyAboutSecuritiesTransfer.oneAtATime.hint = Each transfer can have one seller, and can include one type of security or type of shares.
+orgs.howToNotifyAboutSecuritiesTransfer.moreThanOneAtATime = More than one at a time
+orgs.howToNotifyAboutSecuritiesTransfer.moreThanOneAtATime.hint = Download the template, complete it using one row per transfer, and upload it on the following pages. You can then find the submission on your dashboard and pay the charges due.
+orgs.howToNotifyAboutSecuritiesTransfer.checkYourAnswersLabel = How do you want to tell us about your securities transfers?
+orgs.howToNotifyAboutSecuritiesTransfer.error.required = Select a way to tell us about these securities transfers
+orgs.howToNotifyAboutSecuritiesTransfer.change.hidden = HowToNotifyAboutSecuritiesTransfer
+
+org.connectedPersons.error.required = Select yes if the business and the seller are ‘connected persons’
+org.connectedPersons.p = We need to know if the business buying the securities and the seller are ‘connected persons’, according to
+org.connectedPersons.p.link.content = section 1122 of the Corporation Tax Act 2010
+org.connectedPersons.legend = Is the business and the seller of these securities connected persons?

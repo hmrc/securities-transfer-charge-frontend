@@ -30,9 +30,9 @@
     saveAndReturnButton:SaveAndReturnButton
 )
 
-@(form: Form[_], mode: Mode)(implicit request: Request[_], messages: Messages)
+@(form: Form[_], mode: Mode, backLinkCall: Call)(implicit request: Request[_], messages: Messages)
 
-@layout(pageTitle = title(form, messages("securitiesTarget.title"))) {
+@layout(pageTitle = title(form, messages("securitiesTarget.title")), backLinkUrl = Some(backLinkCall.url)) {
     <div id="caption-heading" class="govuk-caption-l">
         @messages("transfer.details.caption")
     </div>
@@ -59,13 +59,7 @@
                 label = LabelViewModel(messages("securitiesTarget.crn"))
             )
             .withWidth(OneThird)
-            .withHint(Hint(content = HtmlContent(HtmlFormat.raw(s"""
-                <span class="govuk-hint">
-                    ${messages("securitiesTarget.crn.hint.message1")}<br>
-                    ${messages("securitiesTarget.crn.hint.message2")}
-                </span>
-            """)
-            )))
+            .withHint(HintViewModel(messages("securitiesTarget.crn.hint")))
         )
 
         @govukButton(
