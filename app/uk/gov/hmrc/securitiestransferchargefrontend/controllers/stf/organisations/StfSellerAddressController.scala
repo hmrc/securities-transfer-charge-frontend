@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.individuals
+package uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.organisations
 
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import uk.gov.hmrc.securitiestransferchargefrontend.config.FrontendAppConfig
@@ -33,7 +33,7 @@ class StfSellerAddressController @Inject()(val controllerComponents: MessagesCon
                                            auth: StcAuthEnrolledAction,
                                            getData: StcDataRetrievalAction,
                                            requireData: StcDataRequiredAction,
-                                           @Named("individuals") val navigator: Navigator,
+                                           @Named("organisations") val navigator: Navigator,
                                            config: FrontendAppConfig)
                                           (implicit ec: ExecutionContext) extends AbstractAddressController(alf):
 
@@ -41,7 +41,7 @@ class StfSellerAddressController @Inject()(val controllerComponents: MessagesCon
 
   def onPageLoad: Action[AnyContent] = auth.async {
     implicit request =>
-      super.pageLoad(config.sellerAlfConfigFileLocation, config.alfSellerContinueUrl)
+      super.pageLoad(config.sellerAlfConfigFileLocation, config.alfOrgSellerContinueUrl)
   }
 
   def onReturn(addressId: String): Action[AnyContent] = (auth andThen getData andThen requireData).async {

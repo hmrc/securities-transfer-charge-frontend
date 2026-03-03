@@ -25,7 +25,7 @@ import uk.gov.hmrc.securitiestransferchargefrontend.controllers.AbstractAddressC
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.actions.{StcAuthEnrolledAction, StcDataRequiredAction, StcDataRetrievalAction}
 import uk.gov.hmrc.securitiestransferchargefrontend.models.NormalMode
 import uk.gov.hmrc.securitiestransferchargefrontend.navigation.Navigator
-import uk.gov.hmrc.securitiestransferchargefrontend.pages.{AddressPage, StfBuyersAddressPage}
+import uk.gov.hmrc.securitiestransferchargefrontend.pages.StfBuyersAddressPage
 
 import javax.inject.{Inject, Named}
 import scala.concurrent.{ExecutionContext, Future}
@@ -38,9 +38,7 @@ class AddressController @Inject()(val controllerComponents: MessagesControllerCo
                                   @Named("individuals") val navigator: Navigator,
                                   config: FrontendAppConfig)
                                  (implicit ec: ExecutionContext) extends AbstractAddressController(alf):
-
-  val addressPage: AddressPage = StfBuyersAddressPage
-
+  
   def onPageLoad: Action[AnyContent] = auth.async {
     implicit request =>
       super.pageLoad(config.buyersAlfConfigFileLocation, config.alfStfBuyersContinueUrl)

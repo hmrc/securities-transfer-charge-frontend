@@ -20,6 +20,7 @@ import play.api.data.Form
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, Call, MessagesControllerComponents}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
+import uk.gov.hmrc.securitiestransferchargefrontend.controllers.SaveAndReturnButton.isReturn
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.actions.*
 import uk.gov.hmrc.securitiestransferchargefrontend.forms.stf.individuals.NameOfSellerFormProvider
 import uk.gov.hmrc.securitiestransferchargefrontend.models.{Mode, UserAnswers}
@@ -68,7 +69,7 @@ class NameOfSellerController @Inject()(
         value =>
           for {
             updatedAnswers <- Future.fromTry(request.userAnswers.set(NameOfSellerPage, value))
-            nextPage       <- navigator.nextPage(NameOfSellerPage, mode, updatedAnswers)
+            nextPage       <- navigator.nextPage(NameOfSellerPage, mode, updatedAnswers,isReturn(request))
           } yield Redirect(nextPage)
       )
   }

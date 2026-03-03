@@ -19,11 +19,11 @@ package uk.gov.hmrc.securitiestransferchargefrontend.navigation.stf.organisation
 import play.api.mvc.Call
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.routes
-import uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.organisations.routes as orgRoutes
 import uk.gov.hmrc.securitiestransferchargefrontend.models.{NormalMode, UserAnswers}
 import uk.gov.hmrc.securitiestransferchargefrontend.navigation.PersistentNavigationHelper
 import uk.gov.hmrc.securitiestransferchargefrontend.pages.*
 import uk.gov.hmrc.securitiestransferchargefrontend.services.AnswerPersistenceService
+import uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.organisations.routes as orgRoutes
 
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -38,10 +38,9 @@ class ForwardRoutes(answerPersistenceService: AnswerPersistenceService,
   def forwardRoutes(page: Page)(implicit hc: HeaderCarrier): UserAnswers => Future[Call] = page match {
 
     case SubmissionsDashboardPage => userAnswers => goTo(orgRoutes.HowToNotifyAboutSecuritiesTransferController.onPageLoad(NormalMode), Some(userAnswers))
-
-    case ConfirmAddressPage => userAnswers => dataRequired(ConfirmAddressPage, userAnswers, routes.JourneyRecoveryController.onPageLoad())
+    case ConfirmAddressPage => userAnswers => dataRequired(ConfirmAddressPage, userAnswers, orgRoutes.NameOfSellerController.onPageLoad(NormalMode))
     case ConnectedPersonsPage => userAnswers => dataRequired(ConnectedPersonsPage, userAnswers, routes.JourneyRecoveryController.onPageLoad())
-    case StfBuyersAddressPage => userAnswers => dataRequired(StfBuyersAddressPage, userAnswers, routes.JourneyRecoveryController.onPageLoad())
+    case StfBuyersAddressPage => userAnswers => dataRequired(StfBuyersAddressPage, userAnswers, orgRoutes.NameOfSellerController.onPageLoad(NormalMode))
     case NameOfSellerPage => userAnswers => dataRequired(NameOfSellerPage, userAnswers, routes.JourneyRecoveryController.onPageLoad())
 
     case _ => _ => Future.successful(defaultPage)
