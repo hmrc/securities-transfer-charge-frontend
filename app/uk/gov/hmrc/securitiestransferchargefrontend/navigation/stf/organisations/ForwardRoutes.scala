@@ -21,7 +21,7 @@ import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.routes
 import uk.gov.hmrc.securitiestransferchargefrontend.models.UserAnswers
 import uk.gov.hmrc.securitiestransferchargefrontend.navigation.PersistentNavigationHelper
-import uk.gov.hmrc.securitiestransferchargefrontend.pages.{ConfirmAddressPage, ConnectedPersonsPage, Page, StfBuyersAddressPage}
+import uk.gov.hmrc.securitiestransferchargefrontend.pages.{ConfirmAddressPage, ConnectedPersonsPage, NameOfSellerPage, Page, StfBuyersAddressPage}
 import uk.gov.hmrc.securitiestransferchargefrontend.services.AnswerPersistenceService
 
 import scala.concurrent.{ExecutionContext, Future}
@@ -39,7 +39,7 @@ class ForwardRoutes(answerPersistenceService: AnswerPersistenceService,
     case ConfirmAddressPage => userAnswers => dataRequired(ConfirmAddressPage, userAnswers, routes.JourneyRecoveryController.onPageLoad())
     case ConnectedPersonsPage => userAnswers => dataRequired(ConnectedPersonsPage, userAnswers, routes.JourneyRecoveryController.onPageLoad())
     case StfBuyersAddressPage => userAnswers => dataRequired(StfBuyersAddressPage, userAnswers, routes.JourneyRecoveryController.onPageLoad())
-
+    case NameOfSellerPage => userAnswers => dataRequired(NameOfSellerPage, userAnswers, routes.JourneyRecoveryController.onPageLoad())
 
     case _ => _ => Future.successful(defaultPage)
   }

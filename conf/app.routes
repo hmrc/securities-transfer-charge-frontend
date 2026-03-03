@@ -111,3 +111,8 @@ GET        /stf/org/connected-persons                        uk.gov.hmrc.securit
 POST       /stf/org/connected-persons                        uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.organisations.ConnectedPersonsController.onSubmit(mode: Mode = NormalMode)
 GET        /stf/org/change/connected-persons                  uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.organisations.ConnectedPersonsController.onPageLoad(mode: Mode = CheckMode)
 POST       /stf/org/change/connected-persons                  uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.organisations.ConnectedPersonsController.onSubmit(mode: Mode = CheckMode)
+
+GET        /stf/org/seller-name                        uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.organisations.NameOfSellerController.onPageLoad(mode: Mode = NormalMode)
+POST       /stf/org/seller-name                        uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.organisations.NameOfSellerController.onSubmit(mode: Mode = NormalMode)
+GET        /stf/org/change/seller-name                 uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.organisations.NameOfSellerController.onPageLoad(mode: Mode = CheckMode)
+POST       /stf/org/change/seller-name                 uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.organisations.NameOfSellerController.onSubmit(mode: Mode = CheckMode)
