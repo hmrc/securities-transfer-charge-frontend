@@ -20,8 +20,8 @@ import base.SpecBase
 import org.scalatestplus.mockito.MockitoSugar
 import play.api.test.FakeRequest
 import play.api.test.Helpers.*
-import uk.gov.hmrc.securitiestransferchargefrontend.controllers.routes
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.organisations.routes as orgRoutes
+import uk.gov.hmrc.securitiestransferchargefrontend.models.NormalMode
 
 class AddressControllerSpec extends SpecBase with MockitoSugar {
 
@@ -49,7 +49,7 @@ class AddressControllerSpec extends SpecBase with MockitoSugar {
         val result = route(application, request).value
 
         status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual routes.JourneyRecoveryController.onPageLoad().url
+        redirectLocation(result).value mustEqual orgRoutes.NameOfSellerController.onPageLoad(NormalMode).url
       }
     }
   }
