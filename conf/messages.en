@@ -222,8 +222,14 @@ detailsOfThisTransfer.error.typeOfShares.length = Type or class of shares must b
 detailsOfThisTransfer.change.hidden = Change what are the details of this transfer
 
 sectionTitle.businessDetails = Business details
+sectionTitle.sellerDetails = Seller details
 
 org.confirmAddress.title = Confirm business address
 org.confirmAddress.heading = Confirm business address
 org.confirmAddress.editLink = Edit address
 org.confirmAddress.confirm = Confirm and continue
+
+org.connectedPersons.error.required = Select yes if the business and the seller are ‘connected persons’
+org.connectedPersons.p = We need to know if the business buying the securities and the seller are ‘connected persons’, according to
+org.connectedPersons.p.link.content = section 1122 of the Corporation Tax Act 2010
+org.connectedPersons.legend = Is the business and the seller of these securities connected persons?

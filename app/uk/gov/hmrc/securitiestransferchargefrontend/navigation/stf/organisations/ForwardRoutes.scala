@@ -21,8 +21,8 @@ import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.routes
 import uk.gov.hmrc.securitiestransferchargefrontend.models.UserAnswers
 import uk.gov.hmrc.securitiestransferchargefrontend.navigation.PersistentNavigationHelper
-import uk.gov.hmrc.securitiestransferchargefrontend.navigation.stf.individuals.StfNavigator
-import uk.gov.hmrc.securitiestransferchargefrontend.pages.{ConfirmAddressPage, Page, StfBuyersAddressPage}
+import uk.gov.hmrc.securitiestransferchargefrontend.navigation.stf.organisations.StfOrgNavigator
+import uk.gov.hmrc.securitiestransferchargefrontend.pages.{ConfirmAddressPage, ConnectedPersonsPage, Page, StfBuyersAddressPage}
 import uk.gov.hmrc.securitiestransferchargefrontend.services.AnswerPersistenceService
 
 import scala.concurrent.{ExecutionContext, Future}
@@ -30,12 +30,13 @@ import scala.concurrent.{ExecutionContext, Future}
 class ForwardRoutes(answerPersistenceService: AnswerPersistenceService)
                    (implicit ec: ExecutionContext):
 
-  val helper = new PersistentNavigationHelper(answerPersistenceService, StfNavigator.defaultPage, StfNavigator.errorPages)
+  val helper = new PersistentNavigationHelper(answerPersistenceService, StfOrgNavigator.defaultPage, StfOrgNavigator.errorPages)
   import helper.*
 
   def forwardRoutes(page: Page)(implicit hc: HeaderCarrier): UserAnswers => Future[Call] = page match {
 
     case ConfirmAddressPage => userAnswers => dataRequired(ConfirmAddressPage, userAnswers, routes.JourneyRecoveryController.onPageLoad())
+    case ConnectedPersonsPage => userAnswers => dataRequired(ConnectedPersonsPage, userAnswers, routes.JourneyRecoveryController.onPageLoad())
     case StfBuyersAddressPage => userAnswers => dataRequired(StfBuyersAddressPage, userAnswers, routes.JourneyRecoveryController.onPageLoad())
 
 
