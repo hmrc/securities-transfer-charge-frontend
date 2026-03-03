@@ -25,7 +25,7 @@ import uk.gov.hmrc.securitiestransferchargefrontend.forms.stf.individuals.NameOf
 import uk.gov.hmrc.securitiestransferchargefrontend.models.{Mode, UserAnswers}
 import uk.gov.hmrc.securitiestransferchargefrontend.navigation.Navigator
 import uk.gov.hmrc.securitiestransferchargefrontend.pages.NameOfSellerPage
-import uk.gov.hmrc.securitiestransferchargefrontend.views.html.stf.individuals.NameOfSellerView
+import uk.gov.hmrc.securitiestransferchargefrontend.views.html.stf.organisations.NameOfSellerView
 
 import javax.inject.{Inject, Named}
 import scala.concurrent.{ExecutionContext, Future}
