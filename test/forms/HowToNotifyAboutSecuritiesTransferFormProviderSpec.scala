@@ -18,8 +18,8 @@ package forms
 
 import forms.behaviours.OptionFieldBehaviours
 import uk.gov.hmrc.securitiestransferchargefrontend.models.HowToNotifyAboutSecuritiesTransfer
-import uk.gov.hmrc.securitiestransferchargefrontend.forms.HowToNotifyAboutSecuritiesTransferFormProvider
 import play.api.data.FormError
+import uk.gov.hmrc.securitiestransferchargefrontend.forms.stf.organisations.HowToNotifyAboutSecuritiesTransferFormProvider
 
 class HowToNotifyAboutSecuritiesTransferFormProviderSpec extends OptionFieldBehaviours {
 
@@ -28,7 +28,7 @@ class HowToNotifyAboutSecuritiesTransferFormProviderSpec extends OptionFieldBeha
   ".value" - {
 
     val fieldName = "value"
-    val requiredKey = "howToNotifyAboutSecuritiesTransfer.error.required"
+    val requiredKey = "orgs.howToNotifyAboutSecuritiesTransfer.error.required"
 
     behave like optionsField[HowToNotifyAboutSecuritiesTransfer](
       form,

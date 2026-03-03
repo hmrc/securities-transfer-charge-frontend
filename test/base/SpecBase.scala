@@ -17,7 +17,7 @@
 package base
 
 import base.Fixtures.FakeAlfConnector
-import base.stubs.{StubSessionRepository, StubStcAuthEnrolledAction, StubStcDataRequiredAction, StubStcDataRetrievalAction}
+import base.stubs.{OrganisationStubStcAuthEnrolledAction, StubSessionRepository, StubStcAuthEnrolledAction, StubStcDataRequiredAction, StubStcDataRetrievalAction}
 import clients.FakeSaveAndReturnClient
 import controllers.actions.*
 import org.scalatest.concurrent.{IntegrationPatience, ScalaFutures}
@@ -28,7 +28,7 @@ import play.api.Application
 import play.api.i18n.{Messages, MessagesApi}
 import play.api.inject.bind
 import play.api.inject.guice.GuiceApplicationBuilder
-import play.api.mvc.{AnyContent, AnyContentAsEmpty}
+import play.api.mvc.{AnyContent, AnyContentAsEmpty, Call, Request}
 import play.api.test.FakeRequest
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.securitiestransferchargefrontend.clients.SaveAndReturnClient
@@ -36,12 +36,15 @@ import uk.gov.hmrc.securitiestransferchargefrontend.clients.registration.Subscri
 import uk.gov.hmrc.securitiestransferchargefrontend.connectors.AlfAddressConnector
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.actions.*
 import uk.gov.hmrc.securitiestransferchargefrontend.domain.SubmissionId
-import uk.gov.hmrc.securitiestransferchargefrontend.models.UserAnswers
 import uk.gov.hmrc.securitiestransferchargefrontend.models.requests.DataRequest
+import uk.gov.hmrc.securitiestransferchargefrontend.models.{Mode, UserAnswers}
+import uk.gov.hmrc.securitiestransferchargefrontend.navigation.Navigator
+import uk.gov.hmrc.securitiestransferchargefrontend.pages.Page
 import uk.gov.hmrc.securitiestransferchargefrontend.repositories.SessionRepository
+import uk.gov.hmrc.auth.core.AffinityGroup
 
 import java.time.LocalDate
-import scala.concurrent.ExecutionContext
+import scala.concurrent.{ExecutionContext, Future}
 
 trait SpecBase
   extends AnyFreeSpec
@@ -57,6 +60,8 @@ trait SpecBase
   val sessionId = "sessionId1234"
   val submissionId: SubmissionId = SubmissionId("STC-123456789")
   val userId = "internalId"
+  val affinityGroupKeyInd = "individual"
+  val affinityGroupKeyOrg = "orgs"
 
   val subscription: Subscription = Subscription(
     subsValidTo = LocalDate.now().plusDays(5),
@@ -72,6 +77,16 @@ trait SpecBase
 
   def emptyUserAnswers: UserAnswers = UserAnswers.empty(userAnswersId)(submissionId)
 
+  val testBackLinkRoute: Call = Call("GET", "/back-link")
+  val testNextPage = Call("GET", "/next-page")
+  val testErrorPage = Call("GET", "/error-page")
+
+  def getNavigator: Navigator = new Navigator {
+    override def nextPage(page: Page, mode: Mode, userAnswers: UserAnswers, isReturn: Boolean = false)(implicit request: Request[_]): Future[Call] = Future.successful(testNextPage)
+    override def previousPage(page: Page, mode: Mode, userAnswers: UserAnswers): Call = testBackLinkRoute
+    override def errorPage(forPage: Page): Call = testErrorPage
+  }
+  
   val fakeRequest: FakeRequest[AnyContentAsEmpty.type] = FakeRequest().withHeaders("sessionId" -> sessionId)
 
   def fakeDataRequest(userAnswers: UserAnswers): DataRequest[AnyContent] =
@@ -80,12 +95,19 @@ trait SpecBase
   def messages(app: Application): Messages = app.injector.instanceOf[MessagesApi].preferred(FakeRequest())
 
   protected def applicationBuilder(userAnswers: Option[UserAnswers] = None,
+                                   affinityGroup: AffinityGroup = AffinityGroup.Individual,
                                    saveAndReturnClient: SaveAndReturnClient = FakeSaveAndReturnClient(),
-                                   sessionRepository: SessionRepository = StubSessionRepository()): GuiceApplicationBuilder =
+                                   sessionRepository: SessionRepository = StubSessionRepository()
+                                   ): GuiceApplicationBuilder =
     new GuiceApplicationBuilder()
       .overrides(
         bind[IdentifierAction].to[FakeIdentifierAction],
-        bind[StcAuthEnrolledAction].to[StubStcAuthEnrolledAction],
+        bind[StcAuthEnrolledAction].to(
+          if (affinityGroup == AffinityGroup.Organisation)
+            classOf[OrganisationStubStcAuthEnrolledAction]
+          else
+            classOf[StubStcAuthEnrolledAction]
+        ),
         bind[StcDataRetrievalAction].to[StubStcDataRetrievalAction],
         bind[DataRequiredAction].to[DataRequiredActionImpl],
         bind[StcDataRequiredAction].toInstance(StubStcDataRequiredAction(userAnswers)),

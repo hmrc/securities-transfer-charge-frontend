@@ -18,6 +18,7 @@ package uk.gov.hmrc.securitiestransferchargefrontend.pages
 
 import play.api.libs.json.JsPath
 import uk.gov.hmrc.securitiestransferchargefrontend.models.TaxRate
+import uk.gov.hmrc.securitiestransferchargefrontend.pages.QuestionPage
 
 case object TaxRatePage extends QuestionPage[TaxRate] {
 

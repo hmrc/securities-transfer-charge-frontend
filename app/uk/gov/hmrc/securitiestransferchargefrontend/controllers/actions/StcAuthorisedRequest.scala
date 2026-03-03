@@ -25,4 +25,10 @@ final case class StcAuthorisedRequest[A](
                                           internalId: String,
                                           affinityGroup: AffinityGroup,
                                           subscriptionId: SubscriptionId
-                                        ) extends WrappedRequest[A](request)
+                                        ) extends WrappedRequest[A](request) {
+  lazy val affinityGroupKey: String =
+    affinityGroup match {
+      case AffinityGroup.Individual => "individual"
+      case AffinityGroup.Organisation => "orgs"
+    }
+}
