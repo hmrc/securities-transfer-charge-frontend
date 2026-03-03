@@ -20,13 +20,10 @@ import play.api.mvc.Call
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.routes
 import uk.gov.hmrc.securitiestransferchargefrontend.models.UserAnswers
 import uk.gov.hmrc.securitiestransferchargefrontend.navigation.NavigationHelper
-import uk.gov.hmrc.securitiestransferchargefrontend.navigation.stf.organisations.StfOrgNavigator
-import uk.gov.hmrc.securitiestransferchargefrontend.pages.{ConfirmAddressPage, HowToNotifyAboutSecuritiesTransferPage, Page}
-import uk.gov.hmrc.securitiestransferchargefrontend.pages.{ConfirmAddressPage, ConnectedPersonsPage, NameOfSellerPage, Page, StfBuyersAddressPage}
+import uk.gov.hmrc.securitiestransferchargefrontend.pages.*
 
 class BackwardsRoutes(defaultPage: Call):
-
-  val navHelper: NavigationHelper = new NavigationHelper(StfOrgNavigator.defaultPage)
+  
   val navHelper: NavigationHelper = new NavigationHelper(defaultPage)
 
   def predecessorRoutes(page: Page): UserAnswers => Call = page match {
