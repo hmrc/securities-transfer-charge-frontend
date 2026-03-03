@@ -37,6 +37,7 @@ class ForwardRoutes(answerPersistenceService: AnswerPersistenceService,
   def forwardRoutes(page: Page)(implicit hc: HeaderCarrier): UserAnswers => Future[Call] = page match {
 
     case ConfirmAddressPage => userAnswers => dataRequired(ConfirmAddressPage, userAnswers, routes.JourneyRecoveryController.onPageLoad())
+    case ConnectedPersonsPage => userAnswers => dataRequired(ConnectedPersonsPage, userAnswers, routes.JourneyRecoveryController.onPageLoad())
     case StfBuyersAddressPage => userAnswers => dataRequired(StfBuyersAddressPage, userAnswers, routes.JourneyRecoveryController.onPageLoad())
 
 
