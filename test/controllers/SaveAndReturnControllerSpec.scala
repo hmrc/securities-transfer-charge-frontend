@@ -30,7 +30,8 @@ import uk.gov.hmrc.securitiestransferchargefrontend.controllers.SaveAndReturnCon
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.actions.StcAuthEnrolledAction
 import uk.gov.hmrc.securitiestransferchargefrontend.domain.SubmissionId
 import uk.gov.hmrc.securitiestransferchargefrontend.models.UserAnswers
-import uk.gov.hmrc.securitiestransferchargefrontend.navigation.Navigator
+import uk.gov.hmrc.securitiestransferchargefrontend.navigation.stf.individuals.StfNavigator
+import uk.gov.hmrc.securitiestransferchargefrontend.pages.SaveAndReturnPage
 
 import scala.concurrent.*
 
@@ -46,7 +47,7 @@ class SaveAndReturnControllerSpec extends SpecBase with MockitoSugar with ScalaF
   val mockBodyParsers: PlayBodyParsers = mock[PlayBodyParsers]
   val stcAuthEnrolledAction: StcAuthEnrolledAction = StubStcAuthEnrolledAction(mockBodyParsers)
 
-  val mockNavigator: Navigator = mock[Navigator]
+  val mockNavigator: StfNavigator = mock[StfNavigator]
 
   def testSetup(maybeUserAnswers: Option[UserAnswers]): SaveAndReturnController = {
     maybeUserAnswers.fold
@@ -68,12 +69,13 @@ class SaveAndReturnControllerSpec extends SpecBase with MockitoSugar with ScalaF
     }
 
     "Return the starting page if no next page is available in the user answers" in {
+      when(mockNavigator.errorPage(SaveAndReturnPage)).thenReturn(testCall)
       val controller = testSetup(Some(testUserAnswers))
       val action = controller.restore(testSubmissionId)
       val result = action.apply(testRequest)
       whenReady(result) { res =>
         res.header.status mustBe SEE_OTHER
-        res.header.headers("Location") mustEqual Navigator.startPage.url
+        res.header.headers("Location") mustEqual testCall.url
       }
     }
 

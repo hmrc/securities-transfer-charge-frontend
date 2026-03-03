@@ -1,0 +1,58 @@
+@*
+ * Copyright 2026 HM Revenue & Customs
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *@
+
+@import uk.gov.hmrc.securitiestransferchargefrontend.views.html.templates
+@import uk.gov.hmrc.securitiestransferchargefrontend.views.html.templates.address_confirmation_display
+@import uk.gov.hmrc.securitiestransferchargefrontend.models.ConfirmableAddress
+@import uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.individuals.routes
+
+
+@this(
+        layout: templates.Layout,
+        govukButton: GovukButton,
+        formHelper: FormWithCSRF
+)
+
+@(address: ConfirmableAddress)(implicit request: Request[_], messages: Messages)
+
+@layout(pageTitle = titleNoForm(messages("confirmAddress.title"))) {
+
+@formHelper(action = routes.ConfirmAddressController.onSubmit()) {
+    <span class="govuk-caption-l">
+        <span class="govuk-visually-hidden">
+            @messages("section.caption.hidden")
+        </span>
+            @messages("details.caption")
+    </span>
+
+    <h1 class="govuk-heading-l">@messages("confirmAddress.heading")</h1>
+    @address_confirmation_display(address)
+    <br>
+    <p class="govuk-body">
+        <a class="govuk-link"
+            href="@routes.AddressController.onPageLoad().url"
+            id="editAddressLink">
+            @messages("confirmAddress.editLink")
+        </a>
+</p>
+
+
+    @govukButton(
+        ButtonViewModel(messages("confirmAddress.confirm"))
+    )
+    <div></div>
+}
+}

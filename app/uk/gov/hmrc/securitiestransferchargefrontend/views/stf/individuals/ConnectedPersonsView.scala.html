@@ -1,0 +1,89 @@
+@*
+ * Copyright 2026 HM Revenue & Customs
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *@
+
+@import uk.gov.hmrc.securitiestransferchargefrontend.viewmodels.LegendSize.Medium
+@import uk.gov.hmrc.hmrcfrontend.views.html.helpers.HmrcNewTabLinkHelper
+@import uk.gov.hmrc.hmrcfrontend.views.viewmodels.newtablinkhelper.NewTabLinkHelper
+@import uk.gov.hmrc.securitiestransferchargefrontend.config.FrontendAppConfig
+@import uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.individuals.routes.ConnectedPersonsController
+@import play.twirl.api.StringInterpolation
+@import uk.gov.hmrc.securitiestransferchargefrontend.views.html.components.SaveAndReturnButton
+@import uk.gov.hmrc.securitiestransferchargefrontend.views.html.templates
+
+@this(
+    layout: templates.Layout,
+    formHelper: FormWithCSRF,
+    govukErrorSummary: GovukErrorSummary,
+    govukRadios: GovukRadios,
+    govukButton: GovukButton,
+    hmrcNewTabLinkHelper: HmrcNewTabLinkHelper,
+    config: FrontendAppConfig,
+    govukDetails: GovukDetails,
+    saveAndReturnButton:SaveAndReturnButton
+)
+
+@(form: Form[_], mode: Mode, backLinkCall: Call)(implicit request: Request[_], messages: Messages)
+
+@link = @{ hmrcNewTabLinkHelper(NewTabLinkHelper(
+    text = messages("connectedPersons.details.content.link.text"),
+    href = Some(config.connectedPersonsInformationUrl)
+)) }
+
+@layout(pageTitle = title(form, messages("connectedPersons.title"),Some(messages("sectionTitle.transferDetails"))), backLinkUrl = Some(backLinkCall.url)) {
+
+    @formHelper(action = ConnectedPersonsController.onSubmit(mode), Symbol("autoComplete") -> "off") {
+
+        @if(form.errors.nonEmpty) {
+            @govukErrorSummary(ErrorSummaryViewModel(form))
+        }
+        
+        <h1 class="govuk-heading-l">
+            <span class="govuk-caption-l">@messages("transfer.details.caption")</span>
+            @messages("connectedPersons.heading")
+        </h1>
+
+        <p class="govuk-body">@messages("connectedPersons.p")</p>
+        @govukDetails(Details(
+            summary = Text(messages("connectedPersons.details.summary")),
+            content = HtmlContent(
+                HtmlFormat.raw(s"""
+                    <p class="govuk-body">${messages("connectedPersons.details.content.p1")}</p>
+                    <ul class="govuk-list govuk-list--bullet">
+                        <li>${messages("connectedPersons.details.content.l1")}</li>
+                        <li>${messages("connectedPersons.details.content.l2")}</li>
+                        <li>${messages("connectedPersons.details.content.l3")}</li>
+                        <li>${messages("connectedPersons.details.content.l4")}</li>
+                    </ul>
+                    <p class="govuk-body">${messages("connectedPersons.details.content.p2")}</p>
+                    $link
+                """)
+                )
+            ))
+
+        @govukRadios(
+            RadiosViewModel.yesNo(
+                field = form("value"),
+                legend = LegendViewModel(messages("connectedPersons.legend")).asPageHeading(Medium)
+            )
+        )
+
+        @govukButton(
+            ButtonViewModel(messages("site.save-and-continue.button"))
+        )
+
+        @saveAndReturnButton()
+    }
+}

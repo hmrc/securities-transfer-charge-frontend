@@ -18,6 +18,7 @@ package uk.gov.hmrc.securitiestransferchargefrontend.pages
 
 import play.api.libs.json.JsPath
 import uk.gov.hmrc.securitiestransferchargefrontend.models.WhatTypeOfSecurities
+import uk.gov.hmrc.securitiestransferchargefrontend.pages.QuestionPage
 
 case object WhatTypeOfSecuritiesPage extends QuestionPage[WhatTypeOfSecurities] {
 
