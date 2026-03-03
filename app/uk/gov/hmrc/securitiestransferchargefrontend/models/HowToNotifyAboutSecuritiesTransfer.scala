@@ -31,15 +31,19 @@ object HowToNotifyAboutSecuritiesTransfer extends Enumerable.Implicits {
     OneAtATime, MoreThanOneAtATime
   )
 
-  def options(implicit messages: Messages): Seq[RadioItem] =
-    values.zipWithIndex.map {
-      case (value, index) => RadioItem(
-        content = Text(messages(s"howToNotifyAboutSecuritiesTransfer.${value.toString}")),
+  def options(affinityGroupKey: String)(implicit messages: Messages): Seq[RadioItem] = {
+
+    values.zipWithIndex.map { case (value, index) =>
+      RadioItem(
+        content = Text(messages(s"$affinityGroupKey.howToNotifyAboutSecuritiesTransfer.${value.toString}")),
         value = Some(value.toString),
         id = Some(s"value_$index"),
-        hint = Some(Hint(content = Text(messages(s"howToNotifyAboutSecuritiesTransfer.${value.toString}.hint"))))
+        hint = Some(
+          Hint(content = Text(messages(s"$affinityGroupKey.howToNotifyAboutSecuritiesTransfer.${value.toString}.hint")))
+        )
       )
     }
+  }
 
   implicit val enumerable: Enumerable[HowToNotifyAboutSecuritiesTransfer] =
     Enumerable(values.map(v => v.toString -> v): _*)

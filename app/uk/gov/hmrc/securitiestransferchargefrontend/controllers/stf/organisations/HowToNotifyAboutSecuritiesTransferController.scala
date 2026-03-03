@@ -14,27 +14,25 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.individuals
+package uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.organisations
 
 import play.api.data.Form
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, Call, MessagesControllerComponents}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.actions.*
-import uk.gov.hmrc.securitiestransferchargefrontend.forms.stf.individuals.HowToNotifyAboutSecuritiesTransferFormProvider
+import uk.gov.hmrc.securitiestransferchargefrontend.forms.stf.organisations.HowToNotifyAboutSecuritiesTransferFormProvider
 import uk.gov.hmrc.securitiestransferchargefrontend.models.{HowToNotifyAboutSecuritiesTransfer, Mode, UserAnswers}
 import uk.gov.hmrc.securitiestransferchargefrontend.navigation.Navigator
 import uk.gov.hmrc.securitiestransferchargefrontend.pages.HowToNotifyAboutSecuritiesTransferPage
-import uk.gov.hmrc.securitiestransferchargefrontend.views.html.stf.individuals.HowToNotifyAboutSecuritiesTransferView
+import uk.gov.hmrc.securitiestransferchargefrontend.views.html.stf.organisations.HowToNotifyAboutSecuritiesTransferView
 
 import javax.inject.{Inject, Named}
 import scala.concurrent.{ExecutionContext, Future}
-import scala.language.postfixOps
-import uk.gov.hmrc.securitiestransferchargefrontend.controllers.SaveAndReturnButton.isReturn
 
 class HowToNotifyAboutSecuritiesTransferController @Inject()(
                                        override val messagesApi: MessagesApi,
-                                       @Named("individuals") navigator: Navigator,
+                                       @Named("organisations") orgNavigator: Navigator,
                                        stcAuthEnrolled: StcAuthEnrolledAction,
                                        getData: StcDataRetrievalAction,
                                        requireData: StcDataRequiredAction,
@@ -46,26 +44,26 @@ class HowToNotifyAboutSecuritiesTransferController @Inject()(
   val form: Form[HowToNotifyAboutSecuritiesTransfer] = formProvider()
 
   lazy val backLinkCall: Mode => UserAnswers => Call =
-    mode => userAnswers => navigator.previousPage(HowToNotifyAboutSecuritiesTransferPage, mode, userAnswers)
+    mode => userAnswers => orgNavigator.previousPage(HowToNotifyAboutSecuritiesTransferPage, mode, userAnswers)
 
-  def onPageLoad(mode: Mode): Action[AnyContent] = (stcAuthEnrolled andThen getData andThen requireData).async{
+  def onPageLoad(mode: Mode): Action[AnyContent] = (stcAuthEnrolled andThen getData andThen requireData) {
     implicit request =>
-      
+
       val innerRequest = request.request
-      
+
       val preparedForm = request.userAnswers.get(HowToNotifyAboutSecuritiesTransferPage) match {
         case None => form
         case Some(value) => form.fill(value)
       }
 
-      Future.successful(Ok(view(preparedForm, mode, innerRequest.affinityGroupKey, backLinkCall(mode)(request.userAnswers))))
+      Ok(view(preparedForm, mode, innerRequest.affinityGroupKey, backLinkCall(mode)(request.userAnswers)))
   }
 
   def onSubmit(mode: Mode): Action[AnyContent] = (stcAuthEnrolled andThen getData andThen requireData).async {
     implicit request =>
 
       val innerRequest = request.request
-      
+
       form.bindFromRequest().fold(
         formWithErrors =>
           Future.successful(BadRequest(view(formWithErrors, mode, innerRequest.affinityGroupKey, backLinkCall(mode)(request.userAnswers)))),
@@ -73,7 +71,7 @@ class HowToNotifyAboutSecuritiesTransferController @Inject()(
         howToNotify =>
           for {
             updatedAnswers <- Future.fromTry(request.userAnswers.set(HowToNotifyAboutSecuritiesTransferPage, howToNotify))
-            nextPage       <- navigator.nextPage(HowToNotifyAboutSecuritiesTransferPage, mode, updatedAnswers, isReturn(request))
+            nextPage       <- orgNavigator.nextPage(HowToNotifyAboutSecuritiesTransferPage, mode, updatedAnswers)
           } yield Redirect(nextPage)
       )
   }

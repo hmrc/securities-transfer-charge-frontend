@@ -1,5 +1,5 @@
 /*
- * Copyright 2025 HM Revenue & Customs
+ * Copyright 2026 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,15 +14,14 @@
  * limitations under the License.
  */
 
-package views.stf.individuals
+package views.stf.organisations
 
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
 import play.api.Application
-import play.api.mvc.Call
-import uk.gov.hmrc.securitiestransferchargefrontend.forms.stf.individuals.HowToNotifyAboutSecuritiesTransferFormProvider
+import uk.gov.hmrc.securitiestransferchargefrontend.forms.stf.organisations.HowToNotifyAboutSecuritiesTransferFormProvider
 import uk.gov.hmrc.securitiestransferchargefrontend.models.NormalMode
-import uk.gov.hmrc.securitiestransferchargefrontend.views.html.stf.individuals.HowToNotifyAboutSecuritiesTransferView
+import uk.gov.hmrc.securitiestransferchargefrontend.views.html.stf.organisations.HowToNotifyAboutSecuritiesTransferView
 import views.ViewBaseSpec
 
 import scala.language.postfixOps
@@ -30,23 +29,26 @@ import scala.language.postfixOps
 class HowToNotifyAboutSecuritiesTransferViewSpec extends ViewBaseSpec {
 
   override def fakeApplication(): Application = applicationBuilder().build()
-  
+
   private val viewInstance         = app.injector.instanceOf[HowToNotifyAboutSecuritiesTransferView]
   private val formProvider = new HowToNotifyAboutSecuritiesTransferFormProvider()
   private val form = formProvider()
-  private val testBackLinkRoute: Call = Call("GET", "/back-link")
 
 
   def view(): Document = Jsoup.parse(
-    viewInstance(form, NormalMode, affinityGroupKeyInd, testBackLinkRoute)(fakeRequest, messages).body
+    viewInstance(form, NormalMode, affinityGroupKeyOrg, testBackLinkRoute)(fakeRequest, messages).body
   )
 
   object ExpectedContent {
-    val title = "How do you want to tell us about your securities transfers?"
-    val caption = "Transfer details"
-    val heading = "How do you want to tell us about your securities transfers?"
-    val saveAndContinue = "Save and continue"
-    val saveAndReturn = "Save and return to dashboard"
+    val title: String = messages("orgs.howToNotifyAboutSecuritiesTransfer.title")
+    val caption: String = messages("transfer.details.caption")
+    val heading: String = messages("orgs.howToNotifyAboutSecuritiesTransfer.heading")
+    val oneAtATimeRadio: String = messages("orgs.howToNotifyAboutSecuritiesTransfer.oneAtATime")
+    val oneAtATimeHint: String = messages("orgs.howToNotifyAboutSecuritiesTransfer.oneAtATime.hint")
+    val moreThanOneAtATimeRadio: String = messages("orgs.howToNotifyAboutSecuritiesTransfer.moreThanOneAtATime")
+    val moreThanOneAtATimeHint: String = messages("orgs.howToNotifyAboutSecuritiesTransfer.moreThanOneAtATime.hint")
+    val saveAndContinue: String = messages("site.save-and-continue.button")
+    val saveAndReturn: String = messages("site.save-and-return.button")
 
   }
 
@@ -66,6 +68,16 @@ class HowToNotifyAboutSecuritiesTransferViewSpec extends ViewBaseSpec {
         howToNotifyAboutSecuritiesTransferView.getElementsByClass("govuk-caption-l").text() mustBe ExpectedContent.caption
       }
 
+      "display the correct radio hints" in {
+        howToNotifyAboutSecuritiesTransferView.hintWithMultiple(1).value mustBe ExpectedContent.oneAtATimeHint
+        howToNotifyAboutSecuritiesTransferView.hintWithMultiple(2).value mustBe ExpectedContent.moreThanOneAtATimeHint
+      }
+
+      "display the correct radio headings" in {
+        howToNotifyAboutSecuritiesTransferView.radio("oneAtATime").value mustBe ExpectedContent.oneAtATimeRadio
+        howToNotifyAboutSecuritiesTransferView.radio("moreThanOneAtATime").value mustBe ExpectedContent.moreThanOneAtATimeRadio
+      }
+
       "have a button with the text save and continue " in {
         val buttons = howToNotifyAboutSecuritiesTransferView.select(".govuk-button")
         buttons.get(0).text() mustBe ExpectedContent.saveAndContinue
@@ -77,5 +89,4 @@ class HowToNotifyAboutSecuritiesTransferViewSpec extends ViewBaseSpec {
       }
     }
   }
-
 }
