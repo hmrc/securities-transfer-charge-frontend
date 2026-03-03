@@ -161,8 +161,8 @@ taxRate.checkYourAnswersLabel = Tax rate
 taxRate.error.required = Select a tax rate
 taxRate.change.hidden = TaxRate
 
-otherSecuritiesType.title = What type of securities are you buying?
-otherSecuritiesType.heading = What type of securities are you buying?
+otherSecuritiesType.title = Enter the type of securities you are buying
+otherSecuritiesType.heading = Enter the type of securities you are buying
 otherSecuritiesType.checkYourAnswersLabel = What type of securities are you buying?
 otherSecuritiesType.error.required = Enter the type of securities you’re buying
 otherSecuritiesType.change.hidden = Change what type of securities are you buying
