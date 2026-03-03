@@ -21,7 +21,6 @@ import play.api.mvc.{Call, Request}
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.play.http.HeaderCarrierConverter
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.routes
-import uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.organisations.routes as orgRoutes
 import uk.gov.hmrc.securitiestransferchargefrontend.domain.SubmissionId
 import uk.gov.hmrc.securitiestransferchargefrontend.models.UserAnswers
 import uk.gov.hmrc.securitiestransferchargefrontend.navigation.stf.organisations.{BackwardsRoutes, ForwardRoutes}
@@ -36,16 +35,21 @@ import scala.concurrent.{ExecutionContext, Future}
 class StfOrgNavigator @Inject()(answerPersistenceService: AnswerPersistenceService)
                                (implicit ec: ExecutionContext) extends AbstractModeNavigator with PersistentNavigator:
 
-  val forwardRoutes: ForwardRoutes = new ForwardRoutes(answerPersistenceService)
+  override lazy val dashboardPage: Call = routes.SubmissionsDashboardController.onPageLoad()
+  val defaultPage: Call = routes.JourneyRecoveryController.onPageLoad()
+  val errorPages: List[Call] = List(defaultPage)
+
+  val forwardRoutes: ForwardRoutes = new ForwardRoutes(answerPersistenceService, defaultPage, errorPages)
+  val backwardsRoutes: BackwardsRoutes = new BackwardsRoutes(defaultPage)
 
   override def forwardRoutes(page: Page)(implicit hc: HeaderCarrier): UserAnswers => Future[Call] =
     forwardRoutes.forwardRoutes(page)(hc)
 
   override def predecessorRoutes(page: Page): UserAnswers => Call =
-    BackwardsRoutes.predecessorRoutes(page)
+    backwardsRoutes.predecessorRoutes(page)
 
   def errorPage(forPage: Page): Call = forPage match {
-    case _ => StfOrgNavigator.defaultPage
+    case _ => defaultPage
   }
 
   val checkRouteMap: Page => UserAnswers => Call = _ => _ => routes.CheckYourAnswersController.onPageLoad()
@@ -54,9 +58,3 @@ class StfOrgNavigator @Inject()(answerPersistenceService: AnswerPersistenceServi
     implicit val hc: HeaderCarrier = HeaderCarrierConverter.fromRequestAndSession(request, request.session)
     answerPersistenceService.load(submissionId, userId)
   }
-
-object StfOrgNavigator:
-  val startPage: Call = orgRoutes.ConfirmAddressController.onPageLoad()
-  val defaultPage: Call = routes.JourneyRecoveryController.onPageLoad()
-  val defaultPageF: Future[Call] = Future.successful(defaultPage)
-  val errorPages: Seq[Call] = List(defaultPage)

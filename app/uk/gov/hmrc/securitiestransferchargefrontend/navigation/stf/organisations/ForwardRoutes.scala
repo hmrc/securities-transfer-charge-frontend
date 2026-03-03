@@ -22,16 +22,19 @@ import uk.gov.hmrc.securitiestransferchargefrontend.controllers.routes
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.organisations.routes as orgRoutes
 import uk.gov.hmrc.securitiestransferchargefrontend.models.{NormalMode, UserAnswers}
 import uk.gov.hmrc.securitiestransferchargefrontend.navigation.PersistentNavigationHelper
+import uk.gov.hmrc.securitiestransferchargefrontend.pages.{ConfirmAddressPage, ConnectedPersonsPage, NameOfSellerPage, Page, StfBuyersAddressPage}
 import uk.gov.hmrc.securitiestransferchargefrontend.pages.{ConfirmAddressPage, Page, StfBuyersAddressPage}
 import uk.gov.hmrc.securitiestransferchargefrontend.services.AnswerPersistenceService
 import uk.gov.hmrc.securitiestransferchargefrontend.pages.SubmissionsDashboardPage
 
 import scala.concurrent.{ExecutionContext, Future}
 
-class ForwardRoutes(answerPersistenceService: AnswerPersistenceService)
+class ForwardRoutes(answerPersistenceService: AnswerPersistenceService,
+                    defaultPage: Call,
+                    errorPages: Seq[Call])
                    (implicit ec: ExecutionContext):
 
-  val helper = new PersistentNavigationHelper(answerPersistenceService, StfOrgNavigator.defaultPage, StfOrgNavigator.errorPages)
+  val helper = new PersistentNavigationHelper(answerPersistenceService, defaultPage, errorPages)
   import helper.*
 
   def forwardRoutes(page: Page)(implicit hc: HeaderCarrier): UserAnswers => Future[Call] = page match {
@@ -39,8 +42,9 @@ class ForwardRoutes(answerPersistenceService: AnswerPersistenceService)
     case SubmissionsDashboardPage => userAnswers => goTo(orgRoutes.HowToNotifyAboutSecuritiesTransferController.onPageLoad(NormalMode), Some(userAnswers))
 
     case ConfirmAddressPage => userAnswers => dataRequired(ConfirmAddressPage, userAnswers, routes.JourneyRecoveryController.onPageLoad())
+    case ConnectedPersonsPage => userAnswers => dataRequired(ConnectedPersonsPage, userAnswers, routes.JourneyRecoveryController.onPageLoad())
     case StfBuyersAddressPage => userAnswers => dataRequired(StfBuyersAddressPage, userAnswers, routes.JourneyRecoveryController.onPageLoad())
+    case NameOfSellerPage => userAnswers => dataRequired(NameOfSellerPage, userAnswers, routes.JourneyRecoveryController.onPageLoad())
 
-
-    case _ => _ => StfOrgNavigator.defaultPageF
+    case _ => _ => Future.successful(defaultPage)
   }

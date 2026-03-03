@@ -43,7 +43,7 @@ class SubmissionsDashboardController @Inject()(
                                                 @Named("organisations") orgNavigator: Navigator)
                                               (implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport with Logging {
 
-  def onPageLoad: Action[AnyContent] =
+  def onPageLoad(): Action[AnyContent] =
     (stcAuthEnrolled andThen getData).async { implicit request =>
 
       val userId = request.request.internalId

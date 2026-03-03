@@ -29,10 +29,13 @@ import uk.gov.hmrc.securitiestransferchargefrontend.services.AnswerPersistenceSe
 import scala.concurrent.{ExecutionContext, Future}
 
 
-class ForwardRoutes(answerPersistenceService: AnswerPersistenceService)
+class ForwardRoutes(answerPersistenceService: AnswerPersistenceService,
+                    defaultPage: Call,
+                    errorPages: Seq[Call])
                    (implicit ec: ExecutionContext):
-
-  val helper = new PersistentNavigationHelper(answerPersistenceService, StfNavigator.defaultPage, StfNavigator.errorPages)
+  
+  
+  val helper = new PersistentNavigationHelper(answerPersistenceService, defaultPage, errorPages)
   import helper.*
 
   def forwardRoutes(page: Page)(implicit hc: HeaderCarrier): UserAnswers => Future[Call] = page match {
@@ -41,7 +44,7 @@ class ForwardRoutes(answerPersistenceService: AnswerPersistenceService)
     case HowToNotifyAboutSecuritiesTransferPage => userAnswers => {
       dataDependent(HowToNotifyAboutSecuritiesTransferPage, userAnswers) {
         case OneAtATime => individualRoutes.ConfirmAddressController.onPageLoad()
-        case MoreThanOneAtATime => StfNavigator.defaultPage
+        case MoreThanOneAtATime => defaultPage
       }
     }
     case ConfirmAddressPage => userAnswers => dataRequired(ConfirmAddressPage, userAnswers, individualRoutes.NameOfSellerController.onPageLoad(NormalMode))
@@ -69,12 +72,12 @@ class ForwardRoutes(answerPersistenceService: AnswerPersistenceService)
     case AmountPaidForSecuritiesPage => userAnswers =>
       userAnswersDependent(userAnswers) {
         userAnswers =>
-          userAnswers.get(ConnectedPersonsPage).fold(StfNavigator.defaultPage) {
+          userAnswers.get(ConnectedPersonsPage).fold(defaultPage) {
             isConnected =>
               if (isConnected) individualRoutes.TotalMarketValueController.onPageLoad(NormalMode)
               else routes.CheckYourAnswersController.onPageLoad()
           }
       }
     case TotalMarketValuePage => userAnswers => dataRequired(TotalMarketValuePage, userAnswers, routes.CheckYourAnswersController.onPageLoad())
-    case _ => _ => StfNavigator.defaultPageF
+    case _ => _ => Future.successful(defaultPage)
   }

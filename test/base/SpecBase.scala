@@ -82,7 +82,7 @@ trait SpecBase
   val testErrorPage = Call("GET", "/error-page")
 
   def getNavigator: Navigator = new Navigator {
-    override def nextPage(page: Page, mode: Mode, userAnswers: UserAnswers)(implicit request: Request[_]): Future[Call] = Future.successful(testNextPage)
+    override def nextPage(page: Page, mode: Mode, userAnswers: UserAnswers, isReturn: Boolean = false)(implicit request: Request[_]): Future[Call] = Future.successful(testNextPage)
     override def previousPage(page: Page, mode: Mode, userAnswers: UserAnswers): Call = testBackLinkRoute
     override def errorPage(forPage: Page): Call = testErrorPage
   }
