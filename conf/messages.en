@@ -89,7 +89,7 @@ nameOfSeller.checkYourAnswersLabel = What’s the seller’s name?
 nameOfSeller.error.required = Enter the seller’s full name
 nameOfSeller.error.length = Seller’s name must be 35 characters or less
 nameOfSeller.change.hidden = NameOfSeller
-nameOfSeller.hint = This can be the name of a business, person or another entity.
+nameOfSeller.hint = This can be a business, person or another entity.
 
 sectionTitle.transferDetails = Transfer details
 connectedPersons.title = Connected persons
