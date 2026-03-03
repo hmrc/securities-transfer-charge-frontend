@@ -21,7 +21,7 @@ import uk.gov.hmrc.securitiestransferchargefrontend.controllers.routes
 import uk.gov.hmrc.securitiestransferchargefrontend.models.UserAnswers
 import uk.gov.hmrc.securitiestransferchargefrontend.navigation.NavigationHelper
 import uk.gov.hmrc.securitiestransferchargefrontend.navigation.stf.individuals.StfNavigator
-import uk.gov.hmrc.securitiestransferchargefrontend.pages.{ConfirmAddressPage, ConnectedPersonsPage, Page, StfBuyersAddressPage}
+import uk.gov.hmrc.securitiestransferchargefrontend.pages.{ConfirmAddressPage, ConnectedPersonsPage, NameOfSellerPage, Page, StfBuyersAddressPage}
 
 object BackwardsRoutes:
 
@@ -32,6 +32,7 @@ object BackwardsRoutes:
     case ConfirmAddressPage => _ => routes.SubmissionsDashboardController.onPageLoad()
     case ConnectedPersonsPage => _ => routes.SubmissionsDashboardController.onPageLoad()
     case StfBuyersAddressPage => _ => routes.SubmissionsDashboardController.onPageLoad()
+    case NameOfSellerPage => _ => routes.SubmissionsDashboardController.onPageLoad()
     case _ => _ => StfOrgNavigator.defaultPage
 
   }
