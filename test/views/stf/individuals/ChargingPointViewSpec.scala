@@ -39,10 +39,10 @@ class ChargingPointViewSpec extends ViewBaseSpec {
   )
 
   object ExpectedContent {
-    val title = "When did you buy the securities?"
+    val title = "When did you buy these securities?"
     val caption = "Transfer details"
-    val heading = "When did you buy the securities?"
-    val hint = "This is also called the charging point. For example, 12 11 2007"
+    val heading = "When did you buy these securities?"
+    val hint = "This is also called the charging point. For example, 27 3 2024"
     val saveAndContinue = "Save and continue"
     val saveAndReturn = "Save and return to dashboard"
   }
