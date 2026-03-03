@@ -23,4 +23,4 @@ import scala.language.implicitConversions
 
 trait AddressPage extends QuestionPage[AlfConfirmedAddress]:
   override def path: JsPath = JsPath \ toString
-  override def toString: String = "addressPage"
+  override def toString: String

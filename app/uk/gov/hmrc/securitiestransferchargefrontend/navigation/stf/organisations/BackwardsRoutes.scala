@@ -20,10 +20,13 @@ import play.api.mvc.Call
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.routes
 import uk.gov.hmrc.securitiestransferchargefrontend.models.UserAnswers
 import uk.gov.hmrc.securitiestransferchargefrontend.navigation.NavigationHelper
+import uk.gov.hmrc.securitiestransferchargefrontend.pages.{ConfirmAddressPage, ConnectedPersonsPage, NameOfSellerPage, Page, StfBuyersAddressPage}
+import uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.organisations.routes as orgRoutes
+
 import uk.gov.hmrc.securitiestransferchargefrontend.pages.*
 
 class BackwardsRoutes(defaultPage: Call):
-  
+
   val navHelper: NavigationHelper = new NavigationHelper(defaultPage)
 
   def predecessorRoutes(page: Page): UserAnswers => Call = page match {
@@ -32,7 +35,7 @@ class BackwardsRoutes(defaultPage: Call):
     case ConfirmAddressPage => _ => routes.SubmissionsDashboardController.onPageLoad()
     case ConnectedPersonsPage => _ => routes.SubmissionsDashboardController.onPageLoad()
     case StfBuyersAddressPage => _ => routes.SubmissionsDashboardController.onPageLoad()
-    case NameOfSellerPage => _ => routes.SubmissionsDashboardController.onPageLoad()
+    case NameOfSellerPage => _ => orgRoutes.ConfirmAddressController.onPageLoad()
     case _ => _ => defaultPage
 
   }

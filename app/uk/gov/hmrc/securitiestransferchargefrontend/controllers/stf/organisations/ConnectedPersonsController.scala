@@ -20,6 +20,7 @@ import play.api.data.Form
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, Call, MessagesControllerComponents}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
+import uk.gov.hmrc.securitiestransferchargefrontend.controllers.SaveAndReturnButton.isReturn
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.actions.*
 import uk.gov.hmrc.securitiestransferchargefrontend.forms.stf.organisations.ConnectedPersonsFormProvider
 import uk.gov.hmrc.securitiestransferchargefrontend.models.{Mode, UserAnswers}
@@ -67,7 +68,7 @@ class ConnectedPersonsController @Inject()(
         areConnected =>
           for {
             updatedAnswers <- Future.fromTry(request.userAnswers.set(ConnectedPersonsPage, areConnected))
-            nextPage <- navigator.nextPage(ConnectedPersonsPage, mode, updatedAnswers)
+            nextPage <- navigator.nextPage(ConnectedPersonsPage, mode, updatedAnswers,isReturn(request))
           } yield Redirect(nextPage)
       )
   }
