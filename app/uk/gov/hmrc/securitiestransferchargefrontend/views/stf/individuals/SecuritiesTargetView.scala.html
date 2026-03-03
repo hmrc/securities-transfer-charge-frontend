@@ -59,13 +59,7 @@
                 label = LabelViewModel(messages("securitiesTarget.crn"))
             )
             .withWidth(OneThird)
-            .withHint(Hint(content = HtmlContent(HtmlFormat.raw(s"""
-                <span class="govuk-hint">
-                    ${messages("securitiesTarget.crn.hint.message1")}<br>
-                    ${messages("securitiesTarget.crn.hint.message2")}
-                </span>
-            """)
-            )))
+            .withHint(HintViewModel(messages("securitiesTarget.crn.hint")))
         )
 
         @govukButton(
