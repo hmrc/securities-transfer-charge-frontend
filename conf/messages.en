@@ -172,7 +172,7 @@ whatTypeOfSecurities.heading = What type of securities are you buying?
 whatTypeOfSecurities.shares = Shares
 whatTypeOfSecurities.other = Other
 whatTypeOfSecurities.checkYourAnswersLabel = What type of securities are you buying?
-whatTypeOfSecurities.error.required = Select a the type of securities you are buying
+whatTypeOfSecurities.error.required = Select the type of securities you are buying
 whatTypeOfSecurities.change.hidden = Change what type of securities are you buying
 
 totalMarketValue.title = What is the total market value of these securities?
