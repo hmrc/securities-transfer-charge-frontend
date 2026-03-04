@@ -259,5 +259,5 @@ chargingPoint.org.error.required.all = Enter the date the business bought the se
 chargingPoint.error.required.two = The date the business bought the securities must include {0} and {1}
 chargingPoint.org.error.required = The date the business bought the securities must include a {0}
 chargingPoint.org.error.invalid = The date the business bought the securities must be a real date
-chargingPoint.org.error.futureDate = The date the business bought the securities must be today's date or a date in the past
+chargingPoint.org.error.futureDate = The date the business bought the securities must be today’s date or a date in the past
 chargingPoint.org.change.hidden = ChargingPoint
