@@ -125,3 +125,9 @@ GET        /stf/org/seller-name                        uk.gov.hmrc.securitiestra
 POST       /stf/org/seller-name                        uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.organisations.NameOfSellerController.onSubmit(mode: Mode = NormalMode)
 GET        /stf/org/change/seller-name                 uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.organisations.NameOfSellerController.onPageLoad(mode: Mode = CheckMode)
 POST       /stf/org/change/seller-name                 uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.organisations.NameOfSellerController.onSubmit(mode: Mode = CheckMode)
+
+GET        /stf/org/select-relief                     uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.organisations.WhatReliefAreYouApplyingForController.onPageLoad(mode: Mode = NormalMode)
+POST       /stf/org/select-relief                       uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.organisations.WhatReliefAreYouApplyingForController.onSubmit(mode: Mode = NormalMode)
+GET        /stf/org/change/select-relief                  uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.organisations.WhatReliefAreYouApplyingForController.onPageLoad(mode: Mode = CheckMode)
+POST       /stf/org/change/select-relief                  uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.organisations.WhatReliefAreYouApplyingForController.onSubmit(mode: Mode = CheckMode)
+
