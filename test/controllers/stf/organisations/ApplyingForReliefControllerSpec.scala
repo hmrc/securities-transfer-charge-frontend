@@ -28,22 +28,22 @@ import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.securitiestransferchargefrontend.clients.SaveAndReturnClient
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.routes
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.organisations.routes as orgRoutes
-import uk.gov.hmrc.securitiestransferchargefrontend.forms.stf.organisations.WhatReliefAreYouApplyingForFormProvider
-import uk.gov.hmrc.securitiestransferchargefrontend.models.{NormalMode, ReliefsDataSource, UserAnswers}
+import uk.gov.hmrc.securitiestransferchargefrontend.forms.stf.organisations.ApplyingForReliefFormProvider
+import uk.gov.hmrc.securitiestransferchargefrontend.models.{NormalMode, UserAnswers}
 import uk.gov.hmrc.securitiestransferchargefrontend.navigation.Navigator
-import uk.gov.hmrc.securitiestransferchargefrontend.pages.WhatReliefAreYouApplyingForPage
-import uk.gov.hmrc.securitiestransferchargefrontend.views.html.stf.organisations.WhatReliefAreYouApplyingForView
+import uk.gov.hmrc.securitiestransferchargefrontend.pages.ApplyingForReliefPage
+import uk.gov.hmrc.securitiestransferchargefrontend.views.html.stf.organisations.ApplyingForReliefView
 
 import scala.concurrent.Future
 
-class WhatReliefAreYouApplyingForControllerSpec extends SpecBase with MockitoSugar {
+class ApplyingForReliefControllerSpec extends SpecBase with MockitoSugar {
   
-  val formProvider = new WhatReliefAreYouApplyingForFormProvider()
-  val form: Form[String] = formProvider()
+  val formProvider = new ApplyingForReliefFormProvider()
+  val form: Form[Boolean] = formProvider()
 
-  lazy val whatReliefAreYouApplyingForRoute: String = orgRoutes.WhatReliefAreYouApplyingForController.onPageLoad(NormalMode).url
+  lazy val applyingForReliefRoute: String = orgRoutes.ApplyingForReliefController.onPageLoad(NormalMode).url
 
-  "WhatReliefAreYouApplyingFor Controller" - {
+  "ApplyingForRelief Controller" - {
 
     "must return OK and the correct view for a GET" in {
 
@@ -52,42 +52,39 @@ class WhatReliefAreYouApplyingForControllerSpec extends SpecBase with MockitoSug
         .build()
 
       running(application) {
-        val request = FakeRequest(GET, whatReliefAreYouApplyingForRoute)
+        val request = FakeRequest(GET, applyingForReliefRoute)
 
         val result = route(application, request).value
 
-        val view = application.injector.instanceOf[WhatReliefAreYouApplyingForView]
-
-        val reliefsDataSource = application.injector.instanceOf[ReliefsDataSource]
+        val view = application.injector.instanceOf[ApplyingForReliefView]
 
         status(result) mustEqual OK
-        contentAsString(result) mustEqual view(form, NormalMode,reliefsDataSource.reliefs, testBackLinkRoute)(request, messages(application)).toString
+        contentAsString(result) mustEqual view(form, NormalMode, testBackLinkRoute)(request, messages(application)).toString
       }
     }
 
     "must populate the view correctly on a GET when the question has previously been answered" in {
 
-      val userAnswers = UserAnswers(userAnswersId,submissionId).set(WhatReliefAreYouApplyingForPage, "answer").success.value
+      val userAnswers = UserAnswers(userAnswersId,submissionId).set(ApplyingForReliefPage, true).success.value
 
       val application = applicationBuilder(userAnswers = Some(userAnswers))
         .overrides(bind[Navigator].qualifiedWith("organisations").toInstance(getNavigator))
         .build()
 
       running(application) {
-        val request = FakeRequest(GET, whatReliefAreYouApplyingForRoute)
+        val request = FakeRequest(GET, applyingForReliefRoute)
 
-        val view = application.injector.instanceOf[WhatReliefAreYouApplyingForView]
-
-        val reliefsDataSource = application.injector.instanceOf[ReliefsDataSource]
+        val view = application.injector.instanceOf[ApplyingForReliefView]
 
         val result = route(application, request).value
 
         status(result) mustEqual OK
-        contentAsString(result) mustEqual view(form.fill("answer"), NormalMode,reliefsDataSource.reliefs, testBackLinkRoute)(request, messages(application)).toString
+        contentAsString(result) mustEqual view(form.fill(true), NormalMode, testBackLinkRoute)(request, messages(application)).toString
       }
     }
 
-    "must redirect to the next page when valid data is submitted" in {
+    "must redirect to the WhatReliefAreYouApplyingFor page when yes is selected" in {
+
       val saveAndReturnClient = mock[SaveAndReturnClient]
 
       when(saveAndReturnClient.save(any[UserAnswers]())(any[HeaderCarrier]()))
@@ -99,36 +96,58 @@ class WhatReliefAreYouApplyingForControllerSpec extends SpecBase with MockitoSug
 
       running(application) {
         val request =
-          FakeRequest(POST, whatReliefAreYouApplyingForRoute)
-            .withFormUrlEncodedBody(("reliefs", "test-relief"))
+          FakeRequest(POST, applyingForReliefRoute)
+            .withFormUrlEncodedBody(("value", "true"))
 
         val result = route(application, request).value
 
         status(result) mustEqual SEE_OTHER
+        redirectLocation(result).value mustEqual orgRoutes.WhatReliefAreYouApplyingForController.onPageLoad(NormalMode).url
+      }
+    }
+
+    "must redirect to the SecuritiesTarget page when no is selected" in {
+
+      val saveAndReturnClient = mock[SaveAndReturnClient]
+
+      when(saveAndReturnClient.save(any[UserAnswers]())(any[HeaderCarrier]()))
+        .thenReturn(Future.successful(()))
+
+      val application =
+        applicationBuilder(userAnswers = Some(emptyUserAnswers))
+          .build()
+
+      running(application) {
+        val request =
+          FakeRequest(POST, applyingForReliefRoute)
+            .withFormUrlEncodedBody(("value", "false"))
+
+        val result = route(application, request).value
+
+        status(result) mustEqual SEE_OTHER
+        redirectLocation(result).value mustEqual routes.JourneyRecoveryController.onPageLoad().url
       }
     }
 
     "must return a Bad Request and errors when invalid data is submitted" in {
 
       val application = applicationBuilder(userAnswers = Some(emptyUserAnswers))
-      .overrides(bind[Navigator].qualifiedWith("organisations").toInstance(getNavigator))
-      .build()
+        .overrides(bind[Navigator].qualifiedWith("organisations").toInstance(getNavigator))
+        .build()
 
       running(application) {
         val request =
-          FakeRequest(POST, whatReliefAreYouApplyingForRoute)
-            .withFormUrlEncodedBody(("reliefs", ""))
+          FakeRequest(POST, applyingForReliefRoute)
+            .withFormUrlEncodedBody(("value", ""))
 
-        val boundForm = form.bind(Map("reliefs" -> ""))
+        val boundForm = form.bind(Map("value" -> ""))
 
-        val view = application.injector.instanceOf[WhatReliefAreYouApplyingForView]
-        val reliefsDataSource = application.injector.instanceOf[ReliefsDataSource]
-
+        val view = application.injector.instanceOf[ApplyingForReliefView]
 
         val result = route(application, request).value
 
         status(result) mustEqual BAD_REQUEST
-        contentAsString(result) mustEqual view(boundForm, NormalMode,reliefsDataSource.reliefs, testBackLinkRoute)(request, messages(application)).toString
+        contentAsString(result) mustEqual view(boundForm, NormalMode, testBackLinkRoute)(request, messages(application)).toString
       }
     }
 
@@ -137,7 +156,7 @@ class WhatReliefAreYouApplyingForControllerSpec extends SpecBase with MockitoSug
       val application = applicationBuilder(userAnswers = None).build()
 
       running(application) {
-        val request = FakeRequest(GET, whatReliefAreYouApplyingForRoute)
+        val request = FakeRequest(GET, applyingForReliefRoute)
 
         val result = route(application, request).value
 
@@ -152,8 +171,8 @@ class WhatReliefAreYouApplyingForControllerSpec extends SpecBase with MockitoSug
 
       running(application) {
         val request =
-          FakeRequest(POST, whatReliefAreYouApplyingForRoute)
-            .withFormUrlEncodedBody(("reliefs", "answer"))
+          FakeRequest(POST, applyingForReliefRoute)
+            .withFormUrlEncodedBody(("value", "true"))
 
         val result = route(application, request).value
 
