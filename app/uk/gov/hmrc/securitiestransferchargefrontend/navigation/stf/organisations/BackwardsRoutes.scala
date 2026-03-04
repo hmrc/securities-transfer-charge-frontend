@@ -19,14 +19,15 @@ package uk.gov.hmrc.securitiestransferchargefrontend.navigation.stf.organisation
 import play.api.mvc.Call
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.routes
 import uk.gov.hmrc.securitiestransferchargefrontend.models.{NormalMode, UserAnswers}
-import uk.gov.hmrc.securitiestransferchargefrontend.navigation.NavigationHelper
 import uk.gov.hmrc.securitiestransferchargefrontend.pages.{ConfirmAddressPage, ConnectedPersonsPage, NameOfSellerPage, Page, StfBuyersAddressPage}
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.organisations.routes as orgRoutes
 import uk.gov.hmrc.securitiestransferchargefrontend.pages.*
+import uk.gov.hmrc.securitiestransferchargefrontend.navigation.NavigationHelper
 
 class BackwardsRoutes(defaultPage: Call):
 
   val navHelper: NavigationHelper = new NavigationHelper(defaultPage)
+  import navHelper.*
 
   def predecessorRoutes(page: Page): UserAnswers => Call = page match {
 
@@ -36,6 +37,10 @@ class BackwardsRoutes(defaultPage: Call):
     case NameOfSellerPage => _ => orgRoutes.ConfirmAddressController.onPageLoad()
     case ConnectedPersonsPage => _ => orgRoutes.StfSellerAddressController.onPageLoad()
     case ApplyingForReliefPage  => _ => orgRoutes.ConnectedPersonsController.onPageLoad(NormalMode)
+    case SecuritiesTargetPage => userAnswers => dataDependent(ApplyingForReliefPage, userAnswers) {
+      case true => routes.SubmissionsDashboardController.onPageLoad()
+      case false => orgRoutes.ApplyingForReliefController.onPageLoad(NormalMode)
+    }
     case TaxRatePage => _ => routes.SubmissionsDashboardController.onPageLoad()
 
     case _ => _ => defaultPage

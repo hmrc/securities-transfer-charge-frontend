@@ -135,3 +135,8 @@ GET        /stf/org/tax-rate                        uk.gov.hmrc.securitiestransf
 POST       /stf/org/tax-rate                        uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.organisations.TaxRateController.onSubmit(mode: Mode = NormalMode)
 GET        /stf/org/change/tax-rate                  uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.organisations.TaxRateController.onPageLoad(mode: Mode = CheckMode)
 POST       /stf/org/change/tax-rate                  uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.organisations.TaxRateController.onSubmit(mode: Mode = CheckMode)
+
+GET        /stf/org/securities-target                    uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.organisations.SecuritiesTargetController.onPageLoad(mode: Mode = NormalMode)
+POST       /stf/org/securities-target                    uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.organisations.SecuritiesTargetController.onSubmit(mode: Mode = NormalMode)
+GET        /stf/org/change/securities-target                 uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.organisations.SecuritiesTargetController.onPageLoad(mode: Mode = CheckMode)
+POST       /stf/org/change/securities-target                  uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.organisations.SecuritiesTargetController.onSubmit(mode: Mode = CheckMode)

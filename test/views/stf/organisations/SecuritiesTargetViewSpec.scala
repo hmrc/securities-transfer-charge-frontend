@@ -14,15 +14,15 @@
  * limitations under the License.
  */
 
-package views.stf.individuals
+package views.stf.organisations
 
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
 import play.api.Application
 import play.api.mvc.Call
-import uk.gov.hmrc.securitiestransferchargefrontend.forms.stf.individuals.SecuritiesTargetFormProvider
+import uk.gov.hmrc.securitiestransferchargefrontend.forms.stf.organisations.SecuritiesTargetFormProvider
 import uk.gov.hmrc.securitiestransferchargefrontend.models.NormalMode
-import uk.gov.hmrc.securitiestransferchargefrontend.views.html.stf.individuals.SecuritiesTargetView
+import uk.gov.hmrc.securitiestransferchargefrontend.views.html.stf.organisations.SecuritiesTargetView
 import views.ViewBaseSpec
 
 import scala.language.postfixOps
@@ -42,18 +42,18 @@ class SecuritiesTargetViewSpec extends ViewBaseSpec {
   )
 
   object ExpectedContent {
-    val title: String = messages("securitiesTarget.title")
-    val heading: String = messages("securitiesTarget.heading")
+    val title: String = messages("orgs.securitiesTarget.title")
+    val heading: String = messages("orgs.securitiesTarget.heading")
     val caption: String = messages("transfer.details.caption")
-    val field1: String = messages("securitiesTarget.businessName")
-    val field2: String = messages("securitiesTarget.crn")
-    val crnHintMessage1: String = messages("securitiesTarget.crn.hint")
+    val field1: String = messages("orgs.securitiesTarget.businessName")
+    val field2: String = messages("orgs.securitiesTarget.crn")
+    val crnHintMessage1: String = messages("orgs.securitiesTarget.crn.hint")
     val saveAndContinue: String = messages("site.save-and-continue.button")
     val saveAndReturn: String = messages("site.save-and-return.button")
   }
 
   "The SecuritiesTargetView" - {
-    
+      
       val securitiesTargetView = view()
 
       "have the correct title" in {
@@ -90,6 +90,5 @@ class SecuritiesTargetViewSpec extends ViewBaseSpec {
         val buttons = securitiesTargetView.select(".govuk-button")
         buttons.get(1).text() mustBe ExpectedContent.saveAndReturn
       }
-  }
-
+    }
 }

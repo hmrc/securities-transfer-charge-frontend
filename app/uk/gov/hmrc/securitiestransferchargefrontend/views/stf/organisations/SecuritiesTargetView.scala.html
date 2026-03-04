@@ -17,7 +17,7 @@
 @import uk.gov.hmrc.securitiestransferchargefrontend.viewmodels.InputWidth._
 @import uk.gov.hmrc.securitiestransferchargefrontend.viewmodels.LabelSize.Large
 @import uk.gov.hmrc.securitiestransferchargefrontend.views.html.templates
-@import uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.individuals.routes
+@import uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.organisations.routes as orgRoutes
 @import uk.gov.hmrc.securitiestransferchargefrontend.views.html.components.SaveAndReturnButton
 
 
@@ -32,23 +32,23 @@
 
 @(form: Form[_], mode: Mode, backLinkCall: Call)(implicit request: Request[_], messages: Messages)
 
-@layout(pageTitle = title(form, messages("securitiesTarget.title")), backLinkUrl = Some(backLinkCall.url)) {
+@layout(pageTitle = title(form, messages("orgs.securitiesTarget.title")), backLinkUrl = Some(backLinkCall.url)) {
     <div id="caption-heading" class="govuk-caption-l">
         @messages("transfer.details.caption")
     </div>
 
-    @formHelper(action = routes.SecuritiesTargetController.onSubmit(mode), Symbol("autoComplete") -> "off") {
+    @formHelper(action = orgRoutes.SecuritiesTargetController.onSubmit(mode), Symbol("autoComplete") -> "off") {
 
         @if(form.errors.nonEmpty) {
             @govukErrorSummary(ErrorSummaryViewModel(form))
         }
 
-        <h1 class="govuk-heading-l">@messages("securitiesTarget.heading")</h1>
+        <h1 class="govuk-heading-l">@messages("orgs.securitiesTarget.heading")</h1>
 
         @govukInput(
             InputViewModel(
                 field = form("businessName"),
-                label = LabelViewModel(messages("securitiesTarget.businessName"))
+                label = LabelViewModel(messages("orgs.securitiesTarget.businessName"))
             )
             .withWidth(Full)
         )
@@ -56,10 +56,10 @@
         @govukInput(
             InputViewModel(
                 field = form("crn"),
-                label = LabelViewModel(messages("securitiesTarget.crn"))
+                label = LabelViewModel(messages("orgs.securitiesTarget.crn"))
             )
             .withWidth(OneThird)
-            .withHint(HintViewModel(messages("securitiesTarget.crn.hint")))
+            .withHint(HintViewModel(messages("orgs.securitiesTarget.crn.hint")))
         )
 
         @govukButton(
