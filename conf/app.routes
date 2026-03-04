@@ -130,3 +130,8 @@ GET        /stf/org/apply-relief                      uk.gov.hmrc.securitiestran
 POST       /stf/org/apply-relief                         uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.organisations.ApplyingForReliefController.onSubmit(mode: Mode = NormalMode)
 GET        /stf/org/change/apply-relief                  uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.organisations.ApplyingForReliefController.onPageLoad(mode: Mode = CheckMode)
 POST       /stf/org/change/apply-relief                   uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.organisations.ApplyingForReliefController.onSubmit(mode: Mode = CheckMode)
+
+GET        /stf/org/tax-rate                        uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.organisations.TaxRateController.onPageLoad(mode: Mode = NormalMode)
+POST       /stf/org/tax-rate                        uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.organisations.TaxRateController.onSubmit(mode: Mode = NormalMode)
+GET        /stf/org/change/tax-rate                  uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.organisations.TaxRateController.onPageLoad(mode: Mode = CheckMode)
+POST       /stf/org/change/tax-rate                  uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.organisations.TaxRateController.onSubmit(mode: Mode = CheckMode)
