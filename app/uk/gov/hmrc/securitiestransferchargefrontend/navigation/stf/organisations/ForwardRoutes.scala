@@ -43,5 +43,6 @@ class ForwardRoutes(answerPersistenceService: AnswerPersistenceService,
     case NameOfSellerPage => userAnswers => dataRequired(NameOfSellerPage, userAnswers, orgRoutes.StfSellerAddressController.onPageLoad())
     case ConnectedPersonsPage => userAnswers => dataRequired(ConnectedPersonsPage, userAnswers, orgRoutes.ApplyingForReliefController.onPageLoad(NormalMode))
     case ApplyingForReliefPage  => userAnswers => dataRequired(ConnectedPersonsPage, userAnswers,  routes.JourneyRecoveryController.onPageLoad())
+    case TaxRatePage  => userAnswers => dataRequired(TaxRatePage, userAnswers,  routes.JourneyRecoveryController.onPageLoad())
     case _ => _ => Future.successful(defaultPage)
   }
