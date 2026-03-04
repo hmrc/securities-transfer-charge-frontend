@@ -18,6 +18,7 @@ package uk.gov.hmrc.securitiestransferchargefrontend.navigation.stf.individuals
 
 import play.api.mvc.Call
 import uk.gov.hmrc.http.HeaderCarrier
+import uk.gov.hmrc.securitiestransferchargefrontend.config.FrontendAppConfig
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.routes
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.individuals.routes as individualRoutes
 import uk.gov.hmrc.securitiestransferchargefrontend.models.HowToNotifyAboutSecuritiesTransfer.{MoreThanOneAtATime, OneAtATime}
@@ -26,17 +27,21 @@ import uk.gov.hmrc.securitiestransferchargefrontend.navigation.*
 import uk.gov.hmrc.securitiestransferchargefrontend.pages.*
 import uk.gov.hmrc.securitiestransferchargefrontend.services.AnswerPersistenceService
 
+import java.time.LocalDate
+import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 
 
 class ForwardRoutes(answerPersistenceService: AnswerPersistenceService,
+                    appConfig: FrontendAppConfig,
                     defaultPage: Call,
                     errorPages: Seq[Call])
                    (implicit ec: ExecutionContext):
   
-  
   val helper = new PersistentNavigationHelper(answerPersistenceService, defaultPage, errorPages)
   import helper.*
+
+  private val firstDate = appConfig.firstChargingPoint
 
   def forwardRoutes(page: Page)(implicit hc: HeaderCarrier): UserAnswers => Future[Call] = page match {
 
@@ -59,7 +64,10 @@ class ForwardRoutes(answerPersistenceService: AnswerPersistenceService,
       }
     case WhatReliefAreYouApplyingForPage => userAnswers => dataRequired(WhatReliefAreYouApplyingForPage, userAnswers, individualRoutes.SecuritiesTargetController.onPageLoad(NormalMode))
     case SecuritiesTargetPage => userAnswers => dataRequired(SecuritiesTargetPage, userAnswers, individualRoutes.ChargingPointController.onPageLoad(NormalMode))
-    case ChargingPointPage => userAnswers => dataRequired(ChargingPointPage, userAnswers, individualRoutes.TaxRateController.onPageLoad(NormalMode))
+    case ChargingPointPage => userAnswers => dataDependent(ChargingPointPage, userAnswers) { enterDate =>
+      if (firstDate.isBefore(enterDate)) routes.JourneyRecoveryController.onPageLoad()
+      else individualRoutes.TaxRateController.onPageLoad(NormalMode)
+    }
     case TaxRatePage => userAnswers => dataRequired(TaxRatePage, userAnswers, individualRoutes.WhatTypeOfSecuritiesController.onPageLoad(NormalMode))
     case OtherSecuritiesTypePage => userAnswers => dataRequired(OtherSecuritiesTypePage, userAnswers, individualRoutes.AmountPaidForSecuritiesController.onPageLoad(NormalMode))
 
