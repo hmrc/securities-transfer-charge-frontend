@@ -74,12 +74,12 @@ class SecuritiesTargetControllerSpec extends SpecBase with MockitoSugar {
       running(application) {
         val request =
           FakeRequest(POST, securitiesTargetRoute)
-            .withFormUrlEncodedBody(("businessName", "value 1"), ("CRN", "12345678"))
+            .withFormUrlEncodedBody(("businessName", "value 1"), ("crn", "12345678"))
 
         val result = route(application, request).value
 
         status(result) mustEqual SEE_OTHER
-//        redirectLocation(result).value mustEqual orgRoutes.ChargingPointController.onPageLoad(NormalMode).url
+        redirectLocation(result).value mustEqual routes.JourneyRecoveryController.onPageLoad().url
       }
     }
 
