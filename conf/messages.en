@@ -250,3 +250,14 @@ org.applyingForRelief.title = Is the business applying for a relief?
 org.applyingForRelief.heading = Is the business applying for a relief?
 org.applyingForRelief.checkYourAnswersLabel = Is the business applying for a relief?
 org.applyingForRelief.change.hidden = Change applying for a relief
+
+chargingPoint.org.title = What is the charging point?
+chargingPoint.org.heading = What is the charging point?
+chargingPoint.org.hint = This is the date the securities were bought by the business. For example, 27 3 2024
+chargingPoint.org.checkYourAnswersLabel = What is the charging point?
+chargingPoint.org.error.required.all = Enter the date the business bought the securities
+chargingPoint.error.required.two = The date the business bought the securities must include {0} and {1}
+chargingPoint.org.error.required = The date the business bought the securities must include a {0}
+chargingPoint.org.error.invalid = The date the business bought the securities must be a real date
+chargingPoint.org.error.futureDate = The date the business bought the securities must be today's date or a date in the past
+chargingPoint.org.change.hidden = ChargingPoint
