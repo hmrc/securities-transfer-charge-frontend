@@ -28,22 +28,22 @@ import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.securitiestransferchargefrontend.clients.SaveAndReturnClient
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.routes
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.organisations.routes as orgRoutes
-import uk.gov.hmrc.securitiestransferchargefrontend.forms.stf.organisations.ConnectedPersonsFormProvider
+import uk.gov.hmrc.securitiestransferchargefrontend.forms.stf.organisations.ApplyingForReliefFormProvider
 import uk.gov.hmrc.securitiestransferchargefrontend.models.{NormalMode, UserAnswers}
 import uk.gov.hmrc.securitiestransferchargefrontend.navigation.Navigator
-import uk.gov.hmrc.securitiestransferchargefrontend.pages.ConnectedPersonsPage
-import uk.gov.hmrc.securitiestransferchargefrontend.views.html.stf.organisations.ConnectedPersonsView
+import uk.gov.hmrc.securitiestransferchargefrontend.pages.ApplyingForReliefPage
+import uk.gov.hmrc.securitiestransferchargefrontend.views.html.stf.organisations.ApplyingForReliefView
 
 import scala.concurrent.Future
 
-class ConnectedPersonsControllerSpec extends SpecBase with MockitoSugar {
+class ApplyingForReliefControllerSpec extends SpecBase with MockitoSugar {
   
-  val formProvider = new ConnectedPersonsFormProvider()
+  val formProvider = new ApplyingForReliefFormProvider()
   val form: Form[Boolean] = formProvider()
 
-  lazy val connectedPersonsRoute: String = orgRoutes.ConnectedPersonsController.onPageLoad(NormalMode).url
+  lazy val applyingForReliefRoute: String = orgRoutes.ApplyingForReliefController.onPageLoad(NormalMode).url
 
-  "ConnectedPersons Controller" - {
+  "ApplyingForRelief Controller" - {
 
     "must return OK and the correct view for a GET" in {
 
@@ -52,38 +52,38 @@ class ConnectedPersonsControllerSpec extends SpecBase with MockitoSugar {
         .build()
 
       running(application) {
-        val request = FakeRequest(GET, connectedPersonsRoute)
+        val request = FakeRequest(GET, applyingForReliefRoute)
 
         val result = route(application, request).value
 
-        val view = application.injector.instanceOf[ConnectedPersonsView]
+        val view = application.injector.instanceOf[ApplyingForReliefView]
 
         status(result) mustEqual OK
-        contentAsString(result) mustEqual view(form, NormalMode,testBackLinkRoute)(request, messages(application)).toString
+        contentAsString(result) mustEqual view(form, NormalMode, testBackLinkRoute)(request, messages(application)).toString
       }
     }
 
     "must populate the view correctly on a GET when the question has previously been answered" in {
 
-      val userAnswers = UserAnswers(userAnswersId,submissionId).set(ConnectedPersonsPage, true).success.value
+      val userAnswers = UserAnswers(userAnswersId,submissionId).set(ApplyingForReliefPage, true).success.value
 
       val application = applicationBuilder(userAnswers = Some(userAnswers))
         .overrides(bind[Navigator].qualifiedWith("organisations").toInstance(getNavigator))
         .build()
 
       running(application) {
-        val request = FakeRequest(GET, connectedPersonsRoute)
+        val request = FakeRequest(GET, applyingForReliefRoute)
 
-        val view = application.injector.instanceOf[ConnectedPersonsView]
+        val view = application.injector.instanceOf[ApplyingForReliefView]
 
         val result = route(application, request).value
 
         status(result) mustEqual OK
-        contentAsString(result) mustEqual view(form.fill(true), NormalMode,testBackLinkRoute)(request, messages(application)).toString
+        contentAsString(result) mustEqual view(form.fill(true), NormalMode, testBackLinkRoute)(request, messages(application)).toString
       }
     }
 
-    "must redirect to the next page when valid data is submitted" in {
+    "must redirect to the WhatReliefAreYouApplyingFor page when yes is selected" in {
 
       val saveAndReturnClient = mock[SaveAndReturnClient]
 
@@ -96,13 +96,36 @@ class ConnectedPersonsControllerSpec extends SpecBase with MockitoSugar {
 
       running(application) {
         val request =
-          FakeRequest(POST, connectedPersonsRoute)
+          FakeRequest(POST, applyingForReliefRoute)
             .withFormUrlEncodedBody(("value", "true"))
 
         val result = route(application, request).value
 
         status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual orgRoutes.ApplyingForReliefController.onPageLoad(NormalMode).url
+        redirectLocation(result).value mustEqual routes.JourneyRecoveryController.onPageLoad().url
+      }
+    }
+
+    "must redirect to the SecuritiesTarget page when no is selected" in {
+
+      val saveAndReturnClient = mock[SaveAndReturnClient]
+
+      when(saveAndReturnClient.save(any[UserAnswers]())(any[HeaderCarrier]()))
+        .thenReturn(Future.successful(()))
+
+      val application =
+        applicationBuilder(userAnswers = Some(emptyUserAnswers))
+          .build()
+
+      running(application) {
+        val request =
+          FakeRequest(POST, applyingForReliefRoute)
+            .withFormUrlEncodedBody(("value", "false"))
+
+        val result = route(application, request).value
+
+        status(result) mustEqual SEE_OTHER
+        redirectLocation(result).value mustEqual routes.JourneyRecoveryController.onPageLoad().url
       }
     }
 
@@ -114,27 +137,41 @@ class ConnectedPersonsControllerSpec extends SpecBase with MockitoSugar {
 
       running(application) {
         val request =
-          FakeRequest(POST, connectedPersonsRoute)
+          FakeRequest(POST, applyingForReliefRoute)
             .withFormUrlEncodedBody(("value", ""))
 
         val boundForm = form.bind(Map("value" -> ""))
 
-        val view = application.injector.instanceOf[ConnectedPersonsView]
+        val view = application.injector.instanceOf[ApplyingForReliefView]
 
         val result = route(application, request).value
 
         status(result) mustEqual BAD_REQUEST
-        contentAsString(result) mustEqual view(boundForm, NormalMode,testBackLinkRoute)(request, messages(application)).toString
+        contentAsString(result) mustEqual view(boundForm, NormalMode, testBackLinkRoute)(request, messages(application)).toString
       }
     }
-    
+
+    "must redirect to Journey Recovery for a GET if no existing data is found" in {
+
+      val application = applicationBuilder(userAnswers = None).build()
+
+      running(application) {
+        val request = FakeRequest(GET, applyingForReliefRoute)
+
+        val result = route(application, request).value
+
+        status(result) mustEqual SEE_OTHER
+        redirectLocation(result).value mustEqual routes.JourneyRecoveryController.onPageLoad().url
+      }
+    }
+
     "must redirect to Journey Recovery for a POST if no existing data is found" in {
 
       val application = applicationBuilder(userAnswers = None).build()
 
       running(application) {
         val request =
-          FakeRequest(POST, connectedPersonsRoute)
+          FakeRequest(POST, applyingForReliefRoute)
             .withFormUrlEncodedBody(("value", "true"))
 
         val result = route(application, request).value

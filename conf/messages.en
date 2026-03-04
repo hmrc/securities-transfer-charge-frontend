@@ -106,6 +106,7 @@ connectedPersons.details.content.l3 = your husband’s, wife’s or civil partne
 connectedPersons.details.content.l4 = the trustees of a settlement of which you are a settlor, or of which a person who is still alive and who is connected with you is a settlor
 connectedPersons.details.content.p2 = Relative means a brother, sister, ancestor or descendant. It does not include nephews, nieces, uncles and aunts.
 connectedPersons.details.content.link.text = Read HMRC guidance on connected persons
+connectedPersons.change.hidden = Change connected persons
 
 site.save-and-continue.button = Save and continue
 site.save-and-return.button = Save and return to dashboard
@@ -242,3 +243,10 @@ org.connectedPersons.error.required = Select yes if the business and the seller 
 org.connectedPersons.p = We need to know if the business buying the securities and the seller are ‘connected persons’, according to
 org.connectedPersons.p.link.content = section 1122 of the Corporation Tax Act 2010
 org.connectedPersons.legend = Is the business and the seller of these securities connected persons?
+org.connectedPersons.legend = Is the business and the seller of these securities connected persons?
+
+org.applyingForRelief.error.required = Select yes if the business is applying for a relief
+org.applyingForRelief.title = Is the business applying for a relief?
+org.applyingForRelief.heading = Is the business applying for a relief?
+org.applyingForRelief.checkYourAnswersLabel = Is the business applying for a relief?
+org.applyingForRelief.change.hidden = Change applying for a relief
