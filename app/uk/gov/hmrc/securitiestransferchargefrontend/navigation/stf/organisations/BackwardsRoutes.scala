@@ -37,6 +37,8 @@ class BackwardsRoutes(defaultPage: Call):
     case ConnectedPersonsPage => _ => orgRoutes.StfSellerAddressController.onPageLoad()
     case ApplyingForReliefPage  => _ => orgRoutes.ConnectedPersonsController.onPageLoad(NormalMode)
     case WhatReliefAreYouApplyingForPage => _ => orgRoutes.ApplyingForReliefController.onPageLoad(NormalMode)
+    case TaxRatePage => _ => routes.SubmissionsDashboardController.onPageLoad()
+
     case _ => _ => defaultPage
 
   }

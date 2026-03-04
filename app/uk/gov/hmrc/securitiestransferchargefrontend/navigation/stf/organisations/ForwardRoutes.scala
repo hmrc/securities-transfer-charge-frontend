@@ -55,5 +55,6 @@ class ForwardRoutes(answerPersistenceService: AnswerPersistenceService,
         case false => defaultPage
       }
     case WhatReliefAreYouApplyingForPage => userAnswers => dataRequired(WhatReliefAreYouApplyingForPage, userAnswers, routes.SubmissionsDashboardController.onPageLoad())
+    case TaxRatePage  => userAnswers => dataRequired(TaxRatePage, userAnswers,  routes.JourneyRecoveryController.onPageLoad())
     case _ => _ => Future.successful(defaultPage)
   }
