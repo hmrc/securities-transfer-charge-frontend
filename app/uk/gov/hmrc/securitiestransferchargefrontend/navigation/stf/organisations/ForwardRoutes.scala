@@ -39,9 +39,9 @@ class ForwardRoutes(answerPersistenceService: AnswerPersistenceService,
 
     case SubmissionsDashboardPage => userAnswers => goTo(orgRoutes.HowToNotifyAboutSecuritiesTransferController.onPageLoad(NormalMode), Some(userAnswers))
     case ConfirmAddressPage => userAnswers => dataRequired(ConfirmAddressPage, userAnswers, orgRoutes.NameOfSellerController.onPageLoad(NormalMode))
-    case ConnectedPersonsPage => userAnswers => dataRequired(ConnectedPersonsPage, userAnswers, routes.JourneyRecoveryController.onPageLoad())
     case StfBuyersAddressPage => userAnswers => dataRequired(StfBuyersAddressPage, userAnswers, orgRoutes.NameOfSellerController.onPageLoad(NormalMode))
-    case NameOfSellerPage => userAnswers => dataRequired(NameOfSellerPage, userAnswers, routes.JourneyRecoveryController.onPageLoad())
-
+    case NameOfSellerPage => userAnswers => dataRequired(NameOfSellerPage, userAnswers, orgRoutes.StfSellerAddressController.onPageLoad())
+    case ConnectedPersonsPage => userAnswers => dataRequired(ConnectedPersonsPage, userAnswers, orgRoutes.ApplyingForReliefController.onPageLoad(NormalMode))
+    case ApplyingForReliefPage  => userAnswers => dataRequired(ConnectedPersonsPage, userAnswers,  routes.JourneyRecoveryController.onPageLoad())
     case _ => _ => Future.successful(defaultPage)
   }

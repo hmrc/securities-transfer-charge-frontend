@@ -14,15 +14,15 @@
  * limitations under the License.
  */
 
-package views.stf.individuals
+package views.stf.organisations
 
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
 import play.api.Application
 import play.api.mvc.Call
-import uk.gov.hmrc.securitiestransferchargefrontend.forms.stf.individuals.ApplyingForReliefFormProvider
+import uk.gov.hmrc.securitiestransferchargefrontend.forms.stf.organisations.ApplyingForReliefFormProvider
 import uk.gov.hmrc.securitiestransferchargefrontend.models.NormalMode
-import uk.gov.hmrc.securitiestransferchargefrontend.views.html.stf.individuals.ApplyingForReliefView
+import uk.gov.hmrc.securitiestransferchargefrontend.views.html.stf.organisations.ApplyingForReliefView
 import views.ViewBaseSpec
 
 class ApplyingForReliefViewSpec extends ViewBaseSpec {
@@ -41,9 +41,9 @@ class ApplyingForReliefViewSpec extends ViewBaseSpec {
   )
 
   object ExpectedContent {
-    val title: String = messages("applyingForRelief.title")
+    val title: String = messages("org.applyingForRelief.title")
     val caption: String = messages("transfer.details.caption")
-    val heading: String = messages("applyingForRelief.heading")
+    val heading: String = messages("org.applyingForRelief.heading")
     val paragraph: String = messages("applyingForRelief.p")
     val saveAndContinue: String = messages("site.save-and-continue.button")
     val saveAndReturn: String = messages("site.save-and-return.button")

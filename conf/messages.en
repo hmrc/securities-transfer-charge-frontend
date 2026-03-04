@@ -242,3 +242,9 @@ org.connectedPersons.error.required = Select yes if the business and the seller 
 org.connectedPersons.p = We need to know if the business buying the securities and the seller are ‘connected persons’, according to
 org.connectedPersons.p.link.content = section 1122 of the Corporation Tax Act 2010
 org.connectedPersons.legend = Is the business and the seller of these securities connected persons?
+
+org.applyingForRelief.error.required = Select yes if the business is applying for a relief
+org.applyingForRelief.title = Is the business applying for a relief?
+org.applyingForRelief.heading = Is the business applying for a relief?
+org.applyingForRelief.checkYourAnswersLabel = Is the business applying for a relief?
+org.applyingForRelief.change.hidden = Change applying for a relief
