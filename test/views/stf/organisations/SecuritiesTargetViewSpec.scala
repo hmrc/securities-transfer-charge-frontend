@@ -53,7 +53,7 @@ class SecuritiesTargetViewSpec extends ViewBaseSpec {
   }
 
   "The SecuritiesTargetView" - {
-      
+
       val securitiesTargetView = view()
 
       "have the correct title" in {
@@ -72,7 +72,7 @@ class SecuritiesTargetViewSpec extends ViewBaseSpec {
         securitiesTargetView.select(".govuk-label").first().text() mustBe ExpectedContent.field1
       }
 
-      "displays the correct field name for the CRN" in {
+      "displays the correct field name for the crn" in {
         securitiesTargetView.select(".govuk-label").last().text() mustBe ExpectedContent.field2
       }
 

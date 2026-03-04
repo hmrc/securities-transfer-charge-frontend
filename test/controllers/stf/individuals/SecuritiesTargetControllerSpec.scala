@@ -74,7 +74,7 @@ class SecuritiesTargetControllerSpec extends SpecBase with MockitoSugar {
       running(application) {
         val request =
           FakeRequest(POST, securitiesTargetRoute)
-            .withFormUrlEncodedBody(("businessName", "value 1"), ("CRN", "12345678"))
+            .withFormUrlEncodedBody(("businessName", "value 1"), ("crn", "12345678"))
 
         val result = route(application, request).value
 
@@ -126,7 +126,7 @@ class SecuritiesTargetControllerSpec extends SpecBase with MockitoSugar {
       running(application) {
         val request =
           FakeRequest(POST, securitiesTargetRoute)
-            .withFormUrlEncodedBody(("BusinessName", "value 1"), ("CRN", "value 2"))
+            .withFormUrlEncodedBody(("BusinessName", "value 1"), ("crn", "value 2"))
 
         val result = route(application, request).value
 
