@@ -27,8 +27,6 @@ import uk.gov.hmrc.securitiestransferchargefrontend.navigation.*
 import uk.gov.hmrc.securitiestransferchargefrontend.pages.*
 import uk.gov.hmrc.securitiestransferchargefrontend.services.AnswerPersistenceService
 
-import java.time.LocalDate
-import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 
 
@@ -65,7 +63,7 @@ class ForwardRoutes(answerPersistenceService: AnswerPersistenceService,
     case WhatReliefAreYouApplyingForPage => userAnswers => dataRequired(WhatReliefAreYouApplyingForPage, userAnswers, individualRoutes.SecuritiesTargetController.onPageLoad(NormalMode))
     case SecuritiesTargetPage => userAnswers => dataRequired(SecuritiesTargetPage, userAnswers, individualRoutes.ChargingPointController.onPageLoad(NormalMode))
     case ChargingPointPage => userAnswers => dataDependent(ChargingPointPage, userAnswers) { enterDate =>
-      if (firstDate.isBefore(enterDate)) routes.JourneyRecoveryController.onPageLoad()
+      if (enterDate.isBefore(firstDate)) routes.JourneyRecoveryController.onPageLoad()
       else individualRoutes.TaxRateController.onPageLoad(NormalMode)
     }
     case TaxRatePage => userAnswers => dataRequired(TaxRatePage, userAnswers, individualRoutes.WhatTypeOfSecuritiesController.onPageLoad(NormalMode))
