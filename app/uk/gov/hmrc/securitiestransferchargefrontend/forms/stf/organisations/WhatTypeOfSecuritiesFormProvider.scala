@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.securitiestransferchargefrontend.forms.stf.individuals
+package uk.gov.hmrc.securitiestransferchargefrontend.forms.stf.organisations
 
 import play.api.data.Form
 import uk.gov.hmrc.securitiestransferchargefrontend.forms.mappings.Mappings
@@ -26,6 +26,6 @@ class WhatTypeOfSecuritiesFormProvider @Inject() extends Mappings {
 
   def apply(): Form[WhatTypeOfSecurities] =
     Form(
-      "value" -> enumerable[WhatTypeOfSecurities]("individual.whatTypeOfSecurities.error.required")
+      "value" -> enumerable[WhatTypeOfSecurities]("orgs.whatTypeOfSecurities.error.required")
     )
 }

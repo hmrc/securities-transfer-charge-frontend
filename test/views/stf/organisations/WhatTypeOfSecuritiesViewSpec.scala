@@ -14,15 +14,15 @@
  * limitations under the License.
  */
 
-package views.stf.individuals
+package views.stf.organisations
 
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
 import play.api.Application
 import play.api.mvc.Call
-import uk.gov.hmrc.securitiestransferchargefrontend.forms.stf.individuals.WhatTypeOfSecuritiesFormProvider
+import uk.gov.hmrc.securitiestransferchargefrontend.forms.stf.organisations.WhatTypeOfSecuritiesFormProvider
 import uk.gov.hmrc.securitiestransferchargefrontend.models.NormalMode
-import uk.gov.hmrc.securitiestransferchargefrontend.views.html.stf.individuals.WhatTypeOfSecuritiesView
+import uk.gov.hmrc.securitiestransferchargefrontend.views.html.stf.organisations.WhatTypeOfSecuritiesView
 import views.ViewBaseSpec
 
 
@@ -37,17 +37,17 @@ class WhatTypeOfSecuritiesViewSpec extends ViewBaseSpec {
   private val form = formProvider()
 
   def view(): Document = Jsoup.parse(
-    viewInstance(form, NormalMode, affinityGroupKeyInd, testBackLinkRoute)(fakeRequest, messages).body
+    viewInstance(form, NormalMode, affinityGroupKeyOrg, testBackLinkRoute)(fakeRequest, messages).body
   )
 
   object ExpectedContent {
-    val title: String = messages("individual.whatTypeOfSecurities.title")
+    val title: String = messages("orgs.whatTypeOfSecurities.title")
     val caption: String = messages("transfer.details.caption")
-    val heading: String = messages("individual.whatTypeOfSecurities.heading")
+    val heading: String = messages("orgs.whatTypeOfSecurities.heading")
     val saveAndContinue: String = messages("site.save-and-continue.button")
     val saveAndReturn: String = messages("site.save-and-return.button")
-    val sharesRadio: String =  messages("individual.whatTypeOfSecurities.shares")
-    val otherRadio: String =  messages("individual.whatTypeOfSecurities.other")
+    val sharesRadio: String =  messages("orgs.whatTypeOfSecurities.shares")
+    val otherRadio: String =  messages("orgs.whatTypeOfSecurities.other")
   }
 
   "WhatTypeOfSecuritiesView" - {
