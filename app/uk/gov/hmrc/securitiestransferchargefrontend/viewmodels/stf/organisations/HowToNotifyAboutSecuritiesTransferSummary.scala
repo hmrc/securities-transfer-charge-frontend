@@ -34,16 +34,16 @@ object HowToNotifyAboutSecuritiesTransferSummary  {
 
         val value = ValueViewModel(
           HtmlContent(
-            HtmlFormat.escape(messages(s"orgs.howToNotifyAboutSecuritiesTransfer.$answer"))
+            HtmlFormat.escape(messages(s"org.howToNotifyAboutSecuritiesTransfer.$answer"))
           )
         )
 
         SummaryListRowViewModel(
-          key     = "orgs.howToNotifyAboutSecuritiesTransfer.checkYourAnswersLabel",
+          key     = "org.howToNotifyAboutSecuritiesTransfer.checkYourAnswersLabel",
           value   = value,
           actions = Seq(
             ActionItemViewModel("site.change", orgRoutes.HowToNotifyAboutSecuritiesTransferController.onPageLoad(CheckMode).url)
-              .withVisuallyHiddenText(messages("orgs.howToNotifyAboutSecuritiesTransfer.change.hidden"))
+              .withVisuallyHiddenText(messages("org.howToNotifyAboutSecuritiesTransfer.change.hidden"))
           )
         )
     }
