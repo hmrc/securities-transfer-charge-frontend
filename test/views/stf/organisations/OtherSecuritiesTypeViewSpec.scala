@@ -51,7 +51,7 @@ class OtherSecuritiesTypeViewSpec extends ViewBaseSpec {
 
   "OtherSecuritiesTypeView" - {
 
-    "when rendered without errors" - {
+    "render view" - {
 
       val doc = view()
 
