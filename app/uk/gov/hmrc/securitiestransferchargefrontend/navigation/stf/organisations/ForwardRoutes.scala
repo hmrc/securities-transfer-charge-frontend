@@ -18,6 +18,7 @@ package uk.gov.hmrc.securitiestransferchargefrontend.navigation.stf.organisation
 
 import play.api.mvc.Call
 import uk.gov.hmrc.http.HeaderCarrier
+import uk.gov.hmrc.securitiestransferchargefrontend.config.FrontendAppConfig
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.routes
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.organisations.routes as orgRoutes
 import uk.gov.hmrc.securitiestransferchargefrontend.models.HowToNotifyAboutSecuritiesTransfer.{MoreThanOneAtATime, OneAtATime}
@@ -29,12 +30,15 @@ import uk.gov.hmrc.securitiestransferchargefrontend.services.AnswerPersistenceSe
 import scala.concurrent.{ExecutionContext, Future}
 
 class ForwardRoutes(answerPersistenceService: AnswerPersistenceService,
+                    appConfig: FrontendAppConfig,
                     defaultPage: Call,
                     errorPages: Seq[Call])
                    (implicit ec: ExecutionContext):
 
   val helper = new PersistentNavigationHelper(answerPersistenceService, defaultPage, errorPages)
   import helper.*
+
+  private val firstDate = appConfig.firstChargingPoint
 
   def forwardRoutes(page: Page)(implicit hc: HeaderCarrier): UserAnswers => Future[Call] = page match {
 
@@ -57,6 +61,10 @@ class ForwardRoutes(answerPersistenceService: AnswerPersistenceService,
       }
     case WhatReliefAreYouApplyingForPage => userAnswers => dataRequired(WhatReliefAreYouApplyingForPage, userAnswers, routes.SubmissionsDashboardController.onPageLoad())
     case SecuritiesTargetPage => userAnswers => dataRequired(SecuritiesTargetPage, userAnswers, routes.JourneyRecoveryController.onPageLoad())
+    case ChargingPointPage => userAnswers => dataDependent(ChargingPointPage, userAnswers) {enterDate =>
+      if (enterDate.isBefore(firstDate)) routes.JourneyRecoveryController.onPageLoad()
+      else orgRoutes.TaxRateController.onPageLoad(NormalMode)
+    }
     case TaxRatePage  => userAnswers => dataRequired(TaxRatePage, userAnswers,  routes.JourneyRecoveryController.onPageLoad())
     case OtherSecuritiesTypePage => userAnswers => dataRequired(OtherSecuritiesTypePage, userAnswers, routes.JourneyRecoveryController.onPageLoad())
     case _ => _ => Future.successful(defaultPage)

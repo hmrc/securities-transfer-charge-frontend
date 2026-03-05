@@ -42,9 +42,9 @@ class BackwardsRoutes(defaultPage: Call):
       case true => routes.SubmissionsDashboardController.onPageLoad()
       case false => orgRoutes.ApplyingForReliefController.onPageLoad(NormalMode)
     }
+    case ChargingPointPage => _ => orgRoutes.SecuritiesTargetController.onPageLoad(NormalMode)
+    case TaxRatePage => _ => orgRoutes.ChargingPointController.onPageLoad(NormalMode)
     case OtherSecuritiesTypePage => _ => routes.SubmissionsDashboardController.onPageLoad()
-    case TaxRatePage => _ => routes.SubmissionsDashboardController.onPageLoad()
-
     case _ => _ => defaultPage
 
   }
