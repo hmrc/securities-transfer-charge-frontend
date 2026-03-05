@@ -35,7 +35,6 @@ import uk.gov.hmrc.securitiestransferchargefrontend.repositories.SessionReposito
 import uk.gov.hmrc.securitiestransferchargefrontend.views.html.stf.organisations.ChargingPointView
 
 import java.time.{LocalDate, ZoneOffset}
-import navigation.FakeNavigator
 import scala.concurrent.Future
 
 class ChargingPointControllerSpec extends SpecBase with MockitoSugar {
@@ -108,17 +107,13 @@ class ChargingPointControllerSpec extends SpecBase with MockitoSugar {
 
       val application =
         applicationBuilder(userAnswers = Some(emptyUserAnswers))
-          .overrides(
-            bind[Navigator].toInstance(new FakeNavigator(onwardRoute)),
-            bind[SessionRepository].toInstance(mockSessionRepository)
-          )
           .build()
 
       running(application) {
         val result = route(application, postRequest()).value
 
         status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual onwardRoute.url
+        redirectLocation(result).value mustEqual orgRoutes.TaxRateController.onPageLoad(NormalMode).url
       }
     }
 
