@@ -19,7 +19,7 @@
 @import uk.gov.hmrc.securitiestransferchargefrontend.views.html.templates
 @import uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.organisations.routes as orgRoutes
 @import uk.gov.hmrc.securitiestransferchargefrontend.views.html.components.SaveAndReturnButton
-
+@import uk.gov.hmrc.govukfrontend.views.viewmodels.content.HtmlContent
 
 @this(
     layout: templates.Layout,
@@ -59,7 +59,11 @@
                 label = LabelViewModel(messages("orgs.securitiesTarget.crn"))
             )
             .withWidth(OneThird)
-            .withHint(HintViewModel(messages("orgs.securitiesTarget.crn.hint")))
+            .withHint(
+                HintViewModel(
+                    content = HtmlContent(messages("orgs.securitiesTarget.crn.hint"))
+                )
+            )
         )
 
         @govukButton(
