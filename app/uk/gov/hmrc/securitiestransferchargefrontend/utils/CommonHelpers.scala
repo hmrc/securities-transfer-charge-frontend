@@ -17,6 +17,8 @@
 package uk.gov.hmrc.securitiestransferchargefrontend.utils
 
 import play.api.Logger
+import uk.gov.hmrc.securitiestransferchargefrontend.controllers.actions.requests.StcDataRequest
+import uk.gov.hmrc.securitiestransferchargefrontend.pages.ConnectedPersonsPage
 
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -31,4 +33,7 @@ object CommonHelpers {
     def getOrFail(ex: => Throwable)(implicit ec: ExecutionContext): Future[A] =
       fo.flatMap(_.fold[Future[A]](Future.failed(ex))(Future.successful))
   }
+
+  def requireMarketValue(implicit request: StcDataRequest[_]): Boolean =
+    request.userAnswers.get(ConnectedPersonsPage).contains(true)
 }
