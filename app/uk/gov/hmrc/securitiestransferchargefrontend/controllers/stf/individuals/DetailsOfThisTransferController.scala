@@ -16,33 +16,36 @@
 
 package uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.individuals
 
-import play.api.data.Form
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, Call, MessagesControllerComponents}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
+import uk.gov.hmrc.securitiestransferchargefrontend.controllers.SaveAndReturnButton.isReturn
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.actions.*
+import uk.gov.hmrc.securitiestransferchargefrontend.controllers.actions.requests.StcDataRequest
 import uk.gov.hmrc.securitiestransferchargefrontend.forms.stf.individuals.DetailsOfThisTransferFormProvider
 import uk.gov.hmrc.securitiestransferchargefrontend.models.{DetailsOfThisTransfer, Mode, UserAnswers}
 import uk.gov.hmrc.securitiestransferchargefrontend.navigation.Navigator
 import uk.gov.hmrc.securitiestransferchargefrontend.pages.DetailsOfThisTransferPage
+import uk.gov.hmrc.securitiestransferchargefrontend.utils.CommonHelpers.requireMarketValue
 import uk.gov.hmrc.securitiestransferchargefrontend.views.html.stf.individuals.DetailsOfThisTransferView
 
 import javax.inject.{Inject, Named}
 import scala.concurrent.{ExecutionContext, Future}
-import uk.gov.hmrc.securitiestransferchargefrontend.controllers.SaveAndReturnButton.isReturn
 
 class DetailsOfThisTransferController @Inject()(
-                                      override val messagesApi: MessagesApi,
-                                      @Named("individuals") navigator: Navigator,
-                                      stcAuthEnrolled: StcAuthEnrolledAction,
-                                      getData: StcDataRetrievalAction,
-                                      requireData: StcDataRequiredAction,
-                                      formProvider: DetailsOfThisTransferFormProvider,
-                                      val controllerComponents: MessagesControllerComponents,
-                                      view: DetailsOfThisTransferView
-                                     )(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport {
+                                                 override val messagesApi: MessagesApi,
+                                                 @Named("individuals") navigator: Navigator,
+                                                 stcAuthEnrolled: StcAuthEnrolledAction,
+                                                 getData: StcDataRetrievalAction,
+                                                 requireData: StcDataRequiredAction,
+                                                 formProvider: DetailsOfThisTransferFormProvider,
+                                                 val controllerComponents: MessagesControllerComponents,
+                                                 view: DetailsOfThisTransferView
+                                               )(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport {
 
-  val form: Form[DetailsOfThisTransfer] = formProvider()
+  private def form(implicit request: StcDataRequest[_]) =
+    formProvider(requireMarketValue)
+
 
   lazy val backLinkCall: Mode => UserAnswers => Call =
     mode => userAnswers => navigator.previousPage(DetailsOfThisTransferPage, mode, userAnswers)
@@ -55,15 +58,14 @@ class DetailsOfThisTransferController @Inject()(
         case Some(value) => form.fill(value)
       }
 
-      Ok(view(preparedForm, mode, backLinkCall(mode)(request.userAnswers)))
+      Ok(view(preparedForm, mode, backLinkCall(mode)(request.userAnswers), requireMarketValue))
   }
 
   def onSubmit(mode: Mode): Action[AnyContent] = (stcAuthEnrolled andThen getData andThen requireData).async {
     implicit request =>
-
       form.bindFromRequest().fold(
         formWithErrors =>
-          Future.successful(BadRequest(view(formWithErrors, mode, backLinkCall(mode)(request.userAnswers)))),
+          Future.successful(BadRequest(view(formWithErrors, mode, backLinkCall(mode)(request.userAnswers), requireMarketValue))),
 
         detailsOfTransfer =>
           for {

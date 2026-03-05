@@ -37,8 +37,8 @@ class DetailsOfThisTransferViewSpec extends ViewBaseSpec {
 
   private val form = formProvider()
 
-  def view(): Document = Jsoup.parse(
-    viewInstance(form, NormalMode, testBackLinkRoute)(fakeRequest, messages).body
+  def view(requireMarketValue:Boolean): Document = Jsoup.parse(
+    viewInstance(form, NormalMode, testBackLinkRoute,requireMarketValue)(fakeRequest, messages).body
   )
 
   object ExpectedContent {
@@ -50,14 +50,14 @@ class DetailsOfThisTransferViewSpec extends ViewBaseSpec {
     val numberOfShares: String = messages("detailsOfThisTransfer.numberOfShares")
     val typeOfShares: String = messages("detailsOfThisTransfer.typeOfShares")
     val amountPaid: String = messages("detailsOfThisTransfer.amountPaid")
-    val marketValue: String = messages("detailsOfThisTransfer.numberOfShares")
+    val marketValue: String = messages("detailsOfThisTransfer.marketValue")
   }
 
   "The DetailsOfThisTransferView" - {
 
     "when rendered without errors" - {
 
-      val doc = view()
+      val doc = view(requireMarketValue = true)
 
       "have the correct title" in {
         doc.title() must include(ExpectedContent.title)
@@ -86,5 +86,13 @@ class DetailsOfThisTransferViewSpec extends ViewBaseSpec {
         doc.select(".govuk-button--secondary").text() mustBe ExpectedContent.saveAndReturn
       }
     }
+    "when rendered without without marketValue" - {
+      val doc = view(requireMarketValue = false)
+
+      "must not render the market value input" in {
+        doc.select(".govuk-label").text() must not include(ExpectedContent.marketValue)
+      }
+    }
+
   }
 }

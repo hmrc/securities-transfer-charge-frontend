@@ -30,7 +30,7 @@
     saveAndReturnButton:SaveAndReturnButton
 )
 
-@(form: Form[_], mode: Mode, backLinkCall: Call)(implicit request: Request[_], messages: Messages)
+@(form: Form[_], mode: Mode, backLinkCall: Call,requireMarketValue: Boolean= true)(implicit request: Request[_], messages: Messages)
 
 @layout(pageTitle = title(form, messages("detailsOfThisTransfer.title"),Some(messages("sectionTitle.transferDetails"))), backLinkUrl = Some(backLinkCall.url)) {
 
@@ -69,15 +69,17 @@
             .withPrefix(PrefixOrSuffix(content = Text("£")))
         )
 
-         @govukInput(
-            InputViewModel(
-                field = form("marketValue"),
-                label = LabelViewModel(messages("detailsOfThisTransfer.marketValue"))
+        @if(requireMarketValue) {
+            @govukInput(
+                InputViewModel(
+                    field = form("marketValue"),
+                    label = LabelViewModel(messages("detailsOfThisTransfer.marketValue"))
+                )
+                .asNumeric()
+                .withWidth(Fixed10)
+                .withPrefix(PrefixOrSuffix(content = Text("£")))
             )
-            .asNumeric()
-            .withWidth(Fixed10)
-            .withPrefix(PrefixOrSuffix(content = Text("£")))
-        )
+        }
 
         @govukButton(
             ButtonViewModel(messages("site.save-and-continue.button"))

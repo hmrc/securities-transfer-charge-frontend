@@ -133,4 +133,12 @@ trait Constraints {
           Invalid(errorKey, CurrencyFormatter.currencyFormat(maximum))
         }
     }
+
+  def requiredIf(requireMarketValue: Boolean): Constraint[Option[BigDecimal]] =
+    Constraint("constraint.requiredIf") {
+      case None if requireMarketValue =>
+        Invalid("detailsOfThisTransfer.error.marketValue.required")
+      case _ =>
+        Valid
+    }  
 }
