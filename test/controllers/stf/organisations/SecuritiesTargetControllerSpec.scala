@@ -14,23 +14,23 @@
  * limitations under the License.
  */
 
-package controllers.stf.individuals
+package controllers.stf.organisations
 
 import base.SpecBase
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.when
 import org.scalatestplus.mockito.MockitoSugar
 import play.api.data.Form
+import play.api.inject.bind
 import play.api.test.FakeRequest
 import play.api.test.Helpers.*
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.routes
-import uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.individuals.routes as individualRoutes
-import uk.gov.hmrc.securitiestransferchargefrontend.forms.stf.individuals.SecuritiesTargetFormProvider
+import uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.organisations.routes as orgRoutes
+import uk.gov.hmrc.securitiestransferchargefrontend.forms.stf.organisations.SecuritiesTargetFormProvider
 import uk.gov.hmrc.securitiestransferchargefrontend.models.{NormalMode, SecuritiesTarget}
-import uk.gov.hmrc.securitiestransferchargefrontend.repositories.SessionRepository
-import uk.gov.hmrc.securitiestransferchargefrontend.views.html.stf.individuals.SecuritiesTargetView
-import play.api.inject.bind
 import uk.gov.hmrc.securitiestransferchargefrontend.navigation.Navigator
+import uk.gov.hmrc.securitiestransferchargefrontend.repositories.SessionRepository
+import uk.gov.hmrc.securitiestransferchargefrontend.views.html.stf.organisations.SecuritiesTargetView
 
 import scala.concurrent.Future
 
@@ -39,14 +39,14 @@ class SecuritiesTargetControllerSpec extends SpecBase with MockitoSugar {
   val formProvider = new SecuritiesTargetFormProvider()
   val form: Form[SecuritiesTarget] = formProvider()
 
-  lazy val securitiesTargetRoute: String = individualRoutes.SecuritiesTargetController.onPageLoad(NormalMode).url
+  lazy val securitiesTargetRoute: String = orgRoutes.SecuritiesTargetController.onPageLoad(NormalMode).url
   
   "SecuritiesTarget Controller" - {
 
     "must return OK and the correct view for a GET" in {
 
       val application = applicationBuilder(userAnswers = Some(emptyUserAnswers))
-        .overrides(bind[Navigator].qualifiedWith("individuals").toInstance(getNavigator))
+        .overrides(bind[Navigator].qualifiedWith("organisations").toInstance(getNavigator))
         .build()
 
       running(application) {
@@ -79,14 +79,14 @@ class SecuritiesTargetControllerSpec extends SpecBase with MockitoSugar {
         val result = route(application, request).value
 
         status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual individualRoutes.ChargingPointController.onPageLoad(NormalMode).url
+        redirectLocation(result).value mustEqual routes.JourneyRecoveryController.onPageLoad().url
       }
     }
 
     "must return a Bad Request and errors when invalid data is submitted" in {
 
       val application = applicationBuilder(userAnswers = Some(emptyUserAnswers))
-        .overrides(bind[Navigator].qualifiedWith("individuals").toInstance(getNavigator))
+        .overrides(bind[Navigator].qualifiedWith("organisations").toInstance(getNavigator))
         .build()
 
       running(application) {

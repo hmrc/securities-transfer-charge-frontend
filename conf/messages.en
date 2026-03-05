@@ -261,3 +261,15 @@ orgs.whatReliefAreYouApplyingFor.details.content.link.text = See a full list of 
 
 org.taxRate.p1 = For most securities transfers, the business will be charged a tax rate of 0.5% of the consideration.
 org.taxRate.p2 = If the securities are being transferred into a ‘depository receipt scheme’ or a ‘clearance service’, the business will need to pay the 1.5% tax rate in most circumstances. This is usually where the transfer is not integral to capital raising or where the clearance service has elected to remain in the 0.5% regime.
+
+orgs.securitiesTarget.title = Which business are the securities being bought in?
+orgs.securitiesTarget.heading = Which business are the securities being bought in?
+orgs.securitiesTarget.businessName = Business name
+orgs.securitiesTarget.crn = Company registration number (CRN) (optional)
+orgs.securitiesTarget.crn.hint = This is also called a company number.<br>For example, SN898989 or 12345678
+orgs.securitiesTarget.checkYourAnswersLabel = What business are you buying these securities in?
+orgs.securitiesTarget.error.businessName.required = Enter the name of the business the securities are in
+orgs.securitiesTarget.error.businessName.length = Business name must be 160 characters or fewer
+orgs.securitiesTarget.error.crn.length = Company Reference Number must be 8 characters or fewer
+orgs.securitiesTarget.businessName.change.hidden = Change which business the securities are being bought in
+orgs.securitiesTarget.crn.change.hidden = CRN
