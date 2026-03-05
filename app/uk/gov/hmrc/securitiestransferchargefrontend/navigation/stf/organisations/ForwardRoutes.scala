@@ -19,12 +19,12 @@ package uk.gov.hmrc.securitiestransferchargefrontend.navigation.stf.organisation
 import play.api.mvc.Call
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.routes
+import uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.organisations.routes as orgRoutes
+import uk.gov.hmrc.securitiestransferchargefrontend.models.HowToNotifyAboutSecuritiesTransfer.{MoreThanOneAtATime, OneAtATime}
 import uk.gov.hmrc.securitiestransferchargefrontend.models.{NormalMode, UserAnswers}
 import uk.gov.hmrc.securitiestransferchargefrontend.navigation.PersistentNavigationHelper
 import uk.gov.hmrc.securitiestransferchargefrontend.pages.*
 import uk.gov.hmrc.securitiestransferchargefrontend.services.AnswerPersistenceService
-import uk.gov.hmrc.securitiestransferchargefrontend.models.HowToNotifyAboutSecuritiesTransfer.{MoreThanOneAtATime, OneAtATime}
-import uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.organisations.routes as orgRoutes
 
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -52,10 +52,10 @@ class ForwardRoutes(answerPersistenceService: AnswerPersistenceService,
     case ConnectedPersonsPage => userAnswers => dataRequired(ConnectedPersonsPage, userAnswers, orgRoutes.ApplyingForReliefController.onPageLoad(NormalMode))
     case ApplyingForReliefPage => userAnswers =>
       dataDependent(ApplyingForReliefPage, userAnswers) {
-        case true => routes.JourneyRecoveryController.onPageLoad()
+        case true => orgRoutes.WhatReliefAreYouApplyingForController.onPageLoad(NormalMode)
         case false => orgRoutes.SecuritiesTargetController.onPageLoad(NormalMode)
       }
-    case WhatReliefAreYouApplyingForPage => userAnswers => dataRequired(WhatReliefAreYouApplyingForPage, userAnswers, routes.JourneyRecoveryController.onPageLoad())
+    case WhatReliefAreYouApplyingForPage => userAnswers => dataRequired(WhatReliefAreYouApplyingForPage, userAnswers, routes.SubmissionsDashboardController.onPageLoad())
     case SecuritiesTargetPage => userAnswers => dataRequired(SecuritiesTargetPage, userAnswers, routes.JourneyRecoveryController.onPageLoad())
     case TaxRatePage  => userAnswers => dataRequired(TaxRatePage, userAnswers,  routes.JourneyRecoveryController.onPageLoad())
     case _ => _ => Future.successful(defaultPage)

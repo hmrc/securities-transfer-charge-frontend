@@ -25,7 +25,7 @@ object ViewHelper {
   private def reliefToSelectItem(relief: Relief, selected: Boolean = false): SelectItem =
     SelectItem(
       value = Some(relief.name),
-      text = s"${relief.name} (${relief.rate}%)",
+      text = s"${relief.name}",
       selected = selected,
       attributes = Map("id" -> relief.name)
     )

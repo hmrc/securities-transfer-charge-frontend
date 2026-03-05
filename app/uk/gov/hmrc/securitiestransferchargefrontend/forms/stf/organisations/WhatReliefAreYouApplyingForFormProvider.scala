@@ -14,13 +14,17 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.securitiestransferchargefrontend.models
+package uk.gov.hmrc.securitiestransferchargefrontend.forms.stf.organisations
 
-import play.api.libs.json.*
+import play.api.data.Form
+import uk.gov.hmrc.securitiestransferchargefrontend.forms.mappings.Mappings
 
-case class DetailsOfThisTransfer (numberOfShares: String, typeOfShares: String, amountPaid: BigDecimal,marketValue: Option[BigDecimal])
+import javax.inject.Inject
 
-object DetailsOfThisTransfer {
+class WhatReliefAreYouApplyingForFormProvider @Inject() extends Mappings {
 
-  implicit val format: OFormat[DetailsOfThisTransfer] = Json.format
+  def apply(): Form[String] =
+    Form(
+      "reliefs" -> text("orgs.whatReliefAreYouApplyingFor.error.required")
+    )
 }

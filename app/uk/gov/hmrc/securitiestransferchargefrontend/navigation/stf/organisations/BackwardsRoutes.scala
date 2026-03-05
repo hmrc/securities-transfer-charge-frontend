@@ -37,6 +37,7 @@ class BackwardsRoutes(defaultPage: Call):
     case NameOfSellerPage => _ => orgRoutes.ConfirmAddressController.onPageLoad()
     case ConnectedPersonsPage => _ => orgRoutes.StfSellerAddressController.onPageLoad()
     case ApplyingForReliefPage  => _ => orgRoutes.ConnectedPersonsController.onPageLoad(NormalMode)
+    case WhatReliefAreYouApplyingForPage => _ => orgRoutes.ApplyingForReliefController.onPageLoad(NormalMode)
     case SecuritiesTargetPage => userAnswers => dataDependent(ApplyingForReliefPage, userAnswers) {
       case true => routes.SubmissionsDashboardController.onPageLoad()
       case false => orgRoutes.ApplyingForReliefController.onPageLoad(NormalMode)

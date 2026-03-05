@@ -27,11 +27,10 @@ import uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.individuals.
 import uk.gov.hmrc.securitiestransferchargefrontend.forms.stf.individuals.DetailsOfThisTransferFormProvider
 import uk.gov.hmrc.securitiestransferchargefrontend.models.{DetailsOfThisTransfer, NormalMode, UserAnswers}
 import uk.gov.hmrc.securitiestransferchargefrontend.navigation.Navigator
-import uk.gov.hmrc.securitiestransferchargefrontend.pages.DetailsOfThisTransferPage
+import uk.gov.hmrc.securitiestransferchargefrontend.pages.{ConnectedPersonsPage, DetailsOfThisTransferPage}
 import uk.gov.hmrc.securitiestransferchargefrontend.views.html.stf.individuals.DetailsOfThisTransferView
 
 class DetailsOfThisTransferControllerSpec extends SpecBase with MockitoSugar {
-
 
   val formProvider = new DetailsOfThisTransferFormProvider()
   val form: Form[DetailsOfThisTransfer] = formProvider()
@@ -43,7 +42,7 @@ class DetailsOfThisTransferControllerSpec extends SpecBase with MockitoSugar {
   val detailsOfThisTransfer: DetailsOfThisTransfer = DetailsOfThisTransfer(numberOfShares = "25",
     typeOfShares = "stocks",
     amountPaid = BigDecimal(100),
-    marketValue = BigDecimal(10000))
+    marketValue = Some(BigDecimal(10000)))
 
   val userAnswers: UserAnswers = UserAnswers(userAnswersId, submissionId)
 
@@ -51,7 +50,9 @@ class DetailsOfThisTransferControllerSpec extends SpecBase with MockitoSugar {
 
     "must return OK and the correct view for a GET" in {
 
-      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers))
+      val updatedAnswers = emptyUserAnswers.set(ConnectedPersonsPage,true).success.value
+
+      val application = applicationBuilder(userAnswers = Some(updatedAnswers))
         .overrides(bind[Navigator].qualifiedWith("individuals").toInstance(getNavigator))
         .build()
 
@@ -70,7 +71,8 @@ class DetailsOfThisTransferControllerSpec extends SpecBase with MockitoSugar {
 
     "must populate the view correctly on a GET when the question has previously been answered" in {
 
-      val updatedAnswers = userAnswers.set(DetailsOfThisTransferPage, detailsOfThisTransfer).success.value
+      val answers = userAnswers.set(DetailsOfThisTransferPage, detailsOfThisTransfer).success.value
+      val updatedAnswers = answers.set(ConnectedPersonsPage,true).success.value
 
       val application = applicationBuilder(userAnswers = Some(updatedAnswers))
         .overrides(bind[Navigator].qualifiedWith("individuals").toInstance(getNavigator))
@@ -90,8 +92,11 @@ class DetailsOfThisTransferControllerSpec extends SpecBase with MockitoSugar {
 
     "must redirect to the next page when valid data is submitted" in {
 
+      val updatedAnswers = emptyUserAnswers.set(ConnectedPersonsPage, true).success.value
+
+
       val application =
-        applicationBuilder(userAnswers = Some(emptyUserAnswers))
+        applicationBuilder(userAnswers = Some(updatedAnswers))
           .build()
 
       running(application) {
@@ -114,7 +119,9 @@ class DetailsOfThisTransferControllerSpec extends SpecBase with MockitoSugar {
 
     "must return a Bad Request and errors when invalid data is submitted" in {
 
-      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers))
+      val updatedAnswers = emptyUserAnswers.set(ConnectedPersonsPage, true).success.value
+
+      val application = applicationBuilder(userAnswers = Some(updatedAnswers))
         .overrides(bind[Navigator].qualifiedWith("individuals").toInstance(getNavigator))
         .build()
 
