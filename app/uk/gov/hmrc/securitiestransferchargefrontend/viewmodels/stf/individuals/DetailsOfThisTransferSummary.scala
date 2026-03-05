@@ -38,7 +38,7 @@ object DetailsOfThisTransferSummary {
              |${HtmlFormat.escape(answer.numberOfShares).body}<br/>
              |${HtmlFormat.escape(answer.typeOfShares).body}<br/>
              |${HtmlFormat.escape(currencyFormat(answer.amountPaid)).body}<br/>
-             |${HtmlFormat.escape(currencyFormat(answer.marketValue)).body}
+             |${answer.marketValue.map(v => HtmlFormat.escape(currencyFormat(v)).body).getOrElse("")}
              |""".stripMargin
         )
 

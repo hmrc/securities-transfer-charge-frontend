@@ -52,7 +52,7 @@ class SecuritiesTargetFormProviderSpec extends StringFieldBehaviours {
     )
   }
 
-  ".CRN" - {
+  ".crn" - {
 
     val fieldName = "crn"
     val lengthKey = "securitiesTarget.error.crn.length"

@@ -24,13 +24,19 @@ import uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.individuals.
 import uk.gov.hmrc.securitiestransferchargefrontend.models.*
 import uk.gov.hmrc.securitiestransferchargefrontend.pages.*
 import base.Fixtures
+import uk.gov.hmrc.securitiestransferchargefrontend.config.FrontendAppConfig
+import org.scalatestplus.mockito.MockitoSugar.mock
+import org.mockito.Mockito.when
 import uk.gov.hmrc.securitiestransferchargefrontend.navigation.stf.individuals.StfNavigator
 
 import java.time.LocalDate
 
 class StfNavigatorSpec extends SpecBase with ScalaFutures {
 
-  val navigator = new StfNavigator(StubAnswerPersistenceService())
+  private val mockConfig: FrontendAppConfig = mock[FrontendAppConfig]
+  when(mockConfig.firstChargingPoint).thenReturn(LocalDate.of(2026, 1, 1))
+
+  val navigator = new StfNavigator(mockConfig, StubAnswerPersistenceService())
 
   "Navigator" - {
 
@@ -124,7 +130,15 @@ class StfNavigatorSpec extends SpecBase with ScalaFutures {
         }
       }
 
-      "must go from the ChargingPointPage to TaxRateController" in {
+      "must go from the ChargingPointPage to JourneyRecoveryController when the date entered is before 2026-01-01" in {
+        val answers = emptyUserAnswers.set(ChargingPointPage, LocalDate.of(2025,1,2)).get
+        val result = navigator.nextPage(ChargingPointPage, NormalMode, answers)(fakeRequest)
+        whenReady(result) { res =>
+          res mustBe routes.JourneyRecoveryController.onPageLoad()
+        }
+      }
+
+      "must go from the ChargingPointPage to TaxRateController when the date entered is after 2026-01-01" in {
         val answers = emptyUserAnswers.set(ChargingPointPage, LocalDate.now()).get
         val result = navigator.nextPage(ChargingPointPage, NormalMode, answers)(fakeRequest)
         whenReady(result) { res =>
@@ -184,7 +198,7 @@ class StfNavigatorSpec extends SpecBase with ScalaFutures {
 
       "must go from the DetailsOfThisTransferPage to CheckYourAnswersController" in {
         val answers = emptyUserAnswers.set(DetailsOfThisTransferPage, DetailsOfThisTransfer(numberOfShares = "200",
-          typeOfShares = "ordinary share", amountPaid = BigDecimal(500), marketValue = BigDecimal(1500))).get
+          typeOfShares = "ordinary share", amountPaid = BigDecimal(500), marketValue = Some(BigDecimal(1500)))).get
         val result = navigator.nextPage(DetailsOfThisTransferPage, NormalMode, answers)(fakeRequest)
         whenReady(result) { res =>
           res mustBe routes.CheckYourAnswersController.onPageLoad()

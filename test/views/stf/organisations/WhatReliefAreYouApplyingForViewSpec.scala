@@ -14,50 +14,48 @@
  * limitations under the License.
  */
 
-package views.stf.individuals
+package views.stf.organisations
 
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
 import play.api.Application
 import play.api.mvc.Call
-import uk.gov.hmrc.securitiestransferchargefrontend.forms.stf.individuals.DetailsOfThisTransferFormProvider
-import uk.gov.hmrc.securitiestransferchargefrontend.models.NormalMode
-import uk.gov.hmrc.securitiestransferchargefrontend.views.html.stf.individuals.DetailsOfThisTransferView
+import uk.gov.hmrc.securitiestransferchargefrontend.forms.stf.organisations.WhatReliefAreYouApplyingForFormProvider
+import uk.gov.hmrc.securitiestransferchargefrontend.models.{NormalMode, ReliefsDataSource}
+import uk.gov.hmrc.securitiestransferchargefrontend.views.html.stf.organisations.WhatReliefAreYouApplyingForView
 import views.ViewBaseSpec
 
 
-class DetailsOfThisTransferViewSpec extends ViewBaseSpec {
+class WhatReliefAreYouApplyingForViewSpec extends ViewBaseSpec {
 
   override def fakeApplication(): Application =
     applicationBuilder().build()
 
-  private val viewInstance = app.injector.instanceOf[DetailsOfThisTransferView]
-  private val formProvider = new  DetailsOfThisTransferFormProvider()
+  private val viewInstance = app.injector.instanceOf[WhatReliefAreYouApplyingForView]
+  private val source = app.injector.instanceOf[ReliefsDataSource]
+  private val formProvider = new WhatReliefAreYouApplyingForFormProvider()
   private val testBackLinkRoute: Call = Call("GET", "/back-link")
 
   private val form = formProvider()
 
-  def view(requireMarketValue:Boolean): Document = Jsoup.parse(
-    viewInstance(form, NormalMode, testBackLinkRoute,requireMarketValue)(fakeRequest, messages).body
+  def view(): Document = Jsoup.parse(
+    viewInstance(form, NormalMode, source.reliefs, testBackLinkRoute)(fakeRequest, messages).body
   )
 
   object ExpectedContent {
-    val title: String = messages("detailsOfThisTransfer.title")
+    val title: String = messages("orgs.whatReliefAreYouApplyingFor.title")
     val caption: String = messages("transfer.details.caption")
-    val heading: String = messages("detailsOfThisTransfer.heading")
+    val heading: String = messages("orgs.whatReliefAreYouApplyingFor.heading")
+    val paragraph: String = messages("orgs.whatReliefAreYouApplyingFor.p")
     val saveAndContinue: String = messages("site.save-and-continue.button")
     val saveAndReturn: String = messages("site.save-and-return.button")
-    val numberOfShares: String = messages("detailsOfThisTransfer.numberOfShares")
-    val typeOfShares: String = messages("detailsOfThisTransfer.typeOfShares")
-    val amountPaid: String = messages("detailsOfThisTransfer.amountPaid")
-    val marketValue: String = messages("detailsOfThisTransfer.marketValue")
   }
 
-  "The DetailsOfThisTransferView" - {
+  "The WhatReliefAreYouApplyingForView" - {
 
     "when rendered without errors" - {
 
-      val doc = view(requireMarketValue = true)
+      val doc = view()
 
       "have the correct title" in {
         doc.title() must include(ExpectedContent.title)
@@ -71,11 +69,8 @@ class DetailsOfThisTransferViewSpec extends ViewBaseSpec {
         doc.select("h1").text() must include(ExpectedContent.heading)
       }
 
-      "have the correct input text " in {
-        doc.select(".govuk-label").text()  must include(ExpectedContent.numberOfShares)
-        doc.select(".govuk-label").text()  must include(ExpectedContent.typeOfShares)
-        doc.select(".govuk-label").text()  must include(ExpectedContent.amountPaid)
-        doc.select(".govuk-label").text()  must include(ExpectedContent.marketValue)
+      "have the first paragraph" in {
+        doc.select(".govuk-hint").text() must include(ExpectedContent.paragraph)
       }
 
       "have a save and continue button" in {
@@ -86,13 +81,5 @@ class DetailsOfThisTransferViewSpec extends ViewBaseSpec {
         doc.select(".govuk-button--secondary").text() mustBe ExpectedContent.saveAndReturn
       }
     }
-    "when rendered without without marketValue" - {
-      val doc = view(requireMarketValue = false)
-
-      "must not render the market value input" in {
-        doc.select(".govuk-label").text() must not include(ExpectedContent.marketValue)
-      }
-    }
-
   }
 }

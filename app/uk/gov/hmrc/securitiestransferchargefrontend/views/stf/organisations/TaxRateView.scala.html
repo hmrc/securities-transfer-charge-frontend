@@ -14,52 +14,48 @@
  * limitations under the License.
  *@
 
-@import uk.gov.hmrc.securitiestransferchargefrontend.viewmodels.InputWidth._
-@import uk.gov.hmrc.securitiestransferchargefrontend.viewmodels.LabelSize.Large
+@import uk.gov.hmrc.securitiestransferchargefrontend.viewmodels.LegendSize.Medium
+@import uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.organisations.routes
 @import uk.gov.hmrc.securitiestransferchargefrontend.views.html.templates
-@import uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.individuals.routes
+@import uk.gov.hmrc.securitiestransferchargefrontend.models.TaxRate
 @import uk.gov.hmrc.securitiestransferchargefrontend.views.html.components.SaveAndReturnButton
+
 
 
 @this(
     layout: templates.Layout,
     formHelper: FormWithCSRF,
     govukErrorSummary: GovukErrorSummary,
-    govukInput: GovukInput,
+    govukRadios: GovukRadios,
     govukButton: GovukButton,
     saveAndReturnButton:SaveAndReturnButton
+
 )
 
 @(form: Form[_], mode: Mode, backLinkCall: Call)(implicit request: Request[_], messages: Messages)
 
-@layout(pageTitle = title(form, messages("securitiesTarget.title")), backLinkUrl = Some(backLinkCall.url)) {
-    <div id="caption-heading" class="govuk-caption-l">
-        @messages("transfer.details.caption")
-    </div>
+@layout(pageTitle = title(form, messages("taxRate.title")), backLinkUrl = Some(backLinkCall.url)) {
 
-    @formHelper(action = routes.SecuritiesTargetController.onSubmit(mode), Symbol("autoComplete") -> "off") {
+    @formHelper(action = routes.TaxRateController.onSubmit(mode), Symbol("autoComplete") -> "off") {
 
         @if(form.errors.nonEmpty) {
-            @govukErrorSummary(ErrorSummaryViewModel(form))
+            @govukErrorSummary(ErrorSummaryViewModel(form,  errorLinkOverrides = Map("value" -> "value_0")))
         }
 
-        <h1 class="govuk-heading-l">@messages("securitiesTarget.heading")</h1>
+        <h1 class="govuk-heading-l">
+            <span class="govuk-caption-l">@messages("transfer.details.caption")</span>
+            @messages("taxRate.heading")
+        </h1>
 
-        @govukInput(
-            InputViewModel(
-                field = form("businessName"),
-                label = LabelViewModel(messages("securitiesTarget.businessName"))
-            )
-            .withWidth(Full)
-        )
+        <p class="govuk-body">@messages("org.taxRate.p1")</p>
+        <p class="govuk-body">@messages("org.taxRate.p2")</p>
 
-        @govukInput(
-            InputViewModel(
-                field = form("crn"),
-                label = LabelViewModel(messages("securitiesTarget.crn"))
+        @govukRadios(
+            RadiosViewModel(
+                field  = form("value"),
+                legend = LegendViewModel(messages("taxRate.legend")).asPageHeading(Medium),
+                items  = TaxRate.options
             )
-            .withWidth(OneThird)
-            .withHint(HintViewModel(messages("securitiesTarget.crn.hint")))
         )
 
         @govukButton(

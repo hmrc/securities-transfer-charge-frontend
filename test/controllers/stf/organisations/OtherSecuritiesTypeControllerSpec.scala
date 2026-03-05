@@ -17,46 +17,43 @@
 package controllers.stf.organisations
 
 import base.SpecBase
-import org.mockito.ArgumentMatchers.any
-import org.mockito.Mockito.when
 import org.scalatestplus.mockito.MockitoSugar
 import play.api.data.Form
 import play.api.inject.bind
 import play.api.test.FakeRequest
 import play.api.test.Helpers.*
-import uk.gov.hmrc.http.HeaderCarrier
-import uk.gov.hmrc.securitiestransferchargefrontend.clients.SaveAndReturnClient
+import uk.gov.hmrc.auth.core.AffinityGroup
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.routes
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.organisations.routes as orgRoutes
-import uk.gov.hmrc.securitiestransferchargefrontend.forms.stf.organisations.ApplyingForReliefFormProvider
+import uk.gov.hmrc.securitiestransferchargefrontend.forms.stf.organisations.OtherSecuritiesTypeFormProvider
 import uk.gov.hmrc.securitiestransferchargefrontend.models.{NormalMode, UserAnswers}
 import uk.gov.hmrc.securitiestransferchargefrontend.navigation.Navigator
-import uk.gov.hmrc.securitiestransferchargefrontend.pages.ApplyingForReliefPage
-import uk.gov.hmrc.securitiestransferchargefrontend.views.html.stf.organisations.ApplyingForReliefView
+import uk.gov.hmrc.securitiestransferchargefrontend.pages.OtherSecuritiesTypePage
+import uk.gov.hmrc.securitiestransferchargefrontend.views.html.stf.organisations.OtherSecuritiesTypeView
 
-import scala.concurrent.Future
+class OtherSecuritiesTypeControllerSpec extends SpecBase with MockitoSugar {
 
-class ApplyingForReliefControllerSpec extends SpecBase with MockitoSugar {
-  
-  val formProvider = new ApplyingForReliefFormProvider()
-  val form: Form[Boolean] = formProvider()
 
-  lazy val applyingForReliefRoute: String = orgRoutes.ApplyingForReliefController.onPageLoad(NormalMode).url
+  val formProvider = new OtherSecuritiesTypeFormProvider()
+  val form: Form[String] = formProvider()
+  val orgAffinity:AffinityGroup = AffinityGroup.Organisation
 
-  "ApplyingForRelief Controller" - {
+  lazy val otherSecuritiesTypeRoute: String = orgRoutes.OtherSecuritiesTypeController.onPageLoad(NormalMode).url
+
+  "OtherSecuritiesType Controller" - {
 
     "must return OK and the correct view for a GET" in {
 
-      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers))
+      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers),affinityGroup = orgAffinity)
         .overrides(bind[Navigator].qualifiedWith("organisations").toInstance(getNavigator))
         .build()
 
       running(application) {
-        val request = FakeRequest(GET, applyingForReliefRoute)
+        val request = FakeRequest(GET, otherSecuritiesTypeRoute)
 
         val result = route(application, request).value
 
-        val view = application.injector.instanceOf[ApplyingForReliefView]
+        val view = application.injector.instanceOf[OtherSecuritiesTypeView]
 
         status(result) mustEqual OK
         contentAsString(result) mustEqual view(form, NormalMode, testBackLinkRoute)(request, messages(application)).toString
@@ -65,84 +62,57 @@ class ApplyingForReliefControllerSpec extends SpecBase with MockitoSugar {
 
     "must populate the view correctly on a GET when the question has previously been answered" in {
 
-      val userAnswers = UserAnswers(userAnswersId,submissionId).set(ApplyingForReliefPage, true).success.value
+      val userAnswers = UserAnswers(userAnswersId,submissionId).set(OtherSecuritiesTypePage, "answer").success.value
 
-      val application = applicationBuilder(userAnswers = Some(userAnswers))
+      val application = applicationBuilder(userAnswers = Some(userAnswers),affinityGroup = orgAffinity)
         .overrides(bind[Navigator].qualifiedWith("organisations").toInstance(getNavigator))
         .build()
 
       running(application) {
-        val request = FakeRequest(GET, applyingForReliefRoute)
+        val request = FakeRequest(GET, otherSecuritiesTypeRoute)
 
-        val view = application.injector.instanceOf[ApplyingForReliefView]
+        val view = application.injector.instanceOf[OtherSecuritiesTypeView]
 
         val result = route(application, request).value
 
         status(result) mustEqual OK
-        contentAsString(result) mustEqual view(form.fill(true), NormalMode, testBackLinkRoute)(request, messages(application)).toString
+        contentAsString(result) mustEqual view(form.fill("answer"), NormalMode, testBackLinkRoute)(request, messages(application)).toString
       }
     }
 
-    "must redirect to the WhatReliefAreYouApplyingFor page when yes is selected" in {
-
-      val saveAndReturnClient = mock[SaveAndReturnClient]
-
-      when(saveAndReturnClient.save(any[UserAnswers]())(any[HeaderCarrier]()))
-        .thenReturn(Future.successful(()))
+    "must redirect to the next page when valid data is submitted" in {
+      
 
       val application =
-        applicationBuilder(userAnswers = Some(emptyUserAnswers))
+        applicationBuilder(userAnswers = Some(emptyUserAnswers),affinityGroup = orgAffinity)
           .build()
 
       running(application) {
         val request =
-          FakeRequest(POST, applyingForReliefRoute)
-            .withFormUrlEncodedBody(("value", "true"))
+          FakeRequest(POST, otherSecuritiesTypeRoute)
+            .withFormUrlEncodedBody(("value", "answer"))
 
         val result = route(application, request).value
 
         status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual orgRoutes.WhatReliefAreYouApplyingForController.onPageLoad(NormalMode).url
-      }
-    }
-
-    "must redirect to the SecuritiesTarget page when no is selected" in {
-
-      val saveAndReturnClient = mock[SaveAndReturnClient]
-
-      when(saveAndReturnClient.save(any[UserAnswers]())(any[HeaderCarrier]()))
-        .thenReturn(Future.successful(()))
-
-      val application =
-        applicationBuilder(userAnswers = Some(emptyUserAnswers))
-          .build()
-
-      running(application) {
-        val request =
-          FakeRequest(POST, applyingForReliefRoute)
-            .withFormUrlEncodedBody(("value", "false"))
-
-        val result = route(application, request).value
-
-        status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual orgRoutes.SecuritiesTargetController.onPageLoad(NormalMode).url
+        redirectLocation(result).value mustEqual routes.JourneyRecoveryController.onPageLoad().url
       }
     }
 
     "must return a Bad Request and errors when invalid data is submitted" in {
 
-      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers))
+      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers),affinityGroup = orgAffinity)
         .overrides(bind[Navigator].qualifiedWith("organisations").toInstance(getNavigator))
         .build()
 
       running(application) {
         val request =
-          FakeRequest(POST, applyingForReliefRoute)
+          FakeRequest(POST, otherSecuritiesTypeRoute)
             .withFormUrlEncodedBody(("value", ""))
 
         val boundForm = form.bind(Map("value" -> ""))
 
-        val view = application.injector.instanceOf[ApplyingForReliefView]
+        val view = application.injector.instanceOf[OtherSecuritiesTypeView]
 
         val result = route(application, request).value
 
@@ -153,10 +123,10 @@ class ApplyingForReliefControllerSpec extends SpecBase with MockitoSugar {
 
     "must redirect to Journey Recovery for a GET if no existing data is found" in {
 
-      val application = applicationBuilder(userAnswers = None).build()
+      val application = applicationBuilder(userAnswers = None,affinityGroup = orgAffinity).build()
 
       running(application) {
-        val request = FakeRequest(GET, applyingForReliefRoute)
+        val request = FakeRequest(GET, otherSecuritiesTypeRoute)
 
         val result = route(application, request).value
 
@@ -167,12 +137,12 @@ class ApplyingForReliefControllerSpec extends SpecBase with MockitoSugar {
 
     "must redirect to Journey Recovery for a POST if no existing data is found" in {
 
-      val application = applicationBuilder(userAnswers = None).build()
+      val application = applicationBuilder(userAnswers = None,affinityGroup = orgAffinity).build()
 
       running(application) {
         val request =
-          FakeRequest(POST, applyingForReliefRoute)
-            .withFormUrlEncodedBody(("value", "true"))
+          FakeRequest(POST, otherSecuritiesTypeRoute)
+            .withFormUrlEncodedBody(("value", "answer"))
 
         val result = route(application, request).value
 

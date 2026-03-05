@@ -16,9 +16,10 @@
 
 @import uk.gov.hmrc.securitiestransferchargefrontend.viewmodels.InputWidth._
 @import uk.gov.hmrc.securitiestransferchargefrontend.viewmodels.LabelSize.Large
+@import uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.organisations.routes
 @import uk.gov.hmrc.securitiestransferchargefrontend.views.html.templates
-@import uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.individuals.routes
 @import uk.gov.hmrc.securitiestransferchargefrontend.views.html.components.SaveAndReturnButton
+
 
 
 @this(
@@ -32,41 +33,24 @@
 
 @(form: Form[_], mode: Mode, backLinkCall: Call)(implicit request: Request[_], messages: Messages)
 
-@layout(pageTitle = title(form, messages("securitiesTarget.title")), backLinkUrl = Some(backLinkCall.url)) {
-    <div id="caption-heading" class="govuk-caption-l">
-        @messages("transfer.details.caption")
-    </div>
+@layout(pageTitle = title(form, messages("org.otherSecuritiesType.title"),Some(messages("sectionTitle.transferDetails"))), backLinkUrl = Some(backLinkCall.url)) {
 
-    @formHelper(action = routes.SecuritiesTargetController.onSubmit(mode), Symbol("autoComplete") -> "off") {
+    @formHelper(action = routes.OtherSecuritiesTypeController.onSubmit(mode)) {
 
         @if(form.errors.nonEmpty) {
             @govukErrorSummary(ErrorSummaryViewModel(form))
         }
 
-        <h1 class="govuk-heading-l">@messages("securitiesTarget.heading")</h1>
-
+        <span  class="govuk-caption-l">@messages("transfer.details.caption")</span>
         @govukInput(
             InputViewModel(
-                field = form("businessName"),
-                label = LabelViewModel(messages("securitiesTarget.businessName"))
+                field = form("value"),
+                label = LabelViewModel(messages("org.otherSecuritiesType.heading")).asPageHeading(Large)
             )
             .withWidth(Full)
         )
 
-        @govukInput(
-            InputViewModel(
-                field = form("crn"),
-                label = LabelViewModel(messages("securitiesTarget.crn"))
-            )
-            .withWidth(OneThird)
-            .withHint(HintViewModel(messages("securitiesTarget.crn.hint")))
-        )
-
-        @govukButton(
-            ButtonViewModel(
-                messages("site.save-and-continue.button")
-            )
-        )
+        @govukButton(ButtonViewModel(messages("site.save-and-continue.button")))
 
         @saveAndReturnButton()
     }

@@ -33,7 +33,7 @@ trait ModelGenerators {
         typeOfShares <- Gen.alphaStr.suchThat(_.nonEmpty)
         amountPaid <- Gen.choose(BigDecimal(0), BigDecimal(1000000))
         marketValue <- Gen.choose(BigDecimal(0), BigDecimal(1000000))
-      } yield DetailsOfThisTransfer(numberOfShares, typeOfShares, amountPaid, marketValue)
+      } yield DetailsOfThisTransfer(numberOfShares, typeOfShares, amountPaid, Some(marketValue))
     }
 
   implicit lazy val arbitraryWhatTypeOfSecurities: Arbitrary[WhatTypeOfSecurities] =

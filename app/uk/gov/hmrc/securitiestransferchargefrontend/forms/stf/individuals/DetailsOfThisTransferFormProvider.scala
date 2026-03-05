@@ -18,6 +18,7 @@ package uk.gov.hmrc.securitiestransferchargefrontend.forms.stf.individuals
 
 import play.api.data.Form
 import play.api.data.Forms.*
+import play.api.data.validation.Constraint
 import uk.gov.hmrc.securitiestransferchargefrontend.forms.mappings.Mappings
 import uk.gov.hmrc.securitiestransferchargefrontend.models.DetailsOfThisTransfer
 
@@ -25,21 +26,22 @@ import javax.inject.Inject
 
 class DetailsOfThisTransferFormProvider @Inject() extends Mappings {
 
-  def apply(): Form[DetailsOfThisTransfer] = Form(
-    mapping(
-      "numberOfShares" -> text("detailsOfThisTransfer.error.numberOfShares.required")
-        .verifying(maxLength(100, "detailsOfThisTransfer.error.numberOfShares.length")),
-      "typeOfShares" -> text("detailsOfThisTransfer.error.typeOfShares.required")
-        .verifying(maxLength(100, "detailsOfThisTransfer.error.typeOfShares.length")),
-      "amountPaid" ->
-        currency("detailsOfThisTransfer.error.amountPaid.required",
-          "detailsOfThisTransfer.error.amountPaid.invalidNumeric",
-          "detailsOfThisTransfer.error.amountPaid.nonNumeric")
-          .verifying(inRange(BigDecimal(0), BigDecimal(100000000), "detailsOfThisTransfer.error.amountPaid.outOfRange")),
-      "marketValue" -> currency("detailsOfThisTransfer.error.marketValue.required",
-        "detailsOfThisTransfer.error.marketValue.invalidNumeric",
-        "detailsOfThisTransfer.error.marketValue.nonNumeric")
-        .verifying(inRange(BigDecimal(0), BigDecimal(100000000), "detailsOfThisTransfer.error.marketValue.outOfRange"))
-    )(DetailsOfThisTransfer.apply)(x => Some((x.numberOfShares, x.typeOfShares, x.amountPaid, x.marketValue)))
-  )
+  def apply(requireMarketValue: Boolean = true): Form[DetailsOfThisTransfer] =
+    Form(
+      mapping(
+        "numberOfShares" -> text("detailsOfThisTransfer.error.numberOfShares.required")
+          .verifying(maxLength(100, "detailsOfThisTransfer.error.numberOfShares.length")),
+        "typeOfShares" -> text("detailsOfThisTransfer.error.typeOfShares.required")
+          .verifying(maxLength(100, "detailsOfThisTransfer.error.typeOfShares.length")),
+        "amountPaid" ->
+          currency("detailsOfThisTransfer.error.amountPaid.required",
+            "detailsOfThisTransfer.error.amountPaid.invalidNumeric",
+            "detailsOfThisTransfer.error.amountPaid.nonNumeric")
+            .verifying(inRange(BigDecimal(0), BigDecimal(100000000), "detailsOfThisTransfer.error.amountPaid.outOfRange")),
+        "marketValue" -> optional(currency("detailsOfThisTransfer.error.marketValue.required",
+          "detailsOfThisTransfer.error.marketValue.invalidNumeric",
+          "detailsOfThisTransfer.error.marketValue.nonNumeric")
+          .verifying(inRange(BigDecimal(0), BigDecimal(100000000), "detailsOfThisTransfer.error.marketValue.outOfRange"))).verifying(requiredIf(requireMarketValue))
+      )(DetailsOfThisTransfer.apply)(x => Some((x.numberOfShares, x.typeOfShares, x.amountPaid, x.marketValue)))
+    )
 }
