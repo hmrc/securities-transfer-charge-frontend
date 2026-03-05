@@ -19,6 +19,7 @@ package uk.gov.hmrc.securitiestransferchargefrontend.navigation.stf.individuals
 import play.api.mvc.{Call, Request}
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.play.http.HeaderCarrierConverter
+import uk.gov.hmrc.securitiestransferchargefrontend.config.FrontendAppConfig
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.routes
 import uk.gov.hmrc.securitiestransferchargefrontend.domain.SubmissionId
 import uk.gov.hmrc.securitiestransferchargefrontend.models.UserAnswers
@@ -30,14 +31,15 @@ import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 
   
-class StfNavigator @Inject()(answerPersistenceService: AnswerPersistenceService)
+class StfNavigator @Inject()(appConfig: FrontendAppConfig,
+                             answerPersistenceService: AnswerPersistenceService)
                             (implicit ec: ExecutionContext) extends AbstractModeNavigator with PersistentNavigator {
 
   override lazy val dashboardPage: Call = routes.SubmissionsDashboardController.onPageLoad()
   val defaultPage: Call = routes.JourneyRecoveryController.onPageLoad()
   val errorPages: List[Call] = List(defaultPage)
   
-  val forwardRoutes: ForwardRoutes = new ForwardRoutes(answerPersistenceService, defaultPage, errorPages)
+  val forwardRoutes: ForwardRoutes = new ForwardRoutes(answerPersistenceService, appConfig, defaultPage, errorPages)
   val backwardsRoutes: BackwardsRoutes = new BackwardsRoutes(defaultPage)
 
   override def forwardRoutes(page: Page)(implicit hc: HeaderCarrier): UserAnswers => Future[Call] =
