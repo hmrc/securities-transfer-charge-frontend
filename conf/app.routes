@@ -161,3 +161,8 @@ GET        /stf/org/consideration                           uk.gov.hmrc.securiti
 POST       /stf/org/consideration                           uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.organisations.AmountPaidForSecuritiesController.onSubmit(mode: Mode = NormalMode)
 GET        /stf/org/change/consideration                    uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.organisations.AmountPaidForSecuritiesController.onPageLoad(mode: Mode = CheckMode)
 POST       /stf/org/change/consideration                    uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.organisations.AmountPaidForSecuritiesController.onSubmit(mode: Mode = CheckMode)
+
+GET        /totalMarketValue                  uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.organisations.TotalMarketValueController.onPageLoad(mode: Mode = NormalMode)
+POST       /totalMarketValue                  uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.organisations.TotalMarketValueController.onSubmit(mode: Mode = NormalMode)
+GET        /changeTotalMarketValue                        uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.organisations.TotalMarketValueController.onPageLoad(mode: Mode = CheckMode)
+POST       /changeTotalMarketValue                        uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.organisations.TotalMarketValueController.onSubmit(mode: Mode = CheckMode)

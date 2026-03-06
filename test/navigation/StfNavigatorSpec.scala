@@ -27,6 +27,7 @@ import base.Fixtures
 import uk.gov.hmrc.securitiestransferchargefrontend.config.FrontendAppConfig
 import org.scalatestplus.mockito.MockitoSugar.mock
 import org.mockito.Mockito.when
+import uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.organisations
 import uk.gov.hmrc.securitiestransferchargefrontend.navigation.stf.individuals.StfNavigator
 
 import java.time.LocalDate
@@ -227,7 +228,7 @@ class StfNavigatorSpec extends SpecBase with ScalaFutures {
       }
 
       "must go from the TotalMarketValuePage to AmountPaidForSecurities" in {
-        val result = navigator.previousPage(TotalMarketValuePage, NormalMode, emptyUserAnswers)
+        val result = navigator.previousPage(pages.TotalMarketValuePage, NormalMode, emptyUserAnswers)
         result mustBe individualRoutes.AmountPaidForSecuritiesController.onPageLoad(NormalMode)
       }
 

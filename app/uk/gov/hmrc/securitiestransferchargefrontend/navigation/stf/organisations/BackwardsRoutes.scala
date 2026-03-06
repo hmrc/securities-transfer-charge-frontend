@@ -18,11 +18,10 @@ package uk.gov.hmrc.securitiestransferchargefrontend.navigation.stf.organisation
 
 import play.api.mvc.Call
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.routes
-import uk.gov.hmrc.securitiestransferchargefrontend.models.{NormalMode, UserAnswers}
-import uk.gov.hmrc.securitiestransferchargefrontend.pages.{ConfirmAddressPage, ConnectedPersonsPage, NameOfSellerPage, Page, StfBuyersAddressPage}
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.organisations.routes as orgRoutes
-import uk.gov.hmrc.securitiestransferchargefrontend.pages.*
+import uk.gov.hmrc.securitiestransferchargefrontend.models.{NormalMode, UserAnswers}
 import uk.gov.hmrc.securitiestransferchargefrontend.navigation.NavigationHelper
+import uk.gov.hmrc.securitiestransferchargefrontend.pages.*
 
 class BackwardsRoutes(defaultPage: Call):
 
@@ -46,7 +45,7 @@ class BackwardsRoutes(defaultPage: Call):
     case WhatTypeOfSecuritiesPage => _ => orgRoutes.TaxRateController.onPageLoad(NormalMode)
     case OtherSecuritiesTypePage => _ => orgRoutes.WhatTypeOfSecuritiesController.onPageLoad(NormalMode)
     case AmountPaidForSecuritiesPage => _ => orgRoutes.OtherSecuritiesTypeController.onPageLoad(NormalMode)
-
+    case TotalMarketValuePage => _ => orgRoutes.AmountPaidForSecuritiesController.onPageLoad(NormalMode)
     case _ => _ => defaultPage
 
   }
