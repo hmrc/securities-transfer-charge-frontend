@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package controllers.stf.individuals
+package controllers.stf.organisations
 
 import base.SpecBase
 import org.scalatestplus.mockito.MockitoSugar
@@ -23,19 +23,19 @@ import play.api.inject.bind
 import play.api.test.FakeRequest
 import play.api.test.Helpers.*
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.routes
-import uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.individuals.routes as individualRoutes
+import uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.organisations.routes as orgRoutes
 import uk.gov.hmrc.securitiestransferchargefrontend.forms.stf.shared.DetailsOfThisTransferFormProvider
 import uk.gov.hmrc.securitiestransferchargefrontend.models.{DetailsOfThisTransfer, NormalMode, UserAnswers}
 import uk.gov.hmrc.securitiestransferchargefrontend.navigation.Navigator
 import uk.gov.hmrc.securitiestransferchargefrontend.pages.{ConnectedPersonsPage, DetailsOfThisTransferPage}
-import uk.gov.hmrc.securitiestransferchargefrontend.views.html.stf.individuals.DetailsOfThisTransferView
+import uk.gov.hmrc.securitiestransferchargefrontend.views.html.stf.organisations.DetailsOfThisTransferView
 
 class DetailsOfThisTransferControllerSpec extends SpecBase with MockitoSugar {
 
   val formProvider = new DetailsOfThisTransferFormProvider()
   val form: Form[DetailsOfThisTransfer] = formProvider()
 
-  lazy val detailsOfThisTransferRoute: String = individualRoutes.DetailsOfThisTransferController.onPageLoad(NormalMode).url
+  lazy val detailsOfThisTransferRoute: String = orgRoutes.DetailsOfThisTransferController.onPageLoad(NormalMode).url
 
   val amount: BigDecimal = BigDecimal(500)
 
@@ -52,8 +52,8 @@ class DetailsOfThisTransferControllerSpec extends SpecBase with MockitoSugar {
 
       val updatedAnswers = emptyUserAnswers.set(ConnectedPersonsPage,true).success.value
 
-      val application = applicationBuilder(userAnswers = Some(updatedAnswers))
-        .overrides(bind[Navigator].qualifiedWith("individuals").toInstance(getNavigator))
+      val application = applicationBuilder(userAnswers = Some(updatedAnswers),affinityGroup = orgAffinity)
+        .overrides(bind[Navigator].qualifiedWith("organisations").toInstance(getNavigator))
         .build()
 
 
@@ -74,8 +74,8 @@ class DetailsOfThisTransferControllerSpec extends SpecBase with MockitoSugar {
       val answers = userAnswers.set(DetailsOfThisTransferPage, detailsOfThisTransfer).success.value
       val updatedAnswers = answers.set(ConnectedPersonsPage,true).success.value
 
-      val application = applicationBuilder(userAnswers = Some(updatedAnswers))
-        .overrides(bind[Navigator].qualifiedWith("individuals").toInstance(getNavigator))
+      val application = applicationBuilder(userAnswers = Some(updatedAnswers),affinityGroup = orgAffinity)
+        .overrides(bind[Navigator].qualifiedWith("organisations").toInstance(getNavigator))
         .build()
 
       running(application) {
@@ -96,7 +96,7 @@ class DetailsOfThisTransferControllerSpec extends SpecBase with MockitoSugar {
 
 
       val application =
-        applicationBuilder(userAnswers = Some(updatedAnswers))
+        applicationBuilder(userAnswers = Some(updatedAnswers),affinityGroup = orgAffinity)
           .build()
 
       running(application) {
@@ -121,8 +121,8 @@ class DetailsOfThisTransferControllerSpec extends SpecBase with MockitoSugar {
 
       val updatedAnswers = emptyUserAnswers.set(ConnectedPersonsPage, true).success.value
 
-      val application = applicationBuilder(userAnswers = Some(updatedAnswers))
-        .overrides(bind[Navigator].qualifiedWith("individuals").toInstance(getNavigator))
+      val application = applicationBuilder(userAnswers = Some(updatedAnswers),affinityGroup = orgAffinity)
+        .overrides(bind[Navigator].qualifiedWith("organisations").toInstance(getNavigator))
         .build()
 
       running(application) {
@@ -143,7 +143,7 @@ class DetailsOfThisTransferControllerSpec extends SpecBase with MockitoSugar {
 
     "must redirect to Journey Recovery for a GET if no existing data is found" in {
 
-      val application = applicationBuilder(userAnswers = None).build()
+      val application = applicationBuilder(userAnswers = None,affinityGroup = orgAffinity).build()
 
       running(application) {
         val request = FakeRequest(GET, detailsOfThisTransferRoute)
@@ -157,7 +157,7 @@ class DetailsOfThisTransferControllerSpec extends SpecBase with MockitoSugar {
 
     "must redirect to Journey Recovery for a POST if no existing data is found" in {
 
-      val application = applicationBuilder(userAnswers = None).build()
+      val application = applicationBuilder(userAnswers = None,affinityGroup = orgAffinity).build()
 
       running(application) {
         val request =

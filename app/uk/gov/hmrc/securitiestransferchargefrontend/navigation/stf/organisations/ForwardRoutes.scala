@@ -66,5 +66,6 @@ class ForwardRoutes(answerPersistenceService: AnswerPersistenceService,
         if (isConnected) orgRoutes.TotalMarketValueController.onPageLoad(NormalMode)
         else routes.CheckYourAnswersController.onPageLoad()
       }
+    case DetailsOfThisTransferPage => userAnswers => dataRequired(DetailsOfThisTransferPage, userAnswers, routes.CheckYourAnswersController.onPageLoad())
     case _ => _ => Future.successful(defaultPage)
   }
