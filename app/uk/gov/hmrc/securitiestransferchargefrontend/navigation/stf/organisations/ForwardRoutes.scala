@@ -34,6 +34,7 @@ class ForwardRoutes(answerPersistenceService: AnswerPersistenceService,
                    (implicit ec: ExecutionContext):
 
   val helper = new PersistentNavigationHelper(answerPersistenceService, defaultPage, errorPages)
+
   import helper.*
 
   def forwardRoutes(page: Page)(implicit hc: HeaderCarrier): UserAnswers => Future[Call] = page match {
@@ -57,10 +58,8 @@ class ForwardRoutes(answerPersistenceService: AnswerPersistenceService,
       }
     case WhatReliefAreYouApplyingForPage => userAnswers => dataRequired(WhatReliefAreYouApplyingForPage, userAnswers, routes.SubmissionsDashboardController.onPageLoad())
     case SecuritiesTargetPage => userAnswers => dataRequired(SecuritiesTargetPage, userAnswers, routes.JourneyRecoveryController.onPageLoad())
-    case TaxRatePage  => userAnswers => dataRequired(TaxRatePage, userAnswers,  orgRoutes.WhatTypeOfSecuritiesController.onPageLoad(NormalMode))
+    case TaxRatePage => userAnswers => dataRequired(TaxRatePage, userAnswers, orgRoutes.WhatTypeOfSecuritiesController.onPageLoad(NormalMode))
     case WhatTypeOfSecuritiesPage => userAnswers => dataRequired(SecuritiesTargetPage, userAnswers, routes.JourneyRecoveryController.onPageLoad())
-    case OtherSecuritiesTypePage => userAnswers => dataRequired(OtherSecuritiesTypePage, userAnswers, routes.JourneyRecoveryController.onPageLoad())
-    case TaxRatePage  => userAnswers => dataRequired(TaxRatePage, userAnswers,  routes.JourneyRecoveryController.onPageLoad())
     case OtherSecuritiesTypePage => userAnswers => dataRequired(OtherSecuritiesTypePage, userAnswers, orgRoutes.AmountPaidForSecuritiesController.onPageLoad(NormalMode))
     case AmountPaidForSecuritiesPage => userAnswers =>
       userAnswersDependent(userAnswers) {
