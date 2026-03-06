@@ -34,11 +34,11 @@ object ChargingPointSummary  {
         implicit val lang: Lang = messages.lang
 
         SummaryListRowViewModel(
-          key     = "chargingPoint.checkYourAnswersLabel",
+          key     = "org.chargingPoint.checkYourAnswersLabel",
           value   = ValueViewModel(answer.format(dateTimeFormat())),
           actions = Seq(
             ActionItemViewModel("site.change", routes.ChargingPointController.onPageLoad(CheckMode).url)
-              .withVisuallyHiddenText(messages("chargingPoint.change.hidden"))
+              .withVisuallyHiddenText(messages("org.chargingPoint.change.hidden"))
           )
         )
     }
