@@ -43,10 +43,10 @@ class WhatReliefAreYouApplyingForViewSpec extends ViewBaseSpec {
   )
 
   object ExpectedContent {
-    val title: String = messages("orgs.whatReliefAreYouApplyingFor.title")
+    val title: String = messages("org.whatReliefAreYouApplyingFor.title")
     val caption: String = messages("transfer.details.caption")
-    val heading: String = messages("orgs.whatReliefAreYouApplyingFor.heading")
-    val paragraph: String = messages("orgs.whatReliefAreYouApplyingFor.p")
+    val heading: String = messages("org.whatReliefAreYouApplyingFor.heading")
+    val paragraph: String = messages("org.whatReliefAreYouApplyingFor.p")
     val saveAndContinue: String = messages("site.save-and-continue.button")
     val saveAndReturn: String = messages("site.save-and-return.button")
   }

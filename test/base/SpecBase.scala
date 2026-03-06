@@ -61,7 +61,7 @@ trait SpecBase
   val submissionId: SubmissionId = SubmissionId("STC-123456789")
   val userId = "internalId"
   val affinityGroupKeyInd = "individual"
-  val affinityGroupKeyOrg = "orgs"
+  val affinityGroupKeyOrg = "org"
 
   val subscription: Subscription = Subscription(
     subsValidTo = LocalDate.now().plusDays(5),

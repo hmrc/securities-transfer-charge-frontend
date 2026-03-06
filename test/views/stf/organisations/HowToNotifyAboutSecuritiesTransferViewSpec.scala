@@ -40,13 +40,13 @@ class HowToNotifyAboutSecuritiesTransferViewSpec extends ViewBaseSpec {
   )
 
   object ExpectedContent {
-    val title: String = messages("orgs.howToNotifyAboutSecuritiesTransfer.title")
+    val title: String = messages("org.howToNotifyAboutSecuritiesTransfer.title")
     val caption: String = messages("transfer.details.caption")
-    val heading: String = messages("orgs.howToNotifyAboutSecuritiesTransfer.heading")
-    val oneAtATimeRadio: String = messages("orgs.howToNotifyAboutSecuritiesTransfer.oneAtATime")
-    val oneAtATimeHint: String = messages("orgs.howToNotifyAboutSecuritiesTransfer.oneAtATime.hint")
-    val moreThanOneAtATimeRadio: String = messages("orgs.howToNotifyAboutSecuritiesTransfer.moreThanOneAtATime")
-    val moreThanOneAtATimeHint: String = messages("orgs.howToNotifyAboutSecuritiesTransfer.moreThanOneAtATime.hint")
+    val heading: String = messages("org.howToNotifyAboutSecuritiesTransfer.heading")
+    val oneAtATimeRadio: String = messages("org.howToNotifyAboutSecuritiesTransfer.oneAtATime")
+    val oneAtATimeHint: String = messages("org.howToNotifyAboutSecuritiesTransfer.oneAtATime.hint")
+    val moreThanOneAtATimeRadio: String = messages("org.howToNotifyAboutSecuritiesTransfer.moreThanOneAtATime")
+    val moreThanOneAtATimeHint: String = messages("org.howToNotifyAboutSecuritiesTransfer.moreThanOneAtATime.hint")
     val saveAndContinue: String = messages("site.save-and-continue.button")
     val saveAndReturn: String = messages("site.save-and-return.button")
 
