@@ -285,6 +285,18 @@ org.securitiesTarget.error.crn.length = Company Reference Number must be 8 chara
 org.securitiesTarget.businessName.change.hidden = Change which business the securities are being bought in
 org.securitiesTarget.crn.change.hidden = CRN
 
+org.amountPaidForSecurities.title = How much did the business pay for these securities?
+org.amountPaidForSecurities.heading = How much did the business pay for these securities?
+org.amountPaidForSecurities.checkYourAnswersLabel = How much did the business pay for these securities?
+org.amountPaidForSecurities.p1 = Enter the total amount of consideration given in exchange for these securities as a cash amount.
+org.amountPaidForSecurities.p2 = You do not need to provide details about conversion or exchange rates, or how valuations of non-monetary items were reached.
+org.amountPaidForSecurities.hint = For example, £600 or £193.54
+org.amountPaidForSecurities.error.nonNumeric = The amount paid for the securities must be a number
+org.amountPaidForSecurities.error.required = Enter the amount the business paid for the securities
+org.amountPaidForSecurities.error.invalidNumeric = Enter the amount paid for the securities using up to two decimal places
+org.amountPaidForSecurities.error.aboveMaximum = The amount paid for the securities must be {0} or less
+org.amountPaidForSecurities.change.hidden = Change the amount the business paid for the securities
+
 org.otherSecuritiesType.title = What type of securities is the business buying?
 org.otherSecuritiesType.heading = What type of securities is the business buying?
 org.otherSecuritiesType.checkYourAnswersLabel = What type of securities is the business buying?
