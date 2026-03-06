@@ -29,9 +29,9 @@
     saveAndReturnButton:SaveAndReturnButton
 )
 
-@(form: Form[_], mode: Mode)(implicit request: Request[_], messages: Messages)
+@(form: Form[_], mode: Mode, backLinkCall: Call)(implicit request: Request[_], messages: Messages)
 
-@layout(pageTitle = title(form, messages("org.totalMarketValue.title"))) {
+@layout(pageTitle = title(form, messages("org.totalMarketValue.title")), backLinkUrl = Some(backLinkCall.url)) {
 
     @formHelper(action = routes.TotalMarketValueController.onSubmit(mode), Symbol("autoComplete") -> "off") {
 

@@ -16,19 +16,17 @@
 
 package navigation
 
-import base.SpecBase
+import base.{Fixtures, SpecBase}
 import base.stubs.StubAnswerPersistenceService
+import org.mockito.Mockito.when
 import org.scalatest.concurrent.ScalaFutures
+import org.scalatestplus.mockito.MockitoSugar.mock
+import uk.gov.hmrc.securitiestransferchargefrontend.config.FrontendAppConfig
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.routes
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.individuals.routes as individualRoutes
 import uk.gov.hmrc.securitiestransferchargefrontend.models.*
-import uk.gov.hmrc.securitiestransferchargefrontend.pages.*
-import base.Fixtures
-import uk.gov.hmrc.securitiestransferchargefrontend.config.FrontendAppConfig
-import org.scalatestplus.mockito.MockitoSugar.mock
-import org.mockito.Mockito.when
-import uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.organisations
 import uk.gov.hmrc.securitiestransferchargefrontend.navigation.stf.individuals.StfNavigator
+import uk.gov.hmrc.securitiestransferchargefrontend.pages.*
 
 import java.time.LocalDate
 
@@ -228,7 +226,7 @@ class StfNavigatorSpec extends SpecBase with ScalaFutures {
       }
 
       "must go from the TotalMarketValuePage to AmountPaidForSecurities" in {
-        val result = navigator.previousPage(pages.TotalMarketValuePage, NormalMode, emptyUserAnswers)
+        val result = navigator.previousPage(TotalMarketValuePage, NormalMode, emptyUserAnswers)
         result mustBe individualRoutes.AmountPaidForSecuritiesController.onPageLoad(NormalMode)
       }
 

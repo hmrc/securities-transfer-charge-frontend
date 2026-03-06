@@ -1,19 +1,37 @@
-package controllers
+/*
+ * Copyright 2026 HM Revenue & Customs
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+package controllers.stf.organisations
 
 import base.SpecBase
-import uk.gov.hmrc.securitiestransferchargefrontend.models.{NormalMode, UserAnswers}
-import uk.gov.hmrc.securitiestransferchargefrontend.navigation.{FakeNavigator, Navigator}
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.when
 import org.scalatestplus.mockito.MockitoSugar
-import pages.TotalMarketValuePage
-import play.api.inject.bind
 import play.api.mvc.Call
 import play.api.test.FakeRequest
-import play.api.test.Helpers._
+import play.api.test.Helpers.*
+import uk.gov.hmrc.securitiestransferchargefrontend.controllers.routes
+import uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.organisations.routes as orgRoutes
 import uk.gov.hmrc.securitiestransferchargefrontend.forms.stf.organisations.TotalMarketValueFormProvider
+import uk.gov.hmrc.securitiestransferchargefrontend.models.NormalMode
+import uk.gov.hmrc.securitiestransferchargefrontend.navigation.Navigator
+import uk.gov.hmrc.securitiestransferchargefrontend.pages.TotalMarketValuePage
 import uk.gov.hmrc.securitiestransferchargefrontend.repositories.SessionRepository
-import uk.gov.hmrc.securitiestransferchargefrontend.views.html.TotalMarketValueView
+import uk.gov.hmrc.securitiestransferchargefrontend.views.html.stf.organisations.TotalMarketValueView
+import play.api.inject.bind
 
 import scala.concurrent.Future
 
@@ -23,16 +41,19 @@ class TotalMarketValueControllerSpec extends SpecBase with MockitoSugar {
   val form = formProvider()
 
   def onwardRoute = Call("GET", "/foo")
+  lazy val totalMarketValuePageRoute: String = orgRoutes.TotalMarketValueController.onPageLoad(NormalMode).url
 
   val validAnswer = 0
 
-  lazy val totalMarketValueRoute = routes.TotalMarketValueController.onPageLoad(NormalMode).url
+  lazy val totalMarketValueRoute = orgRoutes.TotalMarketValueController.onPageLoad(NormalMode).url
 
   "TotalMarketValue Controller" - {
 
     "must return OK and the correct view for a GET" in {
 
-      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers)).build()
+      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers))
+        .overrides(bind[Navigator].qualifiedWith("organisations").toInstance(getNavigator))
+        .build()
 
       running(application) {
         val request = FakeRequest(GET, totalMarketValueRoute)
@@ -42,15 +63,17 @@ class TotalMarketValueControllerSpec extends SpecBase with MockitoSugar {
         val view = application.injector.instanceOf[TotalMarketValueView]
 
         status(result) mustEqual OK
-        contentAsString(result) mustEqual view(form, NormalMode)(request, messages(application)).toString
+        contentAsString(result) mustEqual view(form, NormalMode, testBackLinkRoute)(request, messages(application)).toString
       }
     }
 
     "must populate the view correctly on a GET when the question has previously been answered" in {
 
-      val userAnswers = UserAnswers(userAnswersId).set(TotalMarketValuePage, validAnswer).success.value
+      val userAnswers = emptyUserAnswers.set(TotalMarketValuePage, validAnswer).success.value
 
-      val application = applicationBuilder(userAnswers = Some(userAnswers)).build()
+      val application = applicationBuilder(userAnswers = Some(userAnswers))
+        .overrides(bind[Navigator].qualifiedWith("organisations").toInstance(getNavigator))
+        .build()
 
       running(application) {
         val request = FakeRequest(GET, totalMarketValueRoute)
@@ -60,7 +83,7 @@ class TotalMarketValueControllerSpec extends SpecBase with MockitoSugar {
         val result = route(application, request).value
 
         status(result) mustEqual OK
-        contentAsString(result) mustEqual view(form.fill(validAnswer), NormalMode)(request, messages(application)).toString
+        contentAsString(result) mustEqual view(form.fill(validAnswer), NormalMode, testBackLinkRoute)(request, messages(application)).toString
       }
     }
 
@@ -68,32 +91,32 @@ class TotalMarketValueControllerSpec extends SpecBase with MockitoSugar {
 
       val mockSessionRepository = mock[SessionRepository]
 
-      when(mockSessionRepository.set(any())) thenReturn Future.successful(true)
+      when(mockSessionRepository.set(any())) thenReturn Future.successful(())
 
       val application =
-        applicationBuilder(userAnswers = Some(emptyUserAnswers))
-          .overrides(
-            bind[Navigator].toInstance(new FakeNavigator(onwardRoute)),
-            bind[SessionRepository].toInstance(mockSessionRepository)
-          )
+        applicationBuilder(userAnswers = Some(emptyUserAnswers), sessionRepository = mockSessionRepository)
+          .overrides(bind[Navigator].qualifiedWith("organisations").toInstance(getNavigator))
           .build()
 
       running(application) {
         val request =
-          FakeRequest(POST, totalMarketValueRoute)
+          FakeRequest(POST, totalMarketValuePageRoute)
             .withFormUrlEncodedBody(("value", validAnswer.toString))
 
         val result = route(application, request).value
 
         status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual onwardRoute.url
+        redirectLocation(result).value mustEqual testNextPage.url
       }
     }
 
     "must return a Bad Request and errors when invalid data is submitted" in {
 
-      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers)).build()
-
+      val application =
+        applicationBuilder(userAnswers = Some(emptyUserAnswers))
+          .overrides(bind[Navigator].qualifiedWith("organisations").toInstance(getNavigator))
+          .build()
+          
       running(application) {
         val request =
           FakeRequest(POST, totalMarketValueRoute)
@@ -106,7 +129,7 @@ class TotalMarketValueControllerSpec extends SpecBase with MockitoSugar {
         val result = route(application, request).value
 
         status(result) mustEqual BAD_REQUEST
-        contentAsString(result) mustEqual view(boundForm, NormalMode)(request, messages(application)).toString
+        contentAsString(result) mustEqual view(boundForm, NormalMode, testBackLinkRoute)(request, messages(application)).toString
       }
     }
 
