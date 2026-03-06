@@ -62,6 +62,7 @@ trait SpecBase
   val userId = "internalId"
   val affinityGroupKeyInd = "individual"
   val affinityGroupKeyOrg = "org"
+  val orgAffinity:AffinityGroup = AffinityGroup.Organisation
 
   val subscription: Subscription = Subscription(
     subsValidTo = LocalDate.now().plusDays(5),

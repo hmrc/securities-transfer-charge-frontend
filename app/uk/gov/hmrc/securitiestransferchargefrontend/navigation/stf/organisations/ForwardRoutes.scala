@@ -60,5 +60,16 @@ class ForwardRoutes(answerPersistenceService: AnswerPersistenceService,
     case TaxRatePage  => userAnswers => dataRequired(TaxRatePage, userAnswers,  orgRoutes.WhatTypeOfSecuritiesController.onPageLoad(NormalMode))
     case WhatTypeOfSecuritiesPage => userAnswers => dataRequired(SecuritiesTargetPage, userAnswers, routes.JourneyRecoveryController.onPageLoad())
     case OtherSecuritiesTypePage => userAnswers => dataRequired(OtherSecuritiesTypePage, userAnswers, routes.JourneyRecoveryController.onPageLoad())
+    case TaxRatePage  => userAnswers => dataRequired(TaxRatePage, userAnswers,  routes.JourneyRecoveryController.onPageLoad())
+    case OtherSecuritiesTypePage => userAnswers => dataRequired(OtherSecuritiesTypePage, userAnswers, orgRoutes.AmountPaidForSecuritiesController.onPageLoad(NormalMode))
+    case AmountPaidForSecuritiesPage => userAnswers =>
+      userAnswersDependent(userAnswers) {
+        userAnswers =>
+          userAnswers.get(ConnectedPersonsPage).fold(defaultPage) {
+            isConnected =>
+              if (isConnected) routes.JourneyRecoveryController.onPageLoad()
+              else routes.CheckYourAnswersController.onPageLoad()
+          }
+      }
     case _ => _ => Future.successful(defaultPage)
   }
