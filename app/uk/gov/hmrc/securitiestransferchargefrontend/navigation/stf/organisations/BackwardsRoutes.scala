@@ -39,12 +39,13 @@ class BackwardsRoutes(defaultPage: Call):
     case ApplyingForReliefPage  => _ => orgRoutes.ConnectedPersonsController.onPageLoad(NormalMode)
     case WhatReliefAreYouApplyingForPage => _ => orgRoutes.ApplyingForReliefController.onPageLoad(NormalMode)
     case SecuritiesTargetPage => userAnswers => dataDependent(ApplyingForReliefPage, userAnswers) {
-      case true => routes.SubmissionsDashboardController.onPageLoad()
+      case true => orgRoutes.WhatReliefAreYouApplyingForController.onPageLoad(NormalMode)
       case false => orgRoutes.ApplyingForReliefController.onPageLoad(NormalMode)
     }
     case ChargingPointPage => _ => orgRoutes.SecuritiesTargetController.onPageLoad(NormalMode)
     case TaxRatePage => _ => orgRoutes.ChargingPointController.onPageLoad(NormalMode)
-    case OtherSecuritiesTypePage => _ => routes.SubmissionsDashboardController.onPageLoad()
+    case OtherSecuritiesTypePage => _ => orgRoutes.WhatTypeOfSecuritiesController.onPageLoad(NormalMode)
+    case WhatTypeOfSecuritiesPage => _ => orgRoutes.TaxRateController.onPageLoad(NormalMode)
     case _ => _ => defaultPage
 
   }

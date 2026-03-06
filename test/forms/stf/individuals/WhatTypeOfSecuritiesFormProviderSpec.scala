@@ -28,7 +28,7 @@ class WhatTypeOfSecuritiesFormProviderSpec extends OptionFieldBehaviours {
   ".value" - {
 
     val fieldName = "value"
-    val requiredKey = "whatTypeOfSecurities.error.required"
+    val requiredKey = "individual.whatTypeOfSecurities.error.required"
 
     behave like optionsField[WhatTypeOfSecurities](
       form,

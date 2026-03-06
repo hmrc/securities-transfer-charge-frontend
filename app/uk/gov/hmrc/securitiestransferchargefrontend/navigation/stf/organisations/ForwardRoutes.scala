@@ -60,12 +60,13 @@ class ForwardRoutes(answerPersistenceService: AnswerPersistenceService,
         case false => orgRoutes.SecuritiesTargetController.onPageLoad(NormalMode)
       }
     case WhatReliefAreYouApplyingForPage => userAnswers => dataRequired(WhatReliefAreYouApplyingForPage, userAnswers, routes.SubmissionsDashboardController.onPageLoad())
-    case SecuritiesTargetPage => userAnswers => dataRequired(SecuritiesTargetPage, userAnswers, orgRoutes.ChargingPointController.onPageLoad(NormalMode))
+    case SecuritiesTargetPage => userAnswers => dataRequired(SecuritiesTargetPage, userAnswers, routes.JourneyRecoveryController.onPageLoad())
     case ChargingPointPage => userAnswers => dataDependent(ChargingPointPage, userAnswers) {enterDate =>
       if (enterDate.isBefore(firstDate)) routes.JourneyRecoveryController.onPageLoad()
       else orgRoutes.TaxRateController.onPageLoad(NormalMode)
     }
-    case TaxRatePage  => userAnswers => dataRequired(TaxRatePage, userAnswers,  routes.JourneyRecoveryController.onPageLoad())
+    case TaxRatePage  => userAnswers => dataRequired(TaxRatePage, userAnswers,  orgRoutes.WhatTypeOfSecuritiesController.onPageLoad(NormalMode))
+    case WhatTypeOfSecuritiesPage => userAnswers => dataRequired(SecuritiesTargetPage, userAnswers, routes.JourneyRecoveryController.onPageLoad())
     case OtherSecuritiesTypePage => userAnswers => dataRequired(OtherSecuritiesTypePage, userAnswers, routes.JourneyRecoveryController.onPageLoad())
     case _ => _ => Future.successful(defaultPage)
   }
