@@ -98,21 +98,22 @@ class ChargingPointControllerSpec extends SpecBase with MockitoSugar {
         contentAsString(result) mustEqual view(form.fill(validAnswer), NormalMode, testBackLinkRoute)(getRequest(), messages(application)).toString
       }
     }
-    
+
     "must redirect to the next page when valid data is submitted" in {
+
       val mockSessionRepository = mock[SessionRepository]
 
       when(mockSessionRepository.set(any())) thenReturn Future.successful(true)
 
-      val application =
-        applicationBuilder(userAnswers = Some(emptyUserAnswers))
-          .build()
+      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers))
+        .overrides(bind[Navigator].qualifiedWith("individuals").toInstance(getNavigator))
+        .build()
 
       running(application) {
         val result = route(application, postRequest()).value
 
         status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual individualRoutes.TaxRateController.onPageLoad(NormalMode).url
+        redirectLocation(result).value mustEqual testNextPage.url
       }
     }
 
