@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package views.stf.individuals
+package views.stf.organisations
 
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
@@ -22,7 +22,7 @@ import play.api.Application
 import play.api.mvc.Call
 import uk.gov.hmrc.securitiestransferchargefrontend.forms.stf.shared.DetailsOfThisTransferFormProvider
 import uk.gov.hmrc.securitiestransferchargefrontend.models.NormalMode
-import uk.gov.hmrc.securitiestransferchargefrontend.views.html.stf.individuals.DetailsOfThisTransferView
+import uk.gov.hmrc.securitiestransferchargefrontend.views.html.stf.organisations.DetailsOfThisTransferView
 import views.ViewBaseSpec
 
 

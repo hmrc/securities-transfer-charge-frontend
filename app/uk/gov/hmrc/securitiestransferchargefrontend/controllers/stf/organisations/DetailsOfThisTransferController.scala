@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.individuals
+package uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.organisations
 
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, Call, MessagesControllerComponents}
@@ -27,14 +27,14 @@ import uk.gov.hmrc.securitiestransferchargefrontend.models.{DetailsOfThisTransfe
 import uk.gov.hmrc.securitiestransferchargefrontend.navigation.Navigator
 import uk.gov.hmrc.securitiestransferchargefrontend.pages.DetailsOfThisTransferPage
 import uk.gov.hmrc.securitiestransferchargefrontend.utils.CommonHelpers.requireMarketValue
-import uk.gov.hmrc.securitiestransferchargefrontend.views.html.stf.individuals.DetailsOfThisTransferView
+import uk.gov.hmrc.securitiestransferchargefrontend.views.html.stf.organisations.DetailsOfThisTransferView
 
 import javax.inject.{Inject, Named}
 import scala.concurrent.{ExecutionContext, Future}
 
 class DetailsOfThisTransferController @Inject()(
                                                  override val messagesApi: MessagesApi,
-                                                 @Named("individuals") navigator: Navigator,
+                                                 @Named("organisations") navigator: Navigator,
                                                  stcAuthEnrolled: StcAuthEnrolledAction,
                                                  getData: StcDataRetrievalAction,
                                                  requireData: StcDataRequiredAction,

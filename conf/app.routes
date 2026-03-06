@@ -161,3 +161,9 @@ GET        /stf/org/consideration                           uk.gov.hmrc.securiti
 POST       /stf/org/consideration                           uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.organisations.AmountPaidForSecuritiesController.onSubmit(mode: Mode = NormalMode)
 GET        /stf/org/change/consideration                    uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.organisations.AmountPaidForSecuritiesController.onPageLoad(mode: Mode = CheckMode)
 POST       /stf/org/change/consideration                    uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.organisations.AmountPaidForSecuritiesController.onSubmit(mode: Mode = CheckMode)
+
+GET        /stf/org/share-details                             uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.organisations.DetailsOfThisTransferController.onPageLoad(mode: Mode = NormalMode)
+POST       /stf/org/share-details                             uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.organisations.DetailsOfThisTransferController.onSubmit(mode: Mode = NormalMode)
+GET        /stf/org/change/share-details                      uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.organisations.DetailsOfThisTransferController.onPageLoad(mode: Mode = CheckMode)
+POST       /stf/org/change/share-details                      uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.organisations.DetailsOfThisTransferController.onSubmit(mode: Mode = CheckMode)
+
