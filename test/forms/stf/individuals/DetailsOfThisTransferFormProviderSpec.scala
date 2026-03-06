@@ -18,7 +18,7 @@ package forms.stf.individuals
 
 import forms.behaviours.{CurrencyFieldBehaviours, StringFieldBehaviours}
 import play.api.data.FormError
-import uk.gov.hmrc.securitiestransferchargefrontend.forms.stf.individuals.DetailsOfThisTransferFormProvider
+import uk.gov.hmrc.securitiestransferchargefrontend.forms.stf.shared.DetailsOfThisTransferFormProvider
 
 class DetailsOfThisTransferFormProviderSpec extends StringFieldBehaviours with CurrencyFieldBehaviours {
 

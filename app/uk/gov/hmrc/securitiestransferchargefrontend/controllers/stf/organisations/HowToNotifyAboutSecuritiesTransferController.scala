@@ -26,6 +26,7 @@ import uk.gov.hmrc.securitiestransferchargefrontend.models.{HowToNotifyAboutSecu
 import uk.gov.hmrc.securitiestransferchargefrontend.navigation.Navigator
 import uk.gov.hmrc.securitiestransferchargefrontend.pages.HowToNotifyAboutSecuritiesTransferPage
 import uk.gov.hmrc.securitiestransferchargefrontend.views.html.stf.organisations.HowToNotifyAboutSecuritiesTransferView
+import uk.gov.hmrc.securitiestransferchargefrontend.controllers.SaveAndReturnButton.isReturn
 
 import javax.inject.{Inject, Named}
 import scala.concurrent.{ExecutionContext, Future}
@@ -71,7 +72,7 @@ class HowToNotifyAboutSecuritiesTransferController @Inject()(
         howToNotify =>
           for {
             updatedAnswers <- Future.fromTry(request.userAnswers.set(HowToNotifyAboutSecuritiesTransferPage, howToNotify))
-            nextPage       <- orgNavigator.nextPage(HowToNotifyAboutSecuritiesTransferPage, mode, updatedAnswers)
+            nextPage       <- orgNavigator.nextPage(HowToNotifyAboutSecuritiesTransferPage, mode, updatedAnswers, isReturn(request))
           } yield Redirect(nextPage)
       )
   }
