@@ -70,5 +70,6 @@ class ForwardRoutes(answerPersistenceService: AnswerPersistenceService,
               else routes.CheckYourAnswersController.onPageLoad()
           }
       }
+    case DetailsOfThisTransferPage => userAnswers => dataRequired(DetailsOfThisTransferPage, userAnswers, routes.CheckYourAnswersController.onPageLoad())
     case _ => _ => Future.successful(defaultPage)
   }
