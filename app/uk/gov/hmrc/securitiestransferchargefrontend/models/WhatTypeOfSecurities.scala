@@ -31,10 +31,10 @@ object WhatTypeOfSecurities extends Enumerable.Implicits {
     Shares, Other
   )
 
-  def options(implicit messages: Messages): Seq[RadioItem] = values.zipWithIndex.map {
+  def options(affinityGroupKey: String)(implicit messages: Messages): Seq[RadioItem] = values.zipWithIndex.map {
     case (value, index) =>
       RadioItem(
-        content = Text(messages(s"whatTypeOfSecurities.${value.toString}")),
+        content = Text(messages(s"$affinityGroupKey.whatTypeOfSecurities.${value.toString}")),
         value   = Some(value.toString),
         id      = Some(s"value_$index")
       )

@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package controllers.stf.individuals
+package controllers.stf.organisations
 
 import base.SpecBase
 import org.mockito.ArgumentMatchers.any
@@ -24,22 +24,23 @@ import play.api.data.Form
 import play.api.inject.bind
 import play.api.test.FakeRequest
 import play.api.test.Helpers.*
+import uk.gov.hmrc.auth.core.AffinityGroup
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.securitiestransferchargefrontend.clients.SaveAndReturnClient
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.routes
-import uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.individuals.routes as individualRoutes
-import uk.gov.hmrc.securitiestransferchargefrontend.forms.stf.individuals.WhatTypeOfSecuritiesFormProvider
+import uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.organisations.routes as orgRoutes
+import uk.gov.hmrc.securitiestransferchargefrontend.forms.stf.organisations.WhatTypeOfSecuritiesFormProvider
 import uk.gov.hmrc.securitiestransferchargefrontend.models.{NormalMode, UserAnswers, WhatTypeOfSecurities}
 import uk.gov.hmrc.securitiestransferchargefrontend.navigation.Navigator
 import uk.gov.hmrc.securitiestransferchargefrontend.pages.WhatTypeOfSecuritiesPage
-import uk.gov.hmrc.securitiestransferchargefrontend.views.html.stf.individuals.WhatTypeOfSecuritiesView
+import uk.gov.hmrc.securitiestransferchargefrontend.views.html.stf.organisations.WhatTypeOfSecuritiesView
 
 import scala.concurrent.Future
 
 class WhatTypeOfSecuritiesControllerSpec extends SpecBase with MockitoSugar {
 
 
-  lazy val whatTypeOfSecuritiesRoute: String = individualRoutes.WhatTypeOfSecuritiesController.onPageLoad(NormalMode).url
+  lazy val whatTypeOfSecuritiesRoute: String = orgRoutes.WhatTypeOfSecuritiesController.onPageLoad(NormalMode).url
 
   val formProvider = new WhatTypeOfSecuritiesFormProvider()
   val form: Form[WhatTypeOfSecurities] = formProvider()
@@ -48,8 +49,11 @@ class WhatTypeOfSecuritiesControllerSpec extends SpecBase with MockitoSugar {
 
     "must return OK and the correct view for a GET" in {
 
-      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers))
-        .overrides(bind[Navigator].qualifiedWith("individuals").toInstance(getNavigator))
+      val application = applicationBuilder(
+        userAnswers = Some(emptyUserAnswers),
+        affinityGroup = AffinityGroup.Organisation
+      )
+        .overrides(bind[Navigator].qualifiedWith("organisations").toInstance(getNavigator))
         .build()
 
       running(application) {
@@ -60,7 +64,7 @@ class WhatTypeOfSecuritiesControllerSpec extends SpecBase with MockitoSugar {
         val view = application.injector.instanceOf[WhatTypeOfSecuritiesView]
 
         status(result) mustEqual OK
-        contentAsString(result) mustEqual view(form, NormalMode, affinityGroupKeyInd, testBackLinkRoute)(request, messages(application)).toString
+        contentAsString(result) mustEqual view(form, NormalMode, affinityGroupKeyOrg, testBackLinkRoute)(request, messages(application)).toString
       }
     }
 
@@ -68,8 +72,11 @@ class WhatTypeOfSecuritiesControllerSpec extends SpecBase with MockitoSugar {
 
       val userAnswers = UserAnswers(userAnswersId,submissionId).set(WhatTypeOfSecuritiesPage, WhatTypeOfSecurities.values.head).success.value
 
-      val application = applicationBuilder(userAnswers = Some(userAnswers))
-        .overrides(bind[Navigator].qualifiedWith("individuals").toInstance(getNavigator))
+      val application = applicationBuilder(
+        userAnswers = Some(userAnswers),
+        affinityGroup = AffinityGroup.Organisation
+      )
+        .overrides(bind[Navigator].qualifiedWith("organisations").toInstance(getNavigator))
         .build()
 
       running(application) {
@@ -80,7 +87,7 @@ class WhatTypeOfSecuritiesControllerSpec extends SpecBase with MockitoSugar {
         val result = route(application, request).value
 
         status(result) mustEqual OK
-        contentAsString(result) mustEqual view(form.fill(WhatTypeOfSecurities.values.head), NormalMode, affinityGroupKeyInd, testBackLinkRoute)(request, messages(application)).toString
+        contentAsString(result) mustEqual view(form.fill(WhatTypeOfSecurities.values.head), NormalMode, affinityGroupKeyOrg, testBackLinkRoute)(request, messages(application)).toString
       }
     }
 
@@ -92,7 +99,10 @@ class WhatTypeOfSecuritiesControllerSpec extends SpecBase with MockitoSugar {
         .thenReturn(Future.successful(()))
 
       val application =
-        applicationBuilder(userAnswers = Some(emptyUserAnswers))
+        applicationBuilder(
+          userAnswers = Some(emptyUserAnswers),
+          affinityGroup = AffinityGroup.Organisation
+        )
           .build()
 
       running(application) {
@@ -103,14 +113,17 @@ class WhatTypeOfSecuritiesControllerSpec extends SpecBase with MockitoSugar {
         val result = route(application, request).value
 
         status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual individualRoutes.DetailsOfThisTransferController.onPageLoad(NormalMode).url
+        redirectLocation(result).value mustEqual routes.JourneyRecoveryController.onPageLoad().url
       }
     }
 
     "must return a Bad Request and errors when invalid data is submitted" in {
 
-      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers))
-        .overrides(bind[Navigator].qualifiedWith("individuals").toInstance(getNavigator))
+      val application = applicationBuilder(
+        userAnswers = Some(emptyUserAnswers),
+        affinityGroup = AffinityGroup.Organisation
+      )
+        .overrides(bind[Navigator].qualifiedWith("organisations").toInstance(getNavigator))
         .build()
 
       running(application) {
@@ -125,13 +138,16 @@ class WhatTypeOfSecuritiesControllerSpec extends SpecBase with MockitoSugar {
         val result = route(application, request).value
 
         status(result) mustEqual BAD_REQUEST
-        contentAsString(result) mustEqual view(boundForm, NormalMode, affinityGroupKeyInd, testBackLinkRoute)(request, messages(application)).toString
+        contentAsString(result) mustEqual view(boundForm, NormalMode, affinityGroupKeyOrg, testBackLinkRoute)(request, messages(application)).toString
       }
     }
 
     "must redirect to Journey Recovery for a GET if no existing data is found" in {
 
-      val application = applicationBuilder(userAnswers = None).build()
+      val application = applicationBuilder(
+        userAnswers = None,
+        affinityGroup = AffinityGroup.Organisation
+      ).build()
 
       running(application) {
         val request = FakeRequest(GET, whatTypeOfSecuritiesRoute)
@@ -145,7 +161,10 @@ class WhatTypeOfSecuritiesControllerSpec extends SpecBase with MockitoSugar {
 
     "redirect to Journey Recovery for a POST if no existing data is found" in {
 
-      val application = applicationBuilder(userAnswers = None).build()
+      val application = applicationBuilder(
+        userAnswers = None,
+        affinityGroup = AffinityGroup.Organisation
+      ).build()
 
       running(application) {
         val request =

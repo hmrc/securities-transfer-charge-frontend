@@ -16,7 +16,7 @@
 
 @import uk.gov.hmrc.securitiestransferchargefrontend.viewmodels.LegendSize.Large
 @import uk.gov.hmrc.securitiestransferchargefrontend.controllers.routes
-@import uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.individuals.routes as individualRoutes
+@import uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.organisations.routes as orgRoutes
 @import uk.gov.hmrc.securitiestransferchargefrontend.views.html.templates
 @import uk.gov.hmrc.securitiestransferchargefrontend.models.WhatTypeOfSecurities
 @import uk.gov.hmrc.securitiestransferchargefrontend.views.html.components.SaveAndReturnButton
@@ -33,9 +33,9 @@
 
 @(form: Form[_], mode: Mode, affinityGroupKey: String, backLinkCall: Call)(implicit request: Request[_], messages: Messages)
 
-@layout(pageTitle = title(form, messages("individual.whatTypeOfSecurities.title"),Some(messages("sectionTitle.transferDetails"))), backLinkUrl = Some(backLinkCall.url)) {
+@layout(pageTitle = title(form, messages("org.whatTypeOfSecurities.title"),Some(messages("sectionTitle.transferDetails"))), backLinkUrl = Some(backLinkCall.url)) {
 
-    @formHelper(action = individualRoutes.WhatTypeOfSecuritiesController.onSubmit(mode), Symbol("autoComplete") -> "off") {
+    @formHelper(action = orgRoutes.WhatTypeOfSecuritiesController.onSubmit(mode), Symbol("autoComplete") -> "off") {
 
         @if(form.errors.nonEmpty) {
             @govukErrorSummary(ErrorSummaryViewModel(form,  errorLinkOverrides = Map("value" -> "value_0")))
@@ -44,7 +44,7 @@
         @govukRadios(
             RadiosViewModel(
                 field  = form("value"),
-                legend = LegendViewModel(messages("individual.whatTypeOfSecurities.heading")).asPageHeading(Large),
+                legend = LegendViewModel(messages("org.whatTypeOfSecurities.heading")).asPageHeading(Large),
                 items  = WhatTypeOfSecurities.options(affinityGroupKey)
             )
         )
