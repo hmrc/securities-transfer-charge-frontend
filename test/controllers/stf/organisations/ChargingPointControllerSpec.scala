@@ -49,8 +49,8 @@ class ChargingPointControllerSpec extends SpecBase with MockitoSugar {
   val validAnswer: LocalDate = LocalDate.now(ZoneOffset.UTC)
 
   lazy val chargingPointRoute: String = orgRoutes.ChargingPointController.onPageLoad(NormalMode).url
-
   override val emptyUserAnswers = UserAnswers(userAnswersId, submissionId)
+
 
   def getRequest(): FakeRequest[AnyContentAsEmpty.type] =
     FakeRequest(GET, chargingPointRoute)
@@ -66,7 +66,6 @@ class ChargingPointControllerSpec extends SpecBase with MockitoSugar {
   "ChargingPoint Controller" - {
 
     "must return OK and the correct view for a GET" in {
-
       val application = applicationBuilder(userAnswers = Some(emptyUserAnswers))
         .overrides(bind[Navigator].qualifiedWith("organisations").toInstance(getNavigator))
         .build()
@@ -105,15 +104,15 @@ class ChargingPointControllerSpec extends SpecBase with MockitoSugar {
 
       when(mockSessionRepository.set(any())) thenReturn Future.successful(true)
 
-      val application =
-        applicationBuilder(userAnswers = Some(emptyUserAnswers))
-          .build()
+      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers))
+        .overrides(bind[Navigator].qualifiedWith("organisations").toInstance(getNavigator))
+        .build()
 
       running(application) {
         val result = route(application, postRequest()).value
 
         status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual orgRoutes.TaxRateController.onPageLoad(NormalMode).url
+        redirectLocation(result).value mustEqual testNextPage
       }
     }
 

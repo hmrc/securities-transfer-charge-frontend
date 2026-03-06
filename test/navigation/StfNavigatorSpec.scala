@@ -138,7 +138,7 @@ class StfNavigatorSpec extends SpecBase with ScalaFutures {
         }
       }
 
-      "must go from the ChargingPointPage to TaxRateController when the date entered is after 2026-01-01" in {
+      "must go from the ChargingPointPage to TaxRateController when the date entered is or after 2026-01-01" in {
         val answers = emptyUserAnswers.set(ChargingPointPage, LocalDate.now()).get
         val result = navigator.nextPage(ChargingPointPage, NormalMode, answers)(fakeRequest)
         whenReady(result) { res =>
