@@ -30,7 +30,7 @@
 
 @(form: Form[_], mode: Mode, backLinkCall: Call)(implicit request: Request[_], messages: Messages)
 
-@layout(pageTitle = title(form, messages("chargingPoint.org.title")), backLinkUrl = Some(backLinkCall.url)) {
+@layout(pageTitle = title(form, messages("org.chargingPoint.title")), backLinkUrl = Some(backLinkCall.url)) {
     <div id="caption-heading" class="govuk-caption-l">
         @messages("transfer.details.caption")
     </div>
@@ -46,9 +46,9 @@
         @govukDateInput(
             DateViewModel(
                     field  = form("value"),
-                    legend = LegendViewModel(messages("chargingPoint.org.heading")).asPageHeading(Large)
+                    legend = LegendViewModel(messages("org.chargingPoint.heading")).asPageHeading(Large)
                 )
-                .withHint(HintViewModel(messages("chargingPoint.org.hint")))
+                .withHint(HintViewModel(messages("org.chargingPoint.hint")))
             )
 
         @govukButton(

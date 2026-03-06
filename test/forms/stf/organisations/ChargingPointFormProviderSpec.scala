@@ -37,6 +37,6 @@ class ChargingPointFormProviderSpec extends DateBehaviours {
 
     behave like dateField(form, "value", validData)
 
-    behave like mandatoryDateField(form, "value", "chargingPoint.org.error.required.all")
+    behave like mandatoryDateField(form, "value", "org.chargingPoint.error.required.all")
   }
 }

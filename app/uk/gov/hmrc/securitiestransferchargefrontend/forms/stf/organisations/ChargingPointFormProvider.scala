@@ -28,12 +28,12 @@ class ChargingPointFormProvider @Inject() extends Mappings {
   def apply()(implicit messages: Messages): Form[LocalDate] =
     Form(
       "value" -> localDate(
-        invalidKey     = "chargingPoint.org.error.invalid",
-        allRequiredKey = "chargingPoint.org.error.required.all",
-        twoRequiredKey = "chargingPoint.org.error.required.two",
-        requiredKey    = "chargingPoint.org.error.required",
+        invalidKey     = "org.chargingPoint.error.invalid",
+        allRequiredKey = "org.chargingPoint.error.required.all",
+        twoRequiredKey = "org.chargingPoint.error.required.two",
+        requiredKey    = "org.chargingPoint.error.required",
       ).verifying(
-        maxDate(LocalDate.now(), "chargingPoint.org.error.futureDate")
+        maxDate(LocalDate.now(), "org.chargingPoint.error.futureDate")
       )
     )
 }
