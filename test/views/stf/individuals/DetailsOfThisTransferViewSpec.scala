@@ -86,7 +86,7 @@ class DetailsOfThisTransferViewSpec extends ViewBaseSpec {
         doc.select(".govuk-button--secondary").text() mustBe ExpectedContent.saveAndReturn
       }
     }
-    "when rendered without without marketValue" - {
+    "when rendered without marketValue" - {
       val doc = view(requireMarketValue = false)
 
       "must not render the market value input" in {
