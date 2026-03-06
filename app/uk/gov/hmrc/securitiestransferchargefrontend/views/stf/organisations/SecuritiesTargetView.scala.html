@@ -32,7 +32,7 @@
 
 @(form: Form[_], mode: Mode, backLinkCall: Call)(implicit request: Request[_], messages: Messages)
 
-@layout(pageTitle = title(form, messages("orgs.securitiesTarget.title")), backLinkUrl = Some(backLinkCall.url)) {
+@layout(pageTitle = title(form, messages("org.securitiesTarget.title")), backLinkUrl = Some(backLinkCall.url)) {
     <div id="caption-heading" class="govuk-caption-l">
         @messages("transfer.details.caption")
     </div>
@@ -43,12 +43,12 @@
             @govukErrorSummary(ErrorSummaryViewModel(form))
         }
 
-        <h1 class="govuk-heading-l">@messages("orgs.securitiesTarget.heading")</h1>
+        <h1 class="govuk-heading-l">@messages("org.securitiesTarget.heading")</h1>
 
         @govukInput(
             InputViewModel(
                 field = form("businessName"),
-                label = LabelViewModel(messages("orgs.securitiesTarget.businessName"))
+                label = LabelViewModel(messages("org.securitiesTarget.businessName"))
             )
             .withWidth(Full)
         )
@@ -56,12 +56,12 @@
         @govukInput(
             InputViewModel(
                 field = form("crn"),
-                label = LabelViewModel(messages("orgs.securitiesTarget.crn"))
+                label = LabelViewModel(messages("org.securitiesTarget.crn"))
             )
             .withWidth(OneThird)
             .withHint(
                 HintViewModel(
-                    content = HtmlContent(messages("orgs.securitiesTarget.crn.hint"))
+                    content = HtmlContent(messages("org.securitiesTarget.crn.hint"))
                 )
             )
         )

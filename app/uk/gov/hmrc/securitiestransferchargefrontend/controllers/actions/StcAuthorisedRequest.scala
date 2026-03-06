@@ -29,6 +29,6 @@ final case class StcAuthorisedRequest[A](
   lazy val affinityGroupKey: String =
     affinityGroup match {
       case AffinityGroup.Individual => "individual"
-      case AffinityGroup.Organisation => "orgs"
+      case AffinityGroup.Organisation => "org"
     }
 }

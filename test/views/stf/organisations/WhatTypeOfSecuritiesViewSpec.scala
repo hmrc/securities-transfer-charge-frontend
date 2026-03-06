@@ -41,13 +41,13 @@ class WhatTypeOfSecuritiesViewSpec extends ViewBaseSpec {
   )
 
   object ExpectedContent {
-    val title: String = messages("orgs.whatTypeOfSecurities.title")
+    val title: String = messages("org.whatTypeOfSecurities.title")
     val caption: String = messages("transfer.details.caption")
-    val heading: String = messages("orgs.whatTypeOfSecurities.heading")
+    val heading: String = messages("org.whatTypeOfSecurities.heading")
     val saveAndContinue: String = messages("site.save-and-continue.button")
     val saveAndReturn: String = messages("site.save-and-return.button")
-    val sharesRadio: String =  messages("orgs.whatTypeOfSecurities.shares")
-    val otherRadio: String =  messages("orgs.whatTypeOfSecurities.other")
+    val sharesRadio: String =  messages("org.whatTypeOfSecurities.shares")
+    val otherRadio: String =  messages("org.whatTypeOfSecurities.other")
   }
 
   "WhatTypeOfSecuritiesView" - {

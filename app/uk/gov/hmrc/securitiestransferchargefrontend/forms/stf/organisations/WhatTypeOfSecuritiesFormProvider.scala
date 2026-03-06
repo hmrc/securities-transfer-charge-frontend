@@ -26,6 +26,6 @@ class WhatTypeOfSecuritiesFormProvider @Inject() extends Mappings {
 
   def apply(): Form[WhatTypeOfSecurities] =
     Form(
-      "value" -> enumerable[WhatTypeOfSecurities]("orgs.whatTypeOfSecurities.error.required")
+      "value" -> enumerable[WhatTypeOfSecurities]("org.whatTypeOfSecurities.error.required")
     )
 }
