@@ -14,31 +14,32 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.individuals
+package uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.organisations
 
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, Call, MessagesControllerComponents}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.SaveAndReturnButton.isReturn
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.actions.*
-import uk.gov.hmrc.securitiestransferchargefrontend.forms.stf.individuals.TotalMarketValueFormProvider
+import uk.gov.hmrc.securitiestransferchargefrontend.forms.stf.organisations.TotalMarketValueFormProvider
 import uk.gov.hmrc.securitiestransferchargefrontend.models.{Mode, UserAnswers}
 import uk.gov.hmrc.securitiestransferchargefrontend.navigation.Navigator
 import uk.gov.hmrc.securitiestransferchargefrontend.pages.TotalMarketValuePage
-import uk.gov.hmrc.securitiestransferchargefrontend.views.html.stf.individuals.TotalMarketValueView
+import uk.gov.hmrc.securitiestransferchargefrontend.views.html.stf.organisations.TotalMarketValueView
 
 import javax.inject.{Inject, Named}
 import scala.concurrent.{ExecutionContext, Future}
 
-class TotalMarketValueController @Inject()( override val messagesApi: MessagesApi,
-                                            @Named("individuals") navigator: Navigator,
-                                            stcAuthEnrolled: StcAuthEnrolledAction,
-                                            getData: StcDataRetrievalAction,
-                                            requireData: StcDataRequiredAction,
-                                            formProvider: TotalMarketValueFormProvider,
-                                            val controllerComponents: MessagesControllerComponents,
-                                            view: TotalMarketValueView)
-                                          ( implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport:
+class TotalMarketValueController @Inject()(
+                                        override val messagesApi: MessagesApi,
+                                        @Named("organisations") navigator: Navigator,
+                                        stcAuthEnrolled: StcAuthEnrolledAction,
+                                        getData: StcDataRetrievalAction,
+                                        requireData: StcDataRequiredAction,
+                                        formProvider: TotalMarketValueFormProvider,
+                                        val controllerComponents: MessagesControllerComponents,
+                                        view: TotalMarketValueView
+                                      )(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport {
 
   private val form = formProvider()
 
@@ -49,8 +50,7 @@ class TotalMarketValueController @Inject()( override val messagesApi: MessagesAp
     implicit request =>
 
       val preparedForm = 
-        request.userAnswers.get(TotalMarketValuePage)
-          .fold(form)(value => form.fill(value))
+        request.userAnswers.get(TotalMarketValuePage).fold(form)(form.fill)
 
       Ok(view(preparedForm, mode, backLinkCall(mode)(request.userAnswers)))
   }
@@ -69,3 +69,4 @@ class TotalMarketValueController @Inject()( override val messagesApi: MessagesAp
           } yield Redirect(nextPage)
       )
   }
+}

@@ -299,3 +299,13 @@ org.whatTypeOfSecurities.other = Other
 org.whatTypeOfSecurities.checkYourAnswersLabel = What type of securities is the business buying?
 org.whatTypeOfSecurities.error.required = Enter the type of securities the business is buying
 org.whatTypeOfSecurities.change.hidden = Change what type of securities the business is buying
+
+org.totalMarketValue.title = What is the total market value of these securities?
+org.totalMarketValue.heading = What is the total market value of these securities?
+org.totalMarketValue.checkYourAnswersLabel = What is the total market value of these securities?
+org.totalMarketValue.error.nonNumeric = The market value of the securities must be a number
+org.totalMarketValue.error.required = Enter the total market value of the securities
+org.totalMarketValue.error.invalidNumeric = Enter the total market value using up to two decimal places
+org.totalMarketValue.error.aboveMaximum = The market value must be {0} or less
+org.totalMarketValue.error.belowMinimum = The market value must be {0} or more
+org.totalMarketValue.change.hidden = Change the market value of the securities

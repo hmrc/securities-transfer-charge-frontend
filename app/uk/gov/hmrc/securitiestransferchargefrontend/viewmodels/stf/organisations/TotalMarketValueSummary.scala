@@ -14,14 +14,14 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.securitiestransferchargefrontend.viewmodels.stf.individuals
+package uk.gov.hmrc.securitiestransferchargefrontend.viewmodels.stf.organisations
 
-import uk.gov.hmrc.securitiestransferchargefrontend.pages.TotalMarketValuePage
 import play.api.i18n.Messages
 import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.SummaryListRow
 import uk.gov.hmrc.securitiestransferchargefrontend.config.CurrencyFormatter.currencyFormat
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.individuals.routes
 import uk.gov.hmrc.securitiestransferchargefrontend.models.{CheckMode, UserAnswers}
+import uk.gov.hmrc.securitiestransferchargefrontend.pages.TotalMarketValuePage
 import uk.gov.hmrc.securitiestransferchargefrontend.viewmodels.govuk.summarylist.*
 import uk.gov.hmrc.securitiestransferchargefrontend.viewmodels.implicits.*
 
@@ -32,11 +32,11 @@ object TotalMarketValueSummary  {
       answer =>
 
         SummaryListRowViewModel(
-          key     = "totalMarketValue.checkYourAnswersLabel",
+          key     = "org.totalMarketValue.checkYourAnswersLabel",
           value   = ValueViewModel(currencyFormat(answer)),
           actions = Seq(
             ActionItemViewModel("site.change", routes.TotalMarketValueController.onPageLoad(CheckMode).url)
-              .withVisuallyHiddenText(messages("totalMarketValue.change.hidden"))
+              .withVisuallyHiddenText(messages("org.totalMarketValue.change.hidden"))
           )
         )
     }
