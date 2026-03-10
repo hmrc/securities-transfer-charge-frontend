@@ -157,15 +157,15 @@ POST       /stf/org/securities-type                       uk.gov.hmrc.securities
 GET        /stf/org/change/securities-type                uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.organisations.WhatTypeOfSecuritiesController.onPageLoad(mode: Mode = CheckMode)
 POST       /stf/org/change/securities-type                uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.organisations.WhatTypeOfSecuritiesController.onSubmit(mode: Mode = CheckMode)
 
-GET        /stf/org/consideration                           uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.organisations.AmountPaidForSecuritiesController.onPageLoad(mode: Mode = NormalMode)
-POST       /stf/org/consideration                           uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.organisations.AmountPaidForSecuritiesController.onSubmit(mode: Mode = NormalMode)
-GET        /stf/org/change/consideration                    uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.organisations.AmountPaidForSecuritiesController.onPageLoad(mode: Mode = CheckMode)
-POST       /stf/org/change/consideration                    uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.organisations.AmountPaidForSecuritiesController.onSubmit(mode: Mode = CheckMode)
+GET        /stf/org/consideration                         uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.organisations.AmountPaidForSecuritiesController.onPageLoad(mode: Mode = NormalMode)
+POST       /stf/org/consideration                         uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.organisations.AmountPaidForSecuritiesController.onSubmit(mode: Mode = NormalMode)
+GET        /stf/org/change/consideration                  uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.organisations.AmountPaidForSecuritiesController.onPageLoad(mode: Mode = CheckMode)
+POST       /stf/org/change/consideration                  uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.organisations.AmountPaidForSecuritiesController.onSubmit(mode: Mode = CheckMode)
 
-GET        /stf/org/share-details                             uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.organisations.DetailsOfThisTransferController.onPageLoad(mode: Mode = NormalMode)
-POST       /stf/org/share-details                             uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.organisations.DetailsOfThisTransferController.onSubmit(mode: Mode = NormalMode)
-GET        /stf/org/change/share-details                      uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.organisations.DetailsOfThisTransferController.onPageLoad(mode: Mode = CheckMode)
-POST       /stf/org/change/share-details                      uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.organisations.DetailsOfThisTransferController.onSubmit(mode: Mode = CheckMode)
+GET        /stf/org/share-details                         uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.organisations.DetailsOfThisTransferController.onPageLoad(mode: Mode = NormalMode)
+POST       /stf/org/share-details                         uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.organisations.DetailsOfThisTransferController.onSubmit(mode: Mode = NormalMode)
+GET        /stf/org/change/share-details                  uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.organisations.DetailsOfThisTransferController.onPageLoad(mode: Mode = CheckMode)
+POST       /stf/org/change/share-details                  uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.organisations.DetailsOfThisTransferController.onSubmit(mode: Mode = CheckMode)
 
 
 GET        /stf/org/total-market-value                    uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.organisations.TotalMarketValueController.onPageLoad(mode: Mode = NormalMode)
