@@ -17,27 +17,39 @@
 package uk.gov.hmrc.securitiestransferchargefrontend.viewmodels.stf.organisations
 
 import play.api.i18n.Messages
+import play.twirl.api.{Html, HtmlFormat}
+import uk.gov.hmrc.govukfrontend.views.viewmodels.content.HtmlContent
 import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.SummaryListRow
-import uk.gov.hmrc.securitiestransferchargefrontend.config.CurrencyFormatter.currencyFormat
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.organisations.routes
 import uk.gov.hmrc.securitiestransferchargefrontend.models.{CheckMode, UserAnswers}
-import uk.gov.hmrc.securitiestransferchargefrontend.pages.TotalMarketValuePage
+import uk.gov.hmrc.securitiestransferchargefrontend.pages.StfSellerAddressPage
 import uk.gov.hmrc.securitiestransferchargefrontend.viewmodels.govuk.summarylist.*
 import uk.gov.hmrc.securitiestransferchargefrontend.viewmodels.implicits.*
 
-object TotalMarketValueSummary  {
+object StfSellerAddressSummary {
 
   def row(answers: UserAnswers)(implicit messages: Messages): Option[SummaryListRow] =
-    answers.get(TotalMarketValuePage).map {
-      answer =>
+    answers.get(StfSellerAddressPage).map { answer =>
 
-        SummaryListRowViewModel(
-          key     = "org.totalMarketValue.checkYourAnswersLabel",
-          value   = ValueViewModel(currencyFormat(answer)),
-          actions = Seq(
-            ActionItemViewModel("site.change", routes.TotalMarketValueController.onPageLoad(CheckMode).url)
-              .withVisuallyHiddenText(messages("org.totalMarketValue.change.hidden"))
-          )
+      val addressLines = answer.address.lines
+        .map(line => HtmlFormat.escape(line).body)
+        .mkString("<br/>")
+
+      val value = Html(
+        s"""
+           |$addressLines<br/>
+           |${HtmlFormat.escape(answer.address.postcode).body}<br/>
+           |${HtmlFormat.escape(answer.address.country.name).body}
+           |""".stripMargin
+      )
+
+      SummaryListRowViewModel(
+        key = "stfSellerAddress.checkYourAnswersLabel",
+        value = ValueViewModel(HtmlContent(value)),
+        actions = Seq(
+          ActionItemViewModel("site.change", routes.StfSellerAddressController.onPageLoad(CheckMode).url)
+            .withVisuallyHiddenText(messages("stfSellerAddress.change.hidden"))
         )
+      )
     }
 }

@@ -17,34 +17,39 @@
 package uk.gov.hmrc.securitiestransferchargefrontend.viewmodels.stf.individuals
 
 import play.api.i18n.Messages
-import play.twirl.api.HtmlFormat
+import play.twirl.api.{Html, HtmlFormat}
 import uk.gov.hmrc.govukfrontend.views.viewmodels.content.HtmlContent
 import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.SummaryListRow
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.individuals.routes
 import uk.gov.hmrc.securitiestransferchargefrontend.models.{CheckMode, UserAnswers}
-import uk.gov.hmrc.securitiestransferchargefrontend.pages.WhatTypeOfSecuritiesPage
+import uk.gov.hmrc.securitiestransferchargefrontend.pages.StfSellerAddressPage
 import uk.gov.hmrc.securitiestransferchargefrontend.viewmodels.govuk.summarylist.*
 import uk.gov.hmrc.securitiestransferchargefrontend.viewmodels.implicits.*
 
-object WhatTypeOfSecuritiesSummary  {
+object StfSellerAddressSummary {
 
   def row(answers: UserAnswers)(implicit messages: Messages): Option[SummaryListRow] =
-    answers.get(WhatTypeOfSecuritiesPage).map {
-      answer =>
+    answers.get(StfSellerAddressPage).map { answer =>
 
-        val value = ValueViewModel(
-          HtmlContent(
-            HtmlFormat.escape(messages(s"individual.whatTypeOfSecurities.$answer"))
-          )
-        )
+      val addressLines = answer.address.lines
+        .map(line => HtmlFormat.escape(line).body)
+        .mkString("<br/>")
 
-        SummaryListRowViewModel(
-          key     = "individual.whatTypeOfSecurities.checkYourAnswersLabel",
-          value   = value,
-          actions = Seq(
-            ActionItemViewModel("site.change", routes.WhatTypeOfSecuritiesController.onPageLoad(CheckMode).url)
-              .withVisuallyHiddenText(messages("whatTypeOfSecurities.change.hidden"))
-          )
+      val value = Html(
+        s"""
+           |$addressLines<br/>
+           |${HtmlFormat.escape(answer.address.postcode).body}<br/>
+           |${HtmlFormat.escape(answer.address.country.name).body}
+           |""".stripMargin
+      )
+
+      SummaryListRowViewModel(
+        key = "stfSellerAddress.checkYourAnswersLabel",
+        value = ValueViewModel(HtmlContent(value)),
+        actions = Seq(
+          ActionItemViewModel("site.change", routes.StfSellerAddressController.onPageLoad(CheckMode).url)
+            .withVisuallyHiddenText(messages("stfSellerAddress.change.hidden"))
         )
+      )
     }
 }

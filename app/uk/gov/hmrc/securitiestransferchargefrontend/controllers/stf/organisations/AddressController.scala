@@ -23,7 +23,7 @@ import uk.gov.hmrc.securitiestransferchargefrontend.config.FrontendAppConfig
 import uk.gov.hmrc.securitiestransferchargefrontend.connectors.AlfAddressConnector
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.AbstractAddressController
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.actions.{StcAuthEnrolledAction, StcDataRequiredAction, StcDataRetrievalAction}
-import uk.gov.hmrc.securitiestransferchargefrontend.models.NormalMode
+import uk.gov.hmrc.securitiestransferchargefrontend.models.{CheckMode, Mode, NormalMode}
 import uk.gov.hmrc.securitiestransferchargefrontend.navigation.Navigator
 import uk.gov.hmrc.securitiestransferchargefrontend.pages.StfBuyersAddressPage
 
@@ -38,18 +38,22 @@ class AddressController @Inject()(val controllerComponents: MessagesControllerCo
                                   @Named("organisations") val navigator: Navigator,
                                   config: FrontendAppConfig)
                                  (implicit ec: ExecutionContext) extends AbstractAddressController(alf):
-  
-  def onPageLoad: Action[AnyContent] = auth.async {
+
+  def onPageLoad(mode: Mode): Action[AnyContent] = auth.async {
     implicit request =>
-      super.pageLoad(config.orgAlfConfigFileLocation, config.alfStfOrgContinueUrl)
+      val returnUrl = mode match {
+        case NormalMode => config.alfStfOrgContinueUrl
+        case CheckMode => config.alfStfOrgContinueChangeUrl
+      }
+      super.pageLoad(config.orgAlfConfigFileLocation, returnUrl)
   }
 
-  def onReturn(addressId: String): Action[AnyContent] = (auth andThen getData andThen requireData).async {
+  def onReturn(addressId: String, mode: Mode): Action[AnyContent] = (auth andThen getData andThen requireData).async {
     implicit request =>
       implicit val hc: HeaderCarrier = HeaderCarrierConverter.fromRequestAndSession(request, request.session)
       for {
-        address     <- super.alfReturn(addressId)
+        address <- super.alfReturn(addressId)
         userAnswers <- Future.fromTry(request.userAnswers.set(StfBuyersAddressPage, address))
-        nextPage    <- navigator.nextPage(StfBuyersAddressPage, NormalMode, userAnswers)
+        nextPage <- navigator.nextPage(StfBuyersAddressPage, mode, userAnswers)
       } yield Redirect(nextPage)
   }

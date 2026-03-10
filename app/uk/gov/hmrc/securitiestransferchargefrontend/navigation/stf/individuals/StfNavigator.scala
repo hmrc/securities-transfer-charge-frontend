@@ -21,16 +21,17 @@ import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.play.http.HeaderCarrierConverter
 import uk.gov.hmrc.securitiestransferchargefrontend.config.FrontendAppConfig
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.routes
+import uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.individuals.routes as individualsRoutes
 import uk.gov.hmrc.securitiestransferchargefrontend.domain.SubmissionId
 import uk.gov.hmrc.securitiestransferchargefrontend.models.UserAnswers
-import uk.gov.hmrc.securitiestransferchargefrontend.navigation.{AbstractModeNavigator, PersistentNavigator}
+import uk.gov.hmrc.securitiestransferchargefrontend.navigation.{AbstractModeNavigator, PersistentNavigationHelper, PersistentNavigator}
 import uk.gov.hmrc.securitiestransferchargefrontend.pages.*
 import uk.gov.hmrc.securitiestransferchargefrontend.services.AnswerPersistenceService
 
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 
-  
+
 class StfNavigator @Inject()(appConfig: FrontendAppConfig,
                              answerPersistenceService: AnswerPersistenceService)
                             (implicit ec: ExecutionContext) extends AbstractModeNavigator with PersistentNavigator {
@@ -38,24 +39,30 @@ class StfNavigator @Inject()(appConfig: FrontendAppConfig,
   override lazy val dashboardPage: Call = routes.SubmissionsDashboardController.onPageLoad()
   val defaultPage: Call = routes.JourneyRecoveryController.onPageLoad()
   val errorPages: List[Call] = List(defaultPage)
-  
   val forwardRoutes: ForwardRoutes = new ForwardRoutes(answerPersistenceService, appConfig, defaultPage, errorPages)
   val backwardsRoutes: BackwardsRoutes = new BackwardsRoutes(defaultPage)
+  val checkRoutes = new CheckRoutes(answerPersistenceService, defaultPage, errorPages)
+  val helper = new PersistentNavigationHelper(answerPersistenceService, defaultPage, errorPages)
 
   override def forwardRoutes(page: Page)(implicit hc: HeaderCarrier): UserAnswers => Future[Call] =
     forwardRoutes.forwardRoutes(page)(hc)
 
   override def predecessorRoutes(page: Page): UserAnswers => Call =
     backwardsRoutes.predecessorRoutes(page)
-  
+
+  override def checkRoutes(page: Page)(implicit hc: HeaderCarrier): UserAnswers => Future[Call] =
+    checkRoutes.checkRoutes(page)(hc)
+
   def errorPage(forPage: Page): Call = forPage match {
     case _ => routes.JourneyRecoveryController.onPageLoad()
   }
 
-  val checkRouteMap: Page => UserAnswers => Call = _ => _ => routes.CheckYourAnswersController.onPageLoad()
 
+  val checkRouteMap: Page => UserAnswers => Call = _ => _ => individualsRoutes.CheckYourAnswersController.onPageLoad()
   def restore(submissionId: SubmissionId, userId: String)(implicit request: Request[?]): Future[UserAnswers] = {
     implicit val hc: HeaderCarrier = HeaderCarrierConverter.fromRequestAndSession(request, request.session)
     answerPersistenceService.load(submissionId, userId)
   }
+
+
 }

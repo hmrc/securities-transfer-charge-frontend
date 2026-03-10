@@ -19,7 +19,7 @@
 @import uk.gov.hmrc.securitiestransferchargefrontend.models.ConfirmableAddress
 @import uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.organisations.routes
 @import uk.gov.hmrc.securitiestransferchargefrontend.views.html.components.SaveAndReturnButton
-
+@import uk.gov.hmrc.securitiestransferchargefrontend.models.NormalMode
 
 
 @this(
@@ -41,7 +41,7 @@
     <br>
     <p class="govuk-body">
         <a class="govuk-link"
-            href="@routes.AddressController.onPageLoad().url"
+            href="@routes.AddressController.onPageLoad(NormalMode).url"
             id="editAddressLink">
             @messages("confirmAddress.editLink")
         </a>

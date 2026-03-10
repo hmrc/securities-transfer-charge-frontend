@@ -33,6 +33,7 @@ abstract class AbstractModeNavigator(implicit ex: ExecutionContext) extends Navi
 
   def forwardRoutes(page: Page)(implicit hc: HeaderCarrier): UserAnswers => Future[Call]
   def predecessorRoutes(page: Page): UserAnswers => Call
+  def checkRoutes(page: Page)(implicit hc: HeaderCarrier): UserAnswers => Future[Call]
   lazy val dashboardPage: Call
   val checkRouteMap: Page => UserAnswers => Call
 
@@ -41,7 +42,7 @@ abstract class AbstractModeNavigator(implicit ex: ExecutionContext) extends Navi
     val maybeRedirectToDashboard: Call => Call = if (isReturn) _ => dashboardPage else identity
     (mode match {
       case NormalMode             => forwardRoutes(page)(hc)(userAnswers)
-      case CheckMode              => Future.successful(checkRouteMap(page)(userAnswers))
+      case CheckMode              => checkRoutes(page)(hc)(userAnswers)
     }).map(maybeRedirectToDashboard)
   }
 

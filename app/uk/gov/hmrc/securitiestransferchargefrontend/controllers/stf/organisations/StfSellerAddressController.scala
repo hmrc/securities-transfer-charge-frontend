@@ -21,7 +21,7 @@ import uk.gov.hmrc.securitiestransferchargefrontend.config.FrontendAppConfig
 import uk.gov.hmrc.securitiestransferchargefrontend.connectors.AlfAddressConnector
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.AbstractAddressController
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.actions.{StcAuthEnrolledAction, StcDataRequiredAction, StcDataRetrievalAction}
-import uk.gov.hmrc.securitiestransferchargefrontend.models.NormalMode
+import uk.gov.hmrc.securitiestransferchargefrontend.models.{CheckMode, Mode, NormalMode}
 import uk.gov.hmrc.securitiestransferchargefrontend.navigation.Navigator
 import uk.gov.hmrc.securitiestransferchargefrontend.pages.{AddressPage, StfSellerAddressPage}
 
@@ -39,16 +39,20 @@ class StfSellerAddressController @Inject()(val controllerComponents: MessagesCon
 
   val addressPage: AddressPage = StfSellerAddressPage
 
-  def onPageLoad: Action[AnyContent] = auth.async {
+  def onPageLoad(mode: Mode): Action[AnyContent] = auth.async {
     implicit request =>
-      super.pageLoad(config.sellerAlfConfigFileLocation, config.alfOrgSellerContinueUrl)
+      val returnUrl = mode match {
+        case NormalMode => config.alfOrgSellerContinueUrl
+        case CheckMode => config.alfOrgSellerContinueChangeUrl
+      }
+      super.pageLoad(config.sellerAlfConfigFileLocation, returnUrl)
   }
 
-  def onReturn(addressId: String): Action[AnyContent] = (auth andThen getData andThen requireData).async {
+  def onReturn(addressId: String, mode: Mode): Action[AnyContent] = (auth andThen getData andThen requireData).async {
     implicit request =>
       for {
         address <- super.alfReturn(addressId)
         userAnswers <- Future.fromTry(request.userAnswers.set(StfSellerAddressPage, address))
-        nextPage <- navigator.nextPage(StfSellerAddressPage, NormalMode, userAnswers)
+        nextPage <- navigator.nextPage(StfSellerAddressPage, mode, userAnswers)
       } yield Redirect(nextPage)
   }

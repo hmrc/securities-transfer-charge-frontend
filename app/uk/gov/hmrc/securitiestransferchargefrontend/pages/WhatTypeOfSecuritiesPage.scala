@@ -17,12 +17,28 @@
 package uk.gov.hmrc.securitiestransferchargefrontend.pages
 
 import play.api.libs.json.JsPath
-import uk.gov.hmrc.securitiestransferchargefrontend.models.WhatTypeOfSecurities
+import uk.gov.hmrc.securitiestransferchargefrontend.models.{UserAnswers, WhatTypeOfSecurities}
 import uk.gov.hmrc.securitiestransferchargefrontend.pages.QuestionPage
+
+import scala.util.Try
 
 case object WhatTypeOfSecuritiesPage extends QuestionPage[WhatTypeOfSecurities] {
 
   override def path: JsPath = JsPath \ toString
 
   override def toString: String = "whatTypeOfSecurities"
+
+  override def cleanup(value: Option[WhatTypeOfSecurities], userAnswers: UserAnswers): Try[UserAnswers] =
+    value match {
+      case Some(WhatTypeOfSecurities.Other) =>
+        userAnswers.remove(DetailsOfThisTransferPage)
+
+      case Some(WhatTypeOfSecurities.Shares) =>
+        userAnswers.remove(OtherSecuritiesTypePage)
+          .flatMap(ua => ua.remove(AmountPaidForSecuritiesPage))
+          .flatMap(ua => ua.remove(TotalMarketValuePage))
+
+      case _ =>
+        super.cleanup(value, userAnswers)
+    }
 }

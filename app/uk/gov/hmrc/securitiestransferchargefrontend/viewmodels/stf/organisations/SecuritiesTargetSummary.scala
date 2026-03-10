@@ -17,26 +17,34 @@
 package uk.gov.hmrc.securitiestransferchargefrontend.viewmodels.stf.organisations
 
 import play.api.i18n.Messages
+import play.twirl.api.{Html, HtmlFormat}
+import uk.gov.hmrc.govukfrontend.views.viewmodels.content.HtmlContent
 import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.SummaryListRow
-import uk.gov.hmrc.securitiestransferchargefrontend.config.CurrencyFormatter.currencyFormat
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.organisations.routes
 import uk.gov.hmrc.securitiestransferchargefrontend.models.{CheckMode, UserAnswers}
-import uk.gov.hmrc.securitiestransferchargefrontend.pages.TotalMarketValuePage
+import uk.gov.hmrc.securitiestransferchargefrontend.pages.SecuritiesTargetPage
 import uk.gov.hmrc.securitiestransferchargefrontend.viewmodels.govuk.summarylist.*
 import uk.gov.hmrc.securitiestransferchargefrontend.viewmodels.implicits.*
 
-object TotalMarketValueSummary  {
+object SecuritiesTargetSummary {
 
   def row(answers: UserAnswers)(implicit messages: Messages): Option[SummaryListRow] =
-    answers.get(TotalMarketValuePage).map {
+    answers.get(SecuritiesTargetPage).map {
       answer =>
 
+        val value = Html(
+          s"""
+             |${HtmlFormat.escape(answer.businessName).body}<br/>
+             |${answer.crn.map(v => HtmlFormat.escape(v))}
+             |""".stripMargin
+        )
+
         SummaryListRowViewModel(
-          key     = "org.totalMarketValue.checkYourAnswersLabel",
-          value   = ValueViewModel(currencyFormat(answer)),
+          key = "org.securitiesTarget.checkYourAnswersLabel",
+          value = ValueViewModel(HtmlContent(value)),
           actions = Seq(
-            ActionItemViewModel("site.change", routes.TotalMarketValueController.onPageLoad(CheckMode).url)
-              .withVisuallyHiddenText(messages("org.totalMarketValue.change.hidden"))
+            ActionItemViewModel("site.change", routes.SecuritiesTargetController.onPageLoad(CheckMode).url)
+              .withVisuallyHiddenText(messages("org.securitiesTarget.change.hidden"))
           )
         )
     }

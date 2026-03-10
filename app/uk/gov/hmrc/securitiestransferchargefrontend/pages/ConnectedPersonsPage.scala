@@ -17,11 +17,31 @@
 package uk.gov.hmrc.securitiestransferchargefrontend.pages
 
 import play.api.libs.json.JsPath
+import uk.gov.hmrc.securitiestransferchargefrontend.models.UserAnswers
 import uk.gov.hmrc.securitiestransferchargefrontend.pages.QuestionPage
+
+import scala.util.Try
 
 case object ConnectedPersonsPage extends QuestionPage[Boolean] {
 
   override def path: JsPath = JsPath \ toString
 
   override def toString: String = "connectedPersons"
+
+  override def cleanup(isConnected: Option[Boolean], userAnswers: UserAnswers): Try[UserAnswers] =
+    isConnected match {
+      case Some(false) =>
+        userAnswers.get(DetailsOfThisTransferPage) match {
+          case Some(details) =>
+            userAnswers
+              .set(DetailsOfThisTransferPage, details.copy(marketValue = None))
+              .flatMap(_.remove(TotalMarketValuePage))
+
+          case None =>
+            userAnswers.remove(TotalMarketValuePage)
+        }
+
+      case _ =>
+        super.cleanup(isConnected, userAnswers)
+    }
 }

@@ -16,9 +16,21 @@
 
 package uk.gov.hmrc.securitiestransferchargefrontend.pages
 
+import uk.gov.hmrc.securitiestransferchargefrontend.models.{AlfConfirmedAddress, UserAnswers}
 import uk.gov.hmrc.securitiestransferchargefrontend.pages.AddressPage
+
+import scala.util.Try
 
 case object StfBuyersAddressPage extends AddressPage {
   override def toString: String = "buyerAddress"
+
+  override def cleanup(value: Option[AlfConfirmedAddress], userAnswers: UserAnswers): Try[UserAnswers] =
+    value match {
+      case Some(_) =>
+        userAnswers.remove(ConfirmAddressPage)
+
+      case None =>
+        super.cleanup(value, userAnswers)
+    }
 }
  

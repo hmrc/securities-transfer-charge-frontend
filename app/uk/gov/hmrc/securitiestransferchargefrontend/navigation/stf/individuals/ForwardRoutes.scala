@@ -52,7 +52,7 @@ class ForwardRoutes(answerPersistenceService: AnswerPersistenceService,
     }
     case ConfirmAddressPage => userAnswers => dataRequired(ConfirmAddressPage, userAnswers, individualRoutes.NameOfSellerController.onPageLoad(NormalMode))
     case StfBuyersAddressPage => userAnswers => dataRequired(StfBuyersAddressPage, userAnswers, individualRoutes.NameOfSellerController.onPageLoad(NormalMode))
-    case NameOfSellerPage => userAnswers => dataRequired(NameOfSellerPage, userAnswers, individualRoutes.StfSellerAddressController.onPageLoad())
+    case NameOfSellerPage => userAnswers => dataRequired(NameOfSellerPage, userAnswers, individualRoutes.StfSellerAddressController.onPageLoad(NormalMode))
     case StfSellerAddressPage => userAnswers => dataRequired(StfSellerAddressPage, userAnswers, individualRoutes.ConnectedPersonsController.onPageLoad(NormalMode))
     case ConnectedPersonsPage => userAnswers => dataRequired(ConnectedPersonsPage, userAnswers, individualRoutes.ApplyingForReliefController.onPageLoad(NormalMode))
     case ApplyingForReliefPage => userAnswers =>
@@ -73,16 +73,16 @@ class ForwardRoutes(answerPersistenceService: AnswerPersistenceService,
         case WhatTypeOfSecurities.Shares => individualRoutes.DetailsOfThisTransferController.onPageLoad(NormalMode)
         case WhatTypeOfSecurities.Other => individualRoutes.OtherSecuritiesTypeController.onPageLoad(NormalMode)
       }
-    case DetailsOfThisTransferPage => userAnswers => dataRequired(DetailsOfThisTransferPage, userAnswers, routes.CheckYourAnswersController.onPageLoad())
+    case DetailsOfThisTransferPage => userAnswers => dataRequired(DetailsOfThisTransferPage, userAnswers, individualRoutes.CheckYourAnswersController.onPageLoad())
     case AmountPaidForSecuritiesPage => userAnswers =>
       userAnswersDependent(userAnswers) {
         userAnswers =>
           userAnswers.get(ConnectedPersonsPage).fold(defaultPage) {
             isConnected =>
               if (isConnected) individualRoutes.TotalMarketValueController.onPageLoad(NormalMode)
-              else routes.CheckYourAnswersController.onPageLoad()
+              else individualRoutes.CheckYourAnswersController.onPageLoad()
           }
       }
-    case TotalMarketValuePage => userAnswers => dataRequired(TotalMarketValuePage, userAnswers, routes.CheckYourAnswersController.onPageLoad())
+    case TotalMarketValuePage => userAnswers => dataRequired(TotalMarketValuePage, userAnswers, individualRoutes.CheckYourAnswersController.onPageLoad())
     case _ => _ => Future.successful(defaultPage)
   }

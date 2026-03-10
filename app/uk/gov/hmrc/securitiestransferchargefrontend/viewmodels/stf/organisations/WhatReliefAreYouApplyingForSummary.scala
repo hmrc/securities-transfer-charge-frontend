@@ -17,26 +17,26 @@
 package uk.gov.hmrc.securitiestransferchargefrontend.viewmodels.stf.organisations
 
 import play.api.i18n.Messages
+import play.twirl.api.HtmlFormat
 import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.SummaryListRow
-import uk.gov.hmrc.securitiestransferchargefrontend.config.CurrencyFormatter.currencyFormat
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.organisations.routes
 import uk.gov.hmrc.securitiestransferchargefrontend.models.{CheckMode, UserAnswers}
-import uk.gov.hmrc.securitiestransferchargefrontend.pages.TotalMarketValuePage
+import uk.gov.hmrc.securitiestransferchargefrontend.pages.WhatReliefAreYouApplyingForPage
 import uk.gov.hmrc.securitiestransferchargefrontend.viewmodels.govuk.summarylist.*
 import uk.gov.hmrc.securitiestransferchargefrontend.viewmodels.implicits.*
 
-object TotalMarketValueSummary  {
+object WhatReliefAreYouApplyingForSummary  {
 
   def row(answers: UserAnswers)(implicit messages: Messages): Option[SummaryListRow] =
-    answers.get(TotalMarketValuePage).map {
+    answers.get(WhatReliefAreYouApplyingForPage).map {
       answer =>
 
         SummaryListRowViewModel(
-          key     = "org.totalMarketValue.checkYourAnswersLabel",
-          value   = ValueViewModel(currencyFormat(answer)),
+          key     = "org.whatReliefAreYouApplyingFor.checkYourAnswersLabel",
+          value   = ValueViewModel(HtmlFormat.escape(answer).toString),
           actions = Seq(
-            ActionItemViewModel("site.change", routes.TotalMarketValueController.onPageLoad(CheckMode).url)
-              .withVisuallyHiddenText(messages("org.totalMarketValue.change.hidden"))
+            ActionItemViewModel("site.change", routes.WhatReliefAreYouApplyingForController.onPageLoad(CheckMode).url)
+              .withVisuallyHiddenText(messages("whatReliefAreYouApplyingFor.change.hidden"))
           )
         )
     }
