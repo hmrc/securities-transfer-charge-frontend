@@ -62,7 +62,7 @@ class ForwardRoutes(answerPersistenceService: AnswerPersistenceService,
       }
     case WhatReliefAreYouApplyingForPage => userAnswers => dataRequired(WhatReliefAreYouApplyingForPage, userAnswers, individualRoutes.SecuritiesTargetController.onPageLoad(NormalMode))
     case SecuritiesTargetPage => userAnswers => dataRequired(SecuritiesTargetPage, userAnswers, individualRoutes.ChargingPointController.onPageLoad(NormalMode))
-    case ChargingPointPage => userAnswers => dataDependent(ChargingPointPage, userAnswers) { enterDate =>
+    case ChargingPointPage => userAnswers => dataDependent(ChargingPointPage, userAnswers) {enterDate =>
       if (enterDate.isBefore(firstDate)) routes.JourneyRecoveryController.onPageLoad()
       else individualRoutes.TaxRateController.onPageLoad(NormalMode)
     }

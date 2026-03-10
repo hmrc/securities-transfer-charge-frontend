@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package controllers.stf.individuals
+package controllers.stf.organisations
 
 import base.SpecBase
 import org.mockito.ArgumentMatchers.any
@@ -26,13 +26,13 @@ import play.api.mvc.{AnyContentAsEmpty, AnyContentAsFormUrlEncoded, Call}
 import play.api.test.FakeRequest
 import play.api.test.Helpers.*
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.routes
-import uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.individuals.routes as individualRoutes
-import uk.gov.hmrc.securitiestransferchargefrontend.forms.stf.individuals.ChargingPointFormProvider
+import uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.organisations.routes as orgRoutes
+import uk.gov.hmrc.securitiestransferchargefrontend.forms.stf.organisations.ChargingPointFormProvider
 import uk.gov.hmrc.securitiestransferchargefrontend.models.{NormalMode, UserAnswers}
 import uk.gov.hmrc.securitiestransferchargefrontend.navigation.Navigator
 import uk.gov.hmrc.securitiestransferchargefrontend.pages.ChargingPointPage
 import uk.gov.hmrc.securitiestransferchargefrontend.repositories.SessionRepository
-import uk.gov.hmrc.securitiestransferchargefrontend.views.html.stf.individuals.ChargingPointView
+import uk.gov.hmrc.securitiestransferchargefrontend.views.html.stf.organisations.ChargingPointView
 
 import java.time.{LocalDate, ZoneOffset}
 import scala.concurrent.Future
@@ -48,9 +48,9 @@ class ChargingPointControllerSpec extends SpecBase with MockitoSugar {
 
   val validAnswer: LocalDate = LocalDate.now(ZoneOffset.UTC)
 
-  lazy val chargingPointRoute: String = individualRoutes.ChargingPointController.onPageLoad(NormalMode).url
-
+  lazy val chargingPointRoute: String = orgRoutes.ChargingPointController.onPageLoad(NormalMode).url
   override val emptyUserAnswers = UserAnswers(userAnswersId, submissionId)
+
 
   def getRequest(): FakeRequest[AnyContentAsEmpty.type] =
     FakeRequest(GET, chargingPointRoute)
@@ -66,9 +66,8 @@ class ChargingPointControllerSpec extends SpecBase with MockitoSugar {
   "ChargingPoint Controller" - {
 
     "must return OK and the correct view for a GET" in {
-
       val application = applicationBuilder(userAnswers = Some(emptyUserAnswers))
-        .overrides(bind[Navigator].qualifiedWith("individuals").toInstance(getNavigator))
+        .overrides(bind[Navigator].qualifiedWith("organisations").toInstance(getNavigator))
         .build()
 
       running(application) {
@@ -86,7 +85,7 @@ class ChargingPointControllerSpec extends SpecBase with MockitoSugar {
       val userAnswers = UserAnswers(userAnswersId, submissionId).set(ChargingPointPage, validAnswer).success.value
 
       val application = applicationBuilder(userAnswers = Some(userAnswers))
-        .overrides(bind[Navigator].qualifiedWith("individuals").toInstance(getNavigator))
+        .overrides(bind[Navigator].qualifiedWith("organisations").toInstance(getNavigator))
         .build()
 
       running(application) {
@@ -106,7 +105,7 @@ class ChargingPointControllerSpec extends SpecBase with MockitoSugar {
       when(mockSessionRepository.set(any())) thenReturn Future.successful(true)
 
       val application = applicationBuilder(userAnswers = Some(emptyUserAnswers))
-        .overrides(bind[Navigator].qualifiedWith("individuals").toInstance(getNavigator))
+        .overrides(bind[Navigator].qualifiedWith("organisations").toInstance(getNavigator))
         .build()
 
       running(application) {
@@ -120,7 +119,7 @@ class ChargingPointControllerSpec extends SpecBase with MockitoSugar {
     "must return a Bad Request and errors when invalid data is submitted" in {
 
       val application = applicationBuilder(userAnswers = Some(emptyUserAnswers))
-        .overrides(bind[Navigator].qualifiedWith("individuals").toInstance(getNavigator))
+        .overrides(bind[Navigator].qualifiedWith("organisations").toInstance(getNavigator))
         .build()
 
       val request =
