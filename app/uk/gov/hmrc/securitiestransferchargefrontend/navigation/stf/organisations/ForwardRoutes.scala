@@ -22,7 +22,7 @@ import uk.gov.hmrc.securitiestransferchargefrontend.config.FrontendAppConfig
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.routes
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.organisations.routes as orgRoutes
 import uk.gov.hmrc.securitiestransferchargefrontend.models.HowToNotifyAboutSecuritiesTransfer.{MoreThanOneAtATime, OneAtATime}
-import uk.gov.hmrc.securitiestransferchargefrontend.models.{NormalMode, UserAnswers}
+import uk.gov.hmrc.securitiestransferchargefrontend.models.{NormalMode, UserAnswers, WhatTypeOfSecurities}
 import uk.gov.hmrc.securitiestransferchargefrontend.navigation.PersistentNavigationHelper
 import uk.gov.hmrc.securitiestransferchargefrontend.pages.*
 import uk.gov.hmrc.securitiestransferchargefrontend.services.AnswerPersistenceService
@@ -61,19 +61,23 @@ class ForwardRoutes(answerPersistenceService: AnswerPersistenceService,
         case false => orgRoutes.SecuritiesTargetController.onPageLoad(NormalMode)
       }
     case WhatReliefAreYouApplyingForPage => userAnswers => dataRequired(WhatReliefAreYouApplyingForPage, userAnswers, orgRoutes.SecuritiesTargetController.onPageLoad(NormalMode))
-    case TaxRatePage => userAnswers => dataRequired(TaxRatePage, userAnswers, orgRoutes.WhatTypeOfSecuritiesController.onPageLoad(NormalMode))
     case SecuritiesTargetPage => userAnswers => dataRequired(SecuritiesTargetPage, userAnswers, orgRoutes.ChargingPointController.onPageLoad(NormalMode))
     case ChargingPointPage => userAnswers => dataDependent(ChargingPointPage, userAnswers) {enterDate =>
       if (enterDate.isBefore(firstDate)) routes.JourneyRecoveryController.onPageLoad()
       else orgRoutes.TaxRateController.onPageLoad(NormalMode)
     }
-    case WhatTypeOfSecuritiesPage => userAnswers => dataRequired(SecuritiesTargetPage, userAnswers, routes.JourneyRecoveryController.onPageLoad())
+    case TaxRatePage => userAnswers => dataRequired(TaxRatePage, userAnswers, orgRoutes.WhatTypeOfSecuritiesController.onPageLoad(NormalMode))
     case OtherSecuritiesTypePage => userAnswers => dataRequired(OtherSecuritiesTypePage, userAnswers, orgRoutes.AmountPaidForSecuritiesController.onPageLoad(NormalMode))
+    case WhatTypeOfSecuritiesPage => userAnswers =>
+      dataDependent(WhatTypeOfSecuritiesPage, userAnswers) {
+        case WhatTypeOfSecurities.Shares => orgRoutes.DetailsOfThisTransferController.onPageLoad(NormalMode)
+        case WhatTypeOfSecurities.Other => orgRoutes.OtherSecuritiesTypeController.onPageLoad(NormalMode)
+      }
+    case DetailsOfThisTransferPage => userAnswers => dataRequired(DetailsOfThisTransferPage, userAnswers, routes.CheckYourAnswersController.onPageLoad())
     case AmountPaidForSecuritiesPage => userAnswers =>
       dataDependent(ConnectedPersonsPage, userAnswers) { isConnected =>
         if (isConnected) orgRoutes.TotalMarketValueController.onPageLoad(NormalMode)
         else routes.CheckYourAnswersController.onPageLoad()
       }
-    case DetailsOfThisTransferPage => userAnswers => dataRequired(DetailsOfThisTransferPage, userAnswers, routes.CheckYourAnswersController.onPageLoad())
     case _ => _ => Future.successful(defaultPage)
   }

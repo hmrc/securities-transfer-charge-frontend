@@ -68,7 +68,6 @@ class ForwardRoutes(answerPersistenceService: AnswerPersistenceService,
     }
     case TaxRatePage => userAnswers => dataRequired(TaxRatePage, userAnswers, individualRoutes.WhatTypeOfSecuritiesController.onPageLoad(NormalMode))
     case OtherSecuritiesTypePage => userAnswers => dataRequired(OtherSecuritiesTypePage, userAnswers, individualRoutes.AmountPaidForSecuritiesController.onPageLoad(NormalMode))
-
     case WhatTypeOfSecuritiesPage => userAnswers =>
       dataDependent(WhatTypeOfSecuritiesPage, userAnswers) {
         case WhatTypeOfSecurities.Shares => individualRoutes.DetailsOfThisTransferController.onPageLoad(NormalMode)
