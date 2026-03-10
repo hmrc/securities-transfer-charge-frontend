@@ -35,6 +35,7 @@ object Fixtures {
   val stcIdentifierKey: String = "STCID"
   val testSubscriptionId: SubscriptionId = SubscriptionId("XAST1234567890")
   val testInternalId = "test-user-808"
+  val testGroupId = "test-group-42"
   val testSubmissionId: SubmissionId = SubmissionId("STC-424242424")
 
   val affinityGroupIndividual: AffinityGroup.Individual.type = AffinityGroup.Individual

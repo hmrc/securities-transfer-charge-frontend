@@ -34,17 +34,18 @@ import scala.concurrent.Future
 class StcAuthEnrolledActionImplSpec extends SpecBase {
 
   type RetrievalType =
-    Option[String] ~ Enrolments ~ Option[AffinityGroup]
+    Option[String] ~ Option[String] ~ Enrolments ~ Option[AffinityGroup]
 
   private val enrolmentKey  = "HMRC-STC-ORG"
   private val identifierKey = "STCID"
 
   def buildRetrieval(
                       maybeInternalId: Option[String] = Some(Fixtures.testInternalId),
+                      maybeGroupId: Option[String] = Some(Fixtures.testGroupId),
                       enrolments: Enrolments = Fixtures.enrolledForStc,
                       maybeAffinityGroup: Option[AffinityGroup] = Some(AffinityGroup.Organisation)
                     ): RetrievalType =
-    new ~(new ~(maybeInternalId, enrolments), maybeAffinityGroup)
+    new ~(new ~(new ~(maybeInternalId, maybeGroupId), enrolments), maybeAffinityGroup)
 
   def testSetup(
                  application: Application,
@@ -135,6 +136,24 @@ class StcAuthEnrolledActionImplSpec extends SpecBase {
 
         val action =
           testSetup(application, buildRetrieval(maybeInternalId = None))()
+
+        val result =
+          action.invokeBlock(FakeRequest(), _ => Future.successful(Results.Ok))
+
+        status(result) mustBe SEE_OTHER
+        redirectLocation(result).value mustBe
+          routes.UnauthorisedController.onPageLoad().url
+      }
+    }
+
+    "must redirect to unauthorised page when groupId is missing" in {
+
+      val application = applicationBuilder().build()
+
+      running(application) {
+
+        val action =
+          testSetup(application, buildRetrieval(maybeGroupId = None))()
 
         val result =
           action.invokeBlock(FakeRequest(), _ => Future.successful(Results.Ok))
