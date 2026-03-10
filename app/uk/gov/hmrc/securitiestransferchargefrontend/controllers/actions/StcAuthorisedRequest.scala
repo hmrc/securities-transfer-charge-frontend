@@ -23,6 +23,7 @@ import uk.gov.hmrc.securitiestransferchargefrontend.domain.SubscriptionId
 final case class StcAuthorisedRequest[A](
                                           request: Request[A],
                                           internalId: String,
+                                          groupId: String,
                                           affinityGroup: AffinityGroup,
                                           subscriptionId: SubscriptionId
                                         ) extends WrappedRequest[A](request) {

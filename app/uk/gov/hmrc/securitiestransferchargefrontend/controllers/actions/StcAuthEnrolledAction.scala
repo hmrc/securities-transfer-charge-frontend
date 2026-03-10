@@ -48,6 +48,7 @@ final class StcAuthEnrolledActionImpl @Inject()(
 
   private val retrievals =
     Retrievals.internalId and
+      Retrievals.groupIdentifier and
       Retrievals.allEnrolments and
       Retrievals.affinityGroup
 
@@ -60,17 +61,19 @@ final class StcAuthEnrolledActionImpl @Inject()(
       HeaderCarrierConverter.fromRequestAndSession(request, request.session)
 
     authorised().retrieve(retrievals) {
-      case maybeInternalId ~ enrolments ~ maybeAffinityGroup =>
+      case maybeInternalId ~ maybeGroupId ~ enrolments ~ maybeAffinityGroup =>
 
         val maybeRequest =
           for {
-            internalId <- retrievalFilter.internalIdPresent(maybeInternalId)
-            affinityGroup <- retrievalFilter.affinityGroupPresent(maybeAffinityGroup)
-            _ <- retrievalFilter.enrolledForStc(enrolments)
-            subscriptionId <- retrievalFilter.subscriptionIdPresent(enrolments)
+            internalId      <- retrievalFilter.optionalAttributePresent(maybeInternalId)
+            groupId         <- retrievalFilter.optionalAttributePresent(maybeGroupId)
+            affinityGroup   <- retrievalFilter.optionalAttributePresent(maybeAffinityGroup)
+            _               <- retrievalFilter.enrolledForStc(enrolments)
+            subscriptionId  <- retrievalFilter.subscriptionIdPresent(enrolments)
           } yield StcAuthorisedRequest(
             request,
             internalId,
+            groupId,
             affinityGroup,
             subscriptionId
           )
