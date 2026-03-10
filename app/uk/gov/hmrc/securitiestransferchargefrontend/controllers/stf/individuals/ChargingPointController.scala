@@ -44,7 +44,7 @@ class ChargingPointController @Inject()(
   lazy val backLinkCall: Mode => UserAnswers => Call =
     mode => userAnswers => navigator.previousPage(ChargingPointPage, mode, userAnswers)
 
-  def onPageLoad(mode: Mode): Action[AnyContent] = (stcAuthEnrolled andThen getData andThen requireData).async {
+  def onPageLoad(mode: Mode): Action[AnyContent] = (stcAuthEnrolled andThen getData andThen requireData) {
     implicit request =>
 
       val form = formProvider()
@@ -54,7 +54,7 @@ class ChargingPointController @Inject()(
         case Some(value) => form.fill(value)
       }
 
-      Future.successful(Ok(view(preparedForm, mode, backLinkCall(mode)(request.userAnswers))))
+      Ok(view(preparedForm, mode, backLinkCall(mode)(request.userAnswers)))
   }
 
   def onSubmit(mode: Mode): Action[AnyContent] = (stcAuthEnrolled andThen getData andThen requireData).async {
