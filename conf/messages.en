@@ -321,4 +321,3 @@ org.totalMarketValue.error.aboveMaximum = The market value must be {0} or less
 org.totalMarketValue.error.belowMinimum = The market value must be {0} or more
 org.totalMarketValue.change.hidden = Change the market value of the securities
 org.totalMarketValue.hint = For example, £600 or £193.54
-
