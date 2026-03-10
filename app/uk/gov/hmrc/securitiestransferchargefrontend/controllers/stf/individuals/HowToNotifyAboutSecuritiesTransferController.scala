@@ -48,7 +48,7 @@ class HowToNotifyAboutSecuritiesTransferController @Inject()(
   lazy val backLinkCall: Mode => UserAnswers => Call =
     mode => userAnswers => navigator.previousPage(HowToNotifyAboutSecuritiesTransferPage, mode, userAnswers)
 
-  def onPageLoad(mode: Mode): Action[AnyContent] = (stcAuthEnrolled andThen getData andThen requireData).async{
+  def onPageLoad(mode: Mode): Action[AnyContent] = (stcAuthEnrolled andThen getData andThen requireData){
     implicit request =>
       
       val innerRequest = request.request
@@ -57,8 +57,8 @@ class HowToNotifyAboutSecuritiesTransferController @Inject()(
         case None => form
         case Some(value) => form.fill(value)
       }
-
-      Future.successful(Ok(view(preparedForm, mode, innerRequest.affinityGroupKey, backLinkCall(mode)(request.userAnswers))))
+      
+      Ok(view(preparedForm, mode, innerRequest.affinityGroupKey, backLinkCall(mode)(request.userAnswers)))
   }
 
   def onSubmit(mode: Mode): Action[AnyContent] = (stcAuthEnrolled andThen getData andThen requireData).async {

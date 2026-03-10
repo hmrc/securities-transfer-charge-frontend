@@ -41,9 +41,10 @@ class BackwardsRoutes(defaultPage: Call):
       case true => orgRoutes.WhatReliefAreYouApplyingForController.onPageLoad(NormalMode)
       case false => orgRoutes.ApplyingForReliefController.onPageLoad(NormalMode)
     }
-    case TaxRatePage => _ => routes.SubmissionsDashboardController.onPageLoad()
-    case WhatTypeOfSecuritiesPage => _ => orgRoutes.TaxRateController.onPageLoad(NormalMode)
+    case ChargingPointPage => _ => orgRoutes.SecuritiesTargetController.onPageLoad(NormalMode)
+    case TaxRatePage => _ => orgRoutes.ChargingPointController.onPageLoad(NormalMode)
     case OtherSecuritiesTypePage => _ => orgRoutes.WhatTypeOfSecuritiesController.onPageLoad(NormalMode)
+    case WhatTypeOfSecuritiesPage => _ => orgRoutes.TaxRateController.onPageLoad(NormalMode)
     case DetailsOfThisTransferPage  => _ => orgRoutes.WhatTypeOfSecuritiesController.onPageLoad(NormalMode)
     case AmountPaidForSecuritiesPage => _ => orgRoutes.OtherSecuritiesTypeController.onPageLoad(NormalMode)
     case TotalMarketValuePage => _ => orgRoutes.AmountPaidForSecuritiesController.onPageLoad(NormalMode)

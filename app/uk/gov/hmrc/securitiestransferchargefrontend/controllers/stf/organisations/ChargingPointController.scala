@@ -16,51 +16,51 @@
 
 package uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.organisations
 
-import play.api.data.Form
 import play.api.i18n.{I18nSupport, MessagesApi}
-import play.api.mvc.{Action, AnyContent, Call, MessagesControllerComponents}
+import play.api.mvc.{Action, Call, AnyContent, MessagesControllerComponents}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.SaveAndReturnButton.isReturn
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.actions.*
-import uk.gov.hmrc.securitiestransferchargefrontend.forms.stf.individuals.NameOfSellerFormProvider
+import uk.gov.hmrc.securitiestransferchargefrontend.forms.stf.organisations.ChargingPointFormProvider
 import uk.gov.hmrc.securitiestransferchargefrontend.models.{Mode, UserAnswers}
 import uk.gov.hmrc.securitiestransferchargefrontend.navigation.Navigator
-import uk.gov.hmrc.securitiestransferchargefrontend.pages.NameOfSellerPage
-import uk.gov.hmrc.securitiestransferchargefrontend.views.html.stf.organisations.NameOfSellerView
+import uk.gov.hmrc.securitiestransferchargefrontend.pages.ChargingPointPage
+import uk.gov.hmrc.securitiestransferchargefrontend.views.html.stf.organisations.ChargingPointView
 
 import javax.inject.{Inject, Named}
 import scala.concurrent.{ExecutionContext, Future}
-import scala.language.postfixOps
 
-class NameOfSellerController @Inject()(
+class ChargingPointController @Inject()(
                                         override val messagesApi: MessagesApi,
                                         @Named("organisations") navigator: Navigator,
                                         stcAuthEnrolled: StcAuthEnrolledAction,
                                         getData: StcDataRetrievalAction,
                                         requireData: StcDataRequiredAction,
-                                        formProvider: NameOfSellerFormProvider,
+                                        formProvider: ChargingPointFormProvider,
                                         val controllerComponents: MessagesControllerComponents,
-                                        view: NameOfSellerView
-                                    )(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport {
-
-  val form: Form[String] = formProvider()
+                                        view: ChargingPointView
+                                      )(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport {
 
   lazy val backLinkCall: Mode => UserAnswers => Call =
-    mode => userAnswers => navigator.previousPage(NameOfSellerPage, mode, userAnswers)
-
-  def onPageLoad(mode: Mode): Action[AnyContent] = (stcAuthEnrolled andThen getData andThen requireData) {
+    mode => userAnswers => navigator.previousPage(ChargingPointPage, mode, userAnswers)
+  
+  def onPageLoad(mode: Mode): Action[AnyContent] = (stcAuthEnrolled andThen getData andThen requireData).async {
     implicit request =>
 
-      val preparedForm = request.userAnswers.get(NameOfSellerPage) match {
+      val form = formProvider()
+
+      val preparedForm = request.userAnswers.get(ChargingPointPage) match {
         case None => form
         case Some(value) => form.fill(value)
       }
 
-      Ok(view(preparedForm, mode, backLinkCall(mode)(request.userAnswers)))
+      Future.successful(Ok(view(preparedForm, mode, backLinkCall(mode)(request.userAnswers))))
   }
 
   def onSubmit(mode: Mode): Action[AnyContent] = (stcAuthEnrolled andThen getData andThen requireData).async {
     implicit request =>
+
+      val form = formProvider()
 
       form.bindFromRequest().fold(
         formWithErrors =>
@@ -68,8 +68,8 @@ class NameOfSellerController @Inject()(
 
         value =>
           for {
-            updatedAnswers <- Future.fromTry(request.userAnswers.set(NameOfSellerPage, value))
-            nextPage       <- navigator.nextPage(NameOfSellerPage, mode, updatedAnswers,isReturn(request))
+            updatedAnswers <- Future.fromTry(request.userAnswers.set(ChargingPointPage, value))
+            nextPage       <- navigator.nextPage(ChargingPointPage, mode, updatedAnswers, isReturn(request))
           } yield Redirect(nextPage)
       )
   }
