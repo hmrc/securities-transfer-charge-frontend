@@ -56,7 +56,7 @@ class ForwardRoutes(answerPersistenceService: AnswerPersistenceService,
         case true => orgRoutes.WhatReliefAreYouApplyingForController.onPageLoad(NormalMode)
         case false => orgRoutes.SecuritiesTargetController.onPageLoad(NormalMode)
       }
-    case WhatReliefAreYouApplyingForPage => userAnswers => dataRequired(WhatReliefAreYouApplyingForPage, userAnswers, routes.SubmissionsDashboardController.onPageLoad())
+    case WhatReliefAreYouApplyingForPage => userAnswers => dataRequired(WhatReliefAreYouApplyingForPage, userAnswers, orgRoutes.SecuritiesTargetController.onPageLoad(NormalMode))
     case SecuritiesTargetPage => userAnswers => dataRequired(SecuritiesTargetPage, userAnswers, routes.JourneyRecoveryController.onPageLoad())
     case TaxRatePage => userAnswers => dataRequired(TaxRatePage, userAnswers, orgRoutes.WhatTypeOfSecuritiesController.onPageLoad(NormalMode))
     case WhatTypeOfSecuritiesPage => userAnswers => dataRequired(SecuritiesTargetPage, userAnswers, routes.JourneyRecoveryController.onPageLoad())
