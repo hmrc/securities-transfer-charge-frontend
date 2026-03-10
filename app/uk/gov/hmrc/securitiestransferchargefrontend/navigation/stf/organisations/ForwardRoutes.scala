@@ -56,19 +56,15 @@ class ForwardRoutes(answerPersistenceService: AnswerPersistenceService,
         case true => orgRoutes.WhatReliefAreYouApplyingForController.onPageLoad(NormalMode)
         case false => orgRoutes.SecuritiesTargetController.onPageLoad(NormalMode)
       }
-    case WhatReliefAreYouApplyingForPage => userAnswers => dataRequired(WhatReliefAreYouApplyingForPage, userAnswers, routes.SubmissionsDashboardController.onPageLoad())
+    case WhatReliefAreYouApplyingForPage => userAnswers => dataRequired(WhatReliefAreYouApplyingForPage, userAnswers, orgRoutes.SecuritiesTargetController.onPageLoad(NormalMode))
     case SecuritiesTargetPage => userAnswers => dataRequired(SecuritiesTargetPage, userAnswers, routes.JourneyRecoveryController.onPageLoad())
     case TaxRatePage => userAnswers => dataRequired(TaxRatePage, userAnswers, orgRoutes.WhatTypeOfSecuritiesController.onPageLoad(NormalMode))
     case WhatTypeOfSecuritiesPage => userAnswers => dataRequired(SecuritiesTargetPage, userAnswers, routes.JourneyRecoveryController.onPageLoad())
     case OtherSecuritiesTypePage => userAnswers => dataRequired(OtherSecuritiesTypePage, userAnswers, orgRoutes.AmountPaidForSecuritiesController.onPageLoad(NormalMode))
     case AmountPaidForSecuritiesPage => userAnswers =>
-      userAnswersDependent(userAnswers) {
-        userAnswers =>
-          userAnswers.get(ConnectedPersonsPage).fold(defaultPage) {
-            isConnected =>
-              if (isConnected) routes.JourneyRecoveryController.onPageLoad()
-              else routes.CheckYourAnswersController.onPageLoad()
-          }
+      dataDependent(ConnectedPersonsPage, userAnswers) { isConnected =>
+        if (isConnected) orgRoutes.TotalMarketValueController.onPageLoad(NormalMode)
+        else routes.CheckYourAnswersController.onPageLoad()
       }
     case DetailsOfThisTransferPage => userAnswers => dataRequired(DetailsOfThisTransferPage, userAnswers, routes.CheckYourAnswersController.onPageLoad())
     case _ => _ => Future.successful(defaultPage)

@@ -50,5 +50,3 @@ class BackwardsRoutes(defaultPage: Call):
     case TotalMarketValuePage => _ => individualsRoutes.AmountPaidForSecuritiesController.onPageLoad(NormalMode)
     case _ => _ => defaultPage
   }
-      
-
