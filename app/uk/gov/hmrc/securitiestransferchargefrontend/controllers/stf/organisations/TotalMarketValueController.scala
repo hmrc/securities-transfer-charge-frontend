@@ -16,45 +16,41 @@
 
 package uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.organisations
 
-import play.api.data.Form
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, Call, MessagesControllerComponents}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.SaveAndReturnButton.isReturn
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.actions.*
-import uk.gov.hmrc.securitiestransferchargefrontend.forms.stf.individuals.NameOfSellerFormProvider
+import uk.gov.hmrc.securitiestransferchargefrontend.forms.stf.organisations.TotalMarketValueFormProvider
 import uk.gov.hmrc.securitiestransferchargefrontend.models.{Mode, UserAnswers}
 import uk.gov.hmrc.securitiestransferchargefrontend.navigation.Navigator
-import uk.gov.hmrc.securitiestransferchargefrontend.pages.NameOfSellerPage
-import uk.gov.hmrc.securitiestransferchargefrontend.views.html.stf.organisations.NameOfSellerView
+import uk.gov.hmrc.securitiestransferchargefrontend.pages.TotalMarketValuePage
+import uk.gov.hmrc.securitiestransferchargefrontend.views.html.stf.organisations.TotalMarketValueView
 
 import javax.inject.{Inject, Named}
 import scala.concurrent.{ExecutionContext, Future}
-import scala.language.postfixOps
 
-class NameOfSellerController @Inject()(
+class TotalMarketValueController @Inject()(
                                         override val messagesApi: MessagesApi,
                                         @Named("organisations") navigator: Navigator,
                                         stcAuthEnrolled: StcAuthEnrolledAction,
                                         getData: StcDataRetrievalAction,
                                         requireData: StcDataRequiredAction,
-                                        formProvider: NameOfSellerFormProvider,
+                                        formProvider: TotalMarketValueFormProvider,
                                         val controllerComponents: MessagesControllerComponents,
-                                        view: NameOfSellerView
-                                    )(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport {
+                                        view: TotalMarketValueView
+                                      )(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport {
 
-  val form: Form[String] = formProvider()
+  private val form = formProvider()
 
   lazy val backLinkCall: Mode => UserAnswers => Call =
-    mode => userAnswers => navigator.previousPage(NameOfSellerPage, mode, userAnswers)
+    mode => userAnswers => navigator.previousPage(TotalMarketValuePage, mode, userAnswers)
 
   def onPageLoad(mode: Mode): Action[AnyContent] = (stcAuthEnrolled andThen getData andThen requireData) {
     implicit request =>
 
-      val preparedForm = request.userAnswers.get(NameOfSellerPage) match {
-        case None => form
-        case Some(value) => form.fill(value)
-      }
+      val preparedForm = 
+        request.userAnswers.get(TotalMarketValuePage).fold(form)(form.fill)
 
       Ok(view(preparedForm, mode, backLinkCall(mode)(request.userAnswers)))
   }
@@ -68,8 +64,8 @@ class NameOfSellerController @Inject()(
 
         value =>
           for {
-            updatedAnswers <- Future.fromTry(request.userAnswers.set(NameOfSellerPage, value))
-            nextPage       <- navigator.nextPage(NameOfSellerPage, mode, updatedAnswers,isReturn(request))
+            updatedAnswers <- Future.fromTry(request.userAnswers.set(TotalMarketValuePage, value))
+            nextPage       <- navigator.nextPage(TotalMarketValuePage, mode, updatedAnswers, isReturn(request))
           } yield Redirect(nextPage)
       )
   }

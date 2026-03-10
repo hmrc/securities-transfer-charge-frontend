@@ -171,3 +171,8 @@ POST       /stf/org/share-details                             uk.gov.hmrc.securi
 GET        /stf/org/change/share-details                      uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.organisations.DetailsOfThisTransferController.onPageLoad(mode: Mode = CheckMode)
 POST       /stf/org/change/share-details                      uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.organisations.DetailsOfThisTransferController.onSubmit(mode: Mode = CheckMode)
 
+
+GET        /stf/org/total-market-value                    uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.organisations.TotalMarketValueController.onPageLoad(mode: Mode = NormalMode)
+POST       /stf/org/total-market-value                    uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.organisations.TotalMarketValueController.onSubmit(mode: Mode = NormalMode)
+GET        /stf/org/change/total-market-value             uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.organisations.TotalMarketValueController.onPageLoad(mode: Mode = CheckMode)
+POST       /stf/org/change/total-market-value             uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.organisations.TotalMarketValueController.onSubmit(mode: Mode = CheckMode)
