@@ -77,7 +77,7 @@ class StfOrgNavigatorSpec extends SpecBase with ScalaFutures {
         val answers = emptyUserAnswers.set(NameOfSellerPage, "John").get
         val result = navigator.nextPage(NameOfSellerPage, NormalMode, answers)(fakeRequest)
         whenReady(result) { res =>
-          res mustBe orgRoutes.StfSellerAddressController.onPageLoad()
+          res mustBe orgRoutes.StfSellerAddressController.onPageLoad(NormalMode)
         }
       }
 
@@ -153,7 +153,7 @@ class StfOrgNavigatorSpec extends SpecBase with ScalaFutures {
         case object UnknownPage extends Page
         val result = navigator.nextPage(UnknownPage, CheckMode, UserAnswers("id", submissionId))(fakeRequest)
         whenReady(result) { res =>
-          res mustBe routes.CheckYourAnswersController.onPageLoad()
+          res mustBe orgRoutes.CheckYourAnswersController.onPageLoad()
         }
       }
     }
@@ -194,7 +194,7 @@ class StfOrgNavigatorSpec extends SpecBase with ScalaFutures {
 
       "must go from the ConnectedPersonsPage to StfSellerAddress" in {
         val result = navigator.previousPage(ConnectedPersonsPage, NormalMode, emptyUserAnswers)
-        result mustBe orgRoutes.StfSellerAddressController.onPageLoad()
+        result mustBe orgRoutes.StfSellerAddressController.onPageLoad(NormalMode)
       }
 
       "must go from the NameOfSellerPage to ConfirmAddress" in {

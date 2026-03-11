@@ -21,6 +21,7 @@ import org.scalatestplus.mockito.MockitoSugar
 import play.api.test.FakeRequest
 import play.api.test.Helpers.*
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.individuals.routes
+import uk.gov.hmrc.securitiestransferchargefrontend.models.NormalMode
 
 class StfSellerAddressControllerSpec extends SpecBase with MockitoSugar {
 
@@ -32,7 +33,7 @@ class StfSellerAddressControllerSpec extends SpecBase with MockitoSugar {
         .build()
 
       running(application) {
-        val request = FakeRequest(GET, routes.StfSellerAddressController.onPageLoad().url)
+        val request = FakeRequest(GET, routes.StfSellerAddressController.onPageLoad(NormalMode).url)
         val result = route(application, request).value
 
         status(result) mustEqual SEE_OTHER
@@ -44,7 +45,7 @@ class StfSellerAddressControllerSpec extends SpecBase with MockitoSugar {
         .build()
 
       running(application) {
-        val request = FakeRequest(GET, routes.StfSellerAddressController.onReturn("key").url)
+        val request = FakeRequest(GET, routes.StfSellerAddressController.onReturn("key", NormalMode).url)
         val result = route(application, request).value
 
         status(result) mustEqual SEE_OTHER

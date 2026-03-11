@@ -33,7 +33,7 @@ class AddressControllerSpec extends SpecBase with MockitoSugar {
         .build()
 
       running(application) {
-        val request = FakeRequest(GET, orgRoutes.AddressController.onPageLoad().url)
+        val request = FakeRequest(GET, orgRoutes.AddressController.onPageLoad(NormalMode).url)
         val result = route(application, request).value
 
         status(result) mustEqual SEE_OTHER
@@ -45,7 +45,7 @@ class AddressControllerSpec extends SpecBase with MockitoSugar {
         .build()
 
       running(application) {
-        val request = FakeRequest(GET, orgRoutes.AddressController.onReturn("addressId").url)
+        val request = FakeRequest(GET, orgRoutes.AddressController.onReturn("addressId",NormalMode).url)
         val result = route(application, request).value
 
         status(result) mustEqual SEE_OTHER

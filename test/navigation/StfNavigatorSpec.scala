@@ -77,7 +77,7 @@ class StfNavigatorSpec extends SpecBase with ScalaFutures {
         val answers = emptyUserAnswers.set(NameOfSellerPage, "John").get
         val result = navigator.nextPage(NameOfSellerPage, NormalMode, answers)(fakeRequest)
         whenReady(result) { res =>
-          res mustBe individualRoutes.StfSellerAddressController.onPageLoad()
+          res mustBe individualRoutes.StfSellerAddressController.onPageLoad(NormalMode)
         }
       }
 
@@ -191,7 +191,7 @@ class StfNavigatorSpec extends SpecBase with ScalaFutures {
         val updated = answers.set(ConnectedPersonsPage, false).get
         val result = navigator.nextPage(AmountPaidForSecuritiesPage, NormalMode, updated)(fakeRequest)
         whenReady(result) { res =>
-          res mustBe routes.CheckYourAnswersController.onPageLoad()
+          res mustBe individualRoutes.CheckYourAnswersController.onPageLoad()
         }
       }
 
@@ -200,7 +200,7 @@ class StfNavigatorSpec extends SpecBase with ScalaFutures {
           typeOfShares = "ordinary share", amountPaid = BigDecimal(500), marketValue = Some(BigDecimal(1500)))).get
         val result = navigator.nextPage(DetailsOfThisTransferPage, NormalMode, answers)(fakeRequest)
         whenReady(result) { res =>
-          res mustBe routes.CheckYourAnswersController.onPageLoad()
+          res mustBe individualRoutes.CheckYourAnswersController.onPageLoad()
         }
       }
     }
@@ -212,7 +212,7 @@ class StfNavigatorSpec extends SpecBase with ScalaFutures {
         case object UnknownPage extends Page
         val result = navigator.nextPage(UnknownPage, CheckMode, UserAnswers("id", submissionId))(fakeRequest)
         whenReady(result) { res =>
-          res mustBe routes.CheckYourAnswersController.onPageLoad()
+          res mustBe individualRoutes.CheckYourAnswersController.onPageLoad()
         }
       }
     }
@@ -284,7 +284,7 @@ class StfNavigatorSpec extends SpecBase with ScalaFutures {
 
       "must go from the ConnectedPersonsPage to StfSellerAddress" in {
         val result = navigator.previousPage(ConnectedPersonsPage, NormalMode, emptyUserAnswers)
-        result mustBe individualRoutes.StfSellerAddressController.onPageLoad()
+        result mustBe individualRoutes.StfSellerAddressController.onPageLoad(NormalMode)
       }
 
       "must go from the StfSellerAddressPage to NameOfSeller" in {
