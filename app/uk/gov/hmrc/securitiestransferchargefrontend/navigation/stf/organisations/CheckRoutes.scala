@@ -19,7 +19,7 @@ package uk.gov.hmrc.securitiestransferchargefrontend.navigation.stf.organisation
 import play.api.mvc.Call
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.organisations.routes as orgRoutes
-import uk.gov.hmrc.securitiestransferchargefrontend.models.UserAnswers
+import uk.gov.hmrc.securitiestransferchargefrontend.models.{CheckMode, UserAnswers, WhatTypeOfSecurities}
 import uk.gov.hmrc.securitiestransferchargefrontend.navigation.*
 import uk.gov.hmrc.securitiestransferchargefrontend.pages.*
 import uk.gov.hmrc.securitiestransferchargefrontend.services.AnswerPersistenceService
@@ -34,7 +34,81 @@ class CheckRoutes(answerPersistenceService: AnswerPersistenceService,
   
   val helper = new PersistentNavigationHelper(answerPersistenceService, defaultPage, errorPages)
   import helper.*
-  
+
   def checkRoutes(page: Page)(implicit hc: HeaderCarrier): UserAnswers => Future[Call] = page match {
+    case ApplyingForReliefPage =>
+      userAnswers =>
+
+        val nextPage = userAnswers.get(ApplyingForReliefPage) match {
+
+          case Some(true) if userAnswers.get(WhatReliefAreYouApplyingForPage).isEmpty =>
+            orgRoutes.WhatReliefAreYouApplyingForController.onPageLoad(CheckMode)
+
+          case _ =>
+            orgRoutes.CheckYourAnswersController.onPageLoad()
+        }
+
+        goTo(nextPage, Some(userAnswers))
+
+    case WhatTypeOfSecuritiesPage =>
+      userAnswers =>
+        val nextPage =
+          userAnswers.get(WhatTypeOfSecuritiesPage) match {
+
+            case Some(WhatTypeOfSecurities.Other) if userAnswers.get(OtherSecuritiesTypePage).isEmpty =>
+              orgRoutes.OtherSecuritiesTypeController.onPageLoad(CheckMode)
+
+            case Some(WhatTypeOfSecurities.Shares) if userAnswers.get(DetailsOfThisTransferPage).isEmpty =>
+              orgRoutes.DetailsOfThisTransferController.onPageLoad(CheckMode)
+
+            case _ =>
+              orgRoutes.CheckYourAnswersController.onPageLoad()
+          }
+
+        goTo(nextPage, Some(userAnswers))
+
+    case OtherSecuritiesTypePage =>
+      userAnswers =>
+
+        val nextPage =
+          userAnswers.get(AmountPaidForSecuritiesPage) match {
+            case None =>
+              orgRoutes.AmountPaidForSecuritiesController.onPageLoad(CheckMode)
+
+            case Some(_) =>
+              orgRoutes.CheckYourAnswersController.onPageLoad()
+          }
+
+        goTo(nextPage, Some(userAnswers))
+
+    case AmountPaidForSecuritiesPage =>
+      userAnswers =>
+        val nextPage =
+          (userAnswers.get(ConnectedPersonsPage), userAnswers.get(TotalMarketValuePage)) match {
+            case (Some(true), None) =>
+              orgRoutes.TotalMarketValueController.onPageLoad(CheckMode)
+
+            case _ =>
+              orgRoutes.CheckYourAnswersController.onPageLoad()
+          }
+
+        goTo(nextPage, Some(userAnswers))
+
+    case ConnectedPersonsPage =>
+      userAnswers =>
+
+        val nextPage = userAnswers.get(ConnectedPersonsPage) match {
+
+          case Some(true) if userAnswers.get(DetailsOfThisTransferPage).forall(_.marketValue.isEmpty) =>
+            orgRoutes.DetailsOfThisTransferController.onPageLoad(CheckMode)
+
+          case _ =>
+            orgRoutes.CheckYourAnswersController.onPageLoad()
+        }
+
+        goTo(nextPage, Some(userAnswers))
+
+
     case _ => userAnswers => goTo(orgRoutes.CheckYourAnswersController.onPageLoad(), Some(userAnswers))
   }
+
