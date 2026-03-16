@@ -176,3 +176,5 @@ GET        /stf/org/total-market-value                    uk.gov.hmrc.securities
 POST       /stf/org/total-market-value                    uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.organisations.TotalMarketValueController.onSubmit(mode: Mode = NormalMode)
 GET        /stf/org/change/total-market-value             uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.organisations.TotalMarketValueController.onPageLoad(mode: Mode = CheckMode)
 POST       /stf/org/change/total-market-value             uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.organisations.TotalMarketValueController.onSubmit(mode: Mode = CheckMode)
+
+GET        /template                       uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.individuals.TemplateInstructionsController.onPageLoad()
