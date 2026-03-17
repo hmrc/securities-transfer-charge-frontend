@@ -27,13 +27,11 @@ import javax.inject.Inject
 class TemplateInstructionsController @Inject()(
                                                 override val messagesApi: MessagesApi,
                                                 stcAuthEnrolled: StcAuthEnrolledAction,
-                                                getData: StcDataRetrievalAction,
-                                                requireData: StcDataRequiredAction,
                                                 val controllerComponents: MessagesControllerComponents,
                                                 view: TemplateInstructionsView
                                               )  extends FrontendBaseController with I18nSupport{
   
-  def onPageLoad(): Action[AnyContent] = (stcAuthEnrolled andThen getData andThen requireData) {
+  def onPageLoad(): Action[AnyContent] = stcAuthEnrolled {
     implicit request =>
       Ok(view())
   }
