@@ -50,6 +50,7 @@ class ForwardRoutes(answerPersistenceService: AnswerPersistenceService,
         case MoreThanOneAtATime => individualRoutes.TemplateInstructionsController.onPageLoad()
       }
     }
+    case TemplateInstructionsPage => userAnswers => goTo(routes.JourneyRecoveryController.onPageLoad(), Some(userAnswers))
     case ConfirmAddressPage => userAnswers => dataRequired(ConfirmAddressPage, userAnswers, individualRoutes.NameOfSellerController.onPageLoad(NormalMode))
     case StfBuyersAddressPage => userAnswers => dataRequired(StfBuyersAddressPage, userAnswers, individualRoutes.NameOfSellerController.onPageLoad(NormalMode))
     case NameOfSellerPage => userAnswers => dataRequired(NameOfSellerPage, userAnswers, individualRoutes.StfSellerAddressController.onPageLoad())
