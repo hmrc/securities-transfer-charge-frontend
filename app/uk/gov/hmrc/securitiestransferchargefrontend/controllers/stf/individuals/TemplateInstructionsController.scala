@@ -16,7 +16,6 @@
 
 package uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.individuals
 
-import play.api.Logging
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
@@ -32,7 +31,7 @@ class TemplateInstructionsController @Inject()(
                                                 requireData: StcDataRequiredAction,
                                                 val controllerComponents: MessagesControllerComponents,
                                                 view: TemplateInstructionsView
-                                              )  extends FrontendBaseController with I18nSupport with Logging{
+                                              )  extends FrontendBaseController with I18nSupport{
   
   def onPageLoad(): Action[AnyContent] = (stcAuthEnrolled andThen getData andThen requireData) {
     implicit request =>
