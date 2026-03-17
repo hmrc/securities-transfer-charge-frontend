@@ -65,6 +65,14 @@ class StfNavigatorSpec extends SpecBase with ScalaFutures {
         }
       }
 
+      "must go from the HowToNotifyAboutSecuritiesTransfer to TemplateInstructionsController when one at a time is selected" in {
+        val answers = emptyUserAnswers.set(HowToNotifyAboutSecuritiesTransferPage, HowToNotifyAboutSecuritiesTransfer.MoreThanOneAtATime).get
+        val result = navigator.nextPage(HowToNotifyAboutSecuritiesTransferPage, NormalMode, answers)(fakeRequest)
+        whenReady(result) { res =>
+          res mustBe individualRoutes.TemplateInstructionsController.onPageLoad()
+        }
+      }
+
       "must go from the ConfirmAddressPage to NameOfSellerController" in {
         val answers = emptyUserAnswers.set(ConfirmAddressPage, Fixtures.confirmableAddress).get
         val result = navigator.nextPage(ConfirmAddressPage, NormalMode, answers)(fakeRequest)

@@ -47,7 +47,7 @@ class ForwardRoutes(answerPersistenceService: AnswerPersistenceService,
     case HowToNotifyAboutSecuritiesTransferPage => userAnswers => {
       dataDependent(HowToNotifyAboutSecuritiesTransferPage, userAnswers) {
         case OneAtATime => individualRoutes.ConfirmAddressController.onPageLoad()
-        case MoreThanOneAtATime => defaultPage
+        case MoreThanOneAtATime => individualRoutes.TemplateInstructionsController.onPageLoad()
       }
     }
     case ConfirmAddressPage => userAnswers => dataRequired(ConfirmAddressPage, userAnswers, individualRoutes.NameOfSellerController.onPageLoad(NormalMode))

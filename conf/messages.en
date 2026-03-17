@@ -321,3 +321,12 @@ org.totalMarketValue.error.aboveMaximum = The market value must be {0} or less
 org.totalMarketValue.error.belowMinimum = The market value must be {0} or more
 org.totalMarketValue.change.hidden = Change the market value of the securities
 org.totalMarketValue.hint = For example, £600 or £193.54
+
+templateInstructions.title = How to use the template
+templateInstructions.heading = How to use the template
+templateInstructions.p1 = Use the template to tell us about more than one securities transfer at a time.
+templateInstructions.step1 = Download the template
+templateInstructions.step2 = Complete the template, using one row for each type of securities you are buying
+templateInstructions.step3 = Upload your file on the next page as a .xlsx or .csv.
+templateInstructions.p2 = Remember, do not edit the first two rows, or change the order of the columns.
+templateInstructions.p3 = Once you have uploaded and submitted your file it will show on your <strong>STC dashboard</strong>. You can then pay any charges due.

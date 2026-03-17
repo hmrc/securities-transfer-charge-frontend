@@ -14,12 +14,12 @@
  * limitations under the License.
  */
 
-package forms
+package forms.stf.organisations
 
 import forms.behaviours.OptionFieldBehaviours
-import uk.gov.hmrc.securitiestransferchargefrontend.models.HowToNotifyAboutSecuritiesTransfer
 import play.api.data.FormError
 import uk.gov.hmrc.securitiestransferchargefrontend.forms.stf.organisations.HowToNotifyAboutSecuritiesTransferFormProvider
+import uk.gov.hmrc.securitiestransferchargefrontend.models.HowToNotifyAboutSecuritiesTransfer
 
 class HowToNotifyAboutSecuritiesTransferFormProviderSpec extends OptionFieldBehaviours {
 
