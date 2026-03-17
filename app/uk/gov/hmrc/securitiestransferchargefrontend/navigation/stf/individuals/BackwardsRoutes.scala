@@ -30,6 +30,7 @@ class BackwardsRoutes(defaultPage: Call):
   
   def predecessorRoutes(page: Page): UserAnswers => Call = page match {
     case HowToNotifyAboutSecuritiesTransferPage => _ => routes.SubmissionsDashboardController.onPageLoad()
+    case TemplateInstructionsPage => _ => individualsRoutes.HowToNotifyAboutSecuritiesTransferController.onPageLoad(NormalMode)
     case ConfirmAddressPage => _ => individualsRoutes.HowToNotifyAboutSecuritiesTransferController.onPageLoad(NormalMode)
     case StfBuyersAddressPage => _ => individualsRoutes.HowToNotifyAboutSecuritiesTransferController.onPageLoad(NormalMode)
     case NameOfSellerPage => _ => individualsRoutes.ConfirmAddressController.onPageLoad()
