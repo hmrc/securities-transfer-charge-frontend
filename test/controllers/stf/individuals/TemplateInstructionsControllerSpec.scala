@@ -24,7 +24,8 @@ import play.api.inject.bind
 import play.api.test.FakeRequest
 import play.api.test.Helpers.*
 import uk.gov.hmrc.securitiestransferchargefrontend.clients.SubmissionIdClient
-import uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.individuals.routes
+import uk.gov.hmrc.securitiestransferchargefrontend.controllers.routes
+import uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.individuals.routes as individualRoutes
 import uk.gov.hmrc.securitiestransferchargefrontend.domain.SubmissionId
 import uk.gov.hmrc.securitiestransferchargefrontend.views.html.stf.individuals.TemplateInstructionsView
 
@@ -41,7 +42,7 @@ class TemplateInstructionsControllerSpec extends SpecBase {
       val application = applicationBuilder(userAnswers = Some(emptyUserAnswers)).build()
 
       running(application) {
-        val request = FakeRequest(GET, routes.TemplateInstructionsController.onPageLoad().url)
+        val request = FakeRequest(GET, individualRoutes.TemplateInstructionsController.onPageLoad().url)
 
         val result = route(application, request).value
 
@@ -63,11 +64,12 @@ class TemplateInstructionsControllerSpec extends SpecBase {
         .build()
 
       running(application) {
-        val request = FakeRequest(POST, routes.TemplateInstructionsController.onSubmit().url)
+        val request = FakeRequest(POST, individualRoutes.TemplateInstructionsController.onSubmit().url)
 
         val result = route(application, request).value
 
         status(result) mustEqual SEE_OTHER
+        redirectLocation(result).value mustEqual routes.JourneyRecoveryController.onPageLoad().url
       }
     }
   }
