@@ -104,8 +104,8 @@ POST       /stf/change/consideration                      uk.gov.hmrc.securities
 GET        /stf/template                                  uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.individuals.TemplateInstructionsController.onPageLoad()
 POST       /stf/template                                  uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.individuals.TemplateInstructionsController.onSubmit()
 
-GET        /stf/formattingError                           uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.individuals.FormattingErrorController.onPageLoad()
-POST       /stf/formattingError                           uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.individuals.FormattingErrorController.onSubmit()
+GET        /stf/bulk-error                           uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.individuals.FormattingErrorController.onPageLoad()
+POST       /stf/bulk-error                           uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.individuals.FormattingErrorController.onSubmit()
 
 GET        /stf/org/confirm-address                       uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.organisations.ConfirmAddressController.onPageLoad()
 

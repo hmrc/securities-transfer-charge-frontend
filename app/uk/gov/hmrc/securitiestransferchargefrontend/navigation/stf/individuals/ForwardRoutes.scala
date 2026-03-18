@@ -51,6 +51,7 @@ class ForwardRoutes(answerPersistenceService: AnswerPersistenceService,
       }
     }
     case TemplateInstructionsPage => _ => goTo(routes.JourneyRecoveryController.onPageLoad(), None)
+    case FormattingErrorPage => _ => goTo(routes.JourneyRecoveryController.onPageLoad(), None)
     case ConfirmAddressPage => userAnswers => dataRequired(ConfirmAddressPage, userAnswers, individualRoutes.NameOfSellerController.onPageLoad(NormalMode))
     case StfBuyersAddressPage => userAnswers => dataRequired(StfBuyersAddressPage, userAnswers, individualRoutes.NameOfSellerController.onPageLoad(NormalMode))
     case NameOfSellerPage => userAnswers => dataRequired(NameOfSellerPage, userAnswers, individualRoutes.StfSellerAddressController.onPageLoad())
