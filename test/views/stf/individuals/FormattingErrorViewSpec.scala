@@ -36,7 +36,7 @@ class FormattingErrorViewSpec extends ViewBaseSpec {
     val title = "Your file has formatting errors"
     val heading = "Your file has formatting errors"
 
-    val para1Value = "More than 35 formatting errors have been detected in this file."
+    val para1Value = "More than 25 formatting errors have been detected in this file."
     val para2Value = "The errors may include things like incorrect formatting of numbers or dates, or a letters in a cell that can only contain numbers."
     val para3Value = "These will need to be corrected before your file can be uploaded again."
     val para4Value = "Check the instructions in the template file for more guidance."
