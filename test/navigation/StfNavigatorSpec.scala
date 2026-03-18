@@ -314,7 +314,11 @@ class StfNavigatorSpec extends SpecBase with ScalaFutures {
         val result = navigator.previousPage(HowToNotifyAboutSecuritiesTransferPage, NormalMode, emptyUserAnswers)
         result mustBe routes.SubmissionsDashboardController.onPageLoad()
       }
-      
+
+      "must go from the TemplateInstructionsController to HowToNotifyAboutSecuritiesTransfer when one at a time is selected" in {
+        val result = navigator.previousPage(TemplateInstructionsPage, NormalMode, emptyUserAnswers)
+        result mustBe individualRoutes.HowToNotifyAboutSecuritiesTransferController.onPageLoad(NormalMode)
+      }
     }
 
   }

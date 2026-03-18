@@ -102,6 +102,7 @@ GET        /stf/change/consideration                      uk.gov.hmrc.securities
 POST       /stf/change/consideration                      uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.individuals.AmountPaidForSecuritiesController.onSubmit(mode: Mode = CheckMode)
 
 GET        /stf/template                                  uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.individuals.TemplateInstructionsController.onPageLoad()
+POST       /stf/template                                  uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.individuals.TemplateInstructionsController.onSubmit()
 
 GET        /stf/org/confirm-address                       uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.organisations.ConfirmAddressController.onPageLoad()
 
