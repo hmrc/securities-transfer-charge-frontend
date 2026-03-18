@@ -17,5 +17,4 @@
 package uk.gov.hmrc.securitiestransferchargefrontend.pages
 
 case object TemplateInstructionsPage extends Page {
-  override def toString: String = "templateInstructions"
 }
