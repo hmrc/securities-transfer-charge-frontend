@@ -334,7 +334,7 @@ templateInstructions.p3 = Once you have uploaded and submitted your file it will
 
 formattingError.title = Your file has formatting errors
 formattingError.heading = Your file has formatting errors
-formattingError.p1 = More than 35 formatting errors have been detected in this file.
+formattingError.p1 = More than 25 formatting errors have been detected in this file.
 formattingError.p2 = The errors may include things like incorrect formatting of numbers or dates, or a letters in a cell that can only contain numbers.
 formattingError.p3 = These will need to be corrected before your file can be uploaded again.
 formattingError.p4 = Check the instructions in the template file for more guidance.
