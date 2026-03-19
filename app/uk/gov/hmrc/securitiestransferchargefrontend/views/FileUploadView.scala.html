@@ -33,7 +33,7 @@
     error.map(msg => uploadForm.withError("file", msg)).getOrElse(uploadForm)
 }
 
-@layout(pageTitle = titleNoForm(messages("upload.title"))) {
+@layout(pageTitle = titleNoForm(messages("fileUpload.title"))) {
 
     <span class="govuk-caption-l">
         @messages("transfer.details.caption")

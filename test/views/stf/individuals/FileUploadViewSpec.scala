@@ -47,7 +47,7 @@ class FileUploadViewSpec extends ViewBaseSpec {
     )
 
   object ExpectedContent {
-    val title: String = messages("upload.title")
+    val title: String = messages("fileUpload.title")
     val caption: String = messages("transfer.details.caption")
     val heading: String = messages("fileUpload.heading")
     val label: String = messages("fileUpload.label")
