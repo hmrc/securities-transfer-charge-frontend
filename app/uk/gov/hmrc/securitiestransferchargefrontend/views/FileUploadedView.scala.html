@@ -17,23 +17,25 @@
 @import uk.gov.hmrc.securitiestransferchargefrontend.models.upscan.FileUpload
 
 @this(
-layout: templates.Layout
+    layout: templates.Layout
 )
 
-@(fileUpload: FileUpload)(implicit request: Request[_], messages: Messages)
+@(fileUpload: FileUpload)(implicit request: Request[_],messages: Messages)
 
 @layout(pageTitle = titleNoForm(messages("fileUploaded.title"))) {
 
-<h1 class="govuk-heading-l">
-    @messages("fileUploaded.heading")
-</h1>
+    <h1 class="govuk-heading-l">
+        @messages("fileUploaded.heading")
+    </h1>
 
-<p class="govuk-body">
-    @messages("fileUploaded.reference") <strong>@fileUpload.reference</strong>
-</p>
+    <p class="govuk-body">
+        @messages("fileUploaded.reference")
+        <strong>@fileUpload.reference</strong>
+    </p>
 
-<p class="govuk-body">
-    @messages("fileUploaded.status") <strong>@fileUpload.status.toString</strong>
-</p>
+    <p class="govuk-body">
+        @messages("fileUploaded.status")
+        <strong>@fileUpload.status.toString</strong>
+    </p>
 
 }

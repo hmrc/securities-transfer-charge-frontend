@@ -20,26 +20,39 @@
 @this(
     layout: templates.Layout,
     govukButton: GovukButton,
-    formHelper: FormWithCSRF,
+    formHelper: FormWithCSRF
 )
 
 @()(implicit request: Request[_], messages: Messages)
 
 @layout(pageTitle = titleNoForm(messages("fileUpload.error.emptyFile.title"))) {
 
- @formHelper(action = routes.FileUploadController.onPageLoad(), Symbol("autoComplete") -> "off") {
+    @formHelper(
+        action = routes.FileUploadController.onPageLoad(),
+        Symbol("autoComplete") -> "off"
+    ) {
 
- <h1 class="govuk-heading-l">@messages("fileUpload.error.emptyFile.heading")</h1>
+        <h1 class="govuk-heading-l">
+            @messages("fileUpload.error.emptyFile.heading")
+        </h1>
 
- <p class="govuk-body">@messages("fileUpload.error.emptyFile.p1")</p>
- <p class="govuk-body">
-  <a class="govuk-link" href="/securities-transfer-charge/assets/Bulk_Securities_Transfer_Charge_template_v1i.xlsx" download="Bulk Securities Transfer Charge template v1i.xlsx">
-   @messages("fileUpload.error.emptyFile.download.text")
-  </a>
- </p>
+        <p class="govuk-body">
+            @messages("fileUpload.error.emptyFile.p1")
+        </p>
 
- @govukButton(
-          ButtonViewModel(messages("fileUpload.upload.another"))
-      )
-  }
+        <p class="govuk-body">
+            <a
+                class="govuk-link"
+                href="/securities-transfer-charge/assets/Bulk_Securities_Transfer_Charge_template_v1i.xlsx"
+                download="Bulk Securities Transfer Charge template v1i.xlsx"
+            >
+                @messages("fileUpload.error.emptyFile.download.text")
+            </a>
+        </p>
+
+        @govukButton(
+            ButtonViewModel(messages("fileUpload.upload.another"))
+        )
+
+    }
 }

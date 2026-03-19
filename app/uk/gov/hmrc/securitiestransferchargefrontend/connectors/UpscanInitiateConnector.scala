@@ -25,6 +25,7 @@ import uk.gov.hmrc.http.{HeaderCarrier, HttpResponse, StringContextOps, Upstream
 import uk.gov.hmrc.securitiestransferchargefrontend.config.FrontendAppConfig
 import uk.gov.hmrc.securitiestransferchargefrontend.models.upscan.{UpscanInitiateRequest, UpscanInitiateResponse}
 import uk.gov.hmrc.securitiestransferchargefrontend.utils.CommonHelpers
+import play.api.http.Status.OK
 
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
@@ -61,7 +62,7 @@ class UpscanInitiateConnectorImpl @Inject()(http: HttpClientV2,
   private def handleUpscanResponse(response: HttpResponse): Future[UpscanInitiateResponse] =
     response.status match {
 
-      case 200 =>
+      case OK =>
         response.json.validate[UpscanInitiateResponse] match {
           case JsSuccess(value, _) => Future.successful(value)
           case JsError(errors) => logInfoAndFail(UpscanException(s"Failed to parse UpscanInitiateResponse: $errors. Body: ${response.body}"))

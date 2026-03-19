@@ -19,55 +19,70 @@
 @import play.api.data.Form
 @import play.api.data.Forms._
 
-
 @this(
-layout: templates.Layout,
-govukButton: GovukButton ,
-govukFileUpload: GovukFileUpload,
-govukErrorSummary: GovukErrorSummary
+    layout: templates.Layout,
+    govukButton: GovukButton,
+    govukFileUpload: GovukFileUpload,
+    govukErrorSummary: GovukErrorSummary
 )
 
-@(upscanInitiateResponse: UploadRequest, error: Option[String] = None)(implicit request: Request[_], messages: Messages)
+@(upscanInitiateResponse: UploadRequest, error: Option[String] = None)(implicit request: Request[_],messages: Messages)
 
 @uploadForm = @{ Form("file" -> nonEmptyText) }
-@formWithUpscanError = @{ error.map(msg => uploadForm.withError("file", msg)).getOrElse(uploadForm) }
+@formWithUpscanError = @{
+    error.map(msg => uploadForm.withError("file", msg)).getOrElse(uploadForm)
+}
 
 @layout(pageTitle = titleNoForm(messages("upload.title"))) {
 
-<span  class="govuk-caption-l">@messages("transfer.details.caption")</span>
-<h1 class="govuk-heading-l">@messages("fileUpload.heading")</h1>
+    <span class="govuk-caption-l">
+        @messages("transfer.details.caption")
+    </span>
 
-@if(formWithUpscanError.errors.nonEmpty) {
-@govukErrorSummary(ErrorSummaryViewModel(formWithUpscanError))
-}
+    <h1 class="govuk-heading-l">
+        @messages("fileUpload.heading")
+    </h1>
 
-
-<form action="@upscanInitiateResponse.href" method="post" enctype="multipart/form-data">
-
-    @for(field <- upscanInitiateResponse.fields) {
-    <input type="hidden" name="@field._1" value="@field._2"/>
+    @if(formWithUpscanError.errors.nonEmpty) {
+        @govukErrorSummary(
+            ErrorSummaryViewModel(formWithUpscanError)
+        )
     }
-    <div class="govuk-inset-text">
-        @messages("fileUpload.inset.text")
-    </div>
-    <label class="govuk-label" >
-        @messages("fileUpload.label")
-    </label>
-    <div class="govuk-drop-zone" data-module="govuk-file-upload">
-        @govukFileUpload(FileUpload(
-        name = "file",
-        id = "file-input",
-        label = Label(
-        classes = "govuk-label--s govuk-visually-hidden",
-        content = messages("fileUpload.heading")
-        ),
-        attributes = Map("accept" -> ".xlsx,.csv", "required" -> "required")
-        ))
-    </div>
 
-    @govukButton(
+    <form action="@upscanInitiateResponse.href" method="post" enctype="multipart/form-data">
+
+        @for(field <- upscanInitiateResponse.fields) {
+            <input type="hidden" name="@field._1" value="@field._2"/>
+        }
+
+        <div class="govuk-inset-text">
+            @messages("fileUpload.inset.text")
+        </div>
+
+        <label class="govuk-label">
+            @messages("fileUpload.label")
+        </label>
+
+        <div class="govuk-drop-zone" data-module="govuk-file-upload">
+            @govukFileUpload(
+                FileUpload(
+                    name = "file",
+                    id = "file-input",
+                    label = Label(
+                        classes = "govuk-label--s govuk-visually-hidden",
+                        content = messages("fileUpload.heading")
+                    ),
+                    attributes = Map(
+                        "accept" -> ".xlsx,.csv",
+                        "required" -> "required"
+                    )
+                )
+            )
+        </div>
+
+        @govukButton(
             ButtonViewModel(messages("fileUpload.button"))
         )
 
-</form>
+    </form>
 }
