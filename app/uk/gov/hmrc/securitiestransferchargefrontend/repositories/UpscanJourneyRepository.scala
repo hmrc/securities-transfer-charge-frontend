@@ -29,7 +29,7 @@ import uk.gov.hmrc.securitiestransferchargefrontend.models.upscan.UpscanCallback
 import uk.gov.hmrc.securitiestransferchargefrontend.models.upscan.{FileUpload, UpscanDocument, UpscanJourneyStatus}
 
 import java.util.concurrent.TimeUnit
-import javax.inject.Inject
+import javax.inject.{Inject,Singleton}
 import scala.concurrent.{ExecutionContext, Future}
 
 
@@ -45,6 +45,7 @@ trait UpscanJourneyRepository {
 
 }
 
+@Singleton
 class UpscanJourneyRepositoryImpl @Inject()(
                                              mongoComponent: MongoComponent,
                                              appConfig: FrontendAppConfig

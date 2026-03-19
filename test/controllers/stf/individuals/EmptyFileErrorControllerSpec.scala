@@ -21,7 +21,7 @@ import org.scalatestplus.mockito.MockitoSugar
 import play.api.test.FakeRequest
 import play.api.test.Helpers.*
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.individuals.routes as individualRoutes
-import uk.gov.hmrc.securitiestransferchargefrontend.views.html.EmptyFileErrorView
+import uk.gov.hmrc.securitiestransferchargefrontend.views.html.stf.individuals.EmptyFileErrorView
 
 class EmptyFileErrorControllerSpec extends SpecBase with MockitoSugar {
 

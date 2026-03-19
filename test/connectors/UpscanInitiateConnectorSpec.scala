@@ -84,7 +84,7 @@ class UpscanInitiateConnectorSpec extends SpecBase with MockitoSugar {
         }
       }
 
-      "should fail when theres an UpscanInitiateResponse parse failure" in {
+      "should fail when there is an UpscanInitiateResponse parse failure" in {
         val invalidResponse = """{
                                 |    "reference": "123455678990",
                                 |    "uploadRequest": {
@@ -103,7 +103,7 @@ class UpscanInitiateConnectorSpec extends SpecBase with MockitoSugar {
         }
       }
 
-      "should fail when response is non-200" in {
+      "should fail when response is a non-200" in {
 
         val response = HttpResponse(INTERNAL_SERVER_ERROR, "error")
         val connector = setup(response)

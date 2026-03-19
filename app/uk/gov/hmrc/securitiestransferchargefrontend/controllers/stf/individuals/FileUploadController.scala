@@ -34,7 +34,7 @@ class FileUploadController @Inject()(
                                       val controllerComponents: MessagesControllerComponents,
                                       view: FileUploadView,
                                       upscanInitiateConnector: UpscanInitiateConnector,
-                                      upscanJourneyRepository: UpscanJourneyRepository,
+                                      upscanJourneyRepository: UpscanJourneyRepository
                                     )(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport {
 
   def onPageLoad(): Action[AnyContent] = stcAuthEnrolled.async { implicit request =>
