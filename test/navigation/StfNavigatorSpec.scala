@@ -65,7 +65,7 @@ class StfNavigatorSpec extends SpecBase with ScalaFutures {
         }
       }
 
-      "must go from the HowToNotifyAboutSecuritiesTransfer to TemplateInstructionsController when one at a time is selected" in {
+      "must go from the HowToNotifyAboutSecuritiesTransfer to TemplateInstructionsController when more than one at a time is selected" in {
         val answers = emptyUserAnswers.set(HowToNotifyAboutSecuritiesTransferPage, HowToNotifyAboutSecuritiesTransfer.MoreThanOneAtATime).get
         val result = navigator.nextPage(HowToNotifyAboutSecuritiesTransferPage, NormalMode, answers)(fakeRequest)
         whenReady(result) { res =>
