@@ -26,18 +26,23 @@
 
 @()(implicit request: Request[_], messages: Messages)
 
-@layout(pageTitle = titleNoForm(messages("formattingError.title"))) {
+@layout(pageTitle = titleNoForm(messages("changedFileError.title"))) {
 
-    <h1 class="govuk-heading-l">@messages("formattingError.heading")</h1>
+    <h1 class="govuk-heading-l">@messages("changedFileError.heading")</h1>
 
-    <p class="govuk-body">@messages("formattingError.p1")</p>
-    <p class="govuk-body">@Html(messages("formattingError.p2"))</p>
-    <p class="govuk-body">@messages("formattingError.p3")</p>
-    <p class="govuk-body">@Html(messages("formattingError.p4"))</p>
+    <p class="govuk-body">@messages("changedFileError.p1")</p>
+    <p class="govuk-body">@Html(messages("changedFileError.p2"))</p>
+    <p class="govuk-body">@messages("changedFileError.p3")</p>
+
+    <p>
+        <a class="govuk-link" href="/securities-transfer-charge/assets/Bulk_Securities_Transfer_Charge_template_v1i.xlsx" download="Bulk Securities Transfer Charge template v1i.xlsx">
+            @messages("changedFileError.download.text")
+        </a>.
+    </p>
 
     @formHelper(action = routes.JourneyRecoveryController.onPageLoad()) {
         @govukButton(
-            ButtonViewModel(messages("site.back-to-upload.button"))
+            ButtonViewModel(messages("fileUpload.upload.another"))
         )
     }
 }

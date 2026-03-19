@@ -20,64 +20,70 @@ import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
 import play.api.Application
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.routes
-import uk.gov.hmrc.securitiestransferchargefrontend.views.html.stf.individuals.FormattingErrorView
+import uk.gov.hmrc.securitiestransferchargefrontend.views.html.stf.individuals.ChangedFileErrorView
 import views.ViewBaseSpec
 
 class ChangedFileErrorViewSpec extends ViewBaseSpec {
 
   override def fakeApplication(): Application = applicationBuilder().build()
 
-  private val viewInstance         = app.injector.instanceOf[FormattingErrorView]
+  private val viewInstance         = app.injector.instanceOf[ChangedFileErrorView]
 
   def view(): Document = Jsoup.parse(
     viewInstance()(fakeRequest, messages).body
   )
 
   object ExpectedContent {
-    val title = "Your file has formatting errors"
-    val heading = "Your file has formatting errors"
+    val title = "There is a problem with your uploaded file"
+    val heading = "There is a problem with your uploaded file"
 
-    val para1Value = "More than 25 formatting errors have been detected in this file."
-    val para2Value = "The errors may include things like incorrect formatting of numbers or dates, or a letters in a cell that can only contain numbers."
-    val para3Value = "These will need to be corrected before your file can be uploaded again."
-    val para4Value = "Check the instructions in the template file for more guidance."
+    val para1Value = "The header rows or columns have been changed."
+    val para2Value = "Correct the errors then you can upload the file again, or upload a different file."
+    val para3Value = "Remember, do not edit the first two rows of the template, or change the order of the columns."
 
-    val backToFIle = "Back to file upload"
+    val downloadText = "Download the template file"
+    val downloadHref = "/securities-transfer-charge/assets/Bulk_Securities_Transfer_Charge_template_v1i.xlsx"
+    val downloadFileName = "Bulk Securities Transfer Charge template v1i.xlsx"
+    val uploadAnother = "Upload a different file"
   }
 
-  "The FormattingErrorView" - {
+  "The ChangedFileErrorView" - {
     "the user is an Individual" - {
-      val formattingErrorView = view()
+      val changedFileErrorView = view()
 
       "have the correct title" in {
-        formattingErrorView.title must include(ExpectedContent.title)
+        changedFileErrorView.title must include(ExpectedContent.title)
       }
 
       "have the correct heading" in {
-        formattingErrorView.select("h1").text() mustBe ExpectedContent.heading
+        changedFileErrorView.select("h1").text() mustBe ExpectedContent.heading
       }
 
       "display the correct of first paragraph content" in {
-        formattingErrorView.para(1) mustBe Some(ExpectedContent.para1Value)
+        changedFileErrorView.para(1) mustBe Some(ExpectedContent.para1Value)
       }
 
       "display the correct second paragraph" in {
-        formattingErrorView.para(2) mustBe Some(ExpectedContent.para2Value)
+        changedFileErrorView.para(2) mustBe Some(ExpectedContent.para2Value)
       }
 
       "display the correct third paragraph" in {
-        formattingErrorView.para(3) mustBe Some(ExpectedContent.para3Value)
+        changedFileErrorView.para(3) mustBe Some(ExpectedContent.para3Value)
       }
 
-      "display the correct fourth paragraph" in {
-        formattingErrorView.para(4) mustBe Some(ExpectedContent.para4Value)
+      "have a link to download the template" in {
+        val downloadLink = changedFileErrorView.select("a[download]").first()
+        downloadLink.text() mustBe ExpectedContent.downloadText
+        downloadLink.attr("href") mustBe ExpectedContent.downloadHref
+        downloadLink.hasAttr("download") mustBe true
+        downloadLink.attr("download") mustBe ExpectedContent.downloadFileName
       }
 
-      "have a back to file upload button that redirects to the correct page" in {
-        val form = formattingErrorView.select("form")
+      "have a button that redirects to the file upload page" in {
+        val form = changedFileErrorView.select("form")
         form.attr("action") mustBe routes.JourneyRecoveryController.onPageLoad().url
         form.attr("method") mustBe "GET"
-        formattingErrorView.select(".govuk-button").first().text() mustBe ExpectedContent.backToFIle
+        changedFileErrorView.select(".govuk-button").first().text() mustBe ExpectedContent.uploadAnother
       }
     }
   }
