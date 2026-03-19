@@ -35,11 +35,9 @@
     <p class="govuk-body">@messages("formattingError.p3")</p>
     <p class="govuk-body">@Html(messages("formattingError.p4"))</p>
 
-
-    <div>
-        <a href="@routes.JourneyRecoveryController.onPageLoad().url" role="button" draggable="false" class="govuk-button" data-module="govuk-button">
-            @messages("site.back-to-upload.button")
-        </a>
-    </div>
-
+    @formHelper(action = routes.JourneyRecoveryController.onPageLoad()) {
+        @govukButton(
+            ButtonViewModel(messages("site.back-to-upload.button"))
+        )
+    }
 }

@@ -45,38 +45,39 @@ class FormattingErrorViewSpec extends ViewBaseSpec {
     val backToFIle = "Back to file upload"
   }
 
-  "The TemplateInstructionsView" - {
+  "The FormattingErrorView" - {
     "the user is an Individual" - {
-      val templateInstructionsView = view()
+      val formattingErrorView = view()
 
       "have the correct title" in {
-        templateInstructionsView.title must include(ExpectedContent.title)
+        formattingErrorView.title must include(ExpectedContent.title)
       }
 
       "have the correct heading" in {
-        templateInstructionsView.select("h1").text() mustBe ExpectedContent.heading
+        formattingErrorView.select("h1").text() mustBe ExpectedContent.heading
       }
 
       "display the correct of first paragraph content" in {
-        templateInstructionsView.para(1) mustBe Some(ExpectedContent.para1Value)
+        formattingErrorView.para(1) mustBe Some(ExpectedContent.para1Value)
       }
 
       "display the correct second paragraph" in {
-        templateInstructionsView.para(2) mustBe Some(ExpectedContent.para2Value)
+        formattingErrorView.para(2) mustBe Some(ExpectedContent.para2Value)
       }
 
       "display the correct third paragraph" in {
-        templateInstructionsView.para(3) mustBe Some(ExpectedContent.para3Value)
+        formattingErrorView.para(3) mustBe Some(ExpectedContent.para3Value)
       }
 
       "display the correct fourth paragraph" in {
-        templateInstructionsView.para(4) mustBe Some(ExpectedContent.para4Value)
+        formattingErrorView.para(4) mustBe Some(ExpectedContent.para4Value)
       }
 
       "have a back to file upload button that redirects to the correct page" in {
-        val button = templateInstructionsView.select(".govuk-button")
-        button.text() mustBe ExpectedContent.backToFIle
-        button.attr("href") mustBe routes.JourneyRecoveryController.onPageLoad().url
+        val form = formattingErrorView.select("form")
+        form.attr("action") mustBe routes.JourneyRecoveryController.onPageLoad().url
+        form.attr("method") mustBe "GET"
+        formattingErrorView.select(".govuk-button").first().text() mustBe ExpectedContent.backToFIle
       }
     }
   }
