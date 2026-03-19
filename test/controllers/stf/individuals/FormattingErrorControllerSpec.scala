@@ -17,23 +17,12 @@
 package controllers.stf.individuals
 
 import base.SpecBase
-import org.mockito.ArgumentMatchers.any
-import org.mockito.Mockito.when
-import org.scalatestplus.mockito.MockitoSugar.mock
-import play.api.inject
 import play.api.test.FakeRequest
 import play.api.test.Helpers.*
-import uk.gov.hmrc.securitiestransferchargefrontend.clients.SubmissionIdClient
-import uk.gov.hmrc.securitiestransferchargefrontend.controllers.routes
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.individuals.routes as individualRoutes
-import uk.gov.hmrc.securitiestransferchargefrontend.domain.SubmissionId
 import uk.gov.hmrc.securitiestransferchargefrontend.views.html.stf.individuals.FormattingErrorView
 
-import scala.concurrent.Future
-
 class FormattingErrorControllerSpec extends SpecBase {
-
-  private val mockIdClient = mock[SubmissionIdClient]
 
   "FormattingError Controller" - {
 
@@ -50,26 +39,6 @@ class FormattingErrorControllerSpec extends SpecBase {
 
         status(result) mustEqual OK
         contentAsString(result) mustEqual view()(request, messages(application)).toString
-      }
-    }
-
-    "must redirect to the next page on submit" in {
-
-      when(mockIdClient.nextSubmissionId()(any())).thenReturn(Future.successful(SubmissionId("test-submission-id")))
-
-      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers))
-        .overrides(
-          inject.bind[SubmissionIdClient].toInstance(mockIdClient)
-        )
-        .build()
-
-      running(application) {
-        val request = FakeRequest(POST, individualRoutes.FormattingErrorController.onSubmit().url)
-
-        val result = route(application, request).value
-
-        status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual routes.JourneyRecoveryController.onPageLoad().url
       }
     }
   }

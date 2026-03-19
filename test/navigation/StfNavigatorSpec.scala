@@ -319,11 +319,6 @@ class StfNavigatorSpec extends SpecBase with ScalaFutures {
         val result = navigator.previousPage(TemplateInstructionsPage, NormalMode, emptyUserAnswers)
         result mustBe individualRoutes.HowToNotifyAboutSecuritiesTransferController.onPageLoad(NormalMode)
       }
-
-      "must go from the FormattingErrorController to FileUpload" in {
-        val result = navigator.previousPage(FormattingErrorPage, NormalMode, emptyUserAnswers)
-        result mustBe routes.JourneyRecoveryController.onPageLoad()
-      }
     }
 
   }

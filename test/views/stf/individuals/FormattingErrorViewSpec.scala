@@ -20,6 +20,7 @@ import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
 import play.api.Application
 import uk.gov.hmrc.securitiestransferchargefrontend.views.html.stf.individuals.FormattingErrorView
+import uk.gov.hmrc.securitiestransferchargefrontend.controllers.routes
 import views.ViewBaseSpec
 
 class FormattingErrorViewSpec extends ViewBaseSpec {
@@ -72,9 +73,10 @@ class FormattingErrorViewSpec extends ViewBaseSpec {
         templateInstructionsView.para(4) mustBe Some(ExpectedContent.para4Value)
       }
 
-      "have a back to file upload button" in {
+      "have a back to file upload button that redirects to the correct page" in {
         val button = templateInstructionsView.select(".govuk-button")
         button.text() mustBe ExpectedContent.backToFIle
+        button.attr("href") mustBe routes.JourneyRecoveryController.onPageLoad().url
       }
     }
   }
