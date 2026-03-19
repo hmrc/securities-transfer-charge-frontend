@@ -322,6 +322,29 @@ org.totalMarketValue.error.belowMinimum = The market value must be {0} or more
 org.totalMarketValue.change.hidden = Change the market value of the securities
 org.totalMarketValue.hint = For example, £600 or £193.54
 
+fileUpload.title = Upload your file
+fileUpload.heading = Upload your file
+fileUpload.label = Upload a file
+fileUpload.button = Upload
+fileUpload.inset.text = Accepted file types: .xlsx, .csv
+
+fileUpload.error.emptyFile.title = There are no transfers in your file
+fileUpload.error.emptyFile.heading = There are no transfers in your file
+fileUpload.error.emptyFile.p1 = Add the correct transfer file details to the file then you can upload it again, or upload a different file.
+fileUpload.error.emptyFile.download.text = Download the template file.
+fileUpload.upload.another = Upload a different file
+
+fileUpload.redirectError.emptyFile = The selected file is empty
+fileUpload.redirectError.EntityTooLarge = The selected file must be smaller than 1GB
+fileUpload.redirectError.generic = The selected file could not be uploaded – try again
+fileUpload.redirectError.InvalidArgument = The selected file must be a .csv or a .xlsx
+
+fileUploaded.title = File uploaded 
+fileUploaded.heading = File uploaded
+fileUploaded.reference = File reference
+fileUploaded.status = Status 
+
+
 templateInstructions.title = How to use the template
 templateInstructions.heading = How to use the template
 templateInstructions.p1 = Use the template to tell us about more than one securities transfer at a time.
