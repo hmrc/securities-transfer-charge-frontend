@@ -78,5 +78,4 @@ class FormattingErrorViewSpec extends ViewBaseSpec {
       }
     }
   }
-
 }

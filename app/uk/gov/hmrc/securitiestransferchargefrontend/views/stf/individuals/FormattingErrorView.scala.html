@@ -15,7 +15,8 @@
  *@
 
 @import uk.gov.hmrc.securitiestransferchargefrontend.views.html.templates
-@import uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.individuals.routes
+@import uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.individuals.{routes => individualRoutes}
+@import uk.gov.hmrc.securitiestransferchargefrontend.controllers.routes
 
 @this(
     layout: templates.Layout,
@@ -26,17 +27,19 @@
 @()(implicit request: Request[_], messages: Messages)
 
 @layout(pageTitle = titleNoForm(messages("formattingError.title"))) {
-    @formHelper(action = routes.FormattingErrorController.onSubmit(), Symbol("autoComplete") -> "off") {
 
-        <h1 class="govuk-heading-l">@messages("formattingError.heading")</h1>
+    <h1 class="govuk-heading-l">@messages("formattingError.heading")</h1>
 
-        <p class="govuk-body">@messages("formattingError.p1")</p>
-        <p class="govuk-body">@Html(messages("formattingError.p2"))</p>
-        <p class="govuk-body">@messages("formattingError.p3")</p>
-        <p class="govuk-body">@Html(messages("formattingError.p4"))</p>
+    <p class="govuk-body">@messages("formattingError.p1")</p>
+    <p class="govuk-body">@Html(messages("formattingError.p2"))</p>
+    <p class="govuk-body">@messages("formattingError.p3")</p>
+    <p class="govuk-body">@Html(messages("formattingError.p4"))</p>
 
-        @govukButton(
-            ButtonViewModel(messages("site.back-to-upload.button"))
-        )
-    }
+
+    <div>
+        <a href="@routes.JourneyRecoveryController.onPageLoad().url" role="button" draggable="false" class="govuk-button" data-module="govuk-button">
+            @messages("site.back-to-upload.button")
+        </a>
+    </div>
+
 }

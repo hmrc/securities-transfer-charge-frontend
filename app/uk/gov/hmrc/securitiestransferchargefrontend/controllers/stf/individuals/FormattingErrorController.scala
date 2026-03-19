@@ -16,41 +16,24 @@
 
 package uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.individuals
 
-import controllers.Execution.trampoline
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
-import uk.gov.hmrc.securitiestransferchargefrontend.clients.SubmissionIdClient
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.actions.*
-import uk.gov.hmrc.securitiestransferchargefrontend.models.{NormalMode, UserAnswers}
-import uk.gov.hmrc.securitiestransferchargefrontend.navigation.Navigator
-import uk.gov.hmrc.securitiestransferchargefrontend.pages.FormattingErrorPage
 import uk.gov.hmrc.securitiestransferchargefrontend.views.html.stf.individuals.FormattingErrorView
 
-import javax.inject.{Inject, Named}
+import javax.inject.Inject
 
 class FormattingErrorController @Inject()(
                                        override val messagesApi: MessagesApi,
-                                       @Named("individuals") navigator: Navigator,
                                        stcAuthEnrolled: StcAuthEnrolledAction,
                                        val controllerComponents: MessagesControllerComponents,
                                        view: FormattingErrorView,
-                                       idClient: SubmissionIdClient,
                                      ) extends FrontendBaseController with I18nSupport {
 
   def onPageLoad: Action[AnyContent] = stcAuthEnrolled {
     implicit request =>
       Ok(view())
-  }
-
-  def onSubmit(): Action[AnyContent] = stcAuthEnrolled.async {
-    implicit request =>
-      val userId = request.internalId
-
-      for {
-        submissionId <- idClient.nextSubmissionId()
-        nextPage <- navigator.nextPage(FormattingErrorPage, NormalMode, UserAnswers.empty(userId)(submissionId))
-      } yield Redirect(nextPage)
   }
 }
 
