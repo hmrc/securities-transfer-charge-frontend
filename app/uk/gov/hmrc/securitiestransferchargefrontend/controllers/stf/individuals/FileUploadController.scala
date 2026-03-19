@@ -44,10 +44,16 @@ class FileUploadController @Inject()(
   }
 
   def onUploadError(): Action[AnyContent] = stcAuthEnrolled.async { implicit request =>
+
     val maybeError = UpscanUploadError.errorMessage(request)
-    prepareUpload().map { response =>
-      BadRequest(view(response.uploadRequest, maybeError))
-    }
+
+    val removeOldDocument = request.getQueryString("key").map(upscanJourneyRepository.delete).getOrElse(Future.unit)
+
+    for {
+      _<- removeOldDocument
+      initiateResponse <- prepareUpload()
+    } yield BadRequest(view(initiateResponse.uploadRequest, maybeError))
+
   }
 
   private def prepareUpload()(implicit request: Request[_]): Future[UpscanInitiateResponse] =
