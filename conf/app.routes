@@ -105,6 +105,8 @@ GET        /stf/template                                  uk.gov.hmrc.securities
 
 GET        /stf/bulk-error                                uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.individuals.FormattingErrorController.onPageLoad()
 
+GET        /stf/bulk-formatting                           uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.individuals.ChangedFileErrorController.onPageLoad()
+
 GET        /stf/org/confirm-address                       uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.organisations.ConfirmAddressController.onPageLoad()
 
 POST       /stf/org/confirm-address                       uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.organisations.ConfirmAddressController.onSubmit()
