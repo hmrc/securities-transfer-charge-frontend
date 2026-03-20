@@ -27,7 +27,7 @@ import uk.gov.hmrc.securitiestransferchargefrontend.handlers.ErrorHandler
 import uk.gov.hmrc.securitiestransferchargefrontend.navigation.stf.individuals.StfNavigator
 import uk.gov.hmrc.securitiestransferchargefrontend.navigation.stf.organisations.StfOrgNavigator
 import uk.gov.hmrc.securitiestransferchargefrontend.navigation.{Navigator, PersistentNavigator}
-import uk.gov.hmrc.securitiestransferchargefrontend.repositories.{SessionRepository, SessionRepositoryImpl, SubscriptionDataRepository, SubscriptionDataRepositoryImpl}
+import uk.gov.hmrc.securitiestransferchargefrontend.repositories.{SessionRepository, SessionRepositoryImpl, SubscriptionDataRepository, SubscriptionDataRepositoryImpl, UpscanJourneyRepository, UpscanJourneyRepositoryImpl}
 import uk.gov.hmrc.securitiestransferchargefrontend.services.*
 
 import java.time.{Clock, ZoneOffset}
@@ -56,6 +56,8 @@ class Module extends AbstractModule {
 
     bind(classOf[SubscriptionDataRepository]).to(classOf[SubscriptionDataRepositoryImpl])
     bind(classOf[SubscriptionConnector]).to(classOf[SubscriptionConnectorImpl])
+    bind(classOf[UpscanInitiateConnector]).to(classOf[UpscanInitiateConnectorImpl])
+    bind(classOf[UpscanJourneyRepository]).to(classOf[UpscanJourneyRepositoryImpl])
     bind(classOf[RegistrationClient]).to(classOf[RegistrationClientImpl]).asEagerSingleton()
     bind(classOf[AnswerPersistenceService]).to(classOf[AnswerPersistenceServiceImpl])
     bind(classOf[Navigator])

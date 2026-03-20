@@ -87,6 +87,8 @@ class FrontendAppConfig @Inject() (configuration: Configuration, servicesConfig:
 
   val cacheTtl: Long = configuration.get[Int]("mongodb.timeToLiveInSeconds")
 
+  val upscanTtl: Long = configuration.get[Int]("mongodb.upscanTimeToLiveInDays")
+
   private val saveAndReturnService =
     configuration.get[Service]("microservice.services.securities-transfer-charge-save-and-return")
 
@@ -103,5 +105,12 @@ class FrontendAppConfig @Inject() (configuration: Configuration, servicesConfig:
 
 
   lazy val connectedPersonsInformationUrl: String = configuration.get[String]("urls.external.connectedPersonsInformation")
+
+  val baseUrl: String = servicesConfig.baseUrl("securities-transfer-charge-frontend")
+  val basePath = "/securities-transfer-charge"
   
+  val upscanBaseUrl: String = servicesConfig.baseUrl("upscan-initiate")
+  val upscanCallbackUrl: String =  s"$baseUrl$basePath/stf/upscan-callback"
+  val upscanUploadSuccessfulUrl: String = s"$baseUrl$basePath/stf/file-uploaded"
+  val upscanUploadFailureUrl: String = s"$baseUrl$basePath/stf/file-upload/problem"
 }
