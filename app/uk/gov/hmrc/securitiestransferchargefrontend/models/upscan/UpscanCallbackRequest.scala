@@ -18,7 +18,7 @@ package uk.gov.hmrc.securitiestransferchargefrontend.models.upscan
 
 import play.api.libs.json.*
 
-import java.net.URL
+import java.net.URI
 import java.time.Instant
 
 sealed trait UpscanCallbackRequest {
@@ -30,7 +30,7 @@ object UpscanCallbackRequest {
   
   case class Ready(
                     reference: String,
-                    downloadUrl: URL,
+                    downloadUrl: URI,
                     uploadDetails: UploadDetails
                   ) extends UpscanCallbackRequest
 
@@ -54,9 +54,9 @@ object UpscanCallbackRequest {
   
   implicit val uploadDetailsFormat: OFormat[UploadDetails] = Json.format[UploadDetails]
   implicit val errorDetailsFormat: OFormat[ErrorDetails] = Json.format[ErrorDetails]
-  implicit val urlFormat: Format[URL] = Format(
-    Reads.StringReads.map(new URL(_)),
-    Writes[URL](url => JsString(url.toString))
+  implicit val uriFormat: Format[URI] = Format(
+    Reads.StringReads.map(new URI(_)),
+    Writes[URI](uri => JsString(uri.toString))
   )
   implicit val readyCallbackBodyFormat: OFormat[Ready] = Json.format[Ready]
   implicit val failedCallbackBodyFormat: OFormat[Failed] = Json.format[Failed]

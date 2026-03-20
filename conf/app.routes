@@ -26,11 +26,6 @@ POST       /stf/confirm-address                           uk.gov.hmrc.securities
 
 
 GET        /submissions-dashboard                         uk.gov.hmrc.securitiestransferchargefrontend.controllers.SubmissionsDashboardController.onPageLoad()
-GET        /stf/file-upload                               uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.individuals.FileUploadController.onPageLoad()
-GET        /stf/file-upload/problem                      uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.individuals.FileUploadController.onUploadError()
-GET        /stf/bulk-empty                                uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.individuals.EmptyFileErrorController.onPageLoad()
-GET        /stf/file-uploaded                             uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.individuals.FileUploadedController.onPageLoad(key:String)
-POST       /stf/upscan-callback                            uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.individuals.UpscanCallbackController.onPageLoad()
 POST       /submissions-dashboard                         uk.gov.hmrc.securitiestransferchargefrontend.controllers.SubmissionsDashboardController.onSubmit()
 
 GET        /stf/how-many-transfers                        uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.individuals.HowToNotifyAboutSecuritiesTransferController.onPageLoad(mode: Mode = NormalMode)
@@ -183,3 +178,10 @@ GET        /stf/org/total-market-value                    uk.gov.hmrc.securities
 POST       /stf/org/total-market-value                    uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.organisations.TotalMarketValueController.onSubmit(mode: Mode = NormalMode)
 GET        /stf/org/change/total-market-value             uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.organisations.TotalMarketValueController.onPageLoad(mode: Mode = CheckMode)
 POST       /stf/org/change/total-market-value             uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.organisations.TotalMarketValueController.onSubmit(mode: Mode = CheckMode)
+
+# FileUpload
+GET        /stf/file-upload                               uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.individuals.FileUploadController.onPageLoad()
+GET        /stf/file-upload/problem                      uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.individuals.FileUploadController.onUploadError()
+GET        /stf/bulk-empty                                uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.individuals.EmptyFileErrorController.onPageLoad()
+GET        /stf/file-uploaded                             uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.individuals.FileUploadedController.onPageLoad(key:String)
+POST       /stf/upscan-callback                            uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.individuals.UpscanCallbackController.callback()

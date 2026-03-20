@@ -34,7 +34,7 @@ class UpscanCallbackController @Inject()(
   extends FrontendBaseController
     with I18nSupport with Logging {
 
-  def onPageLoad(): Action[JsValue] =
+  def callback(): Action[JsValue] =
     Action.async(parse.json) { implicit request =>
 
       logger.info(s"Upscan callback received: ${Json.prettyPrint(request.body)}")
