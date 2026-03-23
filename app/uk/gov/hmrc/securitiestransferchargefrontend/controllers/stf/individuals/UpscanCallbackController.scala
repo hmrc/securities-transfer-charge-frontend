@@ -36,8 +36,7 @@ class UpscanCallbackController @Inject()(
 
   def callback(): Action[JsValue] =
     Action.async(parse.json) { implicit request =>
-
-      logger.info(s"Upscan callback received: ${Json.prettyPrint(request.body)}")
+      
       withJsonBody[UpscanCallbackRequest] {
 
         case UpscanCallbackRequest.Ready(reference, downloadUrl, uploadDetails) =>
