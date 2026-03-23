@@ -111,6 +111,6 @@ class FrontendAppConfig @Inject() (configuration: Configuration, servicesConfig:
   
   val upscanBaseUrl: String = servicesConfig.baseUrl("upscan-initiate")
   val upscanCallbackUrl: String =  s"$baseUrl$basePath/stf/upscan-callback"
-  val upscanUploadSuccessfulUrl: String = s"$baseUrl$basePath/stf/file-uploaded"
-  val upscanUploadFailureUrl: String = s"$baseUrl$basePath/stf/file-upload/problem"
+  val upscanUploadSuccessfulUrl: String = s"$continueUrlBase/stf/file-uploaded"
+  val upscanUploadFailureUrl: String = s"$continueUrlBase/stf/file-upload/problem"
 }
