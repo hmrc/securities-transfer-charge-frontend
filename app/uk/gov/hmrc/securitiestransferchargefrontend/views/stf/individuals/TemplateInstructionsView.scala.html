@@ -16,8 +16,7 @@
 
 @import uk.gov.hmrc.securitiestransferchargefrontend.views.html.templates
 @import uk.gov.hmrc.securitiestransferchargefrontend.views.html.components.SaveAndReturnButton
-@import uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.individuals.{routes => individualRoutes}
-@import uk.gov.hmrc.securitiestransferchargefrontend.controllers.routes
+@import uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.individuals.routes
 
 @this(
     layout: templates.Layout,
@@ -50,7 +49,7 @@
         <p class="govuk-body">@Html(messages("templateInstructions.p3"))</p>
 
         <div>
-            @formHelper(action = routes.JourneyRecoveryController.onPageLoad()) {
+            @formHelper(action = routes.FileUploadController.onPageLoad()) {
                 @govukButton(
                     ButtonViewModel(messages("site.save-and-continue.button"))
                 )

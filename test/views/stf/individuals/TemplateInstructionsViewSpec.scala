@@ -19,7 +19,7 @@ package views.stf.individuals
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
 import play.api.Application
-import uk.gov.hmrc.securitiestransferchargefrontend.controllers.routes
+import uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.individuals.routes
 import uk.gov.hmrc.securitiestransferchargefrontend.views.html.stf.individuals.TemplateInstructionsView
 import views.ViewBaseSpec
 
@@ -105,7 +105,7 @@ class TemplateInstructionsViewSpec extends ViewBaseSpec {
 
       "have a save and continue button" in {
         val form = templateInstructionsView.select("form")
-        form.attr("action") mustBe routes.JourneyRecoveryController.onPageLoad().url
+        form.attr("action") mustBe routes.FileUploadController.onPageLoad().url
         form.attr("method") mustBe "GET"
         templateInstructionsView.select(".govuk-button").first().text() mustBe ExpectedContent.saveAndContinue
       }
