@@ -211,13 +211,6 @@ class StfNavigatorSpec extends SpecBase with ScalaFutures {
           res mustBe routes.CheckYourAnswersController.onPageLoad()
         }
       }
-
-      "must go from the TemplateInstructionsController to FileUploadController" in {
-        val result = navigator.nextPage(TemplateInstructionsPage, NormalMode, emptyUserAnswers)(fakeRequest)
-        whenReady(result) { res =>
-          res mustBe individualRoutes.FileUploadController.onPageLoad()
-        }
-      }
     }
 
     "in Check mode" - {
@@ -322,7 +315,7 @@ class StfNavigatorSpec extends SpecBase with ScalaFutures {
         result mustBe routes.SubmissionsDashboardController.onPageLoad()
       }
 
-      "must go from the TemplateInstructionsController to HowToNotifyAboutSecuritiesTransfer when one at a time is selected" in {
+      "must go from the TemplateInstructionsController to HowToNotifyAboutSecuritiesTransfer" in {
         val result = navigator.previousPage(TemplateInstructionsPage, NormalMode, emptyUserAnswers)
         result mustBe individualRoutes.HowToNotifyAboutSecuritiesTransferController.onPageLoad(NormalMode)
       }

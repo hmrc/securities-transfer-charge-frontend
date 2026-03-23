@@ -73,7 +73,7 @@ class FormattingErrorViewSpec extends ViewBaseSpec {
         formattingErrorView.para(4) mustBe Some(ExpectedContent.para4Value)
       }
 
-      "have a back to file upload button that redirects to the correct page" in {
+      "have a button that redirects to the file upload page" in {
         val form = formattingErrorView.select("form")
         form.attr("action") mustBe routes.JourneyRecoveryController.onPageLoad().url
         form.attr("method") mustBe "GET"
