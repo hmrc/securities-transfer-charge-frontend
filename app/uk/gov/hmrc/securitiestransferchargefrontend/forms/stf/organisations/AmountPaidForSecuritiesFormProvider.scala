@@ -23,13 +23,15 @@ import javax.inject.Inject
 
 class AmountPaidForSecuritiesFormProvider @Inject() extends Mappings {
 
+  private val max = BigDecimal("999999999999.99")
+
   def apply(): Form[BigDecimal] =
     Form(
       "value" -> currency(
         "org.amountPaidForSecurities.error.required",
         "org.amountPaidForSecurities.error.invalidNumeric",
-        "org.amountPaidForSecurities.error.nonNumeric"
-      )
-        .verifying(maximumCurrency(Int.MaxValue, "org.amountPaidForSecurities.error.aboveMaximum"))
+        "org.amountPaidForSecurities.error.nonNumeric",
+        "org.amountPaidForSecurities.error.negative"
+      ).verifying(maximumCurrency(max, "org.amountPaidForSecurities.error.aboveMaximum"))
     )
 }

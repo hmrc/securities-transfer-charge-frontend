@@ -117,6 +117,7 @@ trait Formatters {
                                            requiredKey: String,
                                            invalidNumericKey: String,
                                            nonNumericKey: String,
+                                           negativeValueKey: String,
                                            args: Seq[String] = Seq.empty
                                          ) : Formatter[BigDecimal] =
     new Formatter[BigDecimal] {
@@ -130,6 +131,8 @@ trait Formatters {
           .bind(key, data)
           .map(_.replace(",", "").replace(" ", ""))
           .flatMap {
+            case s if s.trim.startsWith("-") =>
+              Left(Seq(FormError(key, negativeValueKey, args)))
             case s if !s.matches(isNumeric) =>
               Left(Seq(FormError(key, nonNumericKey, args)))
             case s if !s.matches(validDecimal) =>

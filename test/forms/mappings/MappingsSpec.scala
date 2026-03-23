@@ -224,7 +224,7 @@ class MappingsSpec extends AnyFreeSpec with Matchers with OptionValues with Mapp
 
     "must not bind negative numbers" in {
       val result = testForm.bind(Map("value" -> "-1"))
-      result.errors must contain only FormError("value", "error.nonNumeric")
+      result.errors must contain only FormError("value", "error.negative")
     }
 
     "must unbind a valid value" in {
