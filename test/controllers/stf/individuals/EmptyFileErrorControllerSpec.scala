@@ -17,25 +17,29 @@
 package controllers.stf.individuals
 
 import base.SpecBase
+import org.scalatestplus.mockito.MockitoSugar
 import play.api.test.FakeRequest
 import play.api.test.Helpers.*
-import uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.individuals.routes
-import uk.gov.hmrc.securitiestransferchargefrontend.views.html.stf.individuals.TemplateInstructionsView
+import uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.individuals.routes as individualRoutes
+import uk.gov.hmrc.securitiestransferchargefrontend.views.html.stf.individuals.EmptyFileErrorView
 
-class TemplateInstructionsControllerSpec extends SpecBase {
+class EmptyFileErrorControllerSpec extends SpecBase with MockitoSugar {
 
-  "TemplateInstructions Controller" - {
+  lazy val emptyFileErrorRoute: String = individualRoutes.EmptyFileErrorController.onPageLoad().url
+
+  "EmptyFileErrorController Controller" - {
 
     "must return OK and the correct view for a GET" in {
-
-      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers)).build()
-
+      
+      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers))
+        .build()
+      
       running(application) {
-        val request = FakeRequest(GET, routes.TemplateInstructionsController.onPageLoad().url)
+        val request = FakeRequest(GET, emptyFileErrorRoute)
 
         val result = route(application, request).value
 
-        val view = application.injector.instanceOf[TemplateInstructionsView]
+        val view = application.injector.instanceOf[EmptyFileErrorView]
 
         status(result) mustEqual OK
         contentAsString(result) mustEqual view()(request, messages(application)).toString
