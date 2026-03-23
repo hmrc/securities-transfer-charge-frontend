@@ -18,7 +18,7 @@ package uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.individuals
 
 import play.api.Logging
 import play.api.i18n.I18nSupport
-import play.api.libs.json.{JsValue, Json}
+import play.api.libs.json.JsValue
 import play.api.mvc.{Action, MessagesControllerComponents}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import uk.gov.hmrc.securitiestransferchargefrontend.models.upscan.UpscanCallbackRequest
