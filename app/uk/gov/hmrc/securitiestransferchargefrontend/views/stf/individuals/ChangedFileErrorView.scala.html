@@ -15,8 +15,7 @@
  *@
 
 @import uk.gov.hmrc.securitiestransferchargefrontend.views.html.templates
-@import uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.individuals.{routes => individualRoutes}
-@import uk.gov.hmrc.securitiestransferchargefrontend.controllers.routes
+@import uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.individuals.routes
 
 @this(
     layout: templates.Layout,
@@ -40,7 +39,7 @@
         </a>.
     </p>
 
-    @formHelper(action = routes.JourneyRecoveryController.onPageLoad()) {
+    @formHelper(action = routes.FileUploadController.onPageLoad()) {
         @govukButton(
             ButtonViewModel(messages("fileUpload.upload.another"))
         )

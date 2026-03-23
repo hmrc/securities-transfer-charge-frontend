@@ -19,7 +19,7 @@ package views.stf.individuals
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
 import play.api.Application
-import uk.gov.hmrc.securitiestransferchargefrontend.controllers.routes
+import uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.individuals.routes
 import uk.gov.hmrc.securitiestransferchargefrontend.views.html.stf.individuals.ChangedFileErrorView
 import views.ViewBaseSpec
 
@@ -81,7 +81,7 @@ class ChangedFileErrorViewSpec extends ViewBaseSpec {
 
       "have a button that redirects to the file upload page" in {
         val form = changedFileErrorView.select("form")
-        form.attr("action") mustBe routes.JourneyRecoveryController.onPageLoad().url
+        form.attr("action") mustBe routes.FileUploadController.onPageLoad().url
         form.attr("method") mustBe "GET"
         changedFileErrorView.select(".govuk-button").first().text() mustBe ExpectedContent.uploadAnother
       }
