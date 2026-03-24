@@ -14,21 +14,21 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.securitiestransferchargefrontend.config
+package uk.gov.hmrc.securitiestransferchargefrontend.services.fileupload
+
+import uk.gov.hmrc.securitiestransferchargefrontend.models.fileupload.{FileParseError, ParsedFile, UploadedFile}
+import uk.gov.hmrc.securitiestransferchargefrontend.services.fileupload.FileParserSelector
 
 import javax.inject.{Inject, Singleton}
-import play.api.Configuration
 
 @Singleton
-class FileUploadConfig @Inject()(configuration: Configuration) {
+class FileParsingService @Inject()(
+                                    fileParserSelector: FileParserSelector
+                                  ) {
 
-  val maxRows: Int =
-    configuration.get[Int]("file-upload.max-rows")
-
-  val expectedWorksheetName: String =
-    configuration.getOptional[String]("file-upload.xlsx.expected-worksheet")
-      .getOrElse("Sheet1")
-
-  val firstDataRow: Int =
-    configuration.getOptional[Int]("file-upload.first-data-row").getOrElse(3)  
+  def parse(uploadedFile: UploadedFile): Either[FileParseError, ParsedFile] =
+    for {
+      parser <- fileParserSelector.select(uploadedFile.mimeType)
+      parsed <- parser.parse(uploadedFile)
+    } yield parsed
 }

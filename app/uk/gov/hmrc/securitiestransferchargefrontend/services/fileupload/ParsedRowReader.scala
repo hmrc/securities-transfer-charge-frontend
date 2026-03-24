@@ -29,7 +29,13 @@ object ParsedRowReader {
 
   def readBigDecimal(row: ParsedRow, columnIndex: Int): Option[BigDecimal] =
     readString(row, columnIndex)
-      .map(_.replace(",", "").replace("£", ""))
+      .map(
+        _.replace(",", "")
+          .replace("£", "")
+          .replace("%", "")
+          .trim
+      )
+      .filter(_.nonEmpty)
       .flatMap(value => Try(BigDecimal(value)).toOption)
 
   def readBoolean(row: ParsedRow, columnIndex: Int): Option[Boolean] =

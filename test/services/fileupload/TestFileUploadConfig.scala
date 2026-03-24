@@ -14,21 +14,23 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.securitiestransferchargefrontend.config
+package services.fileupload
 
-import javax.inject.{Inject, Singleton}
 import play.api.Configuration
+import uk.gov.hmrc.securitiestransferchargefrontend.config.FileUploadConfig
 
-@Singleton
-class FileUploadConfig @Inject()(configuration: Configuration) {
+object TestFileUploadConfig {
 
-  val maxRows: Int =
-    configuration.get[Int]("file-upload.max-rows")
-
-  val expectedWorksheetName: String =
-    configuration.getOptional[String]("file-upload.xlsx.expected-worksheet")
-      .getOrElse("Sheet1")
-
-  val firstDataRow: Int =
-    configuration.getOptional[Int]("file-upload.first-data-row").getOrElse(3)  
+  def config(
+              maxRows: Int = 1000,
+              expectedWorksheetName: String = "Sheet1",
+              firstDataRow: Int = 3
+            ): FileUploadConfig =
+    new FileUploadConfig(
+      Configuration(
+        "file-upload.max-rows" -> maxRows,
+        "file-upload.xlsx.expected-worksheet" -> expectedWorksheetName,
+        "file-upload.first-data-row" -> firstDataRow
+      )
+    )
 }
