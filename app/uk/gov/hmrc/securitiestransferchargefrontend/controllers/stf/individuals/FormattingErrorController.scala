@@ -20,19 +20,22 @@ import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.actions.*
-import uk.gov.hmrc.securitiestransferchargefrontend.views.html.stf.individuals.TemplateInstructionsView
+import uk.gov.hmrc.securitiestransferchargefrontend.views.html.stf.individuals.FormattingErrorView
 
 import javax.inject.Inject
 
-class TemplateInstructionsController @Inject()(
-                                                override val messagesApi: MessagesApi,
-                                                stcAuthEnrolled: StcAuthEnrolledAction,
-                                                val controllerComponents: MessagesControllerComponents,
-                                                view: TemplateInstructionsView
-                                              )  extends FrontendBaseController with I18nSupport{
-  
-  def onPageLoad(): Action[AnyContent] = stcAuthEnrolled {
+class FormattingErrorController @Inject()(
+                                       override val messagesApi: MessagesApi,
+                                       stcAuthEnrolled: StcAuthEnrolledAction,
+                                       val controllerComponents: MessagesControllerComponents,
+                                       view: FormattingErrorView,
+                                     ) extends FrontendBaseController with I18nSupport {
+
+  def onPageLoad: Action[AnyContent] = stcAuthEnrolled {
     implicit request =>
       Ok(view())
   }
 }
+
+
+

@@ -33,7 +33,7 @@ class AmountPaidForSecuritiesFormProviderSpec extends CurrencyFieldBehaviours {
     val fieldName = "value"
 
     val minimum = 0
-    val maximum = Int.MaxValue
+    val maximum = BigDecimal("999999999")
 
     val validDataGenerator =
       Gen.choose[BigDecimal](minimum, maximum)
