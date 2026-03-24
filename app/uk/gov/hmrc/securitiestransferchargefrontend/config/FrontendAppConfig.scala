@@ -106,11 +106,10 @@ class FrontendAppConfig @Inject() (configuration: Configuration, servicesConfig:
 
   lazy val connectedPersonsInformationUrl: String = configuration.get[String]("urls.external.connectedPersonsInformation")
 
-  val baseUrl: String = servicesConfig.baseUrl("securities-transfer-charge-frontend")
   val basePath = "/securities-transfer-charge"
   
   val upscanBaseUrl: String = servicesConfig.baseUrl("upscan-initiate")
-  val upscanCallbackUrl: String =  s"$baseUrl$basePath/stf/upscan-callback"
-  val upscanUploadSuccessfulUrl: String = s"$continueUrlBase/stf/file-uploaded"
-  val upscanUploadFailureUrl: String = s"$continueUrlBase/stf/file-upload/problem"
+  val upscanCallbackUrl: String =  s"$host$basePath/stf/upscan-callback"
+  val upscanUploadSuccessfulUrl: String = s"$host$basePath/stf/file-uploaded"
+  val upscanUploadFailureUrl: String = s"$host$basePath/stf/file-upload/problem"
 }
