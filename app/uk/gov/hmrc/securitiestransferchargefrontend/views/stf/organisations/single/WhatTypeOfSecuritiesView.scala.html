@@ -33,7 +33,7 @@
 
 @(form: Form[_], mode: Mode, affinityGroupKey: String, backLinkCall: Call)(implicit request: Request[_], messages: Messages)
 
-@layout(pageTitle = title(form, messages("org.whatTypeOfSecurities.title"),Some(messages("sectionTitle.transferDetails"))), backLinkUrl = Some(backLinkCall.url)) {
+@layout(pageTitle = title(form, messages("org.whatTypeOfSecurities.title"),Some(messages("transfer.details.caption"))), backLinkUrl = Some(backLinkCall.url)) {
 
     @formHelper(action = orgRoutes.WhatTypeOfSecuritiesController.onSubmit(mode), Symbol("autoComplete") -> "off") {
 

@@ -27,7 +27,7 @@ import uk.gov.hmrc.securitiestransferchargefrontend.models.stf.HowToNotifyAboutS
 import uk.gov.hmrc.securitiestransferchargefrontend.models.{Mode, UserAnswers}
 import uk.gov.hmrc.securitiestransferchargefrontend.navigation.Navigator
 import uk.gov.hmrc.securitiestransferchargefrontend.pages.stf.shared.HowToNotifyAboutSecuritiesTransferPage
-import uk.gov.hmrc.securitiestransferchargefrontend.views.html.stf.organisations.single.HowToNotifyAboutSecuritiesTransferView
+import uk.gov.hmrc.securitiestransferchargefrontend.views.html.stf.organisations.HowToNotifyAboutSecuritiesTransferView
 
 import javax.inject.{Inject, Named}
 import scala.concurrent.{ExecutionContext, Future}

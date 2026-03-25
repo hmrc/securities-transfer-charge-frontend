@@ -92,7 +92,6 @@ nameOfSeller.error.length = Seller’s name must be 35 characters or less
 nameOfSeller.change.hidden = NameOfSeller
 nameOfSeller.hint = This can be a business, person or another entity.
 
-sectionTitle.transferDetails = Transfer details
 connectedPersons.title = Connected persons
 connectedPersons.heading = Connected persons
 connectedPersons.legend = Are you and the seller of these securities connected?
@@ -108,9 +107,6 @@ connectedPersons.details.content.l4 = the trustees of a settlement of which you 
 connectedPersons.details.content.p2 = Relative means a brother, sister, ancestor or descendant. It does not include nephews, nieces, uncles and aunts.
 connectedPersons.details.content.link.text = Read HMRC guidance on connected persons
 connectedPersons.change.hidden = Change connected persons
-
-site.save-and-continue.button = Save and continue
-site.save-and-return.button = Save and return to dashboard
 
 applyingForRelief.title = Are you applying for a relief?
 applyingForRelief.heading = Are you applying for a relief?
@@ -187,7 +183,6 @@ totalMarketValue.error.aboveMaximum = The market value of the securities must be
 totalMarketValue.error.belowMinimum = The market value of the securities must be greater than zero
 totalMarketValue.change.hidden = Change the market value of the securities
 
-amountPaidForSecurities.caption = Transfer details
 amountPaidForSecurities.title = How much did you pay for these securities?
 amountPaidForSecurities.heading = How much did you pay for these securities?
 amountPaidForSecurities.checkYourAnswersLabel = How much did you pay for these securities?
@@ -243,7 +238,6 @@ org.howToNotifyAboutSecuritiesTransfer.change.hidden = HowToNotifyAboutSecuritie
 org.connectedPersons.error.required = Select yes if the business and the seller are ‘connected persons’
 org.connectedPersons.p = We need to know if the business buying the securities and the seller are ‘connected persons’, according to
 org.connectedPersons.p.link.content = section 1122 of the Corporation Tax Act 2010
-org.connectedPersons.legend = Is the business and the seller of these securities connected persons?
 org.connectedPersons.legend = Is the business and the seller of these securities connected persons?
 
 org.applyingForRelief.error.required = Select yes if the business is applying for a relief
@@ -368,4 +362,3 @@ changedFileError.p1 = The header rows or columns have been changed.
 changedFileError.p2 = Correct the errors then you can upload the file again, or upload a different file.
 changedFileError.p3 = Remember, do not edit the first two rows of the template, or change the order of the columns.
 changedFileError.download.text = Download the template file
-fileUpload.upload.another = Upload a different file

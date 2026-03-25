@@ -42,7 +42,7 @@
     href = Some(config.connectedPersonsInformationUrl)
 )) }
 
-@layout(pageTitle = title(form, messages("connectedPersons.title"),Some(messages("sectionTitle.transferDetails"))), backLinkUrl = Some(backLinkCall.url)) {
+@layout(pageTitle = title(form, messages("connectedPersons.title"),Some(messages("transfer.details.caption"))), backLinkUrl = Some(backLinkCall.url)) {
 
     @formHelper(action = ConnectedPersonsController.onSubmit(mode), Symbol("autoComplete") -> "off") {
 

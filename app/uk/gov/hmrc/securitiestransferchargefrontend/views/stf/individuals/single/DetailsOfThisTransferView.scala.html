@@ -32,7 +32,7 @@
 
 @(form: Form[_], mode: Mode, backLinkCall: Call,requireMarketValue: Boolean= true)(implicit request: Request[_], messages: Messages)
 
-@layout(pageTitle = title(form, messages("detailsOfThisTransfer.title"),Some(messages("sectionTitle.transferDetails"))), backLinkUrl = Some(backLinkCall.url)) {
+@layout(pageTitle = title(form, messages("detailsOfThisTransfer.title"),Some(messages("transfer.details.caption"))), backLinkUrl = Some(backLinkCall.url)) {
 
     @formHelper(action = routes.DetailsOfThisTransferController.onSubmit(mode), Symbol("autoComplete") -> "off") {
 
