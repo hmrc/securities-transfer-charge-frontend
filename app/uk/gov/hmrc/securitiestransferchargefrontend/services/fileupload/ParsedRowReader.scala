@@ -49,12 +49,14 @@ object ParsedRowReader {
     val formatters = Seq(
       DateTimeFormatter.ISO_LOCAL_DATE,
       DateTimeFormatter.ofPattern("d/M/uuuu"),
-      DateTimeFormatter.ofPattern("dd/MM/uuuu")
+      DateTimeFormatter.ofPattern("dd/MM/uuuu"),
+      DateTimeFormatter.ofPattern("d M uuuu"),
+      DateTimeFormatter.ofPattern("dd MM uuuu")
     )
 
     readString(row, columnIndex).flatMap { value =>
       formatters.view.flatMap { formatter =>
-        Try(LocalDate.parse(value, formatter)).toOption
+        Try(LocalDate.parse(value.trim, formatter)).toOption
       }.headOption
     }
   }

@@ -92,20 +92,27 @@ class ParsedRowReaderSpec extends AnyWordSpec with Matchers {
 
   "readDate" should {
 
-    "parse ISO dates" in {
-      ParsedRowReader.readDate(row("2026-03-23"), 0) shouldBe Some(LocalDate.of(2026, 3, 23))
-    }
-
-    "parse d/M/yyyy dates" in {
-      ParsedRowReader.readDate(row("23/3/2026"), 0) shouldBe Some(LocalDate.of(2026, 3, 23))
-    }
-
-    "parse dd/MM/yyyy dates" in {
-      ParsedRowReader.readDate(row("23/03/2026"), 0) shouldBe Some(LocalDate.of(2026, 3, 23))
+    "parse supported date formats" in {
+      Seq(
+        "2026-03-23" -> LocalDate.of(2026, 3, 23),
+        "23/3/2026"  -> LocalDate.of(2026, 3, 23),
+        "23/03/2026" -> LocalDate.of(2026, 3, 23),
+        "23 03 2026" -> LocalDate.of(2026, 3, 23)
+      ).foreach { case (input, expected) =>
+        ParsedRowReader.readDate(row(input), 0) shouldBe Some(expected)
+      }
     }
 
     "return None for invalid dates" in {
       ParsedRowReader.readDate(row("not-a-date"), 0) shouldBe None
+    }
+
+    "return None when the value is blank" in {
+      ParsedRowReader.readDate(row("   "), 0) shouldBe None
+    }
+
+    "return None when the column is missing" in {
+      ParsedRowReader.readDate(row("2026-03-23"), 10) shouldBe None
     }
   }
 }
