@@ -26,9 +26,10 @@ import uk.gov.hmrc.auth.core.AffinityGroup
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.routes
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.organisations.routes as orgRoutes
 import uk.gov.hmrc.securitiestransferchargefrontend.forms.stf.individuals.TaxRateFormProvider
-import uk.gov.hmrc.securitiestransferchargefrontend.models.{NormalMode, TaxRate, UserAnswers}
+import uk.gov.hmrc.securitiestransferchargefrontend.models.stf.TaxRate
+import uk.gov.hmrc.securitiestransferchargefrontend.models.{NormalMode, UserAnswers}
 import uk.gov.hmrc.securitiestransferchargefrontend.navigation.Navigator
-import uk.gov.hmrc.securitiestransferchargefrontend.pages.TaxRatePage
+import uk.gov.hmrc.securitiestransferchargefrontend.pages.stf.single.TaxRatePage
 import uk.gov.hmrc.securitiestransferchargefrontend.views.html.stf.organisations.TaxRateView
 
 class TaxRateControllerSpec extends SpecBase with MockitoSugar {

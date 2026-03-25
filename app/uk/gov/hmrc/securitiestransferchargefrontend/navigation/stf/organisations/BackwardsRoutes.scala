@@ -18,10 +18,12 @@ package uk.gov.hmrc.securitiestransferchargefrontend.navigation.stf.organisation
 
 import play.api.mvc.Call
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.routes
-import uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.organisations.routes as orgRoutes
+import uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.organisations.single.routes as orgRoutes
+import uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.shared.routes as sharedRoutes
 import uk.gov.hmrc.securitiestransferchargefrontend.models.{NormalMode, UserAnswers}
 import uk.gov.hmrc.securitiestransferchargefrontend.navigation.NavigationHelper
 import uk.gov.hmrc.securitiestransferchargefrontend.pages.*
+import uk.gov.hmrc.securitiestransferchargefrontend.pages.stf.single.{AmountPaidForSecuritiesPage, ApplyingForReliefPage, ChargingPointPage, ConfirmAddressPage, ConnectedPersonsPage, DetailsOfThisTransferPage, HowToNotifyAboutSecuritiesTransferPage, NameOfSellerPage, OtherSecuritiesTypePage, SecuritiesTargetPage, StfBuyersAddressPage, TaxRatePage, TotalMarketValuePage, WhatReliefAreYouApplyingForPage, WhatTypeOfSecuritiesPage}
 
 class BackwardsRoutes(defaultPage: Call):
 
@@ -30,7 +32,7 @@ class BackwardsRoutes(defaultPage: Call):
 
   def predecessorRoutes(page: Page): UserAnswers => Call = page match {
 
-    case HowToNotifyAboutSecuritiesTransferPage => _ => routes.SubmissionsDashboardController.onPageLoad()
+    case HowToNotifyAboutSecuritiesTransferPage => _ => sharedRoutes.SubmissionsDashboardController.onPageLoad()
     case ConfirmAddressPage => _ => orgRoutes.HowToNotifyAboutSecuritiesTransferController.onPageLoad(NormalMode)
     case StfBuyersAddressPage => _ =>orgRoutes.HowToNotifyAboutSecuritiesTransferController.onPageLoad(NormalMode)
     case NameOfSellerPage => _ => orgRoutes.ConfirmAddressController.onPageLoad()

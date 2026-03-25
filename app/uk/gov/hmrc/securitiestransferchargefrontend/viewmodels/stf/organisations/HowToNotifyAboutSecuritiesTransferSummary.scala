@@ -20,9 +20,9 @@ import play.api.i18n.Messages
 import play.twirl.api.HtmlFormat
 import uk.gov.hmrc.govukfrontend.views.viewmodels.content.HtmlContent
 import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.SummaryListRow
-import uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.organisations.routes as orgRoutes
+import uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.organisations.single.routes 
 import uk.gov.hmrc.securitiestransferchargefrontend.models.{CheckMode, UserAnswers}
-import uk.gov.hmrc.securitiestransferchargefrontend.pages.HowToNotifyAboutSecuritiesTransferPage
+import uk.gov.hmrc.securitiestransferchargefrontend.pages.stf.single.HowToNotifyAboutSecuritiesTransferPage
 import uk.gov.hmrc.securitiestransferchargefrontend.viewmodels.govuk.summarylist.*
 import uk.gov.hmrc.securitiestransferchargefrontend.viewmodels.implicits.*
 
@@ -42,7 +42,7 @@ object HowToNotifyAboutSecuritiesTransferSummary  {
           key     = "org.howToNotifyAboutSecuritiesTransfer.checkYourAnswersLabel",
           value   = value,
           actions = Seq(
-            ActionItemViewModel("site.change", orgRoutes.HowToNotifyAboutSecuritiesTransferController.onPageLoad(CheckMode).url)
+            ActionItemViewModel("site.change", routes.HowToNotifyAboutSecuritiesTransferController.onPageLoad(CheckMode).url)
               .withVisuallyHiddenText(messages("org.howToNotifyAboutSecuritiesTransfer.change.hidden"))
           )
         )

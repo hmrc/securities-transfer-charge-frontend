@@ -23,9 +23,9 @@ import uk.gov.hmrc.http.HttpReads.Implicits.*
 import uk.gov.hmrc.http.client.HttpClientV2
 import uk.gov.hmrc.http.{HeaderCarrier, HttpResponse, StringContextOps, UpstreamErrorResponse}
 import uk.gov.hmrc.securitiestransferchargefrontend.config.FrontendAppConfig
-import uk.gov.hmrc.securitiestransferchargefrontend.models.upscan.{UpscanInitiateRequest, UpscanInitiateResponse}
 import uk.gov.hmrc.securitiestransferchargefrontend.utils.CommonHelpers
 import play.api.http.Status.OK
+import uk.gov.hmrc.securitiestransferchargefrontend.models.stf.upscan.{UpscanInitiateRequest, UpscanInitiateResponse}
 
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}

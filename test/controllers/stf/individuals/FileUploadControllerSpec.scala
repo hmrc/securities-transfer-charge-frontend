@@ -26,7 +26,7 @@ import play.api.test.Helpers.*
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.securitiestransferchargefrontend.connectors.UpscanInitiateConnector
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.individuals.routes as individualRoutes
-import uk.gov.hmrc.securitiestransferchargefrontend.models.upscan.{UploadRequest, UpscanInitiateResponse}
+import uk.gov.hmrc.securitiestransferchargefrontend.models.stf.upscan.{UploadRequest, UpscanInitiateResponse}
 import uk.gov.hmrc.securitiestransferchargefrontend.views.html.FileUploadView
 
 import scala.concurrent.Future

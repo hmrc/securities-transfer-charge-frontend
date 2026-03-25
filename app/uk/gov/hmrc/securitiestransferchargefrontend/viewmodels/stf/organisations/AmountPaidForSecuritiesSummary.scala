@@ -19,9 +19,9 @@ package uk.gov.hmrc.securitiestransferchargefrontend.viewmodels.stf.organisation
 import play.api.i18n.Messages
 import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.SummaryListRow
 import uk.gov.hmrc.securitiestransferchargefrontend.config.CurrencyFormatter.currencyFormat
-import uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.organisations.routes
+import uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.organisations.single.routes
 import uk.gov.hmrc.securitiestransferchargefrontend.models.{CheckMode, UserAnswers}
-import uk.gov.hmrc.securitiestransferchargefrontend.pages.AmountPaidForSecuritiesPage
+import uk.gov.hmrc.securitiestransferchargefrontend.pages.stf.single.AmountPaidForSecuritiesPage
 import uk.gov.hmrc.securitiestransferchargefrontend.viewmodels.govuk.summarylist.*
 import uk.gov.hmrc.securitiestransferchargefrontend.viewmodels.implicits.*
 

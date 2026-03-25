@@ -23,7 +23,7 @@ import org.scalatest.freespec.AnyFreeSpec
 import org.scalatest.matchers.must.Matchers
 import org.scalatest.OptionValues
 import play.api.libs.json.{JsError, JsString, Json}
-import uk.gov.hmrc.securitiestransferchargefrontend.models.TaxRate
+import uk.gov.hmrc.securitiestransferchargefrontend.models.stf.TaxRate
 
 class TaxRateSpec extends AnyFreeSpec with Matchers with ScalaCheckPropertyChecks with OptionValues {
 

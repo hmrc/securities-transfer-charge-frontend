@@ -31,7 +31,7 @@ import uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.organisation
 import uk.gov.hmrc.securitiestransferchargefrontend.forms.stf.organisations.ConnectedPersonsFormProvider
 import uk.gov.hmrc.securitiestransferchargefrontend.models.{NormalMode, UserAnswers}
 import uk.gov.hmrc.securitiestransferchargefrontend.navigation.Navigator
-import uk.gov.hmrc.securitiestransferchargefrontend.pages.ConnectedPersonsPage
+import uk.gov.hmrc.securitiestransferchargefrontend.pages.stf.single.ConnectedPersonsPage
 import uk.gov.hmrc.securitiestransferchargefrontend.views.html.stf.organisations.ConnectedPersonsView
 
 import scala.concurrent.Future

@@ -25,9 +25,10 @@ import play.api.test.Helpers.*
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.routes
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.individuals.routes as individualRoutes
 import uk.gov.hmrc.securitiestransferchargefrontend.forms.stf.shared.DetailsOfThisTransferFormProvider
-import uk.gov.hmrc.securitiestransferchargefrontend.models.{DetailsOfThisTransfer, NormalMode, UserAnswers}
+import uk.gov.hmrc.securitiestransferchargefrontend.models.stf.DetailsOfThisTransfer
+import uk.gov.hmrc.securitiestransferchargefrontend.models.{NormalMode, UserAnswers}
 import uk.gov.hmrc.securitiestransferchargefrontend.navigation.Navigator
-import uk.gov.hmrc.securitiestransferchargefrontend.pages.{ConnectedPersonsPage, DetailsOfThisTransferPage}
+import uk.gov.hmrc.securitiestransferchargefrontend.pages.stf.single.{ConnectedPersonsPage, DetailsOfThisTransferPage}
 import uk.gov.hmrc.securitiestransferchargefrontend.views.html.stf.individuals.DetailsOfThisTransferView
 
 class DetailsOfThisTransferControllerSpec extends SpecBase with MockitoSugar {

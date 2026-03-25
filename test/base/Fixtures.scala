@@ -25,7 +25,8 @@ import uk.gov.hmrc.auth.core.retrieve.Retrieval
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.securitiestransferchargefrontend.connectors.AlfAddressConnector
 import uk.gov.hmrc.securitiestransferchargefrontend.domain.{SubmissionId, SubscriptionId}
-import uk.gov.hmrc.securitiestransferchargefrontend.models.{AlfAddress, AlfConfirmedAddress, ConfirmableAddress, Country, UserAnswers}
+import uk.gov.hmrc.securitiestransferchargefrontend.models.stf.{AlfAddress, AlfConfirmedAddress, ConfirmableAddress, Country}
+import uk.gov.hmrc.securitiestransferchargefrontend.models.UserAnswers
 
 import scala.concurrent.{ExecutionContext, Future}
 

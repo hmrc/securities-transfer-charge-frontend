@@ -18,7 +18,7 @@ package uk.gov.hmrc.securitiestransferchargefrontend.forms.stf.individuals
 
 import play.api.data.Form
 import uk.gov.hmrc.securitiestransferchargefrontend.forms.mappings.Mappings
-import uk.gov.hmrc.securitiestransferchargefrontend.models.TaxRate
+import uk.gov.hmrc.securitiestransferchargefrontend.models.stf.TaxRate
 
 import javax.inject.Inject
 

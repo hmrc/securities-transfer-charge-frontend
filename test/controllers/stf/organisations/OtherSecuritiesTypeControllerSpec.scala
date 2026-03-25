@@ -27,7 +27,7 @@ import uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.organisation
 import uk.gov.hmrc.securitiestransferchargefrontend.forms.stf.organisations.OtherSecuritiesTypeFormProvider
 import uk.gov.hmrc.securitiestransferchargefrontend.models.{NormalMode, UserAnswers}
 import uk.gov.hmrc.securitiestransferchargefrontend.navigation.Navigator
-import uk.gov.hmrc.securitiestransferchargefrontend.pages.OtherSecuritiesTypePage
+import uk.gov.hmrc.securitiestransferchargefrontend.pages.stf.single.OtherSecuritiesTypePage
 import uk.gov.hmrc.securitiestransferchargefrontend.views.html.stf.organisations.OtherSecuritiesTypeView
 
 class OtherSecuritiesTypeControllerSpec extends SpecBase with MockitoSugar {

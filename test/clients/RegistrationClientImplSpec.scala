@@ -20,8 +20,8 @@ package clients
 import base.SpecBase
 import uk.gov.hmrc.securitiestransferchargefrontend.clients.registration.RegistrationClientImpl
 import uk.gov.hmrc.securitiestransferchargefrontend.clients.registration.SubscriptionResponse.AddressUpdateSuccessful
-import uk.gov.hmrc.securitiestransferchargefrontend.models.Address
 import uk.gov.hmrc.securitiestransferchargefrontend.domain.SubscriptionId
+import uk.gov.hmrc.securitiestransferchargefrontend.models.stf.Address
 
 class RegistrationClientImplSpec extends SpecBase {
 

@@ -19,7 +19,7 @@ package views.stf.individuals
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
 import play.api.Application
-import uk.gov.hmrc.securitiestransferchargefrontend.models.{ConfirmableAddress, Country}
+import uk.gov.hmrc.securitiestransferchargefrontend.models.stf.{ConfirmableAddress, Country}
 import uk.gov.hmrc.securitiestransferchargefrontend.views.html.stf.individuals.ConfirmAddressView
 import views.ViewBaseSpec
 

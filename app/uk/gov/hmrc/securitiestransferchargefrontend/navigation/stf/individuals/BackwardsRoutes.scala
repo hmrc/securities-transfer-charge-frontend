@@ -17,11 +17,13 @@
 package uk.gov.hmrc.securitiestransferchargefrontend.navigation.stf.individuals
 
 import play.api.mvc.Call
-import uk.gov.hmrc.securitiestransferchargefrontend.controllers.routes
-import uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.individuals.routes as individualsRoutes
+import uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.individuals.single.routes as individualSingleRoutes
+import uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.individuals.routes as individualRoutes
+import uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.shared.routes as sharedRoutes
 import uk.gov.hmrc.securitiestransferchargefrontend.models.{NormalMode, UserAnswers}
 import uk.gov.hmrc.securitiestransferchargefrontend.navigation.NavigationHelper
 import uk.gov.hmrc.securitiestransferchargefrontend.pages.*
+import uk.gov.hmrc.securitiestransferchargefrontend.pages.stf.single.{AmountPaidForSecuritiesPage, ApplyingForReliefPage, ChargingPointPage, ConfirmAddressPage, ConnectedPersonsPage, DetailsOfThisTransferPage, HowToNotifyAboutSecuritiesTransferPage, NameOfSellerPage, OtherSecuritiesTypePage, SecuritiesTargetPage, StfBuyersAddressPage, StfSellerAddressPage, TaxRatePage, TotalMarketValuePage, WhatReliefAreYouApplyingForPage, WhatTypeOfSecuritiesPage}
 
 class BackwardsRoutes(defaultPage: Call):
 
@@ -29,26 +31,24 @@ class BackwardsRoutes(defaultPage: Call):
   import navHelper.*
   
   def predecessorRoutes(page: Page): UserAnswers => Call = page match {
-    case HowToNotifyAboutSecuritiesTransferPage => _ => routes.SubmissionsDashboardController.onPageLoad()
-    case TemplateInstructionsPage => _ => individualsRoutes.HowToNotifyAboutSecuritiesTransferController.onPageLoad(NormalMode)
-    case FormattingErrorPage => _ => routes.JourneyRecoveryController.onPageLoad()
-    case ConfirmAddressPage => _ => individualsRoutes.HowToNotifyAboutSecuritiesTransferController.onPageLoad(NormalMode)
-    case StfBuyersAddressPage => _ => individualsRoutes.HowToNotifyAboutSecuritiesTransferController.onPageLoad(NormalMode)
-    case NameOfSellerPage => _ => individualsRoutes.ConfirmAddressController.onPageLoad()
-    case StfSellerAddressPage => _ => individualsRoutes.NameOfSellerController.onPageLoad(NormalMode)
-    case ConnectedPersonsPage => _ => individualsRoutes.StfSellerAddressController.onPageLoad()
-    case ApplyingForReliefPage => _ => individualsRoutes.ConnectedPersonsController.onPageLoad(NormalMode)
-    case WhatReliefAreYouApplyingForPage => _ => individualsRoutes.ApplyingForReliefController.onPageLoad(NormalMode)
+    case HowToNotifyAboutSecuritiesTransferPage => _ => sharedRoutes.SubmissionsDashboardController.onPageLoad()
+    case ConfirmAddressPage => _ => individualRoutes.HowToNotifyAboutSecuritiesTransferController.onPageLoad(NormalMode)
+    case StfBuyersAddressPage => _ => individualRoutes.HowToNotifyAboutSecuritiesTransferController.onPageLoad(NormalMode)
+    case NameOfSellerPage => _ => individualSingleRoutes.ConfirmAddressController.onPageLoad()
+    case StfSellerAddressPage => _ => individualSingleRoutes.NameOfSellerController.onPageLoad(NormalMode)
+    case ConnectedPersonsPage => _ => individualSingleRoutes.StfSellerAddressController.onPageLoad()
+    case ApplyingForReliefPage => _ => individualSingleRoutes.ConnectedPersonsController.onPageLoad(NormalMode)
+    case WhatReliefAreYouApplyingForPage => _ => individualSingleRoutes.ApplyingForReliefController.onPageLoad(NormalMode)
     case SecuritiesTargetPage => userAnswers => dataDependent(ApplyingForReliefPage, userAnswers) {
-      case true => individualsRoutes.WhatReliefAreYouApplyingForController.onPageLoad(NormalMode)
-      case false => individualsRoutes.ApplyingForReliefController.onPageLoad(NormalMode)
+      case true => individualSingleRoutes.WhatReliefAreYouApplyingForController.onPageLoad(NormalMode)
+      case false => individualSingleRoutes.ApplyingForReliefController.onPageLoad(NormalMode)
     }
-    case ChargingPointPage => _ => individualsRoutes.SecuritiesTargetController.onPageLoad(NormalMode)
-    case TaxRatePage => _ => individualsRoutes.ChargingPointController.onPageLoad(NormalMode)
-    case WhatTypeOfSecuritiesPage => _ => individualsRoutes.TaxRateController.onPageLoad(NormalMode)
-    case DetailsOfThisTransferPage => _ => individualsRoutes.WhatTypeOfSecuritiesController.onPageLoad(NormalMode)
-    case OtherSecuritiesTypePage => _ => individualsRoutes.WhatTypeOfSecuritiesController.onPageLoad(NormalMode)
-    case AmountPaidForSecuritiesPage => _ => individualsRoutes.OtherSecuritiesTypeController.onPageLoad(NormalMode)
-    case TotalMarketValuePage => _ => individualsRoutes.AmountPaidForSecuritiesController.onPageLoad(NormalMode)
+    case ChargingPointPage => _ => individualSingleRoutes.SecuritiesTargetController.onPageLoad(NormalMode)
+    case TaxRatePage => _ => individualSingleRoutes.ChargingPointController.onPageLoad(NormalMode)
+    case WhatTypeOfSecuritiesPage => _ => individualSingleRoutes.TaxRateController.onPageLoad(NormalMode)
+    case DetailsOfThisTransferPage => _ => individualSingleRoutes.WhatTypeOfSecuritiesController.onPageLoad(NormalMode)
+    case OtherSecuritiesTypePage => _ => individualSingleRoutes.WhatTypeOfSecuritiesController.onPageLoad(NormalMode)
+    case AmountPaidForSecuritiesPage => _ => individualSingleRoutes.OtherSecuritiesTypeController.onPageLoad(NormalMode)
+    case TotalMarketValuePage => _ => individualSingleRoutes.AmountPaidForSecuritiesController.onPageLoad(NormalMode)
     case _ => _ => defaultPage
   }

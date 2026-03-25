@@ -27,7 +27,7 @@ import uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.organisation
 import uk.gov.hmrc.securitiestransferchargefrontend.forms.stf.organisations.AmountPaidForSecuritiesFormProvider
 import uk.gov.hmrc.securitiestransferchargefrontend.models.{NormalMode, UserAnswers}
 import uk.gov.hmrc.securitiestransferchargefrontend.navigation.Navigator
-import uk.gov.hmrc.securitiestransferchargefrontend.pages.{AmountPaidForSecuritiesPage, ConnectedPersonsPage}
+import uk.gov.hmrc.securitiestransferchargefrontend.pages.stf.single.{AmountPaidForSecuritiesPage, ConnectedPersonsPage}
 import uk.gov.hmrc.securitiestransferchargefrontend.views.html.stf.organisations.AmountPaidForSecuritiesView
 
 class AmountPaidForSecuritiesControllerSpec extends SpecBase with MockitoSugar {

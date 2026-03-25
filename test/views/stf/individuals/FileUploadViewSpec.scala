@@ -20,7 +20,7 @@ import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
 import play.api.Application
 import play.api.test.FakeRequest
-import uk.gov.hmrc.securitiestransferchargefrontend.models.upscan.UploadRequest
+import uk.gov.hmrc.securitiestransferchargefrontend.models.stf.upscan.UploadRequest
 import uk.gov.hmrc.securitiestransferchargefrontend.views.html.FileUploadView
 import views.ViewBaseSpec
 

@@ -20,11 +20,17 @@ import play.api.mvc.Call
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.securitiestransferchargefrontend.config.FrontendAppConfig
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.routes
+import uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.individuals.single.routes as individualSingleRoutes
+import uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.individuals.bulk.routes as individualBulkRoutes
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.individuals.routes as individualRoutes
-import uk.gov.hmrc.securitiestransferchargefrontend.models.HowToNotifyAboutSecuritiesTransfer.{MoreThanOneAtATime, OneAtATime}
-import uk.gov.hmrc.securitiestransferchargefrontend.models.{NormalMode, UserAnswers, WhatTypeOfSecurities}
+import uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.shared.routes as sharedRoutes
+import uk.gov.hmrc.securitiestransferchargefrontend.models.stf.HowToNotifyAboutSecuritiesTransfer.{MoreThanOneAtATime, OneAtATime}
+import uk.gov.hmrc.securitiestransferchargefrontend.models.stf.WhatTypeOfSecurities
+import uk.gov.hmrc.securitiestransferchargefrontend.models.{NormalMode, UserAnswers}
 import uk.gov.hmrc.securitiestransferchargefrontend.navigation.*
 import uk.gov.hmrc.securitiestransferchargefrontend.pages.*
+import uk.gov.hmrc.securitiestransferchargefrontend.pages.stf.shared.SubmissionsDashboardPage
+import uk.gov.hmrc.securitiestransferchargefrontend.pages.stf.single.{AmountPaidForSecuritiesPage, ApplyingForReliefPage, ChargingPointPage, ConfirmAddressPage, ConnectedPersonsPage, DetailsOfThisTransferPage, HowToNotifyAboutSecuritiesTransferPage, NameOfSellerPage, OtherSecuritiesTypePage, SecuritiesTargetPage, StfBuyersAddressPage, StfSellerAddressPage, TaxRatePage, TotalMarketValuePage, WhatReliefAreYouApplyingForPage, WhatTypeOfSecuritiesPage}
 import uk.gov.hmrc.securitiestransferchargefrontend.services.AnswerPersistenceService
 
 import scala.concurrent.{ExecutionContext, Future}
@@ -47,7 +53,7 @@ class ForwardRoutes(answerPersistenceService: AnswerPersistenceService,
     case HowToNotifyAboutSecuritiesTransferPage => userAnswers => {
       dataDependent(HowToNotifyAboutSecuritiesTransferPage, userAnswers) {
         case OneAtATime => individualRoutes.ConfirmAddressController.onPageLoad()
-        case MoreThanOneAtATime => individualRoutes.TemplateInstructionsController.onPageLoad()
+        case MoreThanOneAtATime => individualBulkRoutes.TemplateInstructionsController.onPageLoad()
       }
     }
     case ConfirmAddressPage => userAnswers => dataRequired(ConfirmAddressPage, userAnswers, individualRoutes.NameOfSellerController.onPageLoad(NormalMode))
@@ -57,7 +63,7 @@ class ForwardRoutes(answerPersistenceService: AnswerPersistenceService,
     case ConnectedPersonsPage => userAnswers => dataRequired(ConnectedPersonsPage, userAnswers, individualRoutes.ApplyingForReliefController.onPageLoad(NormalMode))
     case ApplyingForReliefPage => userAnswers =>
       dataDependent(ApplyingForReliefPage, userAnswers) {
-        case true => individualRoutes.WhatReliefAreYouApplyingForController.onPageLoad(NormalMode)
+        case true => individualSingleRoutes.WhatReliefAreYouApplyingForController.onPageLoad(NormalMode)
         case false => individualRoutes.SecuritiesTargetController.onPageLoad(NormalMode)
       }
     case WhatReliefAreYouApplyingForPage => userAnswers => dataRequired(WhatReliefAreYouApplyingForPage, userAnswers, individualRoutes.SecuritiesTargetController.onPageLoad(NormalMode))
@@ -66,7 +72,7 @@ class ForwardRoutes(answerPersistenceService: AnswerPersistenceService,
       if (enterDate.isBefore(firstDate)) routes.JourneyRecoveryController.onPageLoad()
       else individualRoutes.TaxRateController.onPageLoad(NormalMode)
     }
-    case TaxRatePage => userAnswers => dataRequired(TaxRatePage, userAnswers, individualRoutes.WhatTypeOfSecuritiesController.onPageLoad(NormalMode))
+    case TaxRatePage => userAnswers => dataRequired(TaxRatePage, userAnswers, individualSingleRoutes.WhatTypeOfSecuritiesController.onPageLoad(NormalMode))
     case OtherSecuritiesTypePage => userAnswers => dataRequired(OtherSecuritiesTypePage, userAnswers, individualRoutes.AmountPaidForSecuritiesController.onPageLoad(NormalMode))
     case WhatTypeOfSecuritiesPage => userAnswers =>
       dataDependent(WhatTypeOfSecuritiesPage, userAnswers) {
@@ -79,7 +85,7 @@ class ForwardRoutes(answerPersistenceService: AnswerPersistenceService,
         userAnswers =>
           userAnswers.get(ConnectedPersonsPage).fold(defaultPage) {
             isConnected =>
-              if (isConnected) individualRoutes.TotalMarketValueController.onPageLoad(NormalMode)
+              if (isConnected) individualSingleRoutes.TotalMarketValueController.onPageLoad(NormalMode)
               else routes.CheckYourAnswersController.onPageLoad()
           }
       }

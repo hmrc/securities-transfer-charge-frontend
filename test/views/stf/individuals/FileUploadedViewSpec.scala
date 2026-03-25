@@ -19,7 +19,7 @@ package views.stf.individuals
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
 import play.api.Application
-import uk.gov.hmrc.securitiestransferchargefrontend.models.upscan.{FileUpload, UpscanJourneyStatus}
+import uk.gov.hmrc.securitiestransferchargefrontend.models.stf.upscan.{FileUpload, UpscanJourneyStatus}
 import uk.gov.hmrc.securitiestransferchargefrontend.views.html.FileUploadedView
 import views.ViewBaseSpec
 

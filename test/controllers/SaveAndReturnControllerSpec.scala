@@ -26,12 +26,12 @@ import play.api.http.Status.SEE_OTHER
 import play.api.i18n.MessagesApi
 import play.api.mvc.{AnyContentAsEmpty, Call, MessagesControllerComponents, PlayBodyParsers}
 import play.api.test.FakeRequest
-import uk.gov.hmrc.securitiestransferchargefrontend.controllers.SaveAndReturnController
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.actions.StcAuthEnrolledAction
+import uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.shared.SaveAndReturnController
 import uk.gov.hmrc.securitiestransferchargefrontend.domain.SubmissionId
 import uk.gov.hmrc.securitiestransferchargefrontend.models.UserAnswers
 import uk.gov.hmrc.securitiestransferchargefrontend.navigation.stf.individuals.StfNavigator
-import uk.gov.hmrc.securitiestransferchargefrontend.pages.SaveAndReturnPage
+import uk.gov.hmrc.securitiestransferchargefrontend.pages.stf.shared.SaveAndReturnPage
 
 import scala.concurrent.*
 
