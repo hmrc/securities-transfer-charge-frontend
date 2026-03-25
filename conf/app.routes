@@ -26,10 +26,10 @@ POST       /stf/confirm-address                           uk.gov.hmrc.securities
 GET        /submissions-dashboard                         uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.shared.SubmissionsDashboardController.onPageLoad()
 POST       /submissions-dashboard                         uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.shared.SubmissionsDashboardController.onSubmit()
 
-GET        /stf/how-many-transfers                        uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.individuals.single.HowToNotifyAboutSecuritiesTransferController.onPageLoad(mode: Mode = NormalMode)
-POST       /stf/how-many-transfers                        uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.individuals.single.HowToNotifyAboutSecuritiesTransferController.onSubmit(mode: Mode = NormalMode)
-GET        /stf/change/how-many-transfers                 uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.individuals.single.HowToNotifyAboutSecuritiesTransferController.onPageLoad(mode: Mode = CheckMode)
-POST       /stf/change/how-many-transfers                 uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.individuals.single.HowToNotifyAboutSecuritiesTransferController.onSubmit(mode: Mode = CheckMode)
+GET        /stf/how-many-transfers                        uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.individuals.HowToNotifyAboutSecuritiesTransferController.onPageLoad(mode: Mode = NormalMode)
+POST       /stf/how-many-transfers                        uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.individuals.HowToNotifyAboutSecuritiesTransferController.onSubmit(mode: Mode = NormalMode)
+GET        /stf/change/how-many-transfers                 uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.individuals.HowToNotifyAboutSecuritiesTransferController.onPageLoad(mode: Mode = CheckMode)
+POST       /stf/change/how-many-transfers                 uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.individuals.HowToNotifyAboutSecuritiesTransferController.onSubmit(mode: Mode = CheckMode)
 
 GET        /stf/seller-name                               uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.individuals.single.NameOfSellerController.onPageLoad(mode: Mode = NormalMode)
 POST       /stf/seller-name                               uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.individuals.single.NameOfSellerController.onSubmit(mode: Mode = NormalMode)
@@ -117,10 +117,10 @@ GET        /stf/org/address/return                        uk.gov.hmrc.securities
 GET        /stf/org/seller/address                        uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.organisations.single.StfSellerAddressController.onPageLoad()
 GET        /stf/org/seller/address/return                 uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.organisations.single.StfSellerAddressController.onReturn(id: String)
 
-GET        /stf/org/how-many-transfers                    uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.organisations.single.HowToNotifyAboutSecuritiesTransferController.onPageLoad(mode: Mode = NormalMode)
-POST       /stf/org/how-many-transfers                    uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.organisations.single.HowToNotifyAboutSecuritiesTransferController.onSubmit(mode: Mode = NormalMode)
-GET        /stf/org/how-many-transfers                    uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.organisations.single.HowToNotifyAboutSecuritiesTransferController.onPageLoad(mode: Mode = CheckMode)
-POST       /stf/org/how-many-transfers                    uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.organisations.single.HowToNotifyAboutSecuritiesTransferController.onSubmit(mode: Mode = CheckMode)
+GET        /stf/org/how-many-transfers                    uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.organisations.HowToNotifyAboutSecuritiesTransferController.onPageLoad(mode: Mode = NormalMode)
+POST       /stf/org/how-many-transfers                    uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.organisations.HowToNotifyAboutSecuritiesTransferController.onSubmit(mode: Mode = NormalMode)
+GET        /stf/org/how-many-transfers                    uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.organisations.HowToNotifyAboutSecuritiesTransferController.onPageLoad(mode: Mode = CheckMode)
+POST       /stf/org/how-many-transfers                    uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.organisations.HowToNotifyAboutSecuritiesTransferController.onSubmit(mode: Mode = CheckMode)
 
 GET        /stf/org/connected-persons                     uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.organisations.single.ConnectedPersonsController.onPageLoad(mode: Mode = NormalMode)
 POST       /stf/org/connected-persons                     uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.organisations.single.ConnectedPersonsController.onSubmit(mode: Mode = NormalMode)

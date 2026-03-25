@@ -28,7 +28,8 @@ import uk.gov.hmrc.securitiestransferchargefrontend.models.*
 import uk.gov.hmrc.securitiestransferchargefrontend.models.stf.{HowToNotifyAboutSecuritiesTransfer, SecuritiesTarget}
 import uk.gov.hmrc.securitiestransferchargefrontend.navigation.stf.organisations.StfOrgNavigator
 import uk.gov.hmrc.securitiestransferchargefrontend.pages.*
-import uk.gov.hmrc.securitiestransferchargefrontend.pages.stf.single.{ApplyingForReliefPage, ChargingPointPage, ConfirmAddressPage, ConnectedPersonsPage, HowToNotifyAboutSecuritiesTransferPage, NameOfSellerPage, SecuritiesTargetPage, StfBuyersAddressPage, StfSellerAddressPage, TaxRatePage, WhatReliefAreYouApplyingForPage}
+import uk.gov.hmrc.securitiestransferchargefrontend.pages.stf.shared.HowToNotifyAboutSecuritiesTransferPage
+import uk.gov.hmrc.securitiestransferchargefrontend.pages.stf.single.{ApplyingForReliefPage, ChargingPointPage, ConfirmAddressPage, ConnectedPersonsPage, NameOfSellerPage, SecuritiesTargetPage, StfBuyersAddressPage, StfSellerAddressPage, TaxRatePage, WhatReliefAreYouApplyingForPage}
 
 import java.time.LocalDate
 

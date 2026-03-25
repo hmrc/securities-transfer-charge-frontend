@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.organisations.single
+package uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.organisations
 
 import play.api.data.Form
 import play.api.i18n.{I18nSupport, MessagesApi}
@@ -26,7 +26,7 @@ import uk.gov.hmrc.securitiestransferchargefrontend.forms.stf.organisations.HowT
 import uk.gov.hmrc.securitiestransferchargefrontend.models.stf.HowToNotifyAboutSecuritiesTransfer
 import uk.gov.hmrc.securitiestransferchargefrontend.models.{Mode, UserAnswers}
 import uk.gov.hmrc.securitiestransferchargefrontend.navigation.Navigator
-import uk.gov.hmrc.securitiestransferchargefrontend.pages.stf.single.HowToNotifyAboutSecuritiesTransferPage
+import uk.gov.hmrc.securitiestransferchargefrontend.pages.stf.shared.HowToNotifyAboutSecuritiesTransferPage
 import uk.gov.hmrc.securitiestransferchargefrontend.views.html.stf.organisations.single.HowToNotifyAboutSecuritiesTransferView
 
 import javax.inject.{Inject, Named}
