@@ -16,6 +16,8 @@
 
 package uk.gov.hmrc.securitiestransferchargefrontend.models.fileupload
 
+import play.api.libs.json.{Json, OFormat}
+
 final case class StcFileValidationResponse(
                                             rows: Seq[ValidatedStcRow]
                                           ) {
@@ -33,4 +35,8 @@ final case class StcFileValidationResponse(
 
   val nonBlockingErrors: Seq[StcRowValidationError] =
     rows.flatMap(_.validationErrors.filterNot(_.blocking))
+}
+
+object StcFileValidationResponse {
+  implicit val format: OFormat[StcFileValidationResponse] = Json.format[StcFileValidationResponse]
 }

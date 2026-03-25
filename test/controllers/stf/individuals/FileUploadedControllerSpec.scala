@@ -23,10 +23,13 @@ import org.scalatestplus.mockito.MockitoSugar
 import play.api.test.FakeRequest
 import play.api.test.Helpers.*
 import play.api.{Application, inject}
+import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.routes
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.individuals.routes as individualRoutes
+import uk.gov.hmrc.securitiestransferchargefrontend.models.fileupload.StcFileValidationResponse
 import uk.gov.hmrc.securitiestransferchargefrontend.models.upscan.{FileUpload, UpscanJourneyStatus}
 import uk.gov.hmrc.securitiestransferchargefrontend.repositories.UpscanJourneyRepository
+import uk.gov.hmrc.securitiestransferchargefrontend.services.fileupload.StcUpscanProcessingService
 import uk.gov.hmrc.securitiestransferchargefrontend.views.html.FileUploadedView
 
 import scala.concurrent.Future
@@ -34,6 +37,7 @@ import scala.concurrent.Future
 class FileUploadedControllerSpec extends SpecBase with MockitoSugar {
 
   private val mockRepository = mock[UpscanJourneyRepository]
+  private val mockStcUpscanProcessingService = mock[StcUpscanProcessingService]
 
   private val testKey = "test-key"
 
@@ -46,10 +50,15 @@ class FileUploadedControllerSpec extends SpecBase with MockitoSugar {
     message = None
   )
 
+  private val validationResponse = StcFileValidationResponse(
+    rows = Seq.empty
+  )
+
   private def application: Application =
     applicationBuilder()
       .overrides(
-        inject.bind[UpscanJourneyRepository].toInstance(mockRepository)
+        inject.bind[UpscanJourneyRepository].toInstance(mockRepository),
+        inject.bind[StcUpscanProcessingService].toInstance(mockStcUpscanProcessingService)
       )
       .build()
 
@@ -62,6 +71,9 @@ class FileUploadedControllerSpec extends SpecBase with MockitoSugar {
 
       when(mockRepository.find(any()))
         .thenReturn(Future.successful(Some(testFileUpload)))
+
+      when(mockStcUpscanProcessingService.process(any())(any[HeaderCarrier]))
+        .thenReturn(Future.successful(Right(validationResponse)))
 
       val app = application
 

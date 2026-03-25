@@ -53,7 +53,7 @@ class StcUploadProcessingServiceSpec extends AnyWordSpec with Matchers with Eith
     addressLine4 = None,
     postcode = Some("SW1A 2AA"),
     country = Some("United Kingdom"),
-    sellerName = Some("Jane Seller"),
+    sellerName = Some("Bob Seller"),
     sellerAddressInUk = Some(true),
     sellerAddressLine1 = Some("1 Seller Street"),
     sellerAddressLine2 = None,

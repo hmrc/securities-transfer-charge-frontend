@@ -16,6 +16,8 @@
 
 package uk.gov.hmrc.securitiestransferchargefrontend.models.fileupload
 
+import play.api.libs.json.{Json, OFormat}
+
 import java.time.LocalDate
 
 final case class ParsedStcRow(
@@ -47,3 +49,7 @@ final case class ParsedStcRow(
                                amountPaidForSecurities: Option[BigDecimal],
                                totalMarketValue: Option[BigDecimal]
                              )
+
+object ParsedStcRow {
+  implicit val format: OFormat[ParsedStcRow] = Json.format[ParsedStcRow]
+}

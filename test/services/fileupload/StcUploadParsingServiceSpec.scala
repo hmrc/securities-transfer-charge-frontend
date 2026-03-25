@@ -75,7 +75,7 @@ class StcUploadParsingServiceSpec extends AnyWordSpec with Matchers with EitherV
         rowNumber = 3,
         cells = Seq(
           ParsedCell(1, "10 Downing Street"),
-          ParsedCell(7, "Jane Seller"),
+          ParsedCell(7, "Bob Seller"),
           ParsedCell(20, "2026-03-23"),
           ParsedCell(21, "0.5%"),
           ParsedCell(24, "100"),
@@ -101,7 +101,7 @@ class StcUploadParsingServiceSpec extends AnyWordSpec with Matchers with EitherV
         addressLine4 = None,
         postcode = None,
         country = None,
-        sellerName = Some("Jane Seller"),
+        sellerName = Some("Bob Seller"),
         sellerAddressInUk = None,
         sellerAddressLine1 = None,
         sellerAddressLine2 = None,
