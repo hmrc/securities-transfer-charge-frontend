@@ -27,9 +27,7 @@ class FileParserSelector @Inject()(
                                   ) {
 
   private val csvMimeTypes = Set(
-    "text/csv",
-    "application/csv",
-    "text/plain"
+    "text/csv"
   )
 
   private val xlsxMimeTypes = Set(
