@@ -16,7 +16,7 @@
 
 @import uk.gov.hmrc.securitiestransferchargefrontend.views.html.templates
 @import uk.gov.hmrc.securitiestransferchargefrontend.views.html.components.SaveAndReturnButton
-@import uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.individuals.routes
+@import uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.individuals.routes as individualsRoutes
 
 @this(
     layout: templates.Layout,
@@ -31,7 +31,7 @@
 
     <div id="caption-heading" class="govuk-caption-l">@messages("transfer.details.caption")</div>
 
-        <h1 class="govuk-heading-l govuk-!-margin-bottom-8">@messages("templateInstructions.heading")</h1>
+        <h1 class="govuk-heading-xl govuk-!-margin-bottom-8">@messages("templateInstructions.heading")</h1>
 
         <p class="govuk-body">@messages("templateInstructions.p1")</p>
 
@@ -46,14 +46,16 @@
         </ol>
 
         <p class="govuk-body">@messages("templateInstructions.p2")</p>
-        <p class="govuk-body">@Html(messages("templateInstructions.p3"))</p>
+        <p class="govuk-body">
+            @messages("templateInstructions.p3.before")
+            <a class="govuk-link" href="">@messages("templateInstructions.p3.link")</a>
+            @messages("templateInstructions.p3.after")
+        </p>
 
-        <div>
-            @formHelper(action = routes.FileUploadController.onPageLoad()) {
-                @govukButton(
-                    ButtonViewModel(messages("site.save-and-continue.button"))
-                )
-            @saveAndReturnButton()
-            }
+        <div class="govuk-button-group">
+            <a href="" role="button" draggable="false" class="govuk-button" data-module="govuk-button">
+                @messages("site.continue")
+            </a>
+            <a class="govuk-link" href="">@messages("templateInstructions.return.link")</a>
         </div>
 }

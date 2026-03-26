@@ -45,7 +45,7 @@ class TemplateInstructionsViewSpec extends ViewBaseSpec {
     val downloadFileName = "Bulk Securities Transfer Charge template v1i.xlsx"
 
     val step2 = "Complete the template, using one row for each type of securities you are buying"
-    val step3 = "Upload your file on the next page as a .xlsx or .csv."
+    val step3 = "Upload your file on the next page as a .xlsx or .csv"
     val para2Value = "Remember, do not edit the first two rows, or change the order of the columns."
     val para3Value = "Once you have uploaded and submitted your file it will show on your STC dashboard. You can then pay any charges due."
     val para3BoldText = "STC dashboard"
