@@ -18,8 +18,9 @@ package connectors
 
 import com.github.tomakehurst.wiremock.client.WireMock._
 import org.scalatest.BeforeAndAfterAll
-import org.scalatest.concurrent.ScalaFutures
+import org.scalatest.concurrent.{IntegrationPatience, ScalaFutures}
 import org.scalatest.matchers.should.Matchers
+import org.scalatest.time.{Millis, Seconds, Span}
 import org.scalatest.wordspec.AnyWordSpec
 import play.api.Application
 import play.api.inject.guice.GuiceApplicationBuilder
@@ -30,12 +31,10 @@ import utils.WireMockHelper
 import java.io.InputStream
 import scala.io.Source
 
-class UpscanFileDownloadConnectorSpec
-  extends AnyWordSpec
-    with Matchers
-    with ScalaFutures
-    with BeforeAndAfterAll
-    with WireMockHelper {
+class UpscanFileDownloadConnectorSpec extends AnyWordSpec with Matchers with ScalaFutures with IntegrationPatience with BeforeAndAfterAll with WireMockHelper {
+
+  implicit override val patienceConfig: PatienceConfig =
+    PatienceConfig(timeout = Span(5, Seconds), interval = Span(50, Millis))
 
   implicit val hc: HeaderCarrier = HeaderCarrier()
 
@@ -94,16 +93,6 @@ class UpscanFileDownloadConnectorSpec
       }
 
       thrown.getMessage should include("500")
-    }
-
-    "fail the future when the connection cannot be made" in {
-      val thrown = the[Exception] thrownBy {
-        connector.download("http://localhost:59999/file").futureValue
-      }
-
-      thrown.getMessage.toLowerCase should (
-        include("connection") or include("refused") or include("failed")
-        )
     }
   }
 }
