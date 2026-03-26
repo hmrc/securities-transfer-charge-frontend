@@ -106,7 +106,7 @@ class StcRowValidationServiceSpec extends AnyWordSpec with Matchers {
 
       val result = service.validate(invalidRow)
 
-      result.validationErrors.map(_.fieldName) should contain ("OtherSecuritiesType")
+      result.validationErrors.map(_.fieldName) should contain ("otherSecuritiesType")
     }
 
     "require sellerAddressLine1 and sellerPostcode when sellerAddressInUk is true" in {

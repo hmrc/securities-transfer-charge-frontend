@@ -56,7 +56,7 @@ class StcRowValidationService {
 
     val shareTypeError =
       if (row.whatTypeOfSecurities.exists(_.equalsIgnoreCase("Shares")) && row.otherSecuritiesType.isEmpty) {
-        Some(error(row.rowNumber, "OtherSecuritiesType", "Share type is required when security type is Other"))
+        Some(error(row.rowNumber, "otherSecuritiesType", "Share type is required when security type is Other"))
       } else {
         None
       }
