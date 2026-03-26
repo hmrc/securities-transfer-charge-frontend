@@ -34,7 +34,7 @@ import scala.concurrent.Future
 class FileUploadControllerSpec extends SpecBase with MockitoSugar {
 
   lazy val fileUploadRoute: String = individualBulkRoutes.FileUploadController.onPageLoad().url
-//  lazy val onUploadErrorRoute: String = individualBulkRoutes.FileUploadController.onUploadError().url
+  lazy val onUploadErrorRoute: String = individualBulkRoutes.FileUploadController.onUploadError().url
   val reference = "file1"
   val uploadRequest: UploadRequest = UploadRequest(href = "http://someUrl.com", fields = Map("key" -> "1234"))
 
@@ -72,46 +72,46 @@ class FileUploadControllerSpec extends SpecBase with MockitoSugar {
 
     "onUploadError" - {
 
-//      "must return BAD_REQUEST and render the view with error message" in {
-//
-//        val mockConnector = mock[UpscanInitiateConnector]
-//
-//        val reference = "file1"
-//        val uploadRequest =
-//          UploadRequest("http://someUrl.com", Map("key" -> "1234"))
-//
-//        val initiateResponse =
-//          UpscanInitiateResponse(reference, uploadRequest)
-//
-//        when(mockConnector.initiate()(any[HeaderCarrier])).thenReturn(Future.successful(initiateResponse))
-//
-//
-//        val application = applicationBuilder(userAnswers = Some(emptyUserAnswers))
-//          .overrides(
-//            inject.bind[UpscanInitiateConnector].toInstance(mockConnector),
-//          )
-//          .build()
-//
-//        running(application) {
-//          val request = FakeRequest(
-//            GET,
-//            s"$onUploadErrorRoute?errorCode=EntityTooLarge&errorMessage=some+message"
-//          )
-//
-//          val expectedError = Some("The selected file must be smaller than 1GB")
-//
-//          val result = route(application, request).value
-//
-//
-//          val view = application.injector.instanceOf[FileUploadView]
-//
-//          status(result) mustEqual BAD_REQUEST
-//          contentAsString(result) mustEqual view(uploadRequest, expectedError)(
-//            request,
-//            messages(application)
-//          ).toString
-//        }
-//      }
+      "must return BAD_REQUEST and render the view with error message" in {
+
+        val mockConnector = mock[UpscanInitiateConnector]
+
+        val reference = "file1"
+        val uploadRequest =
+          UploadRequest("http://someUrl.com", Map("key" -> "1234"))
+
+        val initiateResponse =
+          UpscanInitiateResponse(reference, uploadRequest)
+
+        when(mockConnector.initiate()(any[HeaderCarrier])).thenReturn(Future.successful(initiateResponse))
+
+
+        val application = applicationBuilder(userAnswers = Some(emptyUserAnswers))
+          .overrides(
+            inject.bind[UpscanInitiateConnector].toInstance(mockConnector),
+          )
+          .build()
+
+        running(application) {
+          val request = FakeRequest(
+            GET,
+            s"$onUploadErrorRoute?errorCode=EntityTooLarge&errorMessage=some+message"
+          )
+
+          val expectedError = Some("The selected file must be smaller than 1GB")
+
+          val result = route(application, request).value
+
+
+          val view = application.injector.instanceOf[FileUploadView]
+
+          status(result) mustEqual BAD_REQUEST
+          contentAsString(result) mustEqual view(uploadRequest, expectedError)(
+            request,
+            messages(application)
+          ).toString
+        }
+      }
     }
   }
 }
