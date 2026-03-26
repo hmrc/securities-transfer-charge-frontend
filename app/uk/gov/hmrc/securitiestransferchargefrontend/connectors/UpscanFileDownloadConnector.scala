@@ -18,6 +18,7 @@ package uk.gov.hmrc.securitiestransferchargefrontend.connectors
 
 import org.apache.pekko.stream.Materializer
 import org.apache.pekko.util.ByteString
+import play.api.Logging
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.http.StringContextOps
 import uk.gov.hmrc.http.client.{HttpClientV2, readSource}
@@ -33,7 +34,7 @@ trait UpscanFileDownloadConnector {
 @Singleton
 class UpscanFileDownloadConnectorImpl @Inject()(
                                                  http: HttpClientV2
-                                               )(implicit ec: ExecutionContext, mat: Materializer) extends UpscanFileDownloadConnector {
+                                               )(implicit ec: ExecutionContext, mat: Materializer) extends UpscanFileDownloadConnector with Logging {
 
   override def download(downloadUrl: String)(implicit hc: HeaderCarrier): Future[InputStream] =
     http
@@ -43,5 +44,12 @@ class UpscanFileDownloadConnectorImpl @Inject()(
         source
           .runFold(ByteString.empty)(_ ++ _)
           .map(bytes => new ByteArrayInputStream(bytes.toArray): InputStream)
+      }
+      .recoverWith { case ex =>
+        logger.warn(
+          s"[UpscanFileDownloadConnectorImpl][download] Failed to download uploaded file from URL: $downloadUrl. Reason: ${ex.getMessage}",
+          ex
+        )
+        Future.failed(ex)
       }
 }
