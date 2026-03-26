@@ -289,7 +289,8 @@ org.amountPaidForSecurities.hint = For example, £600 or £193.54
 org.amountPaidForSecurities.error.nonNumeric = The amount paid for the securities must be a number
 org.amountPaidForSecurities.error.required = Enter the amount the business paid for the securities
 org.amountPaidForSecurities.error.invalidNumeric = Enter the amount paid for the securities using up to two decimal places
-org.amountPaidForSecurities.error.aboveMaximum = The amount paid for the securities must be {0} or less
+org.amountPaidForSecurities.error.aboveMaximum = The amount paid for the securities must be lower than {0}
+org.amountPaidForSecurities.error.negative = The amount paid for the securities cannot be a negative number
 org.amountPaidForSecurities.change.hidden = Change the amount the business paid for the securities
 
 org.otherSecuritiesType.title = What type of securities is the business buying?

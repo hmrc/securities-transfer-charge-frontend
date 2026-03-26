@@ -60,6 +60,7 @@ trait Mappings extends Formatters with Constraints {
   protected def currency(requiredKey: String = "error.required",
                          invalidNumeric: String = "error.invalidNumeric",
                          nonNumericKey: String = "error.nonNumeric",
+                         negativeValueKey:String = "error.negative",
                          args: Seq[String] = Seq.empty): FieldMapping[BigDecimal] =
-    of(currencyFormatter(requiredKey, invalidNumeric, nonNumericKey, args))
+    of(currencyFormatter(requiredKey, invalidNumeric, nonNumericKey, negativeValueKey,args))
 }
