@@ -15,14 +15,13 @@
  *@
 
 @import uk.gov.hmrc.securitiestransferchargefrontend.views.html.templates
-@import uk.gov.hmrc.securitiestransferchargefrontend.views.html.components.SaveAndReturnButton
+@import uk.gov.hmrc.securitiestransferchargefrontend.controllers.routes
 @import uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.individuals.routes as individualsRoutes
 
 @this(
     layout: templates.Layout,
     govukButton: GovukButton,
-    formHelper: FormWithCSRF,
-    saveAndReturnButton:SaveAndReturnButton
+    formHelper: FormWithCSRF
 )
 
 @()(implicit request: Request[_], messages: Messages)
@@ -35,7 +34,7 @@
 
         <p class="govuk-body">@messages("templateInstructions.p1")</p>
 
-        <ol class="govuk-list govuk-list--number govuk-list--spaced govuk-!-padding-left-9">
+        <ol class="govuk-list govuk-list--number govuk-!-padding-left-9">
             <li>
                 <a class="govuk-link" href="/securities-transfer-charge/assets/Bulk_Securities_Transfer_Charge_template_v1i.xlsx" download="Bulk Securities Transfer Charge template v1i.xlsx">
                     @messages("templateInstructions.step1")
@@ -46,16 +45,12 @@
         </ol>
 
         <p class="govuk-body">@messages("templateInstructions.p2")</p>
-        <p class="govuk-body">
-            @messages("templateInstructions.p3.before")
-            <a class="govuk-link" href="">@messages("templateInstructions.p3.link")</a>
-            @messages("templateInstructions.p3.after")
-        </p>
+        <p class="govuk-body">@Html(messages("templateInstructions.p3", routes.SubmissionsDashboardController.onPageLoad()))</p>
 
         <div class="govuk-button-group">
-            <a href="" role="button" draggable="false" class="govuk-button" data-module="govuk-button">
+            <a href="@individualsRoutes.FileUploadController.onPageLoad()" role="button" draggable="false" class="govuk-button" data-module="govuk-button">
                 @messages("site.continue")
             </a>
-            <a class="govuk-link" href="">@messages("templateInstructions.return.link")</a>
+            <a class="govuk-link" href="@routes.SubmissionsDashboardController.onPageLoad()">@messages("templateInstructions.return.link")</a>
         </div>
 }

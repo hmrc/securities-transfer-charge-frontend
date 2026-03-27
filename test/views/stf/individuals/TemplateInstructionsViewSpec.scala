@@ -19,7 +19,8 @@ package views.stf.individuals
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
 import play.api.Application
-import uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.individuals.routes
+import uk.gov.hmrc.securitiestransferchargefrontend.controllers.routes
+import uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.individuals.routes as individualsRoutes
 import uk.gov.hmrc.securitiestransferchargefrontend.views.html.stf.individuals.TemplateInstructionsView
 import views.ViewBaseSpec
 
@@ -47,11 +48,11 @@ class TemplateInstructionsViewSpec extends ViewBaseSpec {
     val step2 = "Complete the template, using one row for each type of securities you are buying"
     val step3 = "Upload your file on the next page as a .xlsx or .csv"
     val para2Value = "Remember, do not edit the first two rows, or change the order of the columns."
-    val para3Value = "Once you have uploaded and submitted your file it will show on your STC dashboard. You can then pay any charges due."
-    val para3BoldText = "STC dashboard"
+    val para3FullText = "Once you have uploaded and submitted your file it will show on your STC dashboard. You can then pay any charges due."
+    val para3LinkText = "STC dashboard"
 
-    val saveAndContinue = "Save and continue"
-    val saveAndReturn = "Save and return to dashboard"
+    val continue = "Continue"
+    val returnLink = "Return to dashboard"
   }
 
   "The TemplateInstructionsView" - {
@@ -98,20 +99,20 @@ class TemplateInstructionsViewSpec extends ViewBaseSpec {
         templateInstructionsView.para(2) mustBe Some(ExpectedContent.para2Value)
       }
 
-      "display the correct dashboard paragraph with bold STC dashboard text" in {
-        templateInstructionsView.para(3) mustBe Some(ExpectedContent.para3Value)
-        templateInstructionsView.select("p.govuk-body strong").text() mustBe ExpectedContent.para3BoldText
+      "display the correct third paragraph with 'STC dashboard' link that takes user back to to the submission dashboard page" in {
       }
 
-      "have a save and continue button" in {
-        val form = templateInstructionsView.select("form")
-        form.attr("action") mustBe routes.FileUploadController.onPageLoad().url
-        form.attr("method") mustBe "GET"
-        templateInstructionsView.select(".govuk-button").first().text() mustBe ExpectedContent.saveAndContinue
+
+      "have a continue button" in {
+        val continueButton = templateInstructionsView.select(".govuk-button").first()
+        continueButton.text() mustBe ExpectedContent.continue
+        continueButton.attr("href") mustBe individualsRoutes.FileUploadController.onPageLoad().url
       }
 
-      "have a save and return button" in {
-        templateInstructionsView.select(".govuk-button--secondary").text() mustBe ExpectedContent.saveAndReturn
+      "have a link to return back to the submission dashboard page" in {
+        val returnLink = templateInstructionsView.select(".govuk-button-group a.govuk-link").first()
+        returnLink.text() mustBe ExpectedContent.returnLink
+        returnLink.attr("href") mustBe routes.SubmissionsDashboardController.onPageLoad().url
       }
     }
   }
