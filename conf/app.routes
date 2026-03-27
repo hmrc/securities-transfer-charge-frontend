@@ -184,7 +184,13 @@ POST       /stf/org/change/total-market-value             uk.gov.hmrc.securities
 
 # FileUpload
 GET        /stf/file-upload                               uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.individuals.FileUploadController.onPageLoad()
+GET        /stf/file-upload/check-status/:reference       uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.individuals.FileUploadStatusController.check(reference:String)
 GET        /stf/file-upload/problem                      uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.individuals.FileUploadController.onUploadError()
 GET        /stf/bulk-empty                                uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.individuals.EmptyFileErrorController.onPageLoad()
 GET        /stf/file-uploaded                             uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.individuals.FileUploadedController.onPageLoad(key:String)
 POST       /stf/upscan-callback                            uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.individuals.UpscanCallbackController.callback()
+GET       /stf/file-upload/problem/error/:reason            uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.individuals.FileUploadController.mapFailureReason(reason:String)
+
+GET    /stf/upload-success          uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.individuals.FileUploadController.success()
+GET    /stf/upload-failure          uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.individuals.FileUploadController.failure()
+GET    /stf/file-upload/remove/:reference          uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.individuals.FileUploadController.remove(reference:String)

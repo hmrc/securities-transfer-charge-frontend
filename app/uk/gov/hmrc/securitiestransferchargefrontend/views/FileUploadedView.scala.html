@@ -15,27 +15,90 @@
  *@
 
 @import uk.gov.hmrc.securitiestransferchargefrontend.models.upscan.FileUpload
+@import uk.gov.hmrc.securitiestransferchargefrontend.controllers.routes
+@import uk.gov.hmrc.securitiestransferchargefrontend.models.upscan.UpscanJourneyStatus
 
-@this(
-    layout: templates.Layout
-)
+@this(layout: templates.Layout)
 
-@(fileUpload: FileUpload)(implicit request: Request[_],messages: Messages)
+@(file: FileUpload)(implicit request: Request[_], messages: Messages)
 
 @layout(pageTitle = titleNoForm(messages("fileUploaded.title"))) {
 
-    <h1 class="govuk-heading-l">
-        @messages("fileUploaded.heading")
-    </h1>
+    @if(file.status != UpscanJourneyStatus.Ready &&
+    file.status != UpscanJourneyStatus.Uploaded &&
+    file.status != UpscanJourneyStatus.Failed) {
+    <meta http-equiv="refresh" content="1">
+}
 
-    <p class="govuk-body">
-        @messages("fileUploaded.reference")
-        <strong>@fileUpload.reference</strong>
-    </p>
+    @* Helpers for tag styling and i18n *@
+    @defining((status: UpscanJourneyStatus) => status match {
+        case UpscanJourneyStatus.Uploaded    => "govuk-tag--green"
+        case UpscanJourneyStatus.Ready    => "govuk-tag--green"
+        case UpscanJourneyStatus.Processing  => "govuk-tag--yellow"
+        case UpscanJourneyStatus.Failed      => "govuk-tag--red"
+        case _                               => "govuk-tag--grey"
+    }) { statusCssClass =>
 
-    <p class="govuk-body">
-        @messages("fileUploaded.status")
-        <strong>@fileUpload.status.toString</strong>
-    </p>
+        @defining((status: UpscanJourneyStatus) => status match {
+            case UpscanJourneyStatus.Uploaded    => "fileUpload.summary.status.uploaded"
+            case UpscanJourneyStatus.Processing  => "fileUpload.summary.status.processing"
+            case UpscanJourneyStatus.Failed      => "fileUpload.summary.status.failed"
+            case UpscanJourneyStatus.Ready      => "uploaded"
+            case other                           => other.toString
+        }) { statusMessageKey =>
 
+            <span class="govuk-caption-l">
+                @messages("transfer.details.caption")
+            </span>
+
+            <h1 class="govuk-heading-l">
+                @messages("fileUpload.heading")
+            </h1>
+
+            <div class="govuk-inset-text">
+                @messages("fileUpload.inset.text")
+            </div>
+
+            <div class="govuk-grid-row">
+                <div class="govuk-grid-column-two-thirds">
+
+                    @* Hidden refresh link *@
+                    <p class="govuk-body govuk-!-display-none" id="refreshPageProgress">
+                        <a href="#" class="govuk-link">
+                            @messages("fileUpload.refreshLink")
+                        </a>
+                    </p>
+
+                    @* ARIA live status region *@
+                    <div class="govuk-visually-hidden" aria-live="polite" id="statusInformation">
+                        @messages("fileUpload.statusInformation", file.uploadDetails.map(_.fileName).getOrElse(""))
+                    </div>
+
+                    @file.uploadDetails.map { details =>
+
+                        <dl class="govuk-summary-list govuk-summary-list--long-key">
+                            <div class="govuk-summary-list__row">
+                                <dt class="govuk-summary-list__key">
+                                    <a class="govuk-link" href="#">@details.fileName</a>
+                                </dt>
+                                <dd class="govuk-summary-list__value"></dd>
+                                <dd class="govuk-summary-list__actions">
+                                    <strong class="govuk-tag @statusCssClass(file.status)">
+                                        @messages(statusMessageKey(file.status))
+                                    </strong>
+                                    <a class="govuk-link" href="@routes.JourneyRecoveryController.onPageLoad().url">
+                                        @messages("fileUpload.remove")
+                                        <span class="govuk-visually-hidden">@details.fileName</span>
+                                    </a>
+                                </dd>
+                            </div>
+                        </dl>
+
+                    }
+
+                </div>
+            </div>
+
+        }
+    }
 }

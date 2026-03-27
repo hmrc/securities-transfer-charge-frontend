@@ -18,7 +18,7 @@ package uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.individuals
 
 import play.api.Logging
 import play.api.i18n.I18nSupport
-import play.api.libs.json.JsValue
+import play.api.libs.json.{JsValue, Json}
 import play.api.mvc.{Action, MessagesControllerComponents}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import uk.gov.hmrc.securitiestransferchargefrontend.models.upscan.UpscanCallbackRequest
@@ -34,10 +34,13 @@ class UpscanCallbackController @Inject()(
   extends FrontendBaseController
     with I18nSupport with Logging {
 
-  def callback(): Action[JsValue] =
+  def callback(): Action[JsValue] = {
     Action.async(parse.json) { implicit request =>
-      
+      logger.info(s"Upscan callback received: ${Json.prettyPrint(request.body)}")
+
+
       withJsonBody[UpscanCallbackRequest] {
+
 
         case UpscanCallbackRequest.Ready(reference, downloadUrl, uploadDetails) =>
           upscanJourneyRepository
@@ -51,4 +54,6 @@ class UpscanCallbackController @Inject()(
 
       }
     }
+    
+  }
 }

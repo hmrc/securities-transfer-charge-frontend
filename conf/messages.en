@@ -344,7 +344,8 @@ fileUpload.redirectError.InvalidArgument = The selected file must be a .csv or a
 fileUploaded.title = File uploaded 
 fileUploaded.heading = File uploaded
 fileUploaded.reference = File reference
-fileUploaded.status = Status 
+fileUploaded.status = Status
+fileUpload.remove = remove
 
 
 templateInstructions.title = How to use the template
@@ -370,3 +371,12 @@ changedFileError.p2 = Correct the errors then you can upload the file again, or 
 changedFileError.p3 = Remember, do not edit the first two rows of the template, or change the order of the columns.
 changedFileError.download.text = Download the template file
 fileUpload.upload.another = Upload a different file
+
+
+upscan.error.quarantine =The uploaded file contains a virus
+upscan.error.unknown = The file could not be uploaded – try again
+upscan.error.notCSV = The uploaded file was not a csv
+upscan.error.tooLarge = The uploaded file must be smaller than 1GB
+upscan.error.invalidFileType = The uploaded file must be a .csv or a .xlsx
+upscan.error.invalidArgument = The uploaded file must be a .csv or a .xlsx
+upscan.error.rejected = The file could not be uploaded – try again

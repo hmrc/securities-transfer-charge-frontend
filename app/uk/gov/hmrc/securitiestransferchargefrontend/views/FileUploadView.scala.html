@@ -59,7 +59,7 @@
             @messages("fileUpload.inset.text")
         </div>
 
-        <label class="govuk-label">
+        <label class="govuk-label" id="i=upload-label">
             @messages("fileUpload.label")
         </label>
 
@@ -73,7 +73,7 @@
                         content = messages("fileUpload.heading")
                     ),
                     attributes = Map(
-                        "accept" -> ".xlsx,.csv",
+                        "accept" -> ".xlsx,.csv,.txt",
                         "required" -> "required"
                     )
                 )

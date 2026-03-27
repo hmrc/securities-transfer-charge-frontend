@@ -26,10 +26,10 @@ import uk.gov.hmrc.mongo.MongoComponent
 import uk.gov.hmrc.mongo.play.json.PlayMongoRepository
 import uk.gov.hmrc.securitiestransferchargefrontend.config.FrontendAppConfig
 import uk.gov.hmrc.securitiestransferchargefrontend.models.upscan.UpscanCallbackRequest.UploadDetails
-import uk.gov.hmrc.securitiestransferchargefrontend.models.upscan.{FileUpload, UpscanDocument, UpscanJourneyStatus}
+import uk.gov.hmrc.securitiestransferchargefrontend.models.upscan.{FailureReason, FileUpload, UpscanDocument, UpscanJourneyStatus}
 
 import java.util.concurrent.TimeUnit
-import javax.inject.{Inject,Singleton}
+import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
 
 
@@ -39,11 +39,14 @@ trait UpscanJourneyRepository {
 
   def markUploadAsSuccessful(reference: String, downloadUrl: String, uploadDetails: UploadDetails): Future[Unit]
 
-  def markUploadAsFailed(reference: String, failureReason: String, message: String): Future[Unit]
+  def markUploadAsFailed(reference: String, failureReason: FailureReason, message: String): Future[Unit]
 
-  def find(reference:String): Future[Option[FileUpload]]
+  def find(reference: String): Future[Option[FileUpload]]
 
-  def delete(reference:String):Future[Unit]
+  def delete(reference: String): Future[Unit]
+
+  def updateStatus(reference: String): Future[Unit]
+
 
 }
 
@@ -64,8 +67,8 @@ class UpscanJourneyRepositoryImpl @Inject()(
           .expireAfter(appConfig.upscanTtl, TimeUnit.DAYS)
       )
     )) with UpscanJourneyRepository {
-  
-  def byReference(reference:String): Bson = Filters.equal("_id",reference)
+
+  def byReference(reference: String): Bson = Filters.equal("_id", reference)
 
   override def insert(journey: UpscanDocument): Future[Unit] =
     collection.replaceOne(
@@ -75,29 +78,32 @@ class UpscanJourneyRepositoryImpl @Inject()(
       )
       .toFuture()
       .map(_ => ())
-  
+
   override def markUploadAsSuccessful(reference: String, downloadUrl: String, uploadDetails: UploadDetails): Future[Unit] =
     collection.updateOne(
-     byReference(reference),
+      byReference(reference),
       combine(
         set("fileUpload.status", UpscanJourneyStatus.Ready.toString),
         set("fileUpload.downloadUrl", downloadUrl),
-        set("fileUpload.uploadDetails",BsonDocument(Json.toJson(uploadDetails).toString())),
+        set("fileUpload.uploadDetails", BsonDocument(Json.toJson(uploadDetails).toString())),
       )
     ).toFuture().map(_ => ())
 
 
-  override def markUploadAsFailed(reference: String, failureReason: String, message: String): Future[Unit] =
+  override def markUploadAsFailed(reference: String, failureReason: FailureReason, message: String): Future[Unit] =
     collection.updateOne(
       byReference(reference),
       combine(
         set("fileUpload.status", UpscanJourneyStatus.Failed.toString),
-        set("fileUpload.failureReason", failureReason),
+        set("fileUpload.failureReason", failureReason.asString),
         set("fileUpload.message", message)
       )
     ).toFuture().map(_ => ())
-  
-  override def find(reference:String): Future[Option[FileUpload]] = collection.find(byReference(reference)).map(_.fileUpload).headOption()
 
-  override def delete(reference: String): Future[Unit] = collection.deleteOne(byReference(reference)).toFuture().map(_=>())
+  override def find(reference: String): Future[Option[FileUpload]] = collection.find(byReference(reference)).map(_.fileUpload).headOption()
+
+  override def delete(reference: String): Future[Unit] = collection.deleteOne(byReference(reference)).toFuture().map(_ => ())
+
+  override def updateStatus(reference: String): Future[Unit] = collection.updateOne(byReference(reference), combine(set("fileUpload.status", UpscanJourneyStatus.Uploaded.toString))).toFuture().map(_ => ())
+
 }

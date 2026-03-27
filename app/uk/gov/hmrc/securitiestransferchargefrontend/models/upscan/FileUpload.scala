@@ -23,7 +23,7 @@ case class FileUpload(reference:String,
                       status:UpscanJourneyStatus,
                       downloadUrl: Option[String] = None,
                       uploadDetails: Option[UploadDetails] = None,
-                      failureReason: Option[String] = None,  
+                      failureReason: Option[FailureReason] = None,  
                       message: Option[String] = None )
 
 object FileUpload {

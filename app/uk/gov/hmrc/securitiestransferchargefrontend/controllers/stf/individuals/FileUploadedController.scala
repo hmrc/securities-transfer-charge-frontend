@@ -20,12 +20,13 @@ import play.api.i18n.I18nSupport
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.actions.StcAuthEnrolledAction
+import uk.gov.hmrc.securitiestransferchargefrontend.controllers.routes
+import uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.individuals.routes as individualsRoutes
 import uk.gov.hmrc.securitiestransferchargefrontend.repositories.UpscanJourneyRepository
 import uk.gov.hmrc.securitiestransferchargefrontend.views.html.FileUploadedView
-import uk.gov.hmrc.securitiestransferchargefrontend.controllers.routes
 
 import javax.inject.Inject
-import scala.concurrent.ExecutionContext
+import scala.concurrent.{ExecutionContext, Future}
 
 //TODO Placeholder controller, update once the content had been confirmed by ucd
 class FileUploadedController @Inject()(
@@ -38,13 +39,22 @@ class FileUploadedController @Inject()(
 
   def onPageLoad(key: String): Action[AnyContent] =
     stcAuthEnrolled.async { implicit request =>
-      
-      upscanJourneyRepository.find(key).map {
+
+      upscanJourneyRepository.find(key).flatMap {
         case Some(fileUpload) =>
-          Ok(view(fileUpload))
           
+          fileUpload.failureReason.fold {
+            // ✅ No failure → show normal view
+            Future.successful(Ok(view(fileUpload)))
+          } { failure =>
+            // 🔴 Failure → redirect to upload error page
+            Future.successful(Redirect(individualsRoutes.FileUploadController.mapFailureReason(failure.asString).url))
+          }
+
         case None =>
-          Redirect(routes.JourneyRecoveryController.onPageLoad())
+          Future.successful(
+            Redirect(routes.JourneyRecoveryController.onPageLoad())
+          )
       }
     }
 }

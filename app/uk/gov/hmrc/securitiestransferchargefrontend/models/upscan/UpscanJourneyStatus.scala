@@ -23,16 +23,20 @@ sealed trait UpscanJourneyStatus
 object UpscanJourneyStatus {
 
   case object Ready extends UpscanJourneyStatus
-  case object Initiated extends UpscanJourneyStatus
+  case object Uploaded extends UpscanJourneyStatus
+  case object Uploading extends UpscanJourneyStatus
   case object Failed    extends UpscanJourneyStatus
+  case object Processing    extends UpscanJourneyStatus
 
   implicit val format: Format[UpscanJourneyStatus] = new Format[UpscanJourneyStatus] {
 
     override def reads(json: JsValue): JsResult[UpscanJourneyStatus] =
       json.validate[String].flatMap {
-        case "Initiated" => JsSuccess(Initiated)
+        case "Uploading" => JsSuccess(Uploading)
         case "Failed" => JsSuccess(Failed)
         case "Ready" => JsSuccess(Ready)
+        case "Processing" => JsSuccess(Processing)
+        case "Uploaded" => JsSuccess(Uploaded)
         case other => JsError(s"Invalid UpscanJourneyStatus: $other")
       }
 
