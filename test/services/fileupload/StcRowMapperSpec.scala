@@ -18,7 +18,7 @@ package services.fileupload
 
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpec
-import uk.gov.hmrc.securitiestransferchargefrontend.models.fileupload.{ParsedCell, ParsedRow, ParsedStcRow}
+import uk.gov.hmrc.securitiestransferchargefrontend.models.fileupload.{ParsedCell, ParsedRow, ParsedStcRow, ParsedValue}
 import uk.gov.hmrc.securitiestransferchargefrontend.services.fileupload.StcRowMapper
 
 import java.time.LocalDate
@@ -64,36 +64,36 @@ class StcRowMapperSpec extends AnyWordSpec with Matchers {
 
       mapper.map(row) shouldBe ParsedStcRow(
         rowNumber = 3,
-        addressLine1 = Some("10 Downing Street"),
-        addressLine2 = Some("Westminster"),
-        addressLine3 = Some("London"),
-        addressLine4 = None,
-        postcode = Some("SW1A 2AA"),
-        country = Some("United Kingdom"),
-        sellerName = Some("Bob Seller"),
-        sellerAddressInUk = Some(true),
-        sellerAddressLine1 = Some("1 Seller Street"),
-        sellerAddressLine2 = Some("Seller District"),
-        sellerAddressLine3 = Some("Seller City"),
-        sellerAddressLine4 = None,
-        sellerPostcode = Some("LS1 1AA"),
-        sellerCountry = Some("United Kingdom"),
-        connectedPersons = Some(false),
-        applyingForRelief = Some(true),
-        whatReliefAreYouApplyingFor = Some("Group relief"),
-        securitiesTarget = Some("Example Holdings Ltd"),
-        companyRegistrationNumber = Some("12345678"),
-        chargingPoint = Some(LocalDate.of(2026, 3, 23)),
-        taxRate = Some(BigDecimal("0.5")),
-        whatTypeOfSecurities = Some("Shares"),
-        otherSecuritiesType = Some("Ordinary"),
-        securitiesQuantity = Some(BigDecimal("1000")),
-        amountPaidForSecurities = Some(BigDecimal("5000.25")),
-        totalMarketValue = Some(BigDecimal("6000"))
+        addressLine1 = ParsedValue.Valid("10 Downing Street"),
+        addressLine2 = ParsedValue.Valid("Westminster"),
+        addressLine3 = ParsedValue.Valid("London"),
+        addressLine4 = ParsedValue.Missing,
+        postcode = ParsedValue.Valid("SW1A 2AA"),
+        country = ParsedValue.Valid("United Kingdom"),
+        sellerName = ParsedValue.Valid("Bob Seller"),
+        sellerAddressInUk = ParsedValue.Valid(true),
+        sellerAddressLine1 = ParsedValue.Valid("1 Seller Street"),
+        sellerAddressLine2 = ParsedValue.Valid("Seller District"),
+        sellerAddressLine3 = ParsedValue.Valid("Seller City"),
+        sellerAddressLine4 = ParsedValue.Missing,
+        sellerPostcode = ParsedValue.Valid("LS1 1AA"),
+        sellerCountry = ParsedValue.Valid("United Kingdom"),
+        connectedPersons = ParsedValue.Valid(false),
+        applyingForRelief = ParsedValue.Valid(true),
+        whatReliefAreYouApplyingFor = ParsedValue.Valid("Group relief"),
+        securitiesTarget = ParsedValue.Valid("Example Holdings Ltd"),
+        companyRegistrationNumber = ParsedValue.Valid("12345678"),
+        chargingPoint = ParsedValue.Valid(LocalDate.of(2026, 3, 23)),
+        taxRate = ParsedValue.Valid(BigDecimal("0.5")),
+        whatTypeOfSecurities = ParsedValue.Valid("Shares"),
+        otherSecuritiesType = ParsedValue.Valid("Ordinary"),
+        securitiesQuantity = ParsedValue.Valid(BigDecimal("1000")),
+        amountPaidForSecurities = ParsedValue.Valid(BigDecimal("5000.25")),
+        totalMarketValue = ParsedValue.Valid(BigDecimal("6000"))
       )
     }
 
-    "map blank values to None where appropriate" in {
+    "map blank values to Missing where appropriate" in {
       val row = ParsedRow(
         rowNumber = 4,
         cells = Seq(
@@ -128,32 +128,76 @@ class StcRowMapperSpec extends AnyWordSpec with Matchers {
 
       mapper.map(row) shouldBe ParsedStcRow(
         rowNumber = 4,
-        addressLine1 = None,
-        addressLine2 = None,
-        addressLine3 = None,
-        addressLine4 = None,
-        postcode = None,
-        country = None,
-        sellerName = None,
-        sellerAddressInUk = None,
-        sellerAddressLine1 = None,
-        sellerAddressLine2 = None,
-        sellerAddressLine3 = None,
-        sellerAddressLine4 = None,
-        sellerPostcode = None,
-        sellerCountry = None,
-        connectedPersons = None,
-        applyingForRelief = None,
-        whatReliefAreYouApplyingFor = None,
-        securitiesTarget = None,
-        companyRegistrationNumber = None,
-        chargingPoint = None,
-        taxRate = None,
-        whatTypeOfSecurities = None,
-        otherSecuritiesType = None,
-        securitiesQuantity = None,
-        amountPaidForSecurities = None,
-        totalMarketValue = None
+        addressLine1 = ParsedValue.Missing,
+        addressLine2 = ParsedValue.Missing,
+        addressLine3 = ParsedValue.Missing,
+        addressLine4 = ParsedValue.Missing,
+        postcode = ParsedValue.Missing,
+        country = ParsedValue.Missing,
+        sellerName = ParsedValue.Missing,
+        sellerAddressInUk = ParsedValue.Missing,
+        sellerAddressLine1 = ParsedValue.Missing,
+        sellerAddressLine2 = ParsedValue.Missing,
+        sellerAddressLine3 = ParsedValue.Missing,
+        sellerAddressLine4 = ParsedValue.Missing,
+        sellerPostcode = ParsedValue.Missing,
+        sellerCountry = ParsedValue.Missing,
+        connectedPersons = ParsedValue.Missing,
+        applyingForRelief = ParsedValue.Missing,
+        whatReliefAreYouApplyingFor = ParsedValue.Missing,
+        securitiesTarget = ParsedValue.Missing,
+        companyRegistrationNumber = ParsedValue.Missing,
+        chargingPoint = ParsedValue.Missing,
+        taxRate = ParsedValue.Missing,
+        whatTypeOfSecurities = ParsedValue.Missing,
+        otherSecuritiesType = ParsedValue.Missing,
+        securitiesQuantity = ParsedValue.Missing,
+        amountPaidForSecurities = ParsedValue.Missing,
+        totalMarketValue = ParsedValue.Missing
+      )
+    }
+
+    "preserve invalid typed values as Invalid instead of collapsing them to Missing" in {
+      val row = ParsedRow(
+        rowNumber = 5,
+        cells = Seq(
+          ParsedCell(8, "maybe"),
+          ParsedCell(20, "not-a-date"),
+          ParsedCell(21, "abc"),
+          ParsedCell(24, "foo"),
+          ParsedCell(25, "bar"),
+          ParsedCell(26, "baz")
+        )
+      )
+
+      mapper.map(row) shouldBe ParsedStcRow(
+        rowNumber = 5,
+        addressLine1 = ParsedValue.Missing,
+        addressLine2 = ParsedValue.Missing,
+        addressLine3 = ParsedValue.Missing,
+        addressLine4 = ParsedValue.Missing,
+        postcode = ParsedValue.Missing,
+        country = ParsedValue.Missing,
+        sellerName = ParsedValue.Missing,
+        sellerAddressInUk = ParsedValue.Invalid("maybe", "not a recognised boolean"),
+        sellerAddressLine1 = ParsedValue.Missing,
+        sellerAddressLine2 = ParsedValue.Missing,
+        sellerAddressLine3 = ParsedValue.Missing,
+        sellerAddressLine4 = ParsedValue.Missing,
+        sellerPostcode = ParsedValue.Missing,
+        sellerCountry = ParsedValue.Missing,
+        connectedPersons = ParsedValue.Missing,
+        applyingForRelief = ParsedValue.Missing,
+        whatReliefAreYouApplyingFor = ParsedValue.Missing,
+        securitiesTarget = ParsedValue.Missing,
+        companyRegistrationNumber = ParsedValue.Missing,
+        chargingPoint = ParsedValue.Invalid("not-a-date", "not a valid date"),
+        taxRate = ParsedValue.Invalid("abc", "not a number"),
+        whatTypeOfSecurities = ParsedValue.Missing,
+        otherSecuritiesType = ParsedValue.Missing,
+        securitiesQuantity = ParsedValue.Invalid("foo", "not a number"),
+        amountPaidForSecurities = ParsedValue.Invalid("bar", "not a number"),
+        totalMarketValue = ParsedValue.Invalid("baz", "not a number")
       )
     }
   }

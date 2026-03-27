@@ -24,7 +24,7 @@ import org.scalatest.wordspec.AnyWordSpec
 import org.scalatestplus.mockito.MockitoSugar
 import play.api.Configuration
 import uk.gov.hmrc.securitiestransferchargefrontend.config.FileUploadConfig
-import uk.gov.hmrc.securitiestransferchargefrontend.models.fileupload.{ParsedCell, ParsedFile, ParsedRow, ParsedStcRow, UploadedFile}
+import uk.gov.hmrc.securitiestransferchargefrontend.models.fileupload.{ParsedCell, ParsedFile, ParsedRow, ParsedStcRow, ParsedValue, UploadedFile}
 import uk.gov.hmrc.securitiestransferchargefrontend.services.fileupload.FileParsingService
 import uk.gov.hmrc.securitiestransferchargefrontend.services.fileupload.StcRowMapper
 import uk.gov.hmrc.securitiestransferchargefrontend.services.fileupload.StcUploadParsingService
@@ -95,32 +95,32 @@ class StcUploadParsingServiceSpec extends AnyWordSpec with Matchers with EitherV
 
       val mappedRow = ParsedStcRow(
         rowNumber = 3,
-        addressLine1 = Some("10 Downing Street"),
-        addressLine2 = None,
-        addressLine3 = None,
-        addressLine4 = None,
-        postcode = None,
-        country = None,
-        sellerName = Some("Bob Seller"),
-        sellerAddressInUk = None,
-        sellerAddressLine1 = None,
-        sellerAddressLine2 = None,
-        sellerAddressLine3 = None,
-        sellerAddressLine4 = None,
-        sellerPostcode = None,
-        sellerCountry = None,
-        connectedPersons = None,
-        applyingForRelief = None,
-        whatReliefAreYouApplyingFor = None,
-        securitiesTarget = None,
-        companyRegistrationNumber = None,
-        chargingPoint = Some(LocalDate.of(2026, 3, 23)),
-        taxRate = Some(BigDecimal("0.5")),
-        whatTypeOfSecurities = None,
-        otherSecuritiesType = None,
-        securitiesQuantity = Some(BigDecimal("100")),
-        amountPaidForSecurities = Some(BigDecimal("500")),
-        totalMarketValue = Some(BigDecimal("600"))
+        addressLine1 = ParsedValue.Valid("10 Downing Street"),
+        addressLine2 = ParsedValue.Missing,
+        addressLine3 = ParsedValue.Missing,
+        addressLine4 = ParsedValue.Missing,
+        postcode = ParsedValue.Missing,
+        country = ParsedValue.Missing,
+        sellerName = ParsedValue.Valid("Bob Seller"),
+        sellerAddressInUk = ParsedValue.Missing,
+        sellerAddressLine1 = ParsedValue.Missing,
+        sellerAddressLine2 = ParsedValue.Missing,
+        sellerAddressLine3 = ParsedValue.Missing,
+        sellerAddressLine4 = ParsedValue.Missing,
+        sellerPostcode = ParsedValue.Missing,
+        sellerCountry = ParsedValue.Missing,
+        connectedPersons = ParsedValue.Missing,
+        applyingForRelief = ParsedValue.Missing,
+        whatReliefAreYouApplyingFor = ParsedValue.Missing,
+        securitiesTarget = ParsedValue.Missing,
+        companyRegistrationNumber = ParsedValue.Missing,
+        chargingPoint = ParsedValue.Valid(LocalDate.of(2026, 3, 23)),
+        taxRate = ParsedValue.Valid(BigDecimal("0.5")),
+        whatTypeOfSecurities = ParsedValue.Missing,
+        otherSecuritiesType = ParsedValue.Missing,
+        securitiesQuantity = ParsedValue.Valid(BigDecimal("100")),
+        amountPaidForSecurities = ParsedValue.Valid(BigDecimal("500")),
+        totalMarketValue = ParsedValue.Valid(BigDecimal("600"))
       )
 
       val parsedFile = ParsedFile(

@@ -16,9 +16,8 @@
 
 package uk.gov.hmrc.securitiestransferchargefrontend.services.fileupload
 
-import uk.gov.hmrc.securitiestransferchargefrontend.models.fileupload.{ParsedRow, ParsedStcRow}
-
 import javax.inject.Singleton
+import uk.gov.hmrc.securitiestransferchargefrontend.models.fileupload.{ParsedRow, ParsedStcRow}
 
 @Singleton
 class StcRowMapper {

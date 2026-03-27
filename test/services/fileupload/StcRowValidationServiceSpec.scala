@@ -18,7 +18,7 @@ package services.fileupload
 
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpec
-import uk.gov.hmrc.securitiestransferchargefrontend.models.fileupload.ParsedStcRow
+import uk.gov.hmrc.securitiestransferchargefrontend.models.fileupload.{ParsedStcRow, ParsedValue}
 import uk.gov.hmrc.securitiestransferchargefrontend.services.fileupload.StcRowValidationService
 
 import java.time.LocalDate
@@ -29,33 +29,36 @@ class StcRowValidationServiceSpec extends AnyWordSpec with Matchers {
 
   private val validRow = ParsedStcRow(
     rowNumber = 3,
-    addressLine1 = Some("10 Downing Street"),
-    addressLine2 = None,
-    addressLine3 = None,
-    addressLine4 = None,
-    postcode = Some("SW1A 2AA"),
-    country = Some("United Kingdom"),
-    sellerName = Some("Bob Seller"),
-    sellerAddressInUk = Some(true),
-    sellerAddressLine1 = Some("1 Seller Street"),
-    sellerAddressLine2 = None,
-    sellerAddressLine3 = None,
-    sellerAddressLine4 = None,
-    sellerPostcode = Some("LS1 1AA"),
-    sellerCountry = Some("United Kingdom"),
-    connectedPersons = Some(false),
-    applyingForRelief = Some(true),
-    whatReliefAreYouApplyingFor = Some("Group relief"),
-    securitiesTarget = Some("Example Holdings Ltd"),
-    companyRegistrationNumber = Some("12345678"),
-    chargingPoint = Some(LocalDate.of(2026, 3, 23)),
-    taxRate = Some(BigDecimal("0.5")),
-    whatTypeOfSecurities = Some("Shares"),
-    otherSecuritiesType = Some("Ordinary"),
-    securitiesQuantity = Some(BigDecimal("100")),
-    amountPaidForSecurities = Some(BigDecimal("500")),
-    totalMarketValue = Some(BigDecimal("600"))
+    addressLine1 = ParsedValue.Valid("10 Downing Street"),
+    addressLine2 = ParsedValue.Missing,
+    addressLine3 = ParsedValue.Missing,
+    addressLine4 = ParsedValue.Missing,
+    postcode = ParsedValue.Valid("SW1A 2AA"),
+    country = ParsedValue.Valid("United Kingdom"),
+    sellerName = ParsedValue.Valid("Bob Seller"),
+    sellerAddressInUk = ParsedValue.Valid(true),
+    sellerAddressLine1 = ParsedValue.Valid("1 Seller Street"),
+    sellerAddressLine2 = ParsedValue.Missing,
+    sellerAddressLine3 = ParsedValue.Missing,
+    sellerAddressLine4 = ParsedValue.Missing,
+    sellerPostcode = ParsedValue.Valid("LS1 1AA"),
+    sellerCountry = ParsedValue.Valid("United Kingdom"),
+    connectedPersons = ParsedValue.Valid(false),
+    applyingForRelief = ParsedValue.Valid(true),
+    whatReliefAreYouApplyingFor = ParsedValue.Valid("Group relief"),
+    securitiesTarget = ParsedValue.Valid("Example Holdings Ltd"),
+    companyRegistrationNumber = ParsedValue.Valid("12345678"),
+    chargingPoint = ParsedValue.Valid(LocalDate.of(2026, 3, 23)),
+    taxRate = ParsedValue.Valid(BigDecimal("0.5")),
+    whatTypeOfSecurities = ParsedValue.Valid("Shares"),
+    otherSecuritiesType = ParsedValue.Valid("Ordinary"),
+    securitiesQuantity = ParsedValue.Valid(BigDecimal("100")),
+    amountPaidForSecurities = ParsedValue.Valid(BigDecimal("500")),
+    totalMarketValue = ParsedValue.Valid(BigDecimal("600"))
   )
+
+  private def messageFor(result: uk.gov.hmrc.securitiestransferchargefrontend.models.fileupload.ValidatedStcRow, fieldName: String): Option[String] =
+    result.validationErrors.find(_.fieldName == fieldName).map(_.message)
 
   "validate" should {
 
@@ -70,9 +73,9 @@ class StcRowValidationServiceSpec extends AnyWordSpec with Matchers {
 
     "return blocking errors for missing required fields" in {
       val invalidRow = validRow.copy(
-        addressLine1 = None,
-        sellerName = None,
-        chargingPoint = None
+        addressLine1 = ParsedValue.Missing,
+        sellerName = ParsedValue.Missing,
+        chargingPoint = ParsedValue.Missing
       )
 
       val result = service.validate(invalidRow)
@@ -85,35 +88,68 @@ class StcRowValidationServiceSpec extends AnyWordSpec with Matchers {
       )
     }
 
+    "return invalid numeric errors when a number field contains non-numeric data" in {
+      val invalidRow = validRow.copy(
+        totalMarketValue = ParsedValue.Invalid("foo", "not a number"),
+        amountPaidForSecurities = ParsedValue.Invalid("bar", "not a number")
+      )
+
+      val result = service.validate(invalidRow)
+
+      messageFor(result, "totalMarketValue") shouldBe Some("totalMarketValue must be a number")
+      messageFor(result, "amountPaidForSecurities") shouldBe Some("amountPaidForSecurities must be a number")
+    }
+
+    "return invalid boolean errors when a boolean field contains an unrecognised value" in {
+      val invalidRow = validRow.copy(
+        sellerAddressInUk = ParsedValue.Invalid("maybe", "not a recognised boolean"),
+        connectedPersons = ParsedValue.Invalid("sometimes", "not a recognised boolean")
+      )
+
+      val result = service.validate(invalidRow)
+
+      messageFor(result, "sellerAddressInUk") shouldBe Some("sellerAddressInUk must be yes or no")
+      messageFor(result, "connectedPersons") shouldBe Some("connectedPersons must be yes or no")
+    }
+
+    "return invalid date errors when a date field contains an invalid value" in {
+      val invalidRow = validRow.copy(
+        chargingPoint = ParsedValue.Invalid("foo", "not a valid date")
+      )
+
+      val result = service.validate(invalidRow)
+
+      result.validationErrors.map(_.fieldName) should contain("chargingPoint")
+      messageFor(result, "chargingPoint") shouldBe Some("chargingPoint must be a valid date")
+    }
+
     "require reliefType when applyingForRelief is true" in {
       val invalidRow = validRow.copy(
-        applyingForRelief = Some(true),
-        whatReliefAreYouApplyingFor = None
+        applyingForRelief = ParsedValue.Valid(true),
+        whatReliefAreYouApplyingFor = ParsedValue.Missing
       )
 
       val result = service.validate(invalidRow)
 
-      result.validationErrors.map(_.fieldName) should contain ("whatReliefAreYouApplyingFor")
+      result.validationErrors.map(_.fieldName) should contain("whatReliefAreYouApplyingFor")
     }
-    
-    // checking  with UCD tem as there is a discrepancy between template and stf journey in frontend
 
-    "require otherSecuritiesType when whatTypeOfSecurities is Shares" in {
+    "require otherSecuritiesType when whatTypeOfSecurities is Other" in {
       val invalidRow = validRow.copy(
-        whatTypeOfSecurities = Some("Shares"),
-        otherSecuritiesType = None
+        whatTypeOfSecurities = ParsedValue.Valid("Other"),
+        otherSecuritiesType = ParsedValue.Missing
       )
 
       val result = service.validate(invalidRow)
 
-      result.validationErrors.map(_.fieldName) should contain ("otherSecuritiesType")
+      result.validationErrors.map(_.fieldName) should contain("otherSecuritiesType")
     }
 
     "require sellerAddressLine1 and sellerPostcode when sellerAddressInUk is true" in {
       val invalidRow = validRow.copy(
-        sellerAddressInUk = Some(true),
-        sellerAddressLine1 = None,
-        sellerPostcode = None
+        sellerAddressInUk = ParsedValue.Valid(true),
+        sellerAddressLine1 = ParsedValue.Missing,
+        sellerPostcode = ParsedValue.Missing
       )
 
       val result = service.validate(invalidRow)
@@ -126,13 +162,13 @@ class StcRowValidationServiceSpec extends AnyWordSpec with Matchers {
 
     "require sellerCountry when sellerAddressInUk is false" in {
       val invalidRow = validRow.copy(
-        sellerAddressInUk = Some(false),
-        sellerCountry = None
+        sellerAddressInUk = ParsedValue.Valid(false),
+        sellerCountry = ParsedValue.Missing
       )
 
       val result = service.validate(invalidRow)
 
-      result.validationErrors.map(_.fieldName) should contain ("sellerCountry")
+      result.validationErrors.map(_.fieldName) should contain("sellerCountry")
     }
   }
 }

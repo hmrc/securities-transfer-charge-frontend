@@ -16,7 +16,7 @@
 
 package uk.gov.hmrc.securitiestransferchargefrontend.services.fileupload
 
-import uk.gov.hmrc.securitiestransferchargefrontend.models.fileupload.ParsedRow
+import uk.gov.hmrc.securitiestransferchargefrontend.models.fileupload.{ParsedRow, ParsedValue}
 
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
@@ -24,28 +24,43 @@ import scala.util.Try
 
 object ParsedRowReader {
 
-  def readString(row: ParsedRow, columnIndex: Int): Option[String] =
-    row.valueAt(columnIndex).map(_.trim).filter(_.nonEmpty)
-
-  def readBigDecimal(row: ParsedRow, columnIndex: Int): Option[BigDecimal] =
-    readString(row, columnIndex)
-      .map(
-        _.replace(",", "")
-          .replace("£", "")
-          .replace("%", "")
-          .trim
-      )
-      .filter(_.nonEmpty)
-      .flatMap(value => Try(BigDecimal(value)).toOption)
-
-  def readBoolean(row: ParsedRow, columnIndex: Int): Option[Boolean] =
-    readString(row, columnIndex).flatMap {
-      case s if Set("true", "yes", "y").contains(s.toLowerCase)  => Some(true)
-      case s if Set("false", "no", "n").contains(s.toLowerCase)  => Some(false)
-      case _                                                     => None
+  def readString(row: ParsedRow, columnIndex: Int): ParsedValue[String] =
+    row.valueAt(columnIndex) match {
+      case None => ParsedValue.Missing
+      case Some(raw) if raw.trim.isEmpty => ParsedValue.Missing
+      case Some(raw) => ParsedValue.Valid(raw.trim)
     }
 
-  def readDate(row: ParsedRow, columnIndex: Int): Option[LocalDate] = {
+  def readBigDecimal(row: ParsedRow, columnIndex: Int): ParsedValue[BigDecimal] =
+    row.valueAt(columnIndex) match {
+      case None => ParsedValue.Missing
+      case Some(raw) if raw.trim.isEmpty => ParsedValue.Missing
+      case Some(raw) =>
+        val cleaned =
+          raw.trim
+            .replace(",", "")
+            .replace("£", "")
+            .replace("%", "")
+
+        Try(BigDecimal(cleaned)).toOption match {
+          case Some(value) => ParsedValue.Valid(value)
+          case None        => ParsedValue.Invalid(raw, "not a number")
+        }
+    }
+
+  def readBoolean(row: ParsedRow, columnIndex: Int): ParsedValue[Boolean] =
+    row.valueAt(columnIndex) match {
+      case None => ParsedValue.Missing
+      case Some(raw) if raw.trim.isEmpty => ParsedValue.Missing
+      case Some(raw) =>
+        raw.trim.toLowerCase match {
+          case "true" | "yes" | "y"  => ParsedValue.Valid(true)
+          case "false" | "no" | "n"  => ParsedValue.Valid(false)
+          case _                     => ParsedValue.Invalid(raw, "not a recognised boolean")
+        }
+    }
+
+  def readDate(row: ParsedRow, columnIndex: Int): ParsedValue[LocalDate] = {
     val formatters = Seq(
       DateTimeFormatter.ISO_LOCAL_DATE,
       DateTimeFormatter.ofPattern("d/M/uuuu"),
@@ -54,10 +69,16 @@ object ParsedRowReader {
       DateTimeFormatter.ofPattern("dd MM uuuu")
     )
 
-    readString(row, columnIndex).flatMap { value =>
-      formatters.view.flatMap { formatter =>
-        Try(LocalDate.parse(value.trim, formatter)).toOption
-      }.headOption
+    row.valueAt(columnIndex) match {
+      case None => ParsedValue.Missing
+      case Some(raw) if raw.trim.isEmpty => ParsedValue.Missing
+      case Some(raw) =>
+        formatters.view.flatMap { formatter =>
+          Try(LocalDate.parse(raw.trim, formatter)).toOption
+        }.headOption match {
+          case Some(date) => ParsedValue.Valid(date)
+          case None       => ParsedValue.Invalid(raw, "not a valid date")
+        }
     }
   }
 }

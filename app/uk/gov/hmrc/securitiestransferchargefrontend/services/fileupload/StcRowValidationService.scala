@@ -17,7 +17,7 @@
 package uk.gov.hmrc.securitiestransferchargefrontend.services.fileupload
 
 import javax.inject.Singleton
-import uk.gov.hmrc.securitiestransferchargefrontend.models.fileupload.{ParsedStcRow, StcRowValidationError, ValidatedStcRow}
+import uk.gov.hmrc.securitiestransferchargefrontend.models.fileupload.{ParsedStcRow, ParsedValue, StcRowValidationError, ValidatedStcRow}
 
 @Singleton
 class StcRowValidationService {
@@ -33,56 +33,155 @@ class StcRowValidationService {
 
   private def requiredFieldErrors(row: ParsedStcRow): Seq[StcRowValidationError] =
     Seq(
-      required(row.rowNumber, "addressLine1", row.addressLine1),
-      required(row.rowNumber, "sellerName", row.sellerName),
-      required(row.rowNumber, "sellerAddressInUk", row.sellerAddressInUk),
-      required(row.rowNumber, "connectedPersons", row.connectedPersons),
-      required(row.rowNumber, "applyingForRelief", row.applyingForRelief),
-      required(row.rowNumber, "chargingPoint", row.chargingPoint),
-      required(row.rowNumber, "taxRate", row.taxRate),
-      required(row.rowNumber, "whatTypeOfSecurities", row.whatTypeOfSecurities),
-      required(row.rowNumber, "securitiesQuantity", row.securitiesQuantity),
-      required(row.rowNumber, "amountPaidForSecurities", row.amountPaidForSecurities),
-      required(row.rowNumber, "totalMarketValue", row.totalMarketValue)
+      requiredString(row.rowNumber, "addressLine1", row.addressLine1),
+      requiredString(row.rowNumber, "sellerName", row.sellerName),
+      requiredBoolean(row.rowNumber, "sellerAddressInUk", row.sellerAddressInUk),
+      requiredBoolean(row.rowNumber, "connectedPersons", row.connectedPersons),
+      requiredBoolean(row.rowNumber, "applyingForRelief", row.applyingForRelief),
+      requiredDate(row.rowNumber, "chargingPoint", row.chargingPoint),
+      requiredNumber(row.rowNumber, "taxRate", row.taxRate),
+      requiredString(row.rowNumber, "whatTypeOfSecurities", row.whatTypeOfSecurities),
+      requiredNumber(row.rowNumber, "securitiesQuantity", row.securitiesQuantity),
+      requiredNumber(row.rowNumber, "amountPaidForSecurities", row.amountPaidForSecurities),
+      requiredNumber(row.rowNumber, "totalMarketValue", row.totalMarketValue)
     ).flatten
 
   private def conditionalErrors(row: ParsedStcRow): Seq[StcRowValidationError] = {
     val reliefError =
-      if (row.applyingForRelief.contains(true) && row.whatReliefAreYouApplyingFor.isEmpty) {
-        Some(error(row.rowNumber, "whatReliefAreYouApplyingFor", "Relief type is required when applying for relief"))
-      } else {
-        None
+      row.applyingForRelief match {
+        case ParsedValue.Valid(true) =>
+          requiredString(
+            row.rowNumber,
+            "whatReliefAreYouApplyingFor",
+            row.whatReliefAreYouApplyingFor,
+            requiredMessage = "Relief type is required when applying for relief",
+            invalidMessage = "Relief type must be a valid value"
+          )
+        case _ =>
+          Seq.empty
       }
 
     val shareTypeError =
-      if (row.whatTypeOfSecurities.exists(_.equalsIgnoreCase("Shares")) && row.otherSecuritiesType.isEmpty) {
-        Some(error(row.rowNumber, "otherSecuritiesType", "Share type is required when security type is Other"))
-      } else {
-        None
+      row.whatTypeOfSecurities match {
+        case ParsedValue.Valid(value) if value.equalsIgnoreCase("Other") =>
+          requiredString(
+            row.rowNumber,
+            "otherSecuritiesType",
+            row.otherSecuritiesType,
+            requiredMessage = "Share type is required when security type is Other",
+            invalidMessage = "Share type must be a valid value"
+          )
+        case _ =>
+          Seq.empty
       }
 
     val sellerUkAddressErrors =
-      if (row.sellerAddressInUk.contains(true)) {
-        Seq(
-          required(row.rowNumber, "sellerAddressLine1", row.sellerAddressLine1),
-          required(row.rowNumber, "sellerPostcode", row.sellerPostcode)
-        ).flatten
-      } else {
-        Seq.empty
+      row.sellerAddressInUk match {
+        case ParsedValue.Valid(true) =>
+          requiredString(row.rowNumber, "sellerAddressLine1", row.sellerAddressLine1) ++
+            requiredString(row.rowNumber, "sellerPostcode", row.sellerPostcode)
+        case _ =>
+          Seq.empty
       }
 
     val sellerNonUkCountryError =
-      if (row.sellerAddressInUk.contains(false) && row.sellerCountry.isEmpty) {
-        Seq(error(row.rowNumber, "sellerCountry", "Seller country is required when seller address is outside the UK"))
-      } else {
-        Seq.empty
+      row.sellerAddressInUk match {
+        case ParsedValue.Valid(false) =>
+          requiredString(
+            row.rowNumber,
+            "sellerCountry",
+            row.sellerCountry,
+            requiredMessage = "Seller country is required when seller address is outside the UK",
+            invalidMessage = "Seller country must be a valid value"
+          )
+        case _ =>
+          Seq.empty
       }
 
-    Seq(reliefError, shareTypeError).flatten ++ sellerUkAddressErrors ++ sellerNonUkCountryError
+    reliefError ++ shareTypeError ++ sellerUkAddressErrors ++ sellerNonUkCountryError
   }
 
-  private def required[A](rowNumber: Int, fieldName: String, value: Option[A]): Option[StcRowValidationError] =
-    if (value.isEmpty) Some(error(rowNumber, fieldName, s"$fieldName is required")) else None
+  private def requiredString(
+                              rowNumber: Int,
+                              fieldName: String,
+                              value: ParsedValue[String],
+                              requiredMessage: String = ""
+                            ): Seq[StcRowValidationError] =
+    value match {
+      case ParsedValue.Missing =>
+        Seq(error(rowNumber, fieldName, messageOrDefault(requiredMessage, s"$fieldName is required")))
+      case ParsedValue.Invalid(_, _) =>
+        Seq(error(rowNumber, fieldName, s"$fieldName must be a valid value"))
+      case ParsedValue.Valid(_) =>
+        Seq.empty
+    }
+
+  private def requiredString(
+                              rowNumber: Int,
+                              fieldName: String,
+                              value: ParsedValue[String],
+                              requiredMessage: String,
+                              invalidMessage: String
+                            ): Seq[StcRowValidationError] =
+    value match {
+      case ParsedValue.Missing =>
+        Seq(error(rowNumber, fieldName, requiredMessage))
+      case ParsedValue.Invalid(_, _) =>
+        Seq(error(rowNumber, fieldName, invalidMessage))
+      case ParsedValue.Valid(_) =>
+        Seq.empty
+    }
+
+  private def requiredNumber(
+                              rowNumber: Int,
+                              fieldName: String,
+                              value: ParsedValue[BigDecimal],
+                              requiredMessage: String = "",
+                              invalidMessage: String = ""
+                            ): Seq[StcRowValidationError] =
+    value match {
+      case ParsedValue.Missing =>
+        Seq(error(rowNumber, fieldName, messageOrDefault(requiredMessage, s"$fieldName is required")))
+      case ParsedValue.Invalid(_, _) =>
+        Seq(error(rowNumber, fieldName, messageOrDefault(invalidMessage, s"$fieldName must be a number")))
+      case ParsedValue.Valid(_) =>
+        Seq.empty
+    }
+
+  private def requiredBoolean(
+                               rowNumber: Int,
+                               fieldName: String,
+                               value: ParsedValue[Boolean],
+                               requiredMessage: String = "",
+                               invalidMessage: String = ""
+                             ): Seq[StcRowValidationError] =
+    value match {
+      case ParsedValue.Missing =>
+        Seq(error(rowNumber, fieldName, messageOrDefault(requiredMessage, s"$fieldName is required")))
+      case ParsedValue.Invalid(_, _) =>
+        Seq(error(rowNumber, fieldName, messageOrDefault(invalidMessage, s"$fieldName must be yes or no")))
+      case ParsedValue.Valid(_) =>
+        Seq.empty
+    }
+
+  private def requiredDate(
+                            rowNumber: Int,
+                            fieldName: String,
+                            value: ParsedValue[java.time.LocalDate],
+                            requiredMessage: String = "",
+                            invalidMessage: String = ""
+                          ): Seq[StcRowValidationError] =
+    value match {
+      case ParsedValue.Missing =>
+        Seq(error(rowNumber, fieldName, messageOrDefault(requiredMessage, s"$fieldName is required")))
+      case ParsedValue.Invalid(_, _) =>
+        Seq(error(rowNumber, fieldName, messageOrDefault(invalidMessage, s"$fieldName must be a valid date")))
+      case ParsedValue.Valid(_) =>
+        Seq.empty
+    }
+
+  private def messageOrDefault(message: String, default: String): String =
+    if (message.nonEmpty) message else default
 
   private def error(rowNumber: Int, fieldName: String, message: String): StcRowValidationError =
     StcRowValidationError(
