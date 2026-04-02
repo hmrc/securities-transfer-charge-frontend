@@ -48,8 +48,9 @@ class TemplateInstructionsViewSpec extends ViewBaseSpec {
     val step2 = "Complete the template, using one row for each type of securities you are buying"
     val step3 = "Upload your file on the next page as a .xlsx or .csv"
     val para2Value = "Remember, do not edit the first two rows, or change the order of the columns."
-    val para3Value = "Once you have uploaded and submitted your file it will show on your STC dashboard. You can then pay any charges due."
-    val para3Link = "STC dashboard"
+    val para3Span1 = "Once you have uploaded and submitted your file it will show on your"
+    val para3LinkText = "STC dashboard"
+    val para3Span2 = "You can then pay any charges due."
 
     val continue = "Continue"
     val returnLink = "Return to dashboard"
@@ -100,10 +101,13 @@ class TemplateInstructionsViewSpec extends ViewBaseSpec {
       }
 
       "display the correct third paragraph with 'STC dashboard' link that takes user back to the submission dashboard page" in {
-        val paragraph = templateInstructionsView.select("main p.govuk-body").get(2)
-        paragraph.text() mustBe ExpectedContent.para3Value
-        paragraph.select("a.govuk-link").text() mustBe ExpectedContent.para3Link
-        paragraph.select("a.govuk-link").attr("href") mustBe routes.SubmissionsDashboardController.onPageLoad().url
+        val paragraph = templateInstructionsView.select("p.govuk-body").last()
+        val spans = paragraph.select("span")
+        spans.get(0).text() mustBe ExpectedContent.para3Span1
+        spans.get(1).select("a.govuk-link").text() mustBe ExpectedContent.para3LinkText
+        spans.get(1).select("a.govuk-link").attr("href") mustBe routes.SubmissionsDashboardController.onPageLoad().url
+        spans.get(1).text() mustBe ExpectedContent.para3LinkText + "."
+        spans.get(2).text() mustBe ExpectedContent.para3Span2
       }
 
 

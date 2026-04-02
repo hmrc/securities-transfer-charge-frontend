@@ -46,7 +46,11 @@
         </ol>
 
         <p class="govuk-body">@messages("templateInstructions.p2")</p>
-        <p class="govuk-body">@messages("templateInstructions.p3", routes.SubmissionsDashboardController.onPageLoad().url)</p>
+        <p class="govuk-body">
+            <span>@messages("templateInstructions.p3.span1")</span>
+            <span><a class="govuk-link" href="@routes.SubmissionsDashboardController.onPageLoad().url"> @messages("templateInstructions.p3.a")</a>.</span>
+            <span>@messages("templateInstructions.p3.span2")</span>
+        </p>
 
         <div class="govuk-button-group">
             @govukButton(

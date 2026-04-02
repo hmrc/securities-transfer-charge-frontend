@@ -354,8 +354,9 @@ templateInstructions.step1 = Download the template
 templateInstructions.step2 = Complete the template, using one row for each type of securities you are buying
 templateInstructions.step3 = Upload your file on the next page as a .xlsx or .csv
 templateInstructions.p2 = Remember, do not edit the first two rows, or change the order of the columns.
-templateInstructions.p3 = Once you have uploaded and submitted your file it will show on your STC dashboard. You can then pay any charges due.
-templateInstructions.STC-Dashboard.linkText = STC dashboard
+templateInstructions.p3.span1 = Once you have uploaded and submitted your file it will show on your
+templateInstructions.p3.a = STC dashboard
+templateInstructions.p3.span2 = You can then pay any charges due.
 return-to-dashboard.link = Return to dashboard
 
 
