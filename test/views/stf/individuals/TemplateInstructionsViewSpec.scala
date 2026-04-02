@@ -24,8 +24,6 @@ import uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.individuals.
 import uk.gov.hmrc.securitiestransferchargefrontend.views.html.stf.individuals.TemplateInstructionsView
 import views.ViewBaseSpec
 
-import scala.language.postfixOps
-
 class TemplateInstructionsViewSpec extends ViewBaseSpec {
 
   override def fakeApplication(): Application = applicationBuilder().build()
