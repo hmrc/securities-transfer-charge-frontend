@@ -24,6 +24,8 @@ import uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.individuals.
 import uk.gov.hmrc.securitiestransferchargefrontend.views.html.stf.individuals.TemplateInstructionsView
 import views.ViewBaseSpec
 
+import scala.language.postfixOps
+
 class TemplateInstructionsViewSpec extends ViewBaseSpec {
 
   override def fakeApplication(): Application = applicationBuilder().build()
@@ -99,8 +101,8 @@ class TemplateInstructionsViewSpec extends ViewBaseSpec {
         templateInstructionsView.para(2) mustBe Some(ExpectedContent.para2Value)
       }
 
-      "display the correct third paragraph with 'STC dashboard' link that takes user back to to the submission dashboard page" in {
-        val paragraph = templateInstructionsView.select("p.govuk-body").last()
+      "display the correct third paragraph with 'STC dashboard' link that takes user back to the submission dashboard page" in {
+        val paragraph = templateInstructionsView.select("main p.govuk-body").get(2)
         paragraph.text() mustBe ExpectedContent.para3Value
         paragraph.select("a.govuk-link").text() mustBe ExpectedContent.para3Link
         paragraph.select("a.govuk-link").attr("href") mustBe routes.SubmissionsDashboardController.onPageLoad().url
