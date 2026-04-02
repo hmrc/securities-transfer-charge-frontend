@@ -354,8 +354,10 @@ templateInstructions.step1 = Download the template
 templateInstructions.step2 = Complete the template, using one row for each type of securities you are buying
 templateInstructions.step3 = Upload your file on the next page as a .xlsx or .csv
 templateInstructions.p2 = Remember, do not edit the first two rows, or change the order of the columns.
-templateInstructions.p3 = Once you have uploaded and submitted your file it will show on your <a class="govuk-link" href="{0}">STC dashboard</a>. You can then pay any charges due.
-return.to.dashboard.link = Return to dashboard
+templateInstructions.p3 = Once you have uploaded and submitted your file it will show on your STC dashboard. You can then pay any charges due.
+templateInstructions.STC-Dashboard.linkText = STC dashboard
+return-to-dashboard.link = Return to dashboard
+
 
 formattingError.title = Your file has formatting errors
 formattingError.heading = Your file has formatting errors

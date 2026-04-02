@@ -20,7 +20,9 @@
 
 @this(
     layout: templates.Layout,
-    formHelper: FormWithCSRF
+    formHelper: FormWithCSRF,
+    govukRadios: GovukRadios,
+    govukButton: GovukButton
 )
 
 @()(implicit request: Request[_], messages: Messages)
@@ -44,14 +46,17 @@
         </ol>
 
         <p class="govuk-body">@messages("templateInstructions.p2")</p>
-        <p class="govuk-body">@Html(messages("templateInstructions.p3", routes.SubmissionsDashboardController.onPageLoad().url))</p>
+        <p class="govuk-body">@messages("templateInstructions.p3", routes.SubmissionsDashboardController.onPageLoad().url)</p>
 
         <div class="govuk-button-group">
-            <a href="@individualsRoutes.FileUploadController.onPageLoad().url" role="button" draggable="false" class="govuk-button" data-module="govuk-button">
-                @messages("site.continue")
-            </a>
+            @govukButton(
+                ButtonViewModel(
+                    messages("site.continue")
+                ).asLink(individualsRoutes.FileUploadController.onPageLoad().url)
+            )
+
             <a class="govuk-link" href="@routes.SubmissionsDashboardController.onPageLoad().url">
-                @messages("return.to.dashboard.link")
+                @messages("return-to-dashboard.link")
             </a>
         </div>
 }
