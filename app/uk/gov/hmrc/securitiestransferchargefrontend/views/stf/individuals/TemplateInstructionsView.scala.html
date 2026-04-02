@@ -20,7 +20,6 @@
 
 @this(
     layout: templates.Layout,
-    govukButton: GovukButton,
     formHelper: FormWithCSRF
 )
 
@@ -45,12 +44,14 @@
         </ol>
 
         <p class="govuk-body">@messages("templateInstructions.p2")</p>
-        <p class="govuk-body">@Html(messages("templateInstructions.p3", routes.SubmissionsDashboardController.onPageLoad()))</p>
+        <p class="govuk-body">@Html(messages("templateInstructions.p3", routes.SubmissionsDashboardController.onPageLoad().url))</p>
 
         <div class="govuk-button-group">
-            <a href="@individualsRoutes.FileUploadController.onPageLoad()" role="button" draggable="false" class="govuk-button" data-module="govuk-button">
+            <a href="@individualsRoutes.FileUploadController.onPageLoad().url" role="button" draggable="false" class="govuk-button" data-module="govuk-button">
                 @messages("site.continue")
             </a>
-            <a class="govuk-link" href="@routes.SubmissionsDashboardController.onPageLoad()">@messages("templateInstructions.return.link")</a>
+            <a class="govuk-link" href="@routes.SubmissionsDashboardController.onPageLoad().url">
+                @messages("return.to.dashboard.link")
+            </a>
         </div>
 }
