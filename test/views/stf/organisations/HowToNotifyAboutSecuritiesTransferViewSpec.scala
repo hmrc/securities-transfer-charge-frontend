@@ -19,6 +19,7 @@ package views.stf.organisations
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
 import play.api.Application
+import uk.gov.hmrc.securitiestransferchargefrontend.controllers.routes
 import uk.gov.hmrc.securitiestransferchargefrontend.forms.stf.organisations.HowToNotifyAboutSecuritiesTransferFormProvider
 import uk.gov.hmrc.securitiestransferchargefrontend.models.NormalMode
 import uk.gov.hmrc.securitiestransferchargefrontend.views.html.stf.organisations.HowToNotifyAboutSecuritiesTransferView
@@ -47,9 +48,8 @@ class HowToNotifyAboutSecuritiesTransferViewSpec extends ViewBaseSpec {
     val oneAtATimeHint: String = messages("org.howToNotifyAboutSecuritiesTransfer.oneAtATime.hint")
     val moreThanOneAtATimeRadio: String = messages("org.howToNotifyAboutSecuritiesTransfer.moreThanOneAtATime")
     val moreThanOneAtATimeHint: String = messages("org.howToNotifyAboutSecuritiesTransfer.moreThanOneAtATime.hint")
-    val saveAndContinue: String = messages("site.save-and-continue.button")
-    val saveAndReturn: String = messages("site.save-and-return.button")
-
+    val continue: String = messages("site.continue")
+    val returnLink: String = messages("return-to-dashboard.link")
   }
 
   "The HowToNotifyAboutSecuritiesTransferView" - {
@@ -78,14 +78,15 @@ class HowToNotifyAboutSecuritiesTransferViewSpec extends ViewBaseSpec {
         howToNotifyAboutSecuritiesTransferView.radio("moreThanOneAtATime").value mustBe ExpectedContent.moreThanOneAtATimeRadio
       }
 
-      "have a button with the text save and continue " in {
-        val buttons = howToNotifyAboutSecuritiesTransferView.select(".govuk-button")
-        buttons.get(0).text() mustBe ExpectedContent.saveAndContinue
+      "have a continue button" in {
+        val button = howToNotifyAboutSecuritiesTransferView.select(".govuk-button").first()
+        button.text() mustBe ExpectedContent.continue
       }
 
-      "have a button with the text save and return to dashboard" in {
-        val buttons = howToNotifyAboutSecuritiesTransferView.select(".govuk-button")
-        buttons.get(1).text() mustBe ExpectedContent.saveAndReturn
+      "have a link to return back to the submission dashboard page" in {
+        val returnLink = howToNotifyAboutSecuritiesTransferView.select(".govuk-button-group a.govuk-link").first()
+        returnLink.text() mustBe ExpectedContent.returnLink
+        returnLink.attr("href") mustBe routes.SubmissionsDashboardController.onPageLoad().url
       }
     }
   }

@@ -109,9 +109,6 @@ connectedPersons.details.content.p2 = Relative means a brother, sister, ancestor
 connectedPersons.details.content.link.text = Read HMRC guidance on connected persons
 connectedPersons.change.hidden = Change connected persons
 
-site.save-and-continue.button = Save and continue
-site.save-and-return.button = Save and return to dashboard
-
 applyingForRelief.title = Are you applying for a relief?
 applyingForRelief.heading = Are you applying for a relief?
 applyingForRelief.checkYourAnswersLabel = Are you applying for a relief?
@@ -346,7 +343,6 @@ fileUploaded.heading = File uploaded
 fileUploaded.reference = File reference
 fileUploaded.status = Status 
 
-
 templateInstructions.title = How to use the template
 templateInstructions.heading = How to use the template
 templateInstructions.p1 = Use the template to tell us about more than one securities transfer at a time.
@@ -358,7 +354,6 @@ templateInstructions.p3.span1 = Once you have uploaded and submitted your file i
 templateInstructions.p3.a = STC dashboard
 templateInstructions.p3.span2 = You can then pay any charges due.
 return-to-dashboard.link = Return to dashboard
-
 
 formattingError.title = Your file has formatting errors
 formattingError.heading = Your file has formatting errors
