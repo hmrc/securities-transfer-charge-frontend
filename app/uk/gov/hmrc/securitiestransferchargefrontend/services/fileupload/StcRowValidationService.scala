@@ -42,8 +42,7 @@ class StcRowValidationService {
       requiredNumber(row.rowNumber, "taxRate", row.taxRate),
       requiredString(row.rowNumber, "whatTypeOfSecurities", row.whatTypeOfSecurities),
       requiredNumber(row.rowNumber, "securitiesQuantity", row.securitiesQuantity),
-      requiredNumber(row.rowNumber, "amountPaidForSecurities", row.amountPaidForSecurities),
-      requiredNumber(row.rowNumber, "totalMarketValue", row.totalMarketValue)
+      requiredNumber(row.rowNumber, "amountPaidForSecurities", row.amountPaidForSecurities)
     ).flatten
 
   private def conditionalErrors(row: ParsedStcRow): Seq[StcRowValidationError] = {
@@ -98,7 +97,34 @@ class StcRowValidationService {
           Seq.empty
       }
 
-    reliefError ++ shareTypeError ++ sellerUkAddressErrors ++ sellerNonUkCountryError
+    val totalMarketValueErrors =
+      row.connectedPersons match {
+        case ParsedValue.Valid(true) =>
+          requiredNumber(
+            row.rowNumber,
+            "totalMarketValue",
+            row.totalMarketValue,
+            requiredMessage = "Total market value is required when connected persons is yes",
+            invalidMessage = "Total market value must be a number"
+          )
+
+        case ParsedValue.Valid(false) =>
+          mustBeEmpty(
+            row.rowNumber,
+            "totalMarketValue",
+            row.totalMarketValue,
+            message = "Total market value must be empty when connected persons is no"
+          )
+
+        case _ =>
+          Seq.empty
+      }
+
+    reliefError ++
+      shareTypeError ++
+      sellerUkAddressErrors ++
+      sellerNonUkCountryError ++
+      totalMarketValueErrors
   }
 
   private def requiredString(
@@ -146,6 +172,19 @@ class StcRowValidationService {
         Seq(error(rowNumber, fieldName, messageOrDefault(invalidMessage, s"$fieldName must be a number")))
       case ParsedValue.Valid(_) =>
         Seq.empty
+    }
+
+  private def mustBeEmpty(
+                           rowNumber: Int,
+                           fieldName: String,
+                           value: ParsedValue[BigDecimal],
+                           message: String
+                         ): Seq[StcRowValidationError] =
+    value match {
+      case ParsedValue.Missing =>
+        Seq.empty
+      case ParsedValue.Valid(_) | ParsedValue.Invalid(_, _) =>
+        Seq(error(rowNumber, fieldName, message))
     }
 
   private def requiredBoolean(

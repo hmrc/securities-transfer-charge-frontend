@@ -37,7 +37,7 @@ class StcUploadParsingServiceSpec extends AnyWordSpec with Matchers with EitherV
 
   private val fileUploadConfig = new FileUploadConfig(
     Configuration(
-      "file-upload.max-rows" -> 1000,
+      "file-upload.max-rows" -> 10002,
       "file-upload.xlsx.expected-worksheet" -> "Sheet1",
       "file-upload.first-data-row" -> 3
     )

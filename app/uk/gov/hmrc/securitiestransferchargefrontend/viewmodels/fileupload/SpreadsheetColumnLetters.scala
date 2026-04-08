@@ -14,21 +14,23 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.securitiestransferchargefrontend.config
+package uk.gov.hmrc.securitiestransferchargefrontend.viewmodels.fileupload
 
-import javax.inject.{Inject, Singleton}
-import play.api.Configuration
+object SpreadsheetColumnLetters {
 
-@Singleton
-class FileUploadConfig @Inject()(configuration: Configuration) {
+  def fromZeroBasedIndex(index: Int): String = {
+    require(index >= 0, s"Column index must be >= 0 but was $index")
 
-  val maxRows: Int =
-    configuration.get[Int]("file-upload.max-rows")
+    @annotation.tailrec
+    def loop(n: Int, acc: String): String = {
+      val remainder = n % 26
+      val next = ('A' + remainder).toChar.toString + acc
+      val quotient = n / 26 - 1
 
-  val expectedWorksheetName: String =
-    configuration.getOptional[String]("file-upload.xlsx.expected-worksheet")
-      .getOrElse("Sheet1")
+      if (quotient < 0) next
+      else loop(quotient, next)
+    }
 
-  val firstDataRow: Int =
-    configuration.getOptional[Int]("file-upload.first-data-row").getOrElse(3)
+    loop(index, "")
+  }
 }

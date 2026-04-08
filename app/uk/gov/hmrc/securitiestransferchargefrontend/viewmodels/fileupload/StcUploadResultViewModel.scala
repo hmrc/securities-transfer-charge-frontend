@@ -22,8 +22,8 @@ final case class StcUploadResultViewModel(
                                            totalRows: Int,
                                            hasErrors: Boolean,
                                            hasBlockingErrors: Boolean,
-                                           blockingErrors: Seq[StcRowValidationError],
-                                           nonBlockingErrors: Seq[StcRowValidationError],
+                                           blockingErrorDisplays: Seq[UploadErrorDisplay],
+                                           nonBlockingErrorDisplays: Seq[UploadErrorDisplay],
                                            validatedRows: Seq[ValidatedStcRow]
                                          )
 
@@ -34,8 +34,25 @@ object StcUploadResultViewModel {
       totalRows = response.rows.size,
       hasErrors = response.hasErrors,
       hasBlockingErrors = response.hasBlockingErrors,
-      blockingErrors = response.blockingErrors,
-      nonBlockingErrors = response.nonBlockingErrors,
+      blockingErrorDisplays = response.blockingErrors.map(toDisplayError),
+      nonBlockingErrorDisplays = response.nonBlockingErrors.map(toDisplayError),
       validatedRows = response.rows
     )
+
+  private def toDisplayError(error: StcRowValidationError): UploadErrorDisplay =
+    StcUploadFieldMetadata.byFieldName.get(error.fieldName) match {
+      case Some(metadata) =>
+        UploadErrorDisplay(
+          cellReference = s"${SpreadsheetColumnLetters.fromZeroBasedIndex(metadata.columnIndex)}${error.rowNumber}",
+          questionLabel = metadata.questionLabel,
+          message = error.message
+        )
+
+      case None =>
+        UploadErrorDisplay(
+          cellReference = s"Row ${error.rowNumber}",
+          questionLabel = error.fieldName,
+          message = error.message
+        )
+    }
 }

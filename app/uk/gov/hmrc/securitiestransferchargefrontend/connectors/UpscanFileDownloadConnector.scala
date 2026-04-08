@@ -47,7 +47,7 @@ class UpscanFileDownloadConnectorImpl @Inject()(
       }
       .recoverWith { case ex =>
         logger.warn(
-          s"[UpscanFileDownloadConnectorImpl][download] Failed to download uploaded file from URL: $downloadUrl. Reason: ${ex.getMessage}",
+          s"[UpscanFileDownloadConnectorImpl][download] Failed to download uploaded file from URL. Reason: ${ex.getMessage}",
           ex
         )
         Future.failed(ex)

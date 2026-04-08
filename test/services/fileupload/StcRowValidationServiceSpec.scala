@@ -54,7 +54,7 @@ class StcRowValidationServiceSpec extends AnyWordSpec with Matchers {
     otherSecuritiesType = ParsedValue.Valid("Ordinary"),
     securitiesQuantity = ParsedValue.Valid(BigDecimal("100")),
     amountPaidForSecurities = ParsedValue.Valid(BigDecimal("500")),
-    totalMarketValue = ParsedValue.Valid(BigDecimal("600"))
+    totalMarketValue = ParsedValue.Missing
   )
 
   private def messageFor(result: uk.gov.hmrc.securitiestransferchargefrontend.models.fileupload.ValidatedStcRow, fieldName: String): Option[String] =
@@ -90,13 +90,14 @@ class StcRowValidationServiceSpec extends AnyWordSpec with Matchers {
 
     "return invalid numeric errors when a number field contains non-numeric data" in {
       val invalidRow = validRow.copy(
+        connectedPersons = ParsedValue.Valid(true),
         totalMarketValue = ParsedValue.Invalid("foo", "not a number"),
         amountPaidForSecurities = ParsedValue.Invalid("bar", "not a number")
       )
 
       val result = service.validate(invalidRow)
 
-      messageFor(result, "totalMarketValue") shouldBe Some("totalMarketValue must be a number")
+      messageFor(result, "totalMarketValue") shouldBe Some("Total market value must be a number")
       messageFor(result, "amountPaidForSecurities") shouldBe Some("amountPaidForSecurities must be a number")
     }
 
