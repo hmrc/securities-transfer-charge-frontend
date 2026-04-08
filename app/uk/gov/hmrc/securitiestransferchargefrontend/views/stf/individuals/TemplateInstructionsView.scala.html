@@ -15,14 +15,14 @@
  *@
 
 @import uk.gov.hmrc.securitiestransferchargefrontend.views.html.templates
-@import uk.gov.hmrc.securitiestransferchargefrontend.views.html.components.SaveAndReturnButton
-@import uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.individuals.routes
+@import uk.gov.hmrc.securitiestransferchargefrontend.controllers.routes
+@import uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.individuals.routes as individualsRoutes
 
 @this(
     layout: templates.Layout,
-    govukButton: GovukButton,
     formHelper: FormWithCSRF,
-    saveAndReturnButton:SaveAndReturnButton
+    govukRadios: GovukRadios,
+    govukButton: GovukButton
 )
 
 @()(implicit request: Request[_], messages: Messages)
@@ -31,11 +31,11 @@
 
     <div id="caption-heading" class="govuk-caption-l">@messages("transfer.details.caption")</div>
 
-        <h1 class="govuk-heading-l govuk-!-margin-bottom-8">@messages("templateInstructions.heading")</h1>
+        <h1 class="govuk-heading-xl govuk-!-margin-bottom-8">@messages("templateInstructions.heading")</h1>
 
         <p class="govuk-body">@messages("templateInstructions.p1")</p>
 
-        <ol class="govuk-list govuk-list--number govuk-list--spaced govuk-!-padding-left-9">
+        <ol class="govuk-list govuk-list--number govuk-!-padding-left-9">
             <li>
                 <a class="govuk-link" href="/securities-transfer-charge/assets/Bulk_Securities_Transfer_Charge_template_v1i.xlsx" download="Bulk Securities Transfer Charge template v1i.xlsx">
                     @messages("templateInstructions.step1")
@@ -46,14 +46,21 @@
         </ol>
 
         <p class="govuk-body">@messages("templateInstructions.p2")</p>
-        <p class="govuk-body">@Html(messages("templateInstructions.p3"))</p>
+        <p class="govuk-body">
+            <span>@messages("templateInstructions.p3.span1")</span>
+            <span><a class="govuk-link" href="@routes.SubmissionsDashboardController.onPageLoad().url"> @messages("templateInstructions.p3.a")</a>.</span>
+            <span>@messages("templateInstructions.p3.span2")</span>
+        </p>
 
-        <div>
-            @formHelper(action = routes.FileUploadController.onPageLoad()) {
-                @govukButton(
-                    ButtonViewModel(messages("site.save-and-continue.button"))
-                )
-            @saveAndReturnButton()
-            }
+        <div class="govuk-button-group">
+            @govukButton(
+                ButtonViewModel(
+                    messages("site.continue")
+                ).asLink(individualsRoutes.FileUploadController.onPageLoad().url)
+            )
+
+            <a class="govuk-link" href="@routes.SubmissionsDashboardController.onPageLoad().url">
+                @messages("return-to-dashboard.link")
+            </a>
         </div>
 }
