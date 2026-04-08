@@ -16,10 +16,11 @@
 
 package views.stf.organisations
 
+import base.Fixtures
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
 import play.api.Application
-import uk.gov.hmrc.securitiestransferchargefrontend.models.UploadedFileError
+import uk.gov.hmrc.securitiestransferchargefrontend.controllers.routes
 import uk.gov.hmrc.securitiestransferchargefrontend.views.html.stf.organisations.UploadedFileErrorView
 import views.ViewBaseSpec
 
@@ -30,20 +31,9 @@ class UploadedFileErrorViewSpec extends ViewBaseSpec {
 
   private val viewInstance = app.injector.instanceOf[UploadedFileErrorView]
 
-  private val testErrors: Seq[UploadedFileError] = Seq(
-    UploadedFileError(
-      cell = "J6",
-      error = "The seller's name cannot contain numbers"
-    ),
-    UploadedFileError(
-      cell = "J36",
-      error = "You have selected that the buyer is a company, you need to enter the registered address"
-    )
-  )
-
   def view(): Document =
     Jsoup.parse(
-      viewInstance(testErrors)(fakeRequest, messages).body
+      viewInstance(Fixtures.uploadedFileErrors)(fakeRequest, messages).body
     )
 
   object ExpectedContent {
@@ -87,17 +77,25 @@ class UploadedFileErrorViewSpec extends ViewBaseSpec {
       "display all errors in the table" in {
         val rows = doc.select("tbody tr")
 
-        rows.size() mustBe testErrors.size
+        rows.size() mustBe Fixtures.uploadedFileErrors.size
 
         rows.get(0).text() must include("J6")
         rows.get(0).text() must include("The seller's name cannot contain numbers")
 
         rows.get(1).text() must include("J36")
         rows.get(1).text() must include("You have selected that the buyer is a company, you need to enter the registered address")
+
+        rows.get(2).text() must include("K3")
+        rows.get(2).text() must include("Buyer's country can only contain letters, numbers and hyphens")
       }
 
       "have a back to file upload button" in {
         doc.select(".govuk-button").text() mustBe messages("site.back-to-upload.button")
+      }
+
+      "file upload button must redirect to the correct page" in {
+        val form = doc.select("form")
+        form.attr("action") mustBe routes.JourneyRecoveryController.onPageLoad().url
       }
     }
   }

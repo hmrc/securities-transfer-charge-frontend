@@ -37,7 +37,7 @@ class UploadedFileErrorController @Inject()(
       Ok(view(stubUploadedFileErrors))
   }
 
-  def stubUploadedFileErrors: Seq[UploadedFileError] = {
+  private def stubUploadedFileErrors: Seq[UploadedFileError] = {
     Seq(
       UploadedFileError(
         cell = "J6",

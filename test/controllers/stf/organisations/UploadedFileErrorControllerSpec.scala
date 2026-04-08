@@ -16,10 +16,10 @@
 
 package controllers.stf.organisations
 
-import base.SpecBase
+import base.{Fixtures, SpecBase}
 import play.api.test.FakeRequest
 import play.api.test.Helpers.*
-import uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.organisations.{UploadedFileErrorController, routes}
+import uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.organisations.routes
 import uk.gov.hmrc.securitiestransferchargefrontend.views.html.stf.organisations.UploadedFileErrorView
 
 class UploadedFileErrorControllerSpec extends SpecBase {
@@ -36,11 +36,9 @@ class UploadedFileErrorControllerSpec extends SpecBase {
         val result = route(application, request).value
 
         val view = application.injector.instanceOf[UploadedFileErrorView]
-        val controller = application.injector.instanceOf[UploadedFileErrorController]
-        val errors = controller.stubUploadedFileErrors
-
+        
         status(result) mustEqual OK
-        contentAsString(result) mustEqual view(errors)(request, messages(application)).toString
+        contentAsString(result) mustEqual view(Fixtures.uploadedFileErrors)(request, messages(application)).toString
       }
     }
   }
