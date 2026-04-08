@@ -42,7 +42,7 @@ class FormattingErrorViewSpec extends ViewBaseSpec {
     val p3 = "These will need to be corrected before your file can be uploaded again."
     val p4 = "Check the instructions in the template file for more guidance."
 
-    val backToFIle = "Back to file upload"
+    val buttonText = "Back to file upload"
   }
 
   "The FormattingErrorView" - {
@@ -76,7 +76,7 @@ class FormattingErrorViewSpec extends ViewBaseSpec {
       "have a button that redirects to the file upload page" in {
         val form = formattingErrorView.select("form")
         form.attr("action") mustBe routes.JourneyRecoveryController.onPageLoad().url
-        formattingErrorView.select(".govuk-button").first().text() mustBe ExpectedContent.backToFIle
+        formattingErrorView.select(".govuk-button").first().text() mustBe ExpectedContent.buttonText
       }
     }
   }
