@@ -189,4 +189,4 @@ GET        /stf/bulk-empty                                uk.gov.hmrc.securities
 GET        /stf/file-uploaded                             uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.individuals.FileUploadedController.onPageLoad(key:String)
 POST       /stf/upscan-callback                            uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.individuals.UpscanCallbackController.callback()
 
-GET /file-upload/result/:reference uk.gov.hmrc.securitiestransferchargefrontend.controllers.FileUploadResultController.onPageLoad(reference: String)
+GET        /stf/org/bulk-error-list                              uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.organisations.UploadedFileErrorController.onPageLoad()
