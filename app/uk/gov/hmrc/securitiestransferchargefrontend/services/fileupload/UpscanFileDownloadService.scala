@@ -33,12 +33,21 @@ class UpscanFileDownloadServiceImpl @Inject()(
                                                upscanFileDownloadConnector: UpscanFileDownloadConnector
                                              )(implicit ec: ExecutionContext) extends UpscanFileDownloadService {
 
-  override def toUploadedFile(fileUpload: FileUpload)(implicit hc: HeaderCarrier): Future[UploadedFile] =
-    upscanFileDownloadConnector.download(fileUpload.downloadUrl.get).map { inputStream =>
+  override def toUploadedFile(fileUpload: FileUpload)(implicit hc: HeaderCarrier): Future[UploadedFile] = {
+    val downloadUrl = fileUpload.downloadUrl.getOrElse {
+      throw new IllegalStateException("downloadUrl was missing for a ready upload")
+    }
+
+    val uploadDetails = fileUpload.uploadDetails.getOrElse {
+      throw new IllegalStateException("uploadDetails were missing for a ready upload")
+    }
+
+    upscanFileDownloadConnector.download(downloadUrl).map { inputStream =>
       UploadedFile(
-        fileName = fileUpload.uploadDetails.get.fileName,
-        mimeType = fileUpload.uploadDetails.get.fileMimeType,
+        fileName = uploadDetails.fileName,
+        mimeType = uploadDetails.fileMimeType,
         inputStream = inputStream
       )
     }
+  }
 }
