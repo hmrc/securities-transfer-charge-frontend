@@ -38,7 +38,7 @@ class StcRowValidationServiceSpec extends AnyWordSpec with Matchers {
     sellerName = ParsedValue.Valid("Bob Seller"),
     sellerAddressInUk = ParsedValue.Valid(true),
     sellerAddressLine1 = ParsedValue.Valid("1 Seller Street"),
-    sellerAddressLine2 = ParsedValue.Missing,
+    sellerAddressLine2 = ParsedValue.Valid("Seller Region"),
     sellerAddressLine3 = ParsedValue.Missing,
     sellerAddressLine4 = ParsedValue.Missing,
     sellerPostcode = ParsedValue.Valid("LS1 1AA"),
@@ -146,10 +146,11 @@ class StcRowValidationServiceSpec extends AnyWordSpec with Matchers {
       result.validationErrors.map(_.fieldName) should contain("otherSecuritiesType")
     }
 
-    "require sellerAddressLine1 and sellerPostcode when sellerAddressInUk is true" in {
+    "require sellerAddressLine1, sellerAddressLine2 and sellerPostcode when sellerAddressInUk is true" in {
       val invalidRow = validRow.copy(
         sellerAddressInUk = ParsedValue.Valid(true),
         sellerAddressLine1 = ParsedValue.Missing,
+        sellerAddressLine2 = ParsedValue.Missing,
         sellerPostcode = ParsedValue.Missing
       )
 
@@ -157,6 +158,7 @@ class StcRowValidationServiceSpec extends AnyWordSpec with Matchers {
 
       result.validationErrors.map(_.fieldName) should contain allOf (
         "sellerAddressLine1",
+        "sellerAddressLine2",
         "sellerPostcode"
       )
     }

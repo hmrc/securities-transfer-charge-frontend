@@ -48,9 +48,8 @@ class FileUploadedController @Inject()(
             case Right(_) =>
               Ok(view(fileUpload))
 
-            case Left(parseError) =>
+            case Left(_) =>
               Redirect(individualRoutes.FormattingErrorController.onPageLoad())
-                .flashing("uploadParseError" -> parseError.message)
           }
 
         case Some(fileUpload) =>

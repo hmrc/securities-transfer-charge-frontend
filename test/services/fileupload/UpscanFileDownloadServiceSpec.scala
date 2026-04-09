@@ -16,7 +16,7 @@
 
 package services.fileupload
 
-import org.mockito.ArgumentMatchers.{eq => eqTo, any}
+import org.mockito.ArgumentMatchers.{any, eq => eqTo}
 import org.mockito.Mockito.{verify, when}
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.matchers.should.Matchers
@@ -77,36 +77,6 @@ class UpscanFileDownloadServiceSpec extends AnyWordSpec with Matchers with Scala
       )
 
       verify(upscanFileDownloadConnector).download(eqTo(downloadUrl))(any[HeaderCarrier])
-    }
-
-    "fail when downloadUrl is missing" in {
-      val fileUpload = FileUpload(
-        reference = "ref-123",
-        status = UpscanJourneyStatus.Ready,
-        downloadUrl = None,
-        uploadDetails = Some(uploadDetails)
-      )
-
-      val exception = the[IllegalStateException] thrownBy {
-        service.toUploadedFile(fileUpload).futureValue
-      }
-
-      exception.getMessage shouldBe "downloadUrl was missing for a ready upload"
-    }
-
-    "fail when uploadDetails are missing" in {
-      val fileUpload = FileUpload(
-        reference = "ref-123",
-        status = UpscanJourneyStatus.Ready,
-        downloadUrl = Some("https://example.com/download/ref-123"),
-        uploadDetails = None
-      )
-
-      val exception = the[IllegalStateException] thrownBy {
-        service.toUploadedFile(fileUpload).futureValue
-      }
-
-      exception.getMessage shouldBe "uploadDetails were missing for a ready upload"
     }
   }
 }

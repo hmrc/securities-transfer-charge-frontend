@@ -34,15 +34,27 @@ class StcUpscanProcessingServiceImpl @Inject()(
                                               )(implicit ec: ExecutionContext) extends StcUpscanProcessingService {
 
   override def process(fileUpload: FileUpload)(implicit hc: HeaderCarrier): Future[Either[FileParseError, StcFileValidationResponse]] =
-    fileUpload.status match {
-      case UpscanJourneyStatus.Ready =>
+    fileUpload match {
+      case FileUpload(_, UpscanJourneyStatus.Ready, Some(_), Some(_), _, _) =>
         upscanFileDownloadService
           .toUploadedFile(fileUpload)
           .map(stcUploadProcessingService.process)
 
-      case status =>
+      case FileUpload(_, UpscanJourneyStatus.Ready, None, _, _, _) =>
         Future.failed(
-          new IllegalStateException(s"Cannot process upload unless status is Ready. Current status: $status")
+          new IllegalArgumentException("Cannot process Ready upload without a downloadUrl")
+        )
+
+      case FileUpload(_, UpscanJourneyStatus.Ready, _, None, _, _) =>
+        Future.failed(
+          new IllegalArgumentException("Cannot process Ready upload without uploadDetails")
+        )
+
+      case _ =>
+        Future.failed(
+          new IllegalArgumentException(
+            s"Cannot process upload unless status is Ready. Current status: ${fileUpload.status}"
+          )
         )
     }
 }

@@ -78,6 +78,7 @@ class StcRowValidationService {
       row.sellerAddressInUk match {
         case ParsedValue.Valid(true) =>
           requiredString(row.rowNumber, "sellerAddressLine1", row.sellerAddressLine1) ++
+            requiredString(row.rowNumber, "sellerAddressLine2", row.sellerAddressLine2) ++
             requiredString(row.rowNumber, "sellerPostcode", row.sellerPostcode)
         case _ =>
           Seq.empty

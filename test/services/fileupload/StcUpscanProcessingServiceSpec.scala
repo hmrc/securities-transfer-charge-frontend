@@ -130,12 +130,30 @@ class StcUpscanProcessingServiceSpec extends AnyWordSpec with Matchers with Eith
       result.left.value shouldBe parseError
     }
 
+    "fail when a ready upload is missing its downloadUrl" in {
+      val uploadMissingDownloadUrl = fileUpload.copy(downloadUrl = None)
+
+      val exception = service.process(uploadMissingDownloadUrl).failed.futureValue
+
+      exception shouldBe a[IllegalArgumentException]
+      exception.getMessage shouldBe "Cannot process Ready upload without a downloadUrl"
+    }
+
+    "fail when a ready upload is missing its uploadDetails" in {
+      val uploadMissingDetails = fileUpload.copy(uploadDetails = None)
+
+      val exception = service.process(uploadMissingDetails).failed.futureValue
+
+      exception shouldBe a[IllegalArgumentException]
+      exception.getMessage shouldBe "Cannot process Ready upload without uploadDetails"
+    }
+
     "fail when the upload status is not Ready" in {
       val initiatedUpload = fileUpload.copy(status = UpscanJourneyStatus.Initiated)
 
       val exception = service.process(initiatedUpload).failed.futureValue
 
-      exception shouldBe a[IllegalStateException]
+      exception shouldBe a[IllegalArgumentException]
       exception.getMessage shouldBe "Cannot process upload unless status is Ready. Current status: Initiated"
     }
 
@@ -144,7 +162,7 @@ class StcUpscanProcessingServiceSpec extends AnyWordSpec with Matchers with Eith
 
       val exception = service.process(failedUpload).failed.futureValue
 
-      exception shouldBe a[IllegalStateException]
+      exception shouldBe a[IllegalArgumentException]
       exception.getMessage shouldBe "Cannot process upload unless status is Ready. Current status: Failed"
     }
   }

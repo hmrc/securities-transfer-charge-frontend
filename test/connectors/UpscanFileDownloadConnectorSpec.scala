@@ -16,27 +16,23 @@
 
 package connectors
 
-import com.github.tomakehurst.wiremock.client.WireMock._
+import base.SpecBase
+import com.github.tomakehurst.wiremock.client.WireMock.*
 import org.scalatest.BeforeAndAfterAll
-import org.scalatest.concurrent.{IntegrationPatience, ScalaFutures}
-import org.scalatest.matchers.should.Matchers
 import org.scalatest.time.{Millis, Seconds, Span}
-import org.scalatest.wordspec.AnyWordSpec
 import play.api.Application
 import play.api.inject.guice.GuiceApplicationBuilder
-import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.securitiestransferchargefrontend.connectors.UpscanFileDownloadConnectorImpl
 import utils.WireMockHelper
 
 import java.io.InputStream
 import scala.io.Source
+import scala.util.Using
 
-class UpscanFileDownloadConnectorSpec extends AnyWordSpec with Matchers with ScalaFutures with IntegrationPatience with BeforeAndAfterAll with WireMockHelper {
+class UpscanFileDownloadConnectorSpec extends SpecBase with BeforeAndAfterAll with WireMockHelper {
 
   implicit override val patienceConfig: PatienceConfig =
     PatienceConfig(timeout = Span(5, Seconds), interval = Span(50, Millis))
-
-  implicit val hc: HeaderCarrier = HeaderCarrier()
 
   private lazy val app: Application =
     GuiceApplicationBuilder()
@@ -58,7 +54,7 @@ class UpscanFileDownloadConnectorSpec extends AnyWordSpec with Matchers with Sca
     super.afterAll()
   }
 
-  "download" should {
+  "download" - {
 
     "return an InputStream containing the downloaded bytes when the request succeeds" in {
       wireMockServer.stubFor(
@@ -73,9 +69,12 @@ class UpscanFileDownloadConnectorSpec extends AnyWordSpec with Matchers with Sca
       val result: InputStream =
         connector.download(s"http://localhost:$wireMockPort/file").futureValue
 
-      val content = Source.fromInputStream(result).mkString
+      val content =
+        Using.resource(result) { inputStream =>
+          Source.fromInputStream(inputStream).mkString
+        }
 
-      content shouldBe "hello world"
+      content mustBe "hello world"
     }
 
     "fail the future when the download endpoint returns an error status" in {
@@ -92,7 +91,7 @@ class UpscanFileDownloadConnectorSpec extends AnyWordSpec with Matchers with Sca
         connector.download(s"http://localhost:$wireMockPort/file").futureValue
       }
 
-      thrown.getMessage should include("500")
+      thrown.getMessage must include("500")
     }
   }
 }

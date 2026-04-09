@@ -104,7 +104,6 @@ class FileUploadedControllerSpec extends SpecBase with MockitoSugar {
 
         status(result) mustBe SEE_OTHER
         redirectLocation(result).value mustBe individualRoutes.FormattingErrorController.onPageLoad().url
-        flash(result).get("uploadParseError").value mustBe "Unsupported file type: application/pdf"
       }
     }
 
