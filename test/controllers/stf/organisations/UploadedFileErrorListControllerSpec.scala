@@ -20,9 +20,9 @@ import base.{Fixtures, SpecBase}
 import play.api.test.FakeRequest
 import play.api.test.Helpers.*
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.organisations.routes
-import uk.gov.hmrc.securitiestransferchargefrontend.views.html.stf.organisations.UploadedFileErrorView
+import uk.gov.hmrc.securitiestransferchargefrontend.views.html.stf.organisations.UploadedFileErrorListView
 
-class UploadedFileErrorControllerSpec extends SpecBase {
+class UploadedFileErrorListControllerSpec extends SpecBase {
 
   "UploadedFileError Controller" - {
 
@@ -31,11 +31,11 @@ class UploadedFileErrorControllerSpec extends SpecBase {
       val application = applicationBuilder(userAnswers = Some(emptyUserAnswers)).build()
 
       running(application) {
-        val request = FakeRequest(GET, routes.UploadedFileErrorController.onPageLoad().url)
+        val request = FakeRequest(GET, routes.UploadedFileErrorListController.onPageLoad().url)
 
         val result = route(application, request).value
 
-        val view = application.injector.instanceOf[UploadedFileErrorView]
+        val view = application.injector.instanceOf[UploadedFileErrorListView]
         
         status(result) mustEqual OK
         contentAsString(result) mustEqual view(Fixtures.uploadedFileErrors)(request, messages(application)).toString

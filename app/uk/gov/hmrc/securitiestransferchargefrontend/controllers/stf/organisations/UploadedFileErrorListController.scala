@@ -20,16 +20,16 @@ import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.actions.*
-import uk.gov.hmrc.securitiestransferchargefrontend.models.UploadedFileError
-import uk.gov.hmrc.securitiestransferchargefrontend.views.html.stf.organisations.UploadedFileErrorView
+import uk.gov.hmrc.securitiestransferchargefrontend.models.UploadedFileErrorList
+import uk.gov.hmrc.securitiestransferchargefrontend.views.html.stf.organisations.UploadedFileErrorListView
 
 import javax.inject.Inject
 
-class UploadedFileErrorController @Inject()(
+class UploadedFileErrorListController @Inject()(
                                              override val messagesApi: MessagesApi,
                                              stcAuthEnrolled: StcAuthEnrolledAction,
                                              val controllerComponents: MessagesControllerComponents,
-                                             view: UploadedFileErrorView,
+                                             view: UploadedFileErrorListView,
                                            ) extends FrontendBaseController with I18nSupport {
 
   def onPageLoad: Action[AnyContent] = stcAuthEnrolled {
@@ -37,17 +37,17 @@ class UploadedFileErrorController @Inject()(
       Ok(view(stubUploadedFileErrors))
   }
 
-  private def stubUploadedFileErrors: Seq[UploadedFileError] = {
+  private def stubUploadedFileErrors: Seq[UploadedFileErrorList] = {
     Seq(
-      UploadedFileError(
+      UploadedFileErrorList(
         cell = "J6",
         error = "The seller's name cannot contain numbers"
       ),
-      UploadedFileError(
+      UploadedFileErrorList(
         cell = "J36",
         error = "You have selected that the buyer is a company, you need to enter the registered address"
       ),
-      UploadedFileError(
+      UploadedFileErrorList(
         cell = "K3",
         error = "Buyer's country can only contain letters, numbers and hyphens"
       )

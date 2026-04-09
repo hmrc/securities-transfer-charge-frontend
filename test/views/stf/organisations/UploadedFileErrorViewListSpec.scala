@@ -21,7 +21,7 @@ import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
 import play.api.Application
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.routes
-import uk.gov.hmrc.securitiestransferchargefrontend.views.html.stf.organisations.UploadedFileErrorView
+import uk.gov.hmrc.securitiestransferchargefrontend.views.html.stf.organisations.UploadedFileErrorListView
 import views.ViewBaseSpec
 
 class UploadedFileErrorViewSpec extends ViewBaseSpec {
@@ -29,7 +29,7 @@ class UploadedFileErrorViewSpec extends ViewBaseSpec {
   override def fakeApplication(): Application =
     applicationBuilder().build()
 
-  private val viewInstance = app.injector.instanceOf[UploadedFileErrorView]
+  private val viewInstance = app.injector.instanceOf[UploadedFileErrorListView]
 
   def view(): Document =
     Jsoup.parse(
@@ -37,13 +37,13 @@ class UploadedFileErrorViewSpec extends ViewBaseSpec {
     )
 
   object ExpectedContent {
-    val title: String = messages("org.uploadedFileError.title")
-    val heading: String = messages("org.uploadedFileError.heading")
-    val paragraph: String = messages("org.uploadedFileError.p1")
+    val title: String = messages("org.uploadedFileErrorList.title")
+    val heading: String = messages("org.uploadedFileErrorList.heading")
+    val paragraph: String = messages("org.uploadedFileErrorList.p1")
 
-    val tableCaption: String = messages("org.uploadedFileError.table.heading")
-    val cellHeader: String = messages("org.uploadedFileError.table.cell")
-    val errorHeader: String = messages("org.uploadedFileError.table.error")
+    val tableCaption: String = messages("org.uploadedFileErrorList.table.heading")
+    val cellHeader: String = messages("org.uploadedFileErrorList.table.cell")
+    val errorHeader: String = messages("org.uploadedFileErrorList.table.error")
   }
 
   "UploadedFileErrorView" - {

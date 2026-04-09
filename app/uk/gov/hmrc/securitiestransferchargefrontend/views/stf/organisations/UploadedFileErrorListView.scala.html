@@ -14,7 +14,7 @@
  * limitations under the License.
  *@
 
-@import uk.gov.hmrc.securitiestransferchargefrontend.models.UploadedFileError
+@import uk.gov.hmrc.securitiestransferchargefrontend.models.UploadedFileErrorList
 @import uk.gov.hmrc.securitiestransferchargefrontend.controllers.routes
 @import uk.gov.hmrc.securitiestransferchargefrontend.views.html.templates
 @import uk.gov.hmrc.govukfrontend.views.viewmodels.table._
@@ -26,26 +26,26 @@
   govukTable: GovukTable
 )
 
-@(errors: Seq[UploadedFileError])(implicit request: Request[_], messages: Messages)
+@(errors: Seq[UploadedFileErrorList])(implicit request: Request[_], messages: Messages)
 
-@layout(pageTitle = titleNoForm(messages("org.uploadedFileError.title"))) {
+@layout(pageTitle = titleNoForm(messages("org.uploadedFileErrorList.title"))) {
 
   <h1 class="govuk-heading-l">
-    @messages("org.uploadedFileError.heading")
+    @messages("org.uploadedFileErrorList.heading")
   </h1>
 
   <p class="govuk-body">
-    @messages("org.uploadedFileError.p1")
+    @messages("org.uploadedFileErrorList.p1")
   </p>
 
   @govukTable(
     Table(
-      caption = Some(messages("org.uploadedFileError.table.heading")),
+      caption = Some(messages("org.uploadedFileErrorList.table.heading")),
       captionClasses = "govuk-table__caption--m",
       head = Some(
         Seq(
-          HeadCell(content = Text(messages("org.uploadedFileError.table.cell"))),
-          HeadCell(content = Text(messages("org.uploadedFileError.table.error")))
+          HeadCell(content = Text(messages("org.uploadedFileErrorList.table.cell"))),
+          HeadCell(content = Text(messages("org.uploadedFileErrorList.table.error")))
         )
       ),
       rows = errors.map { error =>

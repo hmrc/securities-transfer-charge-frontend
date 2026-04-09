@@ -25,7 +25,7 @@ import uk.gov.hmrc.auth.core.retrieve.Retrieval
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.securitiestransferchargefrontend.connectors.AlfAddressConnector
 import uk.gov.hmrc.securitiestransferchargefrontend.domain.{SubmissionId, SubscriptionId}
-import uk.gov.hmrc.securitiestransferchargefrontend.models.{AlfAddress, AlfConfirmedAddress, ConfirmableAddress, Country, UploadedFileError, UserAnswers}
+import uk.gov.hmrc.securitiestransferchargefrontend.models.{AlfAddress, AlfConfirmedAddress, ConfirmableAddress, Country, UploadedFileErrorList, UserAnswers}
 
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -80,10 +80,10 @@ object Fixtures {
     country = Some(Country("United Kingdom", "GB"))
   )
 
-  val uploadedFileErrors: Seq[UploadedFileError] = Seq(
-    UploadedFileError(cell = "J6", error = "The seller's name cannot contain numbers"),
-    UploadedFileError(cell = "J36", error = "You have selected that the buyer is a company, you need to enter the registered address"),
-    UploadedFileError(cell = "K3", error = "Buyer's country can only contain letters, numbers and hyphens")
+  val uploadedFileErrors: Seq[UploadedFileErrorList] = Seq(
+    UploadedFileErrorList(cell = "J6", error = "The seller's name cannot contain numbers"),
+    UploadedFileErrorList(cell = "J36", error = "You have selected that the buyer is a company, you need to enter the registered address"),
+    UploadedFileErrorList(cell = "K3", error = "Buyer's country can only contain letters, numbers and hyphens")
   )
 
   class FakeAuthConnectorSuccess(value: Any) extends AuthConnector {
