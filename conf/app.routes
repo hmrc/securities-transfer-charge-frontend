@@ -142,10 +142,10 @@ POST       /stf/org/select-relief                         uk.gov.hmrc.securities
 GET        /stf/org/change/select-relief                  uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.organisations.WhatReliefAreYouApplyingForController.onPageLoad(mode: Mode = CheckMode)
 POST       /stf/org/change/select-relief                  uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.organisations.WhatReliefAreYouApplyingForController.onSubmit(mode: Mode = CheckMode)
 
-GET        /stf/org/charging-point                 uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.organisations.ChargingPointController.onPageLoad(mode: Mode = NormalMode)
-POST       /stf/org/charging-point                 uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.organisations.ChargingPointController.onSubmit(mode: Mode = NormalMode)
-GET        /stf/org/change/charging-point          uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.organisations.ChargingPointController.onPageLoad(mode: Mode = CheckMode)
-POST       /stf/org/change/charging-point          uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.organisations.ChargingPointController.onSubmit(mode: Mode = CheckMode)
+GET        /stf/org/charging-point                        uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.organisations.ChargingPointController.onPageLoad(mode: Mode = NormalMode)
+POST       /stf/org/charging-point                        uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.organisations.ChargingPointController.onSubmit(mode: Mode = NormalMode)
+GET        /stf/org/change/charging-point                 uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.organisations.ChargingPointController.onPageLoad(mode: Mode = CheckMode)
+POST       /stf/org/change/charging-point                 uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.organisations.ChargingPointController.onSubmit(mode: Mode = CheckMode)
 
 GET        /stf/org/tax-rate                              uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.organisations.TaxRateController.onPageLoad(mode: Mode = NormalMode)
 POST       /stf/org/tax-rate                              uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.organisations.TaxRateController.onSubmit(mode: Mode = NormalMode)
