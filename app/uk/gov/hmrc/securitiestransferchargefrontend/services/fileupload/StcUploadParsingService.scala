@@ -28,10 +28,16 @@ class StcUploadParsingService @Inject()(
                                        ) {
 
   def parse(uploadedFile: UploadedFile): Either[FileParseError, Seq[ParsedStcRow]] =
-    fileParsingService.parse(uploadedFile).map { parsedFile =>
-      parsedFile.rows
-        .filter(_.rowNumber >= fileUploadConfig.firstDataRow)
-        .filterNot(_.isCompletelyEmpty)
-        .map(stcRowMapper.map)
+    fileParsingService.parse(uploadedFile).flatMap { parsedFile =>
+      val dataRows =
+        parsedFile.rows
+          .filter(_.rowNumber >= fileUploadConfig.firstDataRow)
+          .filterNot(_.isCompletelyEmpty)
+
+      if (dataRows.isEmpty) {
+        Left(FileParseError.EmptyFile)
+      } else {
+        Right(dataRows.map(stcRowMapper.map))
+      }
     }
 }
