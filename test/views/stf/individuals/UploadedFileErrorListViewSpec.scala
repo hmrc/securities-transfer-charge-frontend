@@ -24,7 +24,7 @@ import uk.gov.hmrc.securitiestransferchargefrontend.controllers.routes
 import uk.gov.hmrc.securitiestransferchargefrontend.views.html.stf.individuals.UploadedFileErrorListView
 import views.ViewBaseSpec
 
-class UploadedFileErrorViewListSpec extends ViewBaseSpec {
+class UploadedFileErrorListViewSpec extends ViewBaseSpec {
 
   override def fakeApplication(): Application =
     applicationBuilder().build()
