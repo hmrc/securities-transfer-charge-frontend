@@ -50,11 +50,9 @@ class ExcelFileParser @Inject()(config: FileUploadConfig) extends FileParser {
             Left(RowLimitExceeded(rows.size, config.maxRows))
           } else {
             val parsedRows = rows.zipWithIndex.map { case (row, index) =>
-              val lastCellNum = Math.max(row.getLastCellNum.toInt, 0)
-
               ParsedRow(
                 rowNumber = index + 1,
-                cells = (0 until lastCellNum).map { cellIndex =>
+                cells = (0 until config.maxColumns).map { cellIndex =>
                   val rawValue = Option(row.getCell(cellIndex))
                     .map(extractCellValue)
                     .getOrElse("")
@@ -101,7 +99,9 @@ class ExcelFileParser @Inject()(config: FileUploadConfig) extends FileParser {
 
       case CellType.FORMULA =>
         cell.getCachedFormulaResultType match {
-          case CellType.STRING  => cell.getStringCellValue
+          case CellType.STRING =>
+            cell.getStringCellValue
+
           case CellType.NUMERIC =>
             if (DateUtil.isCellDateFormatted(cell)) {
               cell.getDateCellValue.toInstant
@@ -111,8 +111,12 @@ class ExcelFileParser @Inject()(config: FileUploadConfig) extends FileParser {
             } else {
               BigDecimal(cell.getNumericCellValue).bigDecimal.stripTrailingZeros.toPlainString
             }
-          case CellType.BOOLEAN => cell.getBooleanCellValue.toString
-          case _                => ""
+
+          case CellType.BOOLEAN =>
+            cell.getBooleanCellValue.toString
+
+          case _ =>
+            ""
         }
 
       case CellType.BLANK =>

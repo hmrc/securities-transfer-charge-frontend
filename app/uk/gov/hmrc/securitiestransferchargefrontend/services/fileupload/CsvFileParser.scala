@@ -46,10 +46,12 @@ class CsvFileParser @Inject()(config: FileUploadConfig) extends FileParser {
           Left(RowLimitExceeded(records.size, config.maxRows))
         } else {
           val rows = records.zipWithIndex.map { case (record, index) =>
+            val values = record.iterator().asScala.toSeq
+
             ParsedRow(
               rowNumber = index + 1,
-              cells = record.iterator().asScala.toSeq.zipWithIndex.map { case (value, colIndex) =>
-                ParsedCell(colIndex, Option(value).getOrElse("").trim)
+              cells = (0 until config.maxColumns).map { colIndex =>
+                ParsedCell(colIndex, values.lift(colIndex).getOrElse("").trim)
               }
             )
           }

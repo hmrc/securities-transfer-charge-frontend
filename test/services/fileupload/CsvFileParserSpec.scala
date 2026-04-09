@@ -22,11 +22,13 @@ import org.scalatest.wordspec.AnyWordSpec
 import uk.gov.hmrc.securitiestransferchargefrontend.models.fileupload.FileParseError.RowLimitExceeded
 import uk.gov.hmrc.securitiestransferchargefrontend.models.fileupload.{ParsedCell, UploadedFile}
 import uk.gov.hmrc.securitiestransferchargefrontend.services.fileupload.CsvFileParser
+
 import java.io.ByteArrayInputStream
 import java.nio.charset.StandardCharsets
 
 class CsvFileParserSpec extends AnyWordSpec with Matchers with EitherValues {
 
+  private val maxColumns = 27
   private val parser = new CsvFileParser(TestFileUploadConfig.config())
 
   private def uploadedFile(csv: String): UploadedFile =
@@ -35,6 +37,9 @@ class CsvFileParserSpec extends AnyWordSpec with Matchers with EitherValues {
       mimeType = "text/csv",
       inputStream = new ByteArrayInputStream(csv.getBytes(StandardCharsets.UTF_8))
     )
+
+  private def blankCells(fromIndex: Int): Seq[ParsedCell] =
+    (fromIndex until maxColumns).map(index => ParsedCell(index, ""))
 
   "parse" should {
 
@@ -56,14 +61,21 @@ class CsvFileParserSpec extends AnyWordSpec with Matchers with EitherValues {
         ParsedCell(0, "name"),
         ParsedCell(1, "amount"),
         ParsedCell(2, "date")
-      )
+      ) ++ blankCells(fromIndex = 3)
 
       result.rows(1).rowNumber shouldBe 2
       result.rows(1).cells shouldBe Seq(
         ParsedCell(0, "Bill"),
         ParsedCell(1, "100"),
         ParsedCell(2, "2026-03-23")
-      )
+      ) ++ blankCells(fromIndex = 3)
+
+      result.rows(2).rowNumber shouldBe 3
+      result.rows(2).cells shouldBe Seq(
+        ParsedCell(0, "Bob"),
+        ParsedCell(1, "200"),
+        ParsedCell(2, "2026-03-24")
+      ) ++ blankCells(fromIndex = 3)
     }
 
     "handle quoted commas correctly" in {
@@ -77,7 +89,7 @@ class CsvFileParserSpec extends AnyWordSpec with Matchers with EitherValues {
       result.rows(1).cells shouldBe Seq(
         ParsedCell(0, "Bill"),
         ParsedCell(1, "1, High Street")
-      )
+      ) ++ blankCells(fromIndex = 2)
     }
 
     "trim surrounding whitespace from values" in {
@@ -91,7 +103,46 @@ class CsvFileParserSpec extends AnyWordSpec with Matchers with EitherValues {
       result.rows(1).cells shouldBe Seq(
         ParsedCell(0, "Bill"),
         ParsedCell(1, "100")
-      )
+      ) ++ blankCells(fromIndex = 2)
+    }
+
+    "pad missing trailing columns with blank cells up to the configured maximum" in {
+      val csv =
+        """name
+          |Bill
+          |""".stripMargin
+
+      val result = parser.parse(uploadedFile(csv)).value
+
+      result.rows.head.cells shouldBe Seq(
+        ParsedCell(0, "name")
+      ) ++ blankCells(fromIndex = 1)
+
+      result.rows(1).cells shouldBe Seq(
+        ParsedCell(0, "Bill")
+      ) ++ blankCells(fromIndex = 1)
+    }
+
+    "ignore columns beyond the first 27" in {
+      val header = (1 to 30).map(i => s"col$i").mkString(",")
+      val row = (1 to 30).map(i => s"value$i").mkString(",")
+      val csv =
+        s"""$header
+           |$row
+           |""".stripMargin
+
+      val result = parser.parse(uploadedFile(csv)).value
+
+      result.rows.head.cells should have size maxColumns
+      result.rows(1).cells should have size maxColumns
+
+      result.rows.head.cells shouldBe (0 until maxColumns).map { index =>
+        ParsedCell(index, s"col${index + 1}")
+      }
+
+      result.rows(1).cells shouldBe (0 until maxColumns).map { index =>
+        ParsedCell(index, s"value${index + 1}")
+      }
     }
 
     "return RowLimitExceeded when the row count exceeds the configured maximum" in {

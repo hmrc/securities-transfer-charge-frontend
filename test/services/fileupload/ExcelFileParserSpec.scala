@@ -23,12 +23,15 @@ import org.scalatest.wordspec.AnyWordSpec
 import uk.gov.hmrc.securitiestransferchargefrontend.models.fileupload.FileParseError.RowLimitExceeded
 import uk.gov.hmrc.securitiestransferchargefrontend.models.fileupload.{ParsedCell, UploadedFile}
 import uk.gov.hmrc.securitiestransferchargefrontend.services.fileupload.ExcelFileParser
+
 import java.io.{ByteArrayInputStream, ByteArrayOutputStream}
-import java.time.LocalDate
-import java.time.ZoneId
+import java.time.{LocalDate, ZoneId}
 import java.util.Date
 
 class ExcelFileParserSpec extends AnyWordSpec with Matchers with EitherValues {
+
+  private val maxColumns = 27
+  private val parser = new ExcelFileParser(TestFileUploadConfig.config())
 
   private def workbookBytes(build: XSSFWorkbook => Unit): Array[Byte] = {
     val workbook = new XSSFWorkbook()
@@ -48,6 +51,9 @@ class ExcelFileParserSpec extends AnyWordSpec with Matchers with EitherValues {
       mimeType = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
       inputStream = new ByteArrayInputStream(bytes)
     )
+
+  private def blankCells(fromIndex: Int): Seq[ParsedCell] =
+    (fromIndex until maxColumns).map(index => ParsedCell(index, ""))
 
   "parse" should {
 
@@ -71,14 +77,49 @@ class ExcelFileParserSpec extends AnyWordSpec with Matchers with EitherValues {
         dateCell.setCellStyle(dateStyle)
       }
 
-      val parser = new ExcelFileParser(TestFileUploadConfig.config())
       val result = parser.parse(uploadedFile(bytes)).value
 
       result.rows.size shouldBe 1
-      result.rows.head.cells(0) shouldBe ParsedCell(0, "Bob")
-      result.rows.head.cells(1) shouldBe ParsedCell(1, "123.45")
-      result.rows.head.cells(2) shouldBe ParsedCell(2, "true")
-      result.rows.head.cells(3).rawValue shouldBe "2026-03-23"
+      result.rows.head.cells shouldBe Seq(
+        ParsedCell(0, "Bob"),
+        ParsedCell(1, "123.45"),
+        ParsedCell(2, "true"),
+        ParsedCell(3, "2026-03-23")
+      ) ++ blankCells(fromIndex = 4)
+    }
+
+    "pad missing trailing columns with blank cells up to the configured maximum" in {
+      val bytes = workbookBytes { workbook =>
+        val sheet = workbook.createSheet("Sheet1")
+        val row = sheet.createRow(0)
+
+        row.createCell(0).setCellValue("Bob")
+      }
+
+      val result = parser.parse(uploadedFile(bytes)).value
+
+      result.rows.head.cells shouldBe Seq(
+        ParsedCell(0, "Bob")
+      ) ++ blankCells(fromIndex = 1)
+    }
+
+    "ignore columns beyond the first 27" in {
+      val bytes = workbookBytes { workbook =>
+        val sheet = workbook.createSheet("Sheet1")
+        val row = sheet.createRow(0)
+
+        (0 until 30).foreach { index =>
+          row.createCell(index).setCellValue(s"value${index + 1}")
+        }
+      }
+
+      val result = parser.parse(uploadedFile(bytes)).value
+
+      result.rows.size shouldBe 1
+      result.rows.head.cells should have size maxColumns
+      result.rows.head.cells shouldBe (0 until maxColumns).map { index =>
+        ParsedCell(index, s"value${index + 1}")
+      }
     }
 
     "return RowLimitExceeded when the row count exceeds the configured maximum" in {
