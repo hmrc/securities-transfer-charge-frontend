@@ -14,22 +14,22 @@
  * limitations under the License.
  */
 
-package views.stf.individuals
+package views.stf.organisations
 
 import base.Fixtures
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
 import play.api.Application
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.routes
-import uk.gov.hmrc.securitiestransferchargefrontend.views.html.stf.individuals.UploadedFileErrorListView
+import uk.gov.hmrc.securitiestransferchargefrontend.views.html.stf.organisations.UploadedFileErrorView
 import views.ViewBaseSpec
 
-class UploadedFileErrorListViewSpec extends ViewBaseSpec {
+class UploadedFileErrorViewSpec extends ViewBaseSpec {
 
   override def fakeApplication(): Application =
     applicationBuilder().build()
 
-  private val viewInstance = app.injector.instanceOf[UploadedFileErrorListView]
+  private val viewInstance = app.injector.instanceOf[UploadedFileErrorView]
 
   def view(): Document =
     Jsoup.parse(
@@ -37,13 +37,13 @@ class UploadedFileErrorListViewSpec extends ViewBaseSpec {
     )
 
   object ExpectedContent {
-    val title: String = "There is a problem with your uploaded file"
-    val heading: String = "There is a problem with your uploaded file"
-    val paragraph: String = "Correct the errors and upload it again, or upload a different file."
+    val title: String = messages("uploadedFileErrorList.title")
+    val heading: String = messages("uploadedFileErrorList.heading")
+    val paragraph: String = messages("uploadedFileErrorList.p1")
 
-    val tableCaption: String = "Problems with your file"
-    val cellHeader: String = "Cell"
-    val errorHeader: String = "Error"
+    val tableCaption: String = messages("uploadedFileErrorList.table.heading")
+    val cellHeader: String = messages("uploadedFileErrorList.table.cell")
+    val errorHeader: String = messages("uploadedFileErrorList.table.error")
   }
 
   "UploadedFileErrorView" - {

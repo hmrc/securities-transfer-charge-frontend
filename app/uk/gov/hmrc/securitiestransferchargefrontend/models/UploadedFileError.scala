@@ -16,4 +16,4 @@
 
 package uk.gov.hmrc.securitiestransferchargefrontend.models
 
-case class UploadedFileErrorList(cell:String,error:String)
+case class UploadedFileError(cell:String,error:String)

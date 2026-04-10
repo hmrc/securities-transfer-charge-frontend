@@ -370,9 +370,9 @@ changedFileError.p3 = Remember, do not edit the first two rows of the template, 
 changedFileError.download.text = Download the template file
 fileUpload.upload.another = Upload a different file
 
-uploadedFileErrorList.title = There is a problem with your uploaded file
-uploadedFileErrorList.heading = There is a problem with your uploaded file
-uploadedFileErrorList.p1 = Correct the errors and upload it again, or upload a different file.
-uploadedFileErrorList.table.heading = Problems with your file
-uploadedFileErrorList.table.cell = Cell
-uploadedFileErrorList.table.error = Error
+uploadedFileError.title = There is a problem with your uploaded file
+uploadedFileError.heading = There is a problem with your uploaded file
+uploadedFileError.p1 = Correct the errors and upload it again, or upload a different file.
+uploadedFileError.table.heading = Problems with your file
+uploadedFileError.table.cell = Cell
+uploadedFileError.table.error = Error

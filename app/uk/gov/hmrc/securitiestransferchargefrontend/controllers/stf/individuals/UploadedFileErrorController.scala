@@ -20,16 +20,16 @@ import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.actions.*
-import uk.gov.hmrc.securitiestransferchargefrontend.models.UploadedFileErrorList
-import uk.gov.hmrc.securitiestransferchargefrontend.views.html.stf.individuals.UploadedFileErrorListView
+import uk.gov.hmrc.securitiestransferchargefrontend.models.UploadedFileError
+import uk.gov.hmrc.securitiestransferchargefrontend.views.html.stf.individuals.UploadedFileErrorView
 
 import javax.inject.Inject
 
-class UploadedFileErrorListController @Inject()(
+class UploadedFileErrorController @Inject()(
                                        override val messagesApi: MessagesApi,
                                        stcAuthEnrolled: StcAuthEnrolledAction,
                                        val controllerComponents: MessagesControllerComponents,
-                                       view: UploadedFileErrorListView
+                                       view: UploadedFileErrorView
                                      ) extends FrontendBaseController with I18nSupport {
 
   def onPageLoad: Action[AnyContent] = stcAuthEnrolled {
@@ -37,17 +37,17 @@ class UploadedFileErrorListController @Inject()(
       Ok(view(stubUploadedFileErrors))
   }
 
-  private def stubUploadedFileErrors: Seq[UploadedFileErrorList] = {
+  private def stubUploadedFileErrors: Seq[UploadedFileError] = {
     Seq(
-      UploadedFileErrorList(
+      UploadedFileError(
         cell = "J6",
         error = "The seller's name cannot contain numbers"
       ),
-      UploadedFileErrorList(
+      UploadedFileError(
         cell = "J36",
         error = "You have selected that the buyer is a company, you need to enter the registered address"
       ),
-      UploadedFileErrorList(
+      UploadedFileError(
         cell = "K3",
         error = "Buyer's country can only contain letters, numbers and hyphens"
       )
