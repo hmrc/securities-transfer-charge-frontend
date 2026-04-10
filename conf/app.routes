@@ -99,18 +99,8 @@ POST       /stf/consideration                             uk.gov.hmrc.securities
 GET        /stf/change/consideration                      uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.individuals.single.AmountPaidForSecuritiesController.onPageLoad(mode: Mode = CheckMode)
 POST       /stf/change/consideration                      uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.individuals.single.AmountPaidForSecuritiesController.onSubmit(mode: Mode = CheckMode)
 
-GET        /stf/template                                  uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.individuals.bulk.TemplateInstructionsController.onPageLoad()
-GET        /stf/bulk-error                                uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.individuals.bulk.FormattingErrorController.onPageLoad()
-GET        /stf/bulk-formatting                           uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.individuals.bulk.ChangedFileErrorController.onPageLoad()
-GET        /stf/bulk-empty                                uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.individuals.bulk.EmptyFileErrorController.onPageLoad()
-GET        /stf/file-upload                               uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.individuals.bulk.FileUploadController.onPageLoad()
-GET        /stf/file-uploaded                             uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.individuals.bulk.FileUploadedController.onPageLoad(key:String)
-GET        /stf/file-upload/problem                      uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.individuals.bulk.FileUploadController.onUploadError()
-POST       /stf/upscan-callback                            uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.individuals.bulk.UpscanCallbackController.callback()
-
 GET        /stf/org/confirm-address                       uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.organisations.single.ConfirmAddressController.onPageLoad()
 POST       /stf/org/confirm-address                       uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.organisations.single.ConfirmAddressController.onSubmit()
-
 
 GET        /stf/org/address                               uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.organisations.single.AddressController.onPageLoad()
 GET        /stf/org/address/return                        uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.organisations.single.AddressController.onReturn(id: String)
@@ -143,10 +133,10 @@ POST       /stf/org/select-relief                         uk.gov.hmrc.securities
 GET        /stf/org/change/select-relief                  uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.organisations.single.WhatReliefAreYouApplyingForController.onPageLoad(mode: Mode = CheckMode)
 POST       /stf/org/change/select-relief                  uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.organisations.single.WhatReliefAreYouApplyingForController.onSubmit(mode: Mode = CheckMode)
 
-GET        /stf/org/charging-point                 uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.organisations.single.ChargingPointController.onPageLoad(mode: Mode = NormalMode)
-POST       /stf/org/charging-point                 uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.organisations.single.ChargingPointController.onSubmit(mode: Mode = NormalMode)
-GET        /stf/org/change/charging-point          uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.organisations.single.ChargingPointController.onPageLoad(mode: Mode = CheckMode)
-POST       /stf/org/change/charging-point          uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.organisations.single.ChargingPointController.onSubmit(mode: Mode = CheckMode)
+GET        /stf/org/charging-point                        uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.organisations.single.ChargingPointController.onPageLoad(mode: Mode = NormalMode)
+POST       /stf/org/charging-point                        uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.organisations.single.ChargingPointController.onSubmit(mode: Mode = NormalMode)
+GET        /stf/org/change/charging-point                 uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.organisations.single.ChargingPointController.onPageLoad(mode: Mode = CheckMode)
+POST       /stf/org/change/charging-point                 uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.organisations.single.ChargingPointController.onSubmit(mode: Mode = CheckMode)
 
 GET        /stf/org/tax-rate                              uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.organisations.single.TaxRateController.onPageLoad(mode: Mode = NormalMode)
 POST       /stf/org/tax-rate                              uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.organisations.single.TaxRateController.onSubmit(mode: Mode = NormalMode)
@@ -183,6 +173,18 @@ POST       /stf/org/total-market-value                    uk.gov.hmrc.securities
 GET        /stf/org/change/total-market-value             uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.organisations.single.TotalMarketValueController.onPageLoad(mode: Mode = CheckMode)
 POST       /stf/org/change/total-market-value             uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.organisations.single.TotalMarketValueController.onSubmit(mode: Mode = CheckMode)
 
+
+GET        /stf/template                                  uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.individuals.bulk.TemplateInstructionsController.onPageLoad()
+
+GET        /stf/bulk-error                                uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.individuals.bulk.FormattingErrorController.onPageLoad()
+GET        /stf/bulk-formatting                           uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.individuals.bulk.ChangedFileErrorController.onPageLoad()
+GET        /stf/bulk-empty                                uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.individuals.bulk.EmptyFileErrorController.onPageLoad()
 GET        /stf/bulk-error-list                           uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.individuals.bulk.UploadedFileErrorController.onPageLoad()
+
+GET        /stf/file-upload                               uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.individuals.bulk.FileUploadController.onPageLoad()
+GET        /stf/file-uploaded                             uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.individuals.bulk.FileUploadedController.onPageLoad(key:String)
+GET        /stf/file-upload/problem                       uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.individuals.bulk.FileUploadController.onUploadError()
+POST       /stf/upscan-callback                           uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.individuals.bulk.UpscanCallbackController.callback()
+
 GET        /stf/org/bulk-error-list                       uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.organisations.bulk.UploadedFileErrorController.onPageLoad()
 GET        /stf/org/bulk-error                            uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.organisations.bulk.FormattingErrorController.onPageLoad()
