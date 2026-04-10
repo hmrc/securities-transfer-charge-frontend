@@ -192,3 +192,4 @@ POST       /stf/upscan-callback                          uk.gov.hmrc.securitiest
 GET        /stf/bulk-error-list                          uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.individuals.UploadedFileErrorController.onPageLoad()
 
 GET        /stf/org/bulk-error-list                      uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.organisations.UploadedFileErrorController.onPageLoad()
+GET        /stf/org/bulk-error                                uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.organisations.FormattingErrorController.onPageLoad()
