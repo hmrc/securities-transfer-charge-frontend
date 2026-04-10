@@ -18,15 +18,18 @@ package controllers.stf.individuals
 
 import base.SpecBase
 import org.mockito.ArgumentMatchers.any
-import org.mockito.Mockito.*
+import org.mockito.Mockito.when
 import org.scalatestplus.mockito.MockitoSugar
+import play.api.{Application, inject}
 import play.api.test.FakeRequest
 import play.api.test.Helpers.*
-import play.api.{Application, inject}
+import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.routes
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.individuals.routes as individualRoutes
+import uk.gov.hmrc.securitiestransferchargefrontend.models.fileupload.{FileParseError, StcFileValidationResponse}
 import uk.gov.hmrc.securitiestransferchargefrontend.models.upscan.{FileUpload, UpscanJourneyStatus}
 import uk.gov.hmrc.securitiestransferchargefrontend.repositories.UpscanJourneyRepository
+import uk.gov.hmrc.securitiestransferchargefrontend.services.fileupload.StcUpscanProcessingService
 import uk.gov.hmrc.securitiestransferchargefrontend.views.html.FileUploadedView
 
 import scala.concurrent.Future
@@ -34,6 +37,7 @@ import scala.concurrent.Future
 class FileUploadedControllerSpec extends SpecBase with MockitoSugar {
 
   private val mockRepository = mock[UpscanJourneyRepository]
+  private val mockStcUpscanProcessingService = mock[StcUpscanProcessingService]
 
   private val testKey = "test-key"
 
@@ -46,10 +50,15 @@ class FileUploadedControllerSpec extends SpecBase with MockitoSugar {
     message = None
   )
 
+  private val validationResponse = StcFileValidationResponse(
+    rows = Seq.empty
+  )
+
   private def application: Application =
     applicationBuilder()
       .overrides(
-        inject.bind[UpscanJourneyRepository].toInstance(mockRepository)
+        inject.bind[UpscanJourneyRepository].toInstance(mockRepository),
+        inject.bind[StcUpscanProcessingService].toInstance(mockStcUpscanProcessingService)
       )
       .build()
 
@@ -58,24 +67,63 @@ class FileUploadedControllerSpec extends SpecBase with MockitoSugar {
 
   "FileUploadedController" - {
 
-    "must return OK and the correct view when file upload is found" in {
+    "must return OK and the correct view when file upload is found and processing succeeds" in {
 
       when(mockRepository.find(any()))
         .thenReturn(Future.successful(Some(testFileUpload)))
 
+      when(mockStcUpscanProcessingService.process(any())(any[HeaderCarrier]))
+        .thenReturn(Future.successful(Right(validationResponse)))
+
       val app = application
 
       running(app) {
-
         val request = FakeRequest(GET, fileUploadedRoute(testKey))
-
-        val result = route(app, request).value
+        val result  = route(app, request).value
 
         val view = app.injector.instanceOf[FileUploadedView]
 
         status(result) mustBe OK
-        contentAsString(result) mustBe
-          view(testFileUpload)(request, messages(app)).toString
+        contentAsString(result) mustBe view(testFileUpload)(request, messages(app)).toString
+      }
+    }
+
+    "must redirect to the formatting error page when file upload is found and processing returns a parse error" in {
+
+      when(mockRepository.find(any()))
+        .thenReturn(Future.successful(Some(testFileUpload)))
+
+      when(mockStcUpscanProcessingService.process(any())(any[HeaderCarrier]))
+        .thenReturn(Future.successful(Left(FileParseError.UnsupportedMimeType("application/pdf"))))
+
+      val app = application
+
+      running(app) {
+        val request = FakeRequest(GET, fileUploadedRoute(testKey))
+        val result  = route(app, request).value
+
+        status(result) mustBe SEE_OTHER
+        redirectLocation(result).value mustBe individualRoutes.FormattingErrorController.onPageLoad().url
+      }
+    }
+
+    "must return OK and the correct view when file upload is found but is not ready" in {
+
+      val initiatedUpload = testFileUpload.copy(status = UpscanJourneyStatus.Initiated)
+
+      when(mockRepository.find(any()))
+        .thenReturn(Future.successful(Some(initiatedUpload)))
+
+      val app = application
+
+      running(app) {
+        val request = FakeRequest(GET, fileUploadedRoute(testKey))
+        val result  = route(app, request).value
+
+        val view = app.injector.instanceOf[FileUploadedView]
+
+        status(result) mustBe OK
+        contentAsString(result) mustBe view(initiatedUpload)(request, messages(app)).toString
       }
     }
 
@@ -87,10 +135,8 @@ class FileUploadedControllerSpec extends SpecBase with MockitoSugar {
       val app = application
 
       running(app) {
-
         val request = FakeRequest(GET, fileUploadedRoute(testKey))
-
-        val result = route(app, request).value
+        val result  = route(app, request).value
 
         status(result) mustBe SEE_OTHER
         redirectLocation(result).value mustBe routes.JourneyRecoveryController.onPageLoad().url

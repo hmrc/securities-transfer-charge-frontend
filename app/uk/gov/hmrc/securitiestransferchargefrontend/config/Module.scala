@@ -29,6 +29,7 @@ import uk.gov.hmrc.securitiestransferchargefrontend.navigation.stf.organisations
 import uk.gov.hmrc.securitiestransferchargefrontend.navigation.{Navigator, PersistentNavigator}
 import uk.gov.hmrc.securitiestransferchargefrontend.repositories.{SessionRepository, SessionRepositoryImpl, SubscriptionDataRepository, SubscriptionDataRepositoryImpl, UpscanJourneyRepository, UpscanJourneyRepositoryImpl}
 import uk.gov.hmrc.securitiestransferchargefrontend.services.*
+import uk.gov.hmrc.securitiestransferchargefrontend.services.fileupload.*
 
 import java.time.{Clock, ZoneOffset}
 
@@ -57,9 +58,12 @@ class Module extends AbstractModule {
     bind(classOf[SubscriptionDataRepository]).to(classOf[SubscriptionDataRepositoryImpl])
     bind(classOf[SubscriptionConnector]).to(classOf[SubscriptionConnectorImpl])
     bind(classOf[UpscanInitiateConnector]).to(classOf[UpscanInitiateConnectorImpl])
+    bind(classOf[UpscanFileDownloadConnector]).to(classOf[UpscanFileDownloadConnectorImpl])
     bind(classOf[UpscanJourneyRepository]).to(classOf[UpscanJourneyRepositoryImpl])
     bind(classOf[RegistrationClient]).to(classOf[RegistrationClientImpl]).asEagerSingleton()
     bind(classOf[AnswerPersistenceService]).to(classOf[AnswerPersistenceServiceImpl])
+    bind(classOf[UpscanFileDownloadService]).to(classOf[UpscanFileDownloadServiceImpl])
+    bind(classOf[StcUpscanProcessingService]).to(classOf[StcUpscanProcessingServiceImpl])
     bind(classOf[Navigator])
       .annotatedWith(Names.named("organisations"))
       .to(classOf[StfOrgNavigator])
