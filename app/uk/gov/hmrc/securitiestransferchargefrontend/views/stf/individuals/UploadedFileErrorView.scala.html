@@ -20,25 +20,25 @@
 @import uk.gov.hmrc.govukfrontend.views.viewmodels.table._
 
 @this(
-  layout: templates.Layout,
-  formHelper: FormWithCSRF,
-  govukButton: GovukButton,
-  govukTable: GovukTable
+    layout: templates.Layout,
+    formHelper: FormWithCSRF,
+    govukButton: GovukButton,
+    govukTable: GovukTable
 )
 
 @(errors: Seq[UploadedFileError])(implicit request: Request[_], messages: Messages)
 
 @layout(pageTitle = titleNoForm(messages("uploadedFileError.title"))) {
 
-  <h1 class="govuk-heading-l">
-    @messages("uploadedFileError.heading")
-  </h1>
+    <h1 class="govuk-heading-l">
+        @messages("uploadedFileError.heading")
+    </h1>
 
-  <p class="govuk-body">
-    @messages("uploadedFileError.p1")
-  </p>
+    <p class="govuk-body">
+        @messages("uploadedFileError.p1")
+    </p>
 
-  @govukTable(
+    @govukTable(
     Table(
       caption = Some(messages("uploadedFileError.table.heading")),
       captionClasses = "govuk-table__caption--m",
@@ -62,5 +62,6 @@
       ButtonViewModel(messages("site.back-to-upload.button"))
     )
   }
+
 
 }

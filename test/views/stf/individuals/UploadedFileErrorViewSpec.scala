@@ -14,14 +14,14 @@
  * limitations under the License.
  */
 
-package views.stf.organisations
+package views.stf.individuals
 
 import base.Fixtures
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
 import play.api.Application
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.routes
-import uk.gov.hmrc.securitiestransferchargefrontend.views.html.stf.organisations.UploadedFileErrorView
+import uk.gov.hmrc.securitiestransferchargefrontend.views.html.stf.individuals.UploadedFileErrorView
 import views.ViewBaseSpec
 
 class UploadedFileErrorViewSpec extends ViewBaseSpec {
@@ -37,13 +37,13 @@ class UploadedFileErrorViewSpec extends ViewBaseSpec {
     )
 
   object ExpectedContent {
-    val title: String = messages("uploadedFileError.title")
-    val heading: String = messages("uploadedFileError.heading")
-    val paragraph: String = messages("uploadedFileError.p1")
+    val title: String = "There is a problem with your uploaded file"
+    val heading: String = "There is a problem with your uploaded file"
+    val paragraph: String = "Correct the errors and upload it again, or upload a different file."
 
-    val tableCaption: String = messages("uploadedFileError.table.heading")
-    val cellHeader: String = messages("uploadedFileError.table.cell")
-    val errorHeader: String = messages("uploadedFileError.table.error")
+    val tableCaption: String = "Problems with your file"
+    val cellHeader: String = "Cell"
+    val errorHeader: String = "Error"
   }
 
   "UploadedFileErrorView" - {
