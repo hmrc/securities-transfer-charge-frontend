@@ -87,7 +87,7 @@ POST       /stf/share-details                             uk.gov.hmrc.securities
 GET        /stf/change/share-details                      uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.individuals.single.DetailsOfThisTransferController.onPageLoad(mode: Mode = CheckMode)
 POST       /stf/change/share-details                      uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.individuals.single.DetailsOfThisTransferController.onSubmit(mode: Mode = CheckMode)
 
-GET        /drafts/return/:submissionId                    uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.shared.SaveAndReturnController.restore(submissionId: String)
+GET        /drafts/return/:submissionId                   uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.shared.SaveAndReturnController.restore(submissionId: String)
 
 GET        /stf/total-market-value                        uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.individuals.single.TotalMarketValueController.onPageLoad(mode: Mode = NormalMode)
 POST       /stf/total-market-value                        uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.individuals.single.TotalMarketValueController.onSubmit(mode: Mode = NormalMode)
@@ -182,3 +182,7 @@ GET        /stf/org/total-market-value                    uk.gov.hmrc.securities
 POST       /stf/org/total-market-value                    uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.organisations.single.TotalMarketValueController.onSubmit(mode: Mode = NormalMode)
 GET        /stf/org/change/total-market-value             uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.organisations.single.TotalMarketValueController.onPageLoad(mode: Mode = CheckMode)
 POST       /stf/org/change/total-market-value             uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.organisations.single.TotalMarketValueController.onSubmit(mode: Mode = CheckMode)
+
+GET        /stf/bulk-error-list                          uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.individuals.UploadedFileErrorController.onPageLoad()
+GET        /stf/org/bulk-error-list                      uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.organisations.UploadedFileErrorController.onPageLoad()
+GET        /stf/org/bulk-error                                uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.organisations.FormattingErrorController.onPageLoad()

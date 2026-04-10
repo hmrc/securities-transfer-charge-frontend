@@ -17,8 +17,8 @@
 @import uk.gov.hmrc.securitiestransferchargefrontend.models.stf.HowToNotifyAboutSecuritiesTransfer
 @import uk.gov.hmrc.securitiestransferchargefrontend.viewmodels.LegendSize.Large
 @import uk.gov.hmrc.securitiestransferchargefrontend.views.html.templates
-@import uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.individuals.routes
-@import uk.gov.hmrc.securitiestransferchargefrontend.views.html.components.SaveAndReturnButton
+@import uk.gov.hmrc.securitiestransferchargefrontend.controllers.routes
+@import uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.individuals.routes as individualsRoutes
 
 
 @this(
@@ -26,8 +26,7 @@
     formHelper: FormWithCSRF,
     govukErrorSummary: GovukErrorSummary,
     govukRadios: GovukRadios,
-    govukButton: GovukButton,
-    saveAndReturnButton:SaveAndReturnButton
+    govukButton: GovukButton
 )
 
 @(form: Form[_], mode: Mode, affinityGroupKey: String, backLinkCall: Call)(implicit request: Request[_], messages: Messages)
@@ -37,7 +36,7 @@
         @messages("transfer.details.caption")
     </div>
 
-    @formHelper(action = routes.HowToNotifyAboutSecuritiesTransferController.onSubmit(mode), Symbol("autoComplete") -> "off") {
+    @formHelper(action = individualsRoutes.HowToNotifyAboutSecuritiesTransferController.onSubmit(mode), Symbol("autoComplete") -> "off") {
 
         @if(form.errors.nonEmpty) {
             @govukErrorSummary(ErrorSummaryViewModel(form,  errorLinkOverrides = Map("value" -> "value_0")))
@@ -51,13 +50,17 @@
             )
         )
 
-        @govukButton(
-            ButtonViewModel(
-                messages("site.save-and-continue.button")
+        <div class="govuk-button-group">
+            @govukButton(
+                ButtonViewModel(
+                    messages("site.continue")
+                )
             )
-        )
 
-        @saveAndReturnButton()
+            <a class="govuk-link" href="@routes.SubmissionsDashboardController.onPageLoad().url">
+                @messages("return-to-dashboard.link")
+            </a>
 
+        </div>
     }
 }

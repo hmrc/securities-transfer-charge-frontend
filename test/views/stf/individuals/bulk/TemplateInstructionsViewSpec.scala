@@ -45,13 +45,14 @@ class TemplateInstructionsViewSpec extends ViewBaseSpec {
     val downloadFileName = "Bulk Securities Transfer Charge template v1i.xlsx"
 
     val step2 = "Complete the template, using one row for each type of securities you are buying"
-    val step3 = "Upload your file on the next page as a .xlsx or .csv."
+    val step3 = "Upload your file on the next page as a .xlsx or .csv"
     val para2Value = "Remember, do not edit the first two rows, or change the order of the columns."
-    val para3Value = "Once you have uploaded and submitted your file it will show on your STC dashboard. You can then pay any charges due."
-    val para3BoldText = "STC dashboard"
+    val para3Span1 = "Once you have uploaded and submitted your file it will show on your"
+    val para3LinkText = "STC dashboard"
+    val para3Span2 = "You can then pay any charges due."
 
-    val saveAndContinue = "Save and continue"
-    val saveAndReturn = "Save and return to dashboard"
+    val continue = "Continue"
+    val returnLink = "Return to dashboard"
   }
 
   "The TemplateInstructionsView" - {
@@ -98,20 +99,27 @@ class TemplateInstructionsViewSpec extends ViewBaseSpec {
         templateInstructionsView.para(2) mustBe Some(ExpectedContent.para2Value)
       }
 
-      "display the correct dashboard paragraph with bold STC dashboard text" in {
-        templateInstructionsView.para(3) mustBe Some(ExpectedContent.para3Value)
-        templateInstructionsView.select("p.govuk-body strong").text() mustBe ExpectedContent.para3BoldText
+      "display the correct third paragraph with 'STC dashboard' link that takes user back to the submission dashboard page" in {
+        val paragraph = templateInstructionsView.select("p.govuk-body").last()
+        val spans = paragraph.select("span")
+        spans.get(0).text() mustBe ExpectedContent.para3Span1
+        spans.get(1).select("a.govuk-link").text() mustBe ExpectedContent.para3LinkText
+        spans.get(1).select("a.govuk-link").attr("href") mustBe routes.SubmissionsDashboardController.onPageLoad().url
+        spans.get(1).text() mustBe ExpectedContent.para3LinkText + "."
+        spans.get(2).text() mustBe ExpectedContent.para3Span2
       }
 
-      "have a save and continue button" in {
-        val form = templateInstructionsView.select("form")
-        form.attr("action") mustBe routes.FileUploadController.onPageLoad().url
-        form.attr("method") mustBe "GET"
-        templateInstructionsView.select(".govuk-button").first().text() mustBe ExpectedContent.saveAndContinue
+
+      "have a continue button" in {
+        val continueButton = templateInstructionsView.select(".govuk-button").first()
+        continueButton.text() mustBe ExpectedContent.continue
+        continueButton.attr("href") mustBe individualsRoutes.FileUploadController.onPageLoad().url
       }
 
-      "have a save and return button" in {
-        templateInstructionsView.select(".govuk-button--secondary").text() mustBe ExpectedContent.saveAndReturn
+      "have a link to return back to the submission dashboard page" in {
+        val returnLink = templateInstructionsView.select(".govuk-button-group a.govuk-link").first()
+        returnLink.text() mustBe ExpectedContent.returnLink
+        returnLink.attr("href") mustBe routes.SubmissionsDashboardController.onPageLoad().url
       }
     }
   }

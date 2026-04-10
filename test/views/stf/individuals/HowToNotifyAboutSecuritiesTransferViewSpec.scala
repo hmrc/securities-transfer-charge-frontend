@@ -21,6 +21,7 @@ import org.jsoup.nodes.Document
 import play.api.Application
 import play.api.mvc.Call
 import uk.gov.hmrc.securitiestransferchargefrontend.forms.stf.individuals.HowToNotifyAboutSecuritiesTransferFormProvider
+import uk.gov.hmrc.securitiestransferchargefrontend.controllers.routes
 import uk.gov.hmrc.securitiestransferchargefrontend.models.NormalMode
 import uk.gov.hmrc.securitiestransferchargefrontend.views.html.stf.individuals.HowToNotifyAboutSecuritiesTransferView
 import views.ViewBaseSpec
@@ -45,9 +46,8 @@ class HowToNotifyAboutSecuritiesTransferViewSpec extends ViewBaseSpec {
     val title = "How do you want to tell us about your securities transfers?"
     val caption = "Transfer details"
     val heading = "How do you want to tell us about your securities transfers?"
-    val saveAndContinue = "Save and continue"
-    val saveAndReturn = "Save and return to dashboard"
-
+    val continue = "Continue"
+    val returnLink = "Return to dashboard"
   }
 
   "The HowToNotifyAboutSecuritiesTransferView" - {
@@ -66,14 +66,15 @@ class HowToNotifyAboutSecuritiesTransferViewSpec extends ViewBaseSpec {
         howToNotifyAboutSecuritiesTransferView.getElementsByClass("govuk-caption-l").text() mustBe ExpectedContent.caption
       }
 
-      "have a button with the text save and continue " in {
-        val buttons = howToNotifyAboutSecuritiesTransferView.select(".govuk-button")
-        buttons.get(0).text() mustBe ExpectedContent.saveAndContinue
+      "have a continue button" in {
+        val button = howToNotifyAboutSecuritiesTransferView.select(".govuk-button").first()
+        button.text() mustBe ExpectedContent.continue
       }
 
-      "have a button with the text save and return to dashboard" in {
-        val buttons = howToNotifyAboutSecuritiesTransferView.select(".govuk-button")
-        buttons.get(1).text() mustBe ExpectedContent.saveAndReturn
+      "have a link to return back to the submission dashboard page" in {
+        val returnLink = howToNotifyAboutSecuritiesTransferView.select(".govuk-button-group a.govuk-link").first()
+        returnLink.text() mustBe ExpectedContent.returnLink
+        returnLink.attr("href") mustBe routes.SubmissionsDashboardController.onPageLoad().url
       }
     }
   }

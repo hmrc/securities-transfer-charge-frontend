@@ -44,7 +44,7 @@ object Fixtures {
   implicit val hc: HeaderCarrier = HeaderCarrier()
 
   val fakeRequest: FakeRequest[AnyContentAsEmpty.type] = FakeRequest()
-  
+
   val emptyEnrolments: Enrolments =
     Enrolments(Set.empty)
 
@@ -80,6 +80,13 @@ object Fixtures {
     postcode = "ZZ1 1ZZ",
     country = Some(Country("United Kingdom", "GB"))
   )
+
+  val uploadedFileErrors: Seq[UploadedFileError] = Seq(
+    UploadedFileError(cell = "J6", error = "The seller's name cannot contain numbers"),
+    UploadedFileError(cell = "J36", error = "You have selected that the buyer is a company, you need to enter the registered address"),
+    UploadedFileError(cell = "K3", error = "Buyer's country can only contain letters, numbers and hyphens")
+  )
+
   class FakeAuthConnectorSuccess(value: Any) extends AuthConnector {
 
     override def authorise[A](predicate: Predicate, retrieval: Retrieval[A])(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[A] =

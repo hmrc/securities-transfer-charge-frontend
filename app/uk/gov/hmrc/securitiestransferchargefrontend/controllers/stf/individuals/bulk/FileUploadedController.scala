@@ -25,26 +25,35 @@ import uk.gov.hmrc.securitiestransferchargefrontend.repositories.UpscanJourneyRe
 import uk.gov.hmrc.securitiestransferchargefrontend.views.html.stf.individuals.bulk.FileUploadedView
 
 import javax.inject.Inject
-import scala.concurrent.ExecutionContext
+import scala.concurrent.{ExecutionContext, Future}
 
 //TODO Placeholder controller, update once the content had been confirmed by ucd
 class FileUploadedController @Inject()(
                                         val controllerComponents: MessagesControllerComponents,
                                         upscanJourneyRepository: UpscanJourneyRepository,
                                         stcAuthEnrolled: StcAuthEnrolledAction,
+                                        stcUpscanProcessingService: StcUpscanProcessingService,
                                         view: FileUploadedView
                                       )(implicit ec: ExecutionContext)
   extends FrontendBaseController with I18nSupport {
 
   def onPageLoad(key: String): Action[AnyContent] =
     stcAuthEnrolled.async { implicit request =>
-      
-      upscanJourneyRepository.find(key).map {
+      upscanJourneyRepository.find(key).flatMap {
+        case Some(fileUpload) if fileUpload.status == UpscanJourneyStatus.Ready =>
+          stcUpscanProcessingService.process(fileUpload).map {
+            case Right(_) =>
+              Ok(view(fileUpload))
+
+            case Left(_) =>
+              Redirect(individualRoutes.FormattingErrorController.onPageLoad())
+          }
+
         case Some(fileUpload) =>
-          Ok(view(fileUpload))
-          
+          Future.successful(Ok(view(fileUpload)))
+
         case None =>
-          Redirect(routes.JourneyRecoveryController.onPageLoad())
+          Future.successful(Redirect(routes.JourneyRecoveryController.onPageLoad()))
       }
     }
 }

@@ -1,0 +1,66 @@
+@*
+ * Copyright 2026 HM Revenue & Customs
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *@
+
+@import uk.gov.hmrc.securitiestransferchargefrontend.models.UploadedFileError
+@import uk.gov.hmrc.securitiestransferchargefrontend.controllers.routes
+@import uk.gov.hmrc.securitiestransferchargefrontend.views.html.templates
+@import uk.gov.hmrc.govukfrontend.views.viewmodels.table._
+
+@this(
+  layout: templates.Layout,
+  formHelper: FormWithCSRF,
+  govukButton: GovukButton,
+  govukTable: GovukTable
+)
+
+@(errors: Seq[UploadedFileError])(implicit request: Request[_], messages: Messages)
+
+@layout(pageTitle = titleNoForm(messages("uploadedFileError.title"))) {
+
+  <h1 class="govuk-heading-l">
+    @messages("uploadedFileError.heading")
+  </h1>
+
+  <p class="govuk-body">
+    @messages("uploadedFileError.p1")
+  </p>
+
+  @govukTable(
+    Table(
+      caption = Some(messages("uploadedFileError.table.heading")),
+      captionClasses = "govuk-table__caption--m",
+      head = Some(
+        Seq(
+          HeadCell(content = Text(messages("uploadedFileError.table.cell"))),
+          HeadCell(content = Text(messages("uploadedFileError.table.error")))
+        )
+      ),
+      rows = errors.map { error =>
+        Seq(
+          TableRow(content = Text(error.cell)),
+          TableRow(content = Text(error.error))
+        )
+      }
+    )
+  )
+
+  @formHelper(action = routes.JourneyRecoveryController.onPageLoad()) {
+    @govukButton(
+      ButtonViewModel(messages("site.back-to-upload.button"))
+    )
+  }
+
+}

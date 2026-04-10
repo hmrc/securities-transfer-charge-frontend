@@ -14,18 +14,10 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.securitiestransferchargefrontend.forms.stf.individuals
+package uk.gov.hmrc.securitiestransferchargefrontend.services.fileupload
 
-import play.api.data.Form
-import uk.gov.hmrc.securitiestransferchargefrontend.forms.mappings.Mappings
+import uk.gov.hmrc.securitiestransferchargefrontend.models.fileupload.{FileParseError, ParsedFile, UploadedFile}
 
-import javax.inject.Inject
-
-class NameOfSellerFormProvider @Inject() extends Mappings {
-
-  def apply(): Form[String] =
-    Form(
-      "value" -> text("nameOfSeller.error.required")
-        .verifying(maxLength(35, "nameOfSeller.error.length"))
-    )
+trait FileParser {
+  def parse(file: UploadedFile): Either[FileParseError, ParsedFile]
 }
