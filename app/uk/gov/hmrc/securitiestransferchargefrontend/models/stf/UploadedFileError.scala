@@ -14,6 +14,6 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.securitiestransferchargefrontend.models
+package uk.gov.hmrc.securitiestransferchargefrontend.models.stf
 
-case class UploadedFileError(cell:String,error:String)
+case class UploadedFileError(cell: String, error: String)

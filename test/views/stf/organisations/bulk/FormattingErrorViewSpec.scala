@@ -14,13 +14,13 @@
  * limitations under the License.
  */
 
-package views.stf.organisations
+package views.stf.organisations.bulk
 
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
 import play.api.Application
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.routes
-import uk.gov.hmrc.securitiestransferchargefrontend.views.html.stf.organisations.FormattingErrorView
+import uk.gov.hmrc.securitiestransferchargefrontend.views.html.stf.organisations.bulk.FormattingErrorView
 import views.ViewBaseSpec
 
 class FormattingErrorViewSpec extends ViewBaseSpec {

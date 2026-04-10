@@ -14,23 +14,23 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.individuals
+package uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.organisations.bulk
 
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.actions.*
-import uk.gov.hmrc.securitiestransferchargefrontend.models.UploadedFileError
-import uk.gov.hmrc.securitiestransferchargefrontend.views.html.stf.individuals.UploadedFileErrorView
+import uk.gov.hmrc.securitiestransferchargefrontend.models.stf.UploadedFileError
+import uk.gov.hmrc.securitiestransferchargefrontend.views.html.stf.organisations.bulk.UploadedFileErrorView
 
 import javax.inject.Inject
 
 class UploadedFileErrorController @Inject()(
-                                       override val messagesApi: MessagesApi,
-                                       stcAuthEnrolled: StcAuthEnrolledAction,
-                                       val controllerComponents: MessagesControllerComponents,
-                                       view: UploadedFileErrorView
-                                     ) extends FrontendBaseController with I18nSupport {
+                                             override val messagesApi: MessagesApi,
+                                             stcAuthEnrolled: StcAuthEnrolledAction,
+                                             val controllerComponents: MessagesControllerComponents,
+                                             view: UploadedFileErrorView,
+                                           ) extends FrontendBaseController with I18nSupport {
 
   def onPageLoad: Action[AnyContent] = stcAuthEnrolled {
     implicit request =>
@@ -54,3 +54,6 @@ class UploadedFileErrorController @Inject()(
     )
   }
 }
+
+
+

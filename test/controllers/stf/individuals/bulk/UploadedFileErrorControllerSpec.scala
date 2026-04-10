@@ -14,17 +14,17 @@
  * limitations under the License.
  */
 
-package controllers.stf.organisations
+package controllers.stf.individuals.bulk
 
 import base.{Fixtures, SpecBase}
 import play.api.test.FakeRequest
 import play.api.test.Helpers.*
-import uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.organisations.routes
-import uk.gov.hmrc.securitiestransferchargefrontend.views.html.stf.organisations.UploadedFileErrorView
+import uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.individuals.bulk.routes
+import uk.gov.hmrc.securitiestransferchargefrontend.views.html.stf.individuals.bulk.UploadedFileErrorView
 
 class UploadedFileErrorControllerSpec extends SpecBase {
 
-  "UploadedFileError Controller" - {
+  "UploadedFileErrorList Controller" - {
 
     "must return OK and the correct view for a GET" in {
 
@@ -36,7 +36,7 @@ class UploadedFileErrorControllerSpec extends SpecBase {
         val result = route(application, request).value
 
         val view = application.injector.instanceOf[UploadedFileErrorView]
-        
+
         status(result) mustEqual OK
         contentAsString(result) mustEqual view(Fixtures.uploadedFileErrors)(request, messages(application)).toString
       }

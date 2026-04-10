@@ -14,31 +14,31 @@
  * limitations under the License.
  */
 
-package controllers.stf.individuals
+package controllers.stf.organisations.bulk
 
-import base.{Fixtures, SpecBase}
+import base.SpecBase
 import play.api.test.FakeRequest
 import play.api.test.Helpers.*
-import uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.individuals.routes
-import uk.gov.hmrc.securitiestransferchargefrontend.views.html.stf.individuals.UploadedFileErrorView
+import uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.organisations.bulk.routes
+import uk.gov.hmrc.securitiestransferchargefrontend.views.html.stf.organisations.bulk.FormattingErrorView
 
-class UploadedFileErrorControllerSpec extends SpecBase {
+class FormattingErrorControllerSpec extends SpecBase {
 
-  "UploadedFileErrorList Controller" - {
+  "FormattingError Controller" - {
 
     "must return OK and the correct view for a GET" in {
 
       val application = applicationBuilder(userAnswers = Some(emptyUserAnswers)).build()
 
       running(application) {
-        val request = FakeRequest(GET, routes.UploadedFileErrorController.onPageLoad().url)
+        val request = FakeRequest(GET, routes.FormattingErrorController.onPageLoad().url)
 
         val result = route(application, request).value
 
-        val view = application.injector.instanceOf[UploadedFileErrorView]
+        val view = application.injector.instanceOf[FormattingErrorView]
 
         status(result) mustEqual OK
-        contentAsString(result) mustEqual view(Fixtures.uploadedFileErrors)(request, messages(application)).toString
+        contentAsString(result) mustEqual view()(request, messages(application)).toString
       }
     }
   }
