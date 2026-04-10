@@ -37,13 +37,13 @@ class UploadedFileErrorViewSpec extends ViewBaseSpec {
     )
 
   object ExpectedContent {
-    val title: String = messages("uploadedFileErrorList.title")
-    val heading: String = messages("uploadedFileErrorList.heading")
-    val paragraph: String = messages("uploadedFileErrorList.p1")
+    val title: String = messages("uploadedFileError.title")
+    val heading: String = messages("uploadedFileError.heading")
+    val paragraph: String = messages("uploadedFileError.p1")
 
-    val tableCaption: String = messages("uploadedFileErrorList.table.heading")
-    val cellHeader: String = messages("uploadedFileErrorList.table.cell")
-    val errorHeader: String = messages("uploadedFileErrorList.table.error")
+    val tableCaption: String = messages("uploadedFileError.table.heading")
+    val cellHeader: String = messages("uploadedFileError.table.cell")
+    val errorHeader: String = messages("uploadedFileError.table.error")
   }
 
   "UploadedFileErrorView" - {
