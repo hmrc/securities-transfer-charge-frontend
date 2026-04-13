@@ -173,7 +173,6 @@ POST       /stf/org/total-market-value                    uk.gov.hmrc.securities
 GET        /stf/org/change/total-market-value             uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.organisations.single.TotalMarketValueController.onPageLoad(mode: Mode = CheckMode)
 POST       /stf/org/change/total-market-value             uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.organisations.single.TotalMarketValueController.onSubmit(mode: Mode = CheckMode)
 
-
 GET        /stf/template                                  uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.individuals.bulk.TemplateInstructionsController.onPageLoad()
 
 GET        /stf/bulk-error                                uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.individuals.bulk.FormattingErrorController.onPageLoad()
@@ -188,3 +187,4 @@ POST       /stf/upscan-callback                           uk.gov.hmrc.securities
 
 GET        /stf/org/bulk-error-list                       uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.organisations.bulk.UploadedFileErrorController.onPageLoad()
 GET        /stf/org/bulk-error                            uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.organisations.bulk.FormattingErrorController.onPageLoad()
+
