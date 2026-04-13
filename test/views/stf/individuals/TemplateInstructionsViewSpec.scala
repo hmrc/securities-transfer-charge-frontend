@@ -106,7 +106,7 @@ class TemplateInstructionsViewSpec extends ViewBaseSpec {
         spans.get(0).text() mustBe ExpectedContent.para3Span1
         spans.get(1).select("a.govuk-link").text() mustBe ExpectedContent.para3LinkText
         spans.get(1).select("a.govuk-link").attr("href") mustBe routes.SubmissionsDashboardController.onPageLoad().url
-        spans.get(1).text() mustBe ExpectedContent.para3LinkText
+        spans.get(1).text() mustBe ExpectedContent.para3LinkText + "."
         spans.get(2).text() mustBe ExpectedContent.para3Span2
       }
 
