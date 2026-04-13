@@ -29,6 +29,7 @@ import uk.gov.hmrc.securitiestransferchargefrontend.config.FrontendAppConfig
 import uk.gov.hmrc.securitiestransferchargefrontend.connectors.*
 import play.api.http.Status.{ACCEPTED, INTERNAL_SERVER_ERROR, NO_CONTENT, OK, SEE_OTHER}
 import uk.gov.hmrc.securitiestransferchargefrontend.models.*
+import uk.gov.hmrc.securitiestransferchargefrontend.models.stf.{AlfAddress, AlfConfirmedAddress, Country}
 
 import java.net.URL
 import scala.concurrent.*

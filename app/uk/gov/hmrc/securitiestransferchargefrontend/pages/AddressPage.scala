@@ -17,7 +17,7 @@
 package uk.gov.hmrc.securitiestransferchargefrontend.pages
 
 import play.api.libs.json.JsPath
-import uk.gov.hmrc.securitiestransferchargefrontend.models.AlfConfirmedAddress
+import uk.gov.hmrc.securitiestransferchargefrontend.models.stf.AlfConfirmedAddress
 
 import scala.language.implicitConversions
 

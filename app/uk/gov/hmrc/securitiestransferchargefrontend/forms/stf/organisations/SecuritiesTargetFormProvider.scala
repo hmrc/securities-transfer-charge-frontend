@@ -19,7 +19,7 @@ package uk.gov.hmrc.securitiestransferchargefrontend.forms.stf.organisations
 import play.api.data.Form
 import play.api.data.Forms.*
 import uk.gov.hmrc.securitiestransferchargefrontend.forms.mappings.Mappings
-import uk.gov.hmrc.securitiestransferchargefrontend.models.SecuritiesTarget
+import uk.gov.hmrc.securitiestransferchargefrontend.models.stf.SecuritiesTarget
 
 import javax.inject.Inject
 

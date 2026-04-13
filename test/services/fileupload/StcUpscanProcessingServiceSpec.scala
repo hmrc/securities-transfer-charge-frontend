@@ -25,7 +25,7 @@ import org.scalatest.wordspec.AnyWordSpec
 import org.scalatestplus.mockito.MockitoSugar
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.securitiestransferchargefrontend.models.fileupload.*
-import uk.gov.hmrc.securitiestransferchargefrontend.models.upscan.{FileUpload, UpscanCallbackRequest, UpscanJourneyStatus}
+import uk.gov.hmrc.securitiestransferchargefrontend.models.stf.upscan.{FileUpload, UpscanCallbackRequest, UpscanJourneyStatus}
 import uk.gov.hmrc.securitiestransferchargefrontend.services.fileupload.*
 
 import java.io.ByteArrayInputStream

@@ -19,7 +19,7 @@ package forms.stf.individuals
 import forms.behaviours.OptionFieldBehaviours
 import play.api.data.FormError
 import uk.gov.hmrc.securitiestransferchargefrontend.forms.stf.individuals.TaxRateFormProvider
-import uk.gov.hmrc.securitiestransferchargefrontend.models.TaxRate
+import uk.gov.hmrc.securitiestransferchargefrontend.models.stf.TaxRate
 
 class TaxRateFormProviderSpec extends OptionFieldBehaviours {
 
