@@ -20,7 +20,7 @@ import play.api.data.Form
 import play.api.data.Forms.*
 import play.api.data.validation.Constraint
 import uk.gov.hmrc.securitiestransferchargefrontend.forms.mappings.Mappings
-import uk.gov.hmrc.securitiestransferchargefrontend.models.DetailsOfThisTransfer
+import uk.gov.hmrc.securitiestransferchargefrontend.models.stf.DetailsOfThisTransfer
 
 import javax.inject.Inject
 

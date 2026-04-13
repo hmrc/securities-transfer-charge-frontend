@@ -22,6 +22,7 @@ import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.play.http.HeaderCarrierConverter
 import uk.gov.hmrc.securitiestransferchargefrontend.config.FrontendAppConfig
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.routes
+import uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.shared.routes as sharedRoutes
 import uk.gov.hmrc.securitiestransferchargefrontend.domain.SubmissionId
 import uk.gov.hmrc.securitiestransferchargefrontend.models.UserAnswers
 import uk.gov.hmrc.securitiestransferchargefrontend.navigation.stf.organisations.{BackwardsRoutes, ForwardRoutes}
@@ -37,7 +38,7 @@ class StfOrgNavigator @Inject()(appConfig: FrontendAppConfig,
                                 answerPersistenceService: AnswerPersistenceService)
                                (implicit ec: ExecutionContext) extends AbstractModeNavigator with PersistentNavigator:
 
-  override lazy val dashboardPage: Call = routes.SubmissionsDashboardController.onPageLoad()
+  override lazy val dashboardPage: Call = sharedRoutes.SubmissionsDashboardController.onPageLoad()
   val defaultPage: Call = routes.JourneyRecoveryController.onPageLoad()
   val errorPages: List[Call] = List(defaultPage)
 
