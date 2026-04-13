@@ -193,3 +193,5 @@ GET        /stf/bulk-error-list                          uk.gov.hmrc.securitiest
 
 GET        /stf/org/bulk-error-list                      uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.organisations.UploadedFileErrorController.onPageLoad()
 GET        /stf/org/bulk-error                                uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.organisations.FormattingErrorController.onPageLoad()
+
+GET        /stf/org/bulk-empty                       uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.organisations.EmptyFileErrorController.onPageLoad()
