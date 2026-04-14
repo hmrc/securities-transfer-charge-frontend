@@ -20,7 +20,7 @@ import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.actions.*
-import uk.gov.hmrc.securitiestransferchargefrontend.views.html.stf.organisations.ChangedFileErrorView
+import uk.gov.hmrc.securitiestransferchargefrontend.views.html.stf.organisations.bulk.ChangedFileErrorView
 
 import javax.inject.Inject
 

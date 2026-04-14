@@ -19,8 +19,8 @@ package controllers.stf.organisations.bulk
 import base.SpecBase
 import play.api.test.FakeRequest
 import play.api.test.Helpers.*
-import uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.individuals.bulk.routes
-import uk.gov.hmrc.securitiestransferchargefrontend.views.html.stf.individuals.bulk.ChangedFileErrorView
+import uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.organisations.bulk.routes
+import uk.gov.hmrc.securitiestransferchargefrontend.views.html.stf.organisations.bulk.ChangedFileErrorView
 
 class ChangedFileErrorControllerSpec extends SpecBase {
 

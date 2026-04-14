@@ -20,7 +20,7 @@ import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
 import play.api.Application
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.routes
-import uk.gov.hmrc.securitiestransferchargefrontend.views.html.stf.organisations.ChangedFileErrorView
+import uk.gov.hmrc.securitiestransferchargefrontend.views.html.stf.organisations.bulk.ChangedFileErrorView
 import views.ViewBaseSpec
 
 class ChangedFileErrorViewSpec extends ViewBaseSpec {
