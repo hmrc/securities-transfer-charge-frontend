@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.organisations
+package uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.organisations.bulk
 
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}

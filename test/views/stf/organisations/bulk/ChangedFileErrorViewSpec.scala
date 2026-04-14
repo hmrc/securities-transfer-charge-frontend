@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package views.stf.organisations
+package views.stf.organisations.bulk
 
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
@@ -34,17 +34,17 @@ class ChangedFileErrorViewSpec extends ViewBaseSpec {
   )
 
   object ExpectedContent {
-    val title = "There is a problem with your uploaded file"
-    val heading = "There is a problem with your uploaded file"
+    val title = messages("changedFileError.title")
+    val heading = messages("changedFileError.heading")
 
-    val para1Value = "The header rows or columns have been changed."
-    val para2Value = "Correct the errors then you can upload the file again, or upload a different file."
-    val para3Value = "Remember, do not edit the first two rows of the template, or change the order of the columns."
+    val para1Value = messages("changedFileError.p1")
+    val para2Value = messages("changedFileError.p2")
+    val para3Value = messages("changedFileError.p3")
 
-    val downloadText = "Download the template file"
+    val downloadText = messages("changedFileError.download.text")
     val downloadHref = "/securities-transfer-charge/assets/Bulk_Securities_Transfer_Charge_template_v1b.xlsx"
     val downloadFileName = "Bulk Securities Transfer Charge template v1b.xlsx"
-    val uploadAnother = "Upload a different file"
+    val uploadAnother = messages("fileUpload.upload.another")
   }
 
   "The ChangedFileErrorView" - {

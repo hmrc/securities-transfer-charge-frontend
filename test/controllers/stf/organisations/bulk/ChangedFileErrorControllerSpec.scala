@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package controllers.stf.organisations
+package controllers.stf.organisations.bulk
 
 import base.SpecBase
 import play.api.test.FakeRequest
