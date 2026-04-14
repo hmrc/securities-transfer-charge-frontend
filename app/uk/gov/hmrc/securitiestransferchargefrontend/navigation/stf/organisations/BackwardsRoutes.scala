@@ -17,11 +17,14 @@
 package uk.gov.hmrc.securitiestransferchargefrontend.navigation.stf.organisations
 
 import play.api.mvc.Call
-import uk.gov.hmrc.securitiestransferchargefrontend.controllers.routes
+import uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.organisations.single.routes as orgSingleRoutes
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.organisations.routes as orgRoutes
+import uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.shared.routes as sharedRoutes
 import uk.gov.hmrc.securitiestransferchargefrontend.models.{NormalMode, UserAnswers}
 import uk.gov.hmrc.securitiestransferchargefrontend.navigation.NavigationHelper
 import uk.gov.hmrc.securitiestransferchargefrontend.pages.*
+import uk.gov.hmrc.securitiestransferchargefrontend.pages.stf.shared.HowToNotifyAboutSecuritiesTransferPage
+import uk.gov.hmrc.securitiestransferchargefrontend.pages.stf.single.{AmountPaidForSecuritiesPage, ApplyingForReliefPage, ChargingPointPage, ConfirmAddressPage, ConnectedPersonsPage, DetailsOfThisTransferPage, NameOfSellerPage, OtherSecuritiesTypePage, SecuritiesTargetPage, StfBuyersAddressPage, TaxRatePage, TotalMarketValuePage, WhatReliefAreYouApplyingForPage, WhatTypeOfSecuritiesPage}
 
 class BackwardsRoutes(defaultPage: Call):
 
@@ -30,24 +33,24 @@ class BackwardsRoutes(defaultPage: Call):
 
   def predecessorRoutes(page: Page): UserAnswers => Call = page match {
 
-    case HowToNotifyAboutSecuritiesTransferPage => _ => routes.SubmissionsDashboardController.onPageLoad()
+    case HowToNotifyAboutSecuritiesTransferPage => _ => sharedRoutes.SubmissionsDashboardController.onPageLoad()
     case ConfirmAddressPage => _ => orgRoutes.HowToNotifyAboutSecuritiesTransferController.onPageLoad(NormalMode)
     case StfBuyersAddressPage => _ =>orgRoutes.HowToNotifyAboutSecuritiesTransferController.onPageLoad(NormalMode)
-    case NameOfSellerPage => _ => orgRoutes.ConfirmAddressController.onPageLoad()
-    case ConnectedPersonsPage => _ => orgRoutes.StfSellerAddressController.onPageLoad()
-    case ApplyingForReliefPage  => _ => orgRoutes.ConnectedPersonsController.onPageLoad(NormalMode)
-    case WhatReliefAreYouApplyingForPage => _ => orgRoutes.ApplyingForReliefController.onPageLoad(NormalMode)
+    case NameOfSellerPage => _ => orgSingleRoutes.ConfirmAddressController.onPageLoad()
+    case ConnectedPersonsPage => _ => orgSingleRoutes.StfSellerAddressController.onPageLoad()
+    case ApplyingForReliefPage  => _ => orgSingleRoutes.ConnectedPersonsController.onPageLoad(NormalMode)
+    case WhatReliefAreYouApplyingForPage => _ => orgSingleRoutes.ApplyingForReliefController.onPageLoad(NormalMode)
     case SecuritiesTargetPage => userAnswers => dataDependent(ApplyingForReliefPage, userAnswers) {
-      case true => orgRoutes.WhatReliefAreYouApplyingForController.onPageLoad(NormalMode)
-      case false => orgRoutes.ApplyingForReliefController.onPageLoad(NormalMode)
+      case true => orgSingleRoutes.WhatReliefAreYouApplyingForController.onPageLoad(NormalMode)
+      case false => orgSingleRoutes.ApplyingForReliefController.onPageLoad(NormalMode)
     }
-    case ChargingPointPage => _ => orgRoutes.SecuritiesTargetController.onPageLoad(NormalMode)
-    case TaxRatePage => _ => orgRoutes.ChargingPointController.onPageLoad(NormalMode)
-    case OtherSecuritiesTypePage => _ => orgRoutes.WhatTypeOfSecuritiesController.onPageLoad(NormalMode)
-    case WhatTypeOfSecuritiesPage => _ => orgRoutes.TaxRateController.onPageLoad(NormalMode)
-    case DetailsOfThisTransferPage  => _ => orgRoutes.WhatTypeOfSecuritiesController.onPageLoad(NormalMode)
-    case AmountPaidForSecuritiesPage => _ => orgRoutes.OtherSecuritiesTypeController.onPageLoad(NormalMode)
-    case TotalMarketValuePage => _ => orgRoutes.AmountPaidForSecuritiesController.onPageLoad(NormalMode)
+    case ChargingPointPage => _ => orgSingleRoutes.SecuritiesTargetController.onPageLoad(NormalMode)
+    case TaxRatePage => _ => orgSingleRoutes.ChargingPointController.onPageLoad(NormalMode)
+    case OtherSecuritiesTypePage => _ => orgSingleRoutes.WhatTypeOfSecuritiesController.onPageLoad(NormalMode)
+    case WhatTypeOfSecuritiesPage => _ => orgSingleRoutes.TaxRateController.onPageLoad(NormalMode)
+    case DetailsOfThisTransferPage  => _ => orgSingleRoutes.WhatTypeOfSecuritiesController.onPageLoad(NormalMode)
+    case AmountPaidForSecuritiesPage => _ => orgSingleRoutes.OtherSecuritiesTypeController.onPageLoad(NormalMode)
+    case TotalMarketValuePage => _ => orgSingleRoutes.AmountPaidForSecuritiesController.onPageLoad(NormalMode)
     case _ => _ => defaultPage
 
   }

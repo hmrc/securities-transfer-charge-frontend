@@ -25,8 +25,8 @@ import play.api.libs.json.Json
 import uk.gov.hmrc.mongo.MongoComponent
 import uk.gov.hmrc.mongo.play.json.PlayMongoRepository
 import uk.gov.hmrc.securitiestransferchargefrontend.config.FrontendAppConfig
-import uk.gov.hmrc.securitiestransferchargefrontend.models.upscan.UpscanCallbackRequest.UploadDetails
-import uk.gov.hmrc.securitiestransferchargefrontend.models.upscan.{FileUpload, UpscanDocument, UpscanJourneyStatus}
+import uk.gov.hmrc.securitiestransferchargefrontend.models.stf.upscan.{FileUpload, UpscanDocument, UpscanJourneyStatus}
+import uk.gov.hmrc.securitiestransferchargefrontend.models.stf.upscan.UpscanCallbackRequest.UploadDetails
 
 import java.util.concurrent.TimeUnit
 import javax.inject.{Inject,Singleton}
