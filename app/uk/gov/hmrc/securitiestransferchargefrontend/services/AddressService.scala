@@ -18,7 +18,7 @@ package uk.gov.hmrc.securitiestransferchargefrontend.services
 
 
 import uk.gov.hmrc.securitiestransferchargefrontend.clients.registration.Subscription
-import uk.gov.hmrc.securitiestransferchargefrontend.models.{ConfirmableAddress, CountriesList}
+import uk.gov.hmrc.securitiestransferchargefrontend.models.stf.{ConfirmableAddress, CountriesList}
 
 import javax.inject.{Inject, Singleton}
 

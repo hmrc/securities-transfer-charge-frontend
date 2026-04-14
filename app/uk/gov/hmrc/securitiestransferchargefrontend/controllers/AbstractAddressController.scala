@@ -22,7 +22,7 @@ import play.api.mvc.*
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import uk.gov.hmrc.securitiestransferchargefrontend.connectors.AlfAddressConnector
-import uk.gov.hmrc.securitiestransferchargefrontend.models.AlfConfirmedAddress
+import uk.gov.hmrc.securitiestransferchargefrontend.models.stf.AlfConfirmedAddress
 
 import scala.concurrent.Future
 

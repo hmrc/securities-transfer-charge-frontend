@@ -19,7 +19,7 @@ package forms.stf.individuals
 import forms.behaviours.OptionFieldBehaviours
 import play.api.data.FormError
 import uk.gov.hmrc.securitiestransferchargefrontend.forms.stf.individuals.HowToNotifyAboutSecuritiesTransferFormProvider
-import uk.gov.hmrc.securitiestransferchargefrontend.models.HowToNotifyAboutSecuritiesTransfer
+import uk.gov.hmrc.securitiestransferchargefrontend.models.stf.HowToNotifyAboutSecuritiesTransfer
 
 class HowToNotifyAboutSecuritiesTransferFormProviderSpec extends OptionFieldBehaviours {
 

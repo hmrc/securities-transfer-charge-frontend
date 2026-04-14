@@ -20,7 +20,7 @@ package services
 import base.SpecBase
 import org.mockito.Mockito.when
 import org.scalatestplus.mockito.MockitoSugar.mock
-import uk.gov.hmrc.securitiestransferchargefrontend.models.{CountriesList, Country}
+import uk.gov.hmrc.securitiestransferchargefrontend.models.stf.{CountriesList, Country}
 import uk.gov.hmrc.securitiestransferchargefrontend.services.AddressService
 
 class AddressServiceSpec extends SpecBase {
