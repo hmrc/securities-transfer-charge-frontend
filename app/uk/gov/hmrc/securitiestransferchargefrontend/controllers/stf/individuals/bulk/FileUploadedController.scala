@@ -17,12 +17,13 @@
 package uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.individuals.bulk
 
 import play.api.i18n.I18nSupport
-import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
+import play.api.mvc.{Action, AnyContent, MessagesControllerComponents, Result}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
-import uk.gov.hmrc.securitiestransferchargefrontend.controllers.actions.StcAuthEnrolledAction
+import uk.gov.hmrc.securitiestransferchargefrontend.connectors.SubscriptionConnector
+import uk.gov.hmrc.securitiestransferchargefrontend.controllers.actions.{StcAuthEnrolledAction, StcAuthorisedRequest}
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.routes
-import uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.individuals.bulk.routes as individualRoutes 
-import uk.gov.hmrc.securitiestransferchargefrontend.models.stf.upscan.UpscanJourneyStatus
+import uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.individuals.bulk.routes as individualRoutes
+import uk.gov.hmrc.securitiestransferchargefrontend.models.stf.upscan.{FileUpload, UpscanJourneyStatus}
 import uk.gov.hmrc.securitiestransferchargefrontend.repositories.UpscanJourneyRepository
 import uk.gov.hmrc.securitiestransferchargefrontend.services.fileupload.StcUpscanProcessingService
 import uk.gov.hmrc.securitiestransferchargefrontend.views.html.stf.individuals.bulk.FileUploadedView
@@ -30,12 +31,12 @@ import uk.gov.hmrc.securitiestransferchargefrontend.views.html.stf.individuals.b
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 
-//TODO Placeholder controller, update once the content had been confirmed by ucd
 class FileUploadedController @Inject()(
                                         val controllerComponents: MessagesControllerComponents,
                                         upscanJourneyRepository: UpscanJourneyRepository,
                                         stcAuthEnrolled: StcAuthEnrolledAction,
                                         stcUpscanProcessingService: StcUpscanProcessingService,
+                                        subscriptionConnector: SubscriptionConnector,
                                         view: FileUploadedView
                                       )(implicit ec: ExecutionContext)
   extends FrontendBaseController with I18nSupport {
@@ -44,13 +45,7 @@ class FileUploadedController @Inject()(
     stcAuthEnrolled.async { implicit request =>
       upscanJourneyRepository.find(key).flatMap {
         case Some(fileUpload) if fileUpload.status == UpscanJourneyStatus.Ready =>
-          stcUpscanProcessingService.process(fileUpload).map {
-            case Right(_) =>
-              Ok(view(fileUpload))
-
-            case Left(_) =>
-              Redirect(individualRoutes.FormattingErrorController.onPageLoad())
-          }
+          processReadyUpload(fileUpload)
 
         case Some(fileUpload) =>
           Future.successful(Ok(view(fileUpload)))
@@ -59,4 +54,22 @@ class FileUploadedController @Inject()(
           Future.successful(Redirect(routes.JourneyRecoveryController.onPageLoad()))
       }
     }
+
+  private def processReadyUpload(fileUpload: FileUpload)(implicit request: StcAuthorisedRequest[_]): Future[Result] =
+    for {
+      processResult <- stcUpscanProcessingService.process(fileUpload)
+      result <- processResult match {
+        case Right(_) =>
+          subscriptionConnector.getAndStoreSubscription(request.subscriptionId)
+            .map(_ => Ok(view(fileUpload)))
+            .recover {
+              case _ =>
+                Redirect(routes.JourneyRecoveryController.onPageLoad())
+            }
+        case Left(_) =>
+          Future.successful(
+            Redirect(individualRoutes.FormattingErrorController.onPageLoad())
+          )
+      }
+    } yield result
 }

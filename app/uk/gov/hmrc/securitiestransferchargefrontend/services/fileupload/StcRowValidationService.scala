@@ -33,7 +33,6 @@ class StcRowValidationService {
 
   private def requiredFieldErrors(row: ParsedStcRow): Seq[StcRowValidationError] =
     Seq(
-      requiredString(row.rowNumber, "addressLine1", row.addressLine1),
       requiredString(row.rowNumber, "sellerName", row.sellerName),
       requiredBoolean(row.rowNumber, "sellerAddressInUk", row.sellerAddressInUk),
       requiredBoolean(row.rowNumber, "connectedPersons", row.connectedPersons),
