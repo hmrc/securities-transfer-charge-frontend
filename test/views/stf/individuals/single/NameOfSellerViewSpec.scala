@@ -47,7 +47,7 @@ class NameOfSellerViewSpec extends ViewBaseSpec {
     val caption: String = messages("seller.details.caption")
     val saveAndContinue: String = messages("site.save-and-continue.button")
     val saveAndReturn: String = messages("site.save-and-return.button")
-    val hint: String = messages("org.nameOfSeller.hint")
+    val hint: String = messages("nameOfSeller.hint")
 
   }
 

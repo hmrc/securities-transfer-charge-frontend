@@ -42,11 +42,13 @@ class NameOfSellerViewSpec extends ViewBaseSpec {
   )
 
   object ExpectedContent {
-    val title = "What’s the seller’s name?"
-    val heading = "What’s the seller’s name?"
-    val caption = "Seller details"
-    val saveAndContinue = "Save and continue"
-    val saveAndReturn = "Save and return to dashboard"
+
+    val title: String = messages("nameOfSeller.title")
+    val heading: String = messages("nameOfSeller.heading")
+    val caption: String = messages("seller.details.caption")
+    val saveAndContinue: String = messages("site.save-and-continue.button")
+    val saveAndReturn: String = messages("site.save-and-return.button")
+    val hint: String = messages("org.nameOfSeller.hint")
 
   }
 
@@ -64,6 +66,10 @@ class NameOfSellerViewSpec extends ViewBaseSpec {
 
       "display the correct caption text" in {
         nameOfSellerView.getElementsByClass("govuk-caption-l").text() mustBe ExpectedContent.caption
+      }
+
+      "display the correct hint text" in {
+        nameOfSellerView.hintText mustBe Some(ExpectedContent.hint)
       }
 
       "have a button with the text save and continue " in {
