@@ -14,13 +14,13 @@
  * limitations under the License.
  */
 
-package controllers.stf.organisations
+package controllers.stf.organisations.bulk
 
 import base.SpecBase
 import play.api.test.FakeRequest
 import play.api.test.Helpers.*
-import uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.organisations.routes
-import uk.gov.hmrc.securitiestransferchargefrontend.views.html.stf.organisations.EmptyFileErrorView
+import uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.organisations.bulk.routes
+import uk.gov.hmrc.securitiestransferchargefrontend.views.html.stf.organisations.bulk.EmptyFileErrorView
 
 class EmptyFileErrorControllerSpec extends SpecBase {
 

@@ -14,13 +14,13 @@
  * limitations under the License.
  */
 
-package views.stf.organisations
+package views.stf.organisations.bulk
 
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
 import play.api.Application
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.routes
-import uk.gov.hmrc.securitiestransferchargefrontend.views.html.stf.organisations.EmptyFileErrorView
+import uk.gov.hmrc.securitiestransferchargefrontend.views.html.stf.organisations.bulk.EmptyFileErrorView
 import views.ViewBaseSpec
 
 class EmptyFileErrorViewSpec extends ViewBaseSpec {

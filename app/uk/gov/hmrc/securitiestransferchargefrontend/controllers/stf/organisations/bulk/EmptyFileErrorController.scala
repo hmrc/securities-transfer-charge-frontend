@@ -14,13 +14,13 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.organisations
+package uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.organisations.bulk
 
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.actions.*
-import uk.gov.hmrc.securitiestransferchargefrontend.views.html.stf.organisations.EmptyFileErrorView
+import uk.gov.hmrc.securitiestransferchargefrontend.views.html.stf.organisations.bulk.EmptyFileErrorView
 
 import javax.inject.Inject
 
