@@ -31,7 +31,7 @@ class SubscriptionStatusErrorException(msg: String) extends RuntimeException(msg
 
 trait SubscriptionConnector:
 
-  def getValidSubscription(subscriptionId: SubscriptionId)(implicit hc: HeaderCarrier): Future[Subscription]
+  def getAndStoreSubscription(subscriptionId: SubscriptionId)(implicit hc: HeaderCarrier): Future[Subscription]
 
 class SubscriptionConnectorImpl @Inject()(registrationClient: RegistrationClient,
                                           subscriptionDataRepository: SubscriptionDataRepository,
@@ -40,8 +40,8 @@ class SubscriptionConnectorImpl @Inject()(registrationClient: RegistrationClient
 
   private val logInfoAndFail = CommonHelpers.logInfoAndFail(logger)
 
-  def getValidSubscription(subscriptionId: SubscriptionId)
-                          (implicit hc: HeaderCarrier): Future[Subscription] = {
+  def getAndStoreSubscription(subscriptionId: SubscriptionId)
+                             (implicit hc: HeaderCarrier): Future[Subscription] = {
     for {
       subscription <- registrationClient.getSubscriptionDetails(subscriptionId)
       _ <- isValidSubscription(subscriptionId, subscription)

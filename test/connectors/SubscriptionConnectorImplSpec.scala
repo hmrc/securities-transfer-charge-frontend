@@ -55,7 +55,7 @@ class SubscriptionConnectorImplSpec
   private val expiredSubscription =
     subscription.copy(subsValidTo = LocalDate.now().minusDays(1))
 
-  "getValidSubscription" - {
+  "getAndStoreSubscription" - {
 
     "return the subscription and save it when the subscription is valid" in {
       when(mockRegistrationClient.getSubscriptionDetails(any[SubscriptionId])(any[HeaderCarrier]))
@@ -64,7 +64,7 @@ class SubscriptionConnectorImplSpec
       when(mockSubscriptionRepo.saveSubscriptionData(any[SubscriptionId], any[Subscription]))
         .thenReturn(Future.successful(()))
 
-      val result = connector.getValidSubscription(subscriptionId)
+      val result = connector.getAndStoreSubscription(subscriptionId)
 
       whenReady(result) { sub =>
         sub mustBe subscription
@@ -76,7 +76,7 @@ class SubscriptionConnectorImplSpec
       when(mockRegistrationClient.getSubscriptionDetails(any[SubscriptionId])(any[HeaderCarrier]))
         .thenReturn(Future.successful(expiredSubscription))
 
-      val result = connector.getValidSubscription(subscriptionId)
+      val result = connector.getAndStoreSubscription(subscriptionId)
 
       whenReady(result.failed) { ex =>
         ex mustBe a[SubscriptionStatusErrorException]

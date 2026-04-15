@@ -24,6 +24,7 @@ import play.api.test.FakeRequest
 import play.api.test.Helpers.*
 import play.api.{Application, inject}
 import uk.gov.hmrc.http.HeaderCarrier
+import uk.gov.hmrc.securitiestransferchargefrontend.connectors.{SubscriptionConnector, SubscriptionStatusErrorException}
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.routes
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.individuals.bulk.routes as individualRoutes
 import uk.gov.hmrc.securitiestransferchargefrontend.models.fileupload.{FileParseError, StcFileValidationResponse}
@@ -38,6 +39,7 @@ class FileUploadedControllerSpec extends SpecBase with MockitoSugar {
 
   private val mockRepository = mock[UpscanJourneyRepository]
   private val mockStcUpscanProcessingService = mock[StcUpscanProcessingService]
+  private val mockSubscriptionConnector = mock[SubscriptionConnector]
 
   private val testKey = "test-key"
 
@@ -58,7 +60,8 @@ class FileUploadedControllerSpec extends SpecBase with MockitoSugar {
     applicationBuilder()
       .overrides(
         inject.bind[UpscanJourneyRepository].toInstance(mockRepository),
-        inject.bind[StcUpscanProcessingService].toInstance(mockStcUpscanProcessingService)
+        inject.bind[StcUpscanProcessingService].toInstance(mockStcUpscanProcessingService),
+        inject.bind[SubscriptionConnector].toInstance(mockSubscriptionConnector)
       )
       .build()
 
@@ -74,6 +77,9 @@ class FileUploadedControllerSpec extends SpecBase with MockitoSugar {
 
       when(mockStcUpscanProcessingService.process(any())(any[HeaderCarrier]))
         .thenReturn(Future.successful(Right(validationResponse)))
+
+      when(mockSubscriptionConnector.getAndStoreSubscription(any())(any[HeaderCarrier]))
+        .thenReturn(Future.successful(subscription))
 
       val app = application
 
@@ -137,6 +143,28 @@ class FileUploadedControllerSpec extends SpecBase with MockitoSugar {
       running(app) {
         val request = FakeRequest(GET, fileUploadedRoute(testKey))
         val result  = route(app, request).value
+
+        status(result) mustBe SEE_OTHER
+        redirectLocation(result).value mustBe routes.JourneyRecoveryController.onPageLoad().url
+      }
+    }
+
+    "must  redirect to JourneyRecovery for an expired subscription" in {
+
+      when(mockRepository.find(any()))
+        .thenReturn(Future.successful(Some(testFileUpload)))
+
+      when(mockStcUpscanProcessingService.process(any())(any[HeaderCarrier]))
+        .thenReturn(Future.successful(Right(validationResponse)))
+
+      when(mockSubscriptionConnector.getAndStoreSubscription(any())(any()))
+        .thenReturn(Future.failed(new SubscriptionStatusErrorException("expired")))
+
+      val app = application
+
+      running(app) {
+        val request = FakeRequest(GET, fileUploadedRoute(testKey))
+        val result = route(app, request).value
 
         status(result) mustBe SEE_OTHER
         redirectLocation(result).value mustBe routes.JourneyRecoveryController.onPageLoad().url
