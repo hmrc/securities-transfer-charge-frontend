@@ -56,20 +56,17 @@ class FileUploadedController @Inject()(
     }
 
   private def processReadyUpload(fileUpload: FileUpload)(implicit request: StcAuthorisedRequest[_]): Future[Result] =
-    for {
-      processResult <- stcUpscanProcessingService.process(fileUpload)
-      result <- processResult match {
-        case Right(_) =>
-          subscriptionConnector.getAndStoreSubscription(request.subscriptionId)
-            .map(_ => Ok(view(fileUpload)))
-            .recover {
-              case _ =>
-                Redirect(routes.JourneyRecoveryController.onPageLoad())
-            }
-        case Left(_) =>
-          Future.successful(
-            Redirect(individualRoutes.FormattingErrorController.onPageLoad())
-          )
-      }
-    } yield result
+    stcUpscanProcessingService.process(fileUpload).flatMap {
+      case Right(_) =>
+        subscriptionConnector.getAndStoreSubscription(request.subscriptionId)
+          .map(_ => Ok(view(fileUpload)))
+          .recover {
+            case _ => Redirect(routes.JourneyRecoveryController.onPageLoad())
+          }
+
+      case Left(_) =>
+        Future.successful(
+          Redirect(individualRoutes.FormattingErrorController.onPageLoad())
+        )
+    }
 }
