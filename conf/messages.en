@@ -225,7 +225,7 @@ org.confirmAddress.heading = Confirm business address
 org.confirmAddress.editLink = Edit address
 org.confirmAddress.confirm = Confirm and continue
 
-org.nameOfSeller.hint = This is the individual, business or trust buying the shares.
+org.nameOfSeller.hint = This is the individual, business or trust selling the securities.
 
 org.howToNotifyAboutSecuritiesTransfer.title = How do you want to tell us about your securities transfers?
 org.howToNotifyAboutSecuritiesTransfer.heading = How do you want to tell us about your securities transfers?
