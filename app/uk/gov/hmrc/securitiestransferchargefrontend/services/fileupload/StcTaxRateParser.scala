@@ -16,16 +16,23 @@
 
 package uk.gov.hmrc.securitiestransferchargefrontend.services.fileupload
 
-import javax.inject.{Inject, Singleton}
-import uk.gov.hmrc.securitiestransferchargefrontend.models.fileupload.{ParsedRow, StcFileValidationResponse}
+object StcTaxRateParser {
 
-@Singleton
-class StcFileValidationService @Inject()(
-                                          stcRowValidationService: StcRowValidationService
-                                        ) {
+  sealed trait ParsedTaxRate
+  private object ParsedTaxRate {
+    case object HalfPercent extends ParsedTaxRate
+    case object OneAndHalfPercent extends ParsedTaxRate
+  }
 
-  def validate(rows: Seq[ParsedRow]): StcFileValidationResponse =
-    StcFileValidationResponse(
-      rows = rows.map(stcRowValidationService.validate)
-    )
+  def parse(raw: String): Option[ParsedTaxRate] =
+    normalise(raw) match {
+      case "0.5" => Some(ParsedTaxRate.HalfPercent)
+      case "1.5" => Some(ParsedTaxRate.OneAndHalfPercent)
+      case _     => None
+    }
+
+  private def normalise(raw: String): String =
+    raw.trim
+      .replace("%", "")
+      .replace(" ", "")
 }

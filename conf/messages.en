@@ -376,3 +376,12 @@ org.uploadedFileError.p1 = Correct the errors and upload it again, or upload a d
 org.uploadedFileError.table.heading = Problems with your file
 org.uploadedFileError.table.cell = Cell
 org.uploadedFileError.table.error = Error
+
+
+sellerAddressLine1.error.required = Enter the first line of your address
+sellerAddressLine1.error.invalid = Address line 1 can only include letters, numbers and the following characters: , . - '
+
+sellerPostcode.error.required = Enter a postcode
+sellerPostcode.error.invalid = Enter a real postcode, like AA1 1AA
+
+taxRate.error.required = Enter a tax rate of ‘0.5%’ or ‘1.5%’

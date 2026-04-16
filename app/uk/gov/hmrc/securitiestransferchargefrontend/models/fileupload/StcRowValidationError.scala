@@ -21,6 +21,7 @@ import play.api.libs.json.{Json, OFormat}
 final case class StcRowValidationError(
                                         rowNumber: Int,
                                         fieldName: String,
+                                        columnIndex: Int,
                                         message: String,
                                         blocking: Boolean
                                       )
