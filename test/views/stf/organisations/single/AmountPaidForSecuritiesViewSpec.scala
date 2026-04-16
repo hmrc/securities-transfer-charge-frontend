@@ -44,7 +44,7 @@ class AmountPaidForSecuritiesViewSpec extends ViewBaseSpec {
   object ExpectedContent {
     val title: String = messages("org.amountPaidForSecurities.title")
     val heading: String = messages("org.amountPaidForSecurities.heading")
-    val caption: String = messages("amountPaidForSecurities.caption")
+    val caption: String = messages("transfer.details.caption")
     val p1: String = messages("org.amountPaidForSecurities.p1")
     val p2: String = messages("org.amountPaidForSecurities.p2")
     val saveAndContinue: String = messages("site.save-and-continue.button")
