@@ -14,14 +14,18 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.securitiestransferchargefrontend.pages.stf.single
+package uk.gov.hmrc.securitiestransferchargefrontend.forms.stf.agents
 
-import play.api.libs.json.JsPath
-import uk.gov.hmrc.securitiestransferchargefrontend.pages.QuestionPage
+import play.api.data.Form
+import uk.gov.hmrc.securitiestransferchargefrontend.forms.mappings.Mappings
 
-case object AmountPaidForSecuritiesPage extends QuestionPage[BigDecimal] {
+import javax.inject.Inject
 
-  override def path: JsPath = JsPath \ toString
+class AgentReferenceFormProvider @Inject() extends Mappings {
 
-  override def toString: String = "amountPaidForSecurities"
+  def apply(): Form[String] =
+    Form(
+      "value" -> text("agentReference.error.required")
+        .verifying(maxLength(255, "agentReference.error.length"))
+    )
 }

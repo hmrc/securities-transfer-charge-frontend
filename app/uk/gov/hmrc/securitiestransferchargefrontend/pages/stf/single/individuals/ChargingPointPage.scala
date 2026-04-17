@@ -14,14 +14,16 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.securitiestransferchargefrontend.pages.stf.single
+package uk.gov.hmrc.securitiestransferchargefrontend.pages.stf.single.individuals
 
 import play.api.libs.json.JsPath
 import uk.gov.hmrc.securitiestransferchargefrontend.pages.QuestionPage
 
-case object ConnectedPersonsPage extends QuestionPage[Boolean] {
+import java.time.LocalDate
+
+case object ChargingPointPage extends QuestionPage[LocalDate] {
 
   override def path: JsPath = JsPath \ toString
 
-  override def toString: String = "connectedPersons"
+  override def toString: String = "chargingPoint"
 }

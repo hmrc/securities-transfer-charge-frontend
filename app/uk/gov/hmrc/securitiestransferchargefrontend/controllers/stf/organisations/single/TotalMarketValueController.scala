@@ -24,7 +24,7 @@ import uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.shared.SaveA
 import uk.gov.hmrc.securitiestransferchargefrontend.forms.stf.organisations.TotalMarketValueFormProvider
 import uk.gov.hmrc.securitiestransferchargefrontend.models.{Mode, UserAnswers}
 import uk.gov.hmrc.securitiestransferchargefrontend.navigation.Navigator
-import uk.gov.hmrc.securitiestransferchargefrontend.pages.stf.single.TotalMarketValuePage
+import uk.gov.hmrc.securitiestransferchargefrontend.pages.stf.single.individuals.TotalMarketValuePage
 import uk.gov.hmrc.securitiestransferchargefrontend.views.html.stf.organisations.single.TotalMarketValueView
 
 import javax.inject.{Inject, Named}

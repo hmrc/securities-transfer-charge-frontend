@@ -14,14 +14,18 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.securitiestransferchargefrontend.pages.stf.single
+package uk.gov.hmrc.securitiestransferchargefrontend.navigation.stf.agents
 
-import play.api.libs.json.JsPath
-import uk.gov.hmrc.securitiestransferchargefrontend.pages.QuestionPage
+import play.api.mvc.Call
+import uk.gov.hmrc.securitiestransferchargefrontend.models.UserAnswers
+import uk.gov.hmrc.securitiestransferchargefrontend.navigation.NavigationHelper
+import uk.gov.hmrc.securitiestransferchargefrontend.pages.*
 
-case object WhatReliefAreYouApplyingForPage extends QuestionPage[String] {
+class BackwardsRoutes(defaultPage: Call):
 
-  override def path: JsPath = JsPath \ toString
+  val navHelper: NavigationHelper = new NavigationHelper(defaultPage)
 
-  override def toString: String = "whatReliefAreYouApplyingFor"
-}
+  def predecessorRoutes(page: Page): UserAnswers => Call = page match {
+    case _ => _ => defaultPage
+
+  }

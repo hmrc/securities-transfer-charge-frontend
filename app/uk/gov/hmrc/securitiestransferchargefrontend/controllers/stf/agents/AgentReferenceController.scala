@@ -14,49 +14,49 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.organisations.single
+package uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.agents
 
 import play.api.data.Form
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, Call, MessagesControllerComponents}
+import play.twirl.api.Html
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.actions.*
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.shared.SaveAndReturnButton.isReturn
-import uk.gov.hmrc.securitiestransferchargefrontend.forms.stf.organisations.WhatReliefAreYouApplyingForFormProvider
-import uk.gov.hmrc.securitiestransferchargefrontend.models.{Mode, ReliefsDataSource, UserAnswers}
+import uk.gov.hmrc.securitiestransferchargefrontend.forms.stf.agents.AgentReferenceFormProvider
+import uk.gov.hmrc.securitiestransferchargefrontend.models.{Mode, UserAnswers}
 import uk.gov.hmrc.securitiestransferchargefrontend.navigation.Navigator
-import uk.gov.hmrc.securitiestransferchargefrontend.pages.stf.single.individuals.WhatReliefAreYouApplyingForPage
-import uk.gov.hmrc.securitiestransferchargefrontend.views.html.stf.organisations.single.WhatReliefAreYouApplyingForView
+import uk.gov.hmrc.securitiestransferchargefrontend.pages.stf.single.agents.AgentReferencePage
+import uk.gov.hmrc.securitiestransferchargefrontend.views.html.stf.agents.AgentReferenceView
 
 import javax.inject.{Inject, Named}
 import scala.concurrent.{ExecutionContext, Future}
 
-class WhatReliefAreYouApplyingForController @Inject()(
+class AgentReferenceController @Inject()(
                                         override val messagesApi: MessagesApi,
-                                        @Named("organisations") navigator: Navigator,
+                                        @Named("agents") agentNavigator: Navigator,
+                                        navigator: Navigator,
                                         stcAuthEnrolled: StcAuthEnrolledAction,
                                         getData: StcDataRetrievalAction,
                                         requireData: StcDataRequiredAction,
-                                        formProvider: WhatReliefAreYouApplyingForFormProvider,
+                                        formProvider: AgentReferenceFormProvider,
                                         val controllerComponents: MessagesControllerComponents,
-                                        view: WhatReliefAreYouApplyingForView,
-                                        reliefsDataSource:ReliefsDataSource
+                                        view: AgentReferenceView
                                     )(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport {
 
   val form: Form[String] = formProvider()
-
   lazy val backLinkCall: Mode => UserAnswers => Call =
-    mode => userAnswers => navigator.previousPage(WhatReliefAreYouApplyingForPage, mode, userAnswers)
+    mode => userAnswers => agentNavigator.previousPage(AgentReferencePage, mode, userAnswers)
 
   def onPageLoad(mode: Mode): Action[AnyContent] = (stcAuthEnrolled andThen getData andThen requireData) {
     implicit request =>
 
-      val preparedForm = request.userAnswers.get(WhatReliefAreYouApplyingForPage) match {
+      val preparedForm = request.userAnswers.get(AgentReferencePage) match {
         case None => form
         case Some(value) => form.fill(value)
       }
 
-      Ok(view(preparedForm, mode, reliefsDataSource.reliefs, backLinkCall(mode)(request.userAnswers)))
+      Ok(view(preparedForm, mode, backLinkCall(mode)(request.userAnswers)): Html)
   }
 
   def onSubmit(mode: Mode): Action[AnyContent] = (stcAuthEnrolled andThen getData andThen requireData).async {
@@ -64,12 +64,12 @@ class WhatReliefAreYouApplyingForController @Inject()(
 
       form.bindFromRequest().fold(
         formWithErrors =>
-          Future.successful(BadRequest(view(formWithErrors, mode,reliefsDataSource.reliefs, backLinkCall(mode)(request.userAnswers)))),
+          Future.successful(BadRequest(view(formWithErrors, mode, backLinkCall(mode)(request.userAnswers)): Html)),
 
-        relief =>
+        value =>
           for {
-            updatedAnswers <- Future.fromTry(request.userAnswers.set(WhatReliefAreYouApplyingForPage, relief))
-            nextPage <- navigator.nextPage(WhatReliefAreYouApplyingForPage, mode, updatedAnswers, isReturn(request))
+            updatedAnswers <- Future.fromTry(request.userAnswers.set(AgentReferencePage, value))
+            nextPage       <- navigator.nextPage(AgentReferencePage, mode, updatedAnswers, isReturn(request))
           } yield Redirect(nextPage)
       )
   }

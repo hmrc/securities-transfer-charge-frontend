@@ -24,7 +24,7 @@ import uk.gov.hmrc.securitiestransferchargefrontend.controllers.actions.{StcAuth
 import uk.gov.hmrc.securitiestransferchargefrontend.models.NormalMode
 import uk.gov.hmrc.securitiestransferchargefrontend.navigation.Navigator
 import uk.gov.hmrc.securitiestransferchargefrontend.pages.AddressPage
-import uk.gov.hmrc.securitiestransferchargefrontend.pages.stf.single.StfSellerAddressPage
+import uk.gov.hmrc.securitiestransferchargefrontend.pages.stf.single.individuals.StfSellerAddressPage
 
 import javax.inject.{Inject, Named}
 import scala.concurrent.{ExecutionContext, Future}

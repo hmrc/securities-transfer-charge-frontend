@@ -25,7 +25,7 @@ import uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.shared.SaveA
 import uk.gov.hmrc.securitiestransferchargefrontend.forms.stf.organisations.AmountPaidForSecuritiesFormProvider
 import uk.gov.hmrc.securitiestransferchargefrontend.models.{Mode, UserAnswers}
 import uk.gov.hmrc.securitiestransferchargefrontend.navigation.Navigator
-import uk.gov.hmrc.securitiestransferchargefrontend.pages.stf.single.AmountPaidForSecuritiesPage
+import uk.gov.hmrc.securitiestransferchargefrontend.pages.stf.single.individuals.AmountPaidForSecuritiesPage
 import uk.gov.hmrc.securitiestransferchargefrontend.views.html.stf.organisations.single.AmountPaidForSecuritiesView
 
 import javax.inject.{Inject, Named}

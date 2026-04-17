@@ -26,7 +26,7 @@ import uk.gov.hmrc.securitiestransferchargefrontend.forms.stf.individuals.TaxRat
 import uk.gov.hmrc.securitiestransferchargefrontend.models.stf.TaxRate
 import uk.gov.hmrc.securitiestransferchargefrontend.models.{Mode, UserAnswers}
 import uk.gov.hmrc.securitiestransferchargefrontend.navigation.Navigator
-import uk.gov.hmrc.securitiestransferchargefrontend.pages.stf.single.TaxRatePage
+import uk.gov.hmrc.securitiestransferchargefrontend.pages.stf.single.individuals.TaxRatePage
 import uk.gov.hmrc.securitiestransferchargefrontend.views.html.stf.individuals.single.TaxRateView
 
 import javax.inject.{Inject, Named}
