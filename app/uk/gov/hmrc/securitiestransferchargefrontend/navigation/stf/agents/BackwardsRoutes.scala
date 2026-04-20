@@ -21,7 +21,7 @@ import uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.shared.route
 import uk.gov.hmrc.securitiestransferchargefrontend.models.UserAnswers
 import uk.gov.hmrc.securitiestransferchargefrontend.navigation.NavigationHelper
 import uk.gov.hmrc.securitiestransferchargefrontend.pages.*
-import uk.gov.hmrc.securitiestransferchargefrontend.pages.stf.agents.AgentReferencePage
+import uk.gov.hmrc.securitiestransferchargefrontend.pages.stf.single.AgentReferencePage
 
 class BackwardsRoutes(defaultPage: Call):
 

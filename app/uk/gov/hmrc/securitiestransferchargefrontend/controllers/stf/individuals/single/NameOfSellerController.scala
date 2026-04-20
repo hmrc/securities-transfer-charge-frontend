@@ -25,7 +25,7 @@ import uk.gov.hmrc.securitiestransferchargefrontend.controllers.actions.*
 import uk.gov.hmrc.securitiestransferchargefrontend.forms.stf.shared.NameOfSellerFormProvider
 import uk.gov.hmrc.securitiestransferchargefrontend.models.{Mode, UserAnswers}
 import uk.gov.hmrc.securitiestransferchargefrontend.navigation.Navigator
-import uk.gov.hmrc.securitiestransferchargefrontend.pages.stf.individuals.single.NameOfSellerPage
+import uk.gov.hmrc.securitiestransferchargefrontend.pages.stf.single.NameOfSellerPage
 import uk.gov.hmrc.securitiestransferchargefrontend.views.html.stf.individuals.single.NameOfSellerView
 
 import javax.inject.{Inject, Named}

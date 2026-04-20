@@ -14,14 +14,9 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.securitiestransferchargefrontend.pages.stf.individuals.single
+package uk.gov.hmrc.securitiestransferchargefrontend.pages.stf.bulk
 
-import play.api.libs.json.JsPath
-import uk.gov.hmrc.securitiestransferchargefrontend.pages.QuestionPage
+import uk.gov.hmrc.securitiestransferchargefrontend.pages.Page
 
-case object TotalMarketValuePage extends QuestionPage[BigDecimal] {
-
-  override def path: JsPath = JsPath \ toString
-
-  override def toString: String = "totalMarketValuePage"
+case object FileUploadPage extends Page {
 }

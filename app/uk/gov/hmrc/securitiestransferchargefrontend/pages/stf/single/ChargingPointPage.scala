@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.securitiestransferchargefrontend.pages.stf.individuals.single
+package uk.gov.hmrc.securitiestransferchargefrontend.pages.stf.single
 
 import play.api.libs.json.JsPath
 import uk.gov.hmrc.securitiestransferchargefrontend.pages.QuestionPage

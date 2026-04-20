@@ -30,7 +30,7 @@ import uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.individuals.
 import uk.gov.hmrc.securitiestransferchargefrontend.forms.stf.individuals.ChargingPointFormProvider
 import uk.gov.hmrc.securitiestransferchargefrontend.models.{NormalMode, UserAnswers}
 import uk.gov.hmrc.securitiestransferchargefrontend.navigation.Navigator
-import uk.gov.hmrc.securitiestransferchargefrontend.pages.stf.individuals.single.ChargingPointPage
+import uk.gov.hmrc.securitiestransferchargefrontend.pages.stf.single.ChargingPointPage
 import uk.gov.hmrc.securitiestransferchargefrontend.repositories.SessionRepository
 import uk.gov.hmrc.securitiestransferchargefrontend.views.html.stf.individuals.single.ChargingPointView
 
