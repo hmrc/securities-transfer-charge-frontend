@@ -25,7 +25,7 @@ import uk.gov.hmrc.securitiestransferchargefrontend.controllers.actions.*
 import uk.gov.hmrc.securitiestransferchargefrontend.forms.stf.individuals.ApplyingForReliefFormProvider
 import uk.gov.hmrc.securitiestransferchargefrontend.models.{Mode, UserAnswers}
 import uk.gov.hmrc.securitiestransferchargefrontend.navigation.Navigator
-import uk.gov.hmrc.securitiestransferchargefrontend.pages.stf.single.individuals.ApplyingForReliefPage
+import uk.gov.hmrc.securitiestransferchargefrontend.pages.stf.individuals.single.ApplyingForReliefPage
 import uk.gov.hmrc.securitiestransferchargefrontend.views.html.stf.individuals.single.ApplyingForReliefView
 
 import javax.inject.{Inject, Named}

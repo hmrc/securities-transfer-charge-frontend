@@ -17,6 +17,7 @@
 @import uk.gov.hmrc.securitiestransferchargefrontend.viewmodels.InputWidth._
 @import uk.gov.hmrc.securitiestransferchargefrontend.viewmodels.LabelSize.Large
 @import uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.agents.routes
+@import uk.gov.hmrc.securitiestransferchargefrontend.views.html.components.SaveAndReturnButton
 @import uk.gov.hmrc.securitiestransferchargefrontend.views.html.templates
 
 
@@ -25,7 +26,8 @@
     formHelper: FormWithCSRF,
     govukErrorSummary: GovukErrorSummary,
     govukInput: GovukInput,
-    govukButton: GovukButton
+    govukButton: GovukButton,
+    saveAndReturnButton: SaveAndReturnButton
 )
 
 @(form: Form[_], mode: Mode, backLinkCall: Call)(implicit request: Request[_], messages: Messages)
@@ -44,10 +46,15 @@
                 label = LabelViewModel(messages("agentReference.heading")).asPageHeading(Large)
             )
             .withWidth(Full)
+            .withHint(HintViewModel(messages("agentReference.hint")))
         )
 
         @govukButton(
-            ButtonViewModel(messages("site.continue"))
+            ButtonViewModel(
+                messages("site.save-and-continue.button")
+            )
         )
+
+        @saveAndReturnButton()
     }
 }

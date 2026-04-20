@@ -17,15 +17,19 @@
 package uk.gov.hmrc.securitiestransferchargefrontend.navigation.stf.agents
 
 import play.api.mvc.Call
+import uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.shared.routes as sharedRoutes
 import uk.gov.hmrc.securitiestransferchargefrontend.models.UserAnswers
 import uk.gov.hmrc.securitiestransferchargefrontend.navigation.NavigationHelper
 import uk.gov.hmrc.securitiestransferchargefrontend.pages.*
+import uk.gov.hmrc.securitiestransferchargefrontend.pages.stf.agents.AgentReferencePage
 
 class BackwardsRoutes(defaultPage: Call):
 
   val navHelper: NavigationHelper = new NavigationHelper(defaultPage)
 
   def predecessorRoutes(page: Page): UserAnswers => Call = page match {
+
+    case AgentReferencePage => _ => sharedRoutes.SubmissionsDashboardController.onPageLoad()
     case _ => _ => defaultPage
 
   }

@@ -18,7 +18,7 @@ package services.fileupload
 
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpec
-import uk.gov.hmrc.securitiestransferchargefrontend.models.fileupload.{ParsedStcRow, ParsedValue}
+import uk.gov.hmrc.securitiestransferchargefrontend.models.stf.fileupload.{ParsedStcRow, ParsedValue, ValidatedStcRow}
 import uk.gov.hmrc.securitiestransferchargefrontend.services.fileupload.StcRowValidationService
 
 import java.time.LocalDate
@@ -57,7 +57,7 @@ class StcRowValidationServiceSpec extends AnyWordSpec with Matchers {
     totalMarketValue = ParsedValue.Missing
   )
 
-  private def messageFor(result: uk.gov.hmrc.securitiestransferchargefrontend.models.fileupload.ValidatedStcRow, fieldName: String): Option[String] =
+  private def messageFor(result: ValidatedStcRow, fieldName: String): Option[String] =
     result.validationErrors.find(_.fieldName == fieldName).map(_.message)
 
   "validate" should {

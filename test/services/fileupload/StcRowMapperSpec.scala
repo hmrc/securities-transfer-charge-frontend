@@ -18,7 +18,7 @@ package services.fileupload
 
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpec
-import uk.gov.hmrc.securitiestransferchargefrontend.models.fileupload.{ParsedCell, ParsedRow, ParsedStcRow, ParsedValue}
+import uk.gov.hmrc.securitiestransferchargefrontend.models.stf.fileupload.{ParsedCell, ParsedRow, ParsedStcRow, ParsedValue}
 import uk.gov.hmrc.securitiestransferchargefrontend.services.fileupload.StcRowMapper
 
 import java.time.LocalDate

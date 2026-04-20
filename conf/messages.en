@@ -385,3 +385,11 @@ uploadedFileError.table.heading = Problems with your file
 uploadedFileError.table.cell = Cell
 uploadedFileError.table.error = Error
 
+agent.details.caption = Agent details
+agentReference.title = Add a reference
+agentReference.heading = Add a reference (optional)
+agentReference.checkYourAnswersLabel = Add a reference
+agentReference.hint = You can add a reference for your own records and to help you find this submission later. It will not be used by HMRC.
+agentReference.error.required = Enter agentReference
+agentReference.error.length = Your reference must be 255 characters or fewer
+agentReference.change.hidden = AgentReference

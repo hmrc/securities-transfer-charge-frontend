@@ -24,9 +24,10 @@ import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.actions.*
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.shared.SaveAndReturnButton.isReturn
 import uk.gov.hmrc.securitiestransferchargefrontend.forms.stf.agents.AgentReferenceFormProvider
+import uk.gov.hmrc.securitiestransferchargefrontend.models.stf.AgentReference
 import uk.gov.hmrc.securitiestransferchargefrontend.models.{Mode, UserAnswers}
 import uk.gov.hmrc.securitiestransferchargefrontend.navigation.Navigator
-import uk.gov.hmrc.securitiestransferchargefrontend.pages.stf.single.agents.AgentReferencePage
+import uk.gov.hmrc.securitiestransferchargefrontend.pages.stf.agents.AgentReferencePage
 import uk.gov.hmrc.securitiestransferchargefrontend.views.html.stf.agents.AgentReferenceView
 
 import javax.inject.{Inject, Named}
@@ -35,7 +36,6 @@ import scala.concurrent.{ExecutionContext, Future}
 class AgentReferenceController @Inject()(
                                         override val messagesApi: MessagesApi,
                                         @Named("agents") agentNavigator: Navigator,
-                                        navigator: Navigator,
                                         stcAuthEnrolled: StcAuthEnrolledAction,
                                         getData: StcDataRetrievalAction,
                                         requireData: StcDataRequiredAction,
@@ -44,7 +44,7 @@ class AgentReferenceController @Inject()(
                                         view: AgentReferenceView
                                     )(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport {
 
-  val form: Form[String] = formProvider()
+  val form: Form[AgentReference] = formProvider()
   lazy val backLinkCall: Mode => UserAnswers => Call =
     mode => userAnswers => agentNavigator.previousPage(AgentReferencePage, mode, userAnswers)
 
@@ -69,7 +69,7 @@ class AgentReferenceController @Inject()(
         value =>
           for {
             updatedAnswers <- Future.fromTry(request.userAnswers.set(AgentReferencePage, value))
-            nextPage       <- navigator.nextPage(AgentReferencePage, mode, updatedAnswers, isReturn(request))
+            nextPage       <- agentNavigator.nextPage(AgentReferencePage, mode, updatedAnswers, isReturn(request))
           } yield Redirect(nextPage)
       )
   }

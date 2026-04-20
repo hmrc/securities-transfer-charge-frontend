@@ -24,7 +24,7 @@ import uk.gov.hmrc.securitiestransferchargefrontend.controllers.actions.*
 import uk.gov.hmrc.securitiestransferchargefrontend.forms.stf.individuals.ChargingPointFormProvider
 import uk.gov.hmrc.securitiestransferchargefrontend.models.{Mode, UserAnswers}
 import uk.gov.hmrc.securitiestransferchargefrontend.navigation.Navigator
-import uk.gov.hmrc.securitiestransferchargefrontend.pages.stf.single.individuals.ChargingPointPage
+import uk.gov.hmrc.securitiestransferchargefrontend.pages.stf.individuals.single.ChargingPointPage
 import uk.gov.hmrc.securitiestransferchargefrontend.views.html.stf.individuals.single.ChargingPointView
 
 import javax.inject.{Inject, Named}

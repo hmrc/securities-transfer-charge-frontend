@@ -17,15 +17,21 @@
 package uk.gov.hmrc.securitiestransferchargefrontend.forms.stf.agents
 
 import play.api.data.Form
+import play.api.data.Forms.{mapping, optional}
 import uk.gov.hmrc.securitiestransferchargefrontend.forms.mappings.Mappings
+import uk.gov.hmrc.securitiestransferchargefrontend.models.stf.AgentReference
 
 import javax.inject.Inject
 
 class AgentReferenceFormProvider @Inject() extends Mappings {
 
-  def apply(): Form[String] =
-    Form(
-      "value" -> text("agentReference.error.required")
-        .verifying(maxLength(255, "agentReference.error.length"))
-    )
+  def apply(): Form[AgentReference] = Form(
+    mapping(
+      "agentReference" ->
+        optional(
+          text()
+            .verifying(maxLength(8, "org.securitiesTarget.error.crn.length"))
+        )
+    )(AgentReference.apply)(x => Some(x.agentReference))
+  )
 }

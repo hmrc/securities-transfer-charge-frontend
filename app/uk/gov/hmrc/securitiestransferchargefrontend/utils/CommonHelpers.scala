@@ -18,7 +18,7 @@ package uk.gov.hmrc.securitiestransferchargefrontend.utils
 
 import play.api.Logger
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.actions.requests.StcDataRequest
-import uk.gov.hmrc.securitiestransferchargefrontend.pages.stf.single.individuals.ConnectedPersonsPage
+import uk.gov.hmrc.securitiestransferchargefrontend.pages.stf.individuals.single.ConnectedPersonsPage
 
 import scala.concurrent.{ExecutionContext, Future}
 
