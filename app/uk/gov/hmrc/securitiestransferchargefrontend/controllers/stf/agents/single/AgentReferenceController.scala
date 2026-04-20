@@ -28,7 +28,7 @@ import uk.gov.hmrc.securitiestransferchargefrontend.models.stf.AgentReference
 import uk.gov.hmrc.securitiestransferchargefrontend.models.{Mode, UserAnswers}
 import uk.gov.hmrc.securitiestransferchargefrontend.navigation.Navigator
 import uk.gov.hmrc.securitiestransferchargefrontend.pages.stf.single.AgentReferencePage
-import uk.gov.hmrc.securitiestransferchargefrontend.views.html.stf.agents.AgentReferenceView
+import uk.gov.hmrc.securitiestransferchargefrontend.views.html.stf.agents.single.AgentReferenceView
 
 import javax.inject.{Inject, Named}
 import scala.concurrent.{ExecutionContext, Future}

@@ -19,7 +19,7 @@ package uk.gov.hmrc.securitiestransferchargefrontend.viewmodels.stf.agents
 import play.api.i18n.Messages
 import play.twirl.api.HtmlFormat
 import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.SummaryListRow
-import uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.agents.routes
+import uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.agents.single.routes
 import uk.gov.hmrc.securitiestransferchargefrontend.models.{CheckMode, UserAnswers}
 import uk.gov.hmrc.securitiestransferchargefrontend.pages.stf.single.AgentReferencePage
 import uk.gov.hmrc.securitiestransferchargefrontend.viewmodels.govuk.summarylist.*
@@ -28,16 +28,17 @@ import uk.gov.hmrc.securitiestransferchargefrontend.viewmodels.implicits.*
 object AgentReferenceSummary  {
 
   def row(answers: UserAnswers)(implicit messages: Messages): Option[SummaryListRow] =
-    answers.get(AgentReferencePage).map {
-      answer =>
+    answers.get(AgentReferencePage).flatMap { answer =>
+      answer.agentReference.map { value =>
 
         SummaryListRowViewModel(
-          key     = "agentReference.checkYourAnswersLabel",
-          value   = ValueViewModel(HtmlFormat.escape(answer).toString),
+          key = "agentReference.checkYourAnswersLabel",
+          value = ValueViewModel(HtmlFormat.escape(value).toString),
           actions = Seq(
             ActionItemViewModel("site.change", routes.AgentReferenceController.onPageLoad(CheckMode).url)
               .withVisuallyHiddenText(messages("agentReference.change.hidden"))
           )
         )
+      }
     }
 }

@@ -17,9 +17,10 @@
 package uk.gov.hmrc.securitiestransferchargefrontend.pages.stf.single
 
 import play.api.libs.json.JsPath
+import uk.gov.hmrc.securitiestransferchargefrontend.models.stf.AgentReference
 import uk.gov.hmrc.securitiestransferchargefrontend.pages.QuestionPage
 
-case object AgentReferencePage extends QuestionPage[String] {
+case object AgentReferencePage extends QuestionPage[AgentReference] {
 
   override def path: JsPath = JsPath \ toString
 
