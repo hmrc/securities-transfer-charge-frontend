@@ -76,5 +76,11 @@ class Module extends AbstractModule {
     bind(classOf[PersistentNavigator])
       .annotatedWith(Names.named("individuals"))
       .to(classOf[StfNavigator])
+    bind(classOf[Navigator])
+      .annotatedWith(Names.named("agents"))
+      .to(classOf[StfOrgNavigator])
+    bind(classOf[PersistentNavigator])
+      .annotatedWith(Names.named("agents"))
+      .to(classOf[StfOrgNavigator])
   }
 }
