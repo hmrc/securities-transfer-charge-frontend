@@ -113,33 +113,49 @@ class StcBasicRowValidator @Inject()(
         )
       )
     } else {
-      val parts =
-        raw.split("""[/\-\s]""").toList.filter(_.nonEmpty)
+      val parts = raw.split("""[/\-\s]""").toList.filter(_.nonEmpty)
 
-      val boundForm = chargingPointFormProvider().bind(
-        Map(
-          "value.day"   -> parts.headOption.getOrElse(""),
-          "value.month" -> parts.lift(1).getOrElse(""),
-          "value.year"  -> parts.lift(2).getOrElse("")
-        )
-      )
+      val dateMap =
+        parts match {
+          case year :: month :: day :: Nil if year.length == 4 =>
+            Map(
+              "value.day" -> day,
+              "value.month" -> month,
+              "value.year" -> year
+            )
+
+          case day :: month :: year :: Nil =>
+            Map(
+              "value.day" -> day,
+              "value.month" -> month,
+              "value.year" -> year
+            )
+
+          case _ =>
+            Map(
+              "value.day" -> "",
+              "value.month" -> "",
+              "value.year" -> ""
+            )
+        }
+
+      val boundForm = chargingPointFormProvider().bind(dateMap)
 
       boundForm.errors.map { formError =>
         val message =
           formError.message match {
             case "chargingPoint.error.required" =>
               formError.args.headOption match {
-                case Some("day")   => "The date you bought the securities must include a day"
+                case Some("day") => "The date you bought the securities must include a day"
                 case Some("month") => "The date you bought the securities must include a month"
-                case Some("year")  => "The date you bought the securities must include a year"
-                case _             => messages("chargingPoint.error.required")
+                case Some("year") => "The date you bought the securities must include a year"
+                case _ => messages("chargingPoint.error.required")
               }
 
             case "chargingPoint.error.required.all" =>
               messages("chargingPoint.error.required.all")
 
             case "chargingPoint.error.required.two" =>
-              // UCD wants per-part messaging rather than "include X and Y"
               val args = formError.args.map(_.toString).toSet
               if (args.contains("day")) {
                 "The date you bought the securities must include a day"

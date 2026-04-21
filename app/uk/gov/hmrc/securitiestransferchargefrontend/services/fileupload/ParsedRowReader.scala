@@ -63,6 +63,8 @@ object ParsedRowReader {
   def readDate(row: ParsedRow, columnIndex: Int): ParsedValue[LocalDate] = {
     val formatters = Seq(
       DateTimeFormatter.ISO_LOCAL_DATE,
+      DateTimeFormatter.ofPattern("yyyy/M/d"),
+      DateTimeFormatter.ofPattern("yyyy/MM/dd"),
       DateTimeFormatter.ofPattern("d/M/uuuu"),
       DateTimeFormatter.ofPattern("dd/MM/uuuu"),
       DateTimeFormatter.ofPattern("d M uuuu"),
