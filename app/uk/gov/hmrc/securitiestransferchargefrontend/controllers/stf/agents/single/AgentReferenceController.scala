@@ -35,7 +35,7 @@ import scala.concurrent.{ExecutionContext, Future}
 
 class AgentReferenceController @Inject()(
                                         override val messagesApi: MessagesApi,
-                                        @Named("agents") agentNavigator: Navigator,
+                                        @Named("agents") navigator: Navigator,
                                         stcAuthEnrolled: StcAuthEnrolledAction,
                                         getData: StcDataRetrievalAction,
                                         requireData: StcDataRequiredAction,
@@ -45,8 +45,9 @@ class AgentReferenceController @Inject()(
                                     )(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport {
 
   val form: Form[AgentReference] = formProvider()
+
   lazy val backLinkCall: Mode => UserAnswers => Call =
-    mode => userAnswers => agentNavigator.previousPage(AgentReferencePage, mode, userAnswers)
+    mode => userAnswers => navigator.previousPage(AgentReferencePage, mode, userAnswers)
 
   def onPageLoad(mode: Mode): Action[AnyContent] = (stcAuthEnrolled andThen getData andThen requireData) {
     implicit request =>
@@ -69,7 +70,7 @@ class AgentReferenceController @Inject()(
         value =>
           for {
             updatedAnswers <- Future.fromTry(request.userAnswers.set(AgentReferencePage, value))
-            nextPage       <- agentNavigator.nextPage(AgentReferencePage, mode, updatedAnswers, isReturn(request))
+            nextPage       <- navigator.nextPage(AgentReferencePage, mode, updatedAnswers, isReturn(request))
           } yield Redirect(nextPage)
       )
   }

@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.securitiestransferchargefrontend.viewmodels.fileupload
+package uk.gov.hmrc.securitiestransferchargefrontend.viewmodels.stf.fileupload
 
 import uk.gov.hmrc.securitiestransferchargefrontend.models.stf.fileupload.{StcFileValidationResponse, StcRowValidationError, ValidatedStcRow}
 

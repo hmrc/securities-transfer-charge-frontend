@@ -18,9 +18,8 @@ package viewmodels.fileupload
 
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpec
-import uk.gov.hmrc.securitiestransferchargefrontend.models.fileupload.*
-import uk.gov.hmrc.securitiestransferchargefrontend.models.stf.fileupload.{ParsedStcRow, ParsedValue, StcFileValidationResponse, StcRowValidationError, ValidatedStcRow}
-import uk.gov.hmrc.securitiestransferchargefrontend.viewmodels.fileupload.{StcUploadResultViewModel, UploadErrorDisplay}
+import uk.gov.hmrc.securitiestransferchargefrontend.models.stf.fileupload.*
+import uk.gov.hmrc.securitiestransferchargefrontend.viewmodels.stf.fileupload.{StcUploadResultViewModel, UploadErrorDisplay}
 
 import java.time.LocalDate
 

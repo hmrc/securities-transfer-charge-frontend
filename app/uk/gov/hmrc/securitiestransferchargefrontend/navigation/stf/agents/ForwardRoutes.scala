@@ -19,10 +19,12 @@ package uk.gov.hmrc.securitiestransferchargefrontend.navigation.stf.agents
 import play.api.mvc.Call
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.agents.single.routes as agentRoutes
+import uk.gov.hmrc.securitiestransferchargefrontend.controllers.routes
 import uk.gov.hmrc.securitiestransferchargefrontend.models.{NormalMode, UserAnswers}
 import uk.gov.hmrc.securitiestransferchargefrontend.navigation.PersistentNavigationHelper
 import uk.gov.hmrc.securitiestransferchargefrontend.pages.Page
 import uk.gov.hmrc.securitiestransferchargefrontend.pages.stf.shared.SubmissionsDashboardPage
+import uk.gov.hmrc.securitiestransferchargefrontend.pages.stf.single.AgentReferencePage
 import uk.gov.hmrc.securitiestransferchargefrontend.services.AnswerPersistenceService
 
 import scala.concurrent.{ExecutionContext, Future}
@@ -39,5 +41,6 @@ class ForwardRoutes(answerPersistenceService: AnswerPersistenceService,
   def forwardRoutes(page: Page)(implicit hc: HeaderCarrier): UserAnswers => Future[Call] = page match {
 
     case SubmissionsDashboardPage => userAnswers => goTo(agentRoutes.AgentReferenceController.onPageLoad(NormalMode), Some(userAnswers))
+    case AgentReferencePage => userAnswers => dataRequired(AgentReferencePage, userAnswers,routes.JourneyRecoveryController.onPageLoad())
     case _ => _ => Future.successful(defaultPage)
   }
