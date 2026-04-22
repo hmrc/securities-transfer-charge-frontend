@@ -21,15 +21,17 @@ import org.mongodb.scala.bson.BsonDocument
 import org.mongodb.scala.bson.conversions.Bson
 import org.mongodb.scala.model.Updates.{combine, set}
 import org.mongodb.scala.model.{Filters, IndexModel, IndexOptions, Indexes, ReplaceOptions}
-import play.api.libs.json.Json
+import play.api.libs.json.{Format, Json}
 import uk.gov.hmrc.mongo.MongoComponent
 import uk.gov.hmrc.mongo.play.json.PlayMongoRepository
+import uk.gov.hmrc.mongo.play.json.formats.MongoJavatimeFormats
 import uk.gov.hmrc.securitiestransferchargefrontend.config.FrontendAppConfig
-import uk.gov.hmrc.securitiestransferchargefrontend.models.upscan.UpscanCallbackRequest.UploadDetails
-import uk.gov.hmrc.securitiestransferchargefrontend.models.upscan.{FileUpload, UpscanDocument, UpscanJourneyStatus}
+import uk.gov.hmrc.securitiestransferchargefrontend.models.stf.upscan.{FileUpload, UpscanDocument, UpscanJourneyStatus}
+import uk.gov.hmrc.securitiestransferchargefrontend.models.stf.upscan.UpscanCallbackRequest.UploadDetails
 
+import java.time.Instant
 import java.util.concurrent.TimeUnit
-import javax.inject.{Inject,Singleton}
+import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
 
 
@@ -64,6 +66,8 @@ class UpscanJourneyRepositoryImpl @Inject()(
           .expireAfter(appConfig.upscanTtl, TimeUnit.DAYS)
       )
     )) with UpscanJourneyRepository {
+
+  implicit val instantFormat: Format[Instant] = MongoJavatimeFormats.instantFormat
   
   def byReference(reference:String): Bson = Filters.equal("_id",reference)
 

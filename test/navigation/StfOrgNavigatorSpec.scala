@@ -23,10 +23,16 @@ import org.scalatest.concurrent.ScalaFutures
 import org.scalatestplus.mockito.MockitoSugar.mock
 import uk.gov.hmrc.securitiestransferchargefrontend.config.FrontendAppConfig
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.routes
+import uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.organisations.single.routes as orgSingleRoutes
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.organisations.routes as orgRoutes
+import uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.organisations.bulk.routes as orgBulkRoutes
+import uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.shared.routes as sharedRoutes
 import uk.gov.hmrc.securitiestransferchargefrontend.models.*
+import uk.gov.hmrc.securitiestransferchargefrontend.models.stf.{HowToNotifyAboutSecuritiesTransfer, SecuritiesTarget}
 import uk.gov.hmrc.securitiestransferchargefrontend.navigation.stf.organisations.StfOrgNavigator
 import uk.gov.hmrc.securitiestransferchargefrontend.pages.*
+import uk.gov.hmrc.securitiestransferchargefrontend.pages.stf.shared.HowToNotifyAboutSecuritiesTransferPage
+import uk.gov.hmrc.securitiestransferchargefrontend.pages.stf.single.{ApplyingForReliefPage, ChargingPointPage, ConfirmAddressPage, ConnectedPersonsPage, NameOfSellerPage, SecuritiesTargetPage, StfBuyersAddressPage, StfSellerAddressPage, TaxRatePage, WhatReliefAreYouApplyingForPage}
 
 import java.time.LocalDate
 
@@ -61,7 +67,15 @@ class StfOrgNavigatorSpec extends SpecBase with ScalaFutures {
         val answers = emptyUserAnswers.set(HowToNotifyAboutSecuritiesTransferPage, HowToNotifyAboutSecuritiesTransfer.OneAtATime).get
         val result = navigator.nextPage(HowToNotifyAboutSecuritiesTransferPage, NormalMode, answers)(fakeRequest)
         whenReady(result) { res =>
-          res mustBe orgRoutes.ConfirmAddressController.onPageLoad()
+          res mustBe orgSingleRoutes.ConfirmAddressController.onPageLoad()
+        }
+      }
+
+      "must go from the HowToNotifyAboutSecuritiesTransfer to TemplateInstructionsController when more than one at a time is selected" in {
+        val answers = emptyUserAnswers.set(HowToNotifyAboutSecuritiesTransferPage, HowToNotifyAboutSecuritiesTransfer.MoreThanOneAtATime).get
+        val result = navigator.nextPage(HowToNotifyAboutSecuritiesTransferPage, NormalMode, answers)(fakeRequest)
+        whenReady(result) { res =>
+          res mustBe orgBulkRoutes.TemplateInstructionsController.onPageLoad()
         }
       }
 
@@ -69,7 +83,7 @@ class StfOrgNavigatorSpec extends SpecBase with ScalaFutures {
         val answers = emptyUserAnswers.set(ConfirmAddressPage, Fixtures.confirmableAddress).get
         val result = navigator.nextPage(ConfirmAddressPage, NormalMode, answers)(fakeRequest)
         whenReady(result) { res =>
-          res mustBe orgRoutes.NameOfSellerController.onPageLoad(NormalMode)
+          res mustBe orgSingleRoutes.NameOfSellerController.onPageLoad(NormalMode)
         }
       }
 
@@ -77,7 +91,7 @@ class StfOrgNavigatorSpec extends SpecBase with ScalaFutures {
         val answers = emptyUserAnswers.set(NameOfSellerPage, "John").get
         val result = navigator.nextPage(NameOfSellerPage, NormalMode, answers)(fakeRequest)
         whenReady(result) { res =>
-          res mustBe orgRoutes.StfSellerAddressController.onPageLoad()
+          res mustBe orgSingleRoutes.StfSellerAddressController.onPageLoad()
         }
       }
 
@@ -85,7 +99,7 @@ class StfOrgNavigatorSpec extends SpecBase with ScalaFutures {
         val answers = emptyUserAnswers.set(StfBuyersAddressPage, Fixtures.fakeAlfConfirmedAddress).get
         val result = navigator.nextPage(StfBuyersAddressPage, NormalMode, answers)(fakeRequest)
         whenReady(result) { res =>
-          res mustBe orgRoutes.NameOfSellerController.onPageLoad(NormalMode)
+          res mustBe orgSingleRoutes.NameOfSellerController.onPageLoad(NormalMode)
         }
       }
 
@@ -93,7 +107,7 @@ class StfOrgNavigatorSpec extends SpecBase with ScalaFutures {
         val answers = emptyUserAnswers.set(StfSellerAddressPage, Fixtures.fakeAlfConfirmedAddress).get
         val result = navigator.nextPage(StfSellerAddressPage, NormalMode, answers)(fakeRequest)
         whenReady(result) { res =>
-          res mustBe orgRoutes.ConnectedPersonsController.onPageLoad(NormalMode)
+          res mustBe orgSingleRoutes.ConnectedPersonsController.onPageLoad(NormalMode)
         }
       }
 
@@ -101,7 +115,7 @@ class StfOrgNavigatorSpec extends SpecBase with ScalaFutures {
         val answers = emptyUserAnswers.set(ConnectedPersonsPage, true).get
         val result = navigator.nextPage(ConnectedPersonsPage, NormalMode, answers)(fakeRequest)
         whenReady(result) { res =>
-          res mustBe orgRoutes.ApplyingForReliefController.onPageLoad(NormalMode)
+          res mustBe orgSingleRoutes.ApplyingForReliefController.onPageLoad(NormalMode)
         }
       }
 
@@ -109,7 +123,7 @@ class StfOrgNavigatorSpec extends SpecBase with ScalaFutures {
         val answers = emptyUserAnswers.set(ApplyingForReliefPage, true).get
         val result = navigator.nextPage(ApplyingForReliefPage, NormalMode, answers)(fakeRequest)
         whenReady(result) { res =>
-          res mustBe orgRoutes.WhatReliefAreYouApplyingForController.onPageLoad(NormalMode)
+          res mustBe orgSingleRoutes.WhatReliefAreYouApplyingForController.onPageLoad(NormalMode)
         }
       }
 
@@ -117,7 +131,7 @@ class StfOrgNavigatorSpec extends SpecBase with ScalaFutures {
         val answers = emptyUserAnswers.set(ApplyingForReliefPage, false).get
         val result = navigator.nextPage(ApplyingForReliefPage, NormalMode, answers)(fakeRequest)
         whenReady(result) { res =>
-          res mustBe orgRoutes.SecuritiesTargetController.onPageLoad(NormalMode)
+          res mustBe orgSingleRoutes.SecuritiesTargetController.onPageLoad(NormalMode)
         }
       }
 
@@ -125,7 +139,7 @@ class StfOrgNavigatorSpec extends SpecBase with ScalaFutures {
         val answers = emptyUserAnswers.set(SecuritiesTargetPage, SecuritiesTarget("Business 1",Some("12345678"))).get
         val result = navigator.nextPage(SecuritiesTargetPage, NormalMode, answers)(fakeRequest)
         whenReady(result) { res =>
-          res mustBe orgRoutes.ChargingPointController.onPageLoad(NormalMode)
+          res mustBe orgSingleRoutes.ChargingPointController.onPageLoad(NormalMode)
         }
       }
 
@@ -141,7 +155,7 @@ class StfOrgNavigatorSpec extends SpecBase with ScalaFutures {
         val answers = emptyUserAnswers.set(ChargingPointPage, LocalDate.now()).get
         val result = navigator.nextPage(ChargingPointPage, NormalMode, answers)(fakeRequest)
         whenReady(result) { res =>
-          res mustBe orgRoutes.TaxRateController.onPageLoad(NormalMode)
+          res mustBe orgSingleRoutes.TaxRateController.onPageLoad(NormalMode)
         }
       }
     }
@@ -168,38 +182,38 @@ class StfOrgNavigatorSpec extends SpecBase with ScalaFutures {
 
       "must go from the TaxRatePage to ChargingPoint" in {
         val result = navigator.previousPage(TaxRatePage, NormalMode, emptyUserAnswers)
-        result mustBe orgRoutes.ChargingPointController.onPageLoad(NormalMode)
+        result mustBe orgSingleRoutes.ChargingPointController.onPageLoad(NormalMode)
       }
 
       "must go from the ChargingPointPage to SecuritiesTarget" in {
         val result = navigator.previousPage(ChargingPointPage, NormalMode, emptyUserAnswers)
-        result mustBe orgRoutes.SecuritiesTargetController.onPageLoad(NormalMode)
+        result mustBe orgSingleRoutes.SecuritiesTargetController.onPageLoad(NormalMode)
       }
 
       "must go from the SecuritiesTarget to ApplyingForRelief if not applying for a relief" in {
         val answers = emptyUserAnswers.set(ApplyingForReliefPage, false).get
         val result = navigator.previousPage(SecuritiesTargetPage, NormalMode, answers)
-        result mustBe orgRoutes.ApplyingForReliefController.onPageLoad(NormalMode)
+        result mustBe orgSingleRoutes.ApplyingForReliefController.onPageLoad(NormalMode)
       }
 
       "must go from the WhatReliefAreYouApplyingForPage to ApplyingForRelief" in {
         val result = navigator.previousPage(WhatReliefAreYouApplyingForPage, NormalMode, emptyUserAnswers)
-        result mustBe orgRoutes.ApplyingForReliefController.onPageLoad(NormalMode)
+        result mustBe orgSingleRoutes.ApplyingForReliefController.onPageLoad(NormalMode)
       }
 
       "must go from the ApplyingForReliefPage to ConnectedPersons" in {
         val result = navigator.previousPage(ApplyingForReliefPage, NormalMode, emptyUserAnswers)
-        result mustBe orgRoutes.ConnectedPersonsController.onPageLoad(NormalMode)
+        result mustBe orgSingleRoutes.ConnectedPersonsController.onPageLoad(NormalMode)
       }
 
       "must go from the ConnectedPersonsPage to StfSellerAddress" in {
         val result = navigator.previousPage(ConnectedPersonsPage, NormalMode, emptyUserAnswers)
-        result mustBe orgRoutes.StfSellerAddressController.onPageLoad()
+        result mustBe orgSingleRoutes.StfSellerAddressController.onPageLoad()
       }
 
       "must go from the NameOfSellerPage to ConfirmAddress" in {
         val result = navigator.previousPage(NameOfSellerPage, NormalMode, emptyUserAnswers)
-        result mustBe orgRoutes.ConfirmAddressController.onPageLoad()
+        result mustBe orgSingleRoutes.ConfirmAddressController.onPageLoad()
       }
 
       "must go from the ConfirmAddressPage to HowToNotifyAboutSecuritiesTransfer" in {
@@ -209,7 +223,7 @@ class StfOrgNavigatorSpec extends SpecBase with ScalaFutures {
 
       "must go from the HowToNotifyAboutSecuritiesTransferPage to SubmissionsDashboard" in {
         val result = navigator.previousPage(HowToNotifyAboutSecuritiesTransferPage, NormalMode, emptyUserAnswers)
-        result mustBe routes.SubmissionsDashboardController.onPageLoad()
+        result mustBe sharedRoutes.SubmissionsDashboardController.onPageLoad()
       }
       
     }

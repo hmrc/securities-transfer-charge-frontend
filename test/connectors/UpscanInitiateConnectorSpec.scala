@@ -26,9 +26,8 @@ import uk.gov.hmrc.http.*
 import uk.gov.hmrc.http.client.{HttpClientV2, RequestBuilder}
 import uk.gov.hmrc.securitiestransferchargefrontend.config.FrontendAppConfig
 import uk.gov.hmrc.securitiestransferchargefrontend.connectors.{UpscanInitiateConnector, UpscanInitiateConnectorImpl}
-import uk.gov.hmrc.securitiestransferchargefrontend.models.upscan.*
 import uk.gov.hmrc.http.HttpReads.Implicits.*
-
+import uk.gov.hmrc.securitiestransferchargefrontend.models.stf.upscan.{UploadRequest, UpscanInitiateResponse}
 
 import java.net.URL
 import scala.concurrent.Future

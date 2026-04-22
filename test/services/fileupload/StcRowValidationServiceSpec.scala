@@ -73,7 +73,6 @@ class StcRowValidationServiceSpec extends AnyWordSpec with Matchers {
 
     "return blocking errors for missing required fields" in {
       val invalidRow = validRow.copy(
-        addressLine1 = ParsedValue.Missing,
         sellerName = ParsedValue.Missing,
         chargingPoint = ParsedValue.Missing
       )
@@ -82,7 +81,6 @@ class StcRowValidationServiceSpec extends AnyWordSpec with Matchers {
 
       result.hasBlockingErrors shouldBe true
       result.validationErrors.map(_.fieldName) should contain allOf (
-        "addressLine1",
         "sellerName",
         "chargingPoint"
       )

@@ -16,8 +16,8 @@
 
 package uk.gov.hmrc.securitiestransferchargefrontend.viewmodels.fileupload
 
-import uk.gov.hmrc.securitiestransferchargefrontend.models.UploadedFileError
 import uk.gov.hmrc.securitiestransferchargefrontend.models.fileupload.StcRowValidationError
+import uk.gov.hmrc.securitiestransferchargefrontend.models.stf.UploadedFileError
 
 object UploadedFileErrorMapper {
 
