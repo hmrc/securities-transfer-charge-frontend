@@ -19,8 +19,7 @@ package uk.gov.hmrc.securitiestransferchargefrontend.models.submission
 import uk.gov.hmrc.securitiestransferchargefrontend.models.fileupload.{ParsedValue, ValidatedStcRow}
 import uk.gov.hmrc.securitiestransferchargefrontend.models.stf
 
-class RowTransforms {
-  import RowTransforms.*
+object RowTransforms {
 
   def fromValidatedStcRowToStfRequest(validatedRow: ValidatedStcRow, affinityData: AffinityData): SingleTransferRequest =
     require(!validatedRow.hasBlockingErrors, s"Cannot create SingleTransferRequest from row ${validatedRow.parsedRow.rowNumber} with blocking validation errors")
@@ -32,7 +31,7 @@ class RowTransforms {
 
     val shareType = required(row.whatTypeOfSecurities, "whatTypeOfSecurities", row.rowNumber)
     val getDescriptionOfSecurity =
-      if shareType.equalsIgnoreCase("Other") then required(row.whatTypeOfSecurities, "whatTypeOfSecurities", row.rowNumber) else ??? // TODO: Not clear how we should get this
+      if shareType.equalsIgnoreCase("Shares") then "Shares" else required(row.whatTypeOfSecurities, "whatTypeOfSecurities", row.rowNumber) // TODO: Not clear how to get the class of shares
 
     val reliefClaimed = required(row.applyingForRelief, "applyingForRelief", row.rowNumber)
     val reliefPercentage = if reliefClaimed then Some(100) else None // TODO: Get correct percentage based on what relief is being claimed
@@ -119,10 +118,6 @@ class RowTransforms {
       otherBuyers = None, // No way to enter multiple buyers atm
       agentDetails = agentDetails.lift(affinityData)
     )
-
-}
-
-object RowTransforms {
 
   private def required[A](value: ParsedValue[A], fieldName: String, rowNumber: Int): A =
     value match

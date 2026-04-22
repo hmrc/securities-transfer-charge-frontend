@@ -20,10 +20,24 @@ import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpec
 import uk.gov.hmrc.securitiestransferchargefrontend.models.fileupload.{ParsedStcRow, ParsedValue, ValidatedStcRow}
 import uk.gov.hmrc.securitiestransferchargefrontend.models.submission.*
-
+import uk.gov.hmrc.securitiestransferchargefrontend.models.stf
 import java.time.LocalDate
 
-class SingleTransferRequestSpec extends AnyWordSpec with Matchers {
+class RowTransformsSpec extends AnyWordSpec with Matchers {
+
+  private val individualData = Individual(
+    name = "John Doe",
+    address = stf.Address(
+      addressLine1 = "10 Downing Street",
+      addressLine2 = Some("Westminster"),
+      addressLine3 = Some("London"),
+      postcode = "SW1A 2AA",
+      countryCode = "GBR"
+    ),
+    phone = "01234567890",
+    email = "foo@bar.com",
+    nino = "NY054388A"
+  )
 
   private val validatedRow = ValidatedStcRow(
     parsedRow = ParsedStcRow(
@@ -61,7 +75,7 @@ class SingleTransferRequestSpec extends AnyWordSpec with Matchers {
   "fromValidatedStcRow" should {
 
     "transform a validated row into a SingleTransferRequest" in {
-      SingleTransferRequest.fromValidatedStcRow(validatedRow, TransferType.STF) shouldBe SingleTransferRequest(
+      RowTransforms.fromValidatedStcRowToStfRequest(validatedRow, individualData) shouldBe SingleTransferRequest(
         recordId = 3,
         transactionDetails = SingleTransferTransactionDetails(
           transactionType = TransferType.STF,
@@ -79,7 +93,7 @@ class SingleTransferRequestSpec extends AnyWordSpec with Matchers {
           companyName = "Example Holdings Ltd",
           companyRegistrationNumber = Some("12345678"),
           reliefClaimedName = Some("Group relief"),
-          reliefPercentage = None
+          reliefPercentage = Some(100)
         ),
         contingentDetails = None,
         mainSellerDetails = SingleTransferSellerDetails(
@@ -93,15 +107,15 @@ class SingleTransferRequestSpec extends AnyWordSpec with Matchers {
         ),
         otherSellers = None,
         mainBuyerDetails = SingleTransferBuyerDetails(
-          buyerName = "",
+          buyerName = "John Doe",
           addr1 = "10 Downing Street",
           addr2 = Some("Westminster"),
           addr3 = Some("London"),
           addr4 = None,
           postcode = "SW1A 2AA",
-          country = "United Kingdom",
-          email = "",
-          uniqueId = None,
+          country = "GBR",
+          email = "foo@bar.com",
+          uniqueId = Some("NY054388A"),
           taxRate = BuyerTaxRate.OneAndHalfPercent,
           isPLC = None
         ),
@@ -110,11 +124,11 @@ class SingleTransferRequestSpec extends AnyWordSpec with Matchers {
       )
     }
 
-    "throw when buyer postcode is missing" in {
-      val rowMissingBuyerPostcode = validatedRow.copy(parsedRow = validatedRow.parsedRow.copy(postcode = ParsedValue.Missing))
+    "throw when seller postcode is missing" in {
+      val rowMissingBuyerPostcode = validatedRow.copy(parsedRow = validatedRow.parsedRow.copy(sellerPostcode = ParsedValue.Missing))
 
       an[IllegalArgumentException] shouldBe thrownBy {
-        SingleTransferRequest.fromValidatedStcRow(rowMissingBuyerPostcode, TransferType.STF)
+        RowTransforms.fromValidatedStcRowToStfRequest(rowMissingBuyerPostcode, individualData)
       }
     }
 
@@ -122,7 +136,7 @@ class SingleTransferRequestSpec extends AnyWordSpec with Matchers {
       val rowMissingSellerCountry = validatedRow.copy(parsedRow = validatedRow.parsedRow.copy(sellerCountry = ParsedValue.Missing))
 
       an[IllegalArgumentException] shouldBe thrownBy {
-        SingleTransferRequest.fromValidatedStcRow(rowMissingSellerCountry, TransferType.STF)
+        RowTransforms.fromValidatedStcRowToStfRequest(rowMissingSellerCountry, individualData)
       }
     }
 
@@ -130,7 +144,7 @@ class SingleTransferRequestSpec extends AnyWordSpec with Matchers {
       val rowMissingMarketValue = validatedRow.copy(parsedRow = validatedRow.parsedRow.copy(totalMarketValue = ParsedValue.Missing))
 
       an[IllegalArgumentException] shouldBe thrownBy {
-        SingleTransferRequest.fromValidatedStcRow(rowMissingMarketValue, TransferType.STF)
+        RowTransforms.fromValidatedStcRowToStfRequest(rowMissingMarketValue, individualData)
       }
     }
   }
