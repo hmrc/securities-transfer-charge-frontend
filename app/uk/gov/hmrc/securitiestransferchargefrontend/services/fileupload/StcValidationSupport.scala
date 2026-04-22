@@ -33,7 +33,7 @@ class StcValidationSupport @Inject()(messagesApi: MessagesApi) {
 
   val addressLineMaxLength = 50
   val postcodeMaxLength    = 10
-  val countryMaxLength     = 100
+  val countryMaxLength     = 50
 
   val addressPattern: Regex =
     """^[A-Za-z0-9,\.\-\' ]+$""".r
@@ -42,10 +42,10 @@ class StcValidationSupport @Inject()(messagesApi: MessagesApi) {
     """^[A-Za-z0-9,\.\-\' ]+$""".r
 
   val securitiesQuantityMin: BigDecimal = BigDecimal(1)
-  val securitiesQuantityMax: BigDecimal = BigDecimal(1000000000)
+  val securitiesQuantityMax: BigDecimal = BigDecimal(999999999)
 
   private val ukPostcodePattern: Regex =
-    """^(?i)[A-Z]{1,2}\d[A-Z\d]?\s?\d[A-Z]{2}$""".r
+    """(?i)^[A-Z]{1,2}\d[A-Z\d]?\s?\d[A-Z]{2}$""".r
 
   def questionLabel(fieldName: String): String =
     StcUploadFieldMetadata
@@ -79,6 +79,7 @@ class StcValidationSupport @Inject()(messagesApi: MessagesApi) {
                             fieldName: String,
                             requiredMessage: String,
                             maxLength: Option[Int] = None,
+                            lengthMessage: Option[String] = None,
                             pattern: Option[Regex] = None,
                             invalidMessage: String = "Enter a valid value"
                           ): Seq[StcRowValidationError] =
@@ -87,7 +88,15 @@ class StcValidationSupport @Inject()(messagesApi: MessagesApi) {
         Seq(error(rawRow.rowNumber, fieldName, requiredMessage))
 
       case Some(value) =>
-        validateTextValue(rawRow.rowNumber, fieldName, value, maxLength, pattern, invalidMessage)
+        validateTextValue(
+          rowNumber = rawRow.rowNumber,
+          fieldName = fieldName,
+          value = value,
+          maxLength = maxLength,
+          lengthMessage = lengthMessage,
+          pattern = pattern,
+          invalidMessage = invalidMessage
+        )
     }
 
   def validateOptionalText(
@@ -95,6 +104,7 @@ class StcValidationSupport @Inject()(messagesApi: MessagesApi) {
                             columnIndex: Int,
                             fieldName: String,
                             maxLength: Option[Int] = None,
+                            lengthMessage: Option[String] = None,
                             pattern: Option[Regex] = None,
                             invalidMessage: String = "Enter a valid value"
                           ): Seq[StcRowValidationError] =
@@ -103,20 +113,15 @@ class StcValidationSupport @Inject()(messagesApi: MessagesApi) {
         Seq.empty
 
       case Some(value) =>
-        validateTextValue(rawRow.rowNumber, fieldName, value, maxLength, pattern, invalidMessage)
-    }
-
-  def mustBeEmpty(
-                   rawRow: ParsedRow,
-                   columnIndex: Int,
-                   fieldName: String,
-                   message: String
-                 ): Seq[StcRowValidationError] =
-    rawRow.valueAt(columnIndex).map(_.trim) match {
-      case Some(value) if value.nonEmpty =>
-        Seq(error(rawRow.rowNumber, fieldName, message))
-      case _ =>
-        Seq.empty
+        validateTextValue(
+          rowNumber = rawRow.rowNumber,
+          fieldName = fieldName,
+          value = value,
+          maxLength = maxLength,
+          lengthMessage = lengthMessage,
+          pattern = pattern,
+          invalidMessage = invalidMessage
+        )
     }
 
   def validateBooleanField(
@@ -149,25 +154,25 @@ class StcValidationSupport @Inject()(messagesApi: MessagesApi) {
   }
 
   def looksLikeUkPostcode(value: String): Boolean =
-    ukPostcodePattern.matches(value.trim)
+    ukPostcodePattern.pattern.matcher(value.trim).matches()
 
   private def validateTextValue(
                                  rowNumber: Int,
                                  fieldName: String,
                                  value: String,
                                  maxLength: Option[Int],
+                                 lengthMessage: Option[String],
                                  pattern: Option[Regex],
                                  invalidMessage: String
                                ): Seq[StcRowValidationError] = {
     val lengthErrors =
       maxLength.toSeq.collect {
         case max if value.length > max =>
-          fieldName match {
-            case "sellerAddressLine1" => error(rowNumber, fieldName, "Address line 1 must be 50 characters or fewer")
-            case "sellerAddressLine2" => error(rowNumber, fieldName, "Address line 2 must be fewer than 50 characters long")
-            case "sellerCountry"      => error(rowNumber, fieldName, "Country must be 50 characters or fewer")
-            case _                    => error(rowNumber, fieldName, s"${questionLabel(fieldName)} must be $max characters or fewer")
-          }
+          error(
+            rowNumber,
+            fieldName,
+            lengthMessage.getOrElse(s"${questionLabel(fieldName)} must be $max characters or fewer")
+          )
       }
 
     val patternErrors =

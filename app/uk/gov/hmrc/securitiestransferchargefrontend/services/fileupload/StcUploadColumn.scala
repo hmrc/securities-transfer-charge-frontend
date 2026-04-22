@@ -39,7 +39,7 @@ object StcUploadColumn {
   val chargingPoint                   = 20
   val taxRate                         = 21
   val whatTypeOfSecurities            = 22
-  val otherSecuritiesType             = 23
+  val typeOfShares                    = 23
   val securitiesQuantity              = 24  
   val amountPaidForSecurities         = 25
   val totalMarketValue                = 26

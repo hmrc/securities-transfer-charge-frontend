@@ -377,11 +377,35 @@ org.uploadedFileError.table.heading = Problems with your file
 org.uploadedFileError.table.cell = Cell
 org.uploadedFileError.table.error = Error
 
+fileUpload.error.sellerAddressInUk.invalid = Enter ‘yes’ if the seller lives in the UK, or ‘no’ if the seller does not live in the UK
+fileUpload.error.sellerAddressLine1.required = Enter the first line of your address
+fileUpload.error.sellerAddressLine1.length = Address line 1 must be 50 characters or fewer
+fileUpload.error.sellerAddressLine1.invalidCharacters = Address line 1 can only include letters, numbers and the following characters: , . - '
+fileUpload.error.sellerAddressLine2.length = Address line 2 must be fewer than 50 characters long
+fileUpload.error.sellerAddressLine2.invalidCharacters = Address line 2 can only include letters, numbers and the following characters: , . - '
+fileUpload.error.sellerPostcode.required = Enter a postcode
+fileUpload.error.sellerPostcode.notFound = Your postcode cannot be found, check it is correct
+fileUpload.error.sellerPostcode.invalid = Enter a real postcode, like AA1 1AA
+fileUpload.error.sellerCountry.length = Country must be 50 characters or fewer
+fileUpload.error.sellerCountry.invalidCharacters = Country can only include letters, numbers and the following characters: , . - '
 
-sellerAddressLine1.error.required = Enter the first line of your address
-sellerAddressLine1.error.invalid = Address line 1 can only include letters, numbers and the following characters: , . - '
+fileUpload.error.connectedPersons.invalid = Enter ‘yes’ if you and the buyer are connected persons
+fileUpload.error.applyingForRelief.invalid = Enter ‘yes’ if you are applying for a relief, or ‘no’ if you are not applying for a relief
+fileUpload.error.whatReliefAreYouApplyingFor.invalid = Enter the name of the relief you are applying for. See a full list of reliefs (opens in new tab).
 
-sellerPostcode.error.required = Enter a postcode
-sellerPostcode.error.invalid = Enter a real postcode, like AA1 1AA
+fileUpload.error.chargingPoint.invalidCharacters = The date you bought the securities can only contain numbers and letters
+fileUpload.error.taxRate.invalid = Enter a tax rate of ‘0.5%’ or ‘1.5%’
 
-taxRate.error.required = Enter a tax rate of ‘0.5%’ or ‘1.5%’
+fileUpload.error.whatTypeOfSecurities.required = Enter the type of securities you are buying
+fileUpload.error.typeOfShares.required = If you are buying shares, enter the type of shares
+
+fileUpload.error.securitiesQuantity.required = Enter the number of shares you are buying
+fileUpload.error.securitiesQuantity.nonNumeric = The amount of shares you are buying must be a number
+fileUpload.error.securitiesQuantity.minimum = The number of shares must be at least 1
+fileUpload.error.securitiesQuantity.maximum = The number of shares you are buying must be below 999,999,999
+
+fileUpload.error.amountPaidForSecurities.nonNumeric = The amount you paid for the securities must be a number
+fileUpload.error.amountPaidForSecurities.maximum = The amount you paid for the securities must be £999,999,999 or below
+
+fileUpload.error.totalMarketValue.nonNumeric = The market value of the securities must be a number
+fileUpload.error.totalMarketValue.maximum = The market value of the securities must be £999,999,999 or below

@@ -25,18 +25,18 @@ import javax.inject.{Inject, Singleton}
 @Singleton
 class StcBasicRowValidator @Inject()(
                                       support: StcValidationSupport,
-                                      messagesApi: MessagesApi,
-                                      amountPaidForSecuritiesFormProvider: AmountPaidForSecuritiesFormProvider,
+                                      messagesApi: MessagesApi,   
                                       applyingForReliefFormProvider: ApplyingForReliefFormProvider,
                                       chargingPointFormProvider: ChargingPointFormProvider,
                                       connectedPersonsFormProvider: ConnectedPersonsFormProvider,
                                       nameOfSellerFormProvider: NameOfSellerFormProvider,
-                                      securitiesTargetFormProvider: SecuritiesTargetFormProvider,
-                                      whatTypeOfSecuritiesFormProvider: WhatTypeOfSecuritiesFormProvider
+                                      securitiesTargetFormProvider: SecuritiesTargetFormProvider
                                     ) {
 
   private implicit val messages: Messages =
     messagesApi.preferred(Seq(Lang("en")))
+
+  private val amountMaximum = BigDecimal(999999999)
 
   def validate(rawRow: ParsedRow, parsedRow: ParsedStcRow): Seq[StcRowValidationError] =
     validateNameOfSeller(rawRow) ++
@@ -48,7 +48,7 @@ class StcBasicRowValidator @Inject()(
       validateTaxRate(rawRow) ++
       validateWhatTypeOfSecurities(rawRow) ++
       validateSecuritiesQuantity(parsedRow) ++
-      validateAmountPaidForSecurities(rawRow)
+      validateAmountPaidForSecurities(rawRow, parsedRow)
 
   private def validateNameOfSeller(rawRow: ParsedRow): Seq[StcRowValidationError] = {
     val errors = support.bindSingleValue(
@@ -74,8 +74,8 @@ class StcBasicRowValidator @Inject()(
       StcUploadColumn.sellerAddressInUK,
       "sellerAddressInUk",
       connectedPersonsFormProvider(),
-      requiredMessage = "Enter ‘yes’ if the seller lives in the UK",
-      invalidMessage = "Enter ‘yes’ if the seller lives in the UK"
+      requiredMessage = messages("fileUpload.error.sellerAddressInUk.invalid"),
+      invalidMessage = messages("fileUpload.error.sellerAddressInUk.invalid")
     )
 
   private def validateConnectedPersons(rawRow: ParsedRow): Seq[StcRowValidationError] =
@@ -84,8 +84,8 @@ class StcBasicRowValidator @Inject()(
       StcUploadColumn.connectedPersons,
       "connectedPersons",
       connectedPersonsFormProvider(),
-      requiredMessage = "Enter ‘yes’ if you and the buyer are connected persons",
-      invalidMessage = "Enter ‘yes’ if you and the buyer are connected persons"
+      requiredMessage = messages("fileUpload.error.connectedPersons.invalid"),
+      invalidMessage = messages("fileUpload.error.connectedPersons.invalid")
     )
 
   private def validateApplyingForRelief(rawRow: ParsedRow): Seq[StcRowValidationError] =
@@ -94,138 +94,9 @@ class StcBasicRowValidator @Inject()(
       StcUploadColumn.applyingForRelief,
       "applyingForRelief",
       applyingForReliefFormProvider(),
-      requiredMessage = messages("applyingForRelief.error.required"),
-      invalidMessage = "Enter ‘yes’ if you are applying for a relief"
+      requiredMessage = messages("fileUpload.error.applyingForRelief.invalid"),
+      invalidMessage = messages("fileUpload.error.applyingForRelief.invalid")
     )
-
-  private def validateChargingPoint(rawRow: ParsedRow): Seq[StcRowValidationError] = {
-    val raw = rawRow.valueAt(StcUploadColumn.chargingPoint).getOrElse("").trim
-
-    val containsForbiddenChars =
-      raw.nonEmpty && !raw.matches("""^[A-Za-z0-9/\-\s]+$""")
-
-    if (containsForbiddenChars) {
-      Seq(
-        support.error(
-          rawRow.rowNumber,
-          "chargingPoint",
-          "The date you bought the securities can only contain numbers and letters"
-        )
-      )
-    } else {
-      val parts = raw.split("""[/\-\s]""").toList.filter(_.nonEmpty)
-
-      val dateMap =
-        parts match {
-          case year :: month :: day :: Nil if year.length == 4 =>
-            Map(
-              "value.day" -> day,
-              "value.month" -> month,
-              "value.year" -> year
-            )
-
-          case day :: month :: year :: Nil =>
-            Map(
-              "value.day" -> day,
-              "value.month" -> month,
-              "value.year" -> year
-            )
-
-          case _ =>
-            Map(
-              "value.day" -> "",
-              "value.month" -> "",
-              "value.year" -> ""
-            )
-        }
-
-      val boundForm = chargingPointFormProvider().bind(dateMap)
-
-      boundForm.errors.map { formError =>
-        val message =
-          formError.message match {
-            case "chargingPoint.error.required" =>
-              formError.args.headOption match {
-                case Some("day") => "The date you bought the securities must include a day"
-                case Some("month") => "The date you bought the securities must include a month"
-                case Some("year") => "The date you bought the securities must include a year"
-                case _ => messages("chargingPoint.error.required")
-              }
-
-            case "chargingPoint.error.required.all" =>
-              messages("chargingPoint.error.required.all")
-
-            case "chargingPoint.error.required.two" =>
-              val args = formError.args.map(_.toString).toSet
-              if (args.contains("day")) {
-                "The date you bought the securities must include a day"
-              } else if (args.contains("month")) {
-                "The date you bought the securities must include a month"
-              } else if (args.contains("year")) {
-                "The date you bought the securities must include a year"
-              } else {
-                messages("chargingPoint.error.required.two", formError.args: _*)
-              }
-
-            case "chargingPoint.error.futureDate" =>
-              messages("chargingPoint.error.futureDate")
-
-            case "chargingPoint.error.invalid" =>
-              messages("chargingPoint.error.invalid")
-
-            case _ =>
-              "The charging point date is not in the correct format. Enter eg 20 November 2025 as 20/11/2025"
-          }
-
-        support.error(rawRow.rowNumber, "chargingPoint", message)
-      }
-    }
-  }
-
-  private def validateTaxRate(rawRow: ParsedRow): Seq[StcRowValidationError] =
-    rawRow.valueAt(StcUploadColumn.taxRate).map(_.trim) match {
-      case None | Some("") =>
-        Seq(
-          support.error(
-            rawRow.rowNumber,
-            "taxRate",
-            messages("taxRate.error.required")
-          )
-        )
-
-      case Some(rawValue) if StcTaxRateParser.parse(rawValue).isEmpty =>
-        Seq(
-          support.error(
-            rawRow.rowNumber,
-            "taxRate",
-            messages("taxRate.error.required")
-          )
-        )
-
-      case _ =>
-        Seq.empty
-    }
-
-  private def validateWhatTypeOfSecurities(rawRow: ParsedRow): Seq[StcRowValidationError] = {
-    val errors = support.bindSingleValue(
-      whatTypeOfSecuritiesFormProvider(),
-      rawRow.valueAt(StcUploadColumn.whatTypeOfSecurities).getOrElse("")
-    )
-
-    errors.map { formError =>
-      val message =
-        formError.message match {
-          case "individual.whatTypeOfSecurities.error.required" =>
-            messages("individual.whatTypeOfSecurities.error.required")
-          case "error.invalid" =>
-            "Enter a valid type of security"
-          case _ =>
-            "Enter a valid type of security"
-        }
-
-      support.error(rawRow.rowNumber, "whatTypeOfSecurities", message)
-    }
-  }
 
   private def validateSecuritiesTarget(rawRow: ParsedRow): Seq[StcRowValidationError] = {
     val boundForm = securitiesTargetFormProvider().bind(
@@ -249,10 +120,10 @@ class StcBasicRowValidator @Inject()(
             messages("securitiesTarget.error.businessName.length")
 
           case "securitiesTarget.error.crn.length" =>
-            "Company Reference Number must be 8 characters or fewer"
+            messages("securitiesTarget.error.crn.length")
 
           case _ if fieldName == "companyRegistrationNumber" =>
-            "Company Reference Number must be 8 characters or fewer"
+            messages("securitiesTarget.error.crn.length")
 
           case _ =>
             messages("securitiesTarget.error.businessName.required")
@@ -262,6 +133,103 @@ class StcBasicRowValidator @Inject()(
     }
   }
 
+  private def validateChargingPoint(rawRow: ParsedRow): Seq[StcRowValidationError] = {
+    val raw = rawRow.valueAt(StcUploadColumn.chargingPoint).getOrElse("").trim
+
+    val containsForbiddenChars =
+      raw.nonEmpty && !raw.matches("""^[A-Za-z0-9/\-\s]+$""")
+
+    if (containsForbiddenChars) {
+      Seq(
+        support.error(
+          rawRow.rowNumber,
+          "chargingPoint",
+          messages("fileUpload.error.chargingPoint.invalidCharacters")
+        )
+      )
+    } else {
+      val parts = raw.split("""[/\-\s]""").toList.filter(_.nonEmpty)
+
+      val dateMap =
+        parts match {
+          case year :: month :: day :: Nil if year.length == 4 =>
+            Map(
+              "value.day"   -> day,
+              "value.month" -> month,
+              "value.year"  -> year
+            )
+
+          case day :: month :: year :: Nil =>
+            Map(
+              "value.day"   -> day,
+              "value.month" -> month,
+              "value.year"  -> year
+            )
+
+          case _ =>
+            Map(
+              "value.day"   -> "",
+              "value.month" -> "",
+              "value.year"  -> ""
+            )
+        }
+
+      val boundForm = chargingPointFormProvider().bind(dateMap)
+
+      boundForm.errors.map { formError =>
+        val message =
+          formError.message match {
+            case "chargingPoint.error.required.all" =>
+              messages("chargingPoint.error.required.all")
+
+            case "chargingPoint.error.futureDate" =>
+              messages("chargingPoint.error.futureDate")
+
+            case "chargingPoint.error.invalid" =>
+              messages("chargingPoint.error.invalid")
+
+            case "chargingPoint.error.required" =>
+              messages("chargingPoint.error.required", formError.args: _*)
+
+            case "chargingPoint.error.required.two" =>
+              messages("chargingPoint.error.required.two", formError.args: _*)
+
+            case _ =>
+              messages("chargingPoint.error.invalid")
+          }
+
+        support.error(rawRow.rowNumber, "chargingPoint", message)
+      }
+    }
+  }
+
+  private def validateTaxRate(rawRow: ParsedRow): Seq[StcRowValidationError] =
+    rawRow.valueAt(StcUploadColumn.taxRate).map(_.trim) match {
+      case None | Some("") =>
+        Seq(support.error(rawRow.rowNumber, "taxRate", messages("fileUpload.error.taxRate.invalid")))
+
+      case Some(rawValue) if StcTaxRateParser.parse(rawValue).isEmpty =>
+        Seq(support.error(rawRow.rowNumber, "taxRate", messages("fileUpload.error.taxRate.invalid")))
+
+      case _ =>
+        Seq.empty
+    }
+
+  private def validateWhatTypeOfSecurities(rawRow: ParsedRow): Seq[StcRowValidationError] =
+    rawRow.valueAt(StcUploadColumn.whatTypeOfSecurities).map(_.trim) match {
+      case None | Some("") =>
+        Seq(
+          support.error(
+            rawRow.rowNumber,
+            "whatTypeOfSecurities",
+            messages("fileUpload.error.whatTypeOfSecurities.required")
+          )
+        )
+
+      case _ =>
+        Seq.empty
+    }
+
   private def validateSecuritiesQuantity(parsedRow: ParsedStcRow): Seq[StcRowValidationError] =
     parsedRow.securitiesQuantity match {
       case ParsedValue.Missing =>
@@ -269,7 +237,7 @@ class StcBasicRowValidator @Inject()(
           support.error(
             parsedRow.rowNumber,
             "securitiesQuantity",
-            messages("detailsOfThisTransfer.error.numberOfShares.required")
+            messages("fileUpload.error.securitiesQuantity.required")
           )
         )
 
@@ -278,7 +246,7 @@ class StcBasicRowValidator @Inject()(
           support.error(
             parsedRow.rowNumber,
             "securitiesQuantity",
-            "The amount of shares you are buying must be a number"
+            messages("fileUpload.error.securitiesQuantity.nonNumeric")
           )
         )
 
@@ -287,7 +255,7 @@ class StcBasicRowValidator @Inject()(
           support.error(
             parsedRow.rowNumber,
             "securitiesQuantity",
-            "The number of shares must be at least 1"
+            messages("fileUpload.error.securitiesQuantity.minimum")
           )
         )
 
@@ -296,7 +264,7 @@ class StcBasicRowValidator @Inject()(
           support.error(
             parsedRow.rowNumber,
             "securitiesQuantity",
-            "The number of shares you are buying must be below 999,999,999"
+            messages("fileUpload.error.securitiesQuantity.maximum")
           )
         )
 
@@ -304,35 +272,39 @@ class StcBasicRowValidator @Inject()(
         Seq.empty
     }
 
-  private def validateAmountPaidForSecurities(rawRow: ParsedRow): Seq[StcRowValidationError] = {
-    val errors = support.bindSingleValue(
-      amountPaidForSecuritiesFormProvider(),
-      rawRow.valueAt(StcUploadColumn.amountPaidForSecurities).getOrElse("")
-    )
-
-    errors.map { formError =>
-      val message =
-        formError.message match {
-          case "amountPaidForSecurities.error.required" =>
+  private def validateAmountPaidForSecurities(
+                                               rawRow: ParsedRow,
+                                               parsedRow: ParsedStcRow
+                                             ): Seq[StcRowValidationError] =
+    parsedRow.amountPaidForSecurities match {
+      case ParsedValue.Missing =>
+        Seq(
+          support.error(
+            rawRow.rowNumber,
+            "amountPaidForSecurities",
             messages("amountPaidForSecurities.error.required")
+          )
+        )
 
-          case "amountPaidForSecurities.error.invalidNumeric" =>
-            messages("amountPaidForSecurities.error.nonNumeric")
+      case ParsedValue.Invalid(_, _) =>
+        Seq(
+          support.error(
+            rawRow.rowNumber,
+            "amountPaidForSecurities",
+            messages("fileUpload.error.amountPaidForSecurities.nonNumeric")
+          )
+        )
 
-          case "amountPaidForSecurities.error.nonNumeric" =>
-            messages("amountPaidForSecurities.error.nonNumeric")
+      case ParsedValue.Valid(value) if value > amountMaximum =>
+        Seq(
+          support.error(
+            rawRow.rowNumber,
+            "amountPaidForSecurities",
+            messages("fileUpload.error.amountPaidForSecurities.maximum")
+          )
+        )
 
-          case "amountPaidForSecurities.error.belowMinimum" =>
-            messages("amountPaidForSecurities.error.nonNumeric")
-
-          case "amountPaidForSecurities.error.aboveMaximum" =>
-            "The amount you paid for the securities must be £999,999,999 or below"
-
-          case _ =>
-            messages("amountPaidForSecurities.error.required")
-        }
-
-      support.error(rawRow.rowNumber, "amountPaidForSecurities", message)
+      case _ =>
+        Seq.empty
     }
-  }
 }

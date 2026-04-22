@@ -18,10 +18,18 @@ package uk.gov.hmrc.securitiestransferchargefrontend.services.fileupload
 
 object StcTaxRateParser {
 
-  sealed trait ParsedTaxRate
-  private object ParsedTaxRate {
-    case object HalfPercent extends ParsedTaxRate
-    case object OneAndHalfPercent extends ParsedTaxRate
+  sealed trait ParsedTaxRate {
+    def value: BigDecimal
+  }
+
+  object ParsedTaxRate {
+    case object HalfPercent extends ParsedTaxRate {
+      override val value: BigDecimal = BigDecimal("0.5")
+    }
+
+    case object OneAndHalfPercent extends ParsedTaxRate {
+      override val value: BigDecimal = BigDecimal("1.5")
+    }
   }
 
   def parse(raw: String): Option[ParsedTaxRate] =

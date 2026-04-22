@@ -17,7 +17,6 @@
 package uk.gov.hmrc.securitiestransferchargefrontend.services.fileupload
 
 import play.api.i18n.{Lang, Messages, MessagesApi}
-import uk.gov.hmrc.securitiestransferchargefrontend.forms.stf.individuals.{OtherSecuritiesTypeFormProvider, TotalMarketValueFormProvider}
 import uk.gov.hmrc.securitiestransferchargefrontend.models.fileupload.{ParsedRow, ParsedStcRow, ParsedValue, StcRowValidationError}
 
 import javax.inject.{Inject, Singleton}
@@ -25,17 +24,17 @@ import javax.inject.{Inject, Singleton}
 @Singleton
 class StcConditionalRowValidator @Inject()(
                                             support: StcValidationSupport,
-                                            messagesApi: MessagesApi,
-                                            otherSecuritiesTypeFormProvider: OtherSecuritiesTypeFormProvider,
-                                            totalMarketValueFormProvider: TotalMarketValueFormProvider
+                                            messagesApi: MessagesApi
                                           ) {
 
   private implicit val messages: Messages =
     messagesApi.preferred(Seq(Lang("en")))
 
+  private val marketValueMaximum = BigDecimal(999999999)
+
   def validate(rawRow: ParsedRow, parsedRow: ParsedStcRow): Seq[StcRowValidationError] =
     validateReliefType(rawRow, parsedRow) ++
-      validateOtherSecuritiesType(rawRow, parsedRow) ++
+      validateTypeOfShares(rawRow, parsedRow) ++
       validateSellerAddress(rawRow, parsedRow) ++
       validateTotalMarketValue(rawRow, parsedRow)
 
@@ -51,7 +50,7 @@ class StcConditionalRowValidator @Inject()(
               support.error(
                 rawRow.rowNumber,
                 "whatReliefAreYouApplyingFor",
-                "Enter the name of the relief you are applying for"
+                messages("fileUpload.error.whatReliefAreYouApplyingFor.invalid")
               )
             )
 
@@ -60,7 +59,7 @@ class StcConditionalRowValidator @Inject()(
               support.error(
                 rawRow.rowNumber,
                 "whatReliefAreYouApplyingFor",
-                "Enter a valid relief type"
+                messages("fileUpload.error.whatReliefAreYouApplyingFor.invalid")
               )
             )
 
@@ -72,27 +71,24 @@ class StcConditionalRowValidator @Inject()(
         Seq.empty
     }
 
-  private def validateOtherSecuritiesType(
-                                           rawRow: ParsedRow,
-                                           parsedRow: ParsedStcRow
-                                         ): Seq[StcRowValidationError] =
+  private def validateTypeOfShares(
+                                    rawRow: ParsedRow,
+                                    parsedRow: ParsedStcRow
+                                  ): Seq[StcRowValidationError] =
     parsedRow.whatTypeOfSecurities match {
-      case ParsedValue.Valid(value) if value.equalsIgnoreCase("other") =>
-        val errors = support.bindSingleValue(
-          otherSecuritiesTypeFormProvider(),
-          rawRow.valueAt(StcUploadColumn.otherSecuritiesType).getOrElse("")
-        )
+      case ParsedValue.Valid(value) if value.trim.equalsIgnoreCase("shares") =>
+        rawRow.valueAt(StcUploadColumn.typeOfShares).map(_.trim) match {
+          case None | Some("") =>
+            Seq(
+              support.error(
+                rawRow.rowNumber,
+                "typeOfShares",
+                messages("fileUpload.error.typeOfShares.required")
+              )
+            )
 
-        errors.map { formError =>
-          val message =
-            formError.message match {
-              case "otherSecuritiesType.error.required" =>
-                messages("otherSecuritiesType.error.required")
-              case _ =>
-                "Enter a valid type of securities"
-            }
-
-          support.error(rawRow.rowNumber, "otherSecuritiesType", message)
+          case _ =>
+            Seq.empty
         }
 
       case _ =>
@@ -109,20 +105,21 @@ class StcConditionalRowValidator @Inject()(
           rawRow,
           StcUploadColumn.sellerAddressLine1,
           "sellerAddressLine1",
-          requiredMessage = "Enter the first line of your address",
+          requiredMessage = messages("fileUpload.error.sellerAddressLine1.required"),
           maxLength = Some(support.addressLineMaxLength),
+          lengthMessage = Some(messages("fileUpload.error.sellerAddressLine1.length")),
           pattern = Some(support.addressPattern),
-          invalidMessage = "Address line 1 can only include letters, numbers and the following characters: , . - '"
+          invalidMessage = messages("fileUpload.error.sellerAddressLine1.invalidCharacters")
         ) ++
           support.validateOptionalText(
             rawRow,
             StcUploadColumn.sellerAddressLine2,
             "sellerAddressLine2",
             maxLength = Some(support.addressLineMaxLength),
+            lengthMessage = Some(messages("fileUpload.error.sellerAddressLine2.length")),
             pattern = Some(support.addressPattern),
-            invalidMessage = "Address line 2 can only include letters, numbers and the following characters: , . - '"
+            invalidMessage = messages("fileUpload.error.sellerAddressLine2.invalidCharacters")
           ) ++
-          // UCD says no errors for lines 3 and 4
           validateSellerPostcode(rawRow)
 
       case ParsedValue.Valid(false) =>
@@ -131,8 +128,9 @@ class StcConditionalRowValidator @Inject()(
           StcUploadColumn.sellerCountry,
           "sellerCountry",
           maxLength = Some(50),
+          lengthMessage = Some(messages("fileUpload.error.sellerCountry.length")),
           pattern = Some(support.countryPattern),
-          invalidMessage = "Country can only include letters, numbers and the following characters: , . - '"
+          invalidMessage = messages("fileUpload.error.sellerCountry.invalidCharacters")
         )
 
       case _ =>
@@ -142,13 +140,22 @@ class StcConditionalRowValidator @Inject()(
   private def validateSellerPostcode(rawRow: ParsedRow): Seq[StcRowValidationError] =
     rawRow.valueAt(StcUploadColumn.sellerPostcode).map(_.trim) match {
       case None | Some("") =>
-        Seq(support.error(rawRow.rowNumber, "sellerPostcode", "Enter a postcode"))
-
-      case Some(value) if value.length > support.postcodeMaxLength =>
-        Seq(support.error(rawRow.rowNumber, "sellerPostcode", "Enter a real postcode, like AA1 1AA"))
+        Seq(
+          support.error(
+            rawRow.rowNumber,
+            "sellerPostcode",
+            messages("fileUpload.error.sellerPostcode.required")
+          )
+        )
 
       case Some(value) if !support.looksLikeUkPostcode(value) =>
-        Seq(support.error(rawRow.rowNumber, "sellerPostcode", "Enter a real postcode, like AA1 1AA"))
+        Seq(
+          support.error(
+            rawRow.rowNumber,
+            "sellerPostcode",
+            messages("fileUpload.error.sellerPostcode.invalid")
+          )
+        )
 
       case _ =>
         Seq.empty
@@ -160,40 +167,40 @@ class StcConditionalRowValidator @Inject()(
                                       ): Seq[StcRowValidationError] =
     parsedRow.connectedPersons match {
       case ParsedValue.Valid(true) =>
-        val errors = support.bindSingleValue(
-          totalMarketValueFormProvider(),
-          rawRow.valueAt(StcUploadColumn.totalMarketValue).getOrElse("")
-        )
-
-        errors.map { formError =>
-          val message =
-            formError.message match {
-              case "totalMarketValue.error.required" =>
+        parsedRow.totalMarketValue match {
+          case ParsedValue.Missing =>
+            Seq(
+              support.error(
+                rawRow.rowNumber,
+                "totalMarketValue",
                 messages("totalMarketValue.error.required")
+              )
+            )
 
-              case "totalMarketValue.error.invalidNumeric" =>
-                messages("totalMarketValue.error.nonNumeric")
+          case ParsedValue.Invalid(_, _) =>
+            Seq(
+              support.error(
+                rawRow.rowNumber,
+                "totalMarketValue",
+                messages("fileUpload.error.totalMarketValue.nonNumeric")
+              )
+            )
 
-              case "totalMarketValue.error.nonNumeric" =>
-                messages("totalMarketValue.error.nonNumeric")
+          case ParsedValue.Valid(value) if value > marketValueMaximum =>
+            Seq(
+              support.error(
+                rawRow.rowNumber,
+                "totalMarketValue",
+                messages("fileUpload.error.totalMarketValue.maximum")
+              )
+            )
 
-              case "totalMarketValue.error.aboveMaximum" =>
-                "The market value of the securities must be £999,999,999 or below"
-
-              case _ =>
-                messages("totalMarketValue.error.required")
-            }
-
-          support.error(rawRow.rowNumber, "totalMarketValue", message)
+          case _ =>
+            Seq.empty
         }
 
       case ParsedValue.Valid(false) =>
-        support.mustBeEmpty(
-          rawRow,
-          StcUploadColumn.totalMarketValue,
-          "totalMarketValue",
-          "Total market value must be empty when connected persons is no"
-        )
+        Seq.empty
 
       case _ =>
         Seq.empty
