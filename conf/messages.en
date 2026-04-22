@@ -225,7 +225,7 @@ org.confirmAddress.heading = Confirm business address
 org.confirmAddress.editLink = Edit address
 org.confirmAddress.confirm = Confirm and continue
 
-org.nameOfSeller.hint = This is the individual, business or trust buying the shares.
+org.nameOfSeller.hint = This is the individual, business or trust selling the securities.
 
 org.howToNotifyAboutSecuritiesTransfer.title = How do you want to tell us about your securities transfers?
 org.howToNotifyAboutSecuritiesTransfer.heading = How do you want to tell us about your securities transfers?
@@ -290,9 +290,9 @@ org.amountPaidForSecurities.p2 = You do not need to provide details about conver
 org.amountPaidForSecurities.hint = For example, £600 or £193.54
 org.amountPaidForSecurities.error.nonNumeric = The amount paid for the securities must be a number
 org.amountPaidForSecurities.error.required = Enter the amount the business paid for the securities
-org.amountPaidForSecurities.error.invalidNumeric = Enter the amount paid for the securities using up to two decimal places
+org.amountPaidForSecurities.error.invalidNumeric = The amount the business paid for these securities must be a positive number like 600 or 193.54
 org.amountPaidForSecurities.error.aboveMaximum = The amount paid for the securities must be lower than {0}
-org.amountPaidForSecurities.error.negative = The amount paid for the securities cannot be a negative number
+org.amountPaidForSecurities.error.negative = The amount the business paid for these securities must be a positive number like 600 or 193.54
 org.amountPaidForSecurities.change.hidden = Change the amount the business paid for the securities
 
 org.otherSecuritiesType.title = What type of securities is the business buying?
@@ -367,6 +367,16 @@ fileUploaded.title = File uploaded
 fileUploaded.heading = File uploaded
 fileUploaded.reference = File reference
 fileUploaded.status = Status
+
+org.templateInstructions.title = How to use the template
+org.templateInstructions.heading = How to use the template
+org.templateInstructions.p1 = Use the template to tell us about more than one securities transfer at a time.
+org.templateInstructions.step1 = Download the template
+org.templateInstructions.step2 = Complete the template, using one row for each type of securities the business is buying
+org.templateInstructions.step3 = Upload your file on the next page as a .xlsx or .csv
+org.templateInstructions.p2 = Remember, do not edit the first two rows, or change the order of the columns.
+org.templateInstructions.p3.span1 = Once you have uploaded and submitted your file, it may take a few minutes to process before showing as on your dashboard. You can then pay any charges due.
+org.return-to-dashboard.link = Return to dashboard
 
 uploadedFileError.title = There is a problem with your uploaded file
 uploadedFileError.heading = There is a problem with your uploaded file

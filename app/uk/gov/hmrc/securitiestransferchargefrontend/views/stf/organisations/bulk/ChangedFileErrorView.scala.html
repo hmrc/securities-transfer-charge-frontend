@@ -15,7 +15,8 @@
  *@
 
 @import uk.gov.hmrc.securitiestransferchargefrontend.views.html.templates
-@import uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.individuals.bulk.routes
+@import uk.gov.hmrc.securitiestransferchargefrontend.controllers.routes
+
 
 @this(
     layout: templates.Layout,
@@ -33,11 +34,13 @@
     <p class="govuk-body">@Html(messages("changedFileError.p2"))</p>
     <p class="govuk-body">@messages("changedFileError.p3")</p>
 
-    <p class="govuk-body">
-        <span><a class="govuk-link" href="/securities-transfer-charge/assets/Bulk_Securities_Transfer_Charge_template_v1i.xlsx" download="Bulk Securities Transfer Charge template v1i.xlsx">@messages("changedFileError.download.text")</a>.</span>
+    <p>
+        <a class="govuk-link" href="/securities-transfer-charge/assets/Bulk_Securities_Transfer_Charge_template_v1b.xlsx" download="Bulk Securities Transfer Charge template v1b.xlsx">
+            @messages("changedFileError.download.text")
+        </a>.
     </p>
 
-    @formHelper(action = routes.FileUploadController.onPageLoad()) {
+    @formHelper(action = routes.JourneyRecoveryController.onPageLoad()) {
         @govukButton(
             ButtonViewModel(messages("fileUpload.upload.another"))
         )

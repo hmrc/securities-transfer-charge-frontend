@@ -47,7 +47,7 @@ class ConfirmAddressControllerSpec extends SpecBase {
       val mockSubscriptionConnector = mock[SubscriptionConnector]
       val mockAddressService = mock[AddressService]
 
-      when(mockSubscriptionConnector.getValidSubscription(any())(any()))
+      when(mockSubscriptionConnector.getAndStoreSubscription(any())(any()))
         .thenReturn(Future.successful(subscription))
       when(mockAddressService.extractConfirmableAddress(subscription)).thenReturn(confirmableAddress)
 

@@ -52,7 +52,7 @@ class ConfirmAddressController @Inject()(
   def onPageLoad: Action[AnyContent] =
     (stcAuthEnrolled andThen getData).async { implicit request =>
 
-      subscriptionConnector.getValidSubscription(request.request.subscriptionId)
+      subscriptionConnector.getAndStoreSubscription(request.request.subscriptionId)
         .map { subscription =>
           Ok(view(addressService.extractConfirmableAddress(subscription)))
         }
