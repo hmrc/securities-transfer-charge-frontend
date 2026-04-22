@@ -16,14 +16,10 @@
 
 package uk.gov.hmrc.securitiestransferchargefrontend.models.submission
 
-import play.api.libs.json.{Json, OWrites}
+import uk.gov.hmrc.securitiestransferchargefrontend.models.stf
 
-final case class TransformationFailure(
-  recordId: Int,
-  requestIndex: Int,
-  errorCode: String,
-  errorText: String
-)
+sealed trait AffinityData
 
-object TransformationFailure:
-  given OWrites[TransformationFailure] = Json.writes[TransformationFailure]
+case class Individual(name: String, address: stf.Address, phone: String, email: String, nino: String) extends AffinityData
+case class Organisation(name: String, address: stf.Address, phone: String, email: String, utr: String) extends AffinityData
+case class Agent(name: String, address: stf.Address, phone: String, email: String) extends AffinityData

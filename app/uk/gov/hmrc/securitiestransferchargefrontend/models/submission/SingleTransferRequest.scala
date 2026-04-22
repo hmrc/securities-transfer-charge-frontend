@@ -17,6 +17,7 @@
 package uk.gov.hmrc.securitiestransferchargefrontend.models.submission
 
 import play.api.libs.json.{Json, Reads, Writes}
+import uk.gov.hmrc.securitiestransferchargefrontend.models.stf
 
 import java.time.LocalDate
 
@@ -28,7 +29,7 @@ final case class SingleTransferRequest(
   otherSellers: Option[Seq[SingleTransferOtherSellerName]],
   mainBuyerDetails: SingleTransferBuyerDetails,
   otherBuyers: Option[Seq[SingleTransferOtherBuyerName]],
-  agentDetails: Option[Seq[SingleTransferAgentDetails]]
+  agentDetails: Option[SingleTransferAgentDetails]
 )
 
 final case class SingleTransferTransactionDetails(
@@ -51,12 +52,12 @@ final case class SingleTransferTransactionDetails(
 )
 
 final case class SingleTransferContingentDetails(
-  provisionalDate: LocalDate,
-  isAmountUnasertainable: Boolean,
-  unascertainableAmount: Option[BigDecimal],
-  ascertainableAmount: Option[BigDecimal],
-  defermentOfPayment: Boolean,
-  originalDefermentDate: Option[LocalDate]
+  provisionalDate          :LocalDate,
+  isAmountUnascertainable  :Boolean,
+  unascertainableAmount    :Option[BigDecimal],
+  ascertainableAmount      :Option[BigDecimal],
+  defermentOfPayment       :Boolean,
+  originalDefermentDate    :Option[LocalDate]
 )
 
 final case class SingleTransferSellerDetails(
@@ -145,3 +146,15 @@ object SingleTransferRequest:
 
   given Reads[SingleTransferRequest] = Json.reads[SingleTransferRequest]
   given Writes[SingleTransferRequest] = Json.writes[SingleTransferRequest]
+
+  given Reads[Individual] = Json.reads[Individual]
+  given Writes[Individual] = Json.writes[Individual]
+
+  given Reads[Organisation] = Json.reads[Organisation]
+  given Writes[Organisation] = Json.writes[Organisation]
+
+  given Reads[Agent] = Json.reads[Agent]
+  given Writes[Agent] = Json.writes[Agent]
+
+  given Reads[AffinityData] = Json.reads[AffinityData]
+  given Writes[AffinityData] = Json.writes[AffinityData]
