@@ -24,13 +24,15 @@ import uk.gov.hmrc.securitiestransferchargefrontend.models.stf.AgentReference
 import javax.inject.Inject
 
 class AgentReferenceFormProvider @Inject() extends Mappings {
+  
+  val maxLength = 255
 
   def apply(): Form[AgentReference] = Form(
     mapping(
       "value" ->
         optional(
           text()
-            .verifying(maxLength(255, "agentReference.error.length"))
+            .verifying(maxLength(maxLength, "agentReference.error.length"))
         )
     )(AgentReference.apply)(x => Some(x.agentReference))
   )
