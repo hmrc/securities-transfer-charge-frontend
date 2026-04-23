@@ -76,7 +76,7 @@ class StcConditionalRowValidator @Inject()(
                                     parsedRow: ParsedStcRow
                                   ): Seq[StcRowValidationError] =
     parsedRow.whatTypeOfSecurities match {
-      case ParsedValue.Valid(value) if value.trim.equalsIgnoreCase("shares") =>
+      case ParsedValue.Valid(value) if StcSecurityType.isShares(value) =>
         rawRow.valueAt(StcUploadColumn.typeOfShares).map(_.trim) match {
           case None | Some("") =>
             Seq(
@@ -109,7 +109,7 @@ class StcConditionalRowValidator @Inject()(
           maxLength = Some(support.addressLineMaxLength),
           lengthMessage = Some(messages("fileUpload.error.sellerAddressLine1.length")),
           pattern = Some(support.addressPattern),
-          invalidMessage = messages("fileUpload.error.sellerAddressLine1.invalidCharacters")
+          invalidMessage = Some(messages("fileUpload.error.sellerAddressLine1.invalidCharacters"))
         ) ++
           support.validateOptionalText(
             rawRow,
@@ -118,7 +118,7 @@ class StcConditionalRowValidator @Inject()(
             maxLength = Some(support.addressLineMaxLength),
             lengthMessage = Some(messages("fileUpload.error.sellerAddressLine2.length")),
             pattern = Some(support.addressPattern),
-            invalidMessage = messages("fileUpload.error.sellerAddressLine2.invalidCharacters")
+            invalidMessage = Some(messages("fileUpload.error.sellerAddressLine2.invalidCharacters"))
           ) ++
           validateSellerPostcode(rawRow)
 
@@ -127,10 +127,10 @@ class StcConditionalRowValidator @Inject()(
           rawRow,
           StcUploadColumn.sellerCountry,
           "sellerCountry",
-          maxLength = Some(50),
+          maxLength = Some(support.countryMaxLength),
           lengthMessage = Some(messages("fileUpload.error.sellerCountry.length")),
           pattern = Some(support.countryPattern),
-          invalidMessage = messages("fileUpload.error.sellerCountry.invalidCharacters")
+          invalidMessage = Some(messages("fileUpload.error.sellerCountry.invalidCharacters"))
         )
 
       case _ =>
@@ -198,9 +198,6 @@ class StcConditionalRowValidator @Inject()(
           case _ =>
             Seq.empty
         }
-
-      case ParsedValue.Valid(false) =>
-        Seq.empty
 
       case _ =>
         Seq.empty

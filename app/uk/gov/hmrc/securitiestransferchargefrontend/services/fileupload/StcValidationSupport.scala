@@ -16,20 +16,15 @@
 
 package uk.gov.hmrc.securitiestransferchargefrontend.services.fileupload
 
-import play.api.data.Form
-import play.api.data.FormError
-import play.api.i18n.{Lang, Messages, MessagesApi}
+import play.api.data.{Form, FormError}
 import uk.gov.hmrc.securitiestransferchargefrontend.models.fileupload.{ParsedRow, StcRowValidationError}
 import uk.gov.hmrc.securitiestransferchargefrontend.viewmodels.fileupload.StcUploadFieldMetadata
 
-import javax.inject.{Inject, Singleton}
+import javax.inject.Singleton
 import scala.util.matching.Regex
 
 @Singleton
-class StcValidationSupport @Inject()(messagesApi: MessagesApi) {
-
-  implicit val messages: Messages =
-    messagesApi.preferred(Seq(Lang("en")))
+class StcValidationSupport {
 
   val addressLineMaxLength = 50
   val postcodeMaxLength    = 10
@@ -47,19 +42,8 @@ class StcValidationSupport @Inject()(messagesApi: MessagesApi) {
   private val ukPostcodePattern: Regex =
     """(?i)^[A-Z]{1,2}\d[A-Z\d]?\s?\d[A-Z]{2}$""".r
 
-  def questionLabel(fieldName: String): String =
-    StcUploadFieldMetadata
-      .byFieldName
-      .get(fieldName)
-      .map(_.questionLabel)
-      .getOrElse(fieldName)
-
   def columnIndex(fieldName: String): Int =
-    StcUploadFieldMetadata
-      .byFieldName
-      .get(fieldName)
-      .map(_.columnIndex)
-      .getOrElse(-1)
+    StcUploadFieldMetadata.columnIndexByFieldName.getOrElse(fieldName, -1)
 
   def bindSingleValue[A](form: Form[A], rawValue: String): Seq[FormError] =
     form.bind(Map("value" -> rawValue)).errors
@@ -81,7 +65,7 @@ class StcValidationSupport @Inject()(messagesApi: MessagesApi) {
                             maxLength: Option[Int] = None,
                             lengthMessage: Option[String] = None,
                             pattern: Option[Regex] = None,
-                            invalidMessage: String = "Enter a valid value"
+                            invalidMessage: Option[String] = None
                           ): Seq[StcRowValidationError] =
     rawRow.valueAt(columnIndex).map(_.trim) match {
       case None | Some("") =>
@@ -106,7 +90,7 @@ class StcValidationSupport @Inject()(messagesApi: MessagesApi) {
                             maxLength: Option[Int] = None,
                             lengthMessage: Option[String] = None,
                             pattern: Option[Regex] = None,
-                            invalidMessage: String = "Enter a valid value"
+                            invalidMessage: Option[String] = None
                           ): Seq[StcRowValidationError] =
     rawRow.valueAt(columnIndex).map(_.trim) match {
       case None | Some("") =>
@@ -142,9 +126,6 @@ class StcValidationSupport @Inject()(messagesApi: MessagesApi) {
                "error.required" =>
             requiredMessage
 
-          case "error.boolean" =>
-            invalidMessage
-
           case _ =>
             invalidMessage
         }
@@ -163,22 +144,22 @@ class StcValidationSupport @Inject()(messagesApi: MessagesApi) {
                                  maxLength: Option[Int],
                                  lengthMessage: Option[String],
                                  pattern: Option[Regex],
-                                 invalidMessage: String
+                                 invalidMessage: Option[String]
                                ): Seq[StcRowValidationError] = {
     val lengthErrors =
-      maxLength.toSeq.collect {
-        case max if value.length > max =>
-          error(
-            rowNumber,
-            fieldName,
-            lengthMessage.getOrElse(s"${questionLabel(fieldName)} must be $max characters or fewer")
-          )
+      (maxLength, lengthMessage) match {
+        case (Some(max), Some(message)) if value.length > max =>
+          Seq(error(rowNumber, fieldName, message))
+        case _ =>
+          Seq.empty
       }
 
     val patternErrors =
-      pattern.toSeq.collect {
-        case regex if regex.findFirstMatchIn(value).isEmpty =>
-          error(rowNumber, fieldName, invalidMessage)
+      (pattern, invalidMessage) match {
+        case (Some(regex), Some(message)) if regex.findFirstMatchIn(value).isEmpty =>
+          Seq(error(rowNumber, fieldName, message))
+        case _ =>
+          Seq.empty
       }
 
     lengthErrors ++ patternErrors

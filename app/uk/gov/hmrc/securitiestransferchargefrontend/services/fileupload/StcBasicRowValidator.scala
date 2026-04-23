@@ -26,7 +26,7 @@ import javax.inject.{Inject, Singleton}
 @Singleton
 class StcBasicRowValidator @Inject()(
                                       support: StcValidationSupport,
-                                      messagesApi: MessagesApi,   
+                                      messagesApi: MessagesApi,
                                       applyingForReliefFormProvider: ApplyingForReliefFormProvider,
                                       chargingPointFormProvider: ChargingPointFormProvider,
                                       connectedPersonsFormProvider: ConnectedPersonsFormProvider,

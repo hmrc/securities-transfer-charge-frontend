@@ -40,16 +40,16 @@ object StcUploadResultViewModel {
     )
 
   private def toDisplayError(error: StcRowValidationError): UploadErrorDisplay = {
-    val fieldMetadata = StcUploadFieldMetadata.byFieldName.get(error.fieldName)
+    val columnIndex =
+      StcUploadFieldMetadata.columnIndexByFieldName.get(error.fieldName)
 
     UploadErrorDisplay(
       cellReference =
-        if (error.columnIndex >= 0) {
-          s"${SpreadsheetColumnLetters.fromZeroBasedIndex(error.columnIndex)}${error.rowNumber}"
-        } else {
-          s"Row ${error.rowNumber}"
+        columnIndex match {
+          case Some(index) => s"${SpreadsheetColumnLetters.fromZeroBasedIndex(index)}${error.rowNumber}"
+          case None        => s"Row ${error.rowNumber}"
         },
-      questionLabel = fieldMetadata.map(_.questionLabel).getOrElse(error.fieldName),
+      questionLabel = error.fieldName,
       message = error.message
     )
   }
