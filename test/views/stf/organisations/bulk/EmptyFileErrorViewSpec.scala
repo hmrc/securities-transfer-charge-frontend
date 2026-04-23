@@ -46,7 +46,7 @@ class EmptyFileErrorViewSpec extends ViewBaseSpec {
       messages("fileUpload.error.emptyFile.p1")
 
     val downloadText: String =
-      messages("fileUpload.error.emptyFile.download.text")
+      messages("changedFileError.download.text")
 
     val buttonText: String =
       messages("fileUpload.upload.another")
