@@ -20,7 +20,6 @@
 @import uk.gov.hmrc.securitiestransferchargefrontend.views.html.components.SaveAndReturnButton
 @import uk.gov.hmrc.securitiestransferchargefrontend.views.html.templates
 
-
 @this(
     layout: templates.Layout,
     formHelper: FormWithCSRF,
@@ -33,6 +32,9 @@
 @(form: Form[_], mode: Mode, backLinkCall: Call)(implicit request: Request[_], messages: Messages)
 
 @layout(pageTitle = title(form, messages("agentReference.title")), backLinkUrl = Some(backLinkCall.url)) {
+    <div id="caption-heading" class="govuk-caption-l">
+        @messages("agent.details.caption")
+    </div>
 
     @formHelper(action = routes.AgentReferenceController.onSubmit(mode)) {
 
