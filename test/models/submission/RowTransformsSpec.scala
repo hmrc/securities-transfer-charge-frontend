@@ -64,7 +64,7 @@ class RowTransformsSpec extends AnyWordSpec with Matchers {
       chargingPoint = ParsedValue.Valid(LocalDate.of(2026, 3, 23)),
       taxRate = ParsedValue.Valid(BigDecimal("1.5")),
       whatTypeOfSecurities = ParsedValue.Valid("Shares"),
-      otherSecuritiesType = ParsedValue.Missing,
+      typeOfShares = ParsedValue.Missing,
       securitiesQuantity = ParsedValue.Valid(BigDecimal("1000")),
       amountPaidForSecurities = ParsedValue.Valid(BigDecimal("5000.25")),
       totalMarketValue = ParsedValue.Valid(BigDecimal("6000"))

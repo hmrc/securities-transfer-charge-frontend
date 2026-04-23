@@ -44,7 +44,7 @@ final case class ParsedStcRow(
                                chargingPoint: ParsedValue[LocalDate],
                                taxRate: ParsedValue[BigDecimal],
                                whatTypeOfSecurities: ParsedValue[String],
-                               otherSecuritiesType: ParsedValue[String],
+                               typeOfShares: ParsedValue[String],
                                securitiesQuantity: ParsedValue[BigDecimal],
                                amountPaidForSecurities: ParsedValue[BigDecimal],
                                totalMarketValue: ParsedValue[BigDecimal]

@@ -117,7 +117,7 @@ class StcUploadParsingServiceSpec extends AnyWordSpec with Matchers with EitherV
         chargingPoint = ParsedValue.Valid(LocalDate.of(2026, 3, 23)),
         taxRate = ParsedValue.Valid(BigDecimal("0.5")),
         whatTypeOfSecurities = ParsedValue.Missing,
-        otherSecuritiesType = ParsedValue.Missing,
+        typeOfShares = ParsedValue.Missing,
         securitiesQuantity = ParsedValue.Valid(BigDecimal("100")),
         amountPaidForSecurities = ParsedValue.Valid(BigDecimal("500")),
         totalMarketValue = ParsedValue.Valid(BigDecimal("600"))

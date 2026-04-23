@@ -31,7 +31,7 @@ object RowTransforms {
 
     val shareType = required(row.whatTypeOfSecurities, "whatTypeOfSecurities", row.rowNumber)
     val getDescriptionOfSecurity =
-      if shareType.equalsIgnoreCase("Shares") then "Shares" else required(row.whatTypeOfSecurities, "whatTypeOfSecurities", row.rowNumber) // TODO: Not clear how to get the class of shares
+      if shareType.equalsIgnoreCase("Shares") then "Shares" else required(row.typeOfShares, "typeOfShares", row.rowNumber)
 
     val reliefClaimed = required(row.applyingForRelief, "applyingForRelief", row.rowNumber)
     val reliefPercentage = if reliefClaimed then Some(100) else None // TODO: Get correct percentage based on what relief is being claimed
@@ -39,17 +39,17 @@ object RowTransforms {
     val buyerName: String = affinityData match
       case Individual(name, _, _, _, _) => name
       case Organisation(name, _, _, _, _) => name
-      case _ => ??? // ToDo: For agents we need to know where to get this
+      case _ => ??? // ToDo: For agents this will be in the spreadsheet in a location tbd
 
     val buyerAddress: stf.Address = affinityData match
       case Individual(_, address, _, _, _) => address
       case Organisation(_, address, _, _, _) => address
-      case _ => ??? // ToDo: For agents we need to know where to get this
+      case _ => ??? // ToDo: ToDo: For agents this will be in the spreadsheet in a location tbd
 
     val buyerEmail: String = affinityData match
       case Individual(_, _, _, email, _) => email
       case Organisation(_, _, _, email, _) => email
-      case _ => ??? // ToDo: For agents we need to know where to get this
+      case _ => ??? // ToDo: For agents this will be in the spreadsheet in a location tbd
 
     val uniqueId: AffinityData => Option[String] = {
       case Individual(_, _, _, _, nino) => Some(nino)
@@ -68,7 +68,7 @@ object RowTransforms {
         country = address.countryCode,
         phone = phone,
         email = email,
-        clientReference = "" // ToDo: For agents, we need to know where to get this from
+        clientReference = "" // ToDo: For agents this will be in the spreadsheet in a location tbd
       )
 
     SingleTransferRequest(
