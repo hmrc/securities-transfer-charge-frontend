@@ -69,12 +69,6 @@ class StcUpscanProcessingServiceSpec extends AnyWordSpec with Matchers with Eith
 
   private val parsedRow = ParsedStcRow(
     rowNumber = 3,
-    addressLine1 = ParsedValue.Valid("10 Downing Street"),
-    addressLine2 = ParsedValue.Missing,
-    addressLine3 = ParsedValue.Missing,
-    addressLine4 = ParsedValue.Missing,
-    postcode = ParsedValue.Valid("SW1A 2AA"),
-    country = ParsedValue.Valid("United Kingdom"),
     sellerName = ParsedValue.Valid("Bob Seller"),
     sellerAddressInUk = ParsedValue.Valid(true),
     sellerAddressLine1 = ParsedValue.Valid("1 Seller Street"),
@@ -91,7 +85,7 @@ class StcUpscanProcessingServiceSpec extends AnyWordSpec with Matchers with Eith
     chargingPoint = ParsedValue.Valid(LocalDate.of(2026, 3, 23)),
     taxRate = ParsedValue.Valid(BigDecimal("0.5")),
     whatTypeOfSecurities = ParsedValue.Valid("Stock"),
-    otherSecuritiesType = ParsedValue.Missing,
+    typeOfShares = ParsedValue.Missing,
     securitiesQuantity = ParsedValue.Valid(BigDecimal("100")),
     amountPaidForSecurities = ParsedValue.Valid(BigDecimal("500")),
     totalMarketValue = ParsedValue.Valid(BigDecimal("600"))

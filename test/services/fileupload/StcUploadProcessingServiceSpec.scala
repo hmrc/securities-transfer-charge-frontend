@@ -16,84 +16,83 @@
 
 package services.fileupload
 
-import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.when
-import org.scalatest.EitherValues
-import org.scalatest.matchers.should.Matchers
+import org.scalatest.matchers.must.Matchers
 import org.scalatest.wordspec.AnyWordSpec
 import org.scalatestplus.mockito.MockitoSugar
 import uk.gov.hmrc.securitiestransferchargefrontend.models.fileupload.*
-import uk.gov.hmrc.securitiestransferchargefrontend.services.fileupload.*
+import uk.gov.hmrc.securitiestransferchargefrontend.services.fileupload.{StcFileValidationService, StcUploadColumn, StcUploadParsingService, StcUploadProcessingService}
 
 import java.io.ByteArrayInputStream
-import java.nio.charset.StandardCharsets
-import java.time.LocalDate
 
-class StcUploadProcessingServiceSpec extends AnyWordSpec with Matchers with EitherValues with MockitoSugar {
+class StcUploadProcessingServiceSpec extends AnyWordSpec with Matchers with MockitoSugar {
 
   private val stcUploadParsingService = mock[StcUploadParsingService]
   private val stcFileValidationService = mock[StcFileValidationService]
 
-  private val service = new StcUploadProcessingService(
-    stcUploadParsingService,
-    stcFileValidationService
-  )
+  private val service =
+    new StcUploadProcessingService(
+      stcUploadParsingService = stcUploadParsingService,
+      stcFileValidationService = stcFileValidationService
+    )
 
   private val uploadedFile = UploadedFile(
-    fileName = "test.xlsx",
-    mimeType = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-    inputStream = new ByteArrayInputStream("irrelevant".getBytes(StandardCharsets.UTF_8))
+    fileName = "test.csv",
+    mimeType = "text/csv",
+    inputStream = new ByteArrayInputStream("data".getBytes)
   )
 
-  private val parsedRow = ParsedStcRow(
+  private val parsedRow = ParsedRow(
     rowNumber = 3,
-    addressLine1 = ParsedValue.Valid("10 Downing Street"),
-    addressLine2 = ParsedValue.Missing,
-    addressLine3 = ParsedValue.Missing,
-    addressLine4 = ParsedValue.Missing,
-    postcode = ParsedValue.Valid("SW1A 2AA"),
-    country = ParsedValue.Valid("United Kingdom"),
-    sellerName = ParsedValue.Valid("Bob Seller"),
-    sellerAddressInUk = ParsedValue.Valid(true),
-    sellerAddressLine1 = ParsedValue.Valid("1 Seller Street"),
-    sellerAddressLine2 = ParsedValue.Missing,
-    sellerAddressLine3 = ParsedValue.Missing,
-    sellerAddressLine4 = ParsedValue.Missing,
-    sellerPostcode = ParsedValue.Valid("LS1 1AA"),
-    sellerCountry = ParsedValue.Valid("United Kingdom"),
-    connectedPersons = ParsedValue.Valid(false),
-    applyingForRelief = ParsedValue.Valid(false),
-    whatReliefAreYouApplyingFor = ParsedValue.Missing,
-    securitiesTarget = ParsedValue.Missing,
-    companyRegistrationNumber = ParsedValue.Missing,
-    chargingPoint = ParsedValue.Valid(LocalDate.of(2026, 3, 23)),
-    taxRate = ParsedValue.Valid(BigDecimal("0.5")),
-    whatTypeOfSecurities = ParsedValue.Valid("Stock"),
-    otherSecuritiesType = ParsedValue.Missing,
-    securitiesQuantity = ParsedValue.Valid(BigDecimal("100")),
-    amountPaidForSecurities = ParsedValue.Valid(BigDecimal("500")),
-    totalMarketValue = ParsedValue.Valid(BigDecimal("600"))
+    cells = Seq(
+      ParsedCell(StcUploadColumn.sellerName, "Seller Ltd")
+    )
   )
 
-  "process" should {
-
-    "parse the file and validate the parsed rows" in {
-      val validationResponse = StcFileValidationResponse(
-        rows = Seq(ValidatedStcRow(parsedRow, Seq.empty))
+  private val validationResponse = StcFileValidationResponse(
+    rows = Seq(
+      ValidatedStcRow(
+        parsedRow = ParsedStcRow(
+          rowNumber = 3,
+          sellerName = ParsedValue.Valid("Seller Ltd"),
+          sellerAddressInUk = ParsedValue.Missing,
+          sellerAddressLine1 = ParsedValue.Missing,
+          sellerAddressLine2 = ParsedValue.Missing,
+          sellerAddressLine3 = ParsedValue.Missing,
+          sellerAddressLine4 = ParsedValue.Missing,
+          sellerPostcode = ParsedValue.Missing,
+          sellerCountry = ParsedValue.Missing,
+          connectedPersons = ParsedValue.Missing,
+          applyingForRelief = ParsedValue.Missing,
+          whatReliefAreYouApplyingFor = ParsedValue.Missing,
+          securitiesTarget = ParsedValue.Missing,
+          companyRegistrationNumber = ParsedValue.Missing,
+          chargingPoint = ParsedValue.Missing,
+          taxRate = ParsedValue.Missing,
+          whatTypeOfSecurities = ParsedValue.Missing,
+          typeOfShares = ParsedValue.Missing,
+          securitiesQuantity = ParsedValue.Missing,
+          amountPaidForSecurities = ParsedValue.Missing,
+          totalMarketValue = ParsedValue.Missing
+        ),
+        validationErrors = Seq.empty
       )
+    )
+  )
 
-      when(stcUploadParsingService.parse(any[UploadedFile])).thenReturn(Right(Seq(parsedRow)))
+  "StcUploadProcessingService.process" must {
+
+    "parse then validate the uploaded file" in {
+      when(stcUploadParsingService.parse(uploadedFile)).thenReturn(Right(Seq(parsedRow)))
       when(stcFileValidationService.validate(Seq(parsedRow))).thenReturn(validationResponse)
 
-      service.process(uploadedFile).value shouldBe validationResponse
+      service.process(uploadedFile) mustBe Right(validationResponse)
     }
 
-    "return the parse error if parsing fails" in {
-      val parseError = FileParseError.UnsupportedMimeType("application/pdf")
+    "return parse errors without validating" in {
+      when(stcUploadParsingService.parse(uploadedFile)).thenReturn(Left(FileParseError.EmptyFile))
 
-      when(stcUploadParsingService.parse(any[UploadedFile])).thenReturn(Left(parseError))
-
-      service.process(uploadedFile).left.value shouldBe parseError
+      service.process(uploadedFile) mustBe Left(FileParseError.EmptyFile)
     }
   }
 }

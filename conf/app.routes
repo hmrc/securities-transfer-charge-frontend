@@ -178,7 +178,7 @@ GET        /stf/template                                  uk.gov.hmrc.securities
 GET        /stf/bulk-error                                uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.individuals.bulk.FormattingErrorController.onPageLoad()
 GET        /stf/bulk-formatting                           uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.individuals.bulk.ChangedFileErrorController.onPageLoad()
 GET        /stf/bulk-empty                                uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.individuals.bulk.EmptyFileErrorController.onPageLoad()
-GET        /stf/bulk-error-list                           uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.individuals.bulk.UploadedFileErrorController.onPageLoad()
+GET        /stf/bulk-error-list/:reference                uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.individuals.bulk.UploadedFileErrorController.onPageLoad(reference: String)
 
 GET        /stf/file-upload                               uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.individuals.bulk.FileUploadController.onPageLoad()
 GET        /stf/file-uploaded                             uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.individuals.bulk.FileUploadedController.onPageLoad(key:String)
@@ -189,5 +189,5 @@ GET        /stf/org/bulk-empty                            uk.gov.hmrc.securities
 GET        /stf/org/bulk-formatting                       uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.organisations.bulk.ChangedFileErrorController.onPageLoad()
 
 GET        /stf/org/template                              uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.organisations.bulk.TemplateInstructionsController.onPageLoad()
-GET        /stf/org/bulk-error                                uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.individuals.bulk.FormattingErrorController.onPageLoad()
-GET        /stf/bulk-error-list/:reference                              uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.UploadedFileErrorController.onPageLoad(reference: String)
+GET        /stf/org/bulk-error                                uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.organisations.bulk.FormattingErrorController.onPageLoad()
+GET        /stf/bulk-error-list/:reference                              uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.shared.bulk.UploadedFileErrorController.onPageLoad(reference: String)

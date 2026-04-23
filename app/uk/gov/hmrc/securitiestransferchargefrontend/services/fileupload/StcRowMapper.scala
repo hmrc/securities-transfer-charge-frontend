@@ -25,12 +25,6 @@ class StcRowMapper {
   def map(row: ParsedRow): ParsedStcRow =
     ParsedStcRow(
       rowNumber = row.rowNumber,
-      addressLine1 = ParsedRowReader.readString(row, StcUploadColumn.addressLine1),
-      addressLine2 = ParsedRowReader.readString(row, StcUploadColumn.addressLine2),
-      addressLine3 = ParsedRowReader.readString(row, StcUploadColumn.addressLine3),
-      addressLine4 = ParsedRowReader.readString(row, StcUploadColumn.addressLine4),
-      postcode = ParsedRowReader.readString(row, StcUploadColumn.postcode),
-      country = ParsedRowReader.readString(row, StcUploadColumn.country),
       sellerName = ParsedRowReader.readString(row, StcUploadColumn.sellerName),
       sellerAddressInUk = ParsedRowReader.readBoolean(row, StcUploadColumn.sellerAddressInUK),
       sellerAddressLine1 = ParsedRowReader.readString(row, StcUploadColumn.sellerAddressLine1),

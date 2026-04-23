@@ -27,9 +27,7 @@ import javax.inject.{Inject, Singleton}
 class StcBasicRowValidator @Inject()(
                                       support: StcValidationSupport,
                                       messagesApi: MessagesApi,
-                                      applyingForReliefFormProvider: ApplyingForReliefFormProvider,
                                       chargingPointFormProvider: ChargingPointFormProvider,
-                                      connectedPersonsFormProvider: ConnectedPersonsFormProvider,
                                       nameOfSellerFormProvider: NameOfSellerFormProvider,
                                       securitiesTargetFormProvider: SecuritiesTargetFormProvider
                                     ) {
@@ -41,9 +39,9 @@ class StcBasicRowValidator @Inject()(
 
   def validate(rawRow: ParsedRow, parsedRow: ParsedStcRow): Seq[StcRowValidationError] =
     validateNameOfSeller(rawRow) ++
-      validateSellerAddressInUk(rawRow) ++
-      validateConnectedPersons(rawRow) ++
-      validateApplyingForRelief(rawRow) ++
+      validateSellerAddressInUk(parsedRow) ++
+      validateConnectedPersons(parsedRow) ++
+      validateApplyingForRelief(parsedRow) ++
       validateSecuritiesTarget(rawRow) ++
       validateChargingPoint(rawRow) ++
       validateTaxRate(rawRow) ++
@@ -69,35 +67,50 @@ class StcBasicRowValidator @Inject()(
     }
   }
 
-  private def validateSellerAddressInUk(rawRow: ParsedRow): Seq[StcRowValidationError] =
-    support.validateBooleanField(
-      rawRow,
-      StcUploadColumn.sellerAddressInUK,
-      "sellerAddressInUk",
-      connectedPersonsFormProvider(),
-      requiredMessage = messages("fileUpload.error.sellerAddressInUk.invalid"),
-      invalidMessage = messages("fileUpload.error.sellerAddressInUk.invalid")
-    )
+  private def validateSellerAddressInUk(parsedRow: ParsedStcRow): Seq[StcRowValidationError] =
+    parsedRow.sellerAddressInUk match {
+      case ParsedValue.Valid(_) =>
+        Seq.empty
 
-  private def validateConnectedPersons(rawRow: ParsedRow): Seq[StcRowValidationError] =
-    support.validateBooleanField(
-      rawRow,
-      StcUploadColumn.connectedPersons,
-      "connectedPersons",
-      connectedPersonsFormProvider(),
-      requiredMessage = messages("fileUpload.error.connectedPersons.invalid"),
-      invalidMessage = messages("fileUpload.error.connectedPersons.invalid")
-    )
+      case ParsedValue.Missing | ParsedValue.Invalid(_, _) =>
+        Seq(
+          support.error(
+            parsedRow.rowNumber,
+            "sellerAddressInUk",
+            messages("fileUpload.error.sellerAddressInUk.invalid")
+          )
+        )
+    }
 
-  private def validateApplyingForRelief(rawRow: ParsedRow): Seq[StcRowValidationError] =
-    support.validateBooleanField(
-      rawRow,
-      StcUploadColumn.applyingForRelief,
-      "applyingForRelief",
-      applyingForReliefFormProvider(),
-      requiredMessage = messages("fileUpload.error.applyingForRelief.invalid"),
-      invalidMessage = messages("fileUpload.error.applyingForRelief.invalid")
-    )
+  private def validateConnectedPersons(parsedRow: ParsedStcRow): Seq[StcRowValidationError] =
+    parsedRow.connectedPersons match {
+      case ParsedValue.Valid(_) =>
+        Seq.empty
+
+      case ParsedValue.Missing | ParsedValue.Invalid(_, _) =>
+        Seq(
+          support.error(
+            parsedRow.rowNumber,
+            "connectedPersons",
+            messages("fileUpload.error.connectedPersons.invalid")
+          )
+        )
+    }
+
+  private def validateApplyingForRelief(parsedRow: ParsedStcRow): Seq[StcRowValidationError] =
+    parsedRow.applyingForRelief match {
+      case ParsedValue.Valid(_) =>
+        Seq.empty
+
+      case ParsedValue.Missing | ParsedValue.Invalid(_, _) =>
+        Seq(
+          support.error(
+            parsedRow.rowNumber,
+            "applyingForRelief",
+            messages("fileUpload.error.applyingForRelief.invalid")
+          )
+        )
+    }
 
   private def validateSecuritiesTarget(rawRow: ParsedRow): Seq[StcRowValidationError] = {
     val boundForm = securitiesTargetFormProvider().bind(
@@ -207,10 +220,22 @@ class StcBasicRowValidator @Inject()(
   private def validateTaxRate(rawRow: ParsedRow): Seq[StcRowValidationError] =
     rawRow.valueAt(StcUploadColumn.taxRate).map(_.trim) match {
       case None | Some("") =>
-        Seq(support.error(rawRow.rowNumber, "taxRate", messages("fileUpload.error.taxRate.invalid")))
+        Seq(
+          support.error(
+            rawRow.rowNumber,
+            "taxRate",
+            messages("fileUpload.error.taxRate.invalid")
+          )
+        )
 
       case Some(rawValue) if StcTaxRateParser.parse(rawValue).isEmpty =>
-        Seq(support.error(rawRow.rowNumber, "taxRate", messages("fileUpload.error.taxRate.invalid")))
+        Seq(
+          support.error(
+            rawRow.rowNumber,
+            "taxRate",
+            messages("fileUpload.error.taxRate.invalid")
+          )
+        )
 
       case _ =>
         Seq.empty

@@ -16,29 +16,226 @@
 
 package controllers.stf.individuals.bulk
 
-import base.{Fixtures, SpecBase}
+import base.SpecBase
+import org.mockito.ArgumentMatchers.{any as anyArg, eq as eqTo}
+import org.mockito.Mockito.{reset, when}
+import org.scalatest.BeforeAndAfterEach
+import org.scalatestplus.mockito.MockitoSugar
+import play.api.inject.bind
 import play.api.test.FakeRequest
 import play.api.test.Helpers.*
-import uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.individuals.bulk.routes
+import uk.gov.hmrc.http.HeaderCarrier
+import uk.gov.hmrc.securitiestransferchargefrontend.controllers.routes
+import uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.individuals.bulk.routes as individualRoutes
+import uk.gov.hmrc.securitiestransferchargefrontend.models.fileupload.{FileParseError, ParsedStcRow, ParsedValue, StcFileValidationResponse, StcRowValidationError, ValidatedStcRow}
+import uk.gov.hmrc.securitiestransferchargefrontend.models.stf.UploadedFileError
+import uk.gov.hmrc.securitiestransferchargefrontend.models.stf.upscan.{FileUpload, UpscanJourneyStatus}
+import uk.gov.hmrc.securitiestransferchargefrontend.repositories.UpscanJourneyRepository
+import uk.gov.hmrc.securitiestransferchargefrontend.services.fileupload.StcUpscanProcessingService
+import uk.gov.hmrc.securitiestransferchargefrontend.viewmodels.fileupload.UploadedFileErrorMapper
 import uk.gov.hmrc.securitiestransferchargefrontend.views.html.stf.individuals.bulk.UploadedFileErrorView
 
-class UploadedFileErrorControllerSpec extends SpecBase {
+import java.time.LocalDate
+import scala.concurrent.Future
 
-  "UploadedFileErrorList Controller" - {
+class UploadedFileErrorControllerSpec
+  extends SpecBase
+    with MockitoSugar
+    with BeforeAndAfterEach {
 
-    "must return OK and the correct view for a GET" in {
+  private val mockUpscanJourneyRepository    = mock[UpscanJourneyRepository]
+  private val mockStcUpscanProcessingService = mock[StcUpscanProcessingService]
 
-      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers)).build()
+  private val reference = "test-reference"
 
-      running(application) {
-        val request = FakeRequest(GET, routes.UploadedFileErrorController.onPageLoad().url)
+  override protected def beforeEach(): Unit = {
+    super.beforeEach()
+    reset(mockUpscanJourneyRepository, mockStcUpscanProcessingService)
+  }
 
-        val result = route(application, request).value
+  private def application =
+    applicationBuilder(userAnswers = Some(emptyUserAnswers))
+      .overrides(
+        bind[UpscanJourneyRepository].toInstance(mockUpscanJourneyRepository),
+        bind[StcUpscanProcessingService].toInstance(mockStcUpscanProcessingService)
+      )
+      .build()
 
-        val view = application.injector.instanceOf[UploadedFileErrorView]
+  private val readyFileUpload: FileUpload =
+    FileUpload(
+      reference = reference,
+      status = UpscanJourneyStatus.Ready
+    )
+
+  private val failedFileUpload: FileUpload =
+    FileUpload(
+      reference = reference,
+      status = UpscanJourneyStatus.Failed
+    )
+
+  private val parsedRow: ParsedStcRow =
+    ParsedStcRow(
+      rowNumber = 6,
+      sellerName = ParsedValue.Valid("Seller Ltd"),
+      sellerAddressInUk = ParsedValue.Valid(true),
+      sellerAddressLine1 = ParsedValue.Valid("1 Test Street"),
+      sellerAddressLine2 = ParsedValue.Missing,
+      sellerAddressLine3 = ParsedValue.Missing,
+      sellerAddressLine4 = ParsedValue.Missing,
+      sellerPostcode = ParsedValue.Valid("AA1 1AA"),
+      sellerCountry = ParsedValue.Missing,
+      connectedPersons = ParsedValue.Valid(false),
+      applyingForRelief = ParsedValue.Valid(false),
+      whatReliefAreYouApplyingFor = ParsedValue.Missing,
+      securitiesTarget = ParsedValue.Valid("Target Ltd"),
+      companyRegistrationNumber = ParsedValue.Valid("12345678"),
+      chargingPoint = ParsedValue.Valid(LocalDate.of(2025, 11, 20)),
+      taxRate = ParsedValue.Valid(BigDecimal("0.5")),
+      whatTypeOfSecurities = ParsedValue.Valid("Shares"),
+      typeOfShares = ParsedValue.Valid("Ordinary"),
+      securitiesQuantity = ParsedValue.Valid(BigDecimal(100)),
+      amountPaidForSecurities = ParsedValue.Valid(BigDecimal(1000)),
+      totalMarketValue = ParsedValue.Missing
+    )
+
+  private val blockingValidationErrors: Seq[StcRowValidationError] =
+    Seq(
+      StcRowValidationError(
+        rowNumber = 6,
+        fieldName = "sellerName",
+        columnIndex = 7,
+        message = "Enter the seller's full name",
+        blocking = true
+      ),
+      StcRowValidationError(
+        rowNumber = 6,
+        fieldName = "sellerAddressLine1",
+        columnIndex = 9,
+        message = "Enter the first line of your address",
+        blocking = true
+      )
+    )
+
+  private val expectedUploadedFileErrors: Seq[UploadedFileError] =
+    UploadedFileErrorMapper.from(blockingValidationErrors)
+
+  "UploadedFileErrorController" - {
+
+    "must return OK and the correct view for a GET when blocking errors are present" in {
+
+      val validationResponse =
+        StcFileValidationResponse(
+          rows = Seq(
+            ValidatedStcRow(
+              parsedRow = parsedRow,
+              validationErrors = blockingValidationErrors
+            )
+          )
+        )
+
+      when(mockUpscanJourneyRepository.find(reference))
+        .thenReturn(Future.successful(Some(readyFileUpload)))
+
+      when(mockStcUpscanProcessingService.process(eqTo(readyFileUpload))(using anyArg[HeaderCarrier]))
+        .thenReturn(Future.successful(Right(validationResponse)))
+
+      val app = application
+
+      running(app) {
+        val request = FakeRequest(GET, individualRoutes.UploadedFileErrorController.onPageLoad(reference).url)
+
+        val result = route(app, request).value
+
+        val view = app.injector.instanceOf[UploadedFileErrorView]
 
         status(result) mustEqual OK
-        contentAsString(result) mustEqual view(Fixtures.uploadedFileErrors)(request, messages(application)).toString
+        contentAsString(result) mustEqual view(expectedUploadedFileErrors)(request, messages(app)).toString
+      }
+    }
+
+    "must redirect to journey recovery when the upload cannot be found" in {
+
+      when(mockUpscanJourneyRepository.find(reference))
+        .thenReturn(Future.successful(None))
+
+      val app = application
+
+      running(app) {
+        val request = FakeRequest(GET, individualRoutes.UploadedFileErrorController.onPageLoad(reference).url)
+
+        val result = route(app, request).value
+
+        status(result) mustEqual SEE_OTHER
+        redirectLocation(result).value mustEqual routes.JourneyRecoveryController.onPageLoad().url
+      }
+    }
+
+    "must redirect to file upload page when the upload status is not Ready" in {
+
+      when(mockUpscanJourneyRepository.find(reference))
+        .thenReturn(Future.successful(Some(failedFileUpload)))
+
+      val app = application
+
+      running(app) {
+        val request = FakeRequest(GET, individualRoutes.UploadedFileErrorController.onPageLoad(reference).url)
+
+        val result = route(app, request).value
+
+        status(result) mustEqual SEE_OTHER
+        redirectLocation(result).value mustEqual individualRoutes.FileUploadController.onPageLoad().url
+      }
+    }
+
+    "must redirect to file uploaded page when there are no blocking errors" in {
+
+      val validationResponse =
+        StcFileValidationResponse(
+          rows = Seq(
+            ValidatedStcRow(
+              parsedRow = parsedRow,
+              validationErrors = Seq.empty
+            )
+          )
+        )
+
+      when(mockUpscanJourneyRepository.find(reference))
+        .thenReturn(Future.successful(Some(readyFileUpload)))
+
+      when(mockStcUpscanProcessingService.process(eqTo(readyFileUpload))(using anyArg[HeaderCarrier]))
+        .thenReturn(Future.successful(Right(validationResponse)))
+
+      val app = application
+
+      running(app) {
+        val request = FakeRequest(GET, individualRoutes.UploadedFileErrorController.onPageLoad(reference).url)
+
+        val result = route(app, request).value
+
+        status(result) mustEqual SEE_OTHER
+        redirectLocation(result).value mustEqual individualRoutes.FileUploadedController.onPageLoad(reference).url
+      }
+    }
+
+    "must redirect to formatting error page when parsing fails" in {
+
+      val parseError = FileParseError.InvalidXlsx("Test parse error")
+
+      when(mockUpscanJourneyRepository.find(reference))
+        .thenReturn(Future.successful(Some(readyFileUpload)))
+
+      when(mockStcUpscanProcessingService.process(eqTo(readyFileUpload))(using anyArg[HeaderCarrier]))
+        .thenReturn(Future.successful(Left(parseError)))
+
+      val app = application
+
+      running(app) {
+        val request = FakeRequest(GET, individualRoutes.UploadedFileErrorController.onPageLoad(reference).url)
+
+        val result = route(app, request).value
+
+        status(result) mustEqual SEE_OTHER
+        redirectLocation(result).value mustEqual individualRoutes.FormattingErrorController.onPageLoad().url
       }
     }
   }

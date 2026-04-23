@@ -160,7 +160,7 @@ class StfNavigatorSpec extends SpecBase with ScalaFutures {
       }
 
       "must go from the TaxRatePage to WhatTypeOfSecuritiesController" in {
-        val answers = emptyUserAnswers.set(TaxRatePage, TaxRate.Half).get
+        val answers = emptyUserAnswers.set(TaxRatePage, TaxRate.HalfPercent).get
         val result = navigator.nextPage(TaxRatePage, NormalMode, answers)(fakeRequest)
         whenReady(result) { res =>
           res mustBe individualSingleRoutes.WhatTypeOfSecuritiesController.onPageLoad(NormalMode)

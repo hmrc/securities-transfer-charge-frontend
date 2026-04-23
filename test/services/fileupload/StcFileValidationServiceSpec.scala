@@ -17,69 +17,101 @@
 package services.fileupload
 
 import org.mockito.Mockito.when
-import org.scalatest.matchers.should.Matchers
+import org.scalatest.matchers.must.Matchers
 import org.scalatest.wordspec.AnyWordSpec
 import org.scalatestplus.mockito.MockitoSugar
 import uk.gov.hmrc.securitiestransferchargefrontend.models.fileupload.*
-import uk.gov.hmrc.securitiestransferchargefrontend.services.fileupload.*
-
-import java.time.LocalDate
+import uk.gov.hmrc.securitiestransferchargefrontend.services.fileupload.{StcFileValidationService, StcRowValidationService, StcUploadColumn}
 
 class StcFileValidationServiceSpec extends AnyWordSpec with Matchers with MockitoSugar {
 
   private val stcRowValidationService = mock[StcRowValidationService]
   private val service = new StcFileValidationService(stcRowValidationService)
 
-  private val parsedRow1 = ParsedStcRow(
+  private val parsedRow1 = ParsedRow(
     rowNumber = 3,
-    addressLine1 = ParsedValue.Valid("10 Downing Street"),
-    addressLine2 = ParsedValue.Missing,
-    addressLine3 = ParsedValue.Missing,
-    addressLine4 = ParsedValue.Missing,
-    postcode = ParsedValue.Valid("SW1A 2AA"),
-    country = ParsedValue.Valid("United Kingdom"),
-    sellerName = ParsedValue.Valid("Bob Seller"),
-    sellerAddressInUk = ParsedValue.Valid(true),
-    sellerAddressLine1 = ParsedValue.Valid("1 Seller Street"),
-    sellerAddressLine2 = ParsedValue.Missing,
-    sellerAddressLine3 = ParsedValue.Missing,
-    sellerAddressLine4 = ParsedValue.Missing,
-    sellerPostcode = ParsedValue.Valid("LS1 1AA"),
-    sellerCountry = ParsedValue.Valid("United Kingdom"),
-    connectedPersons = ParsedValue.Valid(false),
-    applyingForRelief = ParsedValue.Valid(false),
-    whatReliefAreYouApplyingFor = ParsedValue.Missing,
-    securitiesTarget = ParsedValue.Missing,
-    companyRegistrationNumber = ParsedValue.Missing,
-    chargingPoint = ParsedValue.Valid(LocalDate.of(2026, 3, 23)),
-    taxRate = ParsedValue.Valid(BigDecimal("0.5")),
-    whatTypeOfSecurities = ParsedValue.Valid("Stock"),
-    otherSecuritiesType = ParsedValue.Missing,
-    securitiesQuantity = ParsedValue.Valid(BigDecimal("100")),
-    amountPaidForSecurities = ParsedValue.Valid(BigDecimal("500")),
-    totalMarketValue = ParsedValue.Valid(BigDecimal("600"))
+    cells = Seq(ParsedCell(StcUploadColumn.sellerName, "Seller 1"))
   )
 
-  private val parsedRow2 = parsedRow1.copy(rowNumber = 4)
+  private val parsedRow2 = ParsedRow(
+    rowNumber = 4,
+    cells = Seq(ParsedCell(StcUploadColumn.sellerName, ""))
+  )
 
-  "validate" should {
+  private val validatedRow1 = ValidatedStcRow(
+    parsedRow = ParsedStcRow(
+      rowNumber = 3,
+      sellerName = ParsedValue.Valid("Seller 1"),
+      sellerAddressInUk = ParsedValue.Missing,
+      sellerAddressLine1 = ParsedValue.Missing,
+      sellerAddressLine2 = ParsedValue.Missing,
+      sellerAddressLine3 = ParsedValue.Missing,
+      sellerAddressLine4 = ParsedValue.Missing,
+      sellerPostcode = ParsedValue.Missing,
+      sellerCountry = ParsedValue.Missing,
+      connectedPersons = ParsedValue.Missing,
+      applyingForRelief = ParsedValue.Missing,
+      whatReliefAreYouApplyingFor = ParsedValue.Missing,
+      securitiesTarget = ParsedValue.Missing,
+      companyRegistrationNumber = ParsedValue.Missing,
+      chargingPoint = ParsedValue.Missing,
+      taxRate = ParsedValue.Missing,
+      whatTypeOfSecurities = ParsedValue.Missing,
+      typeOfShares = ParsedValue.Missing,
+      securitiesQuantity = ParsedValue.Missing,
+      amountPaidForSecurities = ParsedValue.Missing,
+      totalMarketValue = ParsedValue.Missing
+    ),
+    validationErrors = Seq.empty
+  )
 
-    "validate each row and wrap the results in a StcFileValidationResponse" in {
-      val validatedRow1 = ValidatedStcRow(parsedRow1, Seq.empty)
-      val validatedRow2 = ValidatedStcRow(
-        parsedRow2,
-        Seq(StcRowValidationError(4, "sellerName", "sellerName is required", blocking = true))
+  private val validatedRow2 = ValidatedStcRow(
+    parsedRow = ParsedStcRow(
+      rowNumber = 4,
+      sellerName = ParsedValue.Missing,
+      sellerAddressInUk = ParsedValue.Missing,
+      sellerAddressLine1 = ParsedValue.Missing,
+      sellerAddressLine2 = ParsedValue.Missing,
+      sellerAddressLine3 = ParsedValue.Missing,
+      sellerAddressLine4 = ParsedValue.Missing,
+      sellerPostcode = ParsedValue.Missing,
+      sellerCountry = ParsedValue.Missing,
+      connectedPersons = ParsedValue.Missing,
+      applyingForRelief = ParsedValue.Missing,
+      whatReliefAreYouApplyingFor = ParsedValue.Missing,
+      securitiesTarget = ParsedValue.Missing,
+      companyRegistrationNumber = ParsedValue.Missing,
+      chargingPoint = ParsedValue.Missing,
+      taxRate = ParsedValue.Missing,
+      whatTypeOfSecurities = ParsedValue.Missing,
+      typeOfShares = ParsedValue.Missing,
+      securitiesQuantity = ParsedValue.Missing,
+      amountPaidForSecurities = ParsedValue.Missing,
+      totalMarketValue = ParsedValue.Missing
+    ),
+    validationErrors = Seq(
+      StcRowValidationError(
+        rowNumber = 4,
+        fieldName = "sellerName",
+        columnIndex = StcUploadColumn.sellerName,
+        message = "sellerName is required",
+        blocking = true
       )
+    )
+  )
 
+  "StcFileValidationService.validate" must {
+
+    "validate each parsed row and return a file validation response" in {
       when(stcRowValidationService.validate(parsedRow1)).thenReturn(validatedRow1)
       when(stcRowValidationService.validate(parsedRow2)).thenReturn(validatedRow2)
 
       val result = service.validate(Seq(parsedRow1, parsedRow2))
 
-      result.rows shouldBe Seq(validatedRow1, validatedRow2)
-      result.hasBlockingErrors shouldBe true
-      result.hasErrors shouldBe true
-      result.validRows shouldBe Seq(parsedRow1)
+      result.rows mustBe Seq(validatedRow1, validatedRow2)
+      result.hasErrors mustBe true
+      result.hasBlockingErrors mustBe true
+      result.validRows mustBe Seq(validatedRow1.parsedRow)
     }
   }
 }

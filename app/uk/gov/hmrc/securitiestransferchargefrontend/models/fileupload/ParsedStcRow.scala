@@ -22,12 +22,6 @@ import java.time.LocalDate
 
 final case class ParsedStcRow(
                                rowNumber: Int,
-                               addressLine1: ParsedValue[String],
-                               addressLine2: ParsedValue[String],
-                               addressLine3: ParsedValue[String],
-                               addressLine4: ParsedValue[String],
-                               postcode: ParsedValue[String],
-                               country: ParsedValue[String],
                                sellerName: ParsedValue[String],
                                sellerAddressInUk: ParsedValue[Boolean],
                                sellerAddressLine1: ParsedValue[String],
