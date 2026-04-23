@@ -36,6 +36,7 @@ import uk.gov.hmrc.securitiestransferchargefrontend.repositories.SessionReposito
 import uk.gov.hmrc.securitiestransferchargefrontend.views.html.stf.agents.single.AgentReferenceView
 
 import scala.concurrent.Future
+import scala.util.Random
 
 class AgentReferenceControllerSpec extends SpecBase with MockitoSugar {
 
@@ -117,11 +118,14 @@ class AgentReferenceControllerSpec extends SpecBase with MockitoSugar {
         .build()
 
       running(application) {
+
+        val invalidValue = Random.alphanumeric.take(260).mkString
+        
         val request =
           FakeRequest(POST, agentReferenceRoute)
-            .withFormUrlEncodedBody(("value", "invalid value"))
+            .withFormUrlEncodedBody(("value", invalidValue))
 
-        val boundForm = form.bind(Map("value" -> "invalid value"))
+        val boundForm = form.bind(Map("value" -> invalidValue))
 
         val view = application.injector.instanceOf[AgentReferenceView]
 

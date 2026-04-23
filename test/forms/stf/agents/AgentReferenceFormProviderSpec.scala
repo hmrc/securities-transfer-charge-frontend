@@ -22,7 +22,6 @@ import uk.gov.hmrc.securitiestransferchargefrontend.forms.stf.agents.AgentRefere
 
 class AgentReferenceFormProviderSpec extends StringFieldBehaviours {
 
-  val requiredKey = "agentReference.error.required"
   val lengthKey = "agentReference.error.length"
   val maxLength = 255
 

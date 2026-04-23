@@ -27,10 +27,10 @@ class AgentReferenceFormProvider @Inject() extends Mappings {
 
   def apply(): Form[AgentReference] = Form(
     mapping(
-      "agentReference" ->
+      "value" ->
         optional(
           text()
-            .verifying(maxLength(8, "org.securitiesTarget.error.crn.length"))
+            .verifying(maxLength(255, "agentReference.error.length"))
         )
     )(AgentReference.apply)(x => Some(x.agentReference))
   )
