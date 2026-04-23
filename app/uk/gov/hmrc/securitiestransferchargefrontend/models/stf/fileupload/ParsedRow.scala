@@ -14,10 +14,15 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.securitiestransferchargefrontend.services.fileupload
+package uk.gov.hmrc.securitiestransferchargefrontend.models.stf.fileupload
 
-import uk.gov.hmrc.securitiestransferchargefrontend.models.stf.fileupload.{FileParseError, ParsedFile, UploadedFile}
+final case class ParsedRow(
+                            rowNumber: Int,
+                            cells: Seq[ParsedCell]
+                          ) {
+  def valueAt(index: Int): Option[String] =
+    cells.find(_.columnIndex == index).map(_.rawValue)
 
-trait FileParser {
-  def parse(file: UploadedFile): Either[FileParseError, ParsedFile]
+  def isCompletelyEmpty: Boolean =
+    cells.forall(_.rawValue.trim.isEmpty)
 }

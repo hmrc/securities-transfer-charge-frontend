@@ -14,10 +14,9 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.securitiestransferchargefrontend.viewmodels.fileupload
+package uk.gov.hmrc.securitiestransferchargefrontend.models.stf.fileupload
 
-final case class UploadErrorDisplay(
-                                     cellReference: String,
-                                     questionLabel: String,
-                                     message: String
-                                   )
+final case class ParsedCell(
+                             columnIndex: Int,
+                             rawValue: String
+                           )

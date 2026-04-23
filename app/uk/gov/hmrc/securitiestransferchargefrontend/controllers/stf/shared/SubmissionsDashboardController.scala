@@ -40,7 +40,8 @@ class SubmissionsDashboardController @Inject()(
                                                 idClient: SubmissionIdClient,
                                                 saveAndReturnClient: SaveAndReturnClient,
                                                 @Named("individuals") individualsNavigator: Navigator,
-                                                @Named("organisations") orgNavigator: Navigator)
+                                                @Named("organisations") orgNavigator: Navigator,
+                                                @Named("agents") agentNavigator: Navigator)
                                               (implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport with Logging {
 
   def onPageLoad(): Action[AnyContent] =
@@ -67,6 +68,9 @@ class SubmissionsDashboardController @Inject()(
         call <- innerRequest.affinityGroup match {
           case AffinityGroup.Organisation =>
             orgNavigator.nextPage(SubmissionsDashboardPage, NormalMode, emptyAnswers)
+
+          case AffinityGroup.Agent =>
+            agentNavigator.nextPage(SubmissionsDashboardPage, NormalMode, emptyAnswers)
 
           case _ =>
             individualsNavigator.nextPage(SubmissionsDashboardPage, NormalMode, emptyAnswers)

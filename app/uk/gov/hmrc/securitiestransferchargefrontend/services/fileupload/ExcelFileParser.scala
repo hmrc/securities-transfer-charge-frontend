@@ -17,15 +17,15 @@
 package uk.gov.hmrc.securitiestransferchargefrontend.services.fileupload
 
 import uk.gov.hmrc.securitiestransferchargefrontend.config.FileUploadConfig
-import uk.gov.hmrc.securitiestransferchargefrontend.models.fileupload.FileParseError._
-import uk.gov.hmrc.securitiestransferchargefrontend.models.fileupload.{FileParseError, ParsedCell, ParsedFile, ParsedRow, UploadedFile}
 import org.apache.poi.ss.usermodel.{Cell, CellType, DateUtil}
 import org.apache.poi.xssf.usermodel.XSSFWorkbook
+import uk.gov.hmrc.securitiestransferchargefrontend.models.stf.fileupload.FileParseError.{InvalidXlsx, MissingWorksheet, RowLimitExceeded}
+import uk.gov.hmrc.securitiestransferchargefrontend.models.stf.fileupload.{FileParseError, ParsedCell, ParsedFile, ParsedRow, UploadedFile}
 
 import java.time.ZoneId
 import java.time.format.DateTimeFormatter
 import javax.inject.{Inject, Singleton}
-import scala.jdk.CollectionConverters._
+import scala.jdk.CollectionConverters.*
 import scala.util.Try
 
 @Singleton

@@ -14,10 +14,13 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.securitiestransferchargefrontend.models.fileupload
+package uk.gov.hmrc.securitiestransferchargefrontend.models.stf
 
-final case class ParsedFile(
-                             fileName: String,
-                             mimeType: String,
-                             rows: Seq[ParsedRow]
-                           )
+import play.api.libs.json.*
+
+case class AgentReference (agentReference: Option[String])
+
+object AgentReference {
+
+  implicit val format: OFormat[AgentReference] = Json.format
+}

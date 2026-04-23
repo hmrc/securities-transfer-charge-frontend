@@ -22,8 +22,8 @@ import org.scalatest.EitherValues
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpec
 import org.scalatestplus.mockito.MockitoSugar
-import uk.gov.hmrc.securitiestransferchargefrontend.models.fileupload.FileParseError.UnsupportedMimeType
-import uk.gov.hmrc.securitiestransferchargefrontend.models.fileupload.{ParsedFile, UploadedFile}
+import uk.gov.hmrc.securitiestransferchargefrontend.models.stf.fileupload.FileParseError.UnsupportedMimeType
+import uk.gov.hmrc.securitiestransferchargefrontend.models.stf.fileupload.{ParsedFile, UploadedFile}
 import uk.gov.hmrc.securitiestransferchargefrontend.services.fileupload.FileParserSelector
 import uk.gov.hmrc.securitiestransferchargefrontend.services.fileupload.FileParser
 import uk.gov.hmrc.securitiestransferchargefrontend.services.fileupload.FileParsingService

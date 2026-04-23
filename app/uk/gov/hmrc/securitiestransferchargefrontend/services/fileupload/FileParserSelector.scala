@@ -17,8 +17,8 @@
 package uk.gov.hmrc.securitiestransferchargefrontend.services.fileupload
 
 import javax.inject.{Inject, Singleton}
-import uk.gov.hmrc.securitiestransferchargefrontend.models.fileupload.FileParseError
-import uk.gov.hmrc.securitiestransferchargefrontend.models.fileupload.FileParseError.UnsupportedMimeType
+import uk.gov.hmrc.securitiestransferchargefrontend.models.stf.fileupload.FileParseError.UnsupportedMimeType
+import uk.gov.hmrc.securitiestransferchargefrontend.models.stf.fileupload.FileParseError
 
 @Singleton
 class FileParserSelector @Inject()(

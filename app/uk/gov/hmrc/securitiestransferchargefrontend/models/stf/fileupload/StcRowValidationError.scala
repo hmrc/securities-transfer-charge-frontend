@@ -14,23 +14,17 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.securitiestransferchargefrontend.viewmodels.fileupload
+package uk.gov.hmrc.securitiestransferchargefrontend.models.stf.fileupload
 
-object SpreadsheetColumnLetters {
+import play.api.libs.json.{Json, OFormat}
 
-  def fromZeroBasedIndex(index: Int): String = {
-    require(index >= 0, s"Column index must be >= 0 but was $index")
+final case class StcRowValidationError(
+                                        rowNumber: Int,
+                                        fieldName: String,
+                                        message: String,
+                                        blocking: Boolean
+                                      )
 
-    @annotation.tailrec
-    def loop(n: Int, acc: String): String = {
-      val remainder = n % 26
-      val next = ('A' + remainder).toChar.toString + acc
-      val quotient = n / 26 - 1
-
-      if (quotient < 0) next
-      else loop(quotient, next)
-    }
-
-    loop(index, "")
-  }
+object StcRowValidationError {
+  implicit val format: OFormat[StcRowValidationError] = Json.format[StcRowValidationError]
 }
