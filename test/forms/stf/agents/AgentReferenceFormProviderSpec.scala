@@ -41,7 +41,7 @@ class AgentReferenceFormProviderSpec extends StringFieldBehaviours {
       form,
       fieldName,
       maxLength,
-      lengthError = FormError(fieldName, lengthKey)
+      lengthError = FormError(fieldName, lengthKey, Seq(maxLength))
     )
 
   }
