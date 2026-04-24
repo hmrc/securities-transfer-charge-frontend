@@ -36,8 +36,8 @@ object ReasonForPurchase:
       case other => JsError(s"Expected a JSON number for ReasonForPurchase, got: $other")
     },
     Writes {
-      case ReasonForPurchase.PurchasedForCancellation  => JsNumber(1)
+      case ReasonForPurchase.PurchasedForCancellation     => JsNumber(1)
       case ReasonForPurchase.PurchasedToPlaceIntoTreasury => JsNumber(2)
-      case ReasonForPurchase.Both                      => JsNumber(3)
+      case ReasonForPurchase.Both                         => JsNumber(3)
     }
   )
