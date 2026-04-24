@@ -78,9 +78,9 @@ class Module extends AbstractModule {
       .to(classOf[StfNavigator])
     bind(classOf[Navigator])
       .annotatedWith(Names.named("agents"))
-      .to(classOf[StfOrgNavigator])
+      .to(classOf[StfAgentNavigator])
     bind(classOf[PersistentNavigator])
       .annotatedWith(Names.named("agents"))
-      .to(classOf[StfOrgNavigator])
+      .to(classOf[StfAgentNavigator])
   }
 }
