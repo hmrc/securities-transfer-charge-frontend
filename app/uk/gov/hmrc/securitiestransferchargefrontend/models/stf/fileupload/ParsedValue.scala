@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.securitiestransferchargefrontend.models.fileupload
+package uk.gov.hmrc.securitiestransferchargefrontend.models.stf.fileupload
 
 import play.api.libs.functional.syntax._
 import play.api.libs.json._

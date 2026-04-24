@@ -22,7 +22,7 @@ import org.scalatest.EitherValues
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpec
 import org.scalatestplus.mockito.MockitoSugar
-import uk.gov.hmrc.securitiestransferchargefrontend.models.fileupload.*
+import uk.gov.hmrc.securitiestransferchargefrontend.models.stf.fileupload.{FileParseError, ParsedStcRow, ParsedValue, StcFileValidationResponse, UploadedFile, ValidatedStcRow}
 import uk.gov.hmrc.securitiestransferchargefrontend.services.fileupload.*
 
 import java.io.ByteArrayInputStream

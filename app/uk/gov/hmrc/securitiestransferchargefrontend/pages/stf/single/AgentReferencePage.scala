@@ -14,17 +14,15 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.securitiestransferchargefrontend.models.fileupload
+package uk.gov.hmrc.securitiestransferchargefrontend.pages.stf.single
 
-import play.api.libs.json.{Json, OFormat}
+import play.api.libs.json.JsPath
+import uk.gov.hmrc.securitiestransferchargefrontend.models.stf.AgentReference
+import uk.gov.hmrc.securitiestransferchargefrontend.pages.QuestionPage
 
-final case class StcRowValidationError(
-                                        rowNumber: Int,
-                                        fieldName: String,
-                                        message: String,
-                                        blocking: Boolean
-                                      )
+case object AgentReferencePage extends QuestionPage[AgentReference] {
 
-object StcRowValidationError {
-  implicit val format: OFormat[StcRowValidationError] = Json.format[StcRowValidationError]
+  override def path: JsPath = JsPath \ toString
+
+  override def toString: String = "agentReference"
 }

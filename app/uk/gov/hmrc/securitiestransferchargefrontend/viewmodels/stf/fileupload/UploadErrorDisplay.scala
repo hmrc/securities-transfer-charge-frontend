@@ -14,10 +14,10 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.securitiestransferchargefrontend.services.fileupload
+package uk.gov.hmrc.securitiestransferchargefrontend.viewmodels.stf.fileupload
 
-import uk.gov.hmrc.securitiestransferchargefrontend.models.stf.fileupload.{FileParseError, ParsedFile, UploadedFile}
-
-trait FileParser {
-  def parse(file: UploadedFile): Either[FileParseError, ParsedFile]
-}
+final case class UploadErrorDisplay(
+                                     cellReference: String,
+                                     questionLabel: String,
+                                     message: String
+                                   )

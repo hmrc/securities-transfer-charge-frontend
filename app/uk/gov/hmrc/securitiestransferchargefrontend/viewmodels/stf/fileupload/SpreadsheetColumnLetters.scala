@@ -14,15 +14,23 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.securitiestransferchargefrontend.models.fileupload
+package uk.gov.hmrc.securitiestransferchargefrontend.viewmodels.stf.fileupload
 
-final case class ParsedRow(
-                            rowNumber: Int,
-                            cells: Seq[ParsedCell]
-                          ) {
-  def valueAt(index: Int): Option[String] =
-    cells.find(_.columnIndex == index).map(_.rawValue)
+object SpreadsheetColumnLetters {
 
-  def isCompletelyEmpty: Boolean =
-    cells.forall(_.rawValue.trim.isEmpty)
+  def fromZeroBasedIndex(index: Int): String = {
+    require(index >= 0, s"Column index must be >= 0 but was $index")
+
+    @annotation.tailrec
+    def loop(n: Int, acc: String): String = {
+      val remainder = n % 26
+      val next = ('A' + remainder).toChar.toString + acc
+      val quotient = n / 26 - 1
+
+      if (quotient < 0) next
+      else loop(quotient, next)
+    }
+
+    loop(index, "")
+  }
 }

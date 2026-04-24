@@ -17,7 +17,7 @@
 package uk.gov.hmrc.securitiestransferchargefrontend.services.fileupload
 
 import uk.gov.hmrc.http.HeaderCarrier
-import uk.gov.hmrc.securitiestransferchargefrontend.models.fileupload.{FileParseError, StcFileValidationResponse}
+import uk.gov.hmrc.securitiestransferchargefrontend.models.stf.fileupload.{FileParseError, StcFileValidationResponse}
 import uk.gov.hmrc.securitiestransferchargefrontend.models.stf.upscan.{FileUpload, UpscanJourneyStatus}
 
 import javax.inject.{Inject, Singleton}
