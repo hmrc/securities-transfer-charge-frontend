@@ -17,8 +17,8 @@
 package uk.gov.hmrc.securitiestransferchargefrontend.services.fileupload
 
 import play.api.data.{Form, FormError}
-import uk.gov.hmrc.securitiestransferchargefrontend.models.fileupload.{ParsedRow, StcRowValidationError}
-import uk.gov.hmrc.securitiestransferchargefrontend.viewmodels.fileupload.StcUploadFieldMetadata
+import uk.gov.hmrc.securitiestransferchargefrontend.models.stf.fileupload.{ParsedRow, StcRowValidationError}
+import uk.gov.hmrc.securitiestransferchargefrontend.viewmodels.stf.fileupload.StcUploadFieldMetadata
 
 import javax.inject.Singleton
 import scala.util.matching.Regex

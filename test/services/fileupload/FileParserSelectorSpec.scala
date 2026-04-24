@@ -22,7 +22,7 @@ import org.scalatest.wordspec.AnyWordSpec
 import uk.gov.hmrc.securitiestransferchargefrontend.services.fileupload.ExcelFileParser
 import uk.gov.hmrc.securitiestransferchargefrontend.services.fileupload.CsvFileParser
 import uk.gov.hmrc.securitiestransferchargefrontend.services.fileupload.FileParserSelector
-import uk.gov.hmrc.securitiestransferchargefrontend.models.fileupload.FileParseError.UnsupportedMimeType
+import uk.gov.hmrc.securitiestransferchargefrontend.models.stf.fileupload.FileParseError.UnsupportedMimeType
 
 class FileParserSelectorSpec extends AnyWordSpec with Matchers with EitherValues {
 

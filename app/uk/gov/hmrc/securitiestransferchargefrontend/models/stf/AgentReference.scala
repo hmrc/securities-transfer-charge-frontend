@@ -14,12 +14,13 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.securitiestransferchargefrontend.models.fileupload
+package uk.gov.hmrc.securitiestransferchargefrontend.models.stf
 
-import java.io.InputStream
+import play.api.libs.json.*
 
-final case class UploadedFile(
-                               fileName: String,
-                               mimeType: String,
-                               inputStream: InputStream
-                             )
+case class AgentReference (agentReference: Option[String])
+
+object AgentReference {
+
+  implicit val format: OFormat[AgentReference] = Json.format
+}

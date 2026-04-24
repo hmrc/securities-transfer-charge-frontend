@@ -16,7 +16,7 @@
 
 package uk.gov.hmrc.securitiestransferchargefrontend.services.fileupload
 
-import uk.gov.hmrc.securitiestransferchargefrontend.models.fileupload._
+import uk.gov.hmrc.securitiestransferchargefrontend.models.stf.fileupload._
 
 object UploadedTransferMapper {
 

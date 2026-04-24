@@ -17,7 +17,7 @@
 package uk.gov.hmrc.securitiestransferchargefrontend.services.fileupload
 
 import javax.inject.{Inject, Singleton}
-import uk.gov.hmrc.securitiestransferchargefrontend.models.fileupload.{FileParseError, StcFileValidationResponse, UploadedFile}
+import uk.gov.hmrc.securitiestransferchargefrontend.models.stf.fileupload.{FileParseError, StcFileValidationResponse, UploadedFile}
 
 @Singleton
 class StcUploadProcessingService @Inject()(

@@ -14,10 +14,9 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.securitiestransferchargefrontend.models.fileupload
+package uk.gov.hmrc.securitiestransferchargefrontend.models.stf.fileupload
 
-final case class ParsedFile(
-                             fileName: String,
-                             mimeType: String,
-                             rows: Seq[ParsedRow]
+final case class ParsedCell(
+                             columnIndex: Int,
+                             rawValue: String
                            )

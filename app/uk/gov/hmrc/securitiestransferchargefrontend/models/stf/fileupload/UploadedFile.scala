@@ -14,9 +14,12 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.securitiestransferchargefrontend.models.fileupload
+package uk.gov.hmrc.securitiestransferchargefrontend.models.stf.fileupload
 
-final case class ParsedCell(
-                             columnIndex: Int,
-                             rawValue: String
-                           )
+import java.io.InputStream
+
+final case class UploadedFile(
+                               fileName: String,
+                               mimeType: String,
+                               inputStream: InputStream
+                             )

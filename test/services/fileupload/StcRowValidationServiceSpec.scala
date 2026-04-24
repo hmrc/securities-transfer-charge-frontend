@@ -21,7 +21,7 @@ import org.scalatest.wordspec.AnyWordSpec
 import play.api.i18n.MessagesApi
 import play.api.test.Helpers.stubMessagesApi
 import uk.gov.hmrc.securitiestransferchargefrontend.forms.stf.individuals.*
-import uk.gov.hmrc.securitiestransferchargefrontend.models.fileupload.{ParsedCell, ParsedRow}
+import uk.gov.hmrc.securitiestransferchargefrontend.models.stf.fileupload.{ParsedCell, ParsedRow}
 import uk.gov.hmrc.securitiestransferchargefrontend.services.fileupload.StcUploadColumn
 import uk.gov.hmrc.securitiestransferchargefrontend.services.fileupload.StcRowValidationService
 import uk.gov.hmrc.securitiestransferchargefrontend.services.fileupload.StcRowMapper

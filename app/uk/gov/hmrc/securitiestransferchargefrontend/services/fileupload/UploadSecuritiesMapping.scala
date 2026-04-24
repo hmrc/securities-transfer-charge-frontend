@@ -16,7 +16,7 @@
 
 package uk.gov.hmrc.securitiestransferchargefrontend.services.fileupload
 
-import uk.gov.hmrc.securitiestransferchargefrontend.models.fileupload.{ParsedStcRow, ParsedValue}
+import uk.gov.hmrc.securitiestransferchargefrontend.models.stf.fileupload.{ParsedStcRow, ParsedValue}
 import uk.gov.hmrc.securitiestransferchargefrontend.models.stf.{DetailsOfThisTransfer, WhatTypeOfSecurities}
 
 final case class UploadSecuritiesMapping(

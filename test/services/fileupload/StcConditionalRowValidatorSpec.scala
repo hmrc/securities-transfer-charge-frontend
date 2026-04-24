@@ -20,7 +20,7 @@ import org.scalatest.matchers.must.Matchers
 import org.scalatest.wordspec.AnyWordSpec
 import play.api.i18n.MessagesApi
 import play.api.test.Helpers.stubMessagesApi
-import uk.gov.hmrc.securitiestransferchargefrontend.models.fileupload._
+import uk.gov.hmrc.securitiestransferchargefrontend.models.stf.fileupload._
 import uk.gov.hmrc.securitiestransferchargefrontend.services.fileupload.StcUploadColumn
 import uk.gov.hmrc.securitiestransferchargefrontend.services.fileupload.StcConditionalRowValidator
 import uk.gov.hmrc.securitiestransferchargefrontend.services.fileupload.StcValidationSupport

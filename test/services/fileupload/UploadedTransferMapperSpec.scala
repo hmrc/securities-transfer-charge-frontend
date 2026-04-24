@@ -18,7 +18,7 @@ package services.fileupload
 
 import org.scalatest.matchers.must.Matchers
 import org.scalatest.wordspec.AnyWordSpec
-import uk.gov.hmrc.securitiestransferchargefrontend.models.fileupload._
+import uk.gov.hmrc.securitiestransferchargefrontend.models.stf.fileupload._
 import uk.gov.hmrc.securitiestransferchargefrontend.services.fileupload.UploadedTransferMapper
 import uk.gov.hmrc.securitiestransferchargefrontend.services.fileupload.UploadedTransferMappingError
 

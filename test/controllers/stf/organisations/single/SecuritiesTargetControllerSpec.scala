@@ -84,7 +84,7 @@ class SecuritiesTargetControllerSpec extends SpecBase with MockitoSugar {
       }
     }
 
-    "must return a Bad Request and errors when invalid data is submitted" in {
+    "must return a Bad Request and errors when invalid data is submitted in the Business name field" in {
 
       val application = applicationBuilder(userAnswers = Some(emptyUserAnswers))
         .overrides(bind[Navigator].qualifiedWith("organisations").toInstance(getNavigator))
@@ -93,9 +93,31 @@ class SecuritiesTargetControllerSpec extends SpecBase with MockitoSugar {
       running(application) {
         val request =
           FakeRequest(POST, securitiesTargetRoute)
-            .withFormUrlEncodedBody(("value", "invalid value"))
+            .withFormUrlEncodedBody(("businessName", ""), ("crn", "12345678"))
 
-        val boundForm = form.bind(Map("value" -> "invalid value"))
+        val boundForm = form.bind(Map(("businessName", ""), ("crn", "12345678")))
+
+        val view = application.injector.instanceOf[SecuritiesTargetView]
+
+        val result = route(application, request).value
+
+        status(result) mustEqual BAD_REQUEST
+        contentAsString(result) mustEqual view(boundForm, NormalMode, testBackLinkRoute)(request, messages(application)).toString
+      }
+    }
+
+    "must return a Bad Request and errors when invalid data is submitted in the CRN field" in {
+
+      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers))
+        .overrides(bind[Navigator].qualifiedWith("organisations").toInstance(getNavigator))
+        .build()
+
+      running(application) {
+        val request =
+          FakeRequest(POST, securitiesTargetRoute)
+            .withFormUrlEncodedBody(("businessName", "valid"), ("crn", "123456789"))
+
+        val boundForm = form.bind(Map(("businessName", "valid"), ("crn", "123456789")))
 
         val view = application.injector.instanceOf[SecuritiesTargetView]
 

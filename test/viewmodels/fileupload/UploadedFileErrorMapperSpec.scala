@@ -19,9 +19,9 @@ package viewmodels.fileupload
 import org.scalatest.matchers.must.Matchers
 import org.scalatest.wordspec.AnyWordSpec
 import uk.gov.hmrc.securitiestransferchargefrontend.models.stf.UploadedFileError
-import uk.gov.hmrc.securitiestransferchargefrontend.models.fileupload.StcRowValidationError
+import uk.gov.hmrc.securitiestransferchargefrontend.models.stf.fileupload.StcRowValidationError
 import uk.gov.hmrc.securitiestransferchargefrontend.services.fileupload.StcUploadColumn
-import uk.gov.hmrc.securitiestransferchargefrontend.viewmodels.fileupload.UploadedFileErrorMapper
+import uk.gov.hmrc.securitiestransferchargefrontend.viewmodels.stf.fileupload.UploadedFileErrorMapper
 
 class UploadedFileErrorMapperSpec extends AnyWordSpec with Matchers {
 
