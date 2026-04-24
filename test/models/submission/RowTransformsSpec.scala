@@ -64,7 +64,7 @@ class RowTransformsSpec extends AnyWordSpec with Matchers {
       chargingPoint = ParsedValue.Valid(LocalDate.of(2026, 3, 23)),
       taxRate = ParsedValue.Valid(BigDecimal("1.5")),
       whatTypeOfSecurities = ParsedValue.Valid("Shares"),
-      typeOfShares = ParsedValue.Missing,
+      typeOfShares = ParsedValue.Valid("Ordinary Shares"),
       securitiesQuantity = ParsedValue.Valid(BigDecimal("1000")),
       amountPaidForSecurities = ParsedValue.Valid(BigDecimal("5000.25")),
       totalMarketValue = ParsedValue.Valid(BigDecimal("6000"))
@@ -80,7 +80,7 @@ class RowTransformsSpec extends AnyWordSpec with Matchers {
         transactionDetails = SingleTransferTransactionDetails(
           transactionType = TransferType.STF,
           reasonForPurchase = None,
-          descriptionOfSecurity = "Shares",
+          descriptionOfSecurity = "Ordinary Shares",
           numberOfShares = 1000,
           nominalValue = None,
           marketValue = Some(BigDecimal("6000")),

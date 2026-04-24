@@ -31,7 +31,7 @@ object RowTransforms {
 
     val shareType = required(row.whatTypeOfSecurities, "whatTypeOfSecurities", row.rowNumber)
     val getDescriptionOfSecurity =
-      if shareType.equalsIgnoreCase("Shares") then "Shares" else required(row.typeOfShares, "typeOfShares", row.rowNumber)
+      if shareType.equalsIgnoreCase("Shares") then required(row.typeOfShares, "typeOfShares", row.rowNumber) else shareType
 
     val reliefClaimed = required(row.applyingForRelief, "applyingForRelief", row.rowNumber)
     val reliefPercentage = if reliefClaimed then Some(100) else None // TODO: Get correct percentage based on what relief is being claimed
