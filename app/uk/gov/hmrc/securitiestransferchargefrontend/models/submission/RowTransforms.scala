@@ -16,7 +16,7 @@
 
 package uk.gov.hmrc.securitiestransferchargefrontend.models.submission
 
-import uk.gov.hmrc.securitiestransferchargefrontend.models.fileupload.{ParsedValue, ValidatedStcRow}
+import uk.gov.hmrc.securitiestransferchargefrontend.models.stf.fileupload.{ParsedValue, ValidatedStcRow}
 import uk.gov.hmrc.securitiestransferchargefrontend.models.stf
 
 object RowTransforms {
