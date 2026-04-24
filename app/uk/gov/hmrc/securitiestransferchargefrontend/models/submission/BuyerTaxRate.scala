@@ -27,9 +27,8 @@ object BuyerTaxRate:
       case JsNumber(n) if n.isValidInt => n.toInt match
         case 1 => JsSuccess(BuyerTaxRate.HalfPercent)
         case 2 => JsSuccess(BuyerTaxRate.OneAndHalfPercent)
-        case other => JsError(s"Invalid BuyerTaxRate value [$other]. Expected one of: 1 (HalfPercent), 2 (OneAndHalfPercent)")
-      case JsNumber(n) => JsError(s"Invalid BuyerTaxRate number [$n]. Expected an integer value: 1 or 2")
-      case other => JsError(s"Expected a JSON number for BuyerTaxRate, got: $other")
+        case n => JsError(s"Invalid BuyerTaxRate value [$n]. Expected one of: 1 (HalfPercent), 2 (OneAndHalfPercent)")
+      case nan => JsError(s"Expected a JSON number for BuyerTaxRate, got: $nan")
     },
     Writes {
       case BuyerTaxRate.HalfPercent       => JsNumber(1)
