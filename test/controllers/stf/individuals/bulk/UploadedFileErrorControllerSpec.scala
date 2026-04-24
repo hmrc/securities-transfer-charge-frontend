@@ -119,19 +119,32 @@ class UploadedFileErrorControllerSpec
   private val expectedUploadedFileErrors: Seq[UploadedFileError] =
     UploadedFileErrorMapper.from(blockingValidationErrors)
 
+  private def validationResponseWithErrors(errors: Seq[StcRowValidationError]): StcFileValidationResponse =
+    StcFileValidationResponse(
+      rows = Seq(
+        ValidatedStcRow(
+          parsedRow = parsedRow,
+          validationErrors = errors
+        )
+      )
+    )
+
+  private def blockingErrors(count: Int): Seq[StcRowValidationError] =
+    (1 to count).map { i =>
+      StcRowValidationError(
+        rowNumber = i + 2,
+        fieldName = "sellerName",
+        columnIndex = 7,
+        message = s"Error $i",
+        blocking = true
+      )
+    }
+
   "UploadedFileErrorController" - {
 
     "must return OK and the correct view for a GET when blocking errors are present" in {
 
-      val validationResponse =
-        StcFileValidationResponse(
-          rows = Seq(
-            ValidatedStcRow(
-              parsedRow = parsedRow,
-              validationErrors = blockingValidationErrors
-            )
-          )
-        )
+      val validationResponse = validationResponseWithErrors(blockingValidationErrors)
 
       when(mockUpscanJourneyRepository.find(reference))
         .thenReturn(Future.successful(Some(readyFileUpload)))
@@ -150,6 +163,54 @@ class UploadedFileErrorControllerSpec
 
         status(result) mustEqual OK
         contentAsString(result) mustEqual view(expectedUploadedFileErrors)(request, messages(app)).toString
+      }
+    }
+
+    "must return OK and the correct view when there are 25 blocking errors" in {
+
+      val errors = blockingErrors(25)
+      val validationResponse = validationResponseWithErrors(errors)
+      val expectedErrors = UploadedFileErrorMapper.from(errors)
+
+      when(mockUpscanJourneyRepository.find(reference))
+        .thenReturn(Future.successful(Some(readyFileUpload)))
+
+      when(mockStcUpscanProcessingService.process(eqTo(readyFileUpload))(using anyArg[HeaderCarrier]))
+        .thenReturn(Future.successful(Right(validationResponse)))
+
+      val app = application
+
+      running(app) {
+        val request = FakeRequest(GET, individualRoutes.UploadedFileErrorController.onPageLoad(reference).url)
+
+        val result = route(app, request).value
+
+        val view = app.injector.instanceOf[UploadedFileErrorView]
+
+        status(result) mustEqual OK
+        contentAsString(result) mustEqual view(expectedErrors)(request, messages(app)).toString
+      }
+    }
+
+    "must redirect to formatting error page when there are 26 or more blocking errors" in {
+
+      val validationResponse = validationResponseWithErrors(blockingErrors(26))
+
+      when(mockUpscanJourneyRepository.find(reference))
+        .thenReturn(Future.successful(Some(readyFileUpload)))
+
+      when(mockStcUpscanProcessingService.process(eqTo(readyFileUpload))(using anyArg[HeaderCarrier]))
+        .thenReturn(Future.successful(Right(validationResponse)))
+
+      val app = application
+
+      running(app) {
+        val request = FakeRequest(GET, individualRoutes.UploadedFileErrorController.onPageLoad(reference).url)
+
+        val result = route(app, request).value
+
+        status(result) mustEqual SEE_OTHER
+        redirectLocation(result).value mustEqual individualRoutes.FormattingErrorController.onPageLoad().url
       }
     }
 
@@ -189,15 +250,7 @@ class UploadedFileErrorControllerSpec
 
     "must redirect to file uploaded page when there are no blocking errors" in {
 
-      val validationResponse =
-        StcFileValidationResponse(
-          rows = Seq(
-            ValidatedStcRow(
-              parsedRow = parsedRow,
-              validationErrors = Seq.empty
-            )
-          )
-        )
+      val validationResponse = validationResponseWithErrors(Seq.empty)
 
       when(mockUpscanJourneyRepository.find(reference))
         .thenReturn(Future.successful(Some(readyFileUpload)))

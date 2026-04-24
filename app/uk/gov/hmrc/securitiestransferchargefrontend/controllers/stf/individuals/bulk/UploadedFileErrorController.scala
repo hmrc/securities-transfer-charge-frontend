@@ -22,6 +22,7 @@ import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.actions.*
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.routes
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.individuals.bulk.routes as individualRoutes
+import uk.gov.hmrc.securitiestransferchargefrontend.models.stf.fileupload.FileParseError
 import uk.gov.hmrc.securitiestransferchargefrontend.models.stf.upscan.UpscanJourneyStatus
 import uk.gov.hmrc.securitiestransferchargefrontend.repositories.UpscanJourneyRepository
 import uk.gov.hmrc.securitiestransferchargefrontend.services.fileupload.StcUpscanProcessingService
@@ -34,12 +35,17 @@ import scala.concurrent.{ExecutionContext, Future}
 class UploadedFileErrorController @Inject()(
                                              override val messagesApi: MessagesApi,
                                              stcAuthEnrolled: StcAuthEnrolledAction,
+                                             val controllerComponents: MessagesControllerComponents,
                                              upscanJourneyRepository: UpscanJourneyRepository,
                                              stcUpscanProcessingService: StcUpscanProcessingService,
-                                             val controllerComponents: MessagesControllerComponents,
                                              view: UploadedFileErrorView
                                            )(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport {
 
+
+  // TODO: This controller currently re-processes the uploaded file to render the
+  //  error page. Maybe we can persist the validation result or blocking errors against
+  //  the upload reference then this controller can be streamlined to only render and simply load the
+  //  errors instead of calling stcUpscanProcessingService.process() again
   def onPageLoad(reference: String): Action[AnyContent] =
     stcAuthEnrolled.async { implicit request =>
       upscanJourneyRepository.find(reference).flatMap {
@@ -51,19 +57,17 @@ class UploadedFileErrorController @Inject()(
 
         case Some(fileUpload) =>
           stcUpscanProcessingService.process(fileUpload).map {
-            case Right(validationResponse) if validationResponse.hasBlockingErrors =>
-              val errors =
-                UploadedFileErrorMapper.from(validationResponse.blockingErrors)
+            case Left(_: FileParseError) =>
+              Redirect(individualRoutes.FormattingErrorController.onPageLoad())
 
-              Ok(view(errors))
+            case Right(validationResponse) if validationResponse.tooManyBlockingErrors =>
+              Redirect(individualRoutes.FormattingErrorController.onPageLoad())
+
+            case Right(validationResponse) if validationResponse.hasBlockingErrors =>
+              Ok(view(UploadedFileErrorMapper.from(validationResponse.blockingErrors)))
 
             case Right(_) =>
-              // TODO replace this with the next real page
               Redirect(individualRoutes.FileUploadedController.onPageLoad(reference))
-
-            case Left(parseError) =>
-              Redirect(individualRoutes.FormattingErrorController.onPageLoad())
-                .flashing("uploadParseError" -> parseError.message)
           }
       }
     }
