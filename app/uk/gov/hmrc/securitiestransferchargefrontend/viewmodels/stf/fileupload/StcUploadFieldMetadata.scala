@@ -49,7 +49,7 @@ object StcUploadFieldMetadata {
     UploadFieldMetadata("chargingPoint", StcUploadColumn.chargingPoint, "When did you buy these securities?"),
     UploadFieldMetadata("taxRate", StcUploadColumn.taxRate, "What is the tax rate for this transfer?"),
     UploadFieldMetadata("whatTypeOfSecurities", StcUploadColumn.whatTypeOfSecurities, "What type of securities are you buying?"),
-    UploadFieldMetadata("otherSecuritiesType", StcUploadColumn.otherSecuritiesType, "If you are buying shares, enter the type of shares"),
+    UploadFieldMetadata("otherSecuritiesType", StcUploadColumn.typeOfShares, "If you are buying shares, enter the type of shares"),
     UploadFieldMetadata("securitiesQuantity", StcUploadColumn.securitiesQuantity, "How many securities are you buying?"),
     UploadFieldMetadata("amountPaidForSecurities", StcUploadColumn.amountPaidForSecurities, "How much did you pay for the securities?"),
     UploadFieldMetadata("totalMarketValue", StcUploadColumn.totalMarketValue, "What is the total market value of this transfer?")

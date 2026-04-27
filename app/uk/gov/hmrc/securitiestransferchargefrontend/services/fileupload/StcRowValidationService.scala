@@ -65,7 +65,7 @@ class StcRowValidationService {
           requiredString(
             row.rowNumber,
             "otherSecuritiesType",
-            row.otherSecuritiesType,
+            row.typeOfShares,
             requiredMessage = "Share type is required when security type is Other",
             invalidMessage = "Share type must be a valid value"
           )

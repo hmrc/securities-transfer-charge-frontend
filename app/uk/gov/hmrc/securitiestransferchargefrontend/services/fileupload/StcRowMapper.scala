@@ -47,7 +47,7 @@ class StcRowMapper {
       chargingPoint = ParsedRowReader.readDate(row, StcUploadColumn.chargingPoint),
       taxRate = ParsedRowReader.readBigDecimal(row, StcUploadColumn.taxRate),
       whatTypeOfSecurities = ParsedRowReader.readString(row, StcUploadColumn.whatTypeOfSecurities),
-      otherSecuritiesType = ParsedRowReader.readString(row, StcUploadColumn.otherSecuritiesType),
+      typeOfShares = ParsedRowReader.readString(row, StcUploadColumn.typeOfShares),
       securitiesQuantity = ParsedRowReader.readBigDecimal(row, StcUploadColumn.securitiesQuantity),
       amountPaidForSecurities = ParsedRowReader.readBigDecimal(row, StcUploadColumn.amountPaidForSecurities),
       totalMarketValue = ParsedRowReader.readBigDecimal(row, StcUploadColumn.totalMarketValue)

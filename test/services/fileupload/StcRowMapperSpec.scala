@@ -86,7 +86,7 @@ class StcRowMapperSpec extends AnyWordSpec with Matchers {
         chargingPoint = ParsedValue.Valid(LocalDate.of(2026, 3, 23)),
         taxRate = ParsedValue.Valid(BigDecimal("0.5")),
         whatTypeOfSecurities = ParsedValue.Valid("Shares"),
-        otherSecuritiesType = ParsedValue.Valid("Ordinary"),
+        typeOfShares = ParsedValue.Valid("Ordinary"),
         securitiesQuantity = ParsedValue.Valid(BigDecimal("1000")),
         amountPaidForSecurities = ParsedValue.Valid(BigDecimal("5000.25")),
         totalMarketValue = ParsedValue.Valid(BigDecimal("6000"))
@@ -150,7 +150,7 @@ class StcRowMapperSpec extends AnyWordSpec with Matchers {
         chargingPoint = ParsedValue.Missing,
         taxRate = ParsedValue.Missing,
         whatTypeOfSecurities = ParsedValue.Missing,
-        otherSecuritiesType = ParsedValue.Missing,
+        typeOfShares = ParsedValue.Missing,
         securitiesQuantity = ParsedValue.Missing,
         amountPaidForSecurities = ParsedValue.Missing,
         totalMarketValue = ParsedValue.Missing
@@ -194,7 +194,7 @@ class StcRowMapperSpec extends AnyWordSpec with Matchers {
         chargingPoint = ParsedValue.Invalid("not-a-date", "not a valid date"),
         taxRate = ParsedValue.Invalid("abc", "not a number"),
         whatTypeOfSecurities = ParsedValue.Missing,
-        otherSecuritiesType = ParsedValue.Missing,
+        typeOfShares = ParsedValue.Missing,
         securitiesQuantity = ParsedValue.Invalid("foo", "not a number"),
         amountPaidForSecurities = ParsedValue.Invalid("bar", "not a number"),
         totalMarketValue = ParsedValue.Invalid("baz", "not a number")
