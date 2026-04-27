@@ -197,3 +197,8 @@ GET        /stf/agent/add-reference                       uk.gov.hmrc.securities
 POST       /stf/agent/add-reference                       uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.agents.single.AgentReferenceController.onSubmit(mode: Mode = NormalMode)
 GET        /stf/agent/change/add-reference                uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.agents.single.AgentReferenceController.onPageLoad(mode: Mode = CheckMode)
 POST       /stf/agent/change/add-reference                uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.agents.single.AgentReferenceController.onSubmit(mode: Mode = CheckMode)
+
+GET        /nameOfSeller                        uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.agents.single.NameOfSellerController.onPageLoad(mode: Mode = NormalMode)
+POST       /nameOfSeller                        uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.agents.single.NameOfSellerController.onSubmit(mode: Mode = NormalMode)
+GET        /changeNameOfSeller                  uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.agents.single.NameOfSellerController.onPageLoad(mode: Mode = CheckMode)
+POST       /changeNameOfSeller                  uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.agents.single.NameOfSellerController.onSubmit(mode: Mode = CheckMode)

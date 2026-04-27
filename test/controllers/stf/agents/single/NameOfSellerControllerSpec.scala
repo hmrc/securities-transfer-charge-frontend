@@ -1,24 +1,6 @@
-/*
- * Copyright 2026 HM Revenue & Customs
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *     http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
-
 package controllers.stf.agents.single
 
 import base.SpecBase
-import org.mockito.ArgumentMatchers.any
-import org.mockito.Mockito.when
 import org.scalatestplus.mockito.MockitoSugar
 import play.api.data.Form
 import play.api.inject.bind
@@ -27,40 +9,36 @@ import play.api.test.FakeRequest
 import play.api.test.Helpers.*
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.routes
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.agents.single.routes as agentRoutes
-import uk.gov.hmrc.securitiestransferchargefrontend.forms.stf.agents.AgentReferenceFormProvider
+import uk.gov.hmrc.securitiestransferchargefrontend.forms.stf.shared.NameOfSellerFormProvider
 import uk.gov.hmrc.securitiestransferchargefrontend.models.{NormalMode, UserAnswers}
-import uk.gov.hmrc.securitiestransferchargefrontend.models.stf.AgentReference
 import uk.gov.hmrc.securitiestransferchargefrontend.navigation.Navigator
-import uk.gov.hmrc.securitiestransferchargefrontend.pages.stf.single.AgentReferencePage
-import uk.gov.hmrc.securitiestransferchargefrontend.repositories.SessionRepository
-import uk.gov.hmrc.securitiestransferchargefrontend.views.html.stf.agents.single.AgentReferenceView
+import uk.gov.hmrc.securitiestransferchargefrontend.pages.stf.single.NameOfSellerPage
+import uk.gov.hmrc.securitiestransferchargefrontend.views.html.stf.agents.single.NameOfSellerView
 
-import scala.concurrent.Future
-import scala.util.Random
-
-class AgentReferenceControllerSpec extends SpecBase with MockitoSugar {
+class NameOfSellerControllerSpec extends SpecBase with MockitoSugar {
 
   def onwardRoute = Call("GET", "/foo")
 
-  val formProvider = new AgentReferenceFormProvider()
-  val form: Form[AgentReference] = formProvider()
+  val formProvider = new NameOfSellerFormProvider()
+  val form: Form[String] = formProvider()
 
-  lazy val agentReferenceRoute: String = agentRoutes.AgentReferenceController.onPageLoad(NormalMode).url
+  lazy val nameOfSellerRoute: String = agentRoutes.NameOfSellerController.onPageLoad(NormalMode).url
 
-  "AgentReference Controller" - {
+  "NameOfSeller Controller" - {
 
     "must return OK and the correct view for a GET" in {
+
       val application = applicationBuilder(userAnswers = Some(emptyUserAnswers))
         .overrides(
           bind[Navigator].qualifiedWith("agents").toInstance(getNavigator))
         .build()
 
       running(application) {
-        val request = FakeRequest(GET, agentReferenceRoute)
+        val request = FakeRequest(GET, nameOfSellerRoute)
 
         val result = route(application, request).value
 
-        val view = application.injector.instanceOf[AgentReferenceView]
+        val view = application.injector.instanceOf[NameOfSellerView]
 
         status(result) mustEqual OK
         contentAsString(result) mustEqual view(form, NormalMode, testBackLinkRoute)(request, messages(application)).toString
@@ -69,37 +47,32 @@ class AgentReferenceControllerSpec extends SpecBase with MockitoSugar {
 
     "must populate the view correctly on a GET when the question has previously been answered" in {
 
-      val userAnswers = UserAnswers(userAnswersId, submissionId).set(AgentReferencePage,AgentReference(Some("answer"))).success.value
+      val userAnswers = UserAnswers(userAnswersId, submissionId).set(NameOfSellerPage, "answer").success.value
 
       val application = applicationBuilder(userAnswers = Some(userAnswers))
         .overrides(bind[Navigator].qualifiedWith("agents").toInstance(getNavigator))
         .build()
 
       running(application) {
-        val request = FakeRequest(GET, agentReferenceRoute)
+        val request = FakeRequest(GET, nameOfSellerRoute)
 
-        val view = application.injector.instanceOf[AgentReferenceView]
+        val view = application.injector.instanceOf[NameOfSellerView]
 
         val result = route(application, request).value
 
         status(result) mustEqual OK
-        contentAsString(result) mustEqual view(form.fill(AgentReference(Some("answer"))), NormalMode, testBackLinkRoute)(request, messages(application)).toString
+        contentAsString(result) mustEqual view(form.fill("answer"), NormalMode, testBackLinkRoute)(request, messages(application)).toString
       }
     }
 
     "must redirect to the next page when valid data is submitted" in {
-
-      val mockSessionRepository = mock[SessionRepository]
-
-      when(mockSessionRepository.set(any())) thenReturn Future.successful(())
-
       val application =
-        applicationBuilder(userAnswers = Some(emptyUserAnswers), sessionRepository = mockSessionRepository)
+        applicationBuilder(userAnswers = Some(emptyUserAnswers))
           .build()
 
       running(application) {
         val request =
-          FakeRequest(POST, agentReferenceRoute)
+          FakeRequest(POST, nameOfSellerRoute)
             .withFormUrlEncodedBody(("value", "answer"))
 
         val result = route(application, request).value
@@ -116,16 +89,13 @@ class AgentReferenceControllerSpec extends SpecBase with MockitoSugar {
         .build()
 
       running(application) {
-
-        val invalidValue = Random.alphanumeric.take(260).mkString
-        
         val request =
-          FakeRequest(POST, agentReferenceRoute)
-            .withFormUrlEncodedBody(("value", invalidValue))
+          FakeRequest(POST, nameOfSellerRoute)
+            .withFormUrlEncodedBody(("value", ""))
 
-        val boundForm = form.bind(Map("value" -> invalidValue))
+        val boundForm = form.bind(Map("value" -> ""))
 
-        val view = application.injector.instanceOf[AgentReferenceView]
+        val view = application.injector.instanceOf[NameOfSellerView]
 
         val result = route(application, request).value
 
@@ -139,7 +109,7 @@ class AgentReferenceControllerSpec extends SpecBase with MockitoSugar {
       val application = applicationBuilder(userAnswers = None).build()
 
       running(application) {
-        val request = FakeRequest(GET, agentReferenceRoute)
+        val request = FakeRequest(GET, nameOfSellerRoute)
 
         val result = route(application, request).value
 
@@ -154,7 +124,7 @@ class AgentReferenceControllerSpec extends SpecBase with MockitoSugar {
 
       running(application) {
         val request =
-          FakeRequest(POST, agentReferenceRoute)
+          FakeRequest(POST, nameOfSellerRoute)
             .withFormUrlEncodedBody(("value", "answer"))
 
         val result = route(application, request).value

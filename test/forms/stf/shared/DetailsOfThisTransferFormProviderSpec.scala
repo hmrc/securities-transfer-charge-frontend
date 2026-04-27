@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package forms.stf.individuals
+package forms.stf.shared
 
 import forms.behaviours.{CurrencyFieldBehaviours, StringFieldBehaviours}
 import play.api.data.FormError

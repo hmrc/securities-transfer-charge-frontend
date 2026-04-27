@@ -23,7 +23,7 @@ import uk.gov.hmrc.securitiestransferchargefrontend.models.{NormalMode, UserAnsw
 import uk.gov.hmrc.securitiestransferchargefrontend.navigation.PersistentNavigationHelper
 import uk.gov.hmrc.securitiestransferchargefrontend.pages.Page
 import uk.gov.hmrc.securitiestransferchargefrontend.pages.stf.shared.SubmissionsDashboardPage
-import uk.gov.hmrc.securitiestransferchargefrontend.pages.stf.single.AgentReferencePage
+import uk.gov.hmrc.securitiestransferchargefrontend.pages.stf.single.{AgentReferencePage, NameOfSellerPage}
 import uk.gov.hmrc.securitiestransferchargefrontend.services.AnswerPersistenceService
 
 import scala.concurrent.{ExecutionContext, Future}
@@ -40,6 +40,7 @@ class ForwardRoutes(answerPersistenceService: AnswerPersistenceService,
   def forwardRoutes(page: Page)(implicit hc: HeaderCarrier): UserAnswers => Future[Call] = page match {
 
     case SubmissionsDashboardPage => userAnswers => goTo(agentRoutes.AgentReferenceController.onPageLoad(NormalMode), Some(userAnswers))
-    case AgentReferencePage => userAnswers => dataRequired(AgentReferencePage, userAnswers, defaultPage)
+    case AgentReferencePage => userAnswers => dataRequired(AgentReferencePage, userAnswers, agentRoutes.NameOfSellerController.onPageLoad(NormalMode))
+    case NameOfSellerPage => userAnswers => dataRequired(NameOfSellerPage, userAnswers, defaultPage)
     case _ => _ => Future.successful(defaultPage)
   }
