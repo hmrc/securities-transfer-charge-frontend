@@ -21,6 +21,7 @@ import uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.shared.route
 import uk.gov.hmrc.securitiestransferchargefrontend.models.UserAnswers
 import uk.gov.hmrc.securitiestransferchargefrontend.navigation.NavigationHelper
 import uk.gov.hmrc.securitiestransferchargefrontend.pages.*
+import uk.gov.hmrc.securitiestransferchargefrontend.pages.stf.shared.HowToNotifyAboutSecuritiesTransferPage
 import uk.gov.hmrc.securitiestransferchargefrontend.pages.stf.single.AgentReferencePage
 
 class BackwardsRoutes(defaultPage: Call):
@@ -29,6 +30,7 @@ class BackwardsRoutes(defaultPage: Call):
 
   def predecessorRoutes(page: Page): UserAnswers => Call = page match {
 
+    case HowToNotifyAboutSecuritiesTransferPage => _ => sharedRoutes.SubmissionsDashboardController.onPageLoad()
     case AgentReferencePage => _ => sharedRoutes.SubmissionsDashboardController.onPageLoad()
     case _ => _ => defaultPage
 
