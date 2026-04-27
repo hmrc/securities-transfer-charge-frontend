@@ -32,11 +32,11 @@ object NameOfSellerSummary  {
       answer =>
 
         SummaryListRowViewModel(
-          key     = "nameOfSeller.checkYourAnswersLabel",
+          key     = "agent.nameOfSeller.checkYourAnswersLabel",
           value   = ValueViewModel(HtmlFormat.escape(answer).toString),
           actions = Seq(
             ActionItemViewModel("site.change", routes.NameOfSellerController.onPageLoad(CheckMode).url)
-              .withVisuallyHiddenText(messages("nameOfSeller.change.hidden"))
+              .withVisuallyHiddenText(messages("agent.nameOfSeller.change.hidden"))
           )
         )
     }

@@ -198,6 +198,11 @@ POST       /stf/agent/add-reference                       uk.gov.hmrc.securities
 GET        /stf/agent/change/add-reference                uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.agents.single.AgentReferenceController.onPageLoad(mode: Mode = CheckMode)
 POST       /stf/agent/change/add-reference                uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.agents.single.AgentReferenceController.onSubmit(mode: Mode = CheckMode)
 
+GET        /stf/agent/how-many-transfers                  uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.agents.HowToNotifyAboutSecuritiesTransferController.onPageLoad(mode: Mode = NormalMode)
+POST       /stf/agent/how-many-transfers                  uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.agents.HowToNotifyAboutSecuritiesTransferController.onSubmit(mode: Mode = NormalMode)
+GET        /stf/agent/how-many-transfers                  uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.agents.HowToNotifyAboutSecuritiesTransferController.onPageLoad(mode: Mode = CheckMode)
+POST       /stf/agent/how-many-transfers                  uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.agents.HowToNotifyAboutSecuritiesTransferController.onSubmit(mode: Mode = CheckMode)
+
 GET        /stf/agent/seller-name                         uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.agents.single.NameOfSellerController.onPageLoad(mode: Mode = NormalMode)
 POST       /stf/agent/seller-name                         uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.agents.single.NameOfSellerController.onSubmit(mode: Mode = NormalMode)
 GET        /stf/agent/change/seller-name                  uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.agents.single.NameOfSellerController.onPageLoad(mode: Mode = CheckMode)

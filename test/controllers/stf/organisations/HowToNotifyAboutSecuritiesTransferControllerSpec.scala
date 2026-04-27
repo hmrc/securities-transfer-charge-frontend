@@ -17,6 +17,9 @@
 package controllers.stf.organisations
 
 import base.SpecBase
+import org.mockito.ArgumentMatchers.any
+import org.mockito.Mockito.when
+import org.scalatestplus.mockito.MockitoSugar.mock
 import play.api.data.Form
 import play.api.inject.bind
 import play.api.test.FakeRequest
@@ -24,12 +27,18 @@ import play.api.test.Helpers.*
 import uk.gov.hmrc.securitiestransferchargefrontend.forms.stf.organisations.HowToNotifyAboutSecuritiesTransferFormProvider
 import uk.gov.hmrc.securitiestransferchargefrontend.models.{NormalMode, UserAnswers}
 import uk.gov.hmrc.securitiestransferchargefrontend.views.html.stf.organisations.HowToNotifyAboutSecuritiesTransferView
+import uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.organisations.single.routes as orgSingleRoutes
+import uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.organisations.bulk.routes as orgBulkRoutes
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.organisations.routes as orgRoutes
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.routes
 import uk.gov.hmrc.securitiestransferchargefrontend.navigation.Navigator
 import uk.gov.hmrc.auth.core.AffinityGroup
+import uk.gov.hmrc.http.HeaderCarrier
+import uk.gov.hmrc.securitiestransferchargefrontend.clients.SaveAndReturnClient
 import uk.gov.hmrc.securitiestransferchargefrontend.models.stf.HowToNotifyAboutSecuritiesTransfer
 import uk.gov.hmrc.securitiestransferchargefrontend.pages.stf.shared.HowToNotifyAboutSecuritiesTransferPage
+
+import scala.concurrent.Future
 
 class HowToNotifyAboutSecuritiesTransferControllerSpec extends SpecBase {
 
@@ -147,6 +156,48 @@ class HowToNotifyAboutSecuritiesTransferControllerSpec extends SpecBase {
         val result = route(application, request).value
 
         status(result) mustEqual SEE_OTHER
+      }
+    }
+
+    "must redirect to agent reference page when one at a time is selected" in {
+      val saveAndReturnClient = mock[SaveAndReturnClient]
+
+      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers), saveAndReturnClient = saveAndReturnClient)
+        .build()
+
+      when(saveAndReturnClient.save(any[UserAnswers]())(any[HeaderCarrier]()))
+        .thenReturn(Future.successful(()))
+
+      running(application) {
+        val request =
+          FakeRequest(POST, howToNotifyAboutSecuritiesTransferRoute)
+            .withFormUrlEncodedBody("value" -> HowToNotifyAboutSecuritiesTransfer.values.head.toString)
+
+        val result = route(application, request).value
+
+        status(result) mustEqual SEE_OTHER
+        redirectLocation(result).value mustEqual orgSingleRoutes.ConfirmAddressController.onPageLoad().url
+      }
+    }
+
+    "must redirect to Template instruction page when more than one at a time is selected" in {
+      val saveAndReturnClient = mock[SaveAndReturnClient]
+
+      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers), saveAndReturnClient = saveAndReturnClient)
+        .build()
+
+      when(saveAndReturnClient.save(any[UserAnswers]())(any[HeaderCarrier]()))
+        .thenReturn(Future.successful(()))
+
+      running(application) {
+        val request =
+          FakeRequest(POST, howToNotifyAboutSecuritiesTransferRoute)
+            .withFormUrlEncodedBody("value" -> HowToNotifyAboutSecuritiesTransfer.values.last.toString)
+
+        val result = route(application, request).value
+
+        status(result) mustEqual SEE_OTHER
+        redirectLocation(result).value mustEqual orgBulkRoutes.TemplateInstructionsController.onPageLoad().url
       }
     }
   }
