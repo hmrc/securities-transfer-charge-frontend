@@ -392,3 +392,10 @@ agentReference.checkYourAnswersLabel = Add a reference
 agentReference.hint = You can add a reference for your own records and to help you find this submission later. It will not be used by HMRC.
 agentReference.error.length = Your reference must be 255 characters or fewer
 agentReference.change.hidden = AgentReference
+
+agent.nameOfSeller.title = What’s the seller’s name?
+agent.nameOfSeller.heading = What’s the seller’s name?
+agent.nameOfSeller.checkYourAnswersLabel = What’s the seller’s name?
+agent.nameOfSeller.change.hidden = NameOfSeller
+agent.nameOfSeller.hint = This is the individual, business or trust selling the securities.
+

@@ -42,12 +42,12 @@ class NameOfSellerViewSpec extends ViewBaseSpec {
   )
 
   object ExpectedContent {
-    val title: String = messages("nameOfSeller.title")
-    val heading: String = messages("nameOfSeller.heading")
+    val title: String = messages("agent.nameOfSeller.title")
+    val heading: String = messages("agent.nameOfSeller.heading")
     val caption: String = messages("seller.details.caption")
     val saveAndContinue: String = messages("site.save-and-continue.button")
     val saveAndReturn: String = messages("site.save-and-return.button")
-    val hint: String = messages("org.nameOfSeller.hint")
+    val hint: String = messages("agent.nameOfSeller.hint")
 
   }
 

@@ -17,7 +17,7 @@
 @import uk.gov.hmrc.securitiestransferchargefrontend.views.html.templates
 @import uk.gov.hmrc.securitiestransferchargefrontend.viewmodels.InputWidth._
 @import uk.gov.hmrc.securitiestransferchargefrontend.viewmodels.LabelSize.Large
-@import uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.individuals.single.routes
+@import uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.agents.single.routes
 @import uk.gov.hmrc.securitiestransferchargefrontend.views.html.components.SaveAndReturnButton
 
 
@@ -32,7 +32,7 @@
 
 @(form: Form[_], mode: Mode, backLinkCall: Call)(implicit request: Request[_], messages: Messages)
 
-@layout(pageTitle = title(form, messages("nameOfSeller.title")), backLinkUrl = Some(backLinkCall.url)) {
+@layout(pageTitle = title(form, messages("agent.nameOfSeller.title")), backLinkUrl = Some(backLinkCall.url)) {
     <div id="caption-heading" class="govuk-caption-l">
         @messages("seller.details.caption")
     </div>
@@ -46,10 +46,10 @@
         @govukInput(
             InputViewModel(
                 field = form("value"),
-                label = LabelViewModel(messages("nameOfSeller.heading")).asPageHeading(Large)
+                label = LabelViewModel(messages("agent.nameOfSeller.heading")).asPageHeading(Large)
             )
             .withWidth(Full)
-            .withHint(HintViewModel(messages("org.nameOfSeller.hint")))
+            .withHint(HintViewModel(messages("agent.nameOfSeller.hint")))
 
         )
 
