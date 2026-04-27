@@ -392,10 +392,3 @@ agentReference.checkYourAnswersLabel = Add a reference
 agentReference.hint = You can add a reference for your own records and to help you find this submission later. It will not be used by HMRC.
 agentReference.error.length = Your reference must be 255 characters or fewer
 agentReference.change.hidden = AgentReference
-
-nameOfSeller.title = nameOfSeller
-nameOfSeller.heading = nameOfSeller
-nameOfSeller.checkYourAnswersLabel = nameOfSeller
-nameOfSeller.error.required = Enter nameOfSeller
-nameOfSeller.error.length = NameOfSeller must be 35 characters or less
-nameOfSeller.change.hidden = NameOfSeller
