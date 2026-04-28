@@ -17,11 +17,18 @@
 package controllers.stf.agents
 
 import base.SpecBase
+import org.mockito.ArgumentMatchers.any
+import org.mockito.Mockito.when
+import org.scalatestplus.mockito.MockitoSugar.mock
 import play.api.data.Form
 import play.api.inject.bind
 import play.api.test.FakeRequest
 import play.api.test.Helpers.*
+import uk.gov.hmrc.http.HeaderCarrier
+import uk.gov.hmrc.securitiestransferchargefrontend.clients.SaveAndReturnClient
+import uk.gov.hmrc.securitiestransferchargefrontend.controllers.routes
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.agents.routes as agentRoutes
+import uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.agents.single.routes as agentSingleRoutes
 import uk.gov.hmrc.securitiestransferchargefrontend.forms.stf.agents.HowToNotifyAboutSecuritiesTransferFormProvider
 import uk.gov.hmrc.securitiestransferchargefrontend.models.stf.HowToNotifyAboutSecuritiesTransfer
 import uk.gov.hmrc.securitiestransferchargefrontend.models.{NormalMode, UserAnswers}
@@ -29,9 +36,11 @@ import uk.gov.hmrc.securitiestransferchargefrontend.navigation.Navigator
 import uk.gov.hmrc.securitiestransferchargefrontend.pages.stf.shared.HowToNotifyAboutSecuritiesTransferPage
 import uk.gov.hmrc.securitiestransferchargefrontend.views.html.stf.agents.HowToNotifyAboutSecuritiesTransferView
 
+import scala.concurrent.Future
+
 class HowToNotifyAboutSecuritiesTransferControllerSpec extends SpecBase {
 
-  lazy val howToNotifyAboutSecuritiesTransferRoute: String = agentRoutes.HowToNotifyAboutSecuritiesTransferController.onPageLoad().url
+  lazy val howToNotifyAboutSecuritiesTransferRoute: String = agentRoutes.HowToNotifyAboutSecuritiesTransferController.onPageLoad(NormalMode).url
 
   val formProvider = new HowToNotifyAboutSecuritiesTransferFormProvider()
   val form: Form[HowToNotifyAboutSecuritiesTransfer] = formProvider()
@@ -93,6 +102,48 @@ class HowToNotifyAboutSecuritiesTransferControllerSpec extends SpecBase {
 
         status(result) mustEqual BAD_REQUEST
         contentAsString(result) mustEqual view(boundForm, NormalMode, affinityGroupKeyInd, testBackLinkRoute)(request, messages(application)).toString
+      }
+    }
+
+    "must redirect to agent reference page when one at a time is selected" in {
+      val saveAndReturnClient = mock[SaveAndReturnClient]
+
+      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers), saveAndReturnClient = saveAndReturnClient)
+        .build()
+
+      when(saveAndReturnClient.save(any[UserAnswers]())(any[HeaderCarrier]()))
+        .thenReturn(Future.successful(()))
+
+      running(application) {
+        val request =
+          FakeRequest(POST, howToNotifyAboutSecuritiesTransferRoute)
+            .withFormUrlEncodedBody("value" -> HowToNotifyAboutSecuritiesTransfer.values.head.toString)
+
+        val result = route(application, request).value
+
+        status(result) mustEqual SEE_OTHER
+        redirectLocation(result).value mustEqual agentSingleRoutes.AgentReferenceController.onPageLoad(NormalMode).url
+      }
+    }
+
+    "must redirect to Template instruction page when more than one at a time is selected" in {
+      val saveAndReturnClient = mock[SaveAndReturnClient]
+
+      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers), saveAndReturnClient = saveAndReturnClient)
+        .build()
+
+      when(saveAndReturnClient.save(any[UserAnswers]())(any[HeaderCarrier]()))
+        .thenReturn(Future.successful(()))
+
+      running(application) {
+        val request =
+          FakeRequest(POST, howToNotifyAboutSecuritiesTransferRoute)
+            .withFormUrlEncodedBody("value" -> HowToNotifyAboutSecuritiesTransfer.values.last.toString)
+
+        val result = route(application, request).value
+
+        status(result) mustEqual SEE_OTHER
+        redirectLocation(result).value mustEqual routes.JourneyRecoveryController.onPageLoad().url
       }
     }
   }

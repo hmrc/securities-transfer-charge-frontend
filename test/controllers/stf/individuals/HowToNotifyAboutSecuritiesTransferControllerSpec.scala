@@ -27,6 +27,7 @@ import play.api.test.Helpers.*
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.securitiestransferchargefrontend.clients.SaveAndReturnClient
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.individuals.single.routes as individualSingleRoutes
+import uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.individuals.bulk.routes as individualBulkRoutes
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.individuals.routes as individualRoutes
 import uk.gov.hmrc.securitiestransferchargefrontend.forms.stf.individuals.HowToNotifyAboutSecuritiesTransferFormProvider
 import uk.gov.hmrc.securitiestransferchargefrontend.models.stf.HowToNotifyAboutSecuritiesTransfer
@@ -122,6 +123,27 @@ class HowToNotifyAboutSecuritiesTransferControllerSpec extends SpecBase {
 
         status(result) mustEqual SEE_OTHER
         redirectLocation(result).value mustEqual individualSingleRoutes.ConfirmAddressController.onPageLoad().url
+      }
+    }
+
+    "must redirect to Template instruction page when more than one at a time is selected" in {
+      val saveAndReturnClient = mock[SaveAndReturnClient]
+
+      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers), saveAndReturnClient = saveAndReturnClient)
+        .build()
+
+      when(saveAndReturnClient.save(any[UserAnswers]())(any[HeaderCarrier]()))
+        .thenReturn(Future.successful(()))
+
+      running(application) {
+        val request =
+          FakeRequest(POST, howToNotifyAboutSecuritiesTransferRoute)
+            .withFormUrlEncodedBody("value" -> HowToNotifyAboutSecuritiesTransfer.values.last.toString)
+
+        val result = route(application, request).value
+
+        status(result) mustEqual SEE_OTHER
+        redirectLocation(result).value mustEqual individualBulkRoutes.TemplateInstructionsController.onPageLoad().url
       }
     }
   }

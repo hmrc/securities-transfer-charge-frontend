@@ -51,14 +51,14 @@ class HowToNotifyAboutSecuritiesTransferController @Inject()(
 
   def onPageLoad(mode: Mode): Action[AnyContent] = (stcAuthEnrolled andThen getData andThen requireData){
     implicit request =>
-      
+
       val innerRequest = request.request
-      
+
       val preparedForm = request.userAnswers.get(HowToNotifyAboutSecuritiesTransferPage) match {
         case None => form
         case Some(value) => form.fill(value)
       }
-      
+
       Ok(view(preparedForm, mode, innerRequest.affinityGroupKey, backLinkCall(mode)(request.userAnswers)))
   }
 
