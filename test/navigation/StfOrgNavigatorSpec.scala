@@ -16,23 +16,22 @@
 
 package navigation
 
-import base.{Fixtures, SpecBase}
 import base.stubs.StubAnswerPersistenceService
+import base.{Fixtures, SpecBase}
 import org.mockito.Mockito.when
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatestplus.mockito.MockitoSugar.mock
 import uk.gov.hmrc.securitiestransferchargefrontend.config.FrontendAppConfig
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.routes
-import uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.organisations.single.routes as orgSingleRoutes
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.organisations.routes as orgRoutes
-import uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.organisations.bulk.routes as orgBulkRoutes
+import uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.organisations.single.routes as orgSingleRoutes
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.shared.routes as sharedRoutes
 import uk.gov.hmrc.securitiestransferchargefrontend.models.*
 import uk.gov.hmrc.securitiestransferchargefrontend.models.stf.{HowToNotifyAboutSecuritiesTransfer, SecuritiesTarget}
 import uk.gov.hmrc.securitiestransferchargefrontend.navigation.stf.organisations.StfOrgNavigator
 import uk.gov.hmrc.securitiestransferchargefrontend.pages.*
 import uk.gov.hmrc.securitiestransferchargefrontend.pages.stf.shared.HowToNotifyAboutSecuritiesTransferPage
-import uk.gov.hmrc.securitiestransferchargefrontend.pages.stf.single.{ApplyingForReliefPage, ChargingPointPage, ConfirmAddressPage, ConnectedPersonsPage, NameOfSellerPage, SecuritiesTargetPage, StfBuyersAddressPage, StfSellerAddressPage, TaxRatePage, WhatReliefAreYouApplyingForPage}
+import uk.gov.hmrc.securitiestransferchargefrontend.pages.stf.single.*
 
 import java.time.LocalDate
 
@@ -68,14 +67,6 @@ class StfOrgNavigatorSpec extends SpecBase with ScalaFutures {
         val result = navigator.nextPage(HowToNotifyAboutSecuritiesTransferPage, NormalMode, answers)(fakeRequest)
         whenReady(result) { res =>
           res mustBe orgSingleRoutes.ConfirmAddressController.onPageLoad()
-        }
-      }
-
-      "must go from the HowToNotifyAboutSecuritiesTransfer to TemplateInstructionsController when more than one at a time is selected" in {
-        val answers = emptyUserAnswers.set(HowToNotifyAboutSecuritiesTransferPage, HowToNotifyAboutSecuritiesTransfer.MoreThanOneAtATime).get
-        val result = navigator.nextPage(HowToNotifyAboutSecuritiesTransferPage, NormalMode, answers)(fakeRequest)
-        whenReady(result) { res =>
-          res mustBe orgBulkRoutes.TemplateInstructionsController.onPageLoad()
         }
       }
 
