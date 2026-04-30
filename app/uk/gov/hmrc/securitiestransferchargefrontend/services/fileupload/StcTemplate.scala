@@ -16,29 +16,19 @@
 
 package uk.gov.hmrc.securitiestransferchargefrontend.services.fileupload
 
-object StcTaxRateParser {
+sealed trait StcTemplate {
+  def identifyingFields: Set[String]
+}
 
-  sealed trait ParsedTaxRate {
-    def value: BigDecimal
+object StcTemplate {
+
+  case object STF extends StcTemplate {
+
+    val identifyingFields: Set[String] = Set("STF")
   }
 
-  object ParsedTaxRate {
-    case object HalfPercent extends ParsedTaxRate {
-      override val value: BigDecimal = BigDecimal("0.5")
-    }
+  case object SH03 extends StcTemplate {
 
-    case object OneAndHalfPercent extends ParsedTaxRate {
-      override val value: BigDecimal = BigDecimal("1.5")
-    }
+    val identifyingFields: Set[String] = Set("SH03")
   }
-
-
-  def parse(value: BigDecimal): Option[ParsedTaxRate] =
-    value match {
-      case v if v == BigDecimal("0.5") => Some(ParsedTaxRate.HalfPercent)
-      case v if v == BigDecimal("1.5") => Some(ParsedTaxRate.OneAndHalfPercent)
-      case _                           => None
-    }
-
-  
 }

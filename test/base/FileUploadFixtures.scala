@@ -16,16 +16,15 @@
 
 package base
 
-import uk.gov.hmrc.securitiestransferchargefrontend.models.stf.fileupload.{ParsedStcRow, ParsedValue, StcFileValidationResponse, StcRowValidationError, ValidatedStcRow}
+import uk.gov.hmrc.securitiestransferchargefrontend.models.stf.fileupload.{ParsedStcRow, StcFileValidationResponse, StcRowValidationError, ValidatedStcRow}
 import uk.gov.hmrc.securitiestransferchargefrontend.models.stf.upscan.{FileUpload, UpscanJourneyStatus}
 
-import java.time.LocalDate
 
 trait FileUploadFixtures {
 
   val reference = "test-reference"
 
-  val successfulValidationResponse = StcFileValidationResponse(
+  val successfulValidationResponse: StcFileValidationResponse = StcFileValidationResponse(
     rows = Seq.empty
   )
 
@@ -48,26 +47,30 @@ trait FileUploadFixtures {
   def parsedStcRow(rowNumber: Int = 6): ParsedStcRow =
     ParsedStcRow(
       rowNumber = rowNumber,
-      sellerName = ParsedValue.Valid("Seller Ltd"),
-      sellerAddressInUk = ParsedValue.Valid(true),
-      sellerAddressLine1 = ParsedValue.Valid("1 Test Street"),
-      sellerAddressLine2 = ParsedValue.Missing,
-      sellerAddressLine3 = ParsedValue.Missing,
-      sellerAddressLine4 = ParsedValue.Missing,
-      sellerPostcode = ParsedValue.Valid("AA1 1AA"),
-      sellerCountry = ParsedValue.Missing,
-      connectedPersons = ParsedValue.Valid(false),
-      applyingForRelief = ParsedValue.Valid(false),
-      whatReliefAreYouApplyingFor = ParsedValue.Missing,
-      securitiesTarget = ParsedValue.Valid("Target Ltd"),
-      companyRegistrationNumber = ParsedValue.Valid("12345678"),
-      chargingPoint = ParsedValue.Valid(LocalDate.of(2025, 11, 20)),
-      taxRate = ParsedValue.Valid(BigDecimal("0.5")),
-      whatTypeOfSecurities = ParsedValue.Valid("Shares"),
-      typeOfShares = ParsedValue.Valid("Ordinary"),
-      securitiesQuantity = ParsedValue.Valid(BigDecimal(100)),
-      amountPaidForSecurities = ParsedValue.Valid(BigDecimal(1000)),
-      totalMarketValue = ParsedValue.Missing
+      sellerName = Some("   "),
+      sellerAddressInUk = Some(true),
+      sellerAddressLine1 = Some("   "),
+      sellerAddressLine2 = Some("   "),
+      sellerAddressLine3 = None,
+      sellerAddressLine4 = None,
+      sellerPostcode = Some("   "),
+      sellerCountry = None,
+      connectedPersons = Some(false),
+      applyingForRelief = Some(false),
+      whatReliefAreYouApplyingFor = Some("   "),
+      securitiesTarget = Some("   "),
+      companyRegistrationNumber = Some("   "),
+      chargingPoint = None,
+      taxRate = None,
+      whatTypeOfSecurities = Some("   "),
+      typeOfShares = Some("   "),
+      securitiesQuantity = Some(BigDecimal(1)),
+      amountPaidForSecurities = Some(BigDecimal(1)),
+      totalMarketValue = Some(BigDecimal(1)),
+      minSharePrice = Some(BigDecimal(1)),
+      maxSharePrice = Some(BigDecimal(1)),
+      sharePurchaseReason = Some("   "),
+      purchaseForCancellation = Some(false)
     )
 
   def validationResponseWithErrors(errors: Seq[StcRowValidationError]): StcFileValidationResponse =

@@ -18,8 +18,6 @@ package uk.gov.hmrc.securitiestransferchargefrontend.services.fileupload
 
 import play.api.data.{Form, FormError}
 import uk.gov.hmrc.securitiestransferchargefrontend.models.stf.fileupload.{ParsedRow, StcRowValidationError}
-import uk.gov.hmrc.securitiestransferchargefrontend.viewmodels.stf.fileupload.StcUploadFieldMetadata
-
 import javax.inject.Singleton
 import scala.util.matching.Regex
 
@@ -42,71 +40,75 @@ class StcValidationSupport {
   private val ukPostcodePattern: Regex =
     """(?i)^[A-Z]{1,2}\d[A-Z\d]?\s?\d[A-Z]{2}$""".r
 
-  def columnIndex(fieldName: String): Int =
-    StcUploadFieldMetadata.columnIndexByFieldName.getOrElse(fieldName, -1)
-
+  
   def bindSingleValue[A](form: Form[A], rawValue: String): Seq[FormError] =
     form.bind(Map("value" -> rawValue)).errors
 
-  def error(rowNumber: Int, fieldName: String, message: String): StcRowValidationError =
+  def error(rowNumber: Int, fieldName: String, message: String)(implicit columnIndexBuilder: ColumnIndexBuilder): StcRowValidationError =
     StcRowValidationError(
       rowNumber = rowNumber,
       fieldName = fieldName,
-      columnIndex = columnIndex(fieldName),
+      columnIndex = columnIndexBuilder.get(fieldName).getOrElse(-1),
       message = message,
       blocking = true
     )
 
   def validateRequiredText(
-                            rawRow: ParsedRow,
-                            columnIndex: Int,
+                            value: Option[String],
+                            rowNumber: Int,
                             fieldName: String,
                             requiredMessage: String,
                             maxLength: Option[Int] = None,
                             lengthMessage: Option[String] = None,
                             pattern: Option[Regex] = None,
                             invalidMessage: Option[String] = None
-                          ): Seq[StcRowValidationError] =
-    rawRow.valueAt(columnIndex).map(_.trim) match {
-      case None | Some("") =>
-        Seq(error(rawRow.rowNumber, fieldName, requiredMessage))
+                          )(implicit columnIndexBuilder: ColumnIndexBuilder): Seq[StcRowValidationError] = {
 
-      case Some(value) =>
+    value.map(_.trim) match {
+
+      case None | Some("") =>
+        Seq(error(rowNumber, fieldName, requiredMessage))
+
+      case Some(v) =>
         validateTextValue(
-          rowNumber = rawRow.rowNumber,
+          rowNumber = rowNumber,
           fieldName = fieldName,
-          value = value,
+          value = v,
           maxLength = maxLength,
           lengthMessage = lengthMessage,
           pattern = pattern,
           invalidMessage = invalidMessage
         )
     }
+  }
 
   def validateOptionalText(
-                            rawRow: ParsedRow,
-                            columnIndex: Int,
+                            value: Option[String],
+                            rowNumber: Int,
                             fieldName: String,
                             maxLength: Option[Int] = None,
                             lengthMessage: Option[String] = None,
                             pattern: Option[Regex] = None,
                             invalidMessage: Option[String] = None
-                          ): Seq[StcRowValidationError] =
-    rawRow.valueAt(columnIndex).map(_.trim) match {
+                          )(implicit columnIndexBuilder: ColumnIndexBuilder): Seq[StcRowValidationError] = {
+
+    value.map(_.trim) match {
+
       case None | Some("") =>
         Seq.empty
 
-      case Some(value) =>
+      case Some(v) =>
         validateTextValue(
-          rowNumber = rawRow.rowNumber,
-          fieldName = fieldName,
-          value = value,
-          maxLength = maxLength,
-          lengthMessage = lengthMessage,
-          pattern = pattern,
-          invalidMessage = invalidMessage
+          rowNumber,
+          fieldName,
+          v,
+          maxLength,
+          lengthMessage,
+          pattern,
+          invalidMessage
         )
     }
+  }
 
   def validateBooleanField(
                             rawRow: ParsedRow,
@@ -115,7 +117,7 @@ class StcValidationSupport {
                             form: Form[Boolean],
                             requiredMessage: String,
                             invalidMessage: String
-                          ): Seq[StcRowValidationError] = {
+                          )(implicit columnIndexBuilder: ColumnIndexBuilder): Seq[StcRowValidationError] = {
     val errors = bindSingleValue(form, rawRow.valueAt(columnIndex).getOrElse(""))
 
     errors.map { formError =>
@@ -145,7 +147,7 @@ class StcValidationSupport {
                                  lengthMessage: Option[String],
                                  pattern: Option[Regex],
                                  invalidMessage: Option[String]
-                               ): Seq[StcRowValidationError] = {
+                               )(implicit columnIndexBuilder: ColumnIndexBuilder): Seq[StcRowValidationError] = {
     val lengthErrors =
       (maxLength, lengthMessage) match {
         case (Some(max), Some(message)) if value.length > max =>

@@ -25,33 +25,17 @@ class StcTaxRateParserSpec extends AnyWordSpec with Matchers {
 
   "StcTaxRateParser.parse" must {
 
-    "parse 0.5%" in {
-      StcTaxRateParser.parse("0.5%") mustBe Some(ParsedTaxRate.HalfPercent)
-    }
-
     "parse 0.5" in {
-      StcTaxRateParser.parse("0.5") mustBe Some(ParsedTaxRate.HalfPercent)
+      StcTaxRateParser.parse(0.5) mustBe Some(ParsedTaxRate.HalfPercent)
     }
-
-    "parse 1.5%" in {
-      StcTaxRateParser.parse("1.5%") mustBe Some(ParsedTaxRate.OneAndHalfPercent)
-    }
-
+    
     "parse 1.5" in {
-      StcTaxRateParser.parse("1.5") mustBe Some(ParsedTaxRate.OneAndHalfPercent)
-    }
-
-    "parse values with whitespace" in {
-      StcTaxRateParser.parse(" 0.5 % ") mustBe Some(ParsedTaxRate.HalfPercent)
-      StcTaxRateParser.parse(" 1.5 % ") mustBe Some(ParsedTaxRate.OneAndHalfPercent)
+      StcTaxRateParser.parse(1.5) mustBe Some(ParsedTaxRate.OneAndHalfPercent)
     }
 
     "return None for invalid values" in {
-      StcTaxRateParser.parse("") mustBe None
-      StcTaxRateParser.parse("2") mustBe None
-      StcTaxRateParser.parse("half") mustBe None
-      StcTaxRateParser.parse("0.50") mustBe None
-      StcTaxRateParser.parse("1.50") mustBe None
+      StcTaxRateParser.parse(0) mustBe None
+      StcTaxRateParser.parse(2) mustBe None
     }
   }
 }

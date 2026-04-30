@@ -16,29 +16,15 @@
 
 package uk.gov.hmrc.securitiestransferchargefrontend.services.fileupload
 
-object StcTaxRateParser {
+import com.google.inject.Singleton
 
-  sealed trait ParsedTaxRate {
-    def value: BigDecimal
-  }
+@Singleton
+final class ColumnIndexBuilder(headers: Seq[String]) {
 
-  object ParsedTaxRate {
-    case object HalfPercent extends ParsedTaxRate {
-      override val value: BigDecimal = BigDecimal("0.5")
-    }
+  private val index: Map[String, Int] =
+    headers.map(_.trim).zipWithIndex.toMap
 
-    case object OneAndHalfPercent extends ParsedTaxRate {
-      override val value: BigDecimal = BigDecimal("1.5")
-    }
-  }
-
-
-  def parse(value: BigDecimal): Option[ParsedTaxRate] =
-    value match {
-      case v if v == BigDecimal("0.5") => Some(ParsedTaxRate.HalfPercent)
-      case v if v == BigDecimal("1.5") => Some(ParsedTaxRate.OneAndHalfPercent)
-      case _                           => None
-    }
-
-  
+  def get(columnName: String): Option[Int] =
+    index.get(columnName.trim)
+    
 }

@@ -18,19 +18,23 @@ package services.fileupload
 
 import org.scalatest.matchers.must.Matchers
 import org.scalatest.wordspec.AnyWordSpec
-import uk.gov.hmrc.securitiestransferchargefrontend.models.stf.fileupload.{ParsedCell, ParsedRow}
-import uk.gov.hmrc.securitiestransferchargefrontend.services.fileupload.StcValidationSupport
+import uk.gov.hmrc.securitiestransferchargefrontend.services.fileupload.{ColumnIndexBuilder, StcValidationSupport}
 
 class StcValidationSupportSpec extends AnyWordSpec with Matchers {
 
   private val support = new StcValidationSupport
 
+  private implicit val columnIndexBuilder: ColumnIndexBuilder =
+    new ColumnIndexBuilder(
+      Seq("sellerAddressLine1", "sellerAddressLine2", "sellerPostcode")
+    )
+
   "StcValidationSupport.validateRequiredText" must {
 
     "return the required message when the value is blank" in {
       val result = support.validateRequiredText(
-        rawRow(columnIndex = 9, value = ""),
-        columnIndex = 9,
+        value = Some(""),
+        rowNumber = 3,
         fieldName = "sellerAddressLine1",
         requiredMessage = "Enter the first line of your address"
       )
@@ -40,8 +44,8 @@ class StcValidationSupportSpec extends AnyWordSpec with Matchers {
 
     "return the provided length message when the value is too long" in {
       val result = support.validateRequiredText(
-        rawRow(columnIndex = 9, value = "a" * 51),
-        columnIndex = 9,
+        value = Some("a" * 51),
+        rowNumber = 3,
         fieldName = "sellerAddressLine1",
         requiredMessage = "Enter the first line of your address",
         maxLength = Some(50),
@@ -53,21 +57,23 @@ class StcValidationSupportSpec extends AnyWordSpec with Matchers {
 
     "return the provided invalid character message when the value does not match the regex" in {
       val result = support.validateRequiredText(
-        rawRow(columnIndex = 9, value = "Address @@@"),
-        columnIndex = 9,
+        value = Some("Address @@@"),
+        rowNumber = 3,
         fieldName = "sellerAddressLine1",
         requiredMessage = "Enter the first line of your address",
         pattern = Some(support.addressPattern),
         invalidMessage = Some("Address line 1 can only include letters, numbers and the following characters: , . - '")
       )
 
-      result.map(_.message) mustBe Seq("Address line 1 can only include letters, numbers and the following characters: , . - '")
+      result.map(_.message) mustBe Seq(
+        "Address line 1 can only include letters, numbers and the following characters: , . - '"
+      )
     }
 
-    "return both length and invalid character errors when both rules are broken and both messages are supplied" in {
+    "return both length and invalid character errors when both rules are broken" in {
       val result = support.validateRequiredText(
-        rawRow(columnIndex = 9, value = ("@" * 51)),
-        columnIndex = 9,
+        value = Some("@" * 51),
+        rowNumber = 3,
         fieldName = "sellerAddressLine1",
         requiredMessage = "Enter the first line of your address",
         maxLength = Some(50),
@@ -87,8 +93,8 @@ class StcValidationSupportSpec extends AnyWordSpec with Matchers {
 
     "return no errors for blank optional values" in {
       val result = support.validateOptionalText(
-        rawRow(columnIndex = 10, value = ""),
-        columnIndex = 10,
+        value = Some(""),
+        rowNumber = 3,
         fieldName = "sellerAddressLine2",
         maxLength = Some(50),
         lengthMessage = Some("Address line 2 must be fewer than 50 characters long")
@@ -99,28 +105,31 @@ class StcValidationSupportSpec extends AnyWordSpec with Matchers {
 
     "validate non-blank optional values" in {
       val result = support.validateOptionalText(
-        rawRow(columnIndex = 10, value = "a" * 51),
-        columnIndex = 10,
+        value = Some("a" * 51),
+        rowNumber = 3,
         fieldName = "sellerAddressLine2",
         maxLength = Some(50),
         lengthMessage = Some("Address line 2 must be fewer than 50 characters long")
       )
 
-      result.map(_.message) mustBe Seq("Address line 2 must be fewer than 50 characters long")
+      result.map(_.message) mustBe Seq(
+        "Address line 2 must be fewer than 50 characters long"
+      )
     }
 
-    "validate invalid characters for non-blank optional values when an invalid message is supplied" in {
+    "validate invalid characters for non-blank optional values" in {
       val result = support.validateOptionalText(
-        rawRow(columnIndex = 10, value = "Address @@@"),
-        columnIndex = 10,
+        value = Some("Address @@@"),
+        rowNumber = 3,
         fieldName = "sellerAddressLine2",
         pattern = Some(support.addressPattern),
         invalidMessage = Some("Address line 2 can only include letters, numbers and the following characters: , . - '")
       )
 
-      result.map(_.message) mustBe Seq("Address line 2 can only include letters, numbers and the following characters: , . - '")
+      result.map(_.message) mustBe Seq(
+        "Address line 2 can only include letters, numbers and the following characters: , . - '"
+      )
     }
-    
   }
 
   "StcValidationSupport.looksLikeUkPostcode" must {
@@ -137,23 +146,4 @@ class StcValidationSupportSpec extends AnyWordSpec with Matchers {
       support.looksLikeUkPostcode("") mustBe false
     }
   }
-
-  "StcValidationSupport.columnIndex" must {
-
-    "return the configured spreadsheet column index for known fields" in {
-      support.columnIndex("sellerName") mustBe 7
-      support.columnIndex("sellerAddressInUk") mustBe 8
-      support.columnIndex("sellerPostcode") mustBe 13
-    }
-
-    "return -1 for unknown fields" in {
-      support.columnIndex("doesNotExist") mustBe -1
-    }
-  }
-
-  private def rawRow(columnIndex: Int, value: String): ParsedRow =
-    ParsedRow(
-      rowNumber = 3,
-      cells = Seq(ParsedCell(columnIndex, value))
-    )
 }

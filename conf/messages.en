@@ -449,3 +449,14 @@ fileUpload.error.amountPaidForSecurities.maximum = The amount you paid for the s
 
 fileUpload.error.totalMarketValue.nonNumeric = The market value of the securities must be a number
 fileUpload.error.totalMarketValue.maximum = The market value of the securities must be £999,999,999 or below
+
+minSharePrice.error.required = Enter an amount in £
+minSharePrice.error.maximum = The minimum share price must be below 999,999,999
+
+maxSharePrice.error.required = Enter an amount in £
+maxSharePrice.error.maximum = The maximum share price must be below 999,999,999
+
+sharePurchaseReason.required = Enter reason for share purchase
+sharePurchaseReason.invalid = Enter ‘cancellation’ or ‘treasury’
+
+purchasedForCancellation.invalid = Enter ‘yes’ if the shares also qualify as treasury shares

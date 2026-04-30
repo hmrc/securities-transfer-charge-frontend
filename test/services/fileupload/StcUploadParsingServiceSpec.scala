@@ -19,6 +19,7 @@ package services.fileupload
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.{verify, when}
 import org.scalatest.EitherValues
+import org.scalatest.matchers.must.Matchers.mustBe
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpec
 import org.scalatestplus.mockito.MockitoSugar
@@ -56,73 +57,49 @@ class StcUploadParsingServiceSpec extends AnyWordSpec with Matchers with EitherV
   "parse" should {
 
     "skip rows before firstDataRow and drop completely empty rows" in {
-      val headerRow = ParsedRow(
-        rowNumber = 1,
-        cells = Seq(ParsedCell(1, "Your address - line 1"))
-      )
-
-      val guidanceRow = ParsedRow(
-        rowNumber = 2,
-        cells = Seq(ParsedCell(1, "Enter the first line of your address"))
-      )
+      val headerRow = ParsedRow(1, Seq(ParsedCell(1, "Header")))
+      val guidanceRow = ParsedRow(2, Seq(ParsedCell(1, "Guidance")))
 
       val dataRow = ParsedRow(
-        rowNumber = 3,
-        cells = Seq(
+        3,
+        Seq(
           ParsedCell(1, "10 Downing Street"),
-          ParsedCell(7, "Bob Seller"),
-          ParsedCell(20, "2026-03-23"),
-          ParsedCell(21, "0.5%"),
-          ParsedCell(24, "100"),
-          ParsedCell(25, "£500"),
-          ParsedCell(26, "600")
+          ParsedCell(7, "Bob Seller")
         )
       )
 
       val emptyDataRow = ParsedRow(
-        rowNumber = 4,
-        cells = Seq(
+        4,
+        Seq(
           ParsedCell(1, ""),
-          ParsedCell(7, " "),
-          ParsedCell(20, "")
+          ParsedCell(7, " ")
         )
       )
 
       val parsedFile = ParsedFile(
         fileName = "test.xlsx",
         mimeType = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+        headers = Seq("col1"),
         rows = Seq(headerRow, guidanceRow, dataRow, emptyDataRow)
       )
 
       when(fileParsingService.parse(any[UploadedFile])).thenReturn(Right(parsedFile))
 
-      val result = service.parse(uploadedFile).value
+      val result = service.parse(uploadedFile)
 
-      result shouldBe Seq(dataRow)
+      result.value.rows mustBe Seq(dataRow)
 
       verify(fileParsingService).parse(uploadedFile)
     }
 
     "keep multiple non-empty data rows from firstDataRow onwards" in {
-      val dataRow1 = ParsedRow(
-        rowNumber = 3,
-        cells = Seq(
-          ParsedCell(7, "Seller 1"),
-          ParsedCell(24, "100")
-        )
-      )
-
-      val dataRow2 = ParsedRow(
-        rowNumber = 4,
-        cells = Seq(
-          ParsedCell(7, "Seller 2"),
-          ParsedCell(24, "200")
-        )
-      )
+      val dataRow1 = ParsedRow(3, Seq(ParsedCell(7, "Seller 1")))
+      val dataRow2 = ParsedRow(4, Seq(ParsedCell(7, "Seller 2")))
 
       val parsedFile = ParsedFile(
-        fileName = "test.xlsx",
-        mimeType = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+        "test.xlsx",
+        "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+        headers = Seq("col1"),
         rows = Seq(
           ParsedRow(1, Seq(ParsedCell(1, "Header"))),
           ParsedRow(2, Seq(ParsedCell(1, "Guidance"))),
@@ -133,15 +110,16 @@ class StcUploadParsingServiceSpec extends AnyWordSpec with Matchers with EitherV
 
       when(fileParsingService.parse(any[UploadedFile])).thenReturn(Right(parsedFile))
 
-      val result = service.parse(uploadedFile).value
+      val result = service.parse(uploadedFile)
 
-      result shouldBe Seq(dataRow1, dataRow2)
+      result.value.rows mustBe Seq(dataRow1, dataRow2)
     }
 
     "return EmptyFile when there are no data rows after filtering" in {
       val parsedFile = ParsedFile(
-        fileName = "test.xlsx",
-        mimeType = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+        "test.xlsx",
+        "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+        headers = Seq("col1"),
         rows = Seq(
           ParsedRow(1, Seq(ParsedCell(1, "Header"))),
           ParsedRow(2, Seq(ParsedCell(1, "Guidance"))),
@@ -152,13 +130,14 @@ class StcUploadParsingServiceSpec extends AnyWordSpec with Matchers with EitherV
 
       when(fileParsingService.parse(any[UploadedFile])).thenReturn(Right(parsedFile))
 
-      service.parse(uploadedFile) shouldBe Left(FileParseError.EmptyFile)
+      service.parse(uploadedFile) mustBe Left(FileParseError.EmptyFile)
     }
 
     "return EmptyFile when the parsed file contains only header and guidance rows" in {
       val parsedFile = ParsedFile(
-        fileName = "test.xlsx",
-        mimeType = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+        "test.xlsx",
+        "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+        headers = Seq("col1"),
         rows = Seq(
           ParsedRow(1, Seq(ParsedCell(1, "Header"))),
           ParsedRow(2, Seq(ParsedCell(1, "Guidance")))
@@ -167,13 +146,14 @@ class StcUploadParsingServiceSpec extends AnyWordSpec with Matchers with EitherV
 
       when(fileParsingService.parse(any[UploadedFile])).thenReturn(Right(parsedFile))
 
-      service.parse(uploadedFile) shouldBe Left(FileParseError.EmptyFile)
+      service.parse(uploadedFile) mustBe Left(FileParseError.EmptyFile)
     }
 
     "propagate file parsing errors" in {
-      when(fileParsingService.parse(any[UploadedFile])).thenReturn(Left(FileParseError.InvalidXlsx("broken workbook")))
+      when(fileParsingService.parse(any[UploadedFile]))
+        .thenReturn(Left(FileParseError.InvalidXlsx("broken workbook")))
 
-      service.parse(uploadedFile) shouldBe Left(FileParseError.InvalidXlsx("broken workbook"))
+      service.parse(uploadedFile) mustBe Left(FileParseError.InvalidXlsx("broken workbook"))
     }
   }
 }

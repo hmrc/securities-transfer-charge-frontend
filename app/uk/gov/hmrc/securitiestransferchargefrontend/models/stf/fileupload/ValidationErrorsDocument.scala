@@ -14,21 +14,20 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.securitiestransferchargefrontend.viewmodels.stf.fileupload
+package uk.gov.hmrc.securitiestransferchargefrontend.models.stf.fileupload
 
-object SpreadsheetColumnLetters {
+import play.api.libs.json.{OFormat, Json}
 
-  def fromZeroBasedIndex(index: Int): String = {
-    require(index >= 0, s"Column index must be >= 0 but was $index")
+import java.time.Instant
 
-    var n = index
-    val sb = new StringBuilder
+final case class ValidationErrorsDocument(
+                                           _id: String,
+                                           errors: Seq[StcRowValidationError],
+                                           createdAt: Instant = Instant.now()
+                                         )
 
-    while (n >= 0) {
-      sb.append(('A' + (n % 26)).toChar)
-      n = n / 26 - 1
-    }
-
-    sb.reverse.toString
-  }
+object ValidationErrorsDocument {
+  implicit val format: OFormat[ValidationErrorsDocument] =
+    Json.format[ValidationErrorsDocument]
 }
+

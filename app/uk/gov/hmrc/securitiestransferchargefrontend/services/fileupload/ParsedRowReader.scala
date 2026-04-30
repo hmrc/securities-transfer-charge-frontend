@@ -17,6 +17,7 @@
 package uk.gov.hmrc.securitiestransferchargefrontend.services.fileupload
 
 import uk.gov.hmrc.securitiestransferchargefrontend.models.stf.fileupload.{ParsedRow, ParsedValue}
+import uk.gov.hmrc.securitiestransferchargefrontend.services.fileupload.StcTaxRateParser.ParsedTaxRate
 
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
@@ -46,6 +47,26 @@ object ParsedRowReader {
           case Some(value) => ParsedValue.Valid(value)
           case None        => ParsedValue.Invalid(raw, "not a number")
         }
+    }
+
+  def readTaxRate(row: ParsedRow, columnIndex: Int): ParsedValue[ParsedTaxRate] =
+    readBigDecimal(row, columnIndex) match {
+
+      case ParsedValue.Valid(value) =>
+        val normalised =
+          if (value < 0.1) value * 100  // handles Excel percentages (0.005 → 0.5)
+          else value                    // handles "0.5%" → 0.5
+
+        StcTaxRateParser.parse(normalised) match {
+          case Some(rate) => ParsedValue.Valid(rate)
+          case None       => ParsedValue.Invalid(value.toString, "unsupported tax rate")
+        }
+
+      case ParsedValue.Missing =>
+        ParsedValue.Missing
+
+      case ParsedValue.Invalid(raw, reason) =>
+        ParsedValue.Invalid(raw, reason)
     }
 
   def readBoolean(row: ParsedRow, columnIndex: Int): ParsedValue[Boolean] =

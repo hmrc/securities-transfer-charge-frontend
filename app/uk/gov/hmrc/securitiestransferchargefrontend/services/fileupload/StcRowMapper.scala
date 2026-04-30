@@ -16,34 +16,87 @@
 
 package uk.gov.hmrc.securitiestransferchargefrontend.services.fileupload
 
-import javax.inject.Singleton
 import uk.gov.hmrc.securitiestransferchargefrontend.models.stf.fileupload.{ParsedRow, ParsedStcRow}
 
+import javax.inject.Singleton
+
 @Singleton
-class StcRowMapper {
+class StcRowMapper(columnIndex: ColumnIndexBuilder) {
+
+  import SafeRowReader.*
 
   def map(row: ParsedRow): ParsedStcRow =
     ParsedStcRow(
       rowNumber = row.rowNumber,
-      sellerName = ParsedRowReader.readString(row, StcUploadColumn.sellerName),
-      sellerAddressInUk = ParsedRowReader.readBoolean(row, StcUploadColumn.sellerAddressInUK),
-      sellerAddressLine1 = ParsedRowReader.readString(row, StcUploadColumn.sellerAddressLine1),
-      sellerAddressLine2 = ParsedRowReader.readString(row, StcUploadColumn.sellerAddressLine2),
-      sellerAddressLine3 = ParsedRowReader.readString(row, StcUploadColumn.sellerAddressLine3),
-      sellerAddressLine4 = ParsedRowReader.readString(row, StcUploadColumn.sellerAddressLine4),
-      sellerPostcode = ParsedRowReader.readString(row, StcUploadColumn.sellerPostcode),
-      sellerCountry = ParsedRowReader.readString(row, StcUploadColumn.sellerCountry),
-      connectedPersons = ParsedRowReader.readBoolean(row, StcUploadColumn.connectedPersons),
-      applyingForRelief = ParsedRowReader.readBoolean(row, StcUploadColumn.applyingForRelief),
-      whatReliefAreYouApplyingFor = ParsedRowReader.readString(row, StcUploadColumn.whatReliefAreYouApplyingFor),
-      securitiesTarget = ParsedRowReader.readString(row, StcUploadColumn.securitiesTarget),
-      companyRegistrationNumber = ParsedRowReader.readString(row, StcUploadColumn.whatIsCRN),
-      chargingPoint = ParsedRowReader.readDate(row, StcUploadColumn.chargingPoint),
-      taxRate = ParsedRowReader.readBigDecimal(row, StcUploadColumn.taxRate),
-      whatTypeOfSecurities = ParsedRowReader.readString(row, StcUploadColumn.whatTypeOfSecurities),
-      typeOfShares = ParsedRowReader.readString(row, StcUploadColumn.typeOfShares),
-      securitiesQuantity = ParsedRowReader.readBigDecimal(row, StcUploadColumn.securitiesQuantity),
-      amountPaidForSecurities = ParsedRowReader.readBigDecimal(row, StcUploadColumn.amountPaidForSecurities),
-      totalMarketValue = ParsedRowReader.readBigDecimal(row, StcUploadColumn.totalMarketValue)
+
+      sellerName =
+        readString(row, columnIndex.get(StcColumns.sellerName)),
+
+      sellerAddressInUk =
+        readBoolean(row, columnIndex.get(StcColumns.sellerAddressInUk)),
+
+      sellerAddressLine1 =
+        readString(row, columnIndex.get(StcColumns.sellerAddressLine1)),
+
+      sellerAddressLine2 =
+        readString(row, columnIndex.get(StcColumns.sellerAddressLine2)),
+
+      sellerAddressLine3 =
+        readString(row, columnIndex.get(StcColumns.sellerAddressLine3)),
+
+      sellerAddressLine4 =
+        readString(row, columnIndex.get(StcColumns.sellerAddressLine4)),
+
+      sellerPostcode =
+        readString(row, columnIndex.get(StcColumns.sellerPostcode)),
+
+      sellerCountry =
+        readString(row, columnIndex.get(StcColumns.sellerCountry)),
+
+      connectedPersons =
+        readBoolean(row, columnIndex.get(StcColumns.connectedPersons)),
+
+      applyingForRelief =
+        readBoolean(row, columnIndex.get(StcColumns.applyingForRelief)),
+
+      whatReliefAreYouApplyingFor =
+        readString(row, columnIndex.get(StcColumns.whatRelief)),
+
+      securitiesTarget =
+        readString(row, columnIndex.get(StcColumns.securitiesTarget)),
+
+      companyRegistrationNumber =
+        readString(row, columnIndex.get(StcColumns.whatIsCRN)),
+
+      chargingPoint =
+        readDate(row, columnIndex.get(StcColumns.chargingPoint)),
+
+      taxRate =
+        readTaxRate(row, columnIndex.get(StcColumns.taxRate)),
+
+      whatTypeOfSecurities =
+        readString(row, columnIndex.get(StcColumns.whatTypeOfSecurities)),
+
+      typeOfShares =
+        readString(row, columnIndex.get(StcColumns.typeOfShares)),
+
+      securitiesQuantity =
+        readBigDecimal(row, columnIndex.get(StcColumns.securitiesQuantity)),
+
+      amountPaidForSecurities =
+        readBigDecimal(row, columnIndex.get(StcColumns.amountPaidForSecurities)),
+
+      totalMarketValue =
+        readBigDecimal(row, columnIndex.get(StcColumns.totalMarketValue)),
+
+      minSharePrice =
+        readBigDecimal(row, columnIndex.get(StcColumns.minSharePrice)),
+      maxSharePrice = readBigDecimal(row, columnIndex.get(StcColumns.maxSharePrice)),
+
+      sharePurchaseReason =
+        readString(row, columnIndex.get(StcColumns.purchaseReason)),
+
+      purchaseForCancellation =
+        readBoolean(row, columnIndex.get(StcColumns.purchasedForCancellation))
     )
 }

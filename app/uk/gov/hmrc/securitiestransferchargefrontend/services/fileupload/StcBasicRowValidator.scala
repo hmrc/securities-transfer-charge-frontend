@@ -19,15 +19,14 @@ package uk.gov.hmrc.securitiestransferchargefrontend.services.fileupload
 import play.api.i18n.{Lang, Messages, MessagesApi}
 import uk.gov.hmrc.securitiestransferchargefrontend.forms.stf.individuals.*
 import uk.gov.hmrc.securitiestransferchargefrontend.forms.stf.shared.NameOfSellerFormProvider
-import uk.gov.hmrc.securitiestransferchargefrontend.models.stf.fileupload.{ParsedRow, ParsedStcRow, ParsedValue, StcRowValidationError}
+import uk.gov.hmrc.securitiestransferchargefrontend.models.stf.fileupload.{ParsedStcRow, StcRowValidationError}
 
-import javax.inject.{Inject, Singleton}
+import javax.inject.Inject
 
-@Singleton
+
 class StcBasicRowValidator @Inject()(
                                       support: StcValidationSupport,
                                       messagesApi: MessagesApi,
-                                      chargingPointFormProvider: ChargingPointFormProvider,
                                       nameOfSellerFormProvider: NameOfSellerFormProvider,
                                       securitiesTargetFormProvider: SecuritiesTargetFormProvider
                                     ) {
@@ -37,96 +36,261 @@ class StcBasicRowValidator @Inject()(
 
   private val amountMaximum = BigDecimal(999999999)
 
-  def validate(rawRow: ParsedRow, parsedRow: ParsedStcRow): Seq[StcRowValidationError] =
-    validateNameOfSeller(rawRow) ++
-      validateSellerAddressInUk(parsedRow) ++
-      validateConnectedPersons(parsedRow) ++
-      validateApplyingForRelief(parsedRow) ++
-      validateSecuritiesTarget(rawRow) ++
-      validateChargingPoint(rawRow) ++
-      validateTaxRate(rawRow) ++
-      validateWhatTypeOfSecurities(rawRow) ++
-      validateSecuritiesQuantity(parsedRow) ++
-      validateAmountPaidForSecurities(rawRow, parsedRow)
+  def validate(
+                row: ParsedStcRow,
+                template: StcTemplate
+              )(implicit cols: ColumnIndexBuilder): Seq[StcRowValidationError] = {
 
-  private def validateNameOfSeller(rawRow: ParsedRow): Seq[StcRowValidationError] = {
-    val errors = support.bindSingleValue(
-      nameOfSellerFormProvider(),
-      rawRow.valueAt(StcUploadColumn.sellerName).getOrElse("")
-    )
+    template match {
 
-    errors.map { formError =>
-      val message =
-        formError.message match {
-          case "nameOfSeller.error.required" => messages("nameOfSeller.error.required")
-          case "nameOfSeller.error.length"   => messages("nameOfSeller.error.length")
-          case _                             => messages("nameOfSeller.error.required")
-        }
+      case StcTemplate.STF =>
+        validateSTF(row)
 
-      support.error(rawRow.rowNumber, "sellerName", message)
+      case StcTemplate.SH03 =>
+        validateSH03(row)
     }
   }
 
-  private def validateSellerAddressInUk(parsedRow: ParsedStcRow): Seq[StcRowValidationError] =
-    parsedRow.sellerAddressInUk match {
-      case ParsedValue.Valid(_) =>
-        Seq.empty
+  def validateSTF(row: ParsedStcRow)(implicit cols: ColumnIndexBuilder): Seq[StcRowValidationError] =
+    validateNameOfSeller(row) ++
+      validateSellerAddressInUk(row) ++
+      validateConnectedPersons(row) ++
+      validateApplyingForRelief(row) ++
+      validateSecuritiesTarget(row) ++
+      validateChargingPoint(row) ++
+      validateTaxRate(row) ++
+      validateWhatTypeOfSecurities(row) ++
+      validateSecuritiesQuantity(row) ++
+      validateAmountPaidForSecurities(row)
 
-      case ParsedValue.Missing | ParsedValue.Invalid(_, _) =>
+
+  def validateSH03(row: ParsedStcRow)(implicit cols: ColumnIndexBuilder): Seq[StcRowValidationError] =
+    validateWhatTypeOfSecurities(row) ++
+      validateSecuritiesQuantity(row) ++
+      validateAmountPaidForSecurities(row) ++
+      validateChargingPoint(row) ++
+      validateMaxSharePrice(row) ++
+      validateMinSharePrice(row) ++
+      validateSharePurchaseReason(row) ++
+      validatePurchasedForCancellation(row)
+
+
+  private def validateNameOfSeller(row: ParsedStcRow)(implicit cols: ColumnIndexBuilder): Seq[StcRowValidationError] = {
+
+    val errors = support.bindSingleValue(
+      nameOfSellerFormProvider(),
+      row.sellerName.getOrElse("")
+    )
+
+    errors.map { e =>
+      support.error(row.rowNumber, "sellerName", messages(e.message))
+    }
+  }
+
+  private def validateTaxRate(
+                               row: ParsedStcRow
+                             )(implicit cols: ColumnIndexBuilder): Seq[StcRowValidationError] = {
+
+    row.taxRate match {
+
+      case None =>
         Seq(
           support.error(
-            parsedRow.rowNumber,
+            row.rowNumber,
+            "taxRate",
+            messages("fileUpload.error.taxRate.invalid")
+          )
+        )
+
+      case Some(_) =>
+        Seq.empty
+    }
+  }
+
+  private def validateChargingPoint(
+                                     row: ParsedStcRow
+                                   )(implicit cols: ColumnIndexBuilder): Seq[StcRowValidationError] = {
+
+    row.chargingPoint match {
+
+      case None =>
+        Seq(
+          support.error(
+            row.rowNumber,
+            "chargingPoint",
+            messages("chargingPoint.error.required.all")
+          )
+        )
+
+      case Some(_) =>
+        Seq.empty
+    }
+  }
+
+  private def validateWhatTypeOfSecurities(row: ParsedStcRow)(implicit cols: ColumnIndexBuilder): Seq[StcRowValidationError] =
+    row.whatTypeOfSecurities.map(_.trim) match {
+
+      case None | Some("") =>
+        Seq(
+          support.error(
+            row.rowNumber,
+            "whatTypeOfSecurities",
+            messages("fileUpload.error.whatTypeOfSecurities.required")
+          )
+        )
+
+      case _ => Seq.empty
+    }
+
+  private def validateSecuritiesQuantity(
+                                          row: ParsedStcRow
+                                        )(implicit cols: ColumnIndexBuilder): Seq[StcRowValidationError] = {
+
+    row.securitiesQuantity match {
+
+      case None =>
+        Seq(
+          support.error(
+            row.rowNumber,
+            "securitiesQuantity",
+            messages("fileUpload.error.securitiesQuantity.required")
+          )
+        )
+
+      case Some(value) if value < support.securitiesQuantityMin =>
+        Seq(
+          support.error(
+            row.rowNumber,
+            "securitiesQuantity",
+            messages("fileUpload.error.securitiesQuantity.minimum")
+          )
+        )
+
+      case Some(value) if value >= support.securitiesQuantityMax =>
+        Seq(
+          support.error(
+            row.rowNumber,
+            "securitiesQuantity",
+            messages("fileUpload.error.securitiesQuantity.maximum")
+          )
+        )
+
+      case _ =>
+        Seq.empty
+    }
+  }
+
+  private def validateAmountPaidForSecurities(
+                                               row: ParsedStcRow
+                                             )(implicit cols: ColumnIndexBuilder): Seq[StcRowValidationError] = {
+
+    row.amountPaidForSecurities match {
+
+      case None =>
+        Seq(
+          support.error(
+            row.rowNumber,
+            "amountPaidForSecurities",
+            messages("amountPaidForSecurities.error.required")
+          )
+        )
+
+      case Some(v) if v > amountMaximum =>
+        Seq(
+          support.error(
+            row.rowNumber,
+            "amountPaidForSecurities",
+            messages("fileUpload.error.amountPaidForSecurities.maximum")
+          )
+        )
+
+      case _ =>
+        Seq.empty
+    }
+  }
+
+  private def validateSellerAddressInUk(
+                                         row: ParsedStcRow
+                                       )(implicit cols: ColumnIndexBuilder): Seq[StcRowValidationError] = {
+
+    row.sellerAddressInUk match {
+
+      case Some(_) =>
+        Seq.empty
+
+      case None =>
+        Seq(
+          support.error(
+            row.rowNumber,
             "sellerAddressInUk",
             messages("fileUpload.error.sellerAddressInUk.invalid")
           )
         )
     }
+  }
 
-  private def validateConnectedPersons(parsedRow: ParsedStcRow): Seq[StcRowValidationError] =
-    parsedRow.connectedPersons match {
-      case ParsedValue.Valid(_) =>
+  private def validateConnectedPersons(
+                                        row: ParsedStcRow
+                                      )(implicit cols: ColumnIndexBuilder): Seq[StcRowValidationError] = {
+
+    row.connectedPersons match {
+
+      case Some(_) =>
         Seq.empty
 
-      case ParsedValue.Missing | ParsedValue.Invalid(_, _) =>
+      case None =>
         Seq(
           support.error(
-            parsedRow.rowNumber,
+            row.rowNumber,
             "connectedPersons",
             messages("fileUpload.error.connectedPersons.invalid")
           )
         )
     }
+  }
 
-  private def validateApplyingForRelief(parsedRow: ParsedStcRow): Seq[StcRowValidationError] =
-    parsedRow.applyingForRelief match {
-      case ParsedValue.Valid(_) =>
+  private def validateApplyingForRelief(
+                                         row: ParsedStcRow
+                                       )(implicit cols: ColumnIndexBuilder): Seq[StcRowValidationError] = {
+
+    row.applyingForRelief match {
+
+      case Some(_) =>
         Seq.empty
 
-      case ParsedValue.Missing | ParsedValue.Invalid(_, _) =>
+      case None =>
         Seq(
           support.error(
-            parsedRow.rowNumber,
+            row.rowNumber,
             "applyingForRelief",
             messages("fileUpload.error.applyingForRelief.invalid")
           )
         )
     }
+  }
 
-  private def validateSecuritiesTarget(rawRow: ParsedRow): Seq[StcRowValidationError] = {
+  private def validateSecuritiesTarget(
+                                        row: ParsedStcRow
+                                      )(implicit cols: ColumnIndexBuilder): Seq[StcRowValidationError] = {
+
     val boundForm = securitiesTargetFormProvider().bind(
       Map(
-        "businessName" -> rawRow.valueAt(StcUploadColumn.securitiesTarget).getOrElse(""),
-        "crn"          -> rawRow.valueAt(StcUploadColumn.whatIsCRN).getOrElse("")
+        "businessName" -> row.securitiesTarget.getOrElse(""),
+        "crn" -> row.companyRegistrationNumber.getOrElse("")
       )
     )
 
     boundForm.errors.map { formError =>
+
       val fieldName =
-        if (formError.key.contains("crn")) "companyRegistrationNumber"
-        else "securitiesTarget"
+        if (formError.key.contains("crn"))
+          "companyRegistrationNumber"
+        else
+          "securitiesTarget"
 
       val message =
         formError.message match {
+
           case "securitiesTarget.error.businessName.required" =>
             messages("securitiesTarget.error.businessName.required")
 
@@ -143,194 +307,114 @@ class StcBasicRowValidator @Inject()(
             messages("securitiesTarget.error.businessName.required")
         }
 
-      support.error(rawRow.rowNumber, fieldName, message)
+      support.error(row.rowNumber, fieldName, message)
     }
   }
 
-  private def validateChargingPoint(rawRow: ParsedRow): Seq[StcRowValidationError] = {
-    val raw = rawRow.valueAt(StcUploadColumn.chargingPoint).getOrElse("").trim
+  private def validateMaxSharePrice(
+                                     row: ParsedStcRow
+                                   )(implicit cols: ColumnIndexBuilder): Seq[StcRowValidationError] = {
 
-    val containsForbiddenChars =
-      raw.nonEmpty && !raw.matches("""^[A-Za-z0-9/\-\s]+$""")
+    row.maxSharePrice match {
 
-    if (containsForbiddenChars) {
-      Seq(
-        support.error(
-          rawRow.rowNumber,
-          "chargingPoint",
-          messages("fileUpload.error.chargingPoint.invalidCharacters")
+      case None =>
+        Seq(
+          support.error(
+            row.rowNumber,
+            "maxSharePrice",
+            messages("maxSharePrice.error.required")
+          )
         )
-      )
-    } else {
-      val parts = raw.split("""[/\-\s]""").toList.filter(_.nonEmpty)
 
-      val dateMap =
-        parts match {
-          case year :: month :: day :: Nil if year.length == 4 =>
-            Map(
-              "value.day"   -> day,
-              "value.month" -> month,
-              "value.year"  -> year
+      case Some(v) if v > amountMaximum =>
+        Seq(
+          support.error(
+            row.rowNumber,
+            "maxSharePrice",
+            messages("maxSharePrice.error.maximum")
+          )
+        )
+
+      case _ =>
+        Seq.empty
+    }
+  }
+
+  private def validateMinSharePrice(
+                                     row: ParsedStcRow
+                                   )(implicit cols: ColumnIndexBuilder): Seq[StcRowValidationError] = {
+
+    row.maxSharePrice match {
+
+      case None =>
+        Seq(
+          support.error(
+            row.rowNumber,
+            "minSharePrice",
+            messages("minSharePrice.error.required")
+          )
+        )
+
+      case Some(v) if v > amountMaximum =>
+        Seq(
+          support.error(
+            row.rowNumber,
+            "minSharePrice",
+            messages("minSharePrice.error.maximum")
+          )
+        )
+
+      case _ =>
+        Seq.empty
+    }
+  }
+
+  private def validateSharePurchaseReason(
+                                           row: ParsedStcRow
+                                         )(implicit cols: ColumnIndexBuilder): Seq[StcRowValidationError] = {
+
+    row.sharePurchaseReason match {
+
+      case None =>
+        Seq(
+          support.error(
+            row.rowNumber,
+            "sharePurchaseReason",
+            messages("sharePurchaseReason.required")
+          )
+        )
+      case Some(value) => value.trim.toLowerCase match {
+        case "cancellation" | "treasury" =>
+          Seq.empty
+        case _ =>
+          Seq(
+            support.error(
+              row.rowNumber,
+              "sharePurchaseReason",
+              messages("sharePurchaseReason.invalid")
             )
-
-          case day :: month :: year :: Nil =>
-            Map(
-              "value.day"   -> day,
-              "value.month" -> month,
-              "value.year"  -> year
-            )
-
-          case _ =>
-            Map(
-              "value.day"   -> "",
-              "value.month" -> "",
-              "value.year"  -> ""
-            )
-        }
-
-      val boundForm = chargingPointFormProvider().bind(dateMap)
-
-      boundForm.errors.map { formError =>
-        val message =
-          formError.message match {
-            case "chargingPoint.error.required.all" =>
-              messages("chargingPoint.error.required.all")
-
-            case "chargingPoint.error.futureDate" =>
-              messages("chargingPoint.error.futureDate")
-
-            case "chargingPoint.error.invalid" =>
-              messages("chargingPoint.error.invalid")
-
-            case "chargingPoint.error.required" =>
-              messages("chargingPoint.error.required", formError.args: _*)
-
-            case "chargingPoint.error.required.two" =>
-              messages("chargingPoint.error.required.two", formError.args: _*)
-
-            case _ =>
-              messages("chargingPoint.error.invalid")
-          }
-
-        support.error(rawRow.rowNumber, "chargingPoint", message)
+          )
       }
     }
   }
 
-  private def validateTaxRate(rawRow: ParsedRow): Seq[StcRowValidationError] =
-    rawRow.valueAt(StcUploadColumn.taxRate).map(_.trim) match {
-      case None | Some("") =>
-        Seq(
-          support.error(
-            rawRow.rowNumber,
-            "taxRate",
-            messages("fileUpload.error.taxRate.invalid")
-          )
-        )
+  private def validatePurchasedForCancellation(
+                                                row: ParsedStcRow
+                                              )(implicit cols: ColumnIndexBuilder): Seq[StcRowValidationError] = {
 
-      case Some(rawValue) if StcTaxRateParser.parse(rawValue).isEmpty =>
-        Seq(
-          support.error(
-            rawRow.rowNumber,
-            "taxRate",
-            messages("fileUpload.error.taxRate.invalid")
-          )
-        )
+    row.purchaseForCancellation match {
 
-      case _ =>
+      case Some(_) =>
         Seq.empty
+
+      case None =>
+        Seq(
+          support.error(
+            row.rowNumber,
+            "purchasedForCancellation",
+            messages("purchasedForCancellation.invalid")
+          )
+        )
     }
-
-  private def validateWhatTypeOfSecurities(rawRow: ParsedRow): Seq[StcRowValidationError] =
-    rawRow.valueAt(StcUploadColumn.whatTypeOfSecurities).map(_.trim) match {
-      case None | Some("") =>
-        Seq(
-          support.error(
-            rawRow.rowNumber,
-            "whatTypeOfSecurities",
-            messages("fileUpload.error.whatTypeOfSecurities.required")
-          )
-        )
-
-      case _ =>
-        Seq.empty
-    }
-
-  private def validateSecuritiesQuantity(parsedRow: ParsedStcRow): Seq[StcRowValidationError] =
-    parsedRow.securitiesQuantity match {
-      case ParsedValue.Missing =>
-        Seq(
-          support.error(
-            parsedRow.rowNumber,
-            "securitiesQuantity",
-            messages("fileUpload.error.securitiesQuantity.required")
-          )
-        )
-
-      case ParsedValue.Invalid(_, _) =>
-        Seq(
-          support.error(
-            parsedRow.rowNumber,
-            "securitiesQuantity",
-            messages("fileUpload.error.securitiesQuantity.nonNumeric")
-          )
-        )
-
-      case ParsedValue.Valid(value) if value < support.securitiesQuantityMin =>
-        Seq(
-          support.error(
-            parsedRow.rowNumber,
-            "securitiesQuantity",
-            messages("fileUpload.error.securitiesQuantity.minimum")
-          )
-        )
-
-      case ParsedValue.Valid(value) if value >= support.securitiesQuantityMax =>
-        Seq(
-          support.error(
-            parsedRow.rowNumber,
-            "securitiesQuantity",
-            messages("fileUpload.error.securitiesQuantity.maximum")
-          )
-        )
-
-      case _ =>
-        Seq.empty
-    }
-
-  private def validateAmountPaidForSecurities(
-                                               rawRow: ParsedRow,
-                                               parsedRow: ParsedStcRow
-                                             ): Seq[StcRowValidationError] =
-    parsedRow.amountPaidForSecurities match {
-      case ParsedValue.Missing =>
-        Seq(
-          support.error(
-            rawRow.rowNumber,
-            "amountPaidForSecurities",
-            messages("amountPaidForSecurities.error.required")
-          )
-        )
-
-      case ParsedValue.Invalid(_, _) =>
-        Seq(
-          support.error(
-            rawRow.rowNumber,
-            "amountPaidForSecurities",
-            messages("fileUpload.error.amountPaidForSecurities.nonNumeric")
-          )
-        )
-
-      case ParsedValue.Valid(value) if value > amountMaximum =>
-        Seq(
-          support.error(
-            rawRow.rowNumber,
-            "amountPaidForSecurities",
-            messages("fileUpload.error.amountPaidForSecurities.maximum")
-          )
-        )
-
-      case _ =>
-        Seq.empty
-    }
+  }
 }

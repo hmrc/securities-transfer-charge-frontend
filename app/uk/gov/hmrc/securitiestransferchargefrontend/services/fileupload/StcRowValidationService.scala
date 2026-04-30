@@ -16,25 +16,53 @@
 
 package uk.gov.hmrc.securitiestransferchargefrontend.services.fileupload
 
-import uk.gov.hmrc.securitiestransferchargefrontend.models.stf.fileupload.{ParsedRow, ValidatedStcRow}
+import uk.gov.hmrc.securitiestransferchargefrontend.models.stf.fileupload.{ParsedRow, ParsedStcRow, ValidatedStcRow}
 
 import javax.inject.{Inject, Singleton}
 
 @Singleton
 class StcRowValidationService @Inject()(
-                                         stcRowMapper: StcRowMapper,
                                          stcBasicRowValidator: StcBasicRowValidator,
                                          stcConditionalRowValidator: StcConditionalRowValidator
                                        ) {
 
-  def validate(rawRow: ParsedRow): ValidatedStcRow = {
-    val parsedRow = stcRowMapper.map(rawRow)
+  def validateAll(
+                   rows: Seq[ParsedRow],
+                   headers: Seq[String]
+                 ): Seq[ValidatedStcRow] = {
 
-    ValidatedStcRow(
-      parsedRow = parsedRow,
-      validationErrors =
-        stcBasicRowValidator.validate(rawRow, parsedRow) ++
-          stcConditionalRowValidator.validate(rawRow, parsedRow)
-    )
+    implicit val columnIndex: ColumnIndexBuilder = new ColumnIndexBuilder(headers)
+    val mapper = new StcRowMapper(columnIndex)
+
+    val parsedRows: Seq[ParsedStcRow] =
+      rows.map(mapper.map)
+
+    val template = detectTemplate(headers)
+
+    parsedRows.map { parsedRow =>
+
+      ValidatedStcRow(
+        parsedRow = parsedRow,
+        validationErrors =
+          stcBasicRowValidator.validate(parsedRow, template) ++
+            stcConditionalRowValidator.validate(parsedRow)
+      )
+    }
+  }
+
+
+  private def detectTemplate(headers: Seq[String]): StcTemplate = {
+
+    val normalised = headers.map(_.trim.toLowerCase).toSet
+
+    val templates = Seq(StcTemplate.SH03, StcTemplate.STF)
+
+    templates.find { template =>
+      template.identifyingFields
+        .map(_.toLowerCase)
+        .subsetOf(normalised)
+    }.getOrElse {
+      throw new IllegalArgumentException("Unable to determine file template")
+    }
   }
 }

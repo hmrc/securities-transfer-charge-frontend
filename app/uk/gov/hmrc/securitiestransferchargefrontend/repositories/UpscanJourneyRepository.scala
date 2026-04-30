@@ -69,7 +69,7 @@ class UpscanJourneyRepositoryImpl @Inject()(
 
   implicit val instantFormat: Format[Instant] = MongoJavatimeFormats.instantFormat
   
-  def byReference(reference:String): Bson = Filters.equal("_id",reference)
+  private def byReference(reference:String): Bson = Filters.equal("_id",reference)
 
   override def insert(journey: UpscanDocument): Future[Unit] =
     collection.replaceOne(

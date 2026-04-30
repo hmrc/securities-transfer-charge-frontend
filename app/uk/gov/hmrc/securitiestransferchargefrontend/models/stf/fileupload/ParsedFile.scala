@@ -19,5 +19,6 @@ package uk.gov.hmrc.securitiestransferchargefrontend.models.stf.fileupload
 final case class ParsedFile(
                              fileName: String,
                              mimeType: String,
+                             headers: Seq[String],
                              rows: Seq[ParsedRow]
                            )

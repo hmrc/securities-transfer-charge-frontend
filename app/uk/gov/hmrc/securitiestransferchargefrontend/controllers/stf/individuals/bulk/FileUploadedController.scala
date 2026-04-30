@@ -24,7 +24,7 @@ import uk.gov.hmrc.securitiestransferchargefrontend.controllers.actions.{StcAuth
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.routes
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.individuals.bulk.routes as individualRoutes
 import uk.gov.hmrc.securitiestransferchargefrontend.models.stf.upscan.{FileUpload, UpscanJourneyStatus}
-import uk.gov.hmrc.securitiestransferchargefrontend.repositories.UpscanJourneyRepository
+import uk.gov.hmrc.securitiestransferchargefrontend.repositories.{UpscanJourneyRepository, ValidationErrorRepository}
 import uk.gov.hmrc.securitiestransferchargefrontend.services.fileupload.StcUpscanProcessingService
 import uk.gov.hmrc.securitiestransferchargefrontend.views.html.stf.individuals.bulk.FileUploadedView
 import uk.gov.hmrc.securitiestransferchargefrontend.models.stf.fileupload.FileParseError
@@ -38,6 +38,7 @@ class FileUploadedController @Inject()(
                                         stcAuthEnrolled: StcAuthEnrolledAction,
                                         stcUpscanProcessingService: StcUpscanProcessingService,
                                         subscriptionConnector: SubscriptionConnector,
+                                        validationErrorRepository: ValidationErrorRepository,
                                         view: FileUploadedView
                                       )(implicit ec: ExecutionContext)
   extends FrontendBaseController with I18nSupport {
@@ -69,9 +70,14 @@ class FileUploadedController @Inject()(
         )
 
       case Right(validationResponse) if validationResponse.hasBlockingErrors =>
-        Future.successful(
-          Redirect(individualRoutes.UploadedFileErrorController.onPageLoad(reference))
-        )
+        validationErrorRepository
+          .save(reference, validationResponse.blockingErrors)
+          .map { _ =>
+            Redirect(
+              individualRoutes.UploadedFileErrorController.onPageLoad(reference)
+            )
+          }
+
 
       case Right(_) =>
         subscriptionConnector.getAndStoreSubscription(request.subscriptionId)

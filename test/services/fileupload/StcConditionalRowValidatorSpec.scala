@@ -21,31 +21,72 @@ import org.scalatest.wordspec.AnyWordSpec
 import play.api.i18n.MessagesApi
 import play.api.test.Helpers.stubMessagesApi
 import uk.gov.hmrc.securitiestransferchargefrontend.models.stf.fileupload._
-import uk.gov.hmrc.securitiestransferchargefrontend.services.fileupload.StcUploadColumn
-import uk.gov.hmrc.securitiestransferchargefrontend.services.fileupload.StcConditionalRowValidator
-import uk.gov.hmrc.securitiestransferchargefrontend.services.fileupload.StcValidationSupport
+import uk.gov.hmrc.securitiestransferchargefrontend.services.fileupload._
 
 import java.time.LocalDate
 
 class StcConditionalRowValidatorSpec extends AnyWordSpec with Matchers {
 
+  private implicit val cols: ColumnIndexBuilder = new ColumnIndexBuilder(Seq.empty)
+
+  private val validParsedRow: ParsedStcRow =
+    ParsedStcRow(
+      rowNumber = 3,
+      sellerName = Some("Seller Ltd"),
+      sellerAddressInUk = Some(true),
+      sellerAddressLine1 = Some("1 Seller Street"),
+      sellerAddressLine2 = None,
+      sellerAddressLine3 = None,
+      sellerAddressLine4 = None,
+      sellerPostcode = Some("AA1 1AA"),
+      sellerCountry = None,
+      connectedPersons = Some(false),
+      applyingForRelief = Some(false),
+      whatReliefAreYouApplyingFor = None,
+      securitiesTarget = Some("Target Ltd"),
+      companyRegistrationNumber = Some("12345678"),
+      chargingPoint = Some(LocalDate.of(2025, 11, 20)),
+      taxRate = Some(BigDecimal("0.5")),
+      whatTypeOfSecurities = Some("shares"),
+      typeOfShares = Some("Ordinary Shares"),
+      securitiesQuantity = Some(BigDecimal(100)),
+      amountPaidForSecurities = Some(BigDecimal(1000)),
+      totalMarketValue = None,
+      minSharePrice = None,
+      maxSharePrice = None,
+      sharePurchaseReason = None,
+      purchaseForCancellation = None
+    )
+
   private val messagesApi: MessagesApi = stubMessagesApi(
     Map(
       "en" -> Map(
-        "fileUpload.error.whatReliefAreYouApplyingFor.invalid" -> "Enter the name of the relief you are applying for. See a full list of reliefs (opens in new tab).",
-        "fileUpload.error.typeOfShares.required" -> "If you are buying shares, enter the type of shares",
-        "fileUpload.error.sellerAddressLine1.required" -> "Enter the first line of your address",
-        "fileUpload.error.sellerAddressLine1.length" -> "Address line 1 must be 50 characters or fewer",
-        "fileUpload.error.sellerAddressLine1.invalidCharacters" -> "Address line 1 can only include letters, numbers and the following characters: , . - '",
-        "fileUpload.error.sellerAddressLine2.length" -> "Address line 2 must be fewer than 50 characters long",
-        "fileUpload.error.sellerAddressLine2.invalidCharacters" -> "Address line 2 can only include letters, numbers and the following characters: , . - '",
-        "fileUpload.error.sellerPostcode.required" -> "Enter a postcode",
-        "fileUpload.error.sellerPostcode.invalid" -> "Enter a real postcode, like AA1 1AA",
-        "fileUpload.error.sellerCountry.length" -> "Country must be 50 characters or fewer",
-        "fileUpload.error.sellerCountry.invalidCharacters" -> "Country can only include letters, numbers and the following characters: , . - '",
-        "totalMarketValue.error.required" -> "Enter the total market value of the securities",
-        "fileUpload.error.totalMarketValue.nonNumeric" -> "The market value of the securities must be a number",
-        "fileUpload.error.totalMarketValue.maximum" -> "The market value of the securities must be £999,999,999 or below"
+        "fileUpload.error.whatReliefAreYouApplyingFor.invalid" ->
+          "Enter the name of the relief you are applying for. See a full list of reliefs (opens in new tab).",
+        "fileUpload.error.typeOfShares.required" ->
+          "If you are buying shares, enter the type of shares",
+        "fileUpload.error.sellerAddressLine1.required" ->
+          "Enter the first line of your address",
+        "fileUpload.error.sellerAddressLine1.length" ->
+          "Address line 1 must be 50 characters or fewer",
+        "fileUpload.error.sellerAddressLine1.invalidCharacters" ->
+          "Address line 1 can only include letters, numbers and the following characters: , . - '",
+        "fileUpload.error.sellerAddressLine2.length" ->
+          "Address line 2 must be fewer than 50 characters long",
+        "fileUpload.error.sellerAddressLine2.invalidCharacters" ->
+          "Address line 2 can only include letters, numbers and the following characters: , . - '",
+        "fileUpload.error.sellerPostcode.required" ->
+          "Enter a postcode",
+        "fileUpload.error.sellerPostcode.invalid" ->
+          "Enter a real postcode, like AA1 1AA",
+        "fileUpload.error.sellerCountry.length" ->
+          "Country must be 50 characters or fewer",
+        "fileUpload.error.sellerCountry.invalidCharacters" ->
+          "Country can only include letters, numbers and the following characters: , . - '",
+        "totalMarketValue.error.required" ->
+          "Enter the total market value of the securities",
+        "fileUpload.error.totalMarketValue.maximum" ->
+          "The market value of the securities must be £999,999,999 or below"
       )
     )
   )
@@ -59,17 +100,15 @@ class StcConditionalRowValidatorSpec extends AnyWordSpec with Matchers {
   "StcConditionalRowValidator.validate" must {
 
     "return no errors for a valid conditional row" in {
-      val result = validator.validate(validRawRow, validParsedRow)
-
+      val result = validator.validate(validParsedRow)
       result mustBe Seq.empty
     }
 
     "require relief type when applying for relief is yes" in {
       val result = validator.validate(
-        rawRow(StcUploadColumn.whatReliefAreYouApplyingFor -> ""),
         validParsedRow.copy(
-          applyingForRelief = ParsedValue.Valid(true),
-          whatReliefAreYouApplyingFor = ParsedValue.Missing
+          applyingForRelief = Some(true),
+          whatReliefAreYouApplyingFor = None
         )
       )
 
@@ -78,10 +117,9 @@ class StcConditionalRowValidatorSpec extends AnyWordSpec with Matchers {
 
     "reject invalid relief name when applying for relief is yes" in {
       val result = validator.validate(
-        rawRow(StcUploadColumn.whatReliefAreYouApplyingFor -> "Made Up Relief"),
         validParsedRow.copy(
-          applyingForRelief = ParsedValue.Valid(true),
-          whatReliefAreYouApplyingFor = ParsedValue.Valid("Made Up Relief")
+          applyingForRelief = Some(true),
+          whatReliefAreYouApplyingFor = Some("Made Up Relief")
         )
       )
 
@@ -90,10 +128,9 @@ class StcConditionalRowValidatorSpec extends AnyWordSpec with Matchers {
 
     "require type of shares when what type of securities is shares" in {
       val result = validator.validate(
-        rawRow(StcUploadColumn.typeOfShares -> ""),
         validParsedRow.copy(
-          whatTypeOfSecurities = ParsedValue.Valid("shares"),
-          typeOfShares = ParsedValue.Missing
+          whatTypeOfSecurities = Some("shares"),
+          typeOfShares = None
         )
       )
 
@@ -102,23 +139,20 @@ class StcConditionalRowValidatorSpec extends AnyWordSpec with Matchers {
 
     "not require type of shares when security type is not shares" in {
       val result = validator.validate(
-        rawRow(StcUploadColumn.typeOfShares -> ""),
         validParsedRow.copy(
-          whatTypeOfSecurities = ParsedValue.Valid("Loan notes or other debt securities"),
-          typeOfShares = ParsedValue.Missing
+          whatTypeOfSecurities = Some("Loan notes"),
+          typeOfShares = None
         )
       )
 
       result.map(_.fieldName) must not contain "typeOfShares"
     }
 
-    "validate UK seller address line 1" in {
+    "validate UK seller address line 1 required" in {
       val result = validator.validate(
-        rawRow(StcUploadColumn.sellerAddressLine1 -> "", StcUploadColumn.sellerPostcode -> "AA1 1AA"),
         validParsedRow.copy(
-          sellerAddressInUk = ParsedValue.Valid(true),
-          sellerAddressLine1 = ParsedValue.Missing,
-          sellerPostcode = ParsedValue.Valid("AA1 1AA")
+          sellerAddressInUk = Some(true),
+          sellerAddressLine1 = None
         )
       )
 
@@ -127,11 +161,9 @@ class StcConditionalRowValidatorSpec extends AnyWordSpec with Matchers {
 
     "validate UK seller address line 1 invalid characters" in {
       val result = validator.validate(
-        rawRow(StcUploadColumn.sellerAddressLine1 -> "Address @@@", StcUploadColumn.sellerPostcode -> "AA1 1AA"),
         validParsedRow.copy(
-          sellerAddressInUk = ParsedValue.Valid(true),
-          sellerAddressLine1 = ParsedValue.Valid("Address @@@"),
-          sellerPostcode = ParsedValue.Valid("AA1 1AA")
+          sellerAddressInUk = Some(true),
+          sellerAddressLine1 = Some("Address @@@")
         )
       )
 
@@ -140,11 +172,9 @@ class StcConditionalRowValidatorSpec extends AnyWordSpec with Matchers {
 
     "validate UK seller postcode required" in {
       val result = validator.validate(
-        rawRow(StcUploadColumn.sellerAddressLine1 -> "1 Seller Street", StcUploadColumn.sellerPostcode -> ""),
         validParsedRow.copy(
-          sellerAddressInUk = ParsedValue.Valid(true),
-          sellerAddressLine1 = ParsedValue.Valid("1 Seller Street"),
-          sellerPostcode = ParsedValue.Missing
+          sellerAddressInUk = Some(true),
+          sellerPostcode = None
         )
       )
 
@@ -153,11 +183,9 @@ class StcConditionalRowValidatorSpec extends AnyWordSpec with Matchers {
 
     "validate UK seller postcode invalid" in {
       val result = validator.validate(
-        rawRow(StcUploadColumn.sellerAddressLine1 -> "1 Seller Street", StcUploadColumn.sellerPostcode -> "not a postcode"),
         validParsedRow.copy(
-          sellerAddressInUk = ParsedValue.Valid(true),
-          sellerAddressLine1 = ParsedValue.Valid("1 Seller Street"),
-          sellerPostcode = ParsedValue.Valid("not a postcode")
+          sellerAddressInUk = Some(true),
+          sellerPostcode = Some("not a postcode")
         )
       )
 
@@ -168,10 +196,9 @@ class StcConditionalRowValidatorSpec extends AnyWordSpec with Matchers {
       val longCountry = "a" * 51
 
       val result = validator.validate(
-        rawRow(StcUploadColumn.sellerCountry -> longCountry),
         validParsedRow.copy(
-          sellerAddressInUk = ParsedValue.Valid(false),
-          sellerCountry = ParsedValue.Valid(longCountry)
+          sellerAddressInUk = Some(false),
+          sellerCountry = Some(longCountry)
         )
       )
 
@@ -180,22 +207,9 @@ class StcConditionalRowValidatorSpec extends AnyWordSpec with Matchers {
 
     "require total market value when connected persons is yes" in {
       val result = validator.validate(
-        rawRow(),
         validParsedRow.copy(
-          connectedPersons = ParsedValue.Valid(true),
-          totalMarketValue = ParsedValue.Missing
-        )
-      )
-
-      result.exists(_.fieldName == "totalMarketValue") mustBe true
-    }
-
-    "reject non-numeric total market value when connected persons is yes" in {
-      val result = validator.validate(
-        rawRow(),
-        validParsedRow.copy(
-          connectedPersons = ParsedValue.Valid(true),
-          totalMarketValue = ParsedValue.Invalid("abc", "not a number")
+          connectedPersons = Some(true),
+          totalMarketValue = None
         )
       )
 
@@ -204,52 +218,14 @@ class StcConditionalRowValidatorSpec extends AnyWordSpec with Matchers {
 
     "reject too large total market value when connected persons is yes" in {
       val result = validator.validate(
-        rawRow(),
         validParsedRow.copy(
-          connectedPersons = ParsedValue.Valid(true),
-          totalMarketValue = ParsedValue.Valid(BigDecimal(1000000000))
+          connectedPersons = Some(true),
+          totalMarketValue = Some(BigDecimal(1000000000))
         )
       )
 
       result.exists(_.fieldName == "totalMarketValue") mustBe true
     }
   }
-
-  private def rawRow(values: (Int, String)*): ParsedRow =
-    ParsedRow(
-      rowNumber = 3,
-      cells = values.map { case (index, value) => ParsedCell(index, value) }
-    )
-
-  private val validRawRow: ParsedRow =
-    rawRow(
-      StcUploadColumn.sellerAddressLine1 -> "1 Seller Street",
-      StcUploadColumn.sellerPostcode -> "AA1 1AA",
-      StcUploadColumn.typeOfShares -> "Ordinary Shares"
-    )
-
-  private val validParsedRow: ParsedStcRow =
-    ParsedStcRow(
-      rowNumber = 3,
-      sellerName = ParsedValue.Valid("Seller Ltd"),
-      sellerAddressInUk = ParsedValue.Valid(true),
-      sellerAddressLine1 = ParsedValue.Valid("1 Seller Street"),
-      sellerAddressLine2 = ParsedValue.Missing,
-      sellerAddressLine3 = ParsedValue.Missing,
-      sellerAddressLine4 = ParsedValue.Missing,
-      sellerPostcode = ParsedValue.Valid("AA1 1AA"),
-      sellerCountry = ParsedValue.Missing,
-      connectedPersons = ParsedValue.Valid(false),
-      applyingForRelief = ParsedValue.Valid(false),
-      whatReliefAreYouApplyingFor = ParsedValue.Missing,
-      securitiesTarget = ParsedValue.Valid("Target Ltd"),
-      companyRegistrationNumber = ParsedValue.Valid("12345678"),
-      chargingPoint = ParsedValue.Valid(LocalDate.of(2025, 11, 20)),
-      taxRate = ParsedValue.Valid(BigDecimal("0.5")),
-      whatTypeOfSecurities = ParsedValue.Valid("shares"),
-      typeOfShares = ParsedValue.Valid("Ordinary Shares"),
-      securitiesQuantity = ParsedValue.Valid(BigDecimal(100)),
-      amountPaidForSecurities = ParsedValue.Valid(BigDecimal("1000")),
-      totalMarketValue = ParsedValue.Missing
-    )
+  
 }

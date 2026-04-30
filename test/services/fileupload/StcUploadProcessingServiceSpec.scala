@@ -21,7 +21,7 @@ import org.scalatest.matchers.must.Matchers
 import org.scalatest.wordspec.AnyWordSpec
 import org.scalatestplus.mockito.MockitoSugar
 import uk.gov.hmrc.securitiestransferchargefrontend.models.stf.fileupload.*
-import uk.gov.hmrc.securitiestransferchargefrontend.services.fileupload.{StcFileValidationService, StcUploadColumn, StcUploadParsingService, StcUploadProcessingService}
+import uk.gov.hmrc.securitiestransferchargefrontend.services.fileupload.{StcFileValidationService, StcUploadParsingService, StcUploadProcessingService}
 
 import java.io.ByteArrayInputStream
 
@@ -42,11 +42,20 @@ class StcUploadProcessingServiceSpec extends AnyWordSpec with Matchers with Mock
     inputStream = new ByteArrayInputStream("data".getBytes)
   )
 
+  private val headers = Seq("nameOfSeller")
+
   private val parsedRow = ParsedRow(
     rowNumber = 3,
     cells = Seq(
-      ParsedCell(StcUploadColumn.sellerName, "Seller Ltd")
+      ParsedCell(1, "Seller Ltd")
     )
+  )
+
+  private val parsedFile = ParsedFile(
+    fileName = "test.csv",
+    mimeType = "text/csv",
+    headers = headers,
+    rows = Seq(parsedRow)
   )
 
   private val validationResponse = StcFileValidationResponse(
@@ -54,26 +63,30 @@ class StcUploadProcessingServiceSpec extends AnyWordSpec with Matchers with Mock
       ValidatedStcRow(
         parsedRow = ParsedStcRow(
           rowNumber = 3,
-          sellerName = ParsedValue.Valid("Seller Ltd"),
-          sellerAddressInUk = ParsedValue.Missing,
-          sellerAddressLine1 = ParsedValue.Missing,
-          sellerAddressLine2 = ParsedValue.Missing,
-          sellerAddressLine3 = ParsedValue.Missing,
-          sellerAddressLine4 = ParsedValue.Missing,
-          sellerPostcode = ParsedValue.Missing,
-          sellerCountry = ParsedValue.Missing,
-          connectedPersons = ParsedValue.Missing,
-          applyingForRelief = ParsedValue.Missing,
-          whatReliefAreYouApplyingFor = ParsedValue.Missing,
-          securitiesTarget = ParsedValue.Missing,
-          companyRegistrationNumber = ParsedValue.Missing,
-          chargingPoint = ParsedValue.Missing,
-          taxRate = ParsedValue.Missing,
-          whatTypeOfSecurities = ParsedValue.Missing,
-          typeOfShares = ParsedValue.Missing,
-          securitiesQuantity = ParsedValue.Missing,
-          amountPaidForSecurities = ParsedValue.Missing,
-          totalMarketValue = ParsedValue.Missing
+          sellerName = Some("Seller 1"),
+          sellerAddressInUk = None,
+          sellerAddressLine1 = None,
+          sellerAddressLine2 = None,
+          sellerAddressLine3 = None,
+          sellerAddressLine4 = None,
+          sellerPostcode = None,
+          sellerCountry = None,
+          connectedPersons = None,
+          applyingForRelief = None,
+          whatReliefAreYouApplyingFor = None,
+          securitiesTarget = None,
+          companyRegistrationNumber = None,
+          chargingPoint = None,
+          taxRate = None,
+          whatTypeOfSecurities = None,
+          typeOfShares = None,
+          securitiesQuantity = None,
+          amountPaidForSecurities = None,
+          totalMarketValue = None,
+          minSharePrice = None,
+          maxSharePrice = None,
+          sharePurchaseReason = None,
+          purchaseForCancellation = None
         ),
         validationErrors = Seq.empty
       )
@@ -83,14 +96,18 @@ class StcUploadProcessingServiceSpec extends AnyWordSpec with Matchers with Mock
   "StcUploadProcessingService.process" must {
 
     "parse then validate the uploaded file" in {
-      when(stcUploadParsingService.parse(uploadedFile)).thenReturn(Right(Seq(parsedRow)))
-      when(stcFileValidationService.validate(Seq(parsedRow))).thenReturn(validationResponse)
+      when(stcUploadParsingService.parse(uploadedFile))
+        .thenReturn(Right(parsedFile))
+
+      when(stcFileValidationService.validate(parsedFile.rows, parsedFile.headers))
+        .thenReturn(validationResponse)
 
       service.process(uploadedFile) mustBe Right(validationResponse)
     }
 
     "return parse errors without validating" in {
-      when(stcUploadParsingService.parse(uploadedFile)).thenReturn(Left(FileParseError.EmptyFile))
+      when(stcUploadParsingService.parse(uploadedFile))
+        .thenReturn(Left(FileParseError.EmptyFile))
 
       service.process(uploadedFile) mustBe Left(FileParseError.EmptyFile)
     }
