@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package controllers.stf.individuals
+package controllers.stf.agents
 
 import base.SpecBase
 import org.mockito.ArgumentMatchers.any
@@ -26,21 +26,21 @@ import play.api.test.FakeRequest
 import play.api.test.Helpers.*
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.securitiestransferchargefrontend.clients.SaveAndReturnClient
-import uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.individuals.single.routes as individualSingleRoutes
-import uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.individuals.bulk.routes as individualBulkRoutes
-import uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.individuals.routes as individualRoutes
-import uk.gov.hmrc.securitiestransferchargefrontend.forms.stf.individuals.HowToNotifyAboutSecuritiesTransferFormProvider
+import uk.gov.hmrc.securitiestransferchargefrontend.controllers.routes
+import uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.agents.routes as agentRoutes
+import uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.agents.single.routes as agentSingleRoutes
+import uk.gov.hmrc.securitiestransferchargefrontend.forms.stf.agents.HowToNotifyAboutSecuritiesTransferFormProvider
 import uk.gov.hmrc.securitiestransferchargefrontend.models.stf.HowToNotifyAboutSecuritiesTransfer
 import uk.gov.hmrc.securitiestransferchargefrontend.models.{NormalMode, UserAnswers}
 import uk.gov.hmrc.securitiestransferchargefrontend.navigation.Navigator
 import uk.gov.hmrc.securitiestransferchargefrontend.pages.stf.shared.HowToNotifyAboutSecuritiesTransferPage
-import uk.gov.hmrc.securitiestransferchargefrontend.views.html.stf.individuals.HowToNotifyAboutSecuritiesTransferView
+import uk.gov.hmrc.securitiestransferchargefrontend.views.html.stf.agents.HowToNotifyAboutSecuritiesTransferView
 
 import scala.concurrent.Future
 
 class HowToNotifyAboutSecuritiesTransferControllerSpec extends SpecBase {
 
-  lazy val howToNotifyAboutSecuritiesTransferRoute: String = individualRoutes.HowToNotifyAboutSecuritiesTransferController.onPageLoad(NormalMode).url
+  lazy val howToNotifyAboutSecuritiesTransferRoute: String = agentRoutes.HowToNotifyAboutSecuritiesTransferController.onPageLoad(NormalMode).url
 
   val formProvider = new HowToNotifyAboutSecuritiesTransferFormProvider()
   val form: Form[HowToNotifyAboutSecuritiesTransfer] = formProvider()
@@ -50,7 +50,7 @@ class HowToNotifyAboutSecuritiesTransferControllerSpec extends SpecBase {
     "must return OK and the correct view for a GET" in {
 
       val application = applicationBuilder(userAnswers = Some(emptyUserAnswers))
-        .overrides(bind[Navigator].qualifiedWith("individuals").toInstance(getNavigator))
+        .overrides(bind[Navigator].qualifiedWith("agents").toInstance(getNavigator))
         .build()
 
       running(application) {
@@ -69,7 +69,7 @@ class HowToNotifyAboutSecuritiesTransferControllerSpec extends SpecBase {
 
       val userAnswers = UserAnswers(userAnswersId, submissionId).set(HowToNotifyAboutSecuritiesTransferPage, HowToNotifyAboutSecuritiesTransfer.values.head).success.value
       val application = applicationBuilder(userAnswers = Some(userAnswers))
-        .overrides(bind[Navigator].qualifiedWith("individuals").toInstance(getNavigator))
+        .overrides(bind[Navigator].qualifiedWith("agents").toInstance(getNavigator))
         .build()
 
       running(application) {
@@ -87,7 +87,7 @@ class HowToNotifyAboutSecuritiesTransferControllerSpec extends SpecBase {
     "must return a Bad Request and errors when invalid data is submitted" in {
 
       val application = applicationBuilder(userAnswers = Some(emptyUserAnswers))
-        .overrides(bind[Navigator].qualifiedWith("individuals").toInstance(getNavigator))
+        .overrides(bind[Navigator].qualifiedWith("agents").toInstance(getNavigator))
         .build()
 
       running(application) {
@@ -105,7 +105,7 @@ class HowToNotifyAboutSecuritiesTransferControllerSpec extends SpecBase {
       }
     }
 
-    "must redirect to confirm your address page when one at a time is selected" in {
+    "must redirect to agent reference page when one at a time is selected" in {
       val saveAndReturnClient = mock[SaveAndReturnClient]
 
       val application = applicationBuilder(userAnswers = Some(emptyUserAnswers), saveAndReturnClient = saveAndReturnClient)
@@ -122,7 +122,7 @@ class HowToNotifyAboutSecuritiesTransferControllerSpec extends SpecBase {
         val result = route(application, request).value
 
         status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual individualSingleRoutes.ConfirmAddressController.onPageLoad().url
+        redirectLocation(result).value mustEqual agentSingleRoutes.AgentReferenceController.onPageLoad(NormalMode).url
       }
     }
 
@@ -143,7 +143,7 @@ class HowToNotifyAboutSecuritiesTransferControllerSpec extends SpecBase {
         val result = route(application, request).value
 
         status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual individualBulkRoutes.TemplateInstructionsController.onPageLoad().url
+        redirectLocation(result).value mustEqual routes.JourneyRecoveryController.onPageLoad().url
       }
     }
   }

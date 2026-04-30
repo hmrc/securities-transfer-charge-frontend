@@ -14,35 +14,27 @@
  * limitations under the License.
  */
 
-package forms.stf.individuals
+package forms.stf.agents
 
-import forms.behaviours.StringFieldBehaviours
+import forms.behaviours.OptionFieldBehaviours
 import play.api.data.FormError
-import uk.gov.hmrc.securitiestransferchargefrontend.forms.stf.shared.NameOfSellerFormProvider
+import uk.gov.hmrc.securitiestransferchargefrontend.forms.stf.agents.HowToNotifyAboutSecuritiesTransferFormProvider
+import uk.gov.hmrc.securitiestransferchargefrontend.models.stf.HowToNotifyAboutSecuritiesTransfer
 
-class NameOfSellerFormProviderSpec extends StringFieldBehaviours {
+class HowToNotifyAboutSecuritiesTransferFormProviderSpec extends OptionFieldBehaviours {
 
-  val requiredKey = "nameOfSeller.error.required"
-  val lengthKey = "nameOfSeller.error.length"
-  val maxLength = 35
-
-  val form = new NameOfSellerFormProvider()()
+  val form = new HowToNotifyAboutSecuritiesTransferFormProvider()()
 
   ".value" - {
 
     val fieldName = "value"
+    val requiredKey = "agent.howToNotifyAboutSecuritiesTransfer.error.required"
 
-    behave like fieldThatBindsValidData(
+    behave like optionsField[HowToNotifyAboutSecuritiesTransfer](
       form,
       fieldName,
-      stringsWithMaxLength(maxLength)
-    )
-
-    behave like fieldWithMaxLength(
-      form,
-      fieldName,
-      maxLength = maxLength,
-      lengthError = FormError(fieldName, lengthKey, Seq(maxLength))
+      validValues  = HowToNotifyAboutSecuritiesTransfer.values,
+      invalidError = FormError(fieldName, "error.invalid")
     )
 
     behave like mandatoryField(
