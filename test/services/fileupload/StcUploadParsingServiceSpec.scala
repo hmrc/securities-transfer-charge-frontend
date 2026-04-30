@@ -24,7 +24,7 @@ import org.scalatest.wordspec.AnyWordSpec
 import org.scalatestplus.mockito.MockitoSugar
 import play.api.Configuration
 import uk.gov.hmrc.securitiestransferchargefrontend.config.FileUploadConfig
-import uk.gov.hmrc.securitiestransferchargefrontend.models.fileupload.{ParsedCell, ParsedFile, ParsedRow, ParsedStcRow, ParsedValue, UploadedFile}
+import uk.gov.hmrc.securitiestransferchargefrontend.models.stf.fileupload.{ParsedCell, ParsedFile, ParsedRow, ParsedStcRow, ParsedValue, UploadedFile}
 import uk.gov.hmrc.securitiestransferchargefrontend.services.fileupload.FileParsingService
 import uk.gov.hmrc.securitiestransferchargefrontend.services.fileupload.StcRowMapper
 import uk.gov.hmrc.securitiestransferchargefrontend.services.fileupload.StcUploadParsingService
@@ -117,7 +117,7 @@ class StcUploadParsingServiceSpec extends AnyWordSpec with Matchers with EitherV
         chargingPoint = ParsedValue.Valid(LocalDate.of(2026, 3, 23)),
         taxRate = ParsedValue.Valid(BigDecimal("0.5")),
         whatTypeOfSecurities = ParsedValue.Missing,
-        otherSecuritiesType = ParsedValue.Missing,
+        typeOfShares = ParsedValue.Missing,
         securitiesQuantity = ParsedValue.Valid(BigDecimal("100")),
         amountPaidForSecurities = ParsedValue.Valid(BigDecimal("500")),
         totalMarketValue = ParsedValue.Valid(BigDecimal("600"))

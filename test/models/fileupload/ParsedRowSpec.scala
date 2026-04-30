@@ -18,7 +18,7 @@ package models.fileupload
 
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpec
-import uk.gov.hmrc.securitiestransferchargefrontend.models.fileupload.*
+import uk.gov.hmrc.securitiestransferchargefrontend.models.stf.fileupload.{ParsedCell, ParsedRow}
 
 class ParsedRowSpec extends AnyWordSpec with Matchers {
 

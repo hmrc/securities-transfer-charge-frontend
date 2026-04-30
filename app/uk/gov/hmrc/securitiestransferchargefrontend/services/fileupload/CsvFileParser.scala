@@ -17,15 +17,15 @@
 package uk.gov.hmrc.securitiestransferchargefrontend.services.fileupload
 
 import uk.gov.hmrc.securitiestransferchargefrontend.config.FileUploadConfig
-import uk.gov.hmrc.securitiestransferchargefrontend.models.fileupload.FileParseError._
-import uk.gov.hmrc.securitiestransferchargefrontend.models.fileupload.{FileParseError, ParsedCell, ParsedFile, ParsedRow, UploadedFile}
 
 import java.io.InputStreamReader
 import java.nio.charset.StandardCharsets
 import javax.inject.{Inject, Singleton}
 import org.apache.commons.csv.{CSVFormat, CSVParser}
+import uk.gov.hmrc.securitiestransferchargefrontend.models.stf.fileupload.FileParseError.{InvalidCsv, RowLimitExceeded}
+import uk.gov.hmrc.securitiestransferchargefrontend.models.stf.fileupload.{FileParseError, ParsedCell, ParsedFile, ParsedRow, UploadedFile}
 
-import scala.jdk.CollectionConverters._
+import scala.jdk.CollectionConverters.*
 import scala.util.Try
 
 @Singleton

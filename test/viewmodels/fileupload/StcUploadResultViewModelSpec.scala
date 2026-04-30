@@ -18,8 +18,8 @@ package viewmodels.fileupload
 
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpec
-import uk.gov.hmrc.securitiestransferchargefrontend.models.fileupload._
-import uk.gov.hmrc.securitiestransferchargefrontend.viewmodels.fileupload.{StcUploadResultViewModel, UploadErrorDisplay}
+import uk.gov.hmrc.securitiestransferchargefrontend.models.stf.fileupload.*
+import uk.gov.hmrc.securitiestransferchargefrontend.viewmodels.stf.fileupload.{StcUploadResultViewModel, UploadErrorDisplay}
 
 import java.time.LocalDate
 
@@ -49,7 +49,7 @@ class StcUploadResultViewModelSpec extends AnyWordSpec with Matchers {
     chargingPoint = ParsedValue.Valid(LocalDate.of(2026, 3, 23)),
     taxRate = ParsedValue.Valid(BigDecimal("0.5")),
     whatTypeOfSecurities = ParsedValue.Valid("Stock"),
-    otherSecuritiesType = ParsedValue.Missing,
+    typeOfShares = ParsedValue.Missing,
     securitiesQuantity = ParsedValue.Valid(BigDecimal("100")),
     amountPaidForSecurities = ParsedValue.Valid(BigDecimal("500")),
     totalMarketValue = ParsedValue.Valid(BigDecimal("600"))

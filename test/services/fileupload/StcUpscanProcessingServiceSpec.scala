@@ -16,7 +16,7 @@
 
 package services.fileupload
 
-import org.mockito.ArgumentMatchers.{any, eq => eqTo}
+import org.mockito.ArgumentMatchers.{any, eq as eqTo}
 import org.mockito.Mockito.{verify, when}
 import org.scalatest.EitherValues
 import org.scalatest.concurrent.ScalaFutures
@@ -24,7 +24,7 @@ import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpec
 import org.scalatestplus.mockito.MockitoSugar
 import uk.gov.hmrc.http.HeaderCarrier
-import uk.gov.hmrc.securitiestransferchargefrontend.models.fileupload.*
+import uk.gov.hmrc.securitiestransferchargefrontend.models.stf.fileupload.{FileParseError, ParsedStcRow, ParsedValue, StcFileValidationResponse, UploadedFile, ValidatedStcRow}
 import uk.gov.hmrc.securitiestransferchargefrontend.models.stf.upscan.{FileUpload, UpscanCallbackRequest, UpscanJourneyStatus}
 import uk.gov.hmrc.securitiestransferchargefrontend.services.fileupload.*
 
@@ -91,7 +91,7 @@ class StcUpscanProcessingServiceSpec extends AnyWordSpec with Matchers with Eith
     chargingPoint = ParsedValue.Valid(LocalDate.of(2026, 3, 23)),
     taxRate = ParsedValue.Valid(BigDecimal("0.5")),
     whatTypeOfSecurities = ParsedValue.Valid("Stock"),
-    otherSecuritiesType = ParsedValue.Missing,
+    typeOfShares = ParsedValue.Missing,
     securitiesQuantity = ParsedValue.Valid(BigDecimal("100")),
     amountPaidForSecurities = ParsedValue.Valid(BigDecimal("500")),
     totalMarketValue = ParsedValue.Valid(BigDecimal("600"))

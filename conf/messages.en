@@ -389,3 +389,26 @@ agents.nameOfBuyer.details.caption = Buyer details
 agents.nameOfBuyer.title = What’s the buyer’s name?
 agents.nameOfBuyer.heading = What’s the buyer’s name?
 agents.nameOfBuyer.hint = This is the person, business or trust buying the securities
+agent.details.caption = Agent details
+agentReference.title = Add a reference
+agentReference.heading = Add a reference (optional)
+agentReference.checkYourAnswersLabel = Add a reference
+agentReference.hint = You can add a reference for your own records and to help you find this submission later. It will not be used by HMRC.
+agentReference.error.length = Your reference must be 255 characters or fewer
+agentReference.change.hidden = AgentReference
+
+agent.howToNotifyAboutSecuritiesTransfer.title = How would you like to tell us about these securities transfers?
+agent.howToNotifyAboutSecuritiesTransfer.heading = How would you like to tell us about these securities transfers?
+agent.howToNotifyAboutSecuritiesTransfer.oneAtATime = One at a time
+agent.howToNotifyAboutSecuritiesTransfer.oneAtATime.hint = Each transfer must be between one buyer and one seller, and can include one kind of security or type of shares.
+agent.howToNotifyAboutSecuritiesTransfer.moreThanOneAtATime = More than one at a time
+agent.howToNotifyAboutSecuritiesTransfer.moreThanOneAtATime.hint = Download the template, complete it using one row per transfer, and upload it on the following pages. Once submitted it will take up to an hour to process. You can then find the submission on your dashboard and pay the charges due.
+agent.howToNotifyAboutSecuritiesTransfer.checkYourAnswersLabel = How would you like to tell us about these securities transfers?
+agent.howToNotifyAboutSecuritiesTransfer.error.required = Select a way to tell us about your securities transfers
+agent.howToNotifyAboutSecuritiesTransfer.change.hidden = HowToNotifyAboutSecuritiesTransfer
+
+agent.nameOfSeller.title = What’s the seller’s name?
+agent.nameOfSeller.heading = What’s the seller’s name?
+agent.nameOfSeller.checkYourAnswersLabel = What’s the seller’s name?
+agent.nameOfSeller.change.hidden = NameOfSeller
+agent.nameOfSeller.hint = This is the individual, business or trust selling the securities.

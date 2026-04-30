@@ -18,7 +18,7 @@ package uk.gov.hmrc.securitiestransferchargefrontend.services.fileupload
 
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.securitiestransferchargefrontend.connectors.UpscanFileDownloadConnector
-import uk.gov.hmrc.securitiestransferchargefrontend.models.fileupload.UploadedFile
+import uk.gov.hmrc.securitiestransferchargefrontend.models.stf.fileupload.UploadedFile
 import uk.gov.hmrc.securitiestransferchargefrontend.models.stf.upscan.FileUpload
 
 import javax.inject.{Inject, Singleton}

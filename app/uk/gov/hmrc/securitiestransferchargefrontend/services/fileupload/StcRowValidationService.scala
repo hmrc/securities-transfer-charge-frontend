@@ -17,7 +17,7 @@
 package uk.gov.hmrc.securitiestransferchargefrontend.services.fileupload
 
 import javax.inject.Singleton
-import uk.gov.hmrc.securitiestransferchargefrontend.models.fileupload.{ParsedStcRow, ParsedValue, StcRowValidationError, ValidatedStcRow}
+import uk.gov.hmrc.securitiestransferchargefrontend.models.stf.fileupload.{ParsedStcRow, ParsedValue, StcRowValidationError, ValidatedStcRow}
 
 @Singleton
 class StcRowValidationService {
@@ -65,7 +65,7 @@ class StcRowValidationService {
           requiredString(
             row.rowNumber,
             "otherSecuritiesType",
-            row.otherSecuritiesType,
+            row.typeOfShares,
             requiredMessage = "Share type is required when security type is Other",
             invalidMessage = "Share type must be a valid value"
           )

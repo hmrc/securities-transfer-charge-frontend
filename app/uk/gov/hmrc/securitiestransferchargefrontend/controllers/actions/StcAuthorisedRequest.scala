@@ -30,5 +30,6 @@ final case class StcAuthorisedRequest[A](
     affinityGroup match {
       case AffinityGroup.Individual => "individual"
       case AffinityGroup.Organisation => "org"
+      case AffinityGroup.Agent => "agent"
     }
 }

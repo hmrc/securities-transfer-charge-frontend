@@ -20,7 +20,7 @@ import org.mockito.Mockito.when
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpec
 import org.scalatestplus.mockito.MockitoSugar
-import uk.gov.hmrc.securitiestransferchargefrontend.models.fileupload.*
+import uk.gov.hmrc.securitiestransferchargefrontend.models.stf.fileupload.{ParsedStcRow, ParsedValue, StcRowValidationError, ValidatedStcRow}
 import uk.gov.hmrc.securitiestransferchargefrontend.services.fileupload.*
 
 import java.time.LocalDate
@@ -54,7 +54,7 @@ class StcFileValidationServiceSpec extends AnyWordSpec with Matchers with Mockit
     chargingPoint = ParsedValue.Valid(LocalDate.of(2026, 3, 23)),
     taxRate = ParsedValue.Valid(BigDecimal("0.5")),
     whatTypeOfSecurities = ParsedValue.Valid("Stock"),
-    otherSecuritiesType = ParsedValue.Missing,
+    typeOfShares = ParsedValue.Missing,
     securitiesQuantity = ParsedValue.Valid(BigDecimal("100")),
     amountPaidForSecurities = ParsedValue.Valid(BigDecimal("500")),
     totalMarketValue = ParsedValue.Valid(BigDecimal("600"))

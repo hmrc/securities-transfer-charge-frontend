@@ -20,8 +20,8 @@ import org.apache.poi.xssf.usermodel.XSSFWorkbook
 import org.scalatest.EitherValues
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpec
-import uk.gov.hmrc.securitiestransferchargefrontend.models.fileupload.FileParseError.RowLimitExceeded
-import uk.gov.hmrc.securitiestransferchargefrontend.models.fileupload.{ParsedCell, UploadedFile}
+import uk.gov.hmrc.securitiestransferchargefrontend.models.stf.fileupload.FileParseError.RowLimitExceeded
+import uk.gov.hmrc.securitiestransferchargefrontend.models.stf.fileupload.{ParsedCell, UploadedFile}
 import uk.gov.hmrc.securitiestransferchargefrontend.services.fileupload.ExcelFileParser
 
 import java.io.{ByteArrayInputStream, ByteArrayOutputStream}

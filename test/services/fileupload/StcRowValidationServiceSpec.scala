@@ -18,7 +18,7 @@ package services.fileupload
 
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpec
-import uk.gov.hmrc.securitiestransferchargefrontend.models.fileupload.{ParsedStcRow, ParsedValue}
+import uk.gov.hmrc.securitiestransferchargefrontend.models.stf.fileupload.{ParsedStcRow, ParsedValue, ValidatedStcRow}
 import uk.gov.hmrc.securitiestransferchargefrontend.services.fileupload.StcRowValidationService
 
 import java.time.LocalDate
@@ -51,13 +51,13 @@ class StcRowValidationServiceSpec extends AnyWordSpec with Matchers {
     chargingPoint = ParsedValue.Valid(LocalDate.of(2026, 3, 23)),
     taxRate = ParsedValue.Valid(BigDecimal("0.5")),
     whatTypeOfSecurities = ParsedValue.Valid("Shares"),
-    otherSecuritiesType = ParsedValue.Valid("Ordinary"),
+    typeOfShares = ParsedValue.Valid("Ordinary"),
     securitiesQuantity = ParsedValue.Valid(BigDecimal("100")),
     amountPaidForSecurities = ParsedValue.Valid(BigDecimal("500")),
     totalMarketValue = ParsedValue.Missing
   )
 
-  private def messageFor(result: uk.gov.hmrc.securitiestransferchargefrontend.models.fileupload.ValidatedStcRow, fieldName: String): Option[String] =
+  private def messageFor(result: ValidatedStcRow, fieldName: String): Option[String] =
     result.validationErrors.find(_.fieldName == fieldName).map(_.message)
 
   "validate" should {
@@ -136,7 +136,7 @@ class StcRowValidationServiceSpec extends AnyWordSpec with Matchers {
     "require otherSecuritiesType when whatTypeOfSecurities is Other" in {
       val invalidRow = validRow.copy(
         whatTypeOfSecurities = ParsedValue.Valid("Other"),
-        otherSecuritiesType = ParsedValue.Missing
+        typeOfShares = ParsedValue.Missing
       )
 
       val result = service.validate(invalidRow)
