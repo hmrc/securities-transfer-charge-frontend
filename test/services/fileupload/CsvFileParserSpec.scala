@@ -55,11 +55,9 @@ class CsvFileParserSpec extends AnyWordSpec with Matchers with EitherValues {
       result.fileName shouldBe "test.csv"
       result.mimeType shouldBe "text/csv"
 
-      // ✅ headers are separate
       result.headers shouldBe Seq("name", "amount", "date") ++
         Seq.fill(maxColumns - 3)("")
 
-      // ✅ only data rows
       result.rows.size shouldBe 2
 
       result.rows.head.rowNumber shouldBe 2

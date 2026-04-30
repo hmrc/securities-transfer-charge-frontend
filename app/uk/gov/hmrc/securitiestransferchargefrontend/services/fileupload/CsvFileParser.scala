@@ -48,7 +48,6 @@ class CsvFileParser @Inject()(config: FileUploadConfig) extends FileParser {
           Left(RowLimitExceeded(records.size, config.maxRows))
         } else {
 
-          // ✅ HEADER ROW
           val headerRecord = records.head
           val headerValues = headerRecord.iterator().asScala.toSeq
 
@@ -57,7 +56,6 @@ class CsvFileParser @Inject()(config: FileUploadConfig) extends FileParser {
               headerValues.lift(colIndex).getOrElse("").trim
             }
 
-          // ✅ DATA ROWS
           val dataRecords = records.tail
 
           val rows = dataRecords.zipWithIndex.map { case (record, index) =>
@@ -78,7 +76,7 @@ class CsvFileParser @Inject()(config: FileUploadConfig) extends FileParser {
             ParsedFile(
               fileName = file.fileName,
               mimeType = file.mimeType,
-              headers = headers,   // ✅ NEW
+              headers = headers,
               rows = rows
             )
           )
