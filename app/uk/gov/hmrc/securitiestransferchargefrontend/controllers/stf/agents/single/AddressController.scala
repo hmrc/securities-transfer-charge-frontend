@@ -41,7 +41,7 @@ class AddressController @Inject()(val controllerComponents: MessagesControllerCo
   
   def onPageLoad: Action[AnyContent] = auth.async {
     implicit request =>
-      super.pageLoad(config.buyersAlfConfigFileLocation, config.alfStfBuyersContinueUrl)
+      super.pageLoad(config.agentAlfConfigFileLocation, config.alfStfAgentContinueUrl)
   }
 
   def onReturn(addressId: String): Action[AnyContent] = (auth andThen getData andThen requireData).async {
