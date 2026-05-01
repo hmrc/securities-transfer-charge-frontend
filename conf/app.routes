@@ -203,10 +203,16 @@ POST       /stf/agent/how-many-transfers                  uk.gov.hmrc.securities
 GET        /stf/agent/how-many-transfers                  uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.agents.HowToNotifyAboutSecuritiesTransferController.onPageLoad(mode: Mode = CheckMode)
 POST       /stf/agent/how-many-transfers                  uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.agents.HowToNotifyAboutSecuritiesTransferController.onSubmit(mode: Mode = CheckMode)
 
+GET        /stf/agent/address                                   uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.agents.single.AddressController.onPageLoad()
+GET        /stf/agent/address/return                            uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.agents.single.AddressController.onReturn(id: String)
+
 GET        /stf/agent/seller-name                         uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.agents.single.NameOfSellerController.onPageLoad(mode: Mode = NormalMode)
 POST       /stf/agent/seller-name                         uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.agents.single.NameOfSellerController.onSubmit(mode: Mode = NormalMode)
 GET        /stf/agent/change/seller-name                  uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.agents.single.NameOfSellerController.onPageLoad(mode: Mode = CheckMode)
 POST       /stf/agent/change/seller-name                  uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.agents.single.NameOfSellerController.onSubmit(mode: Mode = CheckMode)
+
+GET        /stf/agent/seller/address                      uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.agents.single.StfSellerAddressController.onPageLoad()
+GET        /stf/agent/seller/address/return               uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.agents.single.StfSellerAddressController.onReturn(id: String)
 
 GET        /stf/agent/connected-persons                   uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.agents.single.ConnectedPersonsController.onPageLoad(mode: Mode = NormalMode)
 POST       /stf/agent/connected-persons                   uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.agents.single.ConnectedPersonsController.onSubmit(mode: Mode = NormalMode)

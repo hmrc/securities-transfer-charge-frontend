@@ -21,6 +21,3 @@ import uk.gov.hmrc.securitiestransferchargefrontend.pages.AddressPage
 case object StfSellerAddressPage extends AddressPage {
   override def toString: String = "sellerAddress"
 }
-
-
-
