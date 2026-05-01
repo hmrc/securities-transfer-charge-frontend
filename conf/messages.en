@@ -397,6 +397,9 @@ agentReference.hint = You can add a reference for your own records and to help y
 agentReference.error.length = Your reference must be 255 characters or fewer
 agentReference.change.hidden = AgentReference
 
+nameOfBuyer.error.required = Enter the buyer’s name
+nameOfBuyer.error.length = Buyer’s name must be 35 characters or fewer
+
 agent.howToNotifyAboutSecuritiesTransfer.title = How would you like to tell us about these securities transfers?
 agent.howToNotifyAboutSecuritiesTransfer.heading = How would you like to tell us about these securities transfers?
 agent.howToNotifyAboutSecuritiesTransfer.oneAtATime = One at a time

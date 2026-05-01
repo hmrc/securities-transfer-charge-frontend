@@ -69,7 +69,7 @@ class NameOfBuyerController @Inject()(
         value =>
           for {
             updatedAnswers <- Future.fromTry(request.userAnswers.set(NameOfBuyerPage, value))
-            nextPage       <- navigator.nextPage(NameOfBuyerPage, mode, updatedAnswers,isReturn(request))
+            nextPage       <- navigator.nextPage(NameOfBuyerPage, mode, updatedAnswers, isReturn(request))
           } yield Redirect(nextPage)
       )
   }
