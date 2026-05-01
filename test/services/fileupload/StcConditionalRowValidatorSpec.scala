@@ -20,8 +20,8 @@ import org.scalatest.matchers.must.Matchers
 import org.scalatest.wordspec.AnyWordSpec
 import play.api.i18n.MessagesApi
 import play.api.test.Helpers.stubMessagesApi
-import uk.gov.hmrc.securitiestransferchargefrontend.models.stf.fileupload._
-import uk.gov.hmrc.securitiestransferchargefrontend.services.fileupload._
+import uk.gov.hmrc.securitiestransferchargefrontend.models.stf.fileupload.*
+import uk.gov.hmrc.securitiestransferchargefrontend.services.fileupload.*
 
 import java.time.LocalDate
 
@@ -97,10 +97,10 @@ class StcConditionalRowValidatorSpec extends AnyWordSpec with Matchers {
       messagesApi = messagesApi
     )
 
-  "StcConditionalRowValidator.validate" must {
+  "StcConditionalRowValidator.validate STF" must {
 
     "return no errors for a valid conditional row" in {
-      val result = validator.validate(validParsedRow)
+      val result = validator.validate(validParsedRow, StcTemplate.STF)
       result mustBe Seq.empty
     }
 
@@ -109,7 +109,7 @@ class StcConditionalRowValidatorSpec extends AnyWordSpec with Matchers {
         validParsedRow.copy(
           applyingForRelief = Some(true),
           whatReliefAreYouApplyingFor = None
-        )
+        ), StcTemplate.STF
       )
 
       result.exists(_.fieldName == "whatReliefAreYouApplyingFor") mustBe true
@@ -120,7 +120,7 @@ class StcConditionalRowValidatorSpec extends AnyWordSpec with Matchers {
         validParsedRow.copy(
           applyingForRelief = Some(true),
           whatReliefAreYouApplyingFor = Some("Made Up Relief")
-        )
+        ), StcTemplate.STF
       )
 
       result.exists(_.fieldName == "whatReliefAreYouApplyingFor") mustBe true
@@ -131,7 +131,7 @@ class StcConditionalRowValidatorSpec extends AnyWordSpec with Matchers {
         validParsedRow.copy(
           whatTypeOfSecurities = Some("shares"),
           typeOfShares = None
-        )
+        ), StcTemplate.STF
       )
 
       result.exists(_.fieldName == "typeOfShares") mustBe true
@@ -142,7 +142,7 @@ class StcConditionalRowValidatorSpec extends AnyWordSpec with Matchers {
         validParsedRow.copy(
           whatTypeOfSecurities = Some("Loan notes"),
           typeOfShares = None
-        )
+        ), StcTemplate.STF
       )
 
       result.map(_.fieldName) must not contain "typeOfShares"
@@ -153,7 +153,7 @@ class StcConditionalRowValidatorSpec extends AnyWordSpec with Matchers {
         validParsedRow.copy(
           sellerAddressInUk = Some(true),
           sellerAddressLine1 = None
-        )
+        ), StcTemplate.STF
       )
 
       result.exists(_.fieldName == "sellerAddressLine1") mustBe true
@@ -164,7 +164,7 @@ class StcConditionalRowValidatorSpec extends AnyWordSpec with Matchers {
         validParsedRow.copy(
           sellerAddressInUk = Some(true),
           sellerAddressLine1 = Some("Address @@@")
-        )
+        ), StcTemplate.STF
       )
 
       result.exists(_.fieldName == "sellerAddressLine1") mustBe true
@@ -175,7 +175,7 @@ class StcConditionalRowValidatorSpec extends AnyWordSpec with Matchers {
         validParsedRow.copy(
           sellerAddressInUk = Some(true),
           sellerPostcode = None
-        )
+        ), StcTemplate.STF
       )
 
       result.exists(_.fieldName == "sellerPostcode") mustBe true
@@ -186,7 +186,7 @@ class StcConditionalRowValidatorSpec extends AnyWordSpec with Matchers {
         validParsedRow.copy(
           sellerAddressInUk = Some(true),
           sellerPostcode = Some("not a postcode")
-        )
+        ), StcTemplate.STF
       )
 
       result.exists(_.fieldName == "sellerPostcode") mustBe true
@@ -199,7 +199,7 @@ class StcConditionalRowValidatorSpec extends AnyWordSpec with Matchers {
         validParsedRow.copy(
           sellerAddressInUk = Some(false),
           sellerCountry = Some(longCountry)
-        )
+        ), StcTemplate.STF
       )
 
       result.exists(_.fieldName == "sellerCountry") mustBe true
@@ -210,7 +210,7 @@ class StcConditionalRowValidatorSpec extends AnyWordSpec with Matchers {
         validParsedRow.copy(
           connectedPersons = Some(true),
           totalMarketValue = None
-        )
+        ), StcTemplate.STF
       )
 
       result.exists(_.fieldName == "totalMarketValue") mustBe true
@@ -221,11 +221,29 @@ class StcConditionalRowValidatorSpec extends AnyWordSpec with Matchers {
         validParsedRow.copy(
           connectedPersons = Some(true),
           totalMarketValue = Some(BigDecimal(1000000000))
-        )
+        ), StcTemplate.STF
       )
 
       result.exists(_.fieldName == "totalMarketValue") mustBe true
     }
   }
-  
+
+  "StcConditionalRowValidator.validate SH03" must {
+
+    "return no errors for a valid conditional row" in {
+      val result = validator.validate(validParsedRow, StcTemplate.SH03)
+      result mustBe Seq.empty
+    }
+
+    "require relief type when applying for relief is yes" in {
+      val result = validator.validate(
+        validParsedRow.copy(
+          applyingForRelief = Some(true),
+          whatReliefAreYouApplyingFor = None
+        ), StcTemplate.SH03
+      )
+
+      result.exists(_.fieldName == "whatReliefAreYouApplyingFor") mustBe true
+    }
+  }
 }

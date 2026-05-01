@@ -33,12 +33,32 @@ class StcConditionalRowValidator @Inject()(
   private val marketValueMaximum = BigDecimal(999999999)
 
   def validate(
-                row: ParsedStcRow
-              )(implicit cols: ColumnIndexBuilder): Seq[StcRowValidationError] =
+                row: ParsedStcRow,
+                template: StcTemplate
+              )(implicit cols: ColumnIndexBuilder): Seq[StcRowValidationError] = {
+
+    template match {
+
+      case StcTemplate.STF =>
+        validateSTF(row)
+
+      case StcTemplate.SH03 =>
+        validateSH03(row)
+    }
+  }
+
+  def validateSTF(
+                   row: ParsedStcRow
+                 )(implicit cols: ColumnIndexBuilder): Seq[StcRowValidationError] =
     validateReliefType(row) ++
       validateTypeOfShares(row) ++
       validateSellerAddress(row) ++
       validateTotalMarketValue(row)
+
+  def validateSH03(
+                    row: ParsedStcRow
+                  )(implicit cols: ColumnIndexBuilder): Seq[StcRowValidationError] =
+    validateReliefType(row)
 
   private def validateReliefType(
                                   row: ParsedStcRow

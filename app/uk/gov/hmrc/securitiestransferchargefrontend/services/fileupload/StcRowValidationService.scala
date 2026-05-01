@@ -45,7 +45,7 @@ class StcRowValidationService @Inject()(
         parsedRow = parsedRow,
         validationErrors =
           stcBasicRowValidator.validate(parsedRow, template) ++
-            stcConditionalRowValidator.validate(parsedRow)
+            stcConditionalRowValidator.validate(parsedRow, template)
       )
     }
   }
