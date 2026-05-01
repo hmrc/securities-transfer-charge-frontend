@@ -94,7 +94,7 @@ class NameOfSellerControllerSpec extends SpecBase with MockitoSugar {
         val result = route(application, request).value
 
         status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual routes.JourneyRecoveryController.onPageLoad().url
+        redirectLocation(result).value mustEqual agentRoutes.StfSellerAddressController.onPageLoad().url
       }
     }
 
