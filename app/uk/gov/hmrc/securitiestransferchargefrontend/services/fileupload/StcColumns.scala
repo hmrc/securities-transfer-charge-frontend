@@ -24,7 +24,7 @@ object StcColumns {
   val applyingForRelief = "applyingForRelief"
   val securitiesTarget = "securitiesTarget"
   val typeOfShares = "typeOfShares"
-  val whatIsCRN = "whatIsCRN"
+  val companyRegistrationNumber = "companyRegistrationNumber"
   val chargingPoint = "chargingPoint"
   val taxRate = "taxRate"
   val whatTypeOfSecurities = "whatTypeOfSecurities"

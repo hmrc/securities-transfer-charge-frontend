@@ -24,7 +24,7 @@ final class ColumnIndexBuilder(headers: Seq[String]) {
   private val index: Map[String, Int] =
     headers.map(_.trim).zipWithIndex.toMap
 
-  def get(columnName: String): Option[Int] =
+  def find(columnName: String): Option[Int] =
     index.get(columnName.trim)
     
 }

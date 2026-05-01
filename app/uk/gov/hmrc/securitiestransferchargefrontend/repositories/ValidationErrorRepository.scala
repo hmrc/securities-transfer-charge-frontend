@@ -17,14 +17,11 @@
 package uk.gov.hmrc.securitiestransferchargefrontend.repositories
 
 import org.mongodb.scala.model.*
-import play.api.libs.json.Format
 import uk.gov.hmrc.mongo.MongoComponent
 import uk.gov.hmrc.mongo.play.json.PlayMongoRepository
-import uk.gov.hmrc.mongo.play.json.formats.MongoJavatimeFormats
 import uk.gov.hmrc.securitiestransferchargefrontend.config.FrontendAppConfig
 import uk.gov.hmrc.securitiestransferchargefrontend.models.stf.fileupload.{StcRowValidationError, ValidationErrorsDocument}
 
-import java.time.Instant
 import java.util.concurrent.TimeUnit
 import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
@@ -56,9 +53,7 @@ class ValidationErrorRepositoryImpl @Inject()(
       )
     )
   ) with ValidationErrorRepository {
-
-  implicit val instantFormat: Format[Instant] = MongoJavatimeFormats.instantFormat
-
+  
   private def byReference(reference: String) =
     Filters.equal("_id", reference)
 

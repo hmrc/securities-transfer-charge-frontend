@@ -30,73 +30,73 @@ class StcRowMapper(columnIndex: ColumnIndexBuilder) {
       rowNumber = row.rowNumber,
 
       sellerName =
-        readString(row, columnIndex.get(StcColumns.sellerName)),
+        readString(row, columnIndex.find(StcColumns.sellerName)),
 
       sellerAddressInUk =
-        readBoolean(row, columnIndex.get(StcColumns.sellerAddressInUk)),
+        readBoolean(row, columnIndex.find(StcColumns.sellerAddressInUk)),
 
       sellerAddressLine1 =
-        readString(row, columnIndex.get(StcColumns.sellerAddressLine1)),
+        readString(row, columnIndex.find(StcColumns.sellerAddressLine1)),
 
       sellerAddressLine2 =
-        readString(row, columnIndex.get(StcColumns.sellerAddressLine2)),
+        readString(row, columnIndex.find(StcColumns.sellerAddressLine2)),
 
       sellerAddressLine3 =
-        readString(row, columnIndex.get(StcColumns.sellerAddressLine3)),
+        readString(row, columnIndex.find(StcColumns.sellerAddressLine3)),
 
       sellerAddressLine4 =
-        readString(row, columnIndex.get(StcColumns.sellerAddressLine4)),
+        readString(row, columnIndex.find(StcColumns.sellerAddressLine4)),
 
       sellerPostcode =
-        readString(row, columnIndex.get(StcColumns.sellerPostcode)),
+        readString(row, columnIndex.find(StcColumns.sellerPostcode)),
 
       sellerCountry =
-        readString(row, columnIndex.get(StcColumns.sellerCountry)),
+        readString(row, columnIndex.find(StcColumns.sellerCountry)),
 
       connectedPersons =
-        readBoolean(row, columnIndex.get(StcColumns.connectedPersons)),
+        readBoolean(row, columnIndex.find(StcColumns.connectedPersons)),
 
       applyingForRelief =
-        readBoolean(row, columnIndex.get(StcColumns.applyingForRelief)),
+        readBoolean(row, columnIndex.find(StcColumns.applyingForRelief)),
 
       whatReliefAreYouApplyingFor =
-        readString(row, columnIndex.get(StcColumns.whatRelief)),
+        readString(row, columnIndex.find(StcColumns.whatRelief)),
 
       securitiesTarget =
-        readString(row, columnIndex.get(StcColumns.securitiesTarget)),
+        readString(row, columnIndex.find(StcColumns.securitiesTarget)),
 
       companyRegistrationNumber =
-        readString(row, columnIndex.get(StcColumns.whatIsCRN)),
+        readString(row, columnIndex.find(StcColumns.companyRegistrationNumber)),
 
       chargingPoint =
-        readDate(row, columnIndex.get(StcColumns.chargingPoint)),
+        readDate(row, columnIndex.find(StcColumns.chargingPoint)),
 
       taxRate =
-        readTaxRate(row, columnIndex.get(StcColumns.taxRate)),
+        readTaxRate(row, columnIndex.find(StcColumns.taxRate)),
 
       whatTypeOfSecurities =
-        readString(row, columnIndex.get(StcColumns.whatTypeOfSecurities)),
+        readString(row, columnIndex.find(StcColumns.whatTypeOfSecurities)),
 
       typeOfShares =
-        readString(row, columnIndex.get(StcColumns.typeOfShares)),
+        readString(row, columnIndex.find(StcColumns.typeOfShares)),
 
       securitiesQuantity =
-        readBigDecimal(row, columnIndex.get(StcColumns.securitiesQuantity)),
+        readBigDecimal(row, columnIndex.find(StcColumns.securitiesQuantity)),
 
       amountPaidForSecurities =
-        readBigDecimal(row, columnIndex.get(StcColumns.amountPaidForSecurities)),
+        readBigDecimal(row, columnIndex.find(StcColumns.amountPaidForSecurities)),
 
       totalMarketValue =
-        readBigDecimal(row, columnIndex.get(StcColumns.totalMarketValue)),
+        readBigDecimal(row, columnIndex.find(StcColumns.totalMarketValue)),
 
       minSharePrice =
-        readBigDecimal(row, columnIndex.get(StcColumns.minSharePrice)),
-      maxSharePrice = readBigDecimal(row, columnIndex.get(StcColumns.maxSharePrice)),
+        readBigDecimal(row, columnIndex.find(StcColumns.minSharePrice)),
+      maxSharePrice = readBigDecimal(row, columnIndex.find(StcColumns.maxSharePrice)),
 
       sharePurchaseReason =
-        readString(row, columnIndex.get(StcColumns.purchaseReason)),
+        readString(row, columnIndex.find(StcColumns.purchaseReason)),
 
       purchaseForCancellation =
-        readBoolean(row, columnIndex.get(StcColumns.purchasedForCancellation))
+        readBoolean(row, columnIndex.find(StcColumns.purchasedForCancellation))
     )
 }

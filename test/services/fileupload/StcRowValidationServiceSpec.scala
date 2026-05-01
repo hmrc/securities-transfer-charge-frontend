@@ -76,7 +76,7 @@ class StcRowValidationServiceSpec extends AnyWordSpec with Matchers {
       StcColumns.applyingForRelief,
       StcColumns.whatRelief,
       StcColumns.securitiesTarget,
-      StcColumns.whatIsCRN,
+      StcColumns.companyRegistrationNumber,
       StcColumns.chargingPoint,
       StcColumns.taxRate,
       StcColumns.whatTypeOfSecurities,
@@ -96,22 +96,22 @@ class StcRowValidationServiceSpec extends AnyWordSpec with Matchers {
       val row = ParsedRow(
         rowNumber = 3,
         cells = Seq(
-          ParsedCell(columnIndex.get(StcColumns.sellerName).getOrElse(-1), "Seller Ltd"),
-          ParsedCell(columnIndex.get(StcColumns.sellerAddressInUk).getOrElse(-1), "yes"),
-          ParsedCell(columnIndex.get(StcColumns.sellerAddressLine1).getOrElse(-1), "1 Seller Street"),
-          ParsedCell(columnIndex.get(StcColumns.sellerPostcode).getOrElse(-1), "AA1 1AA"),
-          ParsedCell(columnIndex.get(StcColumns.connectedPersons).getOrElse(-1), "no"),
-          ParsedCell(columnIndex.get(StcColumns.applyingForRelief).getOrElse(-1), "no"),
-          ParsedCell(columnIndex.get(StcColumns.whatRelief).getOrElse(-1), ""),
-          ParsedCell(columnIndex.get(StcColumns.securitiesTarget).getOrElse(-1), "Target Ltd"),
-          ParsedCell(columnIndex.get(StcColumns.whatIsCRN).getOrElse(-1), "12345678"),
-          ParsedCell(columnIndex.get(StcColumns.chargingPoint).getOrElse(-1), "20/11/2025"),
-          ParsedCell(columnIndex.get(StcColumns.taxRate).getOrElse(-1), "0.5%"),
-          ParsedCell(columnIndex.get(StcColumns.whatTypeOfSecurities).getOrElse(-1), "shares"),
-          ParsedCell(columnIndex.get(StcColumns.typeOfShares).getOrElse(-1), "ordinary"),
-          ParsedCell(columnIndex.get(StcColumns.securitiesQuantity).getOrElse(-1), "100"),
-          ParsedCell(columnIndex.get(StcColumns.amountPaidForSecurities).getOrElse(-1), "1000"),
-          ParsedCell(columnIndex.get(StcColumns.totalMarketValue).getOrElse(-1), "1500")
+          ParsedCell(columnIndex.find(StcColumns.sellerName).getOrElse(-1), "Seller Ltd"),
+          ParsedCell(columnIndex.find(StcColumns.sellerAddressInUk).getOrElse(-1), "yes"),
+          ParsedCell(columnIndex.find(StcColumns.sellerAddressLine1).getOrElse(-1), "1 Seller Street"),
+          ParsedCell(columnIndex.find(StcColumns.sellerPostcode).getOrElse(-1), "AA1 1AA"),
+          ParsedCell(columnIndex.find(StcColumns.connectedPersons).getOrElse(-1), "no"),
+          ParsedCell(columnIndex.find(StcColumns.applyingForRelief).getOrElse(-1), "no"),
+          ParsedCell(columnIndex.find(StcColumns.whatRelief).getOrElse(-1), ""),
+          ParsedCell(columnIndex.find(StcColumns.securitiesTarget).getOrElse(-1), "Target Ltd"),
+          ParsedCell(columnIndex.find(StcColumns.companyRegistrationNumber).getOrElse(-1), "12345678"),
+          ParsedCell(columnIndex.find(StcColumns.chargingPoint).getOrElse(-1), "20/11/2025"),
+          ParsedCell(columnIndex.find(StcColumns.taxRate).getOrElse(-1), "0.5%"),
+          ParsedCell(columnIndex.find(StcColumns.whatTypeOfSecurities).getOrElse(-1), "shares"),
+          ParsedCell(columnIndex.find(StcColumns.typeOfShares).getOrElse(-1), "ordinary"),
+          ParsedCell(columnIndex.find(StcColumns.securitiesQuantity).getOrElse(-1), "100"),
+          ParsedCell(columnIndex.find(StcColumns.amountPaidForSecurities).getOrElse(-1), "1000"),
+          ParsedCell(columnIndex.find(StcColumns.totalMarketValue).getOrElse(-1), "1500")
         )
       )
 
@@ -125,22 +125,22 @@ class StcRowValidationServiceSpec extends AnyWordSpec with Matchers {
       val row = ParsedRow(
         rowNumber = 3,
         cells = Seq(
-          ParsedCell(columnIndex.get(StcColumns.sellerName).getOrElse(-1), ""),
-          ParsedCell(columnIndex.get(StcColumns.sellerAddressInUk).getOrElse(-1), "yes"),
-          ParsedCell(columnIndex.get(StcColumns.sellerAddressLine1).getOrElse(-1), ""),
-          ParsedCell(columnIndex.get(StcColumns.sellerPostcode).getOrElse(-1), ""),
-          ParsedCell(columnIndex.get(StcColumns.connectedPersons).getOrElse(-1), "yes"),
-          ParsedCell(columnIndex.get(StcColumns.applyingForRelief).getOrElse(-1), "yes"),
-          ParsedCell(columnIndex.get(StcColumns.whatRelief).getOrElse(-1), ""),
-          ParsedCell(columnIndex.get(StcColumns.securitiesTarget).getOrElse(-1), "Target Ltd"),
-          ParsedCell(columnIndex.get(StcColumns.whatIsCRN).getOrElse(-1), "12345678"),
-          ParsedCell(columnIndex.get(StcColumns.chargingPoint).getOrElse(-1), "20/11/2025"),
-          ParsedCell(columnIndex.get(StcColumns.taxRate).getOrElse(-1), "0.5%"),
-          ParsedCell(columnIndex.get(StcColumns.whatTypeOfSecurities).getOrElse(-1), "shares"),
-          ParsedCell(columnIndex.get(StcColumns.typeOfShares).getOrElse(-1), ""),
-          ParsedCell(columnIndex.get(StcColumns.securitiesQuantity).getOrElse(-1), "100"),
-          ParsedCell(columnIndex.get(StcColumns.amountPaidForSecurities).getOrElse(-1), "1000"),
-          ParsedCell(columnIndex.get(StcColumns.totalMarketValue).getOrElse(-1), ""))
+          ParsedCell(columnIndex.find(StcColumns.sellerName).getOrElse(-1), ""),
+          ParsedCell(columnIndex.find(StcColumns.sellerAddressInUk).getOrElse(-1), "yes"),
+          ParsedCell(columnIndex.find(StcColumns.sellerAddressLine1).getOrElse(-1), ""),
+          ParsedCell(columnIndex.find(StcColumns.sellerPostcode).getOrElse(-1), ""),
+          ParsedCell(columnIndex.find(StcColumns.connectedPersons).getOrElse(-1), "yes"),
+          ParsedCell(columnIndex.find(StcColumns.applyingForRelief).getOrElse(-1), "yes"),
+          ParsedCell(columnIndex.find(StcColumns.whatRelief).getOrElse(-1), ""),
+          ParsedCell(columnIndex.find(StcColumns.securitiesTarget).getOrElse(-1), "Target Ltd"),
+          ParsedCell(columnIndex.find(StcColumns.companyRegistrationNumber).getOrElse(-1), "12345678"),
+          ParsedCell(columnIndex.find(StcColumns.chargingPoint).getOrElse(-1), "20/11/2025"),
+          ParsedCell(columnIndex.find(StcColumns.taxRate).getOrElse(-1), "0.5%"),
+          ParsedCell(columnIndex.find(StcColumns.whatTypeOfSecurities).getOrElse(-1), "shares"),
+          ParsedCell(columnIndex.find(StcColumns.typeOfShares).getOrElse(-1), ""),
+          ParsedCell(columnIndex.find(StcColumns.securitiesQuantity).getOrElse(-1), "100"),
+          ParsedCell(columnIndex.find(StcColumns.amountPaidForSecurities).getOrElse(-1), "1000"),
+          ParsedCell(columnIndex.find(StcColumns.totalMarketValue).getOrElse(-1), ""))
         )
 
 

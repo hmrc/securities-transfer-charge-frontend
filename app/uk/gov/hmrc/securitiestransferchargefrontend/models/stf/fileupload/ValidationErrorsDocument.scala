@@ -16,7 +16,8 @@
 
 package uk.gov.hmrc.securitiestransferchargefrontend.models.stf.fileupload
 
-import play.api.libs.json.{OFormat, Json}
+import play.api.libs.json.{Format, Json, OFormat}
+import uk.gov.hmrc.mongo.play.json.formats.MongoJavatimeFormats
 
 import java.time.Instant
 
@@ -27,6 +28,8 @@ final case class ValidationErrorsDocument(
                                          )
 
 object ValidationErrorsDocument {
+  implicit val instantFormat: Format[Instant] = MongoJavatimeFormats.instantFormat
+
   implicit val format: OFormat[ValidationErrorsDocument] =
     Json.format[ValidationErrorsDocument]
 }

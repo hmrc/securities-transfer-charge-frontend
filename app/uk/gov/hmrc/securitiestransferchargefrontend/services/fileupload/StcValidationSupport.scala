@@ -48,7 +48,7 @@ class StcValidationSupport {
     StcRowValidationError(
       rowNumber = rowNumber,
       fieldName = fieldName,
-      columnIndex = columnIndexBuilder.get(fieldName).getOrElse(-1),
+      columnIndex = columnIndexBuilder.find(fieldName).getOrElse(-1),
       message = message,
       blocking = true
     )

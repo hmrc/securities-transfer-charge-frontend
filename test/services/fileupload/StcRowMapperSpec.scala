@@ -38,7 +38,7 @@ class StcRowMapperSpec extends AnyWordSpec with Matchers {
     StcColumns.applyingForRelief,
     StcColumns.whatRelief,
     StcColumns.securitiesTarget,
-    StcColumns.whatIsCRN,
+    StcColumns.companyRegistrationNumber,
     StcColumns.chargingPoint,
     StcColumns.taxRate,
     StcColumns.whatTypeOfSecurities,

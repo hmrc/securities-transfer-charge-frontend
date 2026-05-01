@@ -16,7 +16,9 @@
 
 package uk.gov.hmrc.securitiestransferchargefrontend.models.stf.upscan
 
-import play.api.libs.json.{Json, OFormat}
+import play.api.libs.json.{Format, Json, OFormat}
+import uk.gov.hmrc.mongo.play.json.formats.MongoJavatimeFormats
+
 import java.time.Instant
 
 case class UpscanDocument(
@@ -26,5 +28,7 @@ case class UpscanDocument(
                         )
 
 object UpscanDocument {
+  implicit val instantFormat: Format[Instant] = MongoJavatimeFormats.instantFormat
+
   implicit val format: OFormat[UpscanDocument] = Json.format[UpscanDocument]
 }
