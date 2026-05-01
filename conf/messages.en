@@ -414,4 +414,4 @@ agent.nameOfSeller.title = What’s the seller’s name?
 agent.nameOfSeller.heading = What’s the seller’s name?
 agent.nameOfSeller.checkYourAnswersLabel = What’s the seller’s name?
 agent.nameOfSeller.change.hidden = NameOfSeller
-agent.nameOfSeller.hint = This is the individual, business or trust selling the securities.
+agent.nameOfSeller.hint = This is the individual, business or trust selling the securities

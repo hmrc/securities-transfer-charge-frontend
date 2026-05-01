@@ -24,7 +24,7 @@ import uk.gov.hmrc.securitiestransferchargefrontend.models.{NormalMode, UserAnsw
 import uk.gov.hmrc.securitiestransferchargefrontend.navigation.NavigationHelper
 import uk.gov.hmrc.securitiestransferchargefrontend.pages.*
 import uk.gov.hmrc.securitiestransferchargefrontend.pages.stf.shared.HowToNotifyAboutSecuritiesTransferPage
-import uk.gov.hmrc.securitiestransferchargefrontend.pages.stf.single.{AgentReferencePage, NameOfBuyerPage, NameOfSellerPage}
+import uk.gov.hmrc.securitiestransferchargefrontend.pages.stf.single.{AgentReferencePage, NameOfBuyerPage, NameOfSellerPage, StfBuyersAddressPage}
 
 class BackwardsRoutes(defaultPage: Call):
 
@@ -35,7 +35,8 @@ class BackwardsRoutes(defaultPage: Call):
     case HowToNotifyAboutSecuritiesTransferPage => _ => sharedRoutes.SubmissionsDashboardController.onPageLoad()
     case AgentReferencePage => _ => agentRoutes.HowToNotifyAboutSecuritiesTransferController.onPageLoad(NormalMode)
     case NameOfBuyerPage => _ => agentSingleRoutes.AgentReferenceController.onPageLoad(NormalMode)
-    case NameOfSellerPage => _ => agentSingleRoutes.NameOfBuyerController.onPageLoad(NormalMode)
+    case StfBuyersAddressPage => _ => agentSingleRoutes.NameOfBuyerController.onPageLoad(NormalMode)
+    case NameOfSellerPage => _ => agentSingleRoutes.AddressController.onPageLoad()
     case _ => _ => defaultPage
 
   }
