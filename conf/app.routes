@@ -210,3 +210,6 @@ GET        /stf/agent/seller-name                         uk.gov.hmrc.securities
 POST       /stf/agent/seller-name                         uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.agents.single.NameOfSellerController.onSubmit(mode: Mode = NormalMode)
 GET        /stf/agent/change/seller-name                  uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.agents.single.NameOfSellerController.onPageLoad(mode: Mode = CheckMode)
 POST       /stf/agent/change/seller-name                  uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.agents.single.NameOfSellerController.onSubmit(mode: Mode = CheckMode)
+
+GET        /stf/agent/seller/address                      uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.agents.single.StfSellerAddressController.onPageLoad()
+GET        /stf/agent/seller/address/return               uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.agents.single.StfSellerAddressController.onReturn(id: String)

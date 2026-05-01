@@ -67,6 +67,9 @@ class FrontendAppConfig @Inject() (configuration: Configuration, servicesConfig:
   val alfStfOrgContinueUrl: String = s"$continueUrlBase/stf/org/address/return"
 
   val alfOrgSellerContinueUrl: String = s"$continueUrlBase/stf/org/seller/address/return"
+  
+  val alfAgentSellerContinueUrl: String = s"$continueUrlBase/stf/agent/seller/address/return"
+  val agentSellerAlfConfigFileLocation: String = configuration.get[String]("alf.stf-agent-seller-config-file")
 
   val sellerAlfConfigFileLocation: String = configuration.get[String]("alf.stf-seller-config-file")
   val reliefsFileLocation: String = configuration.get[String]("reliefs.reliefs-config-file")
