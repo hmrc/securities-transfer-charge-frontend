@@ -28,7 +28,7 @@ import uk.gov.hmrc.securitiestransferchargefrontend.pages.Page
 
 import java.time.LocalDate
 
-class StfAgentNavigator extends SpecBase with ScalaFutures {
+class StfAgentNavigatorSpec extends SpecBase with ScalaFutures {
 
   private val mockConfig: FrontendAppConfig = mock[FrontendAppConfig]
   when(mockConfig.firstChargingPoint).thenReturn(LocalDate.of(2026, 1, 1))
