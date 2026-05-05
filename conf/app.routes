@@ -193,6 +193,10 @@ GET        /stf/org/bulk-formatting                       uk.gov.hmrc.securities
 
 GET        /stf/org/template                              uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.organisations.bulk.TemplateInstructionsController.onPageLoad()
 
+GET        /stf/agents/buyer-name                               uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.agents.single.NameOfBuyerController.onPageLoad(mode: Mode = NormalMode)
+POST       /stf/agents/buyer-name                               uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.agents.single.NameOfBuyerController.onSubmit(mode: Mode = NormalMode)
+GET        /stf/agents/change/buyer-name                        uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.agents.single.NameOfBuyerController.onPageLoad(mode: Mode = CheckMode)
+POST       /stf/agents/change/buyer-name                        uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.agents.single.NameOfBuyerController.onSubmit(mode: Mode = CheckMode)
 GET        /stf/agent/add-reference                       uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.agents.single.AgentReferenceController.onPageLoad(mode: Mode = NormalMode)
 POST       /stf/agent/add-reference                       uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.agents.single.AgentReferenceController.onSubmit(mode: Mode = NormalMode)
 GET        /stf/agent/change/add-reference                uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.agents.single.AgentReferenceController.onPageLoad(mode: Mode = CheckMode)

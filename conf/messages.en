@@ -385,13 +385,20 @@ uploadedFileError.table.heading = Problems with your file
 uploadedFileError.table.cell = Cell
 uploadedFileError.table.error = Error
 
-agent.details.caption = Agent details
+agents.nameOfBuyer.details.caption = Buyer details
+agents.nameOfBuyer.title = What’s the buyer’s name?
+agents.nameOfBuyer.heading = What’s the buyer’s name?
+agents.nameOfBuyer.hint = This is the person, business or trust buying the securities
+agents.details.caption = Agent details
 agentReference.title = Add a reference
 agentReference.heading = Add a reference (optional)
 agentReference.checkYourAnswersLabel = Add a reference
 agentReference.hint = You can add a reference for your own records and to help you find this submission later. It will not be used by HMRC.
 agentReference.error.length = Your reference must be 255 characters or fewer
 agentReference.change.hidden = AgentReference
+
+nameOfBuyer.error.required = Enter the buyer’s name
+nameOfBuyer.error.length = Buyer’s name must be 35 characters or fewer
 
 agent.howToNotifyAboutSecuritiesTransfer.title = How would you like to tell us about these securities transfers?
 agent.howToNotifyAboutSecuritiesTransfer.heading = How would you like to tell us about these securities transfers?
@@ -408,4 +415,3 @@ agent.nameOfSeller.heading = What’s the seller’s name?
 agent.nameOfSeller.checkYourAnswersLabel = What’s the seller’s name?
 agent.nameOfSeller.change.hidden = NameOfSeller
 agent.nameOfSeller.hint = This is the individual, business or trust selling the securities
-
