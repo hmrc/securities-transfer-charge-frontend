@@ -33,9 +33,9 @@
 
 @(form: Form[_], mode: Mode, backLinkCall: Call)(implicit request: Request[_], messages: Messages)
 
-@layout(pageTitle = title(form, messages("agents.nameOfBuyer.title")), backLinkUrl = Some(backLinkCall.url)) {
+@layout(pageTitle = title(form, messages("agent.nameOfBuyer.title")), backLinkUrl = Some(backLinkCall.url)) {
     <div id="caption-heading" class="govuk-caption-l">
-        @messages("agents.nameOfBuyer.details.caption")
+        @messages("agent.nameOfBuyer.details.caption")
     </div>
 
     @formHelper(action = routes.NameOfBuyerController.onSubmit(mode)) {
@@ -47,10 +47,10 @@
         @govukInput(
             InputViewModel(
                 field = form("value"),
-                label = LabelViewModel(messages("agents.nameOfBuyer.heading")).asPageHeading(Large)
+                label = LabelViewModel(messages("agent.nameOfBuyer.heading")).asPageHeading(Large)
             )
             .withWidth(Full)
-            .withHint(HintViewModel(messages("agents.nameOfBuyer.hint")))
+            .withHint(HintViewModel(messages("agent.nameOfBuyer.hint")))
 
         )
 

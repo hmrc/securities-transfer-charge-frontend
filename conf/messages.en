@@ -385,11 +385,11 @@ uploadedFileError.table.heading = Problems with your file
 uploadedFileError.table.cell = Cell
 uploadedFileError.table.error = Error
 
-agents.nameOfBuyer.details.caption = Buyer details
-agents.nameOfBuyer.title = What’s the buyer’s name?
-agents.nameOfBuyer.heading = What’s the buyer’s name?
-agents.nameOfBuyer.hint = This is the person, business or trust buying the securities
-agents.details.caption = Agent details
+agent.nameOfBuyer.details.caption = Buyer details
+agent.nameOfBuyer.title = What’s the buyer’s name?
+agent.nameOfBuyer.heading = What’s the buyer’s name?
+agent.nameOfBuyer.hint = This is the person, business or trust buying the securities
+agent.details.caption = Agent details
 agentReference.title = Add a reference
 agentReference.heading = Add a reference (optional)
 agentReference.checkYourAnswersLabel = Add a reference
