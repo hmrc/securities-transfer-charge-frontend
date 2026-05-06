@@ -418,7 +418,7 @@ agent.nameOfSeller.hint = This is the individual, business or trust selling the 
 
 agent.connectedPersons.title = Connected persons
 agent.connectedPersons.heading = Connected persons
-agent.connectedPersons.legend = Are you and the seller of these securities connected?
+agent.connectedPersons.legend = Are the buyer and seller connected persons?
 agent.connectedPersons.checkYourAnswersLabel = Are the buyer and seller connected persons?
 agent.connectedPersons.error.required = Select yes if the buyer and seller are connected persons
 agent.connectedPersons.p = We need to know if the buyer and seller of these shares are considered ’connected persons’ according to
