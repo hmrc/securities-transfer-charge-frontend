@@ -417,7 +417,7 @@ org.uploadedFileError.table.heading = Problems with your file
 org.uploadedFileError.table.cell = Cell
 org.uploadedFileError.table.error = Error
 
-fileUpload.error.sellerAddressInUk.invalid = Enter ‘yes’ if the seller lives in the UK, or ‘no’ if the seller does not live in the UK
+fileUpload.error.sellerAddressInUK.invalid = Enter ‘yes’ if the seller lives in the UK, or ‘no’ if the seller does not live in the UK
 fileUpload.error.sellerAddressLine1.required = Enter the first line of your address
 fileUpload.error.sellerAddressLine1.length = Address line 1 must be 50 characters or fewer
 fileUpload.error.sellerAddressLine1.invalidCharacters = Address line 1 can only include letters, numbers and the following characters: , . - ’
