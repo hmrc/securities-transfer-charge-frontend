@@ -38,7 +38,7 @@
 @(form: Form[_], mode: Mode, backLinkCall: Call)(implicit request: Request[_], messages: Messages)
 
 @link = @{hmrcNewTabLinkHelper(NewTabLinkHelper(
-        text = messages("agent.connectedPersons.p.link.content"),
+        text = messages("agent.connectedPersons.content.link.text"),
         href = Some(config.connectedPersonsInformationUrl)
     ))
 }
@@ -56,10 +56,7 @@
             @messages("agent.connectedPersons.heading")
         </h1>
 
-        <p class="govuk-body">
-            <span>@messages("agent.connectedPersons.p")</span>
-            $link
-        </p>
+        <p class="govuk-body">@messages("agent.connectedPersons.p") @link.</p>
 
         <br>
         <br>

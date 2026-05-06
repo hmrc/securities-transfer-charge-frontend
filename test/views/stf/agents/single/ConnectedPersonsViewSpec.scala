@@ -45,8 +45,8 @@ class ConnectedPersonsViewSpec extends ViewBaseSpec {
     val caption: String = messages("transfer.details.caption")
     val heading: String = messages("agent.connectedPersons.heading")
     val para: String = messages("agent.connectedPersons.p")
+    val legend: String = messages("agent.connectedPersons.legend")
     val paraLinkText: String = messages("agent.connectedPersons.content.link.text")
-    val paraLink: String = "https: //www.gov.uk/hmrc-internal-manuals/vat-insurance/vatins9000"
     val saveAndContinue: String = messages("site.save-and-continue.button")
     val saveAndReturn: String = messages("site.save-and-return.button")
   }
@@ -70,12 +70,12 @@ class ConnectedPersonsViewSpec extends ViewBaseSpec {
       }
 
       "have the correct text with a link" in {
-        val paragraph = connectedPersonsView.select("p.govuk-body").first()
-        val spans = paragraph.select("span")
-        spans.get(0).text() mustBe ExpectedContent.para
-        spans.get(1).select("a.govuk-link").text() mustBe ExpectedContent.paraLinkText
-        spans.get(1).select("a.govuk-link").attr("href") mustBe "https://www.gov.uk/hmrc-internal-manuals/vat-insurance/vatins9000"
-        spans.get(1).text() mustBe ExpectedContent.paraLinkText + "."
+        connectedPersonsView.select(".govuk-body").text() mustBe ExpectedContent.para + " " + ExpectedContent.paraLinkText + " (opens in new tab)."
+        connectedPersonsView.select("p.govuk-body").select("a.govuk-link").attr("href") mustBe "https://www.gov.uk/hmrc-internal-manuals/vat-insurance/vatins9000"
+      }
+
+      "have the correct legend" in {
+        connectedPersonsView.select(".govuk-fieldset").text() must include(ExpectedContent.legend)
       }
 
       "have a save and continue button" in {
