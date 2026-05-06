@@ -18,9 +18,10 @@ package models.submission
 
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpec
-import uk.gov.hmrc.securitiestransferchargefrontend.models.stf.fileupload.{ParsedStcRow, ParsedValue, ValidatedStcRow}
-import uk.gov.hmrc.securitiestransferchargefrontend.models.submission.*
 import uk.gov.hmrc.securitiestransferchargefrontend.models.stf
+import uk.gov.hmrc.securitiestransferchargefrontend.models.stf.fileupload.{ParsedStcRow, ValidatedStcRow}
+import uk.gov.hmrc.securitiestransferchargefrontend.models.submission.*
+
 import java.time.LocalDate
 
 class RowTransformsSpec extends AnyWordSpec with Matchers {
@@ -42,32 +43,30 @@ class RowTransformsSpec extends AnyWordSpec with Matchers {
   private val validatedRow = ValidatedStcRow(
     parsedRow = ParsedStcRow(
       rowNumber = 3,
-      addressLine1 = ParsedValue.Valid("10 Downing Street"),
-      addressLine2 = ParsedValue.Valid("Westminster"),
-      addressLine3 = ParsedValue.Valid("London"),
-      addressLine4 = ParsedValue.Missing,
-      postcode = ParsedValue.Valid("SW1A 2AA"),
-      country = ParsedValue.Valid("United Kingdom"),
-      sellerName = ParsedValue.Valid("Bob Seller"),
-      sellerAddressInUk = ParsedValue.Valid(true),
-      sellerAddressLine1 = ParsedValue.Valid("1 Seller Street"),
-      sellerAddressLine2 = ParsedValue.Valid("Seller District"),
-      sellerAddressLine3 = ParsedValue.Valid("Seller City"),
-      sellerAddressLine4 = ParsedValue.Missing,
-      sellerPostcode = ParsedValue.Valid("LS1 1AA"),
-      sellerCountry = ParsedValue.Valid("United Kingdom"),
-      connectedPersons = ParsedValue.Valid(true),
-      applyingForRelief = ParsedValue.Valid(true),
-      whatReliefAreYouApplyingFor = ParsedValue.Valid("Group relief"),
-      securitiesTarget = ParsedValue.Valid("Example Holdings Ltd"),
-      companyRegistrationNumber = ParsedValue.Valid("12345678"),
-      chargingPoint = ParsedValue.Valid(LocalDate.of(2026, 3, 23)),
-      taxRate = ParsedValue.Valid(BigDecimal("1.5")),
-      whatTypeOfSecurities = ParsedValue.Valid("Shares"),
-      typeOfShares = ParsedValue.Valid("Ordinary Shares"),
-      securitiesQuantity = ParsedValue.Valid(BigDecimal("1000")),
-      amountPaidForSecurities = ParsedValue.Valid(BigDecimal("5000.25")),
-      totalMarketValue = ParsedValue.Valid(BigDecimal("6000"))
+      sellerName = Some("Bob Seller"),
+      sellerAddressInUK = Some(true),
+      sellerAddressLine1 = Some("1 Seller Street"),
+      sellerAddressLine2 = Some("Seller District"),
+      sellerAddressLine3 = Some("Seller City"),
+      sellerAddressLine4 = None,
+      sellerPostcode = Some("LS1 1AA"),
+      sellerCountry = Some("United Kingdom"),
+      connectedPersons = Some(true),
+      applyingForRelief = Some(true),
+      whatReliefAreYouApplyingFor = Some("Group relief"),
+      securitiesTarget = Some("Example Holdings Ltd"),
+      companyRegistrationNumber = Some("12345678"),
+      chargingPoint = Some(LocalDate.of(2026, 3, 23)),
+      taxRate = Some(BigDecimal("1.5")),
+      whatTypeOfSecurities = Some("Shares"),
+      typeOfShares = Some("Ordinary Shares"),
+      securitiesQuantity = Some(BigDecimal("1000")),
+      amountPaidForSecurities = Some(BigDecimal("5000.25")),
+      totalMarketValue = Some(BigDecimal("6000")),
+      minSharePrice = Some(BigDecimal("100")), 
+      maxSharePrice = Some(BigDecimal("1000")), 
+      sharePurchaseReason = Some("cancellation"), 
+      purchaseForCancellation = Some(true)
     ),
     validationErrors = Seq.empty
   )
@@ -125,7 +124,7 @@ class RowTransformsSpec extends AnyWordSpec with Matchers {
     }
 
     "throw when seller postcode is missing" in {
-      val rowMissingBuyerPostcode = validatedRow.copy(parsedRow = validatedRow.parsedRow.copy(sellerPostcode = ParsedValue.Missing))
+      val rowMissingBuyerPostcode = validatedRow.copy(parsedRow = validatedRow.parsedRow.copy(sellerPostcode = None))
 
       an[IllegalArgumentException] shouldBe thrownBy {
         RowTransforms.fromValidatedStcRowToStfRequest(rowMissingBuyerPostcode, individualData)
@@ -133,7 +132,7 @@ class RowTransformsSpec extends AnyWordSpec with Matchers {
     }
 
     "throw when seller country is missing" in {
-      val rowMissingSellerCountry = validatedRow.copy(parsedRow = validatedRow.parsedRow.copy(sellerCountry = ParsedValue.Missing))
+      val rowMissingSellerCountry = validatedRow.copy(parsedRow = validatedRow.parsedRow.copy(sellerCountry = None))
 
       an[IllegalArgumentException] shouldBe thrownBy {
         RowTransforms.fromValidatedStcRowToStfRequest(rowMissingSellerCountry, individualData)
@@ -141,7 +140,7 @@ class RowTransformsSpec extends AnyWordSpec with Matchers {
     }
 
     "throw when market value is missing for connected parties transactions" in {
-      val rowMissingMarketValue = validatedRow.copy(parsedRow = validatedRow.parsedRow.copy(totalMarketValue = ParsedValue.Missing))
+      val rowMissingMarketValue = validatedRow.copy(parsedRow = validatedRow.parsedRow.copy(totalMarketValue = None))
 
       an[IllegalArgumentException] shouldBe thrownBy {
         RowTransforms.fromValidatedStcRowToStfRequest(rowMissingMarketValue, individualData)

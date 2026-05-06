@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 HM Revenue & Customs
+ * Copyright 2026 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,21 +14,23 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.securitiestransferchargefrontend.models.stf.upscan
+package uk.gov.hmrc.securitiestransferchargefrontend.models.stf.fileupload
 
 import play.api.libs.json.{Format, Json, OFormat}
 import uk.gov.hmrc.mongo.play.json.formats.MongoJavatimeFormats
 
 import java.time.Instant
 
-case class UpscanDocument(
-                          _id: String,
-                          fileUpload: FileUpload,
-                          createdAt: Instant = Instant.now()
-                        )
+final case class ValidationErrorsDocument(
+                                           _id: String,
+                                           errors: Seq[StcRowValidationError],
+                                           createdAt: Instant = Instant.now()
+                                         )
 
-object UpscanDocument {
+object ValidationErrorsDocument {
   implicit val instantFormat: Format[Instant] = MongoJavatimeFormats.instantFormat
 
-  implicit val format: OFormat[UpscanDocument] = Json.format[UpscanDocument]
+  implicit val format: OFormat[ValidationErrorsDocument] =
+    Json.format[ValidationErrorsDocument]
 }
+

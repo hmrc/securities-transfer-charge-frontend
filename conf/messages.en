@@ -424,3 +424,54 @@ agent.connectedPersons.error.required = Select yes if the buyer and seller are c
 agent.connectedPersons.p = We need to know if the buyer and seller of these shares are considered ‘connected persons’ according to
 agent.connectedPersons.content.link.text = section 1122 of the Corporation Tax Act 2010
 agent.connectedPersons.change.hidden = Change connected persons
+
+org.uploadedFileError.title = There is a problem with your uploaded file
+org.uploadedFileError.heading = There is a problem with your uploaded file
+org.uploadedFileError.p1 = Correct the errors and upload it again, or upload a different file.
+org.uploadedFileError.table.heading = Problems with your file
+org.uploadedFileError.table.cell = Cell
+org.uploadedFileError.table.error = Error
+
+fileUpload.error.sellerAddressInUK.invalid = Enter ‘yes’ if the seller lives in the UK, or ‘no’ if the seller does not live in the UK
+fileUpload.error.sellerAddressLine1.required = Enter the first line of your address
+fileUpload.error.sellerAddressLine1.length = Address line 1 must be 50 characters or fewer
+fileUpload.error.sellerAddressLine1.invalidCharacters = Address line 1 can only include letters, numbers and the following characters: , . - ’
+fileUpload.error.sellerAddressLine2.length = Address line 2 must be fewer than 50 characters long
+fileUpload.error.sellerAddressLine2.invalidCharacters = Address line 2 can only include letters, numbers and the following characters: , . - ’
+fileUpload.error.sellerPostcode.required = Enter a postcode
+fileUpload.error.sellerPostcode.notFound = Your postcode cannot be found, check it is correct
+fileUpload.error.sellerPostcode.invalid = Enter a real postcode, like AA1 1AA
+fileUpload.error.sellerCountry.length = Country must be 50 characters or fewer
+fileUpload.error.sellerCountry.invalidCharacters = Country can only include letters, numbers and the following characters: , . - ’
+
+fileUpload.error.connectedPersons.invalid = Enter ‘yes’ if you and the buyer are connected persons
+fileUpload.error.applyingForRelief.invalid = Enter ‘yes’ if you are applying for a relief, or ‘no’ if you are not applying for a relief
+fileUpload.error.whatReliefAreYouApplyingFor.invalid = Enter the name of the relief you are applying for. See a full list of reliefs (opens in new tab).
+
+fileUpload.error.chargingPoint.invalidCharacters = The date you bought the securities can only contain numbers and letters
+fileUpload.error.taxRate.invalid = Enter a tax rate of ‘0.5%’ or ‘1.5%’
+
+fileUpload.error.whatTypeOfSecurities.required = Enter the type of securities you are buying
+fileUpload.error.typeOfShares.required = If you are buying shares, enter the type of shares
+
+fileUpload.error.securitiesQuantity.required = Enter the number of shares you are buying
+fileUpload.error.securitiesQuantity.nonNumeric = The amount of shares you are buying must be a number
+fileUpload.error.securitiesQuantity.minimum = The number of shares must be at least 1
+fileUpload.error.securitiesQuantity.maximum = The number of shares you are buying must be below 999,999,999
+
+fileUpload.error.amountPaidForSecurities.nonNumeric = The amount you paid for the securities must be a number
+fileUpload.error.amountPaidForSecurities.maximum = The amount you paid for the securities must be £999,999,999 or below
+
+fileUpload.error.totalMarketValue.nonNumeric = The market value of the securities must be a number
+fileUpload.error.totalMarketValue.maximum = The market value of the securities must be £999,999,999 or below
+
+minSharePrice.error.required = Enter an amount in £
+minSharePrice.error.maximum = The minimum share price must be below 999,999,999
+
+maxSharePrice.error.required = Enter an amount in £
+maxSharePrice.error.maximum = The maximum share price must be below 999,999,999
+
+sharePurchaseReason.required = Enter reason for share purchase
+sharePurchaseReason.invalid = Enter ‘cancellation’ or ‘treasury’
+
+purchasedForCancellation.invalid = Enter ‘yes’ if the shares also qualify as treasury shares

@@ -20,37 +20,29 @@ import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.actions.*
-import uk.gov.hmrc.securitiestransferchargefrontend.models.stf.UploadedFileError
+import uk.gov.hmrc.securitiestransferchargefrontend.repositories.ValidationErrorRepository
+import uk.gov.hmrc.securitiestransferchargefrontend.viewmodels.stf.fileupload.UploadedFileErrorMapper
 import uk.gov.hmrc.securitiestransferchargefrontend.views.html.stf.individuals.bulk.UploadedFileErrorView
 
 import javax.inject.Inject
+import scala.concurrent.ExecutionContext
 
 class UploadedFileErrorController @Inject()(
-                                       override val messagesApi: MessagesApi,
-                                       stcAuthEnrolled: StcAuthEnrolledAction,
-                                       val controllerComponents: MessagesControllerComponents,
-                                       view: UploadedFileErrorView
-                                     ) extends FrontendBaseController with I18nSupport {
+                                             override val messagesApi: MessagesApi,
+                                             stcAuthEnrolled: StcAuthEnrolledAction,
+                                             val controllerComponents: MessagesControllerComponents,
+                                             validationErrorRepository: ValidationErrorRepository,
+                                             view: UploadedFileErrorView
+                                           )(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport {
 
-  def onPageLoad: Action[AnyContent] = stcAuthEnrolled {
-    implicit request =>
-      Ok(view(stubUploadedFileErrors))
-  }
 
-  private def stubUploadedFileErrors: Seq[UploadedFileError] = {
-    Seq(
-      UploadedFileError(
-        cell = "J6",
-        error = "The seller's name cannot contain numbers"
-      ),
-      UploadedFileError(
-        cell = "J36",
-        error = "You have selected that the buyer is a company, you need to enter the registered address"
-      ),
-      UploadedFileError(
-        cell = "K3",
-        error = "Buyer's country can only contain letters, numbers and hyphens"
-      )
-    )
-  }
+  def onPageLoad(reference: String): Action[AnyContent] =
+    stcAuthEnrolled.async { implicit request =>
+      for {
+        validationErrors <- validationErrorRepository.findByReference(reference)
+      } yield {
+        val errors = UploadedFileErrorMapper.from(validationErrors)
+        Ok(view(errors))
+      }
+    }
 }

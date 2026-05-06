@@ -54,24 +54,21 @@ class CsvFileParserSpec extends AnyWordSpec with Matchers with EitherValues {
 
       result.fileName shouldBe "test.csv"
       result.mimeType shouldBe "text/csv"
-      result.rows.size shouldBe 3
 
-      result.rows.head.rowNumber shouldBe 1
+      result.headers shouldBe Seq("name", "amount", "date") ++
+        Seq.fill(maxColumns - 3)("")
+
+      result.rows.size shouldBe 2
+
+      result.rows.head.rowNumber shouldBe 2
       result.rows.head.cells shouldBe Seq(
-        ParsedCell(0, "name"),
-        ParsedCell(1, "amount"),
-        ParsedCell(2, "date")
-      ) ++ blankCells(fromIndex = 3)
-
-      result.rows(1).rowNumber shouldBe 2
-      result.rows(1).cells shouldBe Seq(
         ParsedCell(0, "Bill"),
         ParsedCell(1, "100"),
         ParsedCell(2, "2026-03-23")
       ) ++ blankCells(fromIndex = 3)
 
-      result.rows(2).rowNumber shouldBe 3
-      result.rows(2).cells shouldBe Seq(
+      result.rows(1).rowNumber shouldBe 3
+      result.rows(1).cells shouldBe Seq(
         ParsedCell(0, "Bob"),
         ParsedCell(1, "200"),
         ParsedCell(2, "2026-03-24")
@@ -86,7 +83,7 @@ class CsvFileParserSpec extends AnyWordSpec with Matchers with EitherValues {
 
       val result = parser.parse(uploadedFile(csv)).value
 
-      result.rows(1).cells shouldBe Seq(
+      result.rows.head.cells shouldBe Seq(
         ParsedCell(0, "Bill"),
         ParsedCell(1, "1, High Street")
       ) ++ blankCells(fromIndex = 2)
@@ -100,7 +97,7 @@ class CsvFileParserSpec extends AnyWordSpec with Matchers with EitherValues {
 
       val result = parser.parse(uploadedFile(csv)).value
 
-      result.rows(1).cells shouldBe Seq(
+      result.rows.head.cells shouldBe Seq(
         ParsedCell(0, "Bill"),
         ParsedCell(1, "100")
       ) ++ blankCells(fromIndex = 2)
@@ -114,18 +111,18 @@ class CsvFileParserSpec extends AnyWordSpec with Matchers with EitherValues {
 
       val result = parser.parse(uploadedFile(csv)).value
 
-      result.rows.head.cells shouldBe Seq(
-        ParsedCell(0, "name")
-      ) ++ blankCells(fromIndex = 1)
+      result.headers shouldBe Seq("name") ++
+        Seq.fill(maxColumns - 1)("")
 
-      result.rows(1).cells shouldBe Seq(
+      result.rows.head.cells shouldBe Seq(
         ParsedCell(0, "Bill")
       ) ++ blankCells(fromIndex = 1)
     }
 
     "ignore columns beyond the first 27" in {
       val header = (1 to 30).map(i => s"col$i").mkString(",")
-      val row = (1 to 30).map(i => s"value$i").mkString(",")
+      val row    = (1 to 30).map(i => s"value$i").mkString(",")
+
       val csv =
         s"""$header
            |$row
@@ -133,14 +130,11 @@ class CsvFileParserSpec extends AnyWordSpec with Matchers with EitherValues {
 
       val result = parser.parse(uploadedFile(csv)).value
 
+      result.headers should have size maxColumns
       result.rows.head.cells should have size maxColumns
-      result.rows(1).cells should have size maxColumns
 
+      result.headers shouldBe (1 to maxColumns).map(i => s"col$i")
       result.rows.head.cells shouldBe (0 until maxColumns).map { index =>
-        ParsedCell(index, s"col${index + 1}")
-      }
-
-      result.rows(1).cells shouldBe (0 until maxColumns).map { index =>
         ParsedCell(index, s"value${index + 1}")
       }
     }
@@ -154,7 +148,8 @@ class CsvFileParserSpec extends AnyWordSpec with Matchers with EitherValues {
           |Bob
           |""".stripMargin
 
-      parser.parse(uploadedFile(csv)).left.value shouldBe RowLimitExceeded(3, 1)
+      parser.parse(uploadedFile(csv)).left.value shouldBe
+        RowLimitExceeded(3, 1)
     }
   }
 }

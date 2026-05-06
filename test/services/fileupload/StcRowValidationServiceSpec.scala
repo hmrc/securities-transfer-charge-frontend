@@ -16,160 +16,146 @@
 
 package services.fileupload
 
-import org.scalatest.matchers.should.Matchers
+import org.scalatest.matchers.must.Matchers
 import org.scalatest.wordspec.AnyWordSpec
-import uk.gov.hmrc.securitiestransferchargefrontend.models.stf.fileupload.{ParsedStcRow, ParsedValue, ValidatedStcRow}
-import uk.gov.hmrc.securitiestransferchargefrontend.services.fileupload.StcRowValidationService
-
-import java.time.LocalDate
+import play.api.i18n.MessagesApi
+import play.api.test.Helpers.stubMessagesApi
+import uk.gov.hmrc.securitiestransferchargefrontend.forms.stf.individuals.*
+import uk.gov.hmrc.securitiestransferchargefrontend.forms.stf.shared.NameOfSellerFormProvider
+import uk.gov.hmrc.securitiestransferchargefrontend.models.stf.fileupload.{ParsedCell, ParsedRow}
+import uk.gov.hmrc.securitiestransferchargefrontend.services.fileupload.*
 
 class StcRowValidationServiceSpec extends AnyWordSpec with Matchers {
 
-  private val service = new StcRowValidationService()
+  private val messagesApi: MessagesApi = stubMessagesApi(Map(
+    "en" -> Map(
+      "nameOfSeller.error.required" -> "Enter the seller's full name",
+      "fileUpload.error.sellerAddressInUK.invalid" -> "Enter ‘yes’ if the seller lives in the UK, or ‘no’ if the seller does not live in the UK",
+      "fileUpload.error.connectedPersons.invalid" -> "Enter ‘yes’ if you and the buyer are connected persons",
+      "fileUpload.error.applyingForRelief.invalid" -> "Enter ‘yes’ if you are applying for a relief, or ‘no’ if you are not applying for a relief",
+      "securitiesTarget.error.businessName.required" -> "Enter the name of the business you're buying securities in",
+      "chargingPoint.error.required.all" -> "Enter the date you bought the securities",
+      "fileUpload.error.taxRate.invalid" -> "Enter a tax rate of ‘0.5%’ or ‘1.5%’",
+      "fileUpload.error.whatTypeOfSecurities.required" -> "Enter the type of securities you are buying",
+      "fileUpload.error.securitiesQuantity.required" -> "Enter the number of shares you are buying",
+      "fileUpload.error.securitiesQuantity.minimum" -> "The number of shares must be at least 1",
+      "fileUpload.error.securitiesQuantity.maximum" -> "The number of shares you are buying must be below 999,999,999",
+      "amountPaidForSecurities.error.required" -> "Enter the amount you paid for the securities",
+      "fileUpload.error.sellerAddressLine1.required" -> "Enter the first line of your address",
+      "fileUpload.error.sellerPostcode.required" -> "Enter a postcode",
+      "fileUpload.error.totalMarketValue.maximum" -> "The market value of the securities must be £999,999,999 or below"
+    )
+  ))
 
-  private val validRow = ParsedStcRow(
-    rowNumber = 3,
-    addressLine1 = ParsedValue.Valid("10 Downing Street"),
-    addressLine2 = ParsedValue.Missing,
-    addressLine3 = ParsedValue.Missing,
-    addressLine4 = ParsedValue.Missing,
-    postcode = ParsedValue.Valid("SW1A 2AA"),
-    country = ParsedValue.Valid("United Kingdom"),
-    sellerName = ParsedValue.Valid("Bob Seller"),
-    sellerAddressInUk = ParsedValue.Valid(true),
-    sellerAddressLine1 = ParsedValue.Valid("1 Seller Street"),
-    sellerAddressLine2 = ParsedValue.Valid("Seller Region"),
-    sellerAddressLine3 = ParsedValue.Missing,
-    sellerAddressLine4 = ParsedValue.Missing,
-    sellerPostcode = ParsedValue.Valid("LS1 1AA"),
-    sellerCountry = ParsedValue.Valid("United Kingdom"),
-    connectedPersons = ParsedValue.Valid(false),
-    applyingForRelief = ParsedValue.Valid(true),
-    whatReliefAreYouApplyingFor = ParsedValue.Valid("Group relief"),
-    securitiesTarget = ParsedValue.Valid("Example Holdings Ltd"),
-    companyRegistrationNumber = ParsedValue.Valid("12345678"),
-    chargingPoint = ParsedValue.Valid(LocalDate.of(2026, 3, 23)),
-    taxRate = ParsedValue.Valid(BigDecimal("0.5")),
-    whatTypeOfSecurities = ParsedValue.Valid("Shares"),
-    typeOfShares = ParsedValue.Valid("Ordinary"),
-    securitiesQuantity = ParsedValue.Valid(BigDecimal("100")),
-    amountPaidForSecurities = ParsedValue.Valid(BigDecimal("500")),
-    totalMarketValue = ParsedValue.Missing
-  )
+  private val support = new StcValidationSupport
 
-  private def messageFor(result: ValidatedStcRow, fieldName: String): Option[String] =
-    result.validationErrors.find(_.fieldName == fieldName).map(_.message)
+  private val service =
+    new StcRowValidationService(
+      stcBasicRowValidator = new StcBasicRowValidator(
+        support = support,
+        messagesApi = messagesApi,
+        nameOfSellerFormProvider = new NameOfSellerFormProvider,
+        securitiesTargetFormProvider = new SecuritiesTargetFormProvider
+      ),
+      stcConditionalRowValidator = new StcConditionalRowValidator(
+        support = support,
+        messagesApi = messagesApi
+      )
+    )
 
-  "validate" should {
 
-    "return no validation errors for a valid row" in {
-      val result = service.validate(validRow)
 
-      result.parsedRow shouldBe validRow
-      result.validationErrors shouldBe empty
-      result.hasBlockingErrors shouldBe false
-      result.hasErrors shouldBe false
-    }
+  private val headers: Seq[String] =
+    Seq(
+      "STF",
+      StcColumns.sellerName,
+      StcColumns.sellerAddressInUK,
+      StcColumns.sellerAddressLine1,
+      StcColumns.sellerPostcode,
+      StcColumns.connectedPersons,
+      StcColumns.applyingForRelief,
+      StcColumns.whatRelief,
+      StcColumns.securitiesTarget,
+      StcColumns.companyRegistrationNumber,
+      StcColumns.chargingPoint,
+      StcColumns.taxRate,
+      StcColumns.whatTypeOfSecurities,
+      StcColumns.securitiesQuantity,
+      StcColumns.amountPaidForSecurities,
+      StcColumns.totalMarketValue,
+      StcColumns.typeOfShares,
+      StcColumns.typeOfShares
+    )
+  implicit val columnIndex: ColumnIndexBuilder = new ColumnIndexBuilder(headers)
 
-    "return blocking errors for missing required fields" in {
-      val invalidRow = validRow.copy(
-        sellerName = ParsedValue.Missing,
-        chargingPoint = ParsedValue.Missing
+
+  "StcRowValidationService.validateAll" must {
+
+    "return no errors for a valid row" in {
+
+      val row = ParsedRow(
+        rowNumber = 3,
+        cells = Seq(
+          ParsedCell(columnIndex.find(StcColumns.sellerName).getOrElse(-1), "Seller Ltd"),
+          ParsedCell(columnIndex.find(StcColumns.sellerAddressInUK).getOrElse(-1), "yes"),
+          ParsedCell(columnIndex.find(StcColumns.sellerAddressLine1).getOrElse(-1), "1 Seller Street"),
+          ParsedCell(columnIndex.find(StcColumns.sellerPostcode).getOrElse(-1), "AA1 1AA"),
+          ParsedCell(columnIndex.find(StcColumns.connectedPersons).getOrElse(-1), "no"),
+          ParsedCell(columnIndex.find(StcColumns.applyingForRelief).getOrElse(-1), "no"),
+          ParsedCell(columnIndex.find(StcColumns.whatRelief).getOrElse(-1), ""),
+          ParsedCell(columnIndex.find(StcColumns.securitiesTarget).getOrElse(-1), "Target Ltd"),
+          ParsedCell(columnIndex.find(StcColumns.companyRegistrationNumber).getOrElse(-1), "12345678"),
+          ParsedCell(columnIndex.find(StcColumns.chargingPoint).getOrElse(-1), "20/11/2025"),
+          ParsedCell(columnIndex.find(StcColumns.taxRate).getOrElse(-1), "0.5%"),
+          ParsedCell(columnIndex.find(StcColumns.whatTypeOfSecurities).getOrElse(-1), "shares"),
+          ParsedCell(columnIndex.find(StcColumns.typeOfShares).getOrElse(-1), "ordinary"),
+          ParsedCell(columnIndex.find(StcColumns.securitiesQuantity).getOrElse(-1), "100"),
+          ParsedCell(columnIndex.find(StcColumns.amountPaidForSecurities).getOrElse(-1), "1000"),
+          ParsedCell(columnIndex.find(StcColumns.totalMarketValue).getOrElse(-1), "1500")
+        )
       )
 
-      val result = service.validate(invalidRow)
+      val result = service.validateAll(Seq(row), headers)
 
-      result.hasBlockingErrors shouldBe true
-      result.validationErrors.map(_.fieldName) should contain allOf (
+      result.head.validationErrors mustBe Seq.empty
+    }
+
+    "combine basic and conditional validation errors" in {
+
+      val row = ParsedRow(
+        rowNumber = 3,
+        cells = Seq(
+          ParsedCell(columnIndex.find(StcColumns.sellerName).getOrElse(-1), ""),
+          ParsedCell(columnIndex.find(StcColumns.sellerAddressInUK).getOrElse(-1), "yes"),
+          ParsedCell(columnIndex.find(StcColumns.sellerAddressLine1).getOrElse(-1), ""),
+          ParsedCell(columnIndex.find(StcColumns.sellerPostcode).getOrElse(-1), ""),
+          ParsedCell(columnIndex.find(StcColumns.connectedPersons).getOrElse(-1), "yes"),
+          ParsedCell(columnIndex.find(StcColumns.applyingForRelief).getOrElse(-1), "yes"),
+          ParsedCell(columnIndex.find(StcColumns.whatRelief).getOrElse(-1), ""),
+          ParsedCell(columnIndex.find(StcColumns.securitiesTarget).getOrElse(-1), "Target Ltd"),
+          ParsedCell(columnIndex.find(StcColumns.companyRegistrationNumber).getOrElse(-1), "12345678"),
+          ParsedCell(columnIndex.find(StcColumns.chargingPoint).getOrElse(-1), "20/11/2025"),
+          ParsedCell(columnIndex.find(StcColumns.taxRate).getOrElse(-1), "0.5%"),
+          ParsedCell(columnIndex.find(StcColumns.whatTypeOfSecurities).getOrElse(-1), "shares"),
+          ParsedCell(columnIndex.find(StcColumns.typeOfShares).getOrElse(-1), ""),
+          ParsedCell(columnIndex.find(StcColumns.securitiesQuantity).getOrElse(-1), "100"),
+          ParsedCell(columnIndex.find(StcColumns.amountPaidForSecurities).getOrElse(-1), "1000"),
+          ParsedCell(columnIndex.find(StcColumns.totalMarketValue).getOrElse(-1), ""))
+        )
+
+
+      val result = service.validateAll(Seq(row), headers)
+
+      val errors = result.head.validationErrors.map(_.fieldName)
+
+      errors must contain allOf(
         "sellerName",
-        "chargingPoint"
-      )
-    }
-
-    "return invalid numeric errors when a number field contains non-numeric data" in {
-      val invalidRow = validRow.copy(
-        connectedPersons = ParsedValue.Valid(true),
-        totalMarketValue = ParsedValue.Invalid("foo", "not a number"),
-        amountPaidForSecurities = ParsedValue.Invalid("bar", "not a number")
-      )
-
-      val result = service.validate(invalidRow)
-
-      messageFor(result, "totalMarketValue") shouldBe Some("Total market value must be a number")
-      messageFor(result, "amountPaidForSecurities") shouldBe Some("amountPaidForSecurities must be a number")
-    }
-
-    "return invalid boolean errors when a boolean field contains an unrecognised value" in {
-      val invalidRow = validRow.copy(
-        sellerAddressInUk = ParsedValue.Invalid("maybe", "not a recognised boolean"),
-        connectedPersons = ParsedValue.Invalid("sometimes", "not a recognised boolean")
-      )
-
-      val result = service.validate(invalidRow)
-
-      messageFor(result, "sellerAddressInUk") shouldBe Some("sellerAddressInUk must be yes or no")
-      messageFor(result, "connectedPersons") shouldBe Some("connectedPersons must be yes or no")
-    }
-
-    "return invalid date errors when a date field contains an invalid value" in {
-      val invalidRow = validRow.copy(
-        chargingPoint = ParsedValue.Invalid("foo", "not a valid date")
-      )
-
-      val result = service.validate(invalidRow)
-
-      result.validationErrors.map(_.fieldName) should contain("chargingPoint")
-      messageFor(result, "chargingPoint") shouldBe Some("chargingPoint must be a valid date")
-    }
-
-    "require reliefType when applyingForRelief is true" in {
-      val invalidRow = validRow.copy(
-        applyingForRelief = ParsedValue.Valid(true),
-        whatReliefAreYouApplyingFor = ParsedValue.Missing
-      )
-
-      val result = service.validate(invalidRow)
-
-      result.validationErrors.map(_.fieldName) should contain("whatReliefAreYouApplyingFor")
-    }
-
-    "require otherSecuritiesType when whatTypeOfSecurities is Other" in {
-      val invalidRow = validRow.copy(
-        whatTypeOfSecurities = ParsedValue.Valid("Other"),
-        typeOfShares = ParsedValue.Missing
-      )
-
-      val result = service.validate(invalidRow)
-
-      result.validationErrors.map(_.fieldName) should contain("otherSecuritiesType")
-    }
-
-    "require sellerAddressLine1, sellerAddressLine2 and sellerPostcode when sellerAddressInUk is true" in {
-      val invalidRow = validRow.copy(
-        sellerAddressInUk = ParsedValue.Valid(true),
-        sellerAddressLine1 = ParsedValue.Missing,
-        sellerAddressLine2 = ParsedValue.Missing,
-        sellerPostcode = ParsedValue.Missing
-      )
-
-      val result = service.validate(invalidRow)
-
-      result.validationErrors.map(_.fieldName) should contain allOf (
         "sellerAddressLine1",
-        "sellerAddressLine2",
-        "sellerPostcode"
+        "sellerPostcode",
+        "whatReliefAreYouApplyingFor",
+        "totalMarketValue",
+        "typeOfShares"
       )
-    }
-
-    "require sellerCountry when sellerAddressInUk is false" in {
-      val invalidRow = validRow.copy(
-        sellerAddressInUk = ParsedValue.Valid(false),
-        sellerCountry = ParsedValue.Missing
-      )
-
-      val result = service.validate(invalidRow)
-
-      result.validationErrors.map(_.fieldName) should contain("sellerCountry")
     }
   }
 }

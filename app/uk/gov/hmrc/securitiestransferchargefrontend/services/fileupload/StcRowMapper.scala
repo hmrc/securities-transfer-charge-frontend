@@ -16,40 +16,87 @@
 
 package uk.gov.hmrc.securitiestransferchargefrontend.services.fileupload
 
-import javax.inject.Singleton
 import uk.gov.hmrc.securitiestransferchargefrontend.models.stf.fileupload.{ParsedRow, ParsedStcRow}
 
+import javax.inject.Singleton
+
 @Singleton
-class StcRowMapper {
+class StcRowMapper(columnIndex: ColumnIndexBuilder) {
+
+  import SafeRowReader.*
 
   def map(row: ParsedRow): ParsedStcRow =
     ParsedStcRow(
       rowNumber = row.rowNumber,
-      addressLine1 = ParsedRowReader.readString(row, StcUploadColumn.addressLine1),
-      addressLine2 = ParsedRowReader.readString(row, StcUploadColumn.addressLine2),
-      addressLine3 = ParsedRowReader.readString(row, StcUploadColumn.addressLine3),
-      addressLine4 = ParsedRowReader.readString(row, StcUploadColumn.addressLine4),
-      postcode = ParsedRowReader.readString(row, StcUploadColumn.postcode),
-      country = ParsedRowReader.readString(row, StcUploadColumn.country),
-      sellerName = ParsedRowReader.readString(row, StcUploadColumn.sellerName),
-      sellerAddressInUk = ParsedRowReader.readBoolean(row, StcUploadColumn.sellerAddressInUK),
-      sellerAddressLine1 = ParsedRowReader.readString(row, StcUploadColumn.sellerAddressLine1),
-      sellerAddressLine2 = ParsedRowReader.readString(row, StcUploadColumn.sellerAddressLine2),
-      sellerAddressLine3 = ParsedRowReader.readString(row, StcUploadColumn.sellerAddressLine3),
-      sellerAddressLine4 = ParsedRowReader.readString(row, StcUploadColumn.sellerAddressLine4),
-      sellerPostcode = ParsedRowReader.readString(row, StcUploadColumn.sellerPostcode),
-      sellerCountry = ParsedRowReader.readString(row, StcUploadColumn.sellerCountry),
-      connectedPersons = ParsedRowReader.readBoolean(row, StcUploadColumn.connectedPersons),
-      applyingForRelief = ParsedRowReader.readBoolean(row, StcUploadColumn.applyingForRelief),
-      whatReliefAreYouApplyingFor = ParsedRowReader.readString(row, StcUploadColumn.whatReliefAreYouApplyingFor),
-      securitiesTarget = ParsedRowReader.readString(row, StcUploadColumn.securitiesTarget),
-      companyRegistrationNumber = ParsedRowReader.readString(row, StcUploadColumn.whatIsCRN),
-      chargingPoint = ParsedRowReader.readDate(row, StcUploadColumn.chargingPoint),
-      taxRate = ParsedRowReader.readBigDecimal(row, StcUploadColumn.taxRate),
-      whatTypeOfSecurities = ParsedRowReader.readString(row, StcUploadColumn.whatTypeOfSecurities),
-      typeOfShares = ParsedRowReader.readString(row, StcUploadColumn.typeOfShares),
-      securitiesQuantity = ParsedRowReader.readBigDecimal(row, StcUploadColumn.securitiesQuantity),
-      amountPaidForSecurities = ParsedRowReader.readBigDecimal(row, StcUploadColumn.amountPaidForSecurities),
-      totalMarketValue = ParsedRowReader.readBigDecimal(row, StcUploadColumn.totalMarketValue)
+
+      sellerName =
+        readString(row, columnIndex.find(StcColumns.sellerName)),
+
+      sellerAddressInUK =
+        readBoolean(row, columnIndex.find(StcColumns.sellerAddressInUK)),
+
+      sellerAddressLine1 =
+        readString(row, columnIndex.find(StcColumns.sellerAddressLine1)),
+
+      sellerAddressLine2 =
+        readString(row, columnIndex.find(StcColumns.sellerAddressLine2)),
+
+      sellerAddressLine3 =
+        readString(row, columnIndex.find(StcColumns.sellerAddressLine3)),
+
+      sellerAddressLine4 =
+        readString(row, columnIndex.find(StcColumns.sellerAddressLine4)),
+
+      sellerPostcode =
+        readString(row, columnIndex.find(StcColumns.sellerPostcode)),
+
+      sellerCountry =
+        readString(row, columnIndex.find(StcColumns.sellerCountry)),
+
+      connectedPersons =
+        readBoolean(row, columnIndex.find(StcColumns.connectedPersons)),
+
+      applyingForRelief =
+        readBoolean(row, columnIndex.find(StcColumns.applyingForRelief)),
+
+      whatReliefAreYouApplyingFor =
+        readString(row, columnIndex.find(StcColumns.whatRelief)),
+
+      securitiesTarget =
+        readString(row, columnIndex.find(StcColumns.securitiesTarget)),
+
+      companyRegistrationNumber =
+        readString(row, columnIndex.find(StcColumns.companyRegistrationNumber)),
+
+      chargingPoint =
+        readDate(row, columnIndex.find(StcColumns.chargingPoint)),
+
+      taxRate =
+        readTaxRate(row, columnIndex.find(StcColumns.taxRate)),
+
+      whatTypeOfSecurities =
+        readString(row, columnIndex.find(StcColumns.whatTypeOfSecurities)),
+
+      typeOfShares =
+        readString(row, columnIndex.find(StcColumns.typeOfShares)),
+
+      securitiesQuantity =
+        readBigDecimal(row, columnIndex.find(StcColumns.securitiesQuantity)),
+
+      amountPaidForSecurities =
+        readBigDecimal(row, columnIndex.find(StcColumns.amountPaidForSecurities)),
+
+      totalMarketValue =
+        readBigDecimal(row, columnIndex.find(StcColumns.totalMarketValue)),
+
+      minSharePrice =
+        readBigDecimal(row, columnIndex.find(StcColumns.minSharePrice)),
+      maxSharePrice = readBigDecimal(row, columnIndex.find(StcColumns.maxSharePrice)),
+
+      sharePurchaseReason =
+        readString(row, columnIndex.find(StcColumns.purchaseReason)),
+
+      purchaseForCancellation =
+        readBoolean(row, columnIndex.find(StcColumns.purchasedForCancellation))
     )
 }

@@ -1,0 +1,218 @@
+/*
+ * Copyright 2026 HM Revenue & Customs
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+package services.fileupload
+
+import org.scalatest.matchers.must.Matchers
+import org.scalatest.wordspec.AnyWordSpec
+import play.api.i18n.MessagesApi
+import play.api.test.Helpers.stubMessagesApi
+import uk.gov.hmrc.securitiestransferchargefrontend.forms.stf.individuals.*
+import uk.gov.hmrc.securitiestransferchargefrontend.forms.stf.shared.NameOfSellerFormProvider
+import uk.gov.hmrc.securitiestransferchargefrontend.models.stf.fileupload.*
+import uk.gov.hmrc.securitiestransferchargefrontend.services.fileupload.*
+
+import java.time.LocalDate
+
+class StcBasicRowValidatorSpec extends AnyWordSpec with Matchers {
+
+  private val messagesApi: MessagesApi = stubMessagesApi(
+    Map(
+      "en" -> Map(
+        "nameOfSeller.error.required" -> "Enter the seller's full name",
+        "fileUpload.error.sellerAddressInUK.invalid" -> "Enter ‘yes’ if the seller lives in the UK, or ‘no’ if the seller does not live in the UK",
+        "fileUpload.error.connectedPersons.invalid" -> "Enter ‘yes’ if you and the buyer are connected persons",
+        "fileUpload.error.applyingForRelief.invalid" -> "Enter ‘yes’ if you are applying for a relief, or ‘no’ if you are not applying for a relief",
+        "chargingPoint.error.required.all" -> "Enter the date you bought the securities",
+        "fileUpload.error.taxRate.invalid" -> "Enter a tax rate of ‘0.5%’ or ‘1.5%’",
+        "fileUpload.error.whatTypeOfSecurities.required" -> "Enter the type of securities you are buying",
+        "fileUpload.error.securitiesQuantity.required" -> "Enter the number of shares you are buying",
+        "fileUpload.error.securitiesQuantity.minimum" -> "The number of shares must be at least 1",
+        "fileUpload.error.securitiesQuantity.maximum" -> "The number of shares you are buying must be below 999,999,999",
+        "amountPaidForSecurities.error.required" -> "Enter the amount you paid for the securities",
+        "fileUpload.error.amountPaidForSecurities.maximum" -> "The amount you paid for the securities must be £999,999,999 or below"
+      )
+    )
+  )
+
+  private val validRow: ParsedStcRow =
+    ParsedStcRow(
+      rowNumber = 3,
+      sellerName = Some("Seller Ltd"),
+      sellerAddressInUK = Some(true),
+      sellerAddressLine1 = Some("1 Test"),
+      sellerAddressLine2 = Some("Test Region"),
+      sellerAddressLine3 = None,
+      sellerAddressLine4 = None,
+      sellerPostcode = Some("AA1 1AA"),
+      sellerCountry = None,
+      connectedPersons = Some(true),
+      applyingForRelief = Some(false),
+      whatReliefAreYouApplyingFor = None,
+      securitiesTarget = Some("Target Ltd"),
+      companyRegistrationNumber = Some("12345678"),
+      chargingPoint = Some(LocalDate.of(2025, 11, 20)),
+      taxRate = Some(BigDecimal("0.5")),
+      whatTypeOfSecurities = Some("Shares"),
+      typeOfShares = Some("Ordinary"),
+      securitiesQuantity = Some(BigDecimal(10000)),
+      amountPaidForSecurities = Some(BigDecimal(15000)),
+      totalMarketValue = Some(BigDecimal(20000)),
+      minSharePrice = None,
+      maxSharePrice = None,
+      sharePurchaseReason = None,
+      purchaseForCancellation = None
+    )
+
+  private val validator =
+    new StcBasicRowValidator(
+      support = new StcValidationSupport,
+      messagesApi = messagesApi,
+      nameOfSellerFormProvider = new NameOfSellerFormProvider,
+      securitiesTargetFormProvider = new SecuritiesTargetFormProvider
+    )
+
+  private implicit val columnIndex: ColumnIndexBuilder =
+    new ColumnIndexBuilder(Seq(
+      "sellerName",
+      "sellerAddressInUK",
+      "connectedPersons",
+      "applyingForRelief",
+      "chargingPoint",
+      "taxRate",
+      "whatTypeOfSecurities",
+      "securitiesQuantity",
+      "amountPaidForSecurities"
+    ))
+
+  "StcBasicRowValidator.validate" must {
+
+    "return no errors for a valid row" in {
+      val result = validator.validate(validRow, StcTemplate.STF)
+
+      result mustBe Seq.empty
+    }
+
+    "return seller name required error" in {
+      val result = validator.validate(
+        validRow.copy(sellerName = None),
+        StcTemplate.STF
+      )
+
+      result.exists(_.fieldName == "sellerName") mustBe true
+    }
+
+    "return seller address in uk missing error" in {
+      val result = validator.validate(
+        validRow.copy(sellerAddressInUK = None),
+        StcTemplate.STF
+      )
+
+      result.exists(_.fieldName == "sellerAddressInUK") mustBe true
+    }
+
+    "return connected persons missing error" in {
+      val result = validator.validate(
+        validRow.copy(connectedPersons = None),
+        StcTemplate.STF
+      )
+
+      result.exists(_.fieldName == "connectedPersons") mustBe true
+    }
+
+    "return applying for relief missing error" in {
+      val result = validator.validate(
+        validRow.copy(applyingForRelief = None),
+        StcTemplate.STF
+      )
+
+      result.exists(_.fieldName == "applyingForRelief") mustBe true
+    }
+
+    "return charging point required error" in {
+      val result = validator.validate(
+        validRow.copy(chargingPoint = None),
+        StcTemplate.STF
+      )
+
+      result.exists(_.fieldName == "chargingPoint") mustBe true
+    }
+
+    "return tax rate invalid when missing" in {
+      val result = validator.validate(
+        validRow.copy(taxRate = None),
+        StcTemplate.STF
+      )
+
+      result.exists(_.fieldName == "taxRate") mustBe true
+    }
+
+    "return what type of securities required error" in {
+      val result = validator.validate(
+        validRow.copy(whatTypeOfSecurities = None),
+        StcTemplate.STF
+      )
+
+      result.exists(_.fieldName == "whatTypeOfSecurities") mustBe true
+    }
+
+    "return securities quantity required error" in {
+      val result = validator.validate(
+        validRow.copy(securitiesQuantity = None),
+        StcTemplate.STF
+      )
+
+      result.exists(_.fieldName == "securitiesQuantity") mustBe true
+    }
+
+    "return securities quantity minimum error" in {
+      val result = validator.validate(
+        validRow.copy(securitiesQuantity = Some(BigDecimal(0))),
+        StcTemplate.STF
+      )
+
+      result.exists(_.fieldName == "securitiesQuantity") mustBe true
+    }
+
+    "return securities quantity maximum error" in {
+      val result = validator.validate(
+        validRow.copy(securitiesQuantity = Some(BigDecimal(999999999))),
+        StcTemplate.STF
+      )
+
+      result.exists(_.fieldName == "securitiesQuantity") mustBe true
+    }
+
+    "return amount paid required error" in {
+      val result = validator.validate(
+        validRow.copy(amountPaidForSecurities = None),
+        StcTemplate.STF
+      )
+
+      result.exists(_.fieldName == "amountPaidForSecurities") mustBe true
+    }
+
+    "return amount paid maximum error" in {
+      val result = validator.validate(
+        validRow.copy(amountPaidForSecurities = Some(BigDecimal(1000000000))),
+        StcTemplate.STF
+      )
+
+      result.exists(_.fieldName == "amountPaidForSecurities") mustBe true
+    }
+  }
+
+}

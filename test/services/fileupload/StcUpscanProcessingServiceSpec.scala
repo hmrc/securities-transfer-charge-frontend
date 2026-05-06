@@ -24,7 +24,7 @@ import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpec
 import org.scalatestplus.mockito.MockitoSugar
 import uk.gov.hmrc.http.HeaderCarrier
-import uk.gov.hmrc.securitiestransferchargefrontend.models.stf.fileupload.{FileParseError, ParsedStcRow, ParsedValue, StcFileValidationResponse, UploadedFile, ValidatedStcRow}
+import uk.gov.hmrc.securitiestransferchargefrontend.models.stf.fileupload.*
 import uk.gov.hmrc.securitiestransferchargefrontend.models.stf.upscan.{FileUpload, UpscanCallbackRequest, UpscanJourneyStatus}
 import uk.gov.hmrc.securitiestransferchargefrontend.services.fileupload.*
 
@@ -68,33 +68,31 @@ class StcUpscanProcessingServiceSpec extends AnyWordSpec with Matchers with Eith
   )
 
   private val parsedRow = ParsedStcRow(
-    rowNumber = 3,
-    addressLine1 = ParsedValue.Valid("10 Downing Street"),
-    addressLine2 = ParsedValue.Missing,
-    addressLine3 = ParsedValue.Missing,
-    addressLine4 = ParsedValue.Missing,
-    postcode = ParsedValue.Valid("SW1A 2AA"),
-    country = ParsedValue.Valid("United Kingdom"),
-    sellerName = ParsedValue.Valid("Bob Seller"),
-    sellerAddressInUk = ParsedValue.Valid(true),
-    sellerAddressLine1 = ParsedValue.Valid("1 Seller Street"),
-    sellerAddressLine2 = ParsedValue.Missing,
-    sellerAddressLine3 = ParsedValue.Missing,
-    sellerAddressLine4 = ParsedValue.Missing,
-    sellerPostcode = ParsedValue.Valid("LS1 1AA"),
-    sellerCountry = ParsedValue.Valid("United Kingdom"),
-    connectedPersons = ParsedValue.Valid(false),
-    applyingForRelief = ParsedValue.Valid(false),
-    whatReliefAreYouApplyingFor = ParsedValue.Missing,
-    securitiesTarget = ParsedValue.Missing,
-    companyRegistrationNumber = ParsedValue.Missing,
-    chargingPoint = ParsedValue.Valid(LocalDate.of(2026, 3, 23)),
-    taxRate = ParsedValue.Valid(BigDecimal("0.5")),
-    whatTypeOfSecurities = ParsedValue.Valid("Stock"),
-    typeOfShares = ParsedValue.Missing,
-    securitiesQuantity = ParsedValue.Valid(BigDecimal("100")),
-    amountPaidForSecurities = ParsedValue.Valid(BigDecimal("500")),
-    totalMarketValue = ParsedValue.Valid(BigDecimal("600"))
+    rowNumber = 1,
+    sellerName = Some("Acme Ltd"),
+    sellerAddressInUK = Some(true),
+    sellerAddressLine1 = Some("123 High Street"),
+    sellerAddressLine2 = Some("Suite 1"),
+    sellerAddressLine3 = None,
+    sellerAddressLine4 = None,
+    sellerPostcode = Some("SW1A 1AA"),
+    sellerCountry = None,
+    connectedPersons = Some(false),
+    applyingForRelief = Some(false),
+    whatReliefAreYouApplyingFor = None,
+    securitiesTarget = Some("Target Corp"),
+    companyRegistrationNumber = Some("12345678"),
+    chargingPoint = Some(LocalDate.of(2024, 1, 1)),
+    taxRate = Some(BigDecimal("0.5")),
+    whatTypeOfSecurities = Some("shares"),
+    typeOfShares = Some("ordinary"),
+    securitiesQuantity = Some(BigDecimal(100)),
+    amountPaidForSecurities = Some(BigDecimal(1000)),
+    totalMarketValue = Some(BigDecimal(1000)),
+    minSharePrice = Some(BigDecimal(10)),
+    maxSharePrice = Some(BigDecimal(20)),
+    sharePurchaseReason = Some("Investment"),
+    purchaseForCancellation = Some(true)
   )
 
   private val validationResponse = StcFileValidationResponse(

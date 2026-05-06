@@ -45,4 +45,8 @@ object FileParseError {
   final case class Unexpected(reason: String) extends FileParseError {
     override val message: String = s"Unexpected parsing error: $reason"
   }
+
+  case object EmptyFile extends FileParseError {
+    override val message: String = "The uploaded file is empty"
+  }
 }

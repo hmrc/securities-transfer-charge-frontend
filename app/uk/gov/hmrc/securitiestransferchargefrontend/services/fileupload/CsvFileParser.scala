@@ -42,16 +42,32 @@ class CsvFileParser @Inject()(config: FileUploadConfig) extends FileParser {
       try {
         val records = parser.getRecords.asScala.toSeq
 
-        if (records.size > config.maxRows) {
+        if (records.isEmpty) {
+          Left(InvalidCsv("The file is empty"))
+        } else if (records.size > config.maxRows) {
           Left(RowLimitExceeded(records.size, config.maxRows))
         } else {
-          val rows = records.zipWithIndex.map { case (record, index) =>
+
+          val headerRecord = records.head
+          val headerValues = headerRecord.iterator().asScala.toSeq
+
+          val headers: Seq[String] =
+            (0 until config.maxColumns).map { colIndex =>
+              headerValues.lift(colIndex).getOrElse("").trim
+            }
+
+          val dataRecords = records.tail
+
+          val rows = dataRecords.zipWithIndex.map { case (record, index) =>
             val values = record.iterator().asScala.toSeq
 
             ParsedRow(
-              rowNumber = index + 1,
+              rowNumber = index + 2,
               cells = (0 until config.maxColumns).map { colIndex =>
-                ParsedCell(colIndex, values.lift(colIndex).getOrElse("").trim)
+                ParsedCell(
+                  colIndex,
+                  values.lift(colIndex).getOrElse("").trim
+                )
               }
             )
           }
@@ -60,6 +76,7 @@ class CsvFileParser @Inject()(config: FileUploadConfig) extends FileParser {
             ParsedFile(
               fileName = file.fileName,
               mimeType = file.mimeType,
+              headers = headers,
               rows = rows
             )
           )

@@ -16,7 +16,7 @@
 
 package services.fileupload
 
-import org.scalatest.matchers.should.Matchers
+import org.scalatest.matchers.must.Matchers
 import org.scalatest.wordspec.AnyWordSpec
 import uk.gov.hmrc.securitiestransferchargefrontend.models.stf.fileupload.{ParsedCell, ParsedRow, ParsedValue}
 import uk.gov.hmrc.securitiestransferchargefrontend.services.fileupload.ParsedRowReader
@@ -25,110 +25,98 @@ import java.time.LocalDate
 
 class ParsedRowReaderSpec extends AnyWordSpec with Matchers {
 
-  private def row(values: String*): ParsedRow =
-    ParsedRow(
-      rowNumber = 3,
-      cells = values.zipWithIndex.map { case (value, idx) =>
-        ParsedCell(idx, value)
-      }
-    )
+  private val testColumn = 1
 
-  "readString" should {
+  "ParsedRowReader.readString" must {
 
-    "return Valid(trimmed value) when present" in {
-      ParsedRowReader.readString(row("  hello  "), 0) shouldBe ParsedValue.Valid("hello")
+    "return Missing for absent values" in {
+      ParsedRowReader.readString(row(None), testColumn) mustBe ParsedValue.Missing
+      ParsedRowReader.readString(row(Some("")), testColumn) mustBe ParsedValue.Missing
+      ParsedRowReader.readString(row(Some("   ")), testColumn) mustBe ParsedValue.Missing
     }
 
-    "return Missing for blank strings" in {
-      ParsedRowReader.readString(row("   "), 0) shouldBe ParsedValue.Missing
-    }
-
-    "return Missing when the column is missing" in {
-      ParsedRowReader.readString(row("a"), 10) shouldBe ParsedValue.Missing
+    "return trimmed Valid value" in {
+      ParsedRowReader.readString(row(Some("  abc  ")), testColumn) mustBe ParsedValue.Valid("abc")
     }
   }
 
-  "readBigDecimal" should {
+  "ParsedRowReader.readBigDecimal" must {
 
-    "parse a plain decimal" in {
-      ParsedRowReader.readBigDecimal(row("123.45"), 0) shouldBe ParsedValue.Valid(BigDecimal("123.45"))
+    "parse plain numbers" in {
+      ParsedRowReader.readBigDecimal(row(Some("123.45")), testColumn) mustBe ParsedValue.Valid(BigDecimal("123.45"))
     }
 
-    "parse a value containing commas" in {
-      ParsedRowReader.readBigDecimal(row("1,234.56"), 0) shouldBe ParsedValue.Valid(BigDecimal("1234.56"))
+    "parse values with commas, pounds and percent signs" in {
+      ParsedRowReader.readBigDecimal(row(Some("1,234.56")), testColumn) mustBe ParsedValue.Valid(BigDecimal("1234.56"))
+      ParsedRowReader.readBigDecimal(row(Some("£123.45")), testColumn) mustBe ParsedValue.Valid(BigDecimal("123.45"))
+      ParsedRowReader.readBigDecimal(row(Some("0.5%")), testColumn) mustBe ParsedValue.Valid(BigDecimal("0.5"))
     }
 
-    "parse a value containing a pound sign" in {
-      ParsedRowReader.readBigDecimal(row("£600.00"), 0) shouldBe ParsedValue.Valid(BigDecimal("600.00"))
+    "return Missing for blank values" in {
+      ParsedRowReader.readBigDecimal(row(Some(" ")), testColumn) mustBe ParsedValue.Missing
     }
 
-    "parse a value containing a percent sign" in {
-      ParsedRowReader.readBigDecimal(row("0.5%"), 0) shouldBe ParsedValue.Valid(BigDecimal("0.5"))
-    }
-
-    "return Invalid for an invalid number" in {
-      ParsedRowReader.readBigDecimal(row("abc"), 0) shouldBe ParsedValue.Invalid("abc", "not a number")
-    }
-
-    "return Missing for a blank value" in {
-      ParsedRowReader.readBigDecimal(row("   "), 0) shouldBe ParsedValue.Missing
-    }
-
-    "return Missing when the column is missing" in {
-      ParsedRowReader.readBigDecimal(row("123.45"), 10) shouldBe ParsedValue.Missing
+    "return Invalid for non-numeric values" in {
+      ParsedRowReader.readBigDecimal(row(Some("abc")), testColumn) mustBe ParsedValue.Invalid("abc", "not a number")
     }
   }
 
-  "readBoolean" should {
+  "ParsedRowReader.readBoolean" must {
 
-    "parse positive answers as true" in {
-      ParsedRowReader.readBoolean(row("yes"), 0) shouldBe ParsedValue.Valid(true)
-      ParsedRowReader.readBoolean(row("Y"), 0) shouldBe ParsedValue.Valid(true)
-      ParsedRowReader.readBoolean(row("true"), 0) shouldBe ParsedValue.Valid(true)
+    "parse yes variants to true" in {
+      ParsedRowReader.readBoolean(row(Some("yes")), testColumn) mustBe ParsedValue.Valid(true)
+      ParsedRowReader.readBoolean(row(Some("y")), testColumn) mustBe ParsedValue.Valid(true)
+      ParsedRowReader.readBoolean(row(Some("true")), testColumn) mustBe ParsedValue.Valid(true)
     }
 
-    "parse negative answers as false" in {
-      ParsedRowReader.readBoolean(row("no"), 0) shouldBe ParsedValue.Valid(false)
-      ParsedRowReader.readBoolean(row("N"), 0) shouldBe ParsedValue.Valid(false)
-      ParsedRowReader.readBoolean(row("false"), 0) shouldBe ParsedValue.Valid(false)
+    "parse no variants to false" in {
+      ParsedRowReader.readBoolean(row(Some("no")), testColumn) mustBe ParsedValue.Valid(false)
+      ParsedRowReader.readBoolean(row(Some("n")), testColumn) mustBe ParsedValue.Valid(false)
+      ParsedRowReader.readBoolean(row(Some("false")), testColumn) mustBe ParsedValue.Valid(false)
+    }
+
+    "return Missing for blank values" in {
+      ParsedRowReader.readBoolean(row(Some(" ")), testColumn) mustBe ParsedValue.Missing
     }
 
     "return Invalid for unrecognised values" in {
-      ParsedRowReader.readBoolean(row("maybe"), 0) shouldBe ParsedValue.Invalid("maybe", "not a recognised boolean")
-    }
-
-    "return Missing for a blank value" in {
-      ParsedRowReader.readBoolean(row("   "), 0) shouldBe ParsedValue.Missing
-    }
-
-    "return Missing when the column is missing" in {
-      ParsedRowReader.readBoolean(row("yes"), 10) shouldBe ParsedValue.Missing
+      ParsedRowReader.readBoolean(row(Some("maybe")), testColumn) mustBe ParsedValue.Invalid("maybe", "not a recognised boolean")
     }
   }
 
-  "readDate" should {
+  "ParsedRowReader.readDate" must {
 
-    "parse supported date formats" in {
-      Seq(
-        "2026-03-23" -> LocalDate.of(2026, 3, 23),
-        "23/3/2026"  -> LocalDate.of(2026, 3, 23),
-        "23/03/2026" -> LocalDate.of(2026, 3, 23),
-        "23 03 2026" -> LocalDate.of(2026, 3, 23)
-      ).foreach { case (input, expected) =>
-        ParsedRowReader.readDate(row(input), 0) shouldBe ParsedValue.Valid(expected)
-      }
+    "parse yyyy-MM-dd" in {
+      ParsedRowReader.readDate(row(Some("2025-11-20")), testColumn) mustBe ParsedValue.Valid(LocalDate.of(2025, 11, 20))
     }
 
-    "return Invalid for invalid dates" in {
-      ParsedRowReader.readDate(row("not-a-date"), 0) shouldBe ParsedValue.Invalid("not-a-date", "not a valid date")
+    "parse yyyy/MM/dd" in {
+      ParsedRowReader.readDate(row(Some("2025/11/20")), testColumn) mustBe ParsedValue.Valid(LocalDate.of(2025, 11, 20))
     }
 
-    "return Missing when the value is blank" in {
-      ParsedRowReader.readDate(row("   "), 0) shouldBe ParsedValue.Missing
+    "parse d/M/yyyy and dd/MM/yyyy" in {
+      ParsedRowReader.readDate(row(Some("2/3/2025")), testColumn) mustBe ParsedValue.Valid(LocalDate.of(2025, 3, 2))
+      ParsedRowReader.readDate(row(Some("02/03/2025")), testColumn) mustBe ParsedValue.Valid(LocalDate.of(2025, 3, 2))
     }
 
-    "return Missing when the column is missing" in {
-      ParsedRowReader.readDate(row("2026-03-23"), 10) shouldBe ParsedValue.Missing
+    "parse spaced dates" in {
+      ParsedRowReader.readDate(row(Some("2 3 2025")), testColumn) mustBe ParsedValue.Valid(LocalDate.of(2025, 3, 2))
+      ParsedRowReader.readDate(row(Some("02 03 2025")), testColumn) mustBe ParsedValue.Valid(LocalDate.of(2025, 3, 2))
+    }
+
+    "return Missing for blank values" in {
+      ParsedRowReader.readDate(row(Some(" ")), testColumn) mustBe ParsedValue.Missing
+    }
+
+    "return Invalid for non-date values" in {
+      ParsedRowReader.readDate(row(Some("not a date")), testColumn) mustBe ParsedValue.Invalid("not a date", "not a valid date")
+      ParsedRowReader.readDate(row(Some("32/13/2025")), testColumn) mustBe ParsedValue.Invalid("32/13/2025", "not a valid date")
     }
   }
+
+  private def row(value: Option[String]): ParsedRow =
+    ParsedRow(
+      rowNumber = 3,
+      cells = value.toSeq.map(v => ParsedCell(testColumn, v))
+    )
 }
