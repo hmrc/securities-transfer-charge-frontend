@@ -33,7 +33,7 @@ class StcBasicRowValidatorSpec extends AnyWordSpec with Matchers {
     Map(
       "en" -> Map(
         "nameOfSeller.error.required" -> "Enter the seller's full name",
-        "fileUpload.error.sellerAddressInUk.invalid" -> "Enter ‘yes’ if the seller lives in the UK, or ‘no’ if the seller does not live in the UK",
+        "fileUpload.error.sellerAddressInUK.invalid" -> "Enter ‘yes’ if the seller lives in the UK, or ‘no’ if the seller does not live in the UK",
         "fileUpload.error.connectedPersons.invalid" -> "Enter ‘yes’ if you and the buyer are connected persons",
         "fileUpload.error.applyingForRelief.invalid" -> "Enter ‘yes’ if you are applying for a relief, or ‘no’ if you are not applying for a relief",
         "chargingPoint.error.required.all" -> "Enter the date you bought the securities",
@@ -52,7 +52,7 @@ class StcBasicRowValidatorSpec extends AnyWordSpec with Matchers {
     ParsedStcRow(
       rowNumber = 3,
       sellerName = Some("Seller Ltd"),
-      sellerAddressInUk = Some(true),
+      sellerAddressInUK = Some(true),
       sellerAddressLine1 = Some("1 Test"),
       sellerAddressLine2 = Some("Test Region"),
       sellerAddressLine3 = None,
@@ -88,7 +88,7 @@ class StcBasicRowValidatorSpec extends AnyWordSpec with Matchers {
   private implicit val columnIndex: ColumnIndexBuilder =
     new ColumnIndexBuilder(Seq(
       "sellerName",
-      "sellerAddressInUk",
+      "sellerAddressInUK",
       "connectedPersons",
       "applyingForRelief",
       "chargingPoint",
@@ -117,11 +117,11 @@ class StcBasicRowValidatorSpec extends AnyWordSpec with Matchers {
 
     "return seller address in uk missing error" in {
       val result = validator.validate(
-        validRow.copy(sellerAddressInUk = None),
+        validRow.copy(sellerAddressInUK = None),
         StcTemplate.STF
       )
 
-      result.exists(_.fieldName == "sellerAddressInUk") mustBe true
+      result.exists(_.fieldName == "sellerAddressInUK") mustBe true
     }
 
     "return connected persons missing error" in {

@@ -147,7 +147,7 @@ class StcConditionalRowValidator @Inject()(
                                      row: ParsedStcRow
                                    )(implicit cols: ColumnIndexBuilder): Seq[StcRowValidationError] = {
 
-    row.sellerAddressInUk match {
+    row.sellerAddressInUK match {
 
       case Some(true) =>
         support.validateRequiredText(

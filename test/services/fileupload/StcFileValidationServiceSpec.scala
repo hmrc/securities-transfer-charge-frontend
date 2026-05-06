@@ -49,7 +49,7 @@ class StcFileValidationServiceSpec extends AnyWordSpec with Matchers with Mockit
       parsedRow = ParsedStcRow(
         rowNumber = 3,
         sellerName = Some("Seller 1"),
-        sellerAddressInUk = None,
+        sellerAddressInUK = None,
         sellerAddressLine1 = None,
         sellerAddressLine2 = None,
         sellerAddressLine3 = None,
@@ -81,7 +81,7 @@ class StcFileValidationServiceSpec extends AnyWordSpec with Matchers with Mockit
       parsedRow = ParsedStcRow(
         rowNumber = 4,
         sellerName = None,
-        sellerAddressInUk = None,
+        sellerAddressInUK = None,
         sellerAddressLine1 = None,
         sellerAddressLine2 = None,
         sellerAddressLine3 = None,

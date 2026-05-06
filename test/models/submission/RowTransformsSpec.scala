@@ -44,7 +44,7 @@ class RowTransformsSpec extends AnyWordSpec with Matchers {
     parsedRow = ParsedStcRow(
       rowNumber = 3,
       sellerName = Some("Bob Seller"),
-      sellerAddressInUk = Some(true),
+      sellerAddressInUK = Some(true),
       sellerAddressLine1 = Some("1 Seller Street"),
       sellerAddressLine2 = Some("Seller District"),
       sellerAddressLine3 = Some("Seller City"),

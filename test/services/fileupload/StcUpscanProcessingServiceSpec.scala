@@ -70,7 +70,7 @@ class StcUpscanProcessingServiceSpec extends AnyWordSpec with Matchers with Eith
   private val parsedRow = ParsedStcRow(
     rowNumber = 1,
     sellerName = Some("Acme Ltd"),
-    sellerAddressInUk = Some(true),
+    sellerAddressInUK = Some(true),
     sellerAddressLine1 = Some("123 High Street"),
     sellerAddressLine2 = Some("Suite 1"),
     sellerAddressLine3 = None,

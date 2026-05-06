@@ -30,7 +30,7 @@ class StcRowValidationServiceSpec extends AnyWordSpec with Matchers {
   private val messagesApi: MessagesApi = stubMessagesApi(Map(
     "en" -> Map(
       "nameOfSeller.error.required" -> "Enter the seller's full name",
-      "fileUpload.error.sellerAddressInUk.invalid" -> "Enter ‘yes’ if the seller lives in the UK, or ‘no’ if the seller does not live in the UK",
+      "fileUpload.error.sellerAddressInUK.invalid" -> "Enter ‘yes’ if the seller lives in the UK, or ‘no’ if the seller does not live in the UK",
       "fileUpload.error.connectedPersons.invalid" -> "Enter ‘yes’ if you and the buyer are connected persons",
       "fileUpload.error.applyingForRelief.invalid" -> "Enter ‘yes’ if you are applying for a relief, or ‘no’ if you are not applying for a relief",
       "securitiesTarget.error.businessName.required" -> "Enter the name of the business you're buying securities in",
@@ -69,7 +69,7 @@ class StcRowValidationServiceSpec extends AnyWordSpec with Matchers {
     Seq(
       "STF",
       StcColumns.sellerName,
-      StcColumns.sellerAddressInUk,
+      StcColumns.sellerAddressInUK,
       StcColumns.sellerAddressLine1,
       StcColumns.sellerPostcode,
       StcColumns.connectedPersons,
@@ -97,7 +97,7 @@ class StcRowValidationServiceSpec extends AnyWordSpec with Matchers {
         rowNumber = 3,
         cells = Seq(
           ParsedCell(columnIndex.find(StcColumns.sellerName).getOrElse(-1), "Seller Ltd"),
-          ParsedCell(columnIndex.find(StcColumns.sellerAddressInUk).getOrElse(-1), "yes"),
+          ParsedCell(columnIndex.find(StcColumns.sellerAddressInUK).getOrElse(-1), "yes"),
           ParsedCell(columnIndex.find(StcColumns.sellerAddressLine1).getOrElse(-1), "1 Seller Street"),
           ParsedCell(columnIndex.find(StcColumns.sellerPostcode).getOrElse(-1), "AA1 1AA"),
           ParsedCell(columnIndex.find(StcColumns.connectedPersons).getOrElse(-1), "no"),
@@ -126,7 +126,7 @@ class StcRowValidationServiceSpec extends AnyWordSpec with Matchers {
         rowNumber = 3,
         cells = Seq(
           ParsedCell(columnIndex.find(StcColumns.sellerName).getOrElse(-1), ""),
-          ParsedCell(columnIndex.find(StcColumns.sellerAddressInUk).getOrElse(-1), "yes"),
+          ParsedCell(columnIndex.find(StcColumns.sellerAddressInUK).getOrElse(-1), "yes"),
           ParsedCell(columnIndex.find(StcColumns.sellerAddressLine1).getOrElse(-1), ""),
           ParsedCell(columnIndex.find(StcColumns.sellerPostcode).getOrElse(-1), ""),
           ParsedCell(columnIndex.find(StcColumns.connectedPersons).getOrElse(-1), "yes"),

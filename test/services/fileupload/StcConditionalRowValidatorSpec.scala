@@ -33,7 +33,7 @@ class StcConditionalRowValidatorSpec extends AnyWordSpec with Matchers {
     ParsedStcRow(
       rowNumber = 3,
       sellerName = Some("Seller Ltd"),
-      sellerAddressInUk = Some(true),
+      sellerAddressInUK = Some(true),
       sellerAddressLine1 = Some("1 Seller Street"),
       sellerAddressLine2 = None,
       sellerAddressLine3 = None,
@@ -151,7 +151,7 @@ class StcConditionalRowValidatorSpec extends AnyWordSpec with Matchers {
     "validate UK seller address line 1 required" in {
       val result = validator.validate(
         validParsedRow.copy(
-          sellerAddressInUk = Some(true),
+          sellerAddressInUK = Some(true),
           sellerAddressLine1 = None
         ), StcTemplate.STF
       )
@@ -162,7 +162,7 @@ class StcConditionalRowValidatorSpec extends AnyWordSpec with Matchers {
     "validate UK seller address line 1 invalid characters" in {
       val result = validator.validate(
         validParsedRow.copy(
-          sellerAddressInUk = Some(true),
+          sellerAddressInUK = Some(true),
           sellerAddressLine1 = Some("Address @@@")
         ), StcTemplate.STF
       )
@@ -173,7 +173,7 @@ class StcConditionalRowValidatorSpec extends AnyWordSpec with Matchers {
     "validate UK seller postcode required" in {
       val result = validator.validate(
         validParsedRow.copy(
-          sellerAddressInUk = Some(true),
+          sellerAddressInUK = Some(true),
           sellerPostcode = None
         ), StcTemplate.STF
       )
@@ -184,7 +184,7 @@ class StcConditionalRowValidatorSpec extends AnyWordSpec with Matchers {
     "validate UK seller postcode invalid" in {
       val result = validator.validate(
         validParsedRow.copy(
-          sellerAddressInUk = Some(true),
+          sellerAddressInUK = Some(true),
           sellerPostcode = Some("not a postcode")
         ), StcTemplate.STF
       )
@@ -197,7 +197,7 @@ class StcConditionalRowValidatorSpec extends AnyWordSpec with Matchers {
 
       val result = validator.validate(
         validParsedRow.copy(
-          sellerAddressInUk = Some(false),
+          sellerAddressInUK = Some(false),
           sellerCountry = Some(longCountry)
         ), StcTemplate.STF
       )

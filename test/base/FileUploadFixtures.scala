@@ -48,7 +48,7 @@ trait FileUploadFixtures {
     ParsedStcRow(
       rowNumber = rowNumber,
       sellerName = Some(""),
-      sellerAddressInUk = Some(true),
+      sellerAddressInUK = Some(true),
       sellerAddressLine1 = Some(""),
       sellerAddressLine2 = Some(""),
       sellerAddressLine3 = None,

@@ -64,7 +64,7 @@ class StcUploadProcessingServiceSpec extends AnyWordSpec with Matchers with Mock
         parsedRow = ParsedStcRow(
           rowNumber = 3,
           sellerName = Some("Seller 1"),
-          sellerAddressInUk = None,
+          sellerAddressInUK = None,
           sellerAddressLine1 = None,
           sellerAddressLine2 = None,
           sellerAddressLine3 = None,

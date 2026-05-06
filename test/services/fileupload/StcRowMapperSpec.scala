@@ -27,7 +27,7 @@ class StcRowMapperSpec extends AnyWordSpec with Matchers {
 
   private val headers: Seq[String] = Seq(
     StcColumns.sellerName,
-    StcColumns.sellerAddressInUk,
+    StcColumns.sellerAddressInUK,
     StcColumns.sellerAddressLine1,
     StcColumns.sellerAddressLine2,
     StcColumns.sellerAddressLine3,
@@ -95,7 +95,7 @@ class StcRowMapperSpec extends AnyWordSpec with Matchers {
 
       result.rowNumber mustBe 3
       result.sellerName mustBe Some("Bob Seller")
-      result.sellerAddressInUk mustBe Some(true)
+      result.sellerAddressInUK mustBe Some(true)
       result.sellerPostcode mustBe Some("LS1 1AA")
       result.connectedPersons mustBe Some(false)
       result.applyingForRelief mustBe Some(true)

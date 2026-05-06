@@ -23,7 +23,7 @@ import java.time.LocalDate
 case class ParsedStcRow(
                          rowNumber: Int,
                          sellerName: Option[String],
-                         sellerAddressInUk: Option[Boolean],
+                         sellerAddressInUK: Option[Boolean],
                          sellerAddressLine1: Option[String],
                          sellerAddressLine2: Option[String],
                          sellerAddressLine3: Option[String],

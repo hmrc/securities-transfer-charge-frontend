@@ -213,7 +213,7 @@ class StcBasicRowValidator @Inject()(
                                          row: ParsedStcRow
                                        )(implicit cols: ColumnIndexBuilder): Seq[StcRowValidationError] = {
 
-    row.sellerAddressInUk match {
+    row.sellerAddressInUK match {
 
       case Some(_) =>
         Seq.empty
@@ -223,7 +223,7 @@ class StcBasicRowValidator @Inject()(
           support.error(
             row.rowNumber,
             "sellerAddressInUK",
-            messages("fileUpload.error.sellerAddressInUk.invalid")
+            messages("fileUpload.error.sellerAddressInUK.invalid")
           )
         )
     }

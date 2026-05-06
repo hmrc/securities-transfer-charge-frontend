@@ -19,7 +19,7 @@ package uk.gov.hmrc.securitiestransferchargefrontend.services.fileupload
 object StcColumns {
 
   val sellerName = "nameOfSeller"
-  val sellerAddressInUk = "sellerAddressInUK"
+  val sellerAddressInUK = "sellerAddressInUK"
   val connectedPersons = "connectedPersons"
   val applyingForRelief = "applyingForRelief"
   val securitiesTarget = "securitiesTarget"
@@ -30,7 +30,7 @@ object StcColumns {
   val whatTypeOfSecurities = "whatTypeOfSecurities"
   val securitiesQuantity = "securitiesQuantity"
   val amountPaidForSecurities = "amountPaidForSecurities"
-  val totalMarketValue = "totalMarketValuePage"
+  val totalMarketValue = "totalMarketValue"
   val minSharePrice = "minSharePrice"
   val maxSharePrice = "maxSharePrice"
   val purchaseReason = "sharePurchaseReason"

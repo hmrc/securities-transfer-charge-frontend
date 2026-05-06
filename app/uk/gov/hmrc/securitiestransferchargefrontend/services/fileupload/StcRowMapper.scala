@@ -32,8 +32,8 @@ class StcRowMapper(columnIndex: ColumnIndexBuilder) {
       sellerName =
         readString(row, columnIndex.find(StcColumns.sellerName)),
 
-      sellerAddressInUk =
-        readBoolean(row, columnIndex.find(StcColumns.sellerAddressInUk)),
+      sellerAddressInUK =
+        readBoolean(row, columnIndex.find(StcColumns.sellerAddressInUK)),
 
       sellerAddressLine1 =
         readString(row, columnIndex.find(StcColumns.sellerAddressLine1)),
