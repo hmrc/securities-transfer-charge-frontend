@@ -49,7 +49,7 @@ class ValidationErrorRepositoryImpl @Inject()(
         Indexes.ascending("createdAt"),
         IndexOptions()
           .name("validation_createdAtIdx")
-          .expireAfter(appConfig.validationErrorTtl, TimeUnit.MINUTES)
+          .expireAfter(appConfig.validationErrorTtl, TimeUnit.HOURS)
       )
     )
   ) with ValidationErrorRepository {
