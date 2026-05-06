@@ -20,6 +20,7 @@ import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
 import play.api.Application
 import play.api.mvc.Call
+import uk.gov.hmrc.auth.core.AffinityGroup
 import uk.gov.hmrc.securitiestransferchargefrontend.forms.stf.agents.ConnectedPersonsFormProvider
 import uk.gov.hmrc.securitiestransferchargefrontend.models.NormalMode
 import uk.gov.hmrc.securitiestransferchargefrontend.views.html.stf.agents.single.ConnectedPersonsView
@@ -28,7 +29,7 @@ import views.ViewBaseSpec
 class ConnectedPersonsViewSpec extends ViewBaseSpec {
 
   override def fakeApplication(): Application =
-    applicationBuilder().build()
+    applicationBuilder(affinityGroup = AffinityGroup.Agent).build()
 
   private val viewInstance = app.injector.instanceOf[ConnectedPersonsView]
   private val formProvider = new ConnectedPersonsFormProvider()
