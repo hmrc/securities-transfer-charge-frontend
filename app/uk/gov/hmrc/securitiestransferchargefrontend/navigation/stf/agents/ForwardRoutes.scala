@@ -25,7 +25,7 @@ import uk.gov.hmrc.securitiestransferchargefrontend.models.{NormalMode, UserAnsw
 import uk.gov.hmrc.securitiestransferchargefrontend.navigation.PersistentNavigationHelper
 import uk.gov.hmrc.securitiestransferchargefrontend.pages.Page
 import uk.gov.hmrc.securitiestransferchargefrontend.pages.stf.shared.{HowToNotifyAboutSecuritiesTransferPage, SubmissionsDashboardPage}
-import uk.gov.hmrc.securitiestransferchargefrontend.pages.stf.single.{AgentReferencePage, NameOfSellerPage, StfBuyersAddressPage}
+import uk.gov.hmrc.securitiestransferchargefrontend.pages.stf.single.{AgentReferencePage, ConnectedPersonsPage, NameOfBuyerPage, NameOfSellerPage, StfBuyersAddressPage, StfSellerAddressPage}
 import uk.gov.hmrc.securitiestransferchargefrontend.services.AnswerPersistenceService
 
 import scala.concurrent.{ExecutionContext, Future}
@@ -48,8 +48,12 @@ class ForwardRoutes(answerPersistenceService: AnswerPersistenceService,
         case MoreThanOneAtATime => defaultPage
       }
     }
-    case AgentReferencePage => userAnswers => dataRequired(AgentReferencePage, userAnswers, agentSingleRoutes.AddressController.onPageLoad())
+    case AgentReferencePage => userAnswers => dataRequired(AgentReferencePage, userAnswers, agentSingleRoutes.NameOfBuyerController.onPageLoad(NormalMode))
+    case NameOfBuyerPage => userAnswers => dataRequired(NameOfBuyerPage, userAnswers, agentSingleRoutes.AddressController.onPageLoad())
     case StfBuyersAddressPage => userAnswers => dataRequired(StfBuyersAddressPage, userAnswers, agentSingleRoutes.NameOfSellerController.onPageLoad(NormalMode))
-    case NameOfSellerPage => userAnswers => dataRequired(NameOfSellerPage, userAnswers, defaultPage)
+    case NameOfSellerPage => userAnswers => dataRequired(NameOfSellerPage, userAnswers, agentSingleRoutes.StfSellerAddressController.onPageLoad())
+    case StfSellerAddressPage => userAnswers => dataRequired(StfSellerAddressPage, userAnswers, agentSingleRoutes.ConnectedPersonsController.onPageLoad(NormalMode))
+    case ConnectedPersonsPage => userAnswers => dataRequired(ConnectedPersonsPage, userAnswers, defaultPage)
+
     case _ => _ => Future.successful(defaultPage)
   }

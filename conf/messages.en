@@ -385,6 +385,10 @@ uploadedFileError.table.heading = Problems with your file
 uploadedFileError.table.cell = Cell
 uploadedFileError.table.error = Error
 
+agent.nameOfBuyer.details.caption = Buyer details
+agent.nameOfBuyer.title = What’s the buyer’s name?
+agent.nameOfBuyer.heading = What’s the buyer’s name?
+agent.nameOfBuyer.hint = This is the individual, business or trust buying the securities
 agent.details.caption = Agent details
 agentReference.title = Add a reference
 agentReference.heading = Add a reference (optional)
@@ -392,6 +396,9 @@ agentReference.checkYourAnswersLabel = Add a reference
 agentReference.hint = You can add a reference for your own records and to help you find this submission later. It will not be used by HMRC.
 agentReference.error.length = Your reference must be 255 characters or fewer
 agentReference.change.hidden = AgentReference
+
+nameOfBuyer.error.required = Enter the buyer’s name
+nameOfBuyer.error.length = Buyer’s name must be 35 characters or fewer
 
 agent.howToNotifyAboutSecuritiesTransfer.title = How would you like to tell us about these securities transfers?
 agent.howToNotifyAboutSecuritiesTransfer.heading = How would you like to tell us about these securities transfers?
@@ -409,6 +416,14 @@ agent.nameOfSeller.checkYourAnswersLabel = What’s the seller’s name?
 agent.nameOfSeller.change.hidden = NameOfSeller
 agent.nameOfSeller.hint = This is the individual, business or trust selling the securities
 
+agent.connectedPersons.title = Connected persons
+agent.connectedPersons.heading = Connected persons
+agent.connectedPersons.legend = Are the buyer and seller connected persons?
+agent.connectedPersons.checkYourAnswersLabel = Are the buyer and seller connected persons?
+agent.connectedPersons.error.required = Select yes if the buyer and seller are connected persons
+agent.connectedPersons.p = We need to know if the buyer and seller of these shares are considered ‘connected persons’ according to
+agent.connectedPersons.content.link.text = section 1122 of the Corporation Tax Act 2010
+agent.connectedPersons.change.hidden = Change connected persons
 
 org.uploadedFileError.title = There is a problem with your uploaded file
 org.uploadedFileError.heading = There is a problem with your uploaded file

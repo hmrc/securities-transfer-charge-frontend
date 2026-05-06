@@ -17,50 +17,47 @@
 package controllers.stf.agents.single
 
 import base.SpecBase
+import uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.agents.single.routes as agentSingleRoute
+import uk.gov.hmrc.securitiestransferchargefrontend.controllers.routes
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.when
 import org.scalatestplus.mockito.MockitoSugar
 import play.api.data.Form
 import play.api.inject.bind
-import play.api.mvc.Call
 import play.api.test.FakeRequest
 import play.api.test.Helpers.*
-import uk.gov.hmrc.securitiestransferchargefrontend.controllers.routes
-import uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.agents.single.routes as agentRoutes
-import uk.gov.hmrc.securitiestransferchargefrontend.forms.stf.agents.AgentReferenceFormProvider
+import uk.gov.hmrc.auth.core.AffinityGroup
+import uk.gov.hmrc.http.HeaderCarrier
+import uk.gov.hmrc.securitiestransferchargefrontend.clients.SaveAndReturnClient
+import uk.gov.hmrc.securitiestransferchargefrontend.forms.stf.agents.ConnectedPersonsFormProvider
 import uk.gov.hmrc.securitiestransferchargefrontend.models.{NormalMode, UserAnswers}
-import uk.gov.hmrc.securitiestransferchargefrontend.models.stf.AgentReference
 import uk.gov.hmrc.securitiestransferchargefrontend.navigation.Navigator
-import uk.gov.hmrc.securitiestransferchargefrontend.pages.stf.single.AgentReferencePage
-import uk.gov.hmrc.securitiestransferchargefrontend.repositories.SessionRepository
-import uk.gov.hmrc.securitiestransferchargefrontend.views.html.stf.agents.single.AgentReferenceView
+import uk.gov.hmrc.securitiestransferchargefrontend.pages.stf.single.ConnectedPersonsPage
+import uk.gov.hmrc.securitiestransferchargefrontend.views.html.stf.agents.single.ConnectedPersonsView
 
 import scala.concurrent.Future
-import scala.util.Random
 
-class AgentReferenceControllerSpec extends SpecBase with MockitoSugar {
+class ConnectedPersonsControllerSpec extends SpecBase with MockitoSugar {
 
-  def onwardRoute = Call("GET", "/foo")
+  val formProvider = new ConnectedPersonsFormProvider()
+  val form: Form[Boolean] = formProvider()
 
-  val formProvider = new AgentReferenceFormProvider()
-  val form: Form[AgentReference] = formProvider()
+  lazy val connectedPersonsRoute: String = agentSingleRoute.ConnectedPersonsController.onPageLoad(NormalMode).url
 
-  lazy val agentReferenceRoute: String = agentRoutes.AgentReferenceController.onPageLoad(NormalMode).url
-
-  "AgentReference Controller" - {
+  "ConnectedPersons Controller" - {
 
     "must return OK and the correct view for a GET" in {
-      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers))
-        .overrides(
-          bind[Navigator].qualifiedWith("agents").toInstance(getNavigator))
+
+      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers), AffinityGroup.Agent)
+        .overrides(bind[Navigator].qualifiedWith("agents").toInstance(getNavigator))
         .build()
 
       running(application) {
-        val request = FakeRequest(GET, agentReferenceRoute)
+        val request = FakeRequest(GET, connectedPersonsRoute)
 
         val result = route(application, request).value
 
-        val view = application.injector.instanceOf[AgentReferenceView]
+        val view = application.injector.instanceOf[ConnectedPersonsView]
 
         status(result) mustEqual OK
         contentAsString(result) mustEqual view(form, NormalMode, testBackLinkRoute)(request, messages(application)).toString
@@ -69,63 +66,62 @@ class AgentReferenceControllerSpec extends SpecBase with MockitoSugar {
 
     "must populate the view correctly on a GET when the question has previously been answered" in {
 
-      val userAnswers = UserAnswers(userAnswersId, submissionId).set(AgentReferencePage,AgentReference(Some("answer"))).success.value
 
-      val application = applicationBuilder(userAnswers = Some(userAnswers))
+      val userAnswers = UserAnswers(userAnswersId,submissionId).set(ConnectedPersonsPage, true).success.value
+
+      val application = applicationBuilder(userAnswers = Some(userAnswers), AffinityGroup.Agent)
         .overrides(bind[Navigator].qualifiedWith("agents").toInstance(getNavigator))
         .build()
 
       running(application) {
-        val request = FakeRequest(GET, agentReferenceRoute)
+        val request = FakeRequest(GET, connectedPersonsRoute)
 
-        val view = application.injector.instanceOf[AgentReferenceView]
+        val view = application.injector.instanceOf[ConnectedPersonsView]
 
         val result = route(application, request).value
 
         status(result) mustEqual OK
-        contentAsString(result) mustEqual view(form.fill(AgentReference(Some("answer"))), NormalMode, testBackLinkRoute)(request, messages(application)).toString
+        contentAsString(result) mustEqual view(form.fill(true), NormalMode, testBackLinkRoute)(request, messages(application)).toString
       }
     }
 
     "must redirect to the next page when valid data is submitted" in {
 
-      val mockSessionRepository = mock[SessionRepository]
+      val saveAndReturnClient = mock[SaveAndReturnClient]
 
-      when(mockSessionRepository.set(any())) thenReturn Future.successful(())
+      when(saveAndReturnClient.save(any[UserAnswers]())(any[HeaderCarrier]()))
+        .thenReturn(Future.successful(()))
 
       val application =
-        applicationBuilder(userAnswers = Some(emptyUserAnswers), sessionRepository = mockSessionRepository)
+        applicationBuilder(userAnswers = Some(emptyUserAnswers), AffinityGroup.Agent)
           .build()
 
       running(application) {
         val request =
-          FakeRequest(POST, agentReferenceRoute)
-            .withFormUrlEncodedBody(("value", "answer"))
+          FakeRequest(POST, connectedPersonsRoute)
+            .withFormUrlEncodedBody(("value", "true"))
 
         val result = route(application, request).value
 
         status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual agentRoutes.NameOfBuyerController.onPageLoad(NormalMode).url
+        redirectLocation(result).value mustEqual routes.JourneyRecoveryController.onPageLoad().url
       }
     }
 
     "must return a Bad Request and errors when invalid data is submitted" in {
 
-      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers))
+      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers), AffinityGroup.Agent)
         .overrides(bind[Navigator].qualifiedWith("agents").toInstance(getNavigator))
         .build()
 
       running(application) {
-
-        val invalidValue = Random.alphanumeric.take(260).mkString
-        
         val request =
-          FakeRequest(POST, agentReferenceRoute)
-            .withFormUrlEncodedBody(("value", invalidValue))
+          FakeRequest(POST, connectedPersonsRoute)
+            .withFormUrlEncodedBody(("value", ""))
 
-        val boundForm = form.bind(Map("value" -> invalidValue))
+        val boundForm = form.bind(Map("value" -> ""))
 
-        val view = application.injector.instanceOf[AgentReferenceView]
+        val view = application.injector.instanceOf[ConnectedPersonsView]
 
         val result = route(application, request).value
 
@@ -136,10 +132,10 @@ class AgentReferenceControllerSpec extends SpecBase with MockitoSugar {
 
     "must redirect to Journey Recovery for a GET if no existing data is found" in {
 
-      val application = applicationBuilder(userAnswers = None).build()
+      val application = applicationBuilder(userAnswers = None, AffinityGroup.Agent).build()
 
       running(application) {
-        val request = FakeRequest(GET, agentReferenceRoute)
+        val request = FakeRequest(GET, connectedPersonsRoute)
 
         val result = route(application, request).value
 
@@ -150,12 +146,12 @@ class AgentReferenceControllerSpec extends SpecBase with MockitoSugar {
 
     "must redirect to Journey Recovery for a POST if no existing data is found" in {
 
-      val application = applicationBuilder(userAnswers = None).build()
+      val application = applicationBuilder(userAnswers = None, AffinityGroup.Agent).build()
 
       running(application) {
         val request =
-          FakeRequest(POST, agentReferenceRoute)
-            .withFormUrlEncodedBody(("value", "answer"))
+          FakeRequest(POST, connectedPersonsRoute)
+            .withFormUrlEncodedBody(("value", "true"))
 
         val result = route(application, request).value
 

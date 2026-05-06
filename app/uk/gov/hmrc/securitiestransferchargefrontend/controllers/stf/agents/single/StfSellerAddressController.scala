@@ -17,39 +17,39 @@
 package uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.agents.single
 
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
-import uk.gov.hmrc.http.HeaderCarrier
-import uk.gov.hmrc.play.http.HeaderCarrierConverter
 import uk.gov.hmrc.securitiestransferchargefrontend.config.FrontendAppConfig
 import uk.gov.hmrc.securitiestransferchargefrontend.connectors.AlfAddressConnector
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.AbstractAddressController
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.actions.{StcAuthEnrolledAction, StcDataRequiredAction, StcDataRetrievalAction}
 import uk.gov.hmrc.securitiestransferchargefrontend.models.NormalMode
 import uk.gov.hmrc.securitiestransferchargefrontend.navigation.Navigator
-import uk.gov.hmrc.securitiestransferchargefrontend.pages.stf.single.StfBuyersAddressPage
+import uk.gov.hmrc.securitiestransferchargefrontend.pages.AddressPage
+import uk.gov.hmrc.securitiestransferchargefrontend.pages.stf.single.StfSellerAddressPage
 
 import javax.inject.{Inject, Named}
 import scala.concurrent.{ExecutionContext, Future}
 
-class AddressController @Inject()(val controllerComponents: MessagesControllerComponents,
-                                  alf: AlfAddressConnector,
-                                  auth: StcAuthEnrolledAction,
-                                  getData: StcDataRetrievalAction,
-                                  requireData: StcDataRequiredAction,
-                                  @Named("agents") val navigator: Navigator,
-                                  config: FrontendAppConfig)
-                                 (implicit ec: ExecutionContext) extends AbstractAddressController(alf):
-  
+class StfSellerAddressController @Inject()(val controllerComponents: MessagesControllerComponents,
+                                           alf: AlfAddressConnector,
+                                           auth: StcAuthEnrolledAction,
+                                           getData: StcDataRetrievalAction,
+                                           requireData: StcDataRequiredAction,
+                                           @Named("agents") val navigator: Navigator,
+                                           config: FrontendAppConfig)
+                                          (implicit ec: ExecutionContext) extends AbstractAddressController(alf):
+
+  val addressPage: AddressPage = StfSellerAddressPage
+
   def onPageLoad: Action[AnyContent] = auth.async {
     implicit request =>
-      super.pageLoad(config.agentAlfBuyerConfigFileLocation, config.alfStfAgentContinueUrl)
+      super.pageLoad(config.agentSellerAlfConfigFileLocation, config.alfAgentSellerContinueUrl)
   }
 
   def onReturn(addressId: String): Action[AnyContent] = (auth andThen getData andThen requireData).async {
     implicit request =>
-      implicit val hc: HeaderCarrier = HeaderCarrierConverter.fromRequestAndSession(request, request.session)
       for {
-        address     <- super.alfReturn(addressId)
-        userAnswers <- Future.fromTry(request.userAnswers.set(StfBuyersAddressPage, address))
-        nextPage    <- navigator.nextPage(StfBuyersAddressPage, NormalMode, userAnswers)
+        address <- super.alfReturn(addressId)
+        userAnswers <- Future.fromTry(request.userAnswers.set(StfSellerAddressPage, address))
+        nextPage <- navigator.nextPage(StfSellerAddressPage, NormalMode, userAnswers)
       } yield Redirect(nextPage)
   }

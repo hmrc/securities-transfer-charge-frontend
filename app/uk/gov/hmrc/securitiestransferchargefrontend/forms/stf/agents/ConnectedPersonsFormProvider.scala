@@ -14,10 +14,17 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.securitiestransferchargefrontend.pages.stf.single
+package uk.gov.hmrc.securitiestransferchargefrontend.forms.stf.agents
 
-import uk.gov.hmrc.securitiestransferchargefrontend.pages.AddressPage
+import play.api.data.Form
+import uk.gov.hmrc.securitiestransferchargefrontend.forms.mappings.Mappings
 
-case object StfSellerAddressPage extends AddressPage {
-  override def toString: String = "sellerAddress"
+import javax.inject.Inject
+
+class ConnectedPersonsFormProvider @Inject() extends Mappings {
+
+  def apply(): Form[Boolean] =
+    Form(
+      "value" -> boolean("agent.connectedPersons.error.required")
+    )
 }

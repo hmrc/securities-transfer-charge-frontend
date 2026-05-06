@@ -16,8 +16,12 @@
 
 package uk.gov.hmrc.securitiestransferchargefrontend.pages.stf.single
 
-import uk.gov.hmrc.securitiestransferchargefrontend.pages.AddressPage
+import play.api.libs.json.JsPath
+import uk.gov.hmrc.securitiestransferchargefrontend.pages.QuestionPage
 
-case object StfSellerAddressPage extends AddressPage {
-  override def toString: String = "sellerAddress"
+case object NameOfBuyerPage extends QuestionPage[String] {
+
+  override def path: JsPath = JsPath \ toString
+
+  override def toString: String = "nameOfBuyer"
 }

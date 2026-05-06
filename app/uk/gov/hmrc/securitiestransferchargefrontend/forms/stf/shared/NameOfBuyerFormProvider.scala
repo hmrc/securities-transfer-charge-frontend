@@ -14,10 +14,18 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.securitiestransferchargefrontend.pages.stf.single
+package uk.gov.hmrc.securitiestransferchargefrontend.forms.stf.shared
 
-import uk.gov.hmrc.securitiestransferchargefrontend.pages.AddressPage
+import play.api.data.Form
+import uk.gov.hmrc.securitiestransferchargefrontend.forms.mappings.Mappings
 
-case object StfSellerAddressPage extends AddressPage {
-  override def toString: String = "sellerAddress"
+import javax.inject.Inject
+
+class NameOfBuyerFormProvider @Inject() extends Mappings {
+
+  def apply(): Form[String] =
+    Form(
+      "value" -> text("nameOfBuyer.error.required")
+        .verifying(maxLength(35, "nameOfBuyer.error.length"))
+    )
 }

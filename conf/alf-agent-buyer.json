@@ -1,0 +1,152 @@
+{
+  "version": 2,
+  "options": {
+    "continueUrl": "CHANGE_ME",
+    "homeNavHref": "/",
+    "signOutHref": "/account/sign-out",
+    "useNewGovUkServiceNavigation": true,
+    "accessibilityFooterUrl": "",
+    "phaseFeedbackLink": "/help/alpha",
+    "deskProServiceName": "STC",
+    "showPhaseBanner": false,
+    "alphaPhase": false,
+    "disableTranslations": false,
+    "showBackButtons": true,
+    "includeHMRCBranding": true,
+    "ukMode": false,
+    "selectPageConfig": {
+      "proposalListLimit": 30,
+      "showSearchLinkAgain": true,
+      "showNoneOfTheseOption": true
+    },
+    "confirmPageConfig": {
+      "showChangeLink": true,
+      "showSubHeadingAndInfo": false,
+      "showSearchAgainLink": false,
+      "showConfirmChangeText": false
+    },
+    "manualAddressEntryConfig": {
+      "line1MaxLength": 255,
+      "line2MaxLength": 255,
+      "line3MaxLength": 255,
+      "townMaxLength": 255,
+      "mandatoryFields": {
+        "addressLine1": true,
+        "addressLine2": false,
+        "addressLine3": false,
+        "town": false,
+        "postcode": true
+      },
+      "showOrganisationName": false
+    },
+    "timeoutConfig": {
+      "timeoutAmount": 900,
+      "timeoutUrl": "/there-is-a-problem",
+      "timeoutKeepAliveUrl": "/refresh-session"
+    },
+    "pageHeadingStyle": "govuk-heading-l"
+  },
+  "labels": {
+    "en": {
+      "appLevelLabels": {
+        "navTitle": "",
+        "phaseBannerHtml": ""
+      },
+      "countryPickerLabels": {
+        "title": "Buyer’s address",
+        "heading": "Buyer’s address",
+        "countryLabel": "Which country does the buyer live in?",
+        "submitLabel": "Continue"
+      },
+      "lookupPageLabels": {
+        "title": "Find the buyer’s address",
+        "heading": "Find the buyer’s address",
+        "filterLabel": "Property name or number",
+        "postcodeLabel": "Postcode",
+        "submitLabel": "Continue",
+        "noResultsFoundMessage": "Sorry, we couldn’t find anything for that postcode.",
+        "resultLimitExceededMessage": "There were too many results. Please add additional details to limit the number of results.",
+        "manualAddressLinkText": "Enter the address manually"
+      },
+      "selectPageLabels": {
+        "title": "Select the buyer’s address",
+        "heading": "Select the buyer’s address",
+        "headingWithPostcode": "Addresses found for postcode",
+        "proposalListLabel": "Please select one of the following addresses",
+        "submitLabel": "Continue",
+        "searchAgainLinkText": "Search again",
+        "editAddressLinkText": "Enter address manually"
+      },
+      "confirmPageLabels": {
+        "title": "Confirm the buyer’s address",
+        "heading": "Confirm the buyer’s address",
+        "infoSubheading": "The buyer’s selected address",
+        "submitLabel": "Confirm Address",
+        "changeLinkText": "Edit address"
+      },
+      "editPageLabels": {
+        "title": "Enter the buyer’s address",
+        "heading": "Enter the buyer’s address",
+        "line1Label": "Address line 1",
+        "line2Label": "Address line 2",
+        "townLabel": "Town or city",
+        "postcodeLabel": "Postcode",
+        "countryLabel": "Country",
+        "submitLabel": "Continue"
+      }
+    },
+    "cy": {
+      "appLevelLabels": {
+        "navTitle": "",
+        "phaseBannerHtml": ""
+      },
+      "countryPickerLabels": {
+        "title": "Custom title - Welsh",
+        "heading": "Custom heading - Welsh",
+        "countryLabel": "Custom country label - Welsh",
+        "submitLabel": "Custom submit label - Welsh"
+      },
+      "selectPageLabels": {
+        "title": "Choose address welsh",
+        "heading": "Choose address welsh",
+        "headingWithPostcode": "foo",
+        "proposalListLabel": "Please select one of the following addresses welsh",
+        "submitLabel": "Continue welsh",
+        "searchAgainLinkText": "Search again welsh",
+        "editAddressLinkText": "Enter address manually welsh"
+      },
+      "lookupPageLabels": {
+        "title": "Find address welsh",
+        "heading": "Find address welsh",
+        "afterHeadingText": "We will use this address to send letters welsh",
+        "filterLabel": "Property name or number welsh",
+        "postcodeLabel": "Postcode welsh",
+        "submitLabel": "Find address welsh",
+        "noResultsFoundMessage": "Sorry, we couldn’t find anything for that postcode. welsh",
+        "resultLimitExceededMessage": "There were too many results. Please add additional details to limit the number of results. welsh",
+        "manualAddressLinkText": "Enter the address manually welsh"
+      },
+      "confirmPageLabels": {
+        "title": "Confirm address welsh",
+        "heading": "Review and confirm welsh",
+        "infoSubheading": "Your selected address welsh",
+        "infoMessage": "This is how your address will look. Please double-check it and, if accurate, click on the <kbd>Confirm</kbd> button. welsh",
+        "submitLabel": "Confirm Address welsh",
+        "searchAgainLinkText": "Search again welsh",
+        "changeLinkText": "Edit address welsh",
+        "confirmChangeText": "By confirming this change, you agree that the information you have given is complete and correct. welsh"
+      },
+      "editPageLabels": {
+        "title": "Enter address welsh",
+        "heading": "Enter address welsh",
+        "line1Label": "Address line 1 welsh",
+        "line2Label": "Address line 2 welsh",
+        "line3Label": "Address line 3 welsh",
+        "townLabel": "Town/City welsh",
+        "postcodeLabel": "Postcode welsh",
+        "countryLabel": "Country welsh",
+        "submitLabel": "Continue welsh"
+      }
+    }
+  }
+}
