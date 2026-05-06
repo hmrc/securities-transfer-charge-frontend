@@ -222,7 +222,7 @@ class StcBasicRowValidator @Inject()(
         Seq(
           support.error(
             row.rowNumber,
-            "sellerAddressInUk",
+            "sellerAddressInUK",
             messages("fileUpload.error.sellerAddressInUk.invalid")
           )
         )
