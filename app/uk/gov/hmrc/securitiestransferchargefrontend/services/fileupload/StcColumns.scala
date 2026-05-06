@@ -18,7 +18,7 @@ package uk.gov.hmrc.securitiestransferchargefrontend.services.fileupload
 
 object StcColumns {
 
-  val sellerName = "nameOfSeller"
+  val sellerName = "sellerName"
   val sellerAddressInUK = "sellerAddressInUK"
   val connectedPersons = "connectedPersons"
   val applyingForRelief = "applyingForRelief"
