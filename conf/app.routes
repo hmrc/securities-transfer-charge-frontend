@@ -217,3 +217,8 @@ POST       /stf/agent/change/seller-name                  uk.gov.hmrc.securities
 
 GET        /stf/agent/seller/address                      uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.agents.single.StfSellerAddressController.onPageLoad()
 GET        /stf/agent/seller/address/return               uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.agents.single.StfSellerAddressController.onReturn(id: String)
+
+GET        /stf/agent/connected-persons                   uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.agents.single.ConnectedPersonsController.onPageLoad(mode: Mode = NormalMode)
+POST       /stf/agent/connected-persons                   uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.agents.single.ConnectedPersonsController.onSubmit(mode: Mode = NormalMode)
+GET        /stf/agent/change/connected-persons            uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.agents.single.ConnectedPersonsController.onPageLoad(mode: Mode = CheckMode)
+POST       /stf/agent/change/connected-persons            uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.agents.single.ConnectedPersonsController.onSubmit(mode: Mode = CheckMode)
