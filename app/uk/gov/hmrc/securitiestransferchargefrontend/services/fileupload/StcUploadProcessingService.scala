@@ -26,7 +26,10 @@ class StcUploadProcessingService @Inject()(
                                           ) {
 
   def process(uploadedFile: UploadedFile): Either[FileParseError, StcFileValidationResponse] =
-    stcUploadParsingService.parse(uploadedFile).map { parsedRows =>
-      stcFileValidationService.validate(parsedRows)
+    stcUploadParsingService.parse(uploadedFile).map { parsedFile =>
+      stcFileValidationService.validate(
+        parsedFile.rows,
+        parsedFile.headers
+      )
     }
 }

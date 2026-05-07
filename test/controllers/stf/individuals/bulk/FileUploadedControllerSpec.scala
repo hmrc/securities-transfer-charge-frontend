@@ -16,8 +16,9 @@
 
 package controllers.stf.individuals.bulk
 
-import base.SpecBase
-import org.mockito.ArgumentMatchers.any
+import base.{FileUploadFixtures, SpecBase}
+import org.mockito.ArgumentMatchers.{any => anyArg, eq => eqTo}
+import org.scalatest.BeforeAndAfterEach
 import org.mockito.Mockito.*
 import org.scalatestplus.mockito.MockitoSugar
 import play.api.test.FakeRequest
@@ -27,21 +28,27 @@ import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.securitiestransferchargefrontend.connectors.{SubscriptionConnector, SubscriptionStatusErrorException}
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.routes
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.individuals.bulk.routes as individualRoutes
-import uk.gov.hmrc.securitiestransferchargefrontend.models.stf.fileupload.{FileParseError, StcFileValidationResponse}
+import uk.gov.hmrc.securitiestransferchargefrontend.models.stf.fileupload.FileParseError
 import uk.gov.hmrc.securitiestransferchargefrontend.models.stf.upscan.{FileUpload, UpscanJourneyStatus}
 import uk.gov.hmrc.securitiestransferchargefrontend.repositories.UpscanJourneyRepository
 import uk.gov.hmrc.securitiestransferchargefrontend.services.fileupload.StcUpscanProcessingService
 import uk.gov.hmrc.securitiestransferchargefrontend.views.html.stf.individuals.bulk.FileUploadedView
+import uk.gov.hmrc.securitiestransferchargefrontend.models.stf.fileupload.StcRowValidationError
 
 import scala.concurrent.Future
 
-class FileUploadedControllerSpec extends SpecBase with MockitoSugar {
+class FileUploadedControllerSpec extends SpecBase with MockitoSugar with FileUploadFixtures with BeforeAndAfterEach {
 
   private val mockRepository = mock[UpscanJourneyRepository]
   private val mockStcUpscanProcessingService = mock[StcUpscanProcessingService]
   private val mockSubscriptionConnector = mock[SubscriptionConnector]
 
   private val testKey = "test-key"
+
+  override protected def beforeEach(): Unit = {
+    super.beforeEach()
+    reset(mockRepository, mockStcUpscanProcessingService, mockSubscriptionConnector)
+  }
 
   private val testFileUpload = FileUpload(
     reference = "ref123",
@@ -50,10 +57,6 @@ class FileUploadedControllerSpec extends SpecBase with MockitoSugar {
     uploadDetails = None,
     failureReason = None,
     message = None
-  )
-
-  private val validationResponse = StcFileValidationResponse(
-    rows = Seq.empty
   )
 
   private def application: Application =
@@ -72,13 +75,13 @@ class FileUploadedControllerSpec extends SpecBase with MockitoSugar {
 
     "must return OK and the correct view when file upload is found and processing succeeds" in {
 
-      when(mockRepository.find(any()))
+      when(mockRepository.find(anyArg()))
         .thenReturn(Future.successful(Some(testFileUpload)))
 
-      when(mockStcUpscanProcessingService.process(any())(any[HeaderCarrier]))
-        .thenReturn(Future.successful(Right(validationResponse)))
+      when(mockStcUpscanProcessingService.process(eqTo(testFileUpload))(using anyArg[HeaderCarrier]))
+        .thenReturn(Future.successful(Right(successfulValidationResponse)))
 
-      when(mockSubscriptionConnector.getAndStoreSubscription(any())(any[HeaderCarrier]))
+      when(mockSubscriptionConnector.getAndStoreSubscription(anyArg())(using anyArg[HeaderCarrier]))
         .thenReturn(Future.successful(subscription))
 
       val app = application
@@ -91,15 +94,73 @@ class FileUploadedControllerSpec extends SpecBase with MockitoSugar {
 
         status(result) mustBe OK
         contentAsString(result) mustBe view(testFileUpload)(request, messages(app)).toString
+
+        verify(mockSubscriptionConnector).getAndStoreSubscription(anyArg())(using anyArg[HeaderCarrier])
+      }
+    }
+
+    "must redirect to the uploaded file error page when blocking errors <= 25" in {
+
+      val validationResponse = validationResponseWithErrors(
+        Seq(
+          StcRowValidationError(
+            rowNumber = 6,
+            fieldName = "sellerName",
+            columnIndex = 7,
+            message = "Enter the seller's full name",
+            blocking = true
+          )
+        )
+      )
+
+      when(mockRepository.find(anyArg()))
+        .thenReturn(Future.successful(Some(testFileUpload)))
+
+      when(mockStcUpscanProcessingService.process(eqTo(testFileUpload))(using anyArg[HeaderCarrier]))
+        .thenReturn(Future.successful(Right(validationResponse)))
+
+      val app = application
+
+      running(app) {
+        val request = FakeRequest(GET, fileUploadedRoute(testKey))
+        val result  = route(app, request).value
+
+        status(result) mustBe SEE_OTHER
+        redirectLocation(result).value mustBe individualRoutes.UploadedFileErrorController.onPageLoad(testKey).url
+
+        verify(mockSubscriptionConnector, never()).getAndStoreSubscription(anyArg())(using anyArg[HeaderCarrier])
+      }
+    }
+
+    "must redirect to the formatting error page when blocking errors > 25" in {
+
+      val validationResponse = validationResponseWithErrors(withBlockingErrors(26))
+
+      when(mockRepository.find(anyArg()))
+        .thenReturn(Future.successful(Some(testFileUpload)))
+
+      when(mockStcUpscanProcessingService.process(eqTo(testFileUpload))(using anyArg[HeaderCarrier]))
+        .thenReturn(Future.successful(Right(validationResponse)))
+
+      val app = application
+
+      running(app) {
+        val request = FakeRequest(GET, fileUploadedRoute(testKey))
+        val result  = route(app, request).value
+
+        status(result) mustBe SEE_OTHER
+        redirectLocation(result).value mustBe individualRoutes.FormattingErrorController.onPageLoad().url
+
+        verify(mockSubscriptionConnector, never()).getAndStoreSubscription(anyArg())(using anyArg[HeaderCarrier])
       }
     }
 
     "must redirect to the formatting error page when file upload is found and processing returns a parse error" in {
 
-      when(mockRepository.find(any()))
+      when(mockRepository.find(anyArg()))
         .thenReturn(Future.successful(Some(testFileUpload)))
 
-      when(mockStcUpscanProcessingService.process(any())(any[HeaderCarrier]))
+      when(mockStcUpscanProcessingService.process(eqTo(testFileUpload))(using anyArg[HeaderCarrier]))
         .thenReturn(Future.successful(Left(FileParseError.UnsupportedMimeType("application/pdf"))))
 
       val app = application
@@ -110,6 +171,8 @@ class FileUploadedControllerSpec extends SpecBase with MockitoSugar {
 
         status(result) mustBe SEE_OTHER
         redirectLocation(result).value mustBe individualRoutes.FormattingErrorController.onPageLoad().url
+
+        verify(mockSubscriptionConnector, never()).getAndStoreSubscription(anyArg())(using anyArg[HeaderCarrier])
       }
     }
 
@@ -117,7 +180,7 @@ class FileUploadedControllerSpec extends SpecBase with MockitoSugar {
 
       val initiatedUpload = testFileUpload.copy(status = UpscanJourneyStatus.Initiated)
 
-      when(mockRepository.find(any()))
+      when(mockRepository.find(anyArg()))
         .thenReturn(Future.successful(Some(initiatedUpload)))
 
       val app = application
@@ -130,12 +193,14 @@ class FileUploadedControllerSpec extends SpecBase with MockitoSugar {
 
         status(result) mustBe OK
         contentAsString(result) mustBe view(initiatedUpload)(request, messages(app)).toString
+
+        verify(mockStcUpscanProcessingService, never()).process(anyArg())(using anyArg[HeaderCarrier])
       }
     }
 
     "must redirect to JourneyRecovery when file upload is not found" in {
 
-      when(mockRepository.find(any()))
+      when(mockRepository.find(anyArg()))
         .thenReturn(Future.successful(None))
 
       val app = application
@@ -151,13 +216,13 @@ class FileUploadedControllerSpec extends SpecBase with MockitoSugar {
 
     "must  redirect to JourneyRecovery for an expired subscription" in {
 
-      when(mockRepository.find(any()))
+      when(mockRepository.find(anyArg()))
         .thenReturn(Future.successful(Some(testFileUpload)))
 
-      when(mockStcUpscanProcessingService.process(any())(any[HeaderCarrier]))
-        .thenReturn(Future.successful(Right(validationResponse)))
+      when(mockStcUpscanProcessingService.process(eqTo(testFileUpload))(using anyArg[HeaderCarrier]))
+        .thenReturn(Future.successful(Right(successfulValidationResponse)))
 
-      when(mockSubscriptionConnector.getAndStoreSubscription(any())(any()))
+      when(mockSubscriptionConnector.getAndStoreSubscription(anyArg())(using anyArg[HeaderCarrier]))
         .thenReturn(Future.failed(new SubscriptionStatusErrorException("expired")))
 
       val app = application

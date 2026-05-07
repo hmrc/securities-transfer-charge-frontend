@@ -17,69 +17,122 @@
 package services.fileupload
 
 import org.mockito.Mockito.when
-import org.scalatest.matchers.should.Matchers
+import org.scalatest.matchers.must.Matchers
 import org.scalatest.wordspec.AnyWordSpec
 import org.scalatestplus.mockito.MockitoSugar
-import uk.gov.hmrc.securitiestransferchargefrontend.models.stf.fileupload.{ParsedStcRow, ParsedValue, StcRowValidationError, ValidatedStcRow}
+import uk.gov.hmrc.securitiestransferchargefrontend.models.stf.fileupload.*
 import uk.gov.hmrc.securitiestransferchargefrontend.services.fileupload.*
-
-import java.time.LocalDate
 
 class StcFileValidationServiceSpec extends AnyWordSpec with Matchers with MockitoSugar {
 
   private val stcRowValidationService = mock[StcRowValidationService]
+
   private val service = new StcFileValidationService(stcRowValidationService)
 
-  private val parsedRow1 = ParsedStcRow(
-    rowNumber = 3,
-    addressLine1 = ParsedValue.Valid("10 Downing Street"),
-    addressLine2 = ParsedValue.Missing,
-    addressLine3 = ParsedValue.Missing,
-    addressLine4 = ParsedValue.Missing,
-    postcode = ParsedValue.Valid("SW1A 2AA"),
-    country = ParsedValue.Valid("United Kingdom"),
-    sellerName = ParsedValue.Valid("Bob Seller"),
-    sellerAddressInUk = ParsedValue.Valid(true),
-    sellerAddressLine1 = ParsedValue.Valid("1 Seller Street"),
-    sellerAddressLine2 = ParsedValue.Missing,
-    sellerAddressLine3 = ParsedValue.Missing,
-    sellerAddressLine4 = ParsedValue.Missing,
-    sellerPostcode = ParsedValue.Valid("LS1 1AA"),
-    sellerCountry = ParsedValue.Valid("United Kingdom"),
-    connectedPersons = ParsedValue.Valid(false),
-    applyingForRelief = ParsedValue.Valid(false),
-    whatReliefAreYouApplyingFor = ParsedValue.Missing,
-    securitiesTarget = ParsedValue.Missing,
-    companyRegistrationNumber = ParsedValue.Missing,
-    chargingPoint = ParsedValue.Valid(LocalDate.of(2026, 3, 23)),
-    taxRate = ParsedValue.Valid(BigDecimal("0.5")),
-    whatTypeOfSecurities = ParsedValue.Valid("Stock"),
-    typeOfShares = ParsedValue.Missing,
-    securitiesQuantity = ParsedValue.Valid(BigDecimal("100")),
-    amountPaidForSecurities = ParsedValue.Valid(BigDecimal("500")),
-    totalMarketValue = ParsedValue.Valid(BigDecimal("600"))
-  )
+  private val headers: Seq[String] =
+    Seq("sellerName")
 
-  private val parsedRow2 = parsedRow1.copy(rowNumber = 4)
+  private val parsedRow1 =
+    ParsedRow(
+      rowNumber = 3,
+      cells = Seq(ParsedCell(StcUploadColumn.sellerName, "Seller 1"))
+    )
 
-  "validate" should {
+  private val parsedRow2 =
+    ParsedRow(
+      rowNumber = 4,
+      cells = Seq(ParsedCell(StcUploadColumn.sellerName, ""))
+    )
 
-    "validate each row and wrap the results in a StcFileValidationResponse" in {
-      val validatedRow1 = ValidatedStcRow(parsedRow1, Seq.empty)
-      val validatedRow2 = ValidatedStcRow(
-        parsedRow2,
-        Seq(StcRowValidationError(4, "sellerName", "sellerName is required", blocking = true))
+  private val validatedRow1 =
+    ValidatedStcRow(
+      parsedRow = ParsedStcRow(
+        rowNumber = 3,
+        sellerName = Some("Seller 1"),
+        sellerAddressInUK = None,
+        sellerAddressLine1 = None,
+        sellerAddressLine2 = None,
+        sellerAddressLine3 = None,
+        sellerAddressLine4 = None,
+        sellerPostcode = None,
+        sellerCountry = None,
+        connectedPersons = None,
+        applyingForRelief = None,
+        whatReliefAreYouApplyingFor = None,
+        securitiesTarget = None,
+        companyRegistrationNumber = None,
+        chargingPoint = None,
+        taxRate = None,
+        whatTypeOfSecurities = None,
+        typeOfShares = None,
+        securitiesQuantity = None,
+        amountPaidForSecurities = None,
+        totalMarketValue = None,
+        minSharePrice = None,
+        maxSharePrice = None,
+        sharePurchaseReason = None,
+        purchaseForCancellation = None
+      ),
+      validationErrors = Seq.empty
+    )
+
+  private val validatedRow2 =
+    ValidatedStcRow(
+      parsedRow = ParsedStcRow(
+        rowNumber = 4,
+        sellerName = None,
+        sellerAddressInUK = None,
+        sellerAddressLine1 = None,
+        sellerAddressLine2 = None,
+        sellerAddressLine3 = None,
+        sellerAddressLine4 = None,
+        sellerPostcode = None,
+        sellerCountry = None,
+        connectedPersons = None,
+        applyingForRelief = None,
+        whatReliefAreYouApplyingFor = None,
+        securitiesTarget = None,
+        companyRegistrationNumber = None,
+        chargingPoint = None,
+        taxRate = None,
+        whatTypeOfSecurities = None,
+        typeOfShares = None,
+        securitiesQuantity = None,
+        amountPaidForSecurities = None,
+        totalMarketValue = None,
+        minSharePrice = None,
+        maxSharePrice = None,
+        sharePurchaseReason = None,
+        purchaseForCancellation = None
+      ),
+      validationErrors = Seq(
+        StcRowValidationError(
+          rowNumber = 4,
+          fieldName = "sellerName",
+          columnIndex = StcUploadColumn.sellerName,
+          message = "sellerName is required",
+          blocking = true
+        )
       )
+    )
 
-      when(stcRowValidationService.validate(parsedRow1)).thenReturn(validatedRow1)
-      when(stcRowValidationService.validate(parsedRow2)).thenReturn(validatedRow2)
+  "StcFileValidationService.validate" must {
 
-      val result = service.validate(Seq(parsedRow1, parsedRow2))
+    "validate each parsed row and return a file validation response" in {
 
-      result.rows shouldBe Seq(validatedRow1, validatedRow2)
-      result.hasBlockingErrors shouldBe true
-      result.hasErrors shouldBe true
-      result.validRows shouldBe Seq(parsedRow1)
+      when(
+        stcRowValidationService.validateAll(
+          Seq(parsedRow1, parsedRow2),
+          headers
+        )
+      ).thenReturn(Seq(validatedRow1, validatedRow2))
+
+      val result = service.validate(Seq(parsedRow1, parsedRow2), headers)
+
+      result.rows mustBe Seq(validatedRow1, validatedRow2)
+      result.hasErrors mustBe true
+      result.hasBlockingErrors mustBe true
+      result.validRows mustBe Seq(validatedRow1.parsedRow)
     }
   }
 }

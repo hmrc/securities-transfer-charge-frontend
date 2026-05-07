@@ -16,29 +16,58 @@
 
 package controllers.stf.individuals.bulk
 
-import base.{Fixtures, SpecBase}
+import base.{FileUploadFixtures, SpecBase}
+import org.mockito.Mockito.{reset, when}
+import org.scalatest.BeforeAndAfterEach
+import org.scalatestplus.mockito.MockitoSugar.mock
+import play.api.inject
 import play.api.test.FakeRequest
 import play.api.test.Helpers.*
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.individuals.bulk.routes
+import uk.gov.hmrc.securitiestransferchargefrontend.repositories.ValidationErrorRepository
+import uk.gov.hmrc.securitiestransferchargefrontend.viewmodels.stf.fileupload.UploadedFileErrorMapper
 import uk.gov.hmrc.securitiestransferchargefrontend.views.html.stf.individuals.bulk.UploadedFileErrorView
 
-class UploadedFileErrorControllerSpec extends SpecBase {
+import scala.concurrent.Future
 
-  "UploadedFileErrorList Controller" - {
+class UploadedFileErrorControllerSpec extends SpecBase with BeforeAndAfterEach with FileUploadFixtures {
+
+  private val mockValidationErrorRepository = mock[ValidationErrorRepository]
+
+  override protected def beforeEach(): Unit = {
+    super.beforeEach()
+    reset(mockValidationErrorRepository)
+  }
+
+
+  "UploadedFileErrorController" - {
 
     "must return OK and the correct view for a GET" in {
 
-      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers)).build()
+      val application =
+        applicationBuilder(userAnswers = Some(emptyUserAnswers))
+          .overrides(
+            inject.bind[ValidationErrorRepository].toInstance(mockValidationErrorRepository)
+          ).build()
+
+      when(mockValidationErrorRepository.findByReference(reference))
+        .thenReturn(Future.successful(blockingValidationErrors))
 
       running(application) {
-        val request = FakeRequest(GET, routes.UploadedFileErrorController.onPageLoad().url)
+
+        val request =
+          FakeRequest(GET, routes.UploadedFileErrorController.onPageLoad(reference).url)
 
         val result = route(application, request).value
 
         val view = application.injector.instanceOf[UploadedFileErrorView]
 
         status(result) mustEqual OK
-        contentAsString(result) mustEqual view(Fixtures.uploadedFileErrors)(request, messages(application)).toString
+
+        contentAsString(result) mustEqual
+          view(
+            UploadedFileErrorMapper.from(blockingValidationErrors)
+          )(request, messages(application)).toString
       }
     }
   }

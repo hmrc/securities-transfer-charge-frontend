@@ -16,8 +16,8 @@
 
 package uk.gov.hmrc.securitiestransferchargefrontend.models.submission
 
-import uk.gov.hmrc.securitiestransferchargefrontend.models.stf.fileupload.{ParsedValue, ValidatedStcRow}
 import uk.gov.hmrc.securitiestransferchargefrontend.models.stf
+import uk.gov.hmrc.securitiestransferchargefrontend.models.stf.fileupload.ValidatedStcRow
 
 object RowTransforms {
 
@@ -87,7 +87,7 @@ object RowTransforms {
         considerationActual = required(row.amountPaidForSecurities, "amountPaidForSecurities", row.rowNumber),
         isConnectedPartiesTransactions = connectedPersons,
         companyName = required(row.securitiesTarget, "securitiesTarget", row.rowNumber),
-        companyRegistrationNumber = optional(row.companyRegistrationNumber),
+        companyRegistrationNumber = row.companyRegistrationNumber,
         reliefClaimedName = conditional(reliefClaimed)(row.whatReliefAreYouApplyingFor, "whatReliefAreYouApplyingFor", row.rowNumber),
         reliefPercentage = reliefPercentage
       ),
@@ -95,9 +95,9 @@ object RowTransforms {
       mainSellerDetails = SingleTransferSellerDetails(
         sellerName = required(row.sellerName, "sellerName", row.rowNumber),
         addr1 = required(row.sellerAddressLine1, "sellerAddressLine1", row.rowNumber),
-        addr2 = optional(row.sellerAddressLine2),
-        addr3 = optional(row.sellerAddressLine3),
-        addr4 = optional(row.sellerAddressLine4),
+        addr2 = row.sellerAddressLine2,
+        addr3 = row.sellerAddressLine3,
+        addr4 = row.sellerAddressLine4,
         postcode = required(row.sellerPostcode, "sellerPostcode", row.rowNumber),
         country = required(row.sellerCountry, "sellerCountry", row.rowNumber)
       ),
@@ -119,22 +119,31 @@ object RowTransforms {
       agentDetails = agentDetails.lift(affinityData)
     )
 
-  private def required[A](value: ParsedValue[A], fieldName: String, rowNumber: Int): A =
-    value match
-      case ParsedValue.Valid(v) => v
-      case _                    => throw new IllegalArgumentException(s"Missing or invalid field '$fieldName' on row $rowNumber")
+  private def required[A](value: Option[A], fieldName: String, rowNumber: Int): A =
+    value.getOrElse(
+      throw new IllegalArgumentException(s"Missing field '$fieldName' on row $rowNumber")
+    )
+  
+  private def conditional[A](
+                              required: => Boolean
+                            )(
+                              value: Option[A],
+                              fieldName: String,
+                              rowNumber: Int
+                            ): Option[A] = {
 
-  private def optional[A](value: ParsedValue[A]): Option[A] =
-    value match
-      case ParsedValue.Valid(v) => Some(v)
-      case _                    => None
-
-  private def conditional[A](required: => Boolean)(value: ParsedValue[A], fieldName: String, rowNumber: Int): Option[A] =
     value match {
-      case ParsedValue.Valid(v) => Some(v)
-      case _ if !required       => None
-      case _                    => throw new IllegalArgumentException(s"Missing or invalid field '$fieldName' on row $rowNumber")
+      case Some(v) => Some(v)
+
+      case None if !required =>
+        None
+
+      case None =>
+        throw new IllegalArgumentException(
+          s"Missing field '$fieldName' on row $rowNumber"
+        )
     }
+  }
     
   private def taxRateFrom(rate: BigDecimal): BuyerTaxRate =
     if rate == BigDecimal("1.5") then BuyerTaxRate.OneAndHalfPercent else BuyerTaxRate.HalfPercent

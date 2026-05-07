@@ -14,21 +14,17 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.securitiestransferchargefrontend.viewmodels.stf.fileupload
+package uk.gov.hmrc.securitiestransferchargefrontend.services.fileupload
 
-object SpreadsheetColumnLetters {
+import com.google.inject.Singleton
 
-  def fromZeroBasedIndex(index: Int): String = {
-    require(index >= 0, s"Column index must be >= 0 but was $index")
+@Singleton
+final class ColumnIndexBuilder(headers: Seq[String]) {
 
-    var n = index
-    val sb = new StringBuilder
+  private val index: Map[String, Int] =
+    headers.map(_.trim).zipWithIndex.toMap
 
-    while (n >= 0) {
-      sb.append(('A' + (n % 26)).toChar)
-      n = n / 26 - 1
-    }
-
-    sb.reverse.toString
-  }
+  def find(columnName: String): Option[Int] =
+    index.get(columnName.trim)
+    
 }

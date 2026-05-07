@@ -20,16 +20,14 @@ package uk.gov.hmrc.securitiestransferchargefrontend.repositories
 import org.mongodb.scala.bson.BsonDocument
 import org.mongodb.scala.bson.conversions.Bson
 import org.mongodb.scala.model.Updates.{combine, set}
-import org.mongodb.scala.model.{Filters, IndexModel, IndexOptions, Indexes, ReplaceOptions}
-import play.api.libs.json.{Format, Json}
+import org.mongodb.scala.model.*
+import play.api.libs.json.Json
 import uk.gov.hmrc.mongo.MongoComponent
 import uk.gov.hmrc.mongo.play.json.PlayMongoRepository
-import uk.gov.hmrc.mongo.play.json.formats.MongoJavatimeFormats
 import uk.gov.hmrc.securitiestransferchargefrontend.config.FrontendAppConfig
-import uk.gov.hmrc.securitiestransferchargefrontend.models.stf.upscan.{FileUpload, UpscanDocument, UpscanJourneyStatus}
 import uk.gov.hmrc.securitiestransferchargefrontend.models.stf.upscan.UpscanCallbackRequest.UploadDetails
+import uk.gov.hmrc.securitiestransferchargefrontend.models.stf.upscan.{FileUpload, UpscanDocument, UpscanJourneyStatus}
 
-import java.time.Instant
 import java.util.concurrent.TimeUnit
 import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
@@ -63,13 +61,12 @@ class UpscanJourneyRepositoryImpl @Inject()(
         Indexes.ascending("createdAt"),
         IndexOptions()
           .name("createdAtIdx")
-          .expireAfter(appConfig.upscanTtl, TimeUnit.DAYS)
+          .expireAfter(appConfig.upscanTtl, TimeUnit.HOURS)
       )
     )) with UpscanJourneyRepository {
 
-  implicit val instantFormat: Format[Instant] = MongoJavatimeFormats.instantFormat
   
-  def byReference(reference:String): Bson = Filters.equal("_id",reference)
+  private def byReference(reference:String): Bson = Filters.equal("_id",reference)
 
   override def insert(journey: UpscanDocument): Future[Unit] =
     collection.replaceOne(

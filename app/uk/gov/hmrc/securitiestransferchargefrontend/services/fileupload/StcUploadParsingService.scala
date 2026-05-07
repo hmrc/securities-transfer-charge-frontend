@@ -18,20 +18,26 @@ package uk.gov.hmrc.securitiestransferchargefrontend.services.fileupload
 
 import javax.inject.{Inject, Singleton}
 import uk.gov.hmrc.securitiestransferchargefrontend.config.FileUploadConfig
-import uk.gov.hmrc.securitiestransferchargefrontend.models.stf.fileupload.{FileParseError, ParsedStcRow, UploadedFile}
+import uk.gov.hmrc.securitiestransferchargefrontend.models.stf.fileupload.{FileParseError, ParsedFile, UploadedFile}
 
 @Singleton
 class StcUploadParsingService @Inject()(
                                          fileUploadConfig: FileUploadConfig,
-                                         fileParsingService: FileParsingService,
-                                         stcRowMapper: StcRowMapper
+                                         fileParsingService: FileParsingService
                                        ) {
 
-  def parse(uploadedFile: UploadedFile): Either[FileParseError, Seq[ParsedStcRow]] =
-    fileParsingService.parse(uploadedFile).map { parsedFile =>
-      parsedFile.rows
-        .filter(_.rowNumber >= fileUploadConfig.firstDataRow)
-        .filterNot(_.isCompletelyEmpty)
-        .map(stcRowMapper.map)
+  def parse(uploadedFile: UploadedFile): Either[FileParseError, ParsedFile] =
+    fileParsingService.parse(uploadedFile).flatMap { parsedFile =>
+
+      val dataRows =
+        parsedFile.rows
+          .filter(_.rowNumber >= fileUploadConfig.firstDataRow)
+          .filterNot(_.isCompletelyEmpty)
+
+      if (dataRows.isEmpty) {
+        Left(FileParseError.EmptyFile)
+      } else {
+        Right(parsedFile.copy(rows = dataRows))
+      }
     }
 }

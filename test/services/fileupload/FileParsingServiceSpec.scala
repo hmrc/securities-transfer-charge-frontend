@@ -42,7 +42,8 @@ class FileParsingServiceSpec extends AnyWordSpec with Matchers with EitherValues
   private val parsedFile = ParsedFile(
     fileName = "test.csv",
     mimeType = "text/csv",
-    rows = Seq()
+    rows = Seq(),
+    headers = Seq()
   )
 
   "parse" should {

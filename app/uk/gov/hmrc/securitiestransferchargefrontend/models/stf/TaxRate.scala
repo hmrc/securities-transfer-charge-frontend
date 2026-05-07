@@ -25,11 +25,11 @@ sealed trait TaxRate
 
 object TaxRate extends Enumerable.Implicits {
 
-  case object Half extends WithName("half") with TaxRate
-  case object Oneandhalf extends WithName("oneAndHalf") with TaxRate
+  case object HalfPercent extends WithName("half") with TaxRate
+  case object OneAndHalfPercent extends WithName("oneAndHalf") with TaxRate
 
   val values: Seq[TaxRate] = Seq(
-    Half, Oneandhalf
+    HalfPercent, OneAndHalfPercent
   )
 
   def options(implicit messages: Messages): Seq[RadioItem] = values.zipWithIndex.map {

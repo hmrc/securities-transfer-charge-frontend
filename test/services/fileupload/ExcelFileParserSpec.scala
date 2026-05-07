@@ -55,13 +55,22 @@ class ExcelFileParserSpec extends AnyWordSpec with Matchers with EitherValues {
   private def blankCells(fromIndex: Int): Seq[ParsedCell] =
     (fromIndex until maxColumns).map(index => ParsedCell(index, ""))
 
+  private def blankHeaders(fromIndex: Int): Seq[String] =
+    (fromIndex until maxColumns).map(_ => "")
+
   "parse" should {
 
     "parse string, numeric, boolean and date cells" in {
       val bytes = workbookBytes { workbook =>
         val sheet = workbook.createSheet("Sheet1")
-        val row = sheet.createRow(0)
 
+        val header = sheet.createRow(0)
+        header.createCell(0).setCellValue("name")
+        header.createCell(1).setCellValue("amount")
+        header.createCell(2).setCellValue("flag")
+        header.createCell(3).setCellValue("date")
+
+        val row = sheet.createRow(1)
         row.createCell(0).setCellValue("Bob")
         row.createCell(1).setCellValue(123.45)
         row.createCell(2).setCellValue(true)
@@ -79,44 +88,61 @@ class ExcelFileParserSpec extends AnyWordSpec with Matchers with EitherValues {
 
       val result = parser.parse(uploadedFile(bytes)).value
 
+      result.headers shouldBe Seq(
+        "name", "amount", "flag", "date"
+      ) ++ blankHeaders(4)
+
       result.rows.size shouldBe 1
+
+      result.rows.head.rowNumber shouldBe 2
+
       result.rows.head.cells shouldBe Seq(
         ParsedCell(0, "Bob"),
         ParsedCell(1, "123.45"),
         ParsedCell(2, "true"),
         ParsedCell(3, "2026-03-23")
-      ) ++ blankCells(fromIndex = 4)
+      ) ++ blankCells(4)
     }
 
     "pad missing trailing columns with blank cells up to the configured maximum" in {
       val bytes = workbookBytes { workbook =>
         val sheet = workbook.createSheet("Sheet1")
-        val row = sheet.createRow(0)
 
+        val header = sheet.createRow(0)
+        header.createCell(0).setCellValue("name")
+
+        val row = sheet.createRow(1)
         row.createCell(0).setCellValue("Bob")
       }
 
       val result = parser.parse(uploadedFile(bytes)).value
 
+      result.headers shouldBe Seq("name") ++ blankHeaders(1)
+
       result.rows.head.cells shouldBe Seq(
         ParsedCell(0, "Bob")
-      ) ++ blankCells(fromIndex = 1)
+      ) ++ blankCells(1)
     }
 
     "ignore columns beyond the first 27" in {
       val bytes = workbookBytes { workbook =>
         val sheet = workbook.createSheet("Sheet1")
-        val row = sheet.createRow(0)
+
+        val header = sheet.createRow(0)
+        val row = sheet.createRow(1)
 
         (0 until 30).foreach { index =>
+          header.createCell(index).setCellValue(s"h${index + 1}")
           row.createCell(index).setCellValue(s"value${index + 1}")
         }
       }
 
       val result = parser.parse(uploadedFile(bytes)).value
 
+      result.headers should have size maxColumns
       result.rows.size shouldBe 1
       result.rows.head.cells should have size maxColumns
+
       result.rows.head.cells shouldBe (0 until maxColumns).map { index =>
         ParsedCell(index, s"value${index + 1}")
       }
@@ -125,7 +151,10 @@ class ExcelFileParserSpec extends AnyWordSpec with Matchers with EitherValues {
     "return RowLimitExceeded when the row count exceeds the configured maximum" in {
       val bytes = workbookBytes { workbook =>
         val sheet = workbook.createSheet("Sheet1")
-        sheet.createRow(0).createCell(0).setCellValue("header")
+
+        val header = sheet.createRow(0)
+        header.createCell(0).setCellValue("header")
+
         sheet.createRow(1).createCell(0).setCellValue("row1")
       }
 

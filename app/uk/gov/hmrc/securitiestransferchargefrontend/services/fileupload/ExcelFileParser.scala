@@ -44,28 +44,50 @@ class ExcelFileParser @Inject()(config: FileUploadConfig) extends FileParser {
             .toRight(MissingWorksheet(config.expectedWorksheetName))
 
         sheet.flatMap { worksheet =>
-          val rows = worksheet.iterator().asScala.toSeq
+          val allRows = worksheet.iterator().asScala.toSeq
 
-          if (rows.size > config.maxRows) {
-            Left(RowLimitExceeded(rows.size, config.maxRows))
+          if (allRows.isEmpty) {
+            Left(InvalidXlsx("The file is empty"))
+          } else if (allRows.size > config.maxRows) {
+            Left(RowLimitExceeded(allRows.size, config.maxRows))
           } else {
-            val parsedRows = rows.zipWithIndex.map { case (row, index) =>
+
+            val headerRow = allRows.head
+
+
+
+            val headers =
+              (0 until config.maxColumns).map { i =>
+                Option(headerRow.getCell(i))
+                  .map(extractCellValue)
+                  .getOrElse("")
+                  .trim
+              }
+
+
+            val dataRows = allRows.tail
+
+
+            val parsedRows = dataRows.zipWithIndex.map { case (row, idx) =>
               ParsedRow(
-                rowNumber = index + 1,
-                cells = (0 until config.maxColumns).map { cellIndex =>
-                  val rawValue = Option(row.getCell(cellIndex))
+                rowNumber = idx + 2,
+                cells = (0 until config.maxColumns).map { i =>
+                  val value = Option(row.getCell(i))
                     .map(extractCellValue)
                     .getOrElse("")
+                    .trim
 
-                  ParsedCell(cellIndex, rawValue.trim)
+                  ParsedCell(i, value)
                 }
               )
             }
+
 
             Right(
               ParsedFile(
                 fileName = file.fileName,
                 mimeType = file.mimeType,
+                headers = headers,
                 rows = parsedRows
               )
             )
@@ -81,8 +103,7 @@ class ExcelFileParser @Inject()(config: FileUploadConfig) extends FileParser {
 
   private def extractCellValue(cell: Cell): String =
     cell.getCellType match {
-      case CellType.STRING =>
-        cell.getStringCellValue
+      case CellType.STRING => cell.getStringCellValue
 
       case CellType.NUMERIC =>
         if (DateUtil.isCellDateFormatted(cell)) {
@@ -99,9 +120,7 @@ class ExcelFileParser @Inject()(config: FileUploadConfig) extends FileParser {
 
       case CellType.FORMULA =>
         cell.getCachedFormulaResultType match {
-          case CellType.STRING =>
-            cell.getStringCellValue
-
+          case CellType.STRING  => cell.getStringCellValue
           case CellType.NUMERIC =>
             if (DateUtil.isCellDateFormatted(cell)) {
               cell.getDateCellValue.toInstant
@@ -111,18 +130,11 @@ class ExcelFileParser @Inject()(config: FileUploadConfig) extends FileParser {
             } else {
               BigDecimal(cell.getNumericCellValue).bigDecimal.stripTrailingZeros.toPlainString
             }
-
-          case CellType.BOOLEAN =>
-            cell.getBooleanCellValue.toString
-
-          case _ =>
-            ""
+          case CellType.BOOLEAN => cell.getBooleanCellValue.toString
+          case _                => ""
         }
 
-      case CellType.BLANK =>
-        ""
-
-      case _ =>
-        ""
+      case CellType.BLANK => ""
+      case _              => ""
     }
 }

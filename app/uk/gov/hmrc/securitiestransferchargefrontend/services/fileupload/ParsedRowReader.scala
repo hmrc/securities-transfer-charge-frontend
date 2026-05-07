@@ -17,6 +17,7 @@
 package uk.gov.hmrc.securitiestransferchargefrontend.services.fileupload
 
 import uk.gov.hmrc.securitiestransferchargefrontend.models.stf.fileupload.{ParsedRow, ParsedValue}
+import uk.gov.hmrc.securitiestransferchargefrontend.services.fileupload.StcTaxRateParser.ParsedTaxRate
 
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
@@ -48,6 +49,26 @@ object ParsedRowReader {
         }
     }
 
+  def readTaxRate(row: ParsedRow, columnIndex: Int): ParsedValue[ParsedTaxRate] =
+    readBigDecimal(row, columnIndex) match {
+
+      case ParsedValue.Valid(value) =>
+        val normalised =
+          if (value < 0.1) value * 100  // handles Excel percentages (0.005 → 0.5)
+          else value                    // handles "0.5%" → 0.5
+
+        StcTaxRateParser.parse(normalised) match {
+          case Some(rate) => ParsedValue.Valid(rate)
+          case None       => ParsedValue.Invalid(value.toString, "unsupported tax rate")
+        }
+
+      case ParsedValue.Missing =>
+        ParsedValue.Missing
+
+      case ParsedValue.Invalid(raw, reason) =>
+        ParsedValue.Invalid(raw, reason)
+    }
+
   def readBoolean(row: ParsedRow, columnIndex: Int): ParsedValue[Boolean] =
     row.valueAt(columnIndex) match {
       case None => ParsedValue.Missing
@@ -63,6 +84,8 @@ object ParsedRowReader {
   def readDate(row: ParsedRow, columnIndex: Int): ParsedValue[LocalDate] = {
     val formatters = Seq(
       DateTimeFormatter.ISO_LOCAL_DATE,
+      DateTimeFormatter.ofPattern("yyyy/M/d"),
+      DateTimeFormatter.ofPattern("yyyy/MM/dd"),
       DateTimeFormatter.ofPattern("d/M/uuuu"),
       DateTimeFormatter.ofPattern("dd/MM/uuuu"),
       DateTimeFormatter.ofPattern("d M uuuu"),

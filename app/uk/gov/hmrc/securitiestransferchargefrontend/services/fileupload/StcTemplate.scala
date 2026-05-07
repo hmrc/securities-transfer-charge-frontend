@@ -14,21 +14,21 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.securitiestransferchargefrontend.viewmodels.stf.fileupload
+package uk.gov.hmrc.securitiestransferchargefrontend.services.fileupload
 
-object SpreadsheetColumnLetters {
+sealed trait StcTemplate {
+  def identifyingFields: Set[String]
+}
 
-  def fromZeroBasedIndex(index: Int): String = {
-    require(index >= 0, s"Column index must be >= 0 but was $index")
+object StcTemplate {
 
-    var n = index
-    val sb = new StringBuilder
+  case object STF extends StcTemplate {
 
-    while (n >= 0) {
-      sb.append(('A' + (n % 26)).toChar)
-      n = n / 26 - 1
-    }
+    val identifyingFields: Set[String] = Set("STF")
+  }
 
-    sb.reverse.toString
+  case object SH03 extends StcTemplate {
+
+    val identifyingFields: Set[String] = Set("SH03")
   }
 }

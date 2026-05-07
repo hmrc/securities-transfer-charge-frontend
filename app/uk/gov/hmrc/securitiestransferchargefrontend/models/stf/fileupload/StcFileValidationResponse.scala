@@ -35,6 +35,9 @@ final case class StcFileValidationResponse(
 
   val nonBlockingErrors: Seq[StcRowValidationError] =
     rows.flatMap(_.validationErrors.filterNot(_.blocking))
+
+  val tooManyBlockingErrors: Boolean =
+    blockingErrors.size >= 26
 }
 
 object StcFileValidationResponse {
