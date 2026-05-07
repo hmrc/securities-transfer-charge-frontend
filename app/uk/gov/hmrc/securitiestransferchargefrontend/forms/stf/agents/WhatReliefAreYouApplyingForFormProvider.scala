@@ -25,6 +25,6 @@ class WhatReliefAreYouApplyingForFormProvider @Inject() extends Mappings {
 
   def apply(): Form[String] =
     Form(
-      "reliefs" -> text("agents.whatReliefAreYouApplyingFor.error.required")
+      "reliefs" -> text("agent.whatReliefAreYouApplyingFor.error.required")
     )
 }

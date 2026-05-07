@@ -482,3 +482,4 @@ agent.whatReliefAreYouApplyingFor.title = Enter the relief the buyer is applying
 agent.whatReliefAreYouApplyingFor.heading = Enter the relief the buyer is applying for
 agent.whatReliefAreYouApplyingFor.p = Start typing the name of the relief and select from the list.
 agent.whatReliefAreYouApplyingFor.details.content.link.text = See a full list of reliefs
+agent.whatReliefAreYouApplyingFor.error.required = Start typing the name of the relief and select from the list
