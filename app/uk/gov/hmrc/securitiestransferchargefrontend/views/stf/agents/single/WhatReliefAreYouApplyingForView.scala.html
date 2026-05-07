@@ -25,8 +25,6 @@
 @import uk.gov.hmrc.securitiestransferchargefrontend.models.Relief
 @import uk.gov.hmrc.securitiestransferchargefrontend.views.html.components.SaveAndReturnButton
 
-
-
 @this(
   layout: templates.Layout,
   formHelper: FormWithCSRF,
@@ -34,7 +32,7 @@
   govukSelect: GovukSelect,
   govukButton: GovukButton,
   hmrcNewTabLinkHelper: HmrcNewTabLinkHelper,
-  saveAndReturnButton:SaveAndReturnButton
+  saveAndReturnButton: SaveAndReturnButton
 )
 
 @(form: Form[_], mode: Mode, reliefs: Seq[Relief], backLinkCall: Call)(implicit request: Request[_], messages: Messages)
@@ -53,13 +51,20 @@
     @if(form.errors.nonEmpty) {
       @govukErrorSummary(ErrorSummaryViewModel(form))
     }
-    <span  class="govuk-caption-l">@messages("transfer.details.caption")</span>
+
+    <span class="govuk-caption-l">@messages("transfer.details.caption")</span>
+    <h1 class="govuk-heading-l">@messages("agent.whatReliefAreYouApplyingFor.heading")</h1>
+
+    <p class="govuk-body">@messages("agent.whatReliefAreYouApplyingFor.p") @link.</p>
+
     @govukSelect(Select(
           id = form("reliefs").id,
           name = form("reliefs").name,
-          label = Label(content = HtmlContent(messages("agent.whatReliefAreYouApplyingFor.heading"))).asPageHeading(Large),
-          items = ViewHelper.reliefsToSelectItems(reliefs, form),
-    hint = Some(Hint(content = HtmlContent(s"<p class='govuk-hint'>${messages("agent.whatReliefAreYouApplyingFor.p")} $link</p>")))
+          label = Label(
+            content = HtmlContent(messages("agent.whatReliefAreYouApplyingFor.heading")),
+            classes = "govuk-visually-hidden"
+          ),
+          items = ViewHelper.reliefsToSelectItems(reliefs, form)
       ).asAccessibleAutocomplete().withFormField(form("reliefs")))
 
     @govukButton(ButtonViewModel(messages("site.save-and-continue.button")))
