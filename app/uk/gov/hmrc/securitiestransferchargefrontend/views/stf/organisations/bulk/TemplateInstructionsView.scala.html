@@ -16,6 +16,8 @@
 
 @import uk.gov.hmrc.securitiestransferchargefrontend.views.html.templates
 @import uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.shared.routes
+@import uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.shared.bulk.routes as bulkRoutes
+
 
 @this(
     layout: templates.Layout,
@@ -53,7 +55,7 @@
             @govukButton(
                 ButtonViewModel(
                     messages("site.continue")
-                ).asLink("")
+                ).asLink(bulkRoutes.FileUploadController.onPageLoad().url)
             )
 
             <a class="govuk-link" href="@routes.SubmissionsDashboardController.onPageLoad().url">

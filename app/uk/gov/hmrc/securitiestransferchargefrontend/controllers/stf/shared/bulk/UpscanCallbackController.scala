@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.individuals.bulk
+package uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.shared.bulk
 
 import play.api.Logging
 import play.api.i18n.I18nSupport

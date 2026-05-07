@@ -14,13 +14,13 @@
  * limitations under the License.
  */
 
-package views.stf.individuals.bulk
+package views.stf.shared.bulk
 
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
 import play.api.Application
 import uk.gov.hmrc.securitiestransferchargefrontend.models.stf.upscan.{FileUpload, UpscanJourneyStatus}
-import uk.gov.hmrc.securitiestransferchargefrontend.views.html.stf.individuals.bulk.FileUploadedView
+import uk.gov.hmrc.securitiestransferchargefrontend.views.html.stf.shared.bulk.FileUploadedView
 import views.ViewBaseSpec
 
 class FileUploadedViewSpec extends ViewBaseSpec {

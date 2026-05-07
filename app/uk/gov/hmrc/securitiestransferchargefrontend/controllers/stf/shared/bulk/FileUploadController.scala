@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.individuals.bulk
+package uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.shared.bulk
 
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents, Request}
@@ -23,7 +23,7 @@ import uk.gov.hmrc.securitiestransferchargefrontend.connectors.UpscanInitiateCon
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.actions.*
 import uk.gov.hmrc.securitiestransferchargefrontend.models.stf.upscan.*
 import uk.gov.hmrc.securitiestransferchargefrontend.repositories.UpscanJourneyRepository
-import uk.gov.hmrc.securitiestransferchargefrontend.views.html.stf.individuals.bulk.FileUploadView
+import uk.gov.hmrc.securitiestransferchargefrontend.views.html.stf.shared.bulk.FileUploadView
 
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}

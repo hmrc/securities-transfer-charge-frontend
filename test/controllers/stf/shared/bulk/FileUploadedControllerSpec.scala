@@ -14,12 +14,12 @@
  * limitations under the License.
  */
 
-package controllers.stf.individuals.bulk
+package controllers.stf.shared.bulk
 
 import base.{FileUploadFixtures, SpecBase}
-import org.mockito.ArgumentMatchers.{any => anyArg, eq => eqTo}
-import org.scalatest.BeforeAndAfterEach
+import org.mockito.ArgumentMatchers.{any as anyArg, eq as eqTo}
 import org.mockito.Mockito.*
+import org.scalatest.BeforeAndAfterEach
 import org.scalatestplus.mockito.MockitoSugar
 import play.api.test.FakeRequest
 import play.api.test.Helpers.*
@@ -27,13 +27,12 @@ import play.api.{Application, inject}
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.securitiestransferchargefrontend.connectors.{SubscriptionConnector, SubscriptionStatusErrorException}
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.routes
-import uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.individuals.bulk.routes as individualRoutes
-import uk.gov.hmrc.securitiestransferchargefrontend.models.stf.fileupload.FileParseError
+import uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.shared.bulk.routes as bulkRoutes
+import uk.gov.hmrc.securitiestransferchargefrontend.models.stf.fileupload.{FileParseError, StcRowValidationError}
 import uk.gov.hmrc.securitiestransferchargefrontend.models.stf.upscan.{FileUpload, UpscanJourneyStatus}
 import uk.gov.hmrc.securitiestransferchargefrontend.repositories.UpscanJourneyRepository
 import uk.gov.hmrc.securitiestransferchargefrontend.services.fileupload.StcUpscanProcessingService
-import uk.gov.hmrc.securitiestransferchargefrontend.views.html.stf.individuals.bulk.FileUploadedView
-import uk.gov.hmrc.securitiestransferchargefrontend.models.stf.fileupload.StcRowValidationError
+import uk.gov.hmrc.securitiestransferchargefrontend.views.html.stf.shared.bulk.FileUploadedView
 
 import scala.concurrent.Future
 
@@ -69,7 +68,7 @@ class FileUploadedControllerSpec extends SpecBase with MockitoSugar with FileUpl
       .build()
 
   private def fileUploadedRoute(key: String): String =
-    individualRoutes.FileUploadedController.onPageLoad(key).url
+    bulkRoutes.FileUploadedController.onPageLoad(key).url
 
   "FileUploadedController" - {
 
@@ -126,7 +125,7 @@ class FileUploadedControllerSpec extends SpecBase with MockitoSugar with FileUpl
         val result  = route(app, request).value
 
         status(result) mustBe SEE_OTHER
-        redirectLocation(result).value mustBe individualRoutes.UploadedFileErrorController.onPageLoad(testKey).url
+        redirectLocation(result).value mustBe bulkRoutes.UploadedFileErrorController.onPageLoad(testKey).url
 
         verify(mockSubscriptionConnector, never()).getAndStoreSubscription(anyArg())(using anyArg[HeaderCarrier])
       }
@@ -149,7 +148,7 @@ class FileUploadedControllerSpec extends SpecBase with MockitoSugar with FileUpl
         val result  = route(app, request).value
 
         status(result) mustBe SEE_OTHER
-        redirectLocation(result).value mustBe individualRoutes.FormattingErrorController.onPageLoad().url
+        redirectLocation(result).value mustBe bulkRoutes.FormattingErrorController.onPageLoad().url
 
         verify(mockSubscriptionConnector, never()).getAndStoreSubscription(anyArg())(using anyArg[HeaderCarrier])
       }
@@ -170,7 +169,7 @@ class FileUploadedControllerSpec extends SpecBase with MockitoSugar with FileUpl
         val result  = route(app, request).value
 
         status(result) mustBe SEE_OTHER
-        redirectLocation(result).value mustBe individualRoutes.FormattingErrorController.onPageLoad().url
+        redirectLocation(result).value mustBe bulkRoutes.FormattingErrorController.onPageLoad().url
 
         verify(mockSubscriptionConnector, never()).getAndStoreSubscription(anyArg())(using anyArg[HeaderCarrier])
       }

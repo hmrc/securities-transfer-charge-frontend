@@ -14,20 +14,20 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.individuals.bulk
+package uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.shared.bulk
 
 import play.api.i18n.I18nSupport
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents, Result}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import uk.gov.hmrc.securitiestransferchargefrontend.connectors.SubscriptionConnector
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.actions.{StcAuthEnrolledAction, StcAuthorisedRequest}
-import uk.gov.hmrc.securitiestransferchargefrontend.controllers.routes
-import uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.individuals.bulk.routes as individualRoutes
+import uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.shared.bulk.routes
+import uk.gov.hmrc.securitiestransferchargefrontend.controllers.routes.JourneyRecoveryController
+import uk.gov.hmrc.securitiestransferchargefrontend.models.stf.fileupload.FileParseError
 import uk.gov.hmrc.securitiestransferchargefrontend.models.stf.upscan.{FileUpload, UpscanJourneyStatus}
 import uk.gov.hmrc.securitiestransferchargefrontend.repositories.{UpscanJourneyRepository, ValidationErrorRepository}
 import uk.gov.hmrc.securitiestransferchargefrontend.services.fileupload.StcUpscanProcessingService
-import uk.gov.hmrc.securitiestransferchargefrontend.views.html.stf.individuals.bulk.FileUploadedView
-import uk.gov.hmrc.securitiestransferchargefrontend.models.stf.fileupload.FileParseError
+import uk.gov.hmrc.securitiestransferchargefrontend.views.html.stf.shared.bulk.FileUploadedView
 
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
@@ -53,7 +53,7 @@ class FileUploadedController @Inject()(
           Future.successful(Ok(view(fileUpload)))
 
         case None =>
-          Future.successful(Redirect(routes.JourneyRecoveryController.onPageLoad()))
+          Future.successful(Redirect(JourneyRecoveryController.onPageLoad()))
       }
     }
 
@@ -61,12 +61,12 @@ class FileUploadedController @Inject()(
     stcUpscanProcessingService.process(fileUpload).flatMap {
       case Left(_: FileParseError) =>
         Future.successful(
-          Redirect(individualRoutes.FormattingErrorController.onPageLoad())
+          Redirect(routes.FormattingErrorController.onPageLoad())
         )
 
       case Right(validationResponse) if validationResponse.tooManyBlockingErrors =>
         Future.successful(
-          Redirect(individualRoutes.FormattingErrorController.onPageLoad())
+          Redirect(routes.FormattingErrorController.onPageLoad())
         )
 
       case Right(validationResponse) if validationResponse.hasBlockingErrors =>
@@ -74,7 +74,7 @@ class FileUploadedController @Inject()(
           .save(reference, validationResponse.blockingErrors)
           .map { _ =>
             Redirect(
-              individualRoutes.UploadedFileErrorController.onPageLoad(reference)
+              routes.UploadedFileErrorController.onPageLoad(reference)
             )
           }
 
@@ -83,7 +83,7 @@ class FileUploadedController @Inject()(
         subscriptionConnector.getAndStoreSubscription(request.subscriptionId)
           .map(_ => Ok(view(fileUpload)))
           .recover {
-            case _ => Redirect(routes.JourneyRecoveryController.onPageLoad())
+            case _ => Redirect(JourneyRecoveryController.onPageLoad())
           }
     }
 }

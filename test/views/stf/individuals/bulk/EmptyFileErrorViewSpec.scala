@@ -19,7 +19,7 @@ package views.stf.individuals.bulk
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
 import play.api.Application
-import uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.individuals.bulk.routes
+import uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.shared.bulk.routes
 import uk.gov.hmrc.securitiestransferchargefrontend.views.html.stf.individuals.bulk.EmptyFileErrorView
 import views.ViewBaseSpec
 
