@@ -13,6 +13,7 @@ site.start = Start now
 site.startAgain = Start again
 site.signIn = Sign in
 site.govuk = GOV.UK
+site.upload.file = Upload file
 
 date.day = Day
 date.month = Month
@@ -358,7 +359,7 @@ fileUpload.error.emptyFile.p1 = Add the correct transfer details to the file the
 fileUpload.error.emptyFile.download.text = Download the template file.
 fileUpload.upload.another = Upload a different file
 
-fileUpload.redirectError.emptyFile = The selected file is empty
+fileUpload.redirectError.emptyFile = Select a file to upload
 fileUpload.redirectError.EntityTooLarge = The selected file must be smaller than 1GB
 fileUpload.redirectError.generic = The selected file could not be uploaded – try again
 fileUpload.redirectError.InvalidArgument = The selected file must be a .csv or a .xlsx
@@ -483,3 +484,9 @@ agent.applyingForRelief.error.required = Select yes if the buyer is  applying fo
 agent.applyingForRelief.change.hidden = ApplyingForRelief
 agent.applyingForRelief.p = See a
 agent.applyingForRelief.details.content.link.text = full list of reliefs
+
+agent.whatReliefAreYouApplyingFor.title = Enter the relief the buyer is applying for
+agent.whatReliefAreYouApplyingFor.heading = Enter the relief the buyer is applying for
+agent.whatReliefAreYouApplyingFor.p = Start typing the name of the relief and select from the list. See a
+agent.whatReliefAreYouApplyingFor.details.content.link.text = full list of reliefs
+agent.whatReliefAreYouApplyingFor.error.required = Start typing the name of the relief and select from the list
