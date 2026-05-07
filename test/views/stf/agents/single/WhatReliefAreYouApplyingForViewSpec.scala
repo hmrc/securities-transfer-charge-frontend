@@ -25,7 +25,6 @@ import uk.gov.hmrc.securitiestransferchargefrontend.models.{NormalMode, ReliefsD
 import uk.gov.hmrc.securitiestransferchargefrontend.views.html.stf.agents.single.WhatReliefAreYouApplyingForView
 import views.ViewBaseSpec
 
-
 class WhatReliefAreYouApplyingForViewSpec extends ViewBaseSpec {
 
   override def fakeApplication(): Application =
@@ -70,7 +69,7 @@ class WhatReliefAreYouApplyingForViewSpec extends ViewBaseSpec {
       }
 
       "have the first paragraph" in {
-        doc.select(".govuk-hint").text() must include(ExpectedContent.paragraph)
+        doc.select(".govuk-body").text() must include(ExpectedContent.paragraph)
       }
 
       "have a save and continue button" in {
