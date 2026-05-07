@@ -221,3 +221,9 @@ GET        /stf/agent/connected-persons                   uk.gov.hmrc.securities
 POST       /stf/agent/connected-persons                   uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.agents.single.ConnectedPersonsController.onSubmit(mode: Mode = NormalMode)
 GET        /stf/agent/change/connected-persons            uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.agents.single.ConnectedPersonsController.onPageLoad(mode: Mode = CheckMode)
 POST       /stf/agent/change/connected-persons            uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.agents.single.ConnectedPersonsController.onSubmit(mode: Mode = CheckMode)
+
+
+GET        /stf/agent/select-relief                             uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.agents.single.WhatReliefAreYouApplyingForController.onPageLoad(mode: Mode = NormalMode)
+POST       /stf/agent/select-relief                             uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.agents.single.WhatReliefAreYouApplyingForController.onSubmit(mode: Mode = NormalMode)
+GET        /stf/agent/change/select-relief                      uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.agents.single.WhatReliefAreYouApplyingForController.onPageLoad(mode: Mode = CheckMode)
+POST       /stf/agent/change/select-relief                      uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.agents.single.WhatReliefAreYouApplyingForController.onSubmit(mode: Mode = CheckMode)
