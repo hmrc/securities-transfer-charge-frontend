@@ -180,9 +180,9 @@ GET        /stf/bulk-formatting                           uk.gov.hmrc.securities
 GET        /stf/bulk-empty                                uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.individuals.bulk.EmptyFileErrorController.onPageLoad()
 GET        /stf/bulk-error-list/:reference                uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.individuals.bulk.UploadedFileErrorController.onPageLoad(reference: String)
 
-GET        /stf/file-upload                               uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.individuals.bulk.FileUploadController.onPageLoad()
+GET        /stf/upload-template                              uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.individuals.bulk.FileUploadController.onPageLoad()
 GET        /stf/file-uploaded                             uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.individuals.bulk.FileUploadedController.onPageLoad(key:String)
-GET        /stf/file-upload/problem                       uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.individuals.bulk.FileUploadController.onUploadError()
+GET        /stf/upload-template/problem                       uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.individuals.bulk.FileUploadController.onUploadError()
 POST       /stf/upscan-callback                           uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.individuals.bulk.UpscanCallbackController.callback()
 
 GET        /stf/org/bulk-error-list                       uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.organisations.bulk.UploadedFileErrorController.onPageLoad()

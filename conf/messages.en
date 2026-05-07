@@ -13,6 +13,7 @@ site.start = Start now
 site.startAgain = Start again
 site.signIn = Sign in
 site.govuk = GOV.UK
+site.upload.file = Upload file
 
 date.day = Day
 date.month = Month
@@ -358,7 +359,7 @@ fileUpload.error.emptyFile.p1 = Add the correct transfer details to the file the
 fileUpload.error.emptyFile.download.text = Download the template file.
 fileUpload.upload.another = Upload a different file
 
-fileUpload.redirectError.emptyFile = The selected file is empty
+fileUpload.redirectError.emptyFile = Select a file to upload
 fileUpload.redirectError.EntityTooLarge = The selected file must be smaller than 1GB
 fileUpload.redirectError.generic = The selected file could not be uploaded – try again
 fileUpload.redirectError.InvalidArgument = The selected file must be a .csv or a .xlsx
