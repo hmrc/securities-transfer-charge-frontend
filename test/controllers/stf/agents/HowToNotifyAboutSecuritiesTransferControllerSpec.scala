@@ -24,6 +24,7 @@ import play.api.data.Form
 import play.api.inject.bind
 import play.api.test.FakeRequest
 import play.api.test.Helpers.*
+import uk.gov.hmrc.auth.core.AffinityGroup
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.securitiestransferchargefrontend.clients.SaveAndReturnClient
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.routes
@@ -49,7 +50,7 @@ class HowToNotifyAboutSecuritiesTransferControllerSpec extends SpecBase {
 
     "must return OK and the correct view for a GET" in {
 
-      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers))
+      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers), AffinityGroup.Agent)
         .overrides(bind[Navigator].qualifiedWith("agents").toInstance(getNavigator))
         .build()
 
@@ -86,7 +87,7 @@ class HowToNotifyAboutSecuritiesTransferControllerSpec extends SpecBase {
 
     "must return a Bad Request and errors when invalid data is submitted" in {
 
-      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers))
+      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers), AffinityGroup.Agent)
         .overrides(bind[Navigator].qualifiedWith("agents").toInstance(getNavigator))
         .build()
 
@@ -108,7 +109,7 @@ class HowToNotifyAboutSecuritiesTransferControllerSpec extends SpecBase {
     "must redirect to agent reference page when one at a time is selected" in {
       val saveAndReturnClient = mock[SaveAndReturnClient]
 
-      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers), saveAndReturnClient = saveAndReturnClient)
+      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers), AffinityGroup.Agent, saveAndReturnClient = saveAndReturnClient)
         .build()
 
       when(saveAndReturnClient.save(any[UserAnswers]())(any[HeaderCarrier]()))
@@ -129,7 +130,7 @@ class HowToNotifyAboutSecuritiesTransferControllerSpec extends SpecBase {
     "must redirect to Template instruction page when more than one at a time is selected" in {
       val saveAndReturnClient = mock[SaveAndReturnClient]
 
-      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers), saveAndReturnClient = saveAndReturnClient)
+      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers), AffinityGroup.Agent, saveAndReturnClient = saveAndReturnClient)
         .build()
 
       when(saveAndReturnClient.save(any[UserAnswers]())(any[HeaderCarrier]()))
