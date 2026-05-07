@@ -424,3 +424,11 @@ agent.connectedPersons.error.required = Select yes if the buyer and seller are c
 agent.connectedPersons.p = We need to know if the buyer and seller of these shares are considered ‘connected persons’ according to
 agent.connectedPersons.content.link.text = section 1122 of the Corporation Tax Act 2010
 agent.connectedPersons.change.hidden = Change connected persons
+
+agent.applyingForRelief.title = Is the buyer applying for a relief?
+agent.applyingForRelief.heading = Is the buyer applying for a relief?
+agent.applyingForRelief.checkYourAnswersLabel = Is the buyer applying for a relief?
+agent.applyingForRelief.error.required = Select yes if the buyer is  applying for a relief
+agent.applyingForRelief.change.hidden = ApplyingForRelief
+agent.applyingForRelief.p = See a
+agent.applyingForRelief.details.content.link.text = full list of reliefs
