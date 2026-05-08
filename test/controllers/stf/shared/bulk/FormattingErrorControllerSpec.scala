@@ -14,13 +14,13 @@
  * limitations under the License.
  */
 
-package controllers.stf.organisations.bulk
+package controllers.stf.shared.bulk
 
 import base.SpecBase
 import play.api.test.FakeRequest
 import play.api.test.Helpers.*
-import uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.organisations.bulk.routes
-import uk.gov.hmrc.securitiestransferchargefrontend.views.html.stf.organisations.bulk.FormattingErrorView
+import uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.shared.bulk.routes
+import uk.gov.hmrc.securitiestransferchargefrontend.views.html.stf.shared.bulk.FormattingErrorView
 
 class FormattingErrorControllerSpec extends SpecBase {
 

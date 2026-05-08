@@ -19,7 +19,7 @@ package views.stf.individuals.bulk
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
 import play.api.Application
-import uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.individuals.bulk.routes as individualsRoutes
+import uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.shared.bulk.routes as bulkRoutes
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.shared.routes 
 import uk.gov.hmrc.securitiestransferchargefrontend.views.html.stf.individuals.bulk.TemplateInstructionsView
 import views.ViewBaseSpec
@@ -114,7 +114,7 @@ class TemplateInstructionsViewSpec extends ViewBaseSpec {
       "have a continue button" in {
         val continueButton = templateInstructionsView.select(".govuk-button").first()
         continueButton.text() mustBe ExpectedContent.continue
-        continueButton.attr("href") mustBe individualsRoutes.FileUploadController.onPageLoad().url
+        continueButton.attr("href") mustBe bulkRoutes.FileUploadController.onPageLoad().url
       }
 
       "have a link to return back to the submission dashboard page" in {

@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package controllers.stf.individuals.bulk
+package controllers.stf.shared.bulk
 
 import base.{FileUploadFixtures, SpecBase}
 import org.mockito.Mockito.{reset, when}
@@ -23,10 +23,10 @@ import org.scalatestplus.mockito.MockitoSugar.mock
 import play.api.inject
 import play.api.test.FakeRequest
 import play.api.test.Helpers.*
-import uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.individuals.bulk.routes
+import uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.shared.bulk.routes
 import uk.gov.hmrc.securitiestransferchargefrontend.repositories.ValidationErrorRepository
 import uk.gov.hmrc.securitiestransferchargefrontend.viewmodels.stf.fileupload.UploadedFileErrorMapper
-import uk.gov.hmrc.securitiestransferchargefrontend.views.html.stf.individuals.bulk.UploadedFileErrorView
+import uk.gov.hmrc.securitiestransferchargefrontend.views.html.stf.shared.bulk.UploadedFileErrorView
 
 import scala.concurrent.Future
 

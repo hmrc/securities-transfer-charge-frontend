@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package views.stf.individuals.bulk
+package views.stf.shared.bulk
 
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
@@ -22,7 +22,7 @@ import play.api.Application
 import play.api.test.FakeRequest
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.shared.routes
 import uk.gov.hmrc.securitiestransferchargefrontend.models.stf.upscan.UploadRequest
-import uk.gov.hmrc.securitiestransferchargefrontend.views.html.stf.individuals.bulk.FileUploadView
+import uk.gov.hmrc.securitiestransferchargefrontend.views.html.stf.shared.bulk.FileUploadView
 import views.ViewBaseSpec
 
 class FileUploadViewSpec extends ViewBaseSpec {

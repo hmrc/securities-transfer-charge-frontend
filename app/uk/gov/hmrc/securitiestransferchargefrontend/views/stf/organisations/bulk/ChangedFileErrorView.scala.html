@@ -15,7 +15,7 @@
  *@
 
 @import uk.gov.hmrc.securitiestransferchargefrontend.views.html.templates
-@import uk.gov.hmrc.securitiestransferchargefrontend.controllers.routes
+@import uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.shared.bulk.routes
 
 
 @this(
@@ -26,7 +26,7 @@
 
 @()(implicit request: Request[_], messages: Messages)
 
-@layout(pageTitle = titleNoForm(messages("changedFileError.title"))) {
+@layout(pageTitle = titleNoForm(messages("changedFileError.title")),backLinkUrl = Some(routes.FileUploadController.onPageLoad().url)) {
 
     <h1 class="govuk-heading-l">@messages("changedFileError.heading")</h1>
 
@@ -40,7 +40,7 @@
         </a>.
     </p>
 
-    @formHelper(action = routes.JourneyRecoveryController.onPageLoad()) {
+    @formHelper(action = routes.FileUploadController.onPageLoad()) {
         @govukButton(
             ButtonViewModel(messages("fileUpload.upload.another"))
         )

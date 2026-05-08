@@ -15,7 +15,7 @@
  *@
 
 @import uk.gov.hmrc.securitiestransferchargefrontend.views.html.templates
-@import uk.gov.hmrc.securitiestransferchargefrontend.controllers.routes
+@import uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.shared.bulk.routes
 
 @this(
     layout: templates.Layout,
@@ -25,10 +25,10 @@
 
 @()(implicit request: Request[_], messages: Messages)
 
-@layout(pageTitle = titleNoForm(messages("fileUpload.error.emptyFile.title")),backLinkUrl = Some(routes.JourneyRecoveryController.onPageLoad().url)) {
+@layout(pageTitle = titleNoForm(messages("fileUpload.error.emptyFile.title")),backLinkUrl = Some(routes.FileUploadController.onPageLoad().url)) {
 
     @formHelper(
-            action = routes.JourneyRecoveryController.onPageLoad(),
+            action = routes.FileUploadController.onPageLoad(),
             Symbol("autoComplete") -> "off"
     ){
 
