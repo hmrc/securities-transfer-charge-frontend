@@ -231,3 +231,8 @@ GET        /stf/agent/select-relief                             uk.gov.hmrc.secu
 POST       /stf/agent/select-relief                             uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.agents.single.WhatReliefAreYouApplyingForController.onSubmit(mode: Mode = NormalMode)
 GET        /stf/agent/change/select-relief                      uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.agents.single.WhatReliefAreYouApplyingForController.onPageLoad(mode: Mode = CheckMode)
 POST       /stf/agent/change/select-relief                      uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.agents.single.WhatReliefAreYouApplyingForController.onSubmit(mode: Mode = CheckMode)
+
+GET        /stf/agent/tax-rate                                  uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.agents.single.TaxRateController.onPageLoad(mode: Mode = NormalMode)
+POST       /stf/agent/tax-rate                                  uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.agents.single.TaxRateController.onSubmit(mode: Mode = NormalMode)
+GET        /stf/agent/change/tax-rate                           uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.agents.single.TaxRateController.onPageLoad(mode: Mode = CheckMode)
+POST       /stf/agent/change/tax-rate                           uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.agents.single.TaxRateController.onSubmit(mode: Mode = CheckMode)
