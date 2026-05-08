@@ -490,3 +490,14 @@ agent.whatReliefAreYouApplyingFor.heading = Enter the relief the buyer is applyi
 agent.whatReliefAreYouApplyingFor.p = Start typing the name of the relief and select from the list. See a
 agent.whatReliefAreYouApplyingFor.details.content.link.text = full list of reliefs
 agent.whatReliefAreYouApplyingFor.error.required = Start typing the name of the relief and select from the list
+
+agent.chargingPoint.title = What is the charging point?
+agent.chargingPoint.heading = What is the charging point?
+agent.chargingPoint.hint = This is the date the securities were bought. For example, 27 3 2024
+agent.chargingPoint.checkYourAnswersLabel = What is the charging point?
+agent.chargingPoint.error.required.all = Enter the date the securities were bought
+agent.chargingPoint.error.required.two = The date the securities were bought must include {0} and {1}
+agent.chargingPoint.error.required = The date the securities were bought must include a {0}
+agent.chargingPoint.error.invalid = The date the securities were bought must be a real date
+agent.chargingPoint.error.futureDate = The date the securities were bought must be today’s date or a date in the past
+agent.chargingPoint.change.hidden = ChargingPoint
