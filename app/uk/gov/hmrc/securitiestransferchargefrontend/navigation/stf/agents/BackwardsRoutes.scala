@@ -24,12 +24,13 @@ import uk.gov.hmrc.securitiestransferchargefrontend.models.{NormalMode, UserAnsw
 import uk.gov.hmrc.securitiestransferchargefrontend.navigation.NavigationHelper
 import uk.gov.hmrc.securitiestransferchargefrontend.pages.*
 import uk.gov.hmrc.securitiestransferchargefrontend.pages.stf.shared.HowToNotifyAboutSecuritiesTransferPage
-import uk.gov.hmrc.securitiestransferchargefrontend.pages.stf.single.{AgentReferencePage, ApplyingForReliefPage, ConnectedPersonsPage, NameOfBuyerPage, NameOfSellerPage, StfBuyersAddressPage, StfSellerAddressPage}
+import uk.gov.hmrc.securitiestransferchargefrontend.pages.stf.single.{AgentReferencePage, ApplyingForReliefPage, ConnectedPersonsPage, NameOfBuyerPage, NameOfSellerPage, SecuritiesTargetPage, StfBuyersAddressPage, StfSellerAddressPage}
 
 class BackwardsRoutes(defaultPage: Call):
 
   val navHelper: NavigationHelper = new NavigationHelper(defaultPage)
-
+  import navHelper.*
+  
   def predecessorRoutes(page: Page): UserAnswers => Call = page match {
 
     case HowToNotifyAboutSecuritiesTransferPage => _ => sharedRoutes.SubmissionsDashboardController.onPageLoad()
@@ -38,8 +39,12 @@ class BackwardsRoutes(defaultPage: Call):
     case StfBuyersAddressPage => _ => agentSingleRoutes.NameOfBuyerController.onPageLoad(NormalMode)
     case NameOfSellerPage => _ => agentSingleRoutes.AddressController.onPageLoad()
     case StfSellerAddressPage => _ => agentSingleRoutes.NameOfSellerController.onPageLoad(NormalMode)
-    case ConnectedPersonsPage => _ => agentSingleRoutes.ApplyingForReliefController.onPageLoad(NormalMode)
     case ApplyingForReliefPage => _ => agentSingleRoutes.ConnectedPersonsController.onPageLoad(NormalMode)
+    case SecuritiesTargetPage => userAnswers => dataDependent(ApplyingForReliefPage, userAnswers) {
+      case true => agentSingleRoutes.WhatReliefAreYouApplyingForController.onPageLoad(NormalMode)
+      case false => agentSingleRoutes.ApplyingForReliefController.onPageLoad(NormalMode)
+    }
+    case ConnectedPersonsPage => _ => agentSingleRoutes.ApplyingForReliefController.onPageLoad(NormalMode)
     case _ => _ => defaultPage
 
   }

@@ -18,6 +18,7 @@ package uk.gov.hmrc.securitiestransferchargefrontend.navigation.stf.agents
 
 import play.api.mvc.Call
 import uk.gov.hmrc.http.HeaderCarrier
+import uk.gov.hmrc.securitiestransferchargefrontend.config.FrontendAppConfig
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.agents.routes as agentRoutes
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.agents.single.routes as agentSingleRoutes
 import uk.gov.hmrc.securitiestransferchargefrontend.models.stf.HowToNotifyAboutSecuritiesTransfer.{MoreThanOneAtATime, OneAtATime}
@@ -31,6 +32,7 @@ import uk.gov.hmrc.securitiestransferchargefrontend.services.AnswerPersistenceSe
 import scala.concurrent.{ExecutionContext, Future}
 
 class ForwardRoutes(answerPersistenceService: AnswerPersistenceService,
+                    appConfig: FrontendAppConfig,
                     defaultPage: Call,
                     errorPages: Seq[Call])
                    (implicit ec: ExecutionContext):
@@ -38,7 +40,9 @@ class ForwardRoutes(answerPersistenceService: AnswerPersistenceService,
   val helper = new PersistentNavigationHelper(answerPersistenceService, defaultPage, errorPages)
 
   import helper.*
-  
+
+  private val firstDate = appConfig.firstChargingPoint
+
   def forwardRoutes(page: Page)(implicit hc: HeaderCarrier): UserAnswers => Future[Call] = page match {
 
     case SubmissionsDashboardPage => userAnswers => goTo(agentRoutes.HowToNotifyAboutSecuritiesTransferController.onPageLoad(NormalMode), Some(userAnswers))
@@ -54,9 +58,16 @@ class ForwardRoutes(answerPersistenceService: AnswerPersistenceService,
     case NameOfSellerPage => userAnswers => dataRequired(NameOfSellerPage, userAnswers, agentSingleRoutes.StfSellerAddressController.onPageLoad())
     case StfSellerAddressPage => userAnswers => dataRequired(StfSellerAddressPage, userAnswers, agentSingleRoutes.ConnectedPersonsController.onPageLoad(NormalMode))
     case ConnectedPersonsPage => userAnswers => dataRequired(ConnectedPersonsPage, userAnswers, agentSingleRoutes.ApplyingForReliefController.onPageLoad(NormalMode))
-    case ApplyingForReliefPage => userAnswers => dataRequired(ConnectedPersonsPage, userAnswers, agentSingleRoutes.SecuritiesTargetController.onPageLoad(NormalMode))
-    case SecuritiesTargetPage => userAnswers => dataRequired(SecuritiesTargetPage, userAnswers, defaultPage)
-
+    case ApplyingForReliefPage => userAnswers => dataDependent(ApplyingForReliefPage, userAnswers) {
+      case true => agentSingleRoutes.WhatReliefAreYouApplyingForController.onPageLoad(NormalMode)
+      case false => agentSingleRoutes.SecuritiesTargetController.onPageLoad(NormalMode)
+    }
+    case WhatReliefAreYouApplyingForPage => userAnswers => dataRequired(WhatReliefAreYouApplyingForPage, userAnswers, agentSingleRoutes.SecuritiesTargetController.onPageLoad(NormalMode))
+    case SecuritiesTargetPage => userAnswers => dataRequired(SecuritiesTargetPage, userAnswers, agentSingleRoutes.ChargingPointController.onPageLoad(NormalMode))
+    case ChargingPointPage => userAnswers => dataDependent(ChargingPointPage, userAnswers) {enterDate =>
+      if (enterDate.isBefore(firstDate)) defaultPage
+      else defaultPage
+    }
 
     case _ => _ => Future.successful(defaultPage)
   }

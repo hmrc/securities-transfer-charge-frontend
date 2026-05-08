@@ -14,15 +14,15 @@
  * limitations under the License.
  */
 
-package views.stf.organisations.single
+package views.stf.agents.single
 
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
 import play.api.Application
 import play.api.mvc.Call
-import uk.gov.hmrc.securitiestransferchargefrontend.forms.stf.organisations.ChargingPointFormProvider
+import uk.gov.hmrc.securitiestransferchargefrontend.forms.stf.agents.ChargingPointFormProvider
 import uk.gov.hmrc.securitiestransferchargefrontend.models.NormalMode
-import uk.gov.hmrc.securitiestransferchargefrontend.views.html.stf.organisations.single.ChargingPointView
+import uk.gov.hmrc.securitiestransferchargefrontend.views.html.stf.agents.single.ChargingPointView
 import views.ViewBaseSpec
 
 class ChargingPointViewSpec extends ViewBaseSpec {
@@ -39,10 +39,10 @@ class ChargingPointViewSpec extends ViewBaseSpec {
   )
 
   object ExpectedContent {
-    val title: String = messages("org.chargingPoint.title")
+    val title: String = messages("agent.chargingPoint.title")
     val caption: String = messages("transfer.details.caption")
-    val heading: String = messages("org.chargingPoint.heading")
-    val hint: String = messages("org.chargingPoint.hint")
+    val heading: String = messages("agent.chargingPoint.heading")
+    val hint: String = messages("agent.chargingPoint.hint")
     val saveAndContinue: String = messages("site.save-and-continue.button")
     val saveAndReturn: String = messages("site.save-and-return.button")
   }
