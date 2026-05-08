@@ -58,13 +58,12 @@ class ForwardRoutes(answerPersistenceService: AnswerPersistenceService,
     case NameOfSellerPage => userAnswers => dataRequired(NameOfSellerPage, userAnswers, agentSingleRoutes.StfSellerAddressController.onPageLoad())
     case StfSellerAddressPage => userAnswers => dataRequired(StfSellerAddressPage, userAnswers, agentSingleRoutes.ConnectedPersonsController.onPageLoad(NormalMode))
     case ConnectedPersonsPage => userAnswers => dataRequired(ConnectedPersonsPage, userAnswers, agentSingleRoutes.ApplyingForReliefController.onPageLoad(NormalMode))
-    case ApplyingForReliefPage => userAnswers =>
-      dataDependent(ApplyingForReliefPage, userAnswers) {
-        case true => agentSingleRoutes.WhatReliefAreYouApplyingForController.onPageLoad(NormalMode)
-        case false => defaultPage
-      }
-    case WhatReliefAreYouApplyingForPage => userAnswers => dataRequired(WhatReliefAreYouApplyingForPage, userAnswers, agentSingleRoutes.ChargingPointController.onPageLoad(NormalMode))
-
+    case ApplyingForReliefPage => userAnswers => dataDependent(ApplyingForReliefPage, userAnswers) {
+      case true => agentSingleRoutes.WhatReliefAreYouApplyingForController.onPageLoad(NormalMode)
+      case false => agentSingleRoutes.SecuritiesTargetController.onPageLoad(NormalMode)
+    }
+    case WhatReliefAreYouApplyingForPage => userAnswers => dataRequired(WhatReliefAreYouApplyingForPage, userAnswers, agentSingleRoutes.SecuritiesTargetController.onPageLoad(NormalMode))
+    case SecuritiesTargetPage => userAnswers => dataRequired(SecuritiesTargetPage, userAnswers, agentSingleRoutes.ChargingPointController.onPageLoad(NormalMode))
     case ChargingPointPage => userAnswers => dataDependent(ChargingPointPage, userAnswers) {enterDate =>
       if (enterDate.isBefore(firstDate)) defaultPage
       else defaultPage
