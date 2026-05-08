@@ -20,6 +20,7 @@ import play.api.i18n.Messages
 import play.api.test.Helpers.stubMessages
 import forms.behaviours.DateBehaviours
 import uk.gov.hmrc.securitiestransferchargefrontend.forms.stf.agents.ChargingPointFormProvider
+import uk.gov.hmrc.securitiestransferchargefrontend.models.DateHelper.today
 
 import java.time.{LocalDate, ZoneOffset}
 
@@ -38,5 +39,18 @@ class ChargingPointFormProviderSpec extends DateBehaviours {
     behave like dateField(form, "value", validData)
 
     behave like mandatoryDateField(form, "value", "agent.chargingPoint.error.required.all")
+
+    "reject dates in the future" in {
+      val futureDate = today.plusDays(1)
+
+      val result = form.bind(
+        Map(
+          "value.day" -> futureDate.getDayOfMonth.toString,
+          "value.month" -> futureDate.getMonthValue.toString,
+          "value.year" -> futureDate.getYear.toString
+        )
+      )
+      result.errors.map(_.message) must contain("agent.chargingPoint.error.futureDate")
+    }
   }
 }
