@@ -17,6 +17,7 @@
 @import uk.gov.hmrc.securitiestransferchargefrontend.config.FrontendAppConfig
 @import uk.gov.hmrc.hmrcfrontend.views.config.StandardBetaBanner
 @import uk.gov.hmrc.hmrcfrontend.views.html.helpers._
+@import views.html.helper.CSPNonce
 @import uk.gov.hmrc.hmrcfrontend.views.html.components._
 @import uk.gov.hmrc.govukfrontend.views.html.components._
 @import uk.gov.hmrc.hmrcfrontend.views.viewmodels.hmrcstandardpage._
@@ -51,6 +52,8 @@
             language            = Some(messages.lang.code)
         ))
     }
+
+<link @{CSPNonce.attr} href="@routes.Assets.versioned("stylesheets/application.css").url" media="screen" rel="stylesheet" type="text/css" />
 }
 
 @content = {
