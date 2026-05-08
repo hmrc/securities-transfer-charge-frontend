@@ -19,7 +19,7 @@ package views.stf.organisations.bulk
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
 import play.api.Application
-import uk.gov.hmrc.securitiestransferchargefrontend.controllers.routes
+import uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.shared.bulk.routes
 import uk.gov.hmrc.securitiestransferchargefrontend.views.html.stf.organisations.bulk.EmptyFileErrorView
 import views.ViewBaseSpec
 
@@ -84,7 +84,7 @@ class EmptyFileErrorViewSpec extends ViewBaseSpec {
 
       "must post to the correct controller action" in {
         val form = doc.select("form")
-        form.attr("action") mustBe routes.JourneyRecoveryController.onPageLoad().url
+        form.attr("action") mustBe routes.FileUploadController.onPageLoad().url
       }
     }
   }

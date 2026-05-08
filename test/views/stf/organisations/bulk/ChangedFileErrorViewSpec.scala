@@ -19,7 +19,7 @@ package views.stf.organisations.bulk
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
 import play.api.Application
-import uk.gov.hmrc.securitiestransferchargefrontend.controllers.routes
+import uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.shared.bulk.routes
 import uk.gov.hmrc.securitiestransferchargefrontend.views.html.stf.organisations.bulk.ChangedFileErrorView
 import views.ViewBaseSpec
 
@@ -34,17 +34,17 @@ class ChangedFileErrorViewSpec extends ViewBaseSpec {
   )
 
   object ExpectedContent {
-    val title = messages("changedFileError.title")
-    val heading = messages("changedFileError.heading")
+    val title: String = messages("changedFileError.title")
+    val heading: String = messages("changedFileError.heading")
 
-    val para1Value = messages("changedFileError.p1")
-    val para2Value = messages("changedFileError.p2")
-    val para3Value = messages("changedFileError.p3")
+    val para1Value: String = messages("changedFileError.p1")
+    val para2Value: String = messages("changedFileError.p2")
+    val para3Value: String = messages("changedFileError.p3")
 
-    val downloadText = messages("changedFileError.download.text")
+    val downloadText: String = messages("changedFileError.download.text")
     val downloadHref = "/securities-transfer-charge/assets/Bulk_Securities_Transfer_Charge_template_v1b.xlsx"
     val downloadFileName = "Bulk Securities Transfer Charge template v1b.xlsx"
-    val uploadAnother = messages("fileUpload.upload.another")
+    val uploadAnother: String = messages("fileUpload.upload.another")
   }
 
   "The ChangedFileErrorView" - {
@@ -81,7 +81,7 @@ class ChangedFileErrorViewSpec extends ViewBaseSpec {
 
       "have a button that redirects to the file upload page" in {
         val form = changedFileErrorView.select("form")
-        form.attr("action") mustBe routes.JourneyRecoveryController.onPageLoad().url
+        form.attr("action") mustBe routes.FileUploadController.onPageLoad().url
         form.attr("method") mustBe "GET"
         changedFileErrorView.select(".govuk-button").first().text() mustBe ExpectedContent.uploadAnother
       }

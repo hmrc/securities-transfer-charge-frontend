@@ -14,14 +14,14 @@
  * limitations under the License.
  */
 
-package views.stf.individuals.bulk
+package views.stf.shared.bulk
 
 import base.Fixtures
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
 import play.api.Application
-import uk.gov.hmrc.securitiestransferchargefrontend.controllers.routes
-import uk.gov.hmrc.securitiestransferchargefrontend.views.html.stf.individuals.bulk.UploadedFileErrorView
+import uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.shared.bulk.routes
+import uk.gov.hmrc.securitiestransferchargefrontend.views.html.stf.shared.bulk.UploadedFileErrorView
 import views.ViewBaseSpec
 
 class UploadedFileErrorViewSpec extends ViewBaseSpec {
@@ -95,7 +95,7 @@ class UploadedFileErrorViewSpec extends ViewBaseSpec {
 
       "file upload button must redirect to the correct page" in {
         val form = doc.select("form")
-        form.attr("action") mustBe routes.JourneyRecoveryController.onPageLoad().url
+        form.attr("action") mustBe routes.FileUploadController.onPageLoad().url
       }
     }
   }
