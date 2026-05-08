@@ -24,6 +24,9 @@
 
 .loading-spinner__content .govuk-heading-l {
   margin-bottom: 1.5rem; // space below heading
+  max-width: 17rem;
+  margin-left: auto;
+  margin-right: auto;
 }
 
 .loading-spinner__content .govuk-body {

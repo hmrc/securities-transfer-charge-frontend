@@ -509,10 +509,7 @@ agent.taxRate.p2 = If the securities are being transferred into a ‘depository 
 agent.taxRate.error.required = Select a tax rate
 
 fileUpload.processing.title = We are checking your file
-fileUpload.processing.title.p1 = We are checking
-fileUpload.processing.title.p2 = your file
 fileUpload.processing.paragraph = This may take a few seconds
-
 
 agent.chargingPoint.title = What is the charging point?
 agent.chargingPoint.heading = What is the charging point?

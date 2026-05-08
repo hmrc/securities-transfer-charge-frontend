@@ -34,10 +34,6 @@ class FileProcessingViewSpec extends ViewBaseSpec {
   object ExpectedContent {
     val title: String = messages("fileUpload.processing.title")
 
-    val headingLine1: String = messages("fileUpload.processing.title.p1")
-
-    val headingLine2: String = messages("fileUpload.processing.title.p2")
-
     val paragraph: String = messages("fileUpload.processing.paragraph")
   }
 
@@ -53,10 +49,7 @@ class FileProcessingViewSpec extends ViewBaseSpec {
 
       "have the correct heading" in {
         val heading = doc.select("h1")
-
-        heading.html() must include(ExpectedContent.headingLine1)
-        heading.html() must include(ExpectedContent.headingLine2)
-        heading.html() must include("<br>")
+        heading.html() must include(ExpectedContent.title)
       }
 
       "have the correct paragraph text" in {
