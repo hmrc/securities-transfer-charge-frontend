@@ -13,6 +13,7 @@ site.start = Start now
 site.startAgain = Start again
 site.signIn = Sign in
 site.govuk = GOV.UK
+site.upload.file = Upload file
 
 date.day = Day
 date.month = Month
@@ -358,7 +359,7 @@ fileUpload.error.emptyFile.p1 = Add the correct transfer details to the file the
 fileUpload.error.emptyFile.download.text = Download the template file.
 fileUpload.upload.another = Upload a different file
 
-fileUpload.redirectError.emptyFile = The selected file is empty
+fileUpload.redirectError.emptyFile = Select a file to upload
 fileUpload.redirectError.EntityTooLarge = The selected file must be smaller than 1GB
 fileUpload.redirectError.generic = The selected file could not be uploaded – try again
 fileUpload.redirectError.InvalidArgument = The selected file must be a .csv or a .xlsx
@@ -488,3 +489,21 @@ sharePurchaseReason.required = Enter reason for share purchase
 sharePurchaseReason.invalid = Enter ‘cancellation’ or ‘treasury’
 
 purchasedForCancellation.invalid = Enter ‘yes’ if the shares also qualify as treasury shares
+
+agent.applyingForRelief.title = Is the buyer applying for a relief?
+agent.applyingForRelief.heading = Is the buyer applying for a relief?
+agent.applyingForRelief.checkYourAnswersLabel = Is the buyer applying for a relief?
+agent.applyingForRelief.error.required = Select yes if the buyer is  applying for a relief
+agent.applyingForRelief.change.hidden = ApplyingForRelief
+agent.applyingForRelief.p = See a
+agent.applyingForRelief.details.content.link.text = full list of reliefs
+
+agent.whatReliefAreYouApplyingFor.title = Enter the relief the buyer is applying for
+agent.whatReliefAreYouApplyingFor.heading = Enter the relief the buyer is applying for
+agent.whatReliefAreYouApplyingFor.p = Start typing the name of the relief and select from the list. See a
+agent.whatReliefAreYouApplyingFor.details.content.link.text = full list of reliefs
+agent.whatReliefAreYouApplyingFor.error.required = Start typing the name of the relief and select from the list
+
+agent.taxRate.p1 = For most securities transfers, you will be charged a tax rate of 0.5% of the consideration.
+agent.taxRate.p2 = If the securities are being transferred into a ‘depository receipt scheme’ or a ‘clearance service’, the buyer will need to pay the 1.5% tax rate in most circumstances. This is usually where the transfer is not integral to capital raising or where the clearance service has elected to remain in the 0.5% regime.
+agent.taxRate.error.required = Select a tax rate

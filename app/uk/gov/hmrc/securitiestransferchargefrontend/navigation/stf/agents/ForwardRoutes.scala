@@ -26,6 +26,7 @@ import uk.gov.hmrc.securitiestransferchargefrontend.navigation.PersistentNavigat
 import uk.gov.hmrc.securitiestransferchargefrontend.pages.Page
 import uk.gov.hmrc.securitiestransferchargefrontend.pages.stf.shared.{HowToNotifyAboutSecuritiesTransferPage, SubmissionsDashboardPage}
 import uk.gov.hmrc.securitiestransferchargefrontend.pages.stf.single.{AgentReferencePage, ConnectedPersonsPage, NameOfBuyerPage, NameOfSellerPage, SecuritiesTargetPage, StfBuyersAddressPage, StfSellerAddressPage}
+import uk.gov.hmrc.securitiestransferchargefrontend.pages.stf.single.{AgentReferencePage, ApplyingForReliefPage, ConnectedPersonsPage, NameOfBuyerPage, NameOfSellerPage, StfBuyersAddressPage, StfSellerAddressPage}
 import uk.gov.hmrc.securitiestransferchargefrontend.services.AnswerPersistenceService
 
 import scala.concurrent.{ExecutionContext, Future}
@@ -55,5 +56,9 @@ class ForwardRoutes(answerPersistenceService: AnswerPersistenceService,
     case StfSellerAddressPage => userAnswers => dataRequired(StfSellerAddressPage, userAnswers, agentSingleRoutes.ConnectedPersonsController.onPageLoad(NormalMode))
     case ConnectedPersonsPage => userAnswers => dataRequired(ConnectedPersonsPage, userAnswers, agentSingleRoutes.SecuritiesTargetController.onPageLoad(NormalMode))
     case SecuritiesTargetPage => userAnswers => dataRequired(SecuritiesTargetPage, userAnswers, defaultPage)
+    case ConnectedPersonsPage => userAnswers => dataRequired(ConnectedPersonsPage, userAnswers, agentSingleRoutes.ApplyingForReliefController.onPageLoad(NormalMode))
+    case ApplyingForReliefPage => userAnswers => dataRequired(ConnectedPersonsPage, userAnswers, defaultPage)
+
+
     case _ => _ => Future.successful(defaultPage)
   }

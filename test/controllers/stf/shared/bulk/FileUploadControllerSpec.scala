@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package controllers.stf.individuals.bulk
+package controllers.stf.shared.bulk
 
 import base.SpecBase
 import org.mockito.ArgumentMatchers.any
@@ -25,16 +25,16 @@ import play.api.test.FakeRequest
 import play.api.test.Helpers.*
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.securitiestransferchargefrontend.connectors.UpscanInitiateConnector
-import uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.individuals.bulk.routes as individualBulkRoutes
+import uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.shared.bulk.routes
 import uk.gov.hmrc.securitiestransferchargefrontend.models.stf.upscan.{UploadRequest, UpscanInitiateResponse}
-import uk.gov.hmrc.securitiestransferchargefrontend.views.html.stf.individuals.bulk.FileUploadView
+import uk.gov.hmrc.securitiestransferchargefrontend.views.html.stf.shared.bulk.FileUploadView
 
 import scala.concurrent.Future
 
 class FileUploadControllerSpec extends SpecBase with MockitoSugar {
 
-  lazy val fileUploadRoute: String = individualBulkRoutes.FileUploadController.onPageLoad().url
-  lazy val onUploadErrorRoute: String = individualBulkRoutes.FileUploadController.onUploadError().url
+  lazy val fileUploadRoute: String = routes.FileUploadController.onPageLoad().url
+  lazy val onUploadErrorRoute: String = routes.FileUploadController.onUploadError().url
   val reference = "file1"
   val uploadRequest: UploadRequest = UploadRequest(href = "http://someUrl.com", fields = Map("key" -> "1234"))
 

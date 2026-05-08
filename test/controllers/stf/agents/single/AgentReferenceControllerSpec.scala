@@ -25,6 +25,7 @@ import play.api.inject.bind
 import play.api.mvc.Call
 import play.api.test.FakeRequest
 import play.api.test.Helpers.*
+import uk.gov.hmrc.auth.core.AffinityGroup
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.routes
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.agents.single.routes as agentRoutes
 import uk.gov.hmrc.securitiestransferchargefrontend.forms.stf.agents.AgentReferenceFormProvider
@@ -50,7 +51,7 @@ class AgentReferenceControllerSpec extends SpecBase with MockitoSugar {
   "AgentReference Controller" - {
 
     "must return OK and the correct view for a GET" in {
-      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers))
+      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers), AffinityGroup.Agent)
         .overrides(
           bind[Navigator].qualifiedWith("agents").toInstance(getNavigator))
         .build()
@@ -71,7 +72,7 @@ class AgentReferenceControllerSpec extends SpecBase with MockitoSugar {
 
       val userAnswers = UserAnswers(userAnswersId, submissionId).set(AgentReferencePage,AgentReference(Some("answer"))).success.value
 
-      val application = applicationBuilder(userAnswers = Some(userAnswers))
+      val application = applicationBuilder(userAnswers = Some(userAnswers), AffinityGroup.Agent)
         .overrides(bind[Navigator].qualifiedWith("agents").toInstance(getNavigator))
         .build()
 
@@ -94,7 +95,7 @@ class AgentReferenceControllerSpec extends SpecBase with MockitoSugar {
       when(mockSessionRepository.set(any())) thenReturn Future.successful(())
 
       val application =
-        applicationBuilder(userAnswers = Some(emptyUserAnswers), sessionRepository = mockSessionRepository)
+        applicationBuilder(userAnswers = Some(emptyUserAnswers), AffinityGroup.Agent, sessionRepository = mockSessionRepository)
           .build()
 
       running(application) {
@@ -111,7 +112,7 @@ class AgentReferenceControllerSpec extends SpecBase with MockitoSugar {
 
     "must return a Bad Request and errors when invalid data is submitted" in {
 
-      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers))
+      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers), AffinityGroup.Agent)
         .overrides(bind[Navigator].qualifiedWith("agents").toInstance(getNavigator))
         .build()
 
@@ -136,7 +137,7 @@ class AgentReferenceControllerSpec extends SpecBase with MockitoSugar {
 
     "must redirect to Journey Recovery for a GET if no existing data is found" in {
 
-      val application = applicationBuilder(userAnswers = None).build()
+      val application = applicationBuilder(userAnswers = None, AffinityGroup.Agent).build()
 
       running(application) {
         val request = FakeRequest(GET, agentReferenceRoute)
@@ -150,7 +151,7 @@ class AgentReferenceControllerSpec extends SpecBase with MockitoSugar {
 
     "must redirect to Journey Recovery for a POST if no existing data is found" in {
 
-      val application = applicationBuilder(userAnswers = None).build()
+      val application = applicationBuilder(userAnswers = None, AffinityGroup.Agent).build()
 
       running(application) {
         val request =

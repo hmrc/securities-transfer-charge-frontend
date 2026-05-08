@@ -14,14 +14,15 @@
  * limitations under the License.
  */
 
-package views.stf.individuals.bulk
+package views.stf.shared.bulk
 
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
 import play.api.Application
 import play.api.test.FakeRequest
+import uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.shared.routes
 import uk.gov.hmrc.securitiestransferchargefrontend.models.stf.upscan.UploadRequest
-import uk.gov.hmrc.securitiestransferchargefrontend.views.html.stf.individuals.bulk.FileUploadView
+import uk.gov.hmrc.securitiestransferchargefrontend.views.html.stf.shared.bulk.FileUploadView
 import views.ViewBaseSpec
 
 class FileUploadViewSpec extends ViewBaseSpec {
@@ -51,8 +52,9 @@ class FileUploadViewSpec extends ViewBaseSpec {
     val caption: String = messages("transfer.details.caption")
     val heading: String = messages("fileUpload.heading")
     val label: String = messages("fileUpload.label")
-    val button: String = messages("fileUpload.button")
+    val button: String = messages("site.upload.file")
     val insetText: String = messages("fileUpload.inset.text")
+    val returnToDashboard: String = messages("return-to-dashboard.link")
   }
 
   "FileUploadView" - {
@@ -85,8 +87,14 @@ class FileUploadViewSpec extends ViewBaseSpec {
         doc.select("input[type=file]").attr("id") mustBe "file-input"
       }
 
-      "have a submit button" in {
+      "have a upload button" in {
         doc.select(".govuk-button").text() mustBe ExpectedContent.button
+      }
+
+      "have a link to return back to the submission dashboard page" in {
+        val returnLink = doc.select(".govuk-button-group a.govuk-link").first()
+        returnLink.text() mustBe ExpectedContent.returnToDashboard
+        returnLink.attr("href") mustBe routes.SubmissionsDashboardController.onPageLoad().url
       }
 
       "have the correct form action" in {

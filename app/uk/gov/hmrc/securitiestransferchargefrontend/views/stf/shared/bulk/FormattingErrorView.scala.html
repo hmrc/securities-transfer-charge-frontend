@@ -15,7 +15,7 @@
  *@
 
 @import uk.gov.hmrc.securitiestransferchargefrontend.views.html.templates
-@import uk.gov.hmrc.securitiestransferchargefrontend.controllers.routes
+@import uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.shared.bulk.routes
 
 @this(
     layout: templates.Layout,
@@ -29,14 +29,12 @@
 
     <h1 class="govuk-heading-l">@messages("formattingError.heading")</h1>
 
-    <div class="govuk-body">
-        <p>@messages("formattingError.p1")</p>
-        <p>@messages("formattingError.p2")</p>
-        <p>@messages("formattingError.p3")</p>
-        <p>@messages("formattingError.p4")</p>
-    </div>
+    <p class="govuk-body">@messages("formattingError.p1")</p>
+    <p class="govuk-body">@Html(messages("formattingError.p2"))</p>
+    <p class="govuk-body">@messages("formattingError.p3")</p>
+    <p class="govuk-body">@Html(messages("formattingError.p4"))</p>
 
-    @formHelper(action = routes.JourneyRecoveryController.onPageLoad()) {
+    @formHelper(action = routes.FileUploadController.onPageLoad()) {
         @govukButton(
             ButtonViewModel(messages("site.back-to-upload.button"))
         )

@@ -17,47 +17,42 @@
 package controllers.stf.agents.single
 
 import base.SpecBase
-import uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.agents.single.routes as agentSingleRoute
-import uk.gov.hmrc.securitiestransferchargefrontend.controllers.routes
-import org.mockito.ArgumentMatchers.any
-import org.mockito.Mockito.when
 import org.scalatestplus.mockito.MockitoSugar
 import play.api.data.Form
 import play.api.inject.bind
 import play.api.test.FakeRequest
 import play.api.test.Helpers.*
 import uk.gov.hmrc.auth.core.AffinityGroup
-import uk.gov.hmrc.http.HeaderCarrier
-import uk.gov.hmrc.securitiestransferchargefrontend.clients.SaveAndReturnClient
-import uk.gov.hmrc.securitiestransferchargefrontend.forms.stf.agents.ConnectedPersonsFormProvider
+import uk.gov.hmrc.securitiestransferchargefrontend.controllers.routes
+import uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.agents.single.routes as agentSingleRoutes
+import uk.gov.hmrc.securitiestransferchargefrontend.forms.stf.agents.TaxRateFormProvider
+import uk.gov.hmrc.securitiestransferchargefrontend.models.stf.TaxRate
 import uk.gov.hmrc.securitiestransferchargefrontend.models.{NormalMode, UserAnswers}
 import uk.gov.hmrc.securitiestransferchargefrontend.navigation.Navigator
-import uk.gov.hmrc.securitiestransferchargefrontend.pages.stf.single.ConnectedPersonsPage
-import uk.gov.hmrc.securitiestransferchargefrontend.views.html.stf.agents.single.ConnectedPersonsView
+import uk.gov.hmrc.securitiestransferchargefrontend.pages.stf.single.TaxRatePage
+import uk.gov.hmrc.securitiestransferchargefrontend.views.html.stf.agents.single.TaxRateView
 
-import scala.concurrent.Future
+class TaxRateControllerSpec extends SpecBase with MockitoSugar {
+  
+  lazy val taxRateRoute: String = agentSingleRoutes.TaxRateController.onPageLoad(NormalMode).url
 
-class ConnectedPersonsControllerSpec extends SpecBase with MockitoSugar {
+  val formProvider = new TaxRateFormProvider()
+  val form: Form[TaxRate] = formProvider()
 
-  val formProvider = new ConnectedPersonsFormProvider()
-  val form: Form[Boolean] = formProvider()
-
-  lazy val connectedPersonsRoute: String = agentSingleRoute.ConnectedPersonsController.onPageLoad(NormalMode).url
-
-  "ConnectedPersons Controller" - {
+  "TaxRate Controller" - {
 
     "must return OK and the correct view for a GET" in {
 
-      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers), AffinityGroup.Agent)
+      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers),affinityGroup = AffinityGroup.Agent)
         .overrides(bind[Navigator].qualifiedWith("agents").toInstance(getNavigator))
         .build()
 
       running(application) {
-        val request = FakeRequest(GET, connectedPersonsRoute)
+        val request = FakeRequest(GET, taxRateRoute)
 
         val result = route(application, request).value
 
-        val view = application.injector.instanceOf[ConnectedPersonsView]
+        val view = application.injector.instanceOf[TaxRateView]
 
         status(result) mustEqual OK
         contentAsString(result) mustEqual view(form, NormalMode, testBackLinkRoute)(request, messages(application)).toString
@@ -66,62 +61,58 @@ class ConnectedPersonsControllerSpec extends SpecBase with MockitoSugar {
 
     "must populate the view correctly on a GET when the question has previously been answered" in {
 
+      val userAnswers = UserAnswers(userAnswersId, submissionId).set(TaxRatePage, TaxRate.values.head).success.value
 
-      val userAnswers = UserAnswers(userAnswersId,submissionId).set(ConnectedPersonsPage, true).success.value
-
-      val application = applicationBuilder(userAnswers = Some(userAnswers), AffinityGroup.Agent)
+      val application = applicationBuilder(userAnswers = Some(userAnswers), affinityGroup = AffinityGroup.Agent)
         .overrides(bind[Navigator].qualifiedWith("agents").toInstance(getNavigator))
         .build()
 
       running(application) {
-        val request = FakeRequest(GET, connectedPersonsRoute)
+        val request = FakeRequest(GET, taxRateRoute)
 
-        val view = application.injector.instanceOf[ConnectedPersonsView]
+        val view = application.injector.instanceOf[TaxRateView]
 
         val result = route(application, request).value
 
         status(result) mustEqual OK
-        contentAsString(result) mustEqual view(form.fill(true), NormalMode, testBackLinkRoute)(request, messages(application)).toString
+        contentAsString(result) mustEqual view(form.fill(TaxRate.values.head), NormalMode, testBackLinkRoute)(request, messages(application)).toString
       }
     }
 
     "must redirect to the next page when valid data is submitted" in {
+      val userAnswers = UserAnswers(userAnswersId, submissionId).set(TaxRatePage, TaxRate.values.head).success.value
 
-      val saveAndReturnClient = mock[SaveAndReturnClient]
-
-      when(saveAndReturnClient.save(any[UserAnswers]())(any[HeaderCarrier]()))
-        .thenReturn(Future.successful(()))
+      
 
       val application =
-        applicationBuilder(userAnswers = Some(emptyUserAnswers), AffinityGroup.Agent)
+        applicationBuilder(userAnswers = Some(userAnswers),affinityGroup = AffinityGroup.Agent)
           .build()
 
       running(application) {
         val request =
-          FakeRequest(POST, connectedPersonsRoute)
-            .withFormUrlEncodedBody(("value", "true"))
+          FakeRequest(POST, taxRateRoute)
+            .withFormUrlEncodedBody(("value", TaxRate.values.head.toString))
 
         val result = route(application, request).value
 
         status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual agentSingleRoute.ApplyingForReliefController.onPageLoad(NormalMode).url
       }
     }
 
     "must return a Bad Request and errors when invalid data is submitted" in {
 
-      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers), AffinityGroup.Agent)
+      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers), affinityGroup = AffinityGroup.Agent)
         .overrides(bind[Navigator].qualifiedWith("agents").toInstance(getNavigator))
         .build()
 
       running(application) {
         val request =
-          FakeRequest(POST, connectedPersonsRoute)
-            .withFormUrlEncodedBody(("value", ""))
+          FakeRequest(POST, taxRateRoute)
+            .withFormUrlEncodedBody(("value", "invalid value"))
 
-        val boundForm = form.bind(Map("value" -> ""))
+        val boundForm = form.bind(Map("value" -> "invalid value"))
 
-        val view = application.injector.instanceOf[ConnectedPersonsView]
+        val view = application.injector.instanceOf[TaxRateView]
 
         val result = route(application, request).value
 
@@ -132,10 +123,10 @@ class ConnectedPersonsControllerSpec extends SpecBase with MockitoSugar {
 
     "must redirect to Journey Recovery for a GET if no existing data is found" in {
 
-      val application = applicationBuilder(userAnswers = None, AffinityGroup.Agent).build()
+      val application = applicationBuilder(userAnswers = None, affinityGroup = AffinityGroup.Agent).build()
 
       running(application) {
-        val request = FakeRequest(GET, connectedPersonsRoute)
+        val request = FakeRequest(GET, taxRateRoute)
 
         val result = route(application, request).value
 
@@ -144,18 +135,19 @@ class ConnectedPersonsControllerSpec extends SpecBase with MockitoSugar {
       }
     }
 
-    "must redirect to Journey Recovery for a POST if no existing data is found" in {
+    "redirect to Journey Recovery for a POST if no existing data is found" in {
 
-      val application = applicationBuilder(userAnswers = None, AffinityGroup.Agent).build()
+      val application = applicationBuilder(userAnswers = None, affinityGroup = AffinityGroup.Agent).build()
 
       running(application) {
         val request =
-          FakeRequest(POST, connectedPersonsRoute)
-            .withFormUrlEncodedBody(("value", "true"))
+          FakeRequest(POST, taxRateRoute)
+            .withFormUrlEncodedBody(("value", TaxRate.values.head.toString))
 
         val result = route(application, request).value
 
         status(result) mustEqual SEE_OTHER
+
         redirectLocation(result).value mustEqual routes.JourneyRecoveryController.onPageLoad().url
       }
     }
