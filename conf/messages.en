@@ -505,3 +505,16 @@ agent.chargingPoint.error.required = The date the securities were bought must in
 agent.chargingPoint.error.invalid = The date the securities were bought must be a real date
 agent.chargingPoint.error.futureDate = The date the securities were bought must be today’s date or a date in the past
 agent.chargingPoint.change.hidden = ChargingPoint
+
+agent.amountPaidForSecurities.error.required = Enter the amount paid for the securities
+agent.amountPaidForSecurities.error.invalidNumeric = The amount paid for the securities must be a number and can include up to two decimal places, like 30 or 28.60
+agent.amountPaidForSecurities.error.nonNumeric = The amount paid for the securities must be a number and can include up to two decimal places, like 30 or 28.60
+agent.amountPaidForSecurities.error.negative = The amount paid for the securities must be 0 or more
+agent.amountPaidForSecurities.error.aboveMaximum = The amount paid for the securities must be £999,999,999 or below
+agent.amountPaidForSecurities.title = How much did the buyer pay for the securities?
+agent.amountPaidForSecurities.heading = How much did the buyer pay for the securities?
+agent.amountPaidForSecurities.checkYourAnswersLabel = How much did the buyer pay for the securities?
+agent.amountPaidForSecurities.p1 = Enter the total amount of consideration given in exchange for these securities as a cash amount.
+agent.amountPaidForSecurities.p2 = You do not need to provide details about conversion or exchange rates, or how valuable of non-monetary items were reached.
+agent.amountPaidForSecurities.hint = For example, £600 or £193.54
+agent.amountPaidForSecurities.change.hidden = Change the amount the buyer paid for the securities

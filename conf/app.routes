@@ -244,3 +244,8 @@ GET        /stf/agent/tax-rate                            uk.gov.hmrc.securities
 POST       /stf/agent/tax-rate                            uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.agents.single.TaxRateController.onSubmit(mode: Mode = NormalMode)
 GET        /stf/agent/change/tax-rate                     uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.agents.single.TaxRateController.onPageLoad(mode: Mode = CheckMode)
 POST       /stf/agent/change/tax-rate                     uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.agents.single.TaxRateController.onSubmit(mode: Mode = CheckMode)
+
+GET        /stf/agent/consideration                         uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.agents.single.AmountPaidForSecuritiesController.onPageLoad(mode: Mode = NormalMode)
+POST       /stf/agent/consideration                         uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.agents.single.AmountPaidForSecuritiesController.onSubmit(mode: Mode = NormalMode)
+GET        /stf/agent/change/consideration                  uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.agents.single.AmountPaidForSecuritiesController.onPageLoad(mode: Mode = CheckMode)
+POST       /stf/agent/change/consideration                  uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.agents.single.AmountPaidForSecuritiesController.onSubmit(mode: Mode = CheckMode)
