@@ -494,3 +494,9 @@ agent.whatReliefAreYouApplyingFor.error.required = Start typing the name of the 
 agent.taxRate.p1 = For most securities transfers, you will be charged a tax rate of 0.5% of the consideration.
 agent.taxRate.p2 = If the securities are being transferred into a ‘depository receipt scheme’ or a ‘clearance service’, the buyer will need to pay the 1.5% tax rate in most circumstances. This is usually where the transfer is not integral to capital raising or where the clearance service has elected to remain in the 0.5% regime.
 agent.taxRate.error.required = Select a tax rate
+
+agent.whatTypeOfSecurities.title = What type of securities is the buyer purchasing?
+agent.whatTypeOfSecurities.heading = What type of securities is the buyer purchasing?
+agent.whatTypeOfSecurities.shares = Shares
+agent.whatTypeOfSecurities.other = Other
+agent.whatTypeOfSecurities.error.required = Start typing the name of the relief and select from the list
