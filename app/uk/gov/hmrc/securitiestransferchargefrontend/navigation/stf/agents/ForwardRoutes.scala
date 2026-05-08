@@ -18,6 +18,7 @@ package uk.gov.hmrc.securitiestransferchargefrontend.navigation.stf.agents
 
 import play.api.mvc.Call
 import uk.gov.hmrc.http.HeaderCarrier
+import uk.gov.hmrc.securitiestransferchargefrontend.config.FrontendAppConfig
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.agents.routes as agentRoutes
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.agents.single.routes as agentSingleRoutes
 import uk.gov.hmrc.securitiestransferchargefrontend.models.stf.HowToNotifyAboutSecuritiesTransfer.{MoreThanOneAtATime, OneAtATime}
@@ -25,12 +26,13 @@ import uk.gov.hmrc.securitiestransferchargefrontend.models.{NormalMode, UserAnsw
 import uk.gov.hmrc.securitiestransferchargefrontend.navigation.PersistentNavigationHelper
 import uk.gov.hmrc.securitiestransferchargefrontend.pages.Page
 import uk.gov.hmrc.securitiestransferchargefrontend.pages.stf.shared.{HowToNotifyAboutSecuritiesTransferPage, SubmissionsDashboardPage}
-import uk.gov.hmrc.securitiestransferchargefrontend.pages.stf.single.{AgentReferencePage, ApplyingForReliefPage, ConnectedPersonsPage, NameOfBuyerPage, NameOfSellerPage, StfBuyersAddressPage, StfSellerAddressPage}
+import uk.gov.hmrc.securitiestransferchargefrontend.pages.stf.single.*
 import uk.gov.hmrc.securitiestransferchargefrontend.services.AnswerPersistenceService
 
 import scala.concurrent.{ExecutionContext, Future}
 
 class ForwardRoutes(answerPersistenceService: AnswerPersistenceService,
+                    appConfig: FrontendAppConfig,
                     defaultPage: Call,
                     errorPages: Seq[Call])
                    (implicit ec: ExecutionContext):
@@ -38,7 +40,9 @@ class ForwardRoutes(answerPersistenceService: AnswerPersistenceService,
   val helper = new PersistentNavigationHelper(answerPersistenceService, defaultPage, errorPages)
 
   import helper.*
-  
+
+  private val firstDate = appConfig.firstChargingPoint
+
   def forwardRoutes(page: Page)(implicit hc: HeaderCarrier): UserAnswers => Future[Call] = page match {
 
     case SubmissionsDashboardPage => userAnswers => goTo(agentRoutes.HowToNotifyAboutSecuritiesTransferController.onPageLoad(NormalMode), Some(userAnswers))
@@ -54,8 +58,17 @@ class ForwardRoutes(answerPersistenceService: AnswerPersistenceService,
     case NameOfSellerPage => userAnswers => dataRequired(NameOfSellerPage, userAnswers, agentSingleRoutes.StfSellerAddressController.onPageLoad())
     case StfSellerAddressPage => userAnswers => dataRequired(StfSellerAddressPage, userAnswers, agentSingleRoutes.ConnectedPersonsController.onPageLoad(NormalMode))
     case ConnectedPersonsPage => userAnswers => dataRequired(ConnectedPersonsPage, userAnswers, agentSingleRoutes.ApplyingForReliefController.onPageLoad(NormalMode))
-    case ApplyingForReliefPage => userAnswers => dataRequired(ConnectedPersonsPage, userAnswers, defaultPage)
+    case ApplyingForReliefPage => userAnswers =>
+      dataDependent(ApplyingForReliefPage, userAnswers) {
+        case true => agentSingleRoutes.WhatReliefAreYouApplyingForController.onPageLoad(NormalMode)
+        case false => defaultPage
+      }
+    case WhatReliefAreYouApplyingForPage => userAnswers => dataRequired(WhatReliefAreYouApplyingForPage, userAnswers, agentSingleRoutes.ChargingPointController.onPageLoad(NormalMode))
 
+    case ChargingPointPage => userAnswers => dataDependent(ChargingPointPage, userAnswers) {enterDate =>
+      if (enterDate.isBefore(firstDate)) defaultPage
+      else defaultPage
+    }
 
     case _ => _ => Future.successful(defaultPage)
   }
