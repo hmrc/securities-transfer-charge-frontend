@@ -69,10 +69,11 @@ class ForwardRoutes(answerPersistenceService: AnswerPersistenceService,
       if (enterDate.isBefore(firstDate)) defaultPage
       else agentSingleRoutes.TaxRateController.onPageLoad(NormalMode)
     }
+    case TaxRatePage => userAnswers => dataRequired(TaxRatePage, userAnswers, agentSingleRoutes.WhatTypeOfSecuritiesController.onPageLoad(NormalMode))
     case WhatTypeOfSecuritiesPage => userAnswers =>
       dataDependent(WhatTypeOfSecuritiesPage, userAnswers) {
         case WhatTypeOfSecurities.Shares => defaultPage
-        case WhatTypeOfSecurities.Other => defaultPage
+        case WhatTypeOfSecurities.Other => agentSingleRoutes.OtherSecuritiesTypeController.onPageLoad(NormalMode)
       }
 
     case _ => _ => Future.successful(defaultPage)
