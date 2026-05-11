@@ -527,6 +527,6 @@ agent.whatTypeOfSecurities.title = What type of securities is the buyer purchasi
 agent.whatTypeOfSecurities.heading = What type of securities is the buyer purchasing?
 agent.whatTypeOfSecurities.shares = Shares
 agent.whatTypeOfSecurities.other = Other
-agent.whatTypeOfSecurities.error.required = Start typing the name of the relief and select from the list
+agent.whatTypeOfSecurities.error.required = Select the type of securities the buyer is purchasing
 agent.whatTypeOfSecurities.checkYourAnswersLabel = What type of securities is the buyer purchasing?
 agent.whatTypeOfSecurities.change.hidden = Change the type of securities the buyer is purchasing
