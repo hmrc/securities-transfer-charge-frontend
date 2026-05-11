@@ -426,6 +426,19 @@ agent.connectedPersons.p = We need to know if the buyer and seller of these shar
 agent.connectedPersons.content.link.text = section 1122 of the Corporation Tax Act 2010
 agent.connectedPersons.change.hidden = Change connected persons
 
+agent.securitiesTarget.title = What business are the securities bought in?
+agent.securitiesTarget.heading = What business are the securities bought in?
+agent.securitiesTarget.businessName = Business name
+agent.securitiesTarget.crn = Company registration number (CRN) (optional)
+agent.securitiesTarget.crn.hint = This is also called a company number. For example, SN898989 or 12345678
+agent.securitiesTarget.checkYourAnswersLabel = What business are the securities bought in?
+agent.securitiesTarget.error.businessName.required = Enter the name of the business the securities are in
+agent.securitiesTarget.error.businessName.length = Business name must be 160 characters or fewer
+agent.securitiesTarget.error.crn.length = Company registration number must 8 characters long
+agent.securitiesTarget.error.crn.invalid = Company registration number can only be numbers or letters
+agent.securitiesTarget.businessName.change.hidden = BusinessName
+agent.securitiesTarget.crn.change.hidden = CRN
+
 org.uploadedFileError.title = There is a problem with your uploaded file
 org.uploadedFileError.heading = There is a problem with your uploaded file
 org.uploadedFileError.p1 = Correct the errors and upload it again, or upload a different file.
@@ -495,8 +508,23 @@ agent.taxRate.p1 = For most securities transfers, you will be charged a tax rate
 agent.taxRate.p2 = If the securities are being transferred into a ‘depository receipt scheme’ or a ‘clearance service’, the buyer will need to pay the 1.5% tax rate in most circumstances. This is usually where the transfer is not integral to capital raising or where the clearance service has elected to remain in the 0.5% regime.
 agent.taxRate.error.required = Select a tax rate
 
+
+agent.chargingPoint.title = What’s the charging point?
+agent.chargingPoint.heading = What’s the charging point?
+agent.chargingPoint.hint = This is the date the securities were bought. For example, 27 3 2024
+agent.chargingPoint.checkYourAnswersLabel = What is the charging point?
+agent.chargingPoint.error.required.all = Enter the date the securities were bought
+agent.chargingPoint.error.required.two = The date the securities were bought must include {0} and {1}
+agent.chargingPoint.error.required = The date the securities were bought must include a {0}
+agent.chargingPoint.error.invalid = The date the securities were bought must be a real date
+agent.chargingPoint.error.futureDate = The date the securities were bought must be today’s date or a date in the past
+agent.chargingPoint.change.hidden = ChargingPoint
+
+
 agent.whatTypeOfSecurities.title = What type of securities is the buyer purchasing?
 agent.whatTypeOfSecurities.heading = What type of securities is the buyer purchasing?
 agent.whatTypeOfSecurities.shares = Shares
 agent.whatTypeOfSecurities.other = Other
 agent.whatTypeOfSecurities.error.required = Start typing the name of the relief and select from the list
+agent.whatTypeOfSecurities.checkYourAnswersLabel = What type of securities is the buyer purchasing?
+agent.whatTypeOfSecurities.change.hidden = Change the type of securities the buyer is purchasing
