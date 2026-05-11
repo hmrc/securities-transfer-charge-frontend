@@ -70,6 +70,7 @@ class ForwardRoutes(answerPersistenceService: AnswerPersistenceService,
       else agentSingleRoutes.TaxRateController.onPageLoad(NormalMode)
     }
     case TaxRatePage => userAnswers => dataRequired(TaxRatePage, userAnswers, agentSingleRoutes.WhatTypeOfSecuritiesController.onPageLoad(NormalMode))
+    case OtherSecuritiesTypePage => userAnswers => dataRequired(OtherSecuritiesTypePage, userAnswers, agentSingleRoutes.AmountPaidForSecuritiesController.onPageLoad(NormalMode))
     case WhatTypeOfSecuritiesPage => userAnswers =>
       dataDependent(WhatTypeOfSecuritiesPage, userAnswers) {
         case WhatTypeOfSecurities.Shares => defaultPage
