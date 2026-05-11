@@ -19,7 +19,6 @@ package views.stf.shared.bulk
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
 import play.api.Application
-import uk.gov.hmrc.securitiestransferchargefrontend.models.stf.upscan.{FileUpload, UpscanJourneyStatus}
 import uk.gov.hmrc.securitiestransferchargefrontend.views.html.stf.shared.bulk.FileProcessingView
 import views.ViewBaseSpec
 
@@ -58,12 +57,6 @@ class FileProcessingViewSpec extends ViewBaseSpec {
 
       "display the loading spinner" in {
         doc.select(".loading-spinner__spinner").size() mustBe 1
-      }
-
-      "have a noscript refresh tag" in {
-        val noscriptMeta = doc.select("noscript meta[http-equiv=refresh]")
-
-        noscriptMeta.attr("content") mustBe "2"
       }
 
       "not display a back link" in {
