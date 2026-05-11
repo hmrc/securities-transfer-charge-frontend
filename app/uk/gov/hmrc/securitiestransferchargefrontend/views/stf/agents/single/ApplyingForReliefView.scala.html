@@ -52,7 +52,7 @@
                 legend = LegendViewModel(messages("agent.applyingForRelief.heading")).asPageHeading(Large)
             ).withHint(Hint(content = HtmlContent(
         HtmlFormat.raw(s"""
-        <p class="govuk-body">${messages("agent.applyingForRelief.p")} $link.</p>
+        <p class="govuk-body">${messages("agent.applyingForRelief.p")} $link</p>
         """))))
         )
         @govukButton(ButtonViewModel(messages("site.save-and-continue.button")))

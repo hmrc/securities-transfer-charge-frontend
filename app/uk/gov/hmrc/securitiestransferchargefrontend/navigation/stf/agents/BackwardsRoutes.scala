@@ -39,12 +39,11 @@ class BackwardsRoutes(defaultPage: Call):
     case StfBuyersAddressPage => _ => agentSingleRoutes.NameOfBuyerController.onPageLoad(NormalMode)
     case NameOfSellerPage => _ => agentSingleRoutes.AddressController.onPageLoad()
     case StfSellerAddressPage => _ => agentSingleRoutes.NameOfSellerController.onPageLoad(NormalMode)
+    case ConnectedPersonsPage => _ => agentSingleRoutes.StfSellerAddressController.onPageLoad()
     case ApplyingForReliefPage => _ => agentSingleRoutes.ConnectedPersonsController.onPageLoad(NormalMode)
     case SecuritiesTargetPage => userAnswers => dataDependent(ApplyingForReliefPage, userAnswers) {
       case true => agentSingleRoutes.WhatReliefAreYouApplyingForController.onPageLoad(NormalMode)
       case false => agentSingleRoutes.ApplyingForReliefController.onPageLoad(NormalMode)
     }
-    case ConnectedPersonsPage => _ => agentSingleRoutes.ApplyingForReliefController.onPageLoad(NormalMode)
     case _ => _ => defaultPage
-
   }
