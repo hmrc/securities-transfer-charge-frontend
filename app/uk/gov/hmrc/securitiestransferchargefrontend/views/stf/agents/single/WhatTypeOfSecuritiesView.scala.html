@@ -1,0 +1,55 @@
+@*
+ * Copyright 2026 HM Revenue & Customs
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *@
+
+@import uk.gov.hmrc.securitiestransferchargefrontend.viewmodels.LegendSize.Large
+@import uk.gov.hmrc.securitiestransferchargefrontend.controllers.routes
+@import uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.agents.single.routes as agentRoutes
+@import uk.gov.hmrc.securitiestransferchargefrontend.views.html.templates
+@import uk.gov.hmrc.securitiestransferchargefrontend.models.stf.WhatTypeOfSecurities
+@import uk.gov.hmrc.securitiestransferchargefrontend.views.html.components.SaveAndReturnButton
+
+
+@this(
+    layout: templates.Layout,
+    formHelper: FormWithCSRF,
+    govukErrorSummary: GovukErrorSummary,
+    govukRadios: GovukRadios,
+    govukButton: GovukButton,
+    saveAndReturnButton:SaveAndReturnButton
+)
+
+@(form: Form[_], mode: Mode, affinityGroupKey: String, backLinkCall: Call)(implicit request: Request[_], messages: Messages)
+
+@layout(pageTitle = title(form, messages("agent.whatTypeOfSecurities.title"),Some(messages("transfer.details.caption"))), backLinkUrl = Some(backLinkCall.url)) {
+
+    @formHelper(action = agentRoutes.WhatTypeOfSecuritiesController.onSubmit(mode), Symbol("autoComplete") -> "off") {
+
+        @if(form.errors.nonEmpty) {
+            @govukErrorSummary(ErrorSummaryViewModel(form,  errorLinkOverrides = Map("value" -> "value_0")))
+        }
+        <span  class="govuk-caption-l">@messages("transfer.details.caption")</span>
+        @govukRadios(
+            RadiosViewModel(
+                field  = form("value"),
+                legend = LegendViewModel(messages("agent.whatTypeOfSecurities.heading")).asPageHeading(Large),
+                items  = WhatTypeOfSecurities.options(affinityGroupKey)
+            )
+        )
+
+        @govukButton(ButtonViewModel(messages("site.save-and-continue.button")))
+        @saveAndReturnButton()
+    }
+}

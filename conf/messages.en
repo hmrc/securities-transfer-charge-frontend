@@ -521,3 +521,12 @@ agent.chargingPoint.error.required = The date the securities were bought must in
 agent.chargingPoint.error.invalid = The date the securities were bought must be a real date
 agent.chargingPoint.error.futureDate = The date the securities were bought must be today’s date or a date in the past
 agent.chargingPoint.change.hidden = ChargingPoint
+
+
+agent.whatTypeOfSecurities.title = What type of securities is the buyer purchasing?
+agent.whatTypeOfSecurities.heading = What type of securities is the buyer purchasing?
+agent.whatTypeOfSecurities.shares = Shares
+agent.whatTypeOfSecurities.other = Other
+agent.whatTypeOfSecurities.error.required = Select the type of securities the buyer is purchasing
+agent.whatTypeOfSecurities.checkYourAnswersLabel = What type of securities is the buyer purchasing?
+agent.whatTypeOfSecurities.change.hidden = Change the type of securities the buyer is purchasing

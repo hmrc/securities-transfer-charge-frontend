@@ -28,6 +28,7 @@ import uk.gov.hmrc.securitiestransferchargefrontend.pages.Page
 import uk.gov.hmrc.securitiestransferchargefrontend.pages.stf.shared.{HowToNotifyAboutSecuritiesTransferPage, SubmissionsDashboardPage}
 import uk.gov.hmrc.securitiestransferchargefrontend.pages.stf.single.*
 import uk.gov.hmrc.securitiestransferchargefrontend.services.AnswerPersistenceService
+import uk.gov.hmrc.securitiestransferchargefrontend.models.stf.WhatTypeOfSecurities
 
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -66,8 +67,13 @@ class ForwardRoutes(answerPersistenceService: AnswerPersistenceService,
     case SecuritiesTargetPage => userAnswers => dataRequired(SecuritiesTargetPage, userAnswers, agentSingleRoutes.ChargingPointController.onPageLoad(NormalMode))
     case ChargingPointPage => userAnswers => dataDependent(ChargingPointPage, userAnswers) {enterDate =>
       if (enterDate.isBefore(firstDate)) defaultPage
-      else defaultPage
+      else agentSingleRoutes.TaxRateController.onPageLoad(NormalMode)
     }
+    case WhatTypeOfSecuritiesPage => userAnswers =>
+      dataDependent(WhatTypeOfSecuritiesPage, userAnswers) {
+        case WhatTypeOfSecurities.Shares => defaultPage
+        case WhatTypeOfSecurities.Other => defaultPage
+      }
 
     case _ => _ => Future.successful(defaultPage)
   }
