@@ -511,8 +511,8 @@ agent.taxRate.error.required = Select a tax rate
 fileUpload.processing.title = We are checking your file
 fileUpload.processing.paragraph = This may take a few seconds
 
-agent.chargingPoint.title = What is the charging point?
-agent.chargingPoint.heading = What is the charging point?
+agent.chargingPoint.title = What’s the charging point?
+agent.chargingPoint.heading = What’s the charging point?
 agent.chargingPoint.hint = This is the date the securities were bought. For example, 27 3 2024
 agent.chargingPoint.checkYourAnswersLabel = What is the charging point?
 agent.chargingPoint.error.required.all = Enter the date the securities were bought
