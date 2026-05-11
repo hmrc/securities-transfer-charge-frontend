@@ -252,6 +252,11 @@ POST       /stf/agent/change/securities-type                    uk.gov.hmrc.secu
 
 GET        /stf/bulk-processing                           uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.shared.bulk.FileProcessingController.onPageLoad()
 
+GET        /stf/agent/consideration                         uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.agents.single.AmountPaidForSecuritiesController.onPageLoad(mode: Mode = NormalMode)
+POST       /stf/agent/consideration                         uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.agents.single.AmountPaidForSecuritiesController.onSubmit(mode: Mode = NormalMode)
+GET        /stf/agent/change/consideration                  uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.agents.single.AmountPaidForSecuritiesController.onPageLoad(mode: Mode = CheckMode)
+POST       /stf/agent/change/consideration                  uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.agents.single.AmountPaidForSecuritiesController.onSubmit(mode: Mode = CheckMode)
+
 GET        /stf/agent/security-type                         uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.agents.single.OtherSecuritiesTypeController.onPageLoad(mode: Mode = NormalMode)
 POST       /stf/agent/security-type                         uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.agents.single.OtherSecuritiesTypeController.onSubmit(mode: Mode = NormalMode)
 GET        /stf/agent/change/security-type                  uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.agents.single.OtherSecuritiesTypeController.onPageLoad(mode: Mode = CheckMode)
