@@ -530,6 +530,7 @@ agent.whatTypeOfSecurities.other = Other
 agent.whatTypeOfSecurities.error.required = Select the type of securities the buyer is purchasing
 agent.whatTypeOfSecurities.checkYourAnswersLabel = What type of securities is the buyer purchasing?
 agent.whatTypeOfSecurities.change.hidden = Change the type of securities the buyer is purchasing
+
 agent.amountPaidForSecurities.error.required = Enter the amount paid for the securities
 agent.amountPaidForSecurities.error.invalidNumeric = The amount paid for the securities must be a number and can include up to two decimal places, like 30 or 28.60
 agent.amountPaidForSecurities.error.nonNumeric = The amount paid for the securities must be a number and can include up to two decimal places, like 30 or 28.60
@@ -542,3 +543,10 @@ agent.amountPaidForSecurities.p1 = Enter the total amount of consideration given
 agent.amountPaidForSecurities.p2 = You do not need to provide details about conversion or exchange rates, or how valuable of non-monetary items were reached.
 agent.amountPaidForSecurities.hint = For example, £600 or £193.54
 agent.amountPaidForSecurities.change.hidden = Change the amount the buyer paid for the securities
+
+agent.otherSecuritiesType.title = Enter the type of securities the buyer is purchasing
+agent.otherSecuritiesType.heading = Enter the type of securities the buyer is purchasing
+agent.otherSecuritiesType.checkYourAnswersLabel = What type of securities is the buyer purchasing?
+agent.otherSecuritiesType.error.required = Enter the type of securities the buyer is purchasing
+agent.otherSecuritiesType.change.hidden = Change the type of securities the buyer is purchasing
+agent.otherSecuritiesType.error.length = The type of securities the buyer is purchasing must be 255 characters or fewer
