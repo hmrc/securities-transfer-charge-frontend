@@ -554,4 +554,3 @@ agent.otherSecuritiesType.error.length = The type of securities the buyer is pur
 fileUploaded.error.emptyFile.title = The file you have uploaded is empty
 fileUploaded.error.emptyFile.heading = The file you have uploaded is empty
 fileUploaded.error.emptyFile.p = Check you have uploaded the correct file.
-fileUploaded.error.backlink = Back to file upload
