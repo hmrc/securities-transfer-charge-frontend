@@ -40,7 +40,7 @@ class DetailsOfThisTransferControllerSpec extends SpecBase with MockitoSugar {
 
   val amount: BigDecimal = BigDecimal(500)
 
-  val detailsOfThisTransfer: DetailsOfThisTransfer = DetailsOfThisTransfer(numberOfShares = "25",
+  val detailsOfThisTransfer: DetailsOfThisTransfer = DetailsOfThisTransfer(numberOfShares = 25,
     typeOfShares = "stocks",
     amountPaid = BigDecimal(100),
     marketValue = Some(BigDecimal(10000)))

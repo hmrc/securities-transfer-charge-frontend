@@ -29,6 +29,8 @@ import uk.gov.hmrc.securitiestransferchargefrontend.pages.stf.shared.{HowToNotif
 import uk.gov.hmrc.securitiestransferchargefrontend.pages.stf.single.*
 import uk.gov.hmrc.securitiestransferchargefrontend.services.AnswerPersistenceService
 import uk.gov.hmrc.securitiestransferchargefrontend.models.stf.WhatTypeOfSecurities
+import uk.gov.hmrc.securitiestransferchargefrontend.controllers.routes
+
 
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -73,9 +75,10 @@ class ForwardRoutes(answerPersistenceService: AnswerPersistenceService,
     case OtherSecuritiesTypePage => userAnswers => dataRequired(OtherSecuritiesTypePage, userAnswers, agentSingleRoutes.AmountPaidForSecuritiesController.onPageLoad(NormalMode))
     case WhatTypeOfSecuritiesPage => userAnswers =>
       dataDependent(WhatTypeOfSecuritiesPage, userAnswers) {
-        case WhatTypeOfSecurities.Shares => defaultPage
+        case WhatTypeOfSecurities.Shares => agentSingleRoutes.DetailsOfThisTransferController.onPageLoad(NormalMode)
         case WhatTypeOfSecurities.Other => agentSingleRoutes.OtherSecuritiesTypeController.onPageLoad(NormalMode)
       }
+    case DetailsOfThisTransferPage => userAnswers => dataRequired(DetailsOfThisTransferPage, userAnswers, routes.CheckYourAnswersController.onPageLoad())  
 
     case _ => _ => Future.successful(defaultPage)
   }

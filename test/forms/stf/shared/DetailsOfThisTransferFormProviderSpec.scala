@@ -16,11 +16,11 @@
 
 package forms.stf.shared
 
-import forms.behaviours.{CurrencyFieldBehaviours, StringFieldBehaviours}
+import forms.behaviours.{CurrencyFieldBehaviours, IntFieldBehaviours, StringFieldBehaviours}
 import play.api.data.FormError
 import uk.gov.hmrc.securitiestransferchargefrontend.forms.stf.shared.DetailsOfThisTransferFormProvider
 
-class DetailsOfThisTransferFormProviderSpec extends StringFieldBehaviours with CurrencyFieldBehaviours {
+class DetailsOfThisTransferFormProviderSpec extends StringFieldBehaviours with CurrencyFieldBehaviours with IntFieldBehaviours {
 
   val form = new DetailsOfThisTransferFormProvider()()
 
@@ -28,26 +28,38 @@ class DetailsOfThisTransferFormProviderSpec extends StringFieldBehaviours with C
 
     val fieldName = "numberOfShares"
     val requiredKey = "detailsOfThisTransfer.error.numberOfShares.required"
-    val lengthKey = "detailsOfThisTransfer.error.numberOfShares.length"
-    val maxLength = 100
+    val nonNumericKey = "detailsOfThisTransfer.error.numberOfShares.nonNumeric"
+    val wholeNumberKey = "detailsOfThisTransfer.error.numberOfShares.wholeNumber"
+    val minimumKey = "detailsOfThisTransfer.error.numberOfShares.min"
+    val maximumKey = "detailsOfThisTransfer.error.numberOfShares.max"
+    val max = 999999999
+    val min = 1
 
-    behave like fieldThatBindsValidData(
+
+    behave like intFieldWithMinimum(
       form,
       fieldName,
-      stringsWithMaxLength(maxLength)
+      minimum = min,
+      expectedError = FormError(fieldName, minimumKey)
     )
-
-    behave like fieldWithMaxLength(
+    behave like intFieldWithMaximum(
       form,
       fieldName,
-      maxLength = maxLength,
-      lengthError = FormError(fieldName, lengthKey, Seq(maxLength))
+      maximum = max,
+      expectedError = FormError(fieldName, maximumKey)
     )
 
     behave like mandatoryField(
       form,
       fieldName,
       requiredError = FormError(fieldName, requiredKey)
+    )
+
+    behave like intField(
+      form,
+      fieldName,
+      FormError(fieldName, nonNumericKey),
+      FormError(fieldName, wholeNumberKey)
     )
   }
 

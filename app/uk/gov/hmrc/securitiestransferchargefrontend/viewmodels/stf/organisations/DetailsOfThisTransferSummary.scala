@@ -35,7 +35,7 @@ object DetailsOfThisTransferSummary {
 
         val value = Html(
           s"""
-             |${HtmlFormat.escape(answer.numberOfShares).body}<br/>
+             |${HtmlFormat.escape(answer.numberOfShares.toString).body}<br/>
              |${HtmlFormat.escape(answer.typeOfShares).body}<br/>
              |${HtmlFormat.escape(currencyFormat(answer.amountPaid)).body}<br/>
              |${answer.marketValue.map(v => HtmlFormat.escape(currencyFormat(v)).body).getOrElse("")}

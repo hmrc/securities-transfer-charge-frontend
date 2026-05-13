@@ -201,7 +201,7 @@ class StfNavigatorSpec extends SpecBase with ScalaFutures {
       }
 
       "must go from the DetailsOfThisTransferPage to CheckYourAnswersController" in {
-        val answers = emptyUserAnswers.set(DetailsOfThisTransferPage, DetailsOfThisTransfer(numberOfShares = "200",
+        val answers = emptyUserAnswers.set(DetailsOfThisTransferPage, DetailsOfThisTransfer(numberOfShares = 200,
           typeOfShares = "ordinary share", amountPaid = BigDecimal(500), marketValue = Some(BigDecimal(1500)))).get
         val result = navigator.nextPage(DetailsOfThisTransferPage, NormalMode, answers)(fakeRequest)
         whenReady(result) { res =>

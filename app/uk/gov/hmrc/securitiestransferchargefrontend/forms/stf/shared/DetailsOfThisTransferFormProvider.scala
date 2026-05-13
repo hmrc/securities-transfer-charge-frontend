@@ -26,11 +26,21 @@ import javax.inject.Inject
 
 class DetailsOfThisTransferFormProvider @Inject() extends Mappings {
 
+  val max = 999999999
+  val min = 1
+
   def apply(requireMarketValue: Boolean = true): Form[DetailsOfThisTransfer] =
     Form(
       mapping(
-        "numberOfShares" -> text("detailsOfThisTransfer.error.numberOfShares.required")
-          .verifying(maxLength(100, "detailsOfThisTransfer.error.numberOfShares.length")),
+        "numberOfShares" -> int(
+          "detailsOfThisTransfer.error.numberOfShares.required",
+          "detailsOfThisTransfer.error.numberOfShares.wholeNumber",
+          "detailsOfThisTransfer.error.numberOfShares.nonNumeric"
+        ).verifying("detailsOfThisTransfer.error.numberOfShares.min",
+          _ >= min
+        ).verifying("detailsOfThisTransfer.error.numberOfShares.max",
+          _ <= max
+        ),
         "typeOfShares" -> text("detailsOfThisTransfer.error.typeOfShares.required")
           .verifying(maxLength(100, "detailsOfThisTransfer.error.typeOfShares.length")),
         "amountPaid" ->
