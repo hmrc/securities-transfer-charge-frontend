@@ -263,3 +263,5 @@ GET        /stf/agent/change/security-type                  uk.gov.hmrc.securiti
 POST       /stf/agent/change/security-type                  uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.agents.single.OtherSecuritiesTypeController.onSubmit(mode: Mode = CheckMode)
 
 GET        /stf/bulk-error-empty                            uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.shared.bulk.BulkUploadFileEmptyController.onPageLoad()
+
+GET        /stf/bulk-error-type                           uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.shared.bulk.FileTypeErrorController.onPageLoad()
