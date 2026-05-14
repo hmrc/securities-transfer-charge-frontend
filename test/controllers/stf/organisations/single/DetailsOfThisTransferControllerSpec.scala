@@ -34,7 +34,7 @@ import uk.gov.hmrc.securitiestransferchargefrontend.views.html.stf.organisations
 class DetailsOfThisTransferControllerSpec extends SpecBase with MockitoSugar {
 
   val formProvider = new DetailsOfThisTransferFormProvider()
-  val form: Form[DetailsOfThisTransfer] = formProvider()
+  val form: Form[DetailsOfThisTransfer] = formProvider(affinityKey = affinityGroupKeyOrg)
 
   lazy val detailsOfThisTransferRoute: String = orgSingleRoutes.DetailsOfThisTransferController.onPageLoad(NormalMode).url
 

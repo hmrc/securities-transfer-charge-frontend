@@ -35,7 +35,7 @@ class DetailsOfThisTransferViewSpec extends ViewBaseSpec {
   private val formProvider = new  DetailsOfThisTransferFormProvider()
   private val testBackLinkRoute: Call = Call("GET", "/back-link")
 
-  private val form = formProvider()
+  private val form = formProvider(affinityKey = affinityGroupKeyInd)
 
   def view(requireMarketValue:Boolean): Document = Jsoup.parse(
     viewInstance(form, NormalMode, testBackLinkRoute,requireMarketValue)(fakeRequest, messages).body

@@ -14,27 +14,36 @@
  * limitations under the License.
  */
 
-package forms.stf.shared
+package forms.stf.agents
 
+import base.SpecBase
 import forms.behaviours.{CurrencyFieldBehaviours, IntFieldBehaviours, StringFieldBehaviours}
 import play.api.data.FormError
 import uk.gov.hmrc.securitiestransferchargefrontend.forms.stf.shared.DetailsOfThisTransferFormProvider
 
-class DetailsOfThisTransferFormProviderSpec extends StringFieldBehaviours with CurrencyFieldBehaviours with IntFieldBehaviours {
+class DetailsOfThisTransferFormProviderSpec
+  extends StringFieldBehaviours
+    with CurrencyFieldBehaviours
+    with IntFieldBehaviours with SpecBase{
 
-  val form = new DetailsOfThisTransferFormProvider()()
+  private val affinityKey = affinityGroupKeyAgent
+
+  val form = new DetailsOfThisTransferFormProvider()(
+    requireMarketValue = true,
+    affinityKey = affinityKey
+  )
 
   ".numberOfShares" - {
 
     val fieldName = "numberOfShares"
-    val requiredKey = "detailsOfThisTransfer.error.numberOfShares.required"
-    val nonNumericKey = "detailsOfThisTransfer.error.numberOfShares.nonNumeric"
+    val requiredKey = s"$affinityKey.detailsOfThisTransfer.error.numberOfShares.required"
+    val nonNumericKey = s"$affinityKey.detailsOfThisTransfer.error.numberOfShares.nonNumeric"
     val wholeNumberKey = "detailsOfThisTransfer.error.numberOfShares.wholeNumber"
     val minimumKey = "detailsOfThisTransfer.error.numberOfShares.min"
     val maximumKey = "detailsOfThisTransfer.error.numberOfShares.max"
+
     val max = 999999999
     val min = 1
-
 
     behave like intFieldWithMinimum(
       form,
@@ -42,6 +51,7 @@ class DetailsOfThisTransferFormProviderSpec extends StringFieldBehaviours with C
       minimum = min,
       expectedError = FormError(fieldName, minimumKey)
     )
+
     behave like intFieldWithMaximum(
       form,
       fieldName,
@@ -66,8 +76,12 @@ class DetailsOfThisTransferFormProviderSpec extends StringFieldBehaviours with C
   ".typeOfShares" - {
 
     val fieldName = "typeOfShares"
-    val requiredKey = "detailsOfThisTransfer.error.typeOfShares.required"
-    val lengthKey = "detailsOfThisTransfer.error.typeOfShares.length"
+    val requiredKey =
+      s"$affinityKey.detailsOfThisTransfer.error.typeOfShares.required"
+
+    val lengthKey =
+      s"$affinityKey.detailsOfThisTransfer.error.typeOfShares.length"
+
     val maxLength = 100
 
     behave like fieldThatBindsValidData(
@@ -94,10 +108,10 @@ class DetailsOfThisTransferFormProviderSpec extends StringFieldBehaviours with C
 
     val fieldName = "amountPaid"
 
-    val minimum = 0
-    val maximum = 100000000
+    val maximum = 999999999
 
-    val validDataGenerator = intsInRangeWithCommas(minimum, maximum)
+    val validDataGenerator =
+      intsInRangeWithCommas(0, maximum)
 
     behave like fieldThatBindsValidData(
       form,
@@ -108,22 +122,38 @@ class DetailsOfThisTransferFormProviderSpec extends StringFieldBehaviours with C
     behave like currencyField(
       form,
       fieldName,
-      nonNumericError = FormError(fieldName, "detailsOfThisTransfer.error.amountPaid.nonNumeric"),
-      invalidNumericError = FormError(fieldName, "detailsOfThisTransfer.error.amountPaid.invalidNumeric")
+      nonNumericError =
+        FormError(
+          fieldName,
+          s"$affinityKey.detailsOfThisTransfer.error.amountPaid.nonNumeric"
+        ),
+      invalidNumericError =
+        FormError(
+          fieldName,
+          s"$affinityKey.detailsOfThisTransfer.error.amountPaid.invalidNumeric"
+        )
     )
 
-    behave like currencyFieldWithRange(
+    behave like currencyFieldWithMaximum(
       form,
       fieldName,
       maximum = maximum,
       expectedError =
-        FormError(fieldName, "detailsOfThisTransfer.error.amountPaid.outOfRange", Seq(minimum, maximum))
+        FormError(
+          fieldName,
+          s"$affinityKey.detailsOfThisTransfer.error.amountPaid.aboveMaximum",
+          Seq("£999,999,999")
+        )
     )
 
     behave like mandatoryField(
       form,
       fieldName,
-      requiredError = FormError(fieldName, "detailsOfThisTransfer.error.amountPaid.required")
+      requiredError =
+        FormError(
+          fieldName,
+          s"$affinityKey.detailsOfThisTransfer.error.amountPaid.required"
+        )
     )
   }
 
@@ -131,10 +161,10 @@ class DetailsOfThisTransferFormProviderSpec extends StringFieldBehaviours with C
 
     val fieldName = "marketValue"
 
-    val minimum = 0
-    val maximum = 100000000
+    val maximum = 999999999
 
-    val validDataGenerator = intsInRangeWithCommas(minimum, maximum)
+    val validDataGenerator =
+      intsInRangeWithCommas(0, maximum)
 
     behave like fieldThatBindsValidData(
       form,
@@ -145,22 +175,60 @@ class DetailsOfThisTransferFormProviderSpec extends StringFieldBehaviours with C
     behave like currencyField(
       form,
       fieldName,
-      nonNumericError = FormError(fieldName, "detailsOfThisTransfer.error.marketValue.nonNumeric"),
-      invalidNumericError = FormError(fieldName, "detailsOfThisTransfer.error.marketValue.invalidNumeric")
+      nonNumericError =
+        FormError(
+          fieldName,
+          s"$affinityKey.detailsOfThisTransfer.error.marketValue.nonNumeric"
+        ),
+      invalidNumericError =
+        FormError(
+          fieldName,
+          s"$affinityKey.detailsOfThisTransfer.error.marketValue.invalidNumeric"
+        )
     )
 
-    behave like currencyFieldWithRange(
+    behave like currencyFieldWithMaximum(
       form,
       fieldName,
       maximum = maximum,
       expectedError =
-        FormError(fieldName, "detailsOfThisTransfer.error.marketValue.outOfRange", Seq(minimum, maximum))
+        FormError(
+          fieldName,
+          s"$affinityKey.detailsOfThisTransfer.error.marketValue.aboveMaximum",
+          Seq("£999,999,999")
+        )
     )
 
     behave like mandatoryField(
       form,
       fieldName,
-      requiredError = FormError(fieldName, "detailsOfThisTransfer.error.marketValue.required")
+      requiredError =
+        FormError(
+          fieldName,
+          s"$affinityKey.detailsOfThisTransfer.error.marketValue.required"
+        )
     )
+  }
+
+  ".marketValue when requireMarketValue = false" - {
+
+    val optionalForm =
+      new DetailsOfThisTransferFormProvider()(
+        requireMarketValue = false,
+        affinityKey = affinityKey
+      )
+
+    "not require marketValue" in {
+
+      val result = optionalForm.bind(
+        Map(
+          "numberOfShares" -> "10",
+          "typeOfShares" -> "Ordinary",
+          "amountPaid" -> "100"
+        )
+      )
+
+      result.errors mustBe empty
+    }
   }
 }

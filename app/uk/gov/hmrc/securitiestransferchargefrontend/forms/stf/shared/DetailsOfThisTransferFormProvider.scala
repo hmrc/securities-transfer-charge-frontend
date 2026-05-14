@@ -26,9 +26,9 @@ import javax.inject.Inject
 
 class DetailsOfThisTransferFormProvider @Inject() extends Mappings {
 
-  val maxNumOfShares = 999999999
-  val minNumOfShares = 1
-  val maxCurrency: BigDecimal = BigDecimal(999999999)
+  private val maxNumOfShares = 999999999
+  private val minNumOfShares = 1
+  private val maxCurrency: BigDecimal = BigDecimal(999999999)
 
   def apply(requireMarketValue: Boolean = true, affinityKey:String): Form[DetailsOfThisTransfer] =
     Form(
@@ -43,7 +43,7 @@ class DetailsOfThisTransferFormProvider @Inject() extends Mappings {
           _ <= maxNumOfShares
         ),
         "typeOfShares" -> text(s"${affinityKey}.detailsOfThisTransfer.error.typeOfShares.required")
-          .verifying(maxLength(100, "detailsOfThisTransfer.error.typeOfShares.length")),
+          .verifying(maxLength(100, s"${affinityKey}.detailsOfThisTransfer.error.typeOfShares.length")),
         "amountPaid" ->
           currency(s"${affinityKey}.detailsOfThisTransfer.error.amountPaid.required",
             s"${affinityKey}.detailsOfThisTransfer.error.amountPaid.invalidNumeric",
@@ -55,7 +55,7 @@ class DetailsOfThisTransferFormProvider @Inject() extends Mappings {
           s"${affinityKey}.detailsOfThisTransfer.error.marketValue.nonNumeric",
           s"${affinityKey}.detailsOfThisTransfer.error.marketValue.negative")
           .verifying(maximumCurrency(maxCurrency, s"${affinityKey}.detailsOfThisTransfer.error.marketValue.aboveMaximum")))
-          .verifying(requiredIf(requireMarketValue))
+          .verifying(requiredIf(requireMarketValue,affinityKey))
       )(DetailsOfThisTransfer.apply)(x => Some((x.numberOfShares, x.typeOfShares, x.amountPaid, x.marketValue)))
     )
 }

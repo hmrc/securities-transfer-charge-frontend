@@ -34,7 +34,7 @@ import uk.gov.hmrc.securitiestransferchargefrontend.views.html.stf.agents.single
 class DetailsOfThisTransferControllerSpec extends SpecBase with MockitoSugar {
 
   val formProvider = new DetailsOfThisTransferFormProvider()
-  val form: Form[DetailsOfThisTransfer] = formProvider()
+  val form: Form[DetailsOfThisTransfer] = formProvider(affinityKey = affinityGroupKeyAgent)
 
   lazy val detailsOfThisTransferRoute: String = agentSingleRoutes.DetailsOfThisTransferController.onPageLoad(NormalMode).url
 
@@ -131,13 +131,15 @@ class DetailsOfThisTransferControllerSpec extends SpecBase with MockitoSugar {
       running(application) {
         val request =
           FakeRequest(POST, detailsOfThisTransferRoute)
-            .withFormUrlEncodedBody(("value", "invalid value"))
+            .withFormUrlEncodedBody(("numberOfShares", "invalid value"))
 
-        val boundForm = form.bind(Map("value" -> "invalid value"))
+        val boundForm = form.bind(Map("numberOfShares" -> "invalid value"))
 
         val view = application.injector.instanceOf[DetailsOfThisTransferView]
 
         val result = route(application, request).value
+
+
 
         status(result) mustEqual BAD_REQUEST
         contentAsString(result) mustEqual view(boundForm, NormalMode, testBackLinkRoute)(request, messages(application)).toString
