@@ -36,7 +36,7 @@ class FileTypeErrorViewSpec extends ViewBaseSpec {
 
     val paragraph: String = messages("fileUpload.error.type.p")
 
-    val backLinkText: String = messages("fileUpload.error.type.backline")
+    val backLinkText: String = messages("fileUpload.error.type.backlink")
 
     val backLinkUrl: String = routes.FileUploadController.onPageLoad().url
   }
