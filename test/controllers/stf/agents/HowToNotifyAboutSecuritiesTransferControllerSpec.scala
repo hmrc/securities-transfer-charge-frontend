@@ -62,7 +62,7 @@ class HowToNotifyAboutSecuritiesTransferControllerSpec extends SpecBase {
         val view = application.injector.instanceOf[HowToNotifyAboutSecuritiesTransferView]
 
         status(result) mustEqual OK
-        contentAsString(result) mustEqual view(form, NormalMode, affinityGroupKeyInd, testBackLinkRoute)(request, messages(application)).toString
+        contentAsString(result) mustEqual view(form, NormalMode, affinityGroupKeyAgent, testBackLinkRoute)(request, messages(application)).toString
       }
     }
 
@@ -102,7 +102,7 @@ class HowToNotifyAboutSecuritiesTransferControllerSpec extends SpecBase {
         val result = route(application, request).value
 
         status(result) mustEqual BAD_REQUEST
-        contentAsString(result) mustEqual view(boundForm, NormalMode, affinityGroupKeyInd, testBackLinkRoute)(request, messages(application)).toString
+        contentAsString(result) mustEqual view(boundForm, NormalMode, affinityGroupKeyAgent, testBackLinkRoute)(request, messages(application)).toString
       }
     }
 

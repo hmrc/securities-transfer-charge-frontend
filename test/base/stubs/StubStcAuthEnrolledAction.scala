@@ -58,3 +58,11 @@ class OrganisationStubStcAuthEnrolledAction @Inject() (
   override protected val affinityGroup: AffinityGroup =
     AffinityGroup.Organisation
 }
+
+class AgentStubStcAuthEnrolledAction @Inject() (
+                                                        playBodyParsers: PlayBodyParsers
+                                                      ) extends StubStcAuthEnrolledAction(playBodyParsers) {
+
+  override protected val affinityGroup: AffinityGroup =
+    AffinityGroup.Agent
+}
