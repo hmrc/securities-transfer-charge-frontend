@@ -45,7 +45,7 @@ class DetailsOfThisTransferController @Inject()(
                                                )(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport {
 
   private def form(implicit request: StcDataRequest[_]) =
-    formProvider(requireMarketValue)
+    formProvider(requireMarketValue,request.request.affinityGroupKey)
 
 
   lazy val backLinkCall: Mode => UserAnswers => Call =
