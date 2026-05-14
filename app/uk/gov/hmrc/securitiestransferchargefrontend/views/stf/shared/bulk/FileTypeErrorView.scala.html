@@ -15,27 +15,25 @@
  *@
 
 @import uk.gov.hmrc.securitiestransferchargefrontend.views.html.templates
+@import uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.shared.bulk.routes
 
 @this(
-    layout: templates.Layout
+    layout: templates.Layout,
+    govukButton: GovukButton,
+    formHelper: FormWithCSRF
 )
 
 @()(implicit request: Request[_], messages: Messages)
 
-@layout(pageTitle = titleNoForm(messages("fileUpload.processing.title")),showBackLink = false) {
-    <div class="loading-spinner-wrapper">
-        <div class="loading-spinner">
-            <div class="loading-spinner__spinner" aria-live="polite" role="status"></div>
+@layout(pageTitle = titleNoForm(messages("fileUpload.error.type.title")), backLinkUrl = Some(routes.FileUploadController.onPageLoad().url)) {
 
-            <div class="loading-spinner__content">
-                <h1 class="govuk-heading-m">
-                    @messages("fileUpload.processing.title")
-                </h1>
+    <h1 class="govuk-heading-l">@messages("fileUpload.error.type.title")</h1>
 
-                <p class="govuk-body">
-                    @messages("fileUpload.processing.paragraph")
-                </p>
-            </div>
-        </div>
+    <p class="govuk-body">@messages("fileUpload.error.type.p")</p>
+
+    <div class="govuk-button-group">
+        <a class="govuk-link" href="@routes.FileUploadController.onPageLoad().url">
+            @messages("fileUpload.error.type.backlink")
+        </a>
     </div>
 }
