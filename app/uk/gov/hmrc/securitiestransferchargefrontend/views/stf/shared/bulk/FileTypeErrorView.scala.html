@@ -1,0 +1,39 @@
+@*
+ * Copyright 2026 HM Revenue & Customs
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *@
+
+@import uk.gov.hmrc.securitiestransferchargefrontend.views.html.templates
+@import uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.shared.bulk.routes
+
+@this(
+    layout: templates.Layout,
+    govukButton: GovukButton,
+    formHelper: FormWithCSRF
+)
+
+@()(implicit request: Request[_], messages: Messages)
+
+@layout(pageTitle = titleNoForm(messages("fileUpload.error.type.title")), backLinkUrl = Some(routes.FileUploadController.onPageLoad().url)) {
+
+    <h1 class="govuk-heading-l">@messages("fileUpload.error.type.title")</h1>
+
+    <p class="govuk-body">@messages("fileUpload.error.type.p")</p>
+
+    <div class="govuk-button-group">
+        <a class="govuk-link" href="@routes.FileUploadController.onPageLoad().url">
+            @messages("fileUpload.error.type.backlink")
+        </a>
+    </div>
+}

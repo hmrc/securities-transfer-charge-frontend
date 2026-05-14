@@ -24,13 +24,13 @@ import uk.gov.hmrc.securitiestransferchargefrontend.models.{NormalMode, UserAnsw
 import uk.gov.hmrc.securitiestransferchargefrontend.navigation.NavigationHelper
 import uk.gov.hmrc.securitiestransferchargefrontend.pages.*
 import uk.gov.hmrc.securitiestransferchargefrontend.pages.stf.shared.HowToNotifyAboutSecuritiesTransferPage
-import uk.gov.hmrc.securitiestransferchargefrontend.pages.stf.single.{AgentReferencePage, ApplyingForReliefPage, ConnectedPersonsPage, NameOfBuyerPage, NameOfSellerPage, SecuritiesTargetPage, StfBuyersAddressPage, StfSellerAddressPage}
+import uk.gov.hmrc.securitiestransferchargefrontend.pages.stf.single.*
 
 class BackwardsRoutes(defaultPage: Call):
 
   val navHelper: NavigationHelper = new NavigationHelper(defaultPage)
   import navHelper.*
-  
+
   def predecessorRoutes(page: Page): UserAnswers => Call = page match {
 
     case HowToNotifyAboutSecuritiesTransferPage => _ => sharedRoutes.SubmissionsDashboardController.onPageLoad()
@@ -41,9 +41,19 @@ class BackwardsRoutes(defaultPage: Call):
     case StfSellerAddressPage => _ => agentSingleRoutes.NameOfSellerController.onPageLoad(NormalMode)
     case ConnectedPersonsPage => _ => agentSingleRoutes.StfSellerAddressController.onPageLoad()
     case ApplyingForReliefPage => _ => agentSingleRoutes.ConnectedPersonsController.onPageLoad(NormalMode)
+
+    case WhatReliefAreYouApplyingForPage => _ => agentSingleRoutes.ApplyingForReliefController.onPageLoad(NormalMode)
+
     case SecuritiesTargetPage => userAnswers => dataDependent(ApplyingForReliefPage, userAnswers) {
-      case true => agentSingleRoutes.WhatReliefAreYouApplyingForController.onPageLoad(NormalMode)
+      case true  => agentSingleRoutes.WhatReliefAreYouApplyingForController.onPageLoad(NormalMode)
       case false => agentSingleRoutes.ApplyingForReliefController.onPageLoad(NormalMode)
     }
+
+    case ChargingPointPage => _ => agentSingleRoutes.SecuritiesTargetController.onPageLoad(NormalMode)
+    case TaxRatePage       => _ => agentSingleRoutes.ChargingPointController.onPageLoad(NormalMode)
+    case WhatTypeOfSecuritiesPage => _ => agentSingleRoutes.TaxRateController.onPageLoad(NormalMode)
+    case OtherSecuritiesTypePage  => _ => agentSingleRoutes.WhatTypeOfSecuritiesController.onPageLoad(NormalMode)
+    case AmountPaidForSecuritiesPage => _ => agentSingleRoutes.OtherSecuritiesTypeController.onPageLoad(NormalMode)
+
     case _ => _ => defaultPage
   }

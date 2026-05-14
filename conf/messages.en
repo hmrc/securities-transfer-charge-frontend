@@ -504,7 +504,7 @@ agent.whatReliefAreYouApplyingFor.p = Start typing the name of the relief and se
 agent.whatReliefAreYouApplyingFor.details.content.link.text = full list of reliefs
 agent.whatReliefAreYouApplyingFor.error.required = Start typing the name of the relief and select from the list
 
-agent.taxRate.p1 = For most securities transfers, you will be charged a tax rate of 0.5% of the consideration.
+agent.taxRate.p1 = For most securities transfers, the buyer will be charged a tax rate of 0.5% of the consideration.
 agent.taxRate.p2 = If the securities are being transferred into a ‘depository receipt scheme’ or a ‘clearance service’, the buyer will need to pay the 1.5% tax rate in most circumstances. This is usually where the transfer is not integral to capital raising or where the clearance service has elected to remain in the 0.5% regime.
 agent.taxRate.error.required = Select a tax rate
 
@@ -521,3 +521,40 @@ agent.chargingPoint.error.required = The date the securities were bought must in
 agent.chargingPoint.error.invalid = The date the securities were bought must be a real date
 agent.chargingPoint.error.futureDate = The date the securities were bought must be today’s date or a date in the past
 agent.chargingPoint.change.hidden = ChargingPoint
+
+
+agent.whatTypeOfSecurities.title = What type of securities is the buyer purchasing?
+agent.whatTypeOfSecurities.heading = What type of securities is the buyer purchasing?
+agent.whatTypeOfSecurities.shares = Shares
+agent.whatTypeOfSecurities.other = Other
+agent.whatTypeOfSecurities.error.required = Select the type of securities the buyer is purchasing
+agent.whatTypeOfSecurities.checkYourAnswersLabel = What type of securities is the buyer purchasing?
+agent.whatTypeOfSecurities.change.hidden = Change the type of securities the buyer is purchasing
+
+agent.amountPaidForSecurities.error.required = Enter the amount paid for the securities
+agent.amountPaidForSecurities.error.invalidNumeric = The amount paid for the securities must be a number and can include up to two decimal places, like 30 or 28.60
+agent.amountPaidForSecurities.error.nonNumeric = The amount paid for the securities must be a number and can include up to two decimal places, like 30 or 28.60
+agent.amountPaidForSecurities.error.negative = The amount paid for the securities must be 0 or more
+agent.amountPaidForSecurities.error.aboveMaximum = The amount paid for the securities must be £999,999,999 or below
+agent.amountPaidForSecurities.title = How much did the buyer pay for the securities?
+agent.amountPaidForSecurities.heading = How much did the buyer pay for the securities?
+agent.amountPaidForSecurities.checkYourAnswersLabel = How much did the buyer pay for the securities?
+agent.amountPaidForSecurities.p1 = Enter the total amount of consideration given in exchange for these securities as a cash amount.
+agent.amountPaidForSecurities.p2 = You do not need to provide details about conversion or exchange rates, or how valuations of non-monetary items were reached.
+agent.amountPaidForSecurities.hint = For example, £600 or £193.54
+agent.amountPaidForSecurities.change.hidden = Change the amount the buyer paid for the securities
+
+agent.otherSecuritiesType.title = Enter the type of securities the buyer is purchasing
+agent.otherSecuritiesType.heading = Enter the type of securities the buyer is purchasing
+agent.otherSecuritiesType.checkYourAnswersLabel = What type of securities is the buyer purchasing?
+agent.otherSecuritiesType.error.required = Enter the type of securities the buyer is purchasing
+agent.otherSecuritiesType.change.hidden = Change the type of securities the buyer is purchasing
+agent.otherSecuritiesType.error.length = The type of securities the buyer is purchasing must be 255 characters or fewer
+
+fileUploaded.error.emptyFile.title = The file you have uploaded is empty
+fileUploaded.error.emptyFile.heading = The file you have uploaded is empty
+fileUploaded.error.emptyFile.p = Check you have uploaded the correct file.
+
+fileUpload.error.type.title = You cannot upload this file type
+fileUpload.error.type.p = The template file you upload must be a .csv or a .xlsx
+fileUpload.error.type.backlink = Back to file upload
