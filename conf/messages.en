@@ -540,7 +540,7 @@ agent.amountPaidForSecurities.title = How much did the buyer pay for the securit
 agent.amountPaidForSecurities.heading = How much did the buyer pay for the securities?
 agent.amountPaidForSecurities.checkYourAnswersLabel = How much did the buyer pay for the securities?
 agent.amountPaidForSecurities.p1 = Enter the total amount of consideration given in exchange for these securities as a cash amount.
-agent.amountPaidForSecurities.p2 = You do not need to provide details about conversion or exchange rates, or how valuable of non-monetary items were reached.
+agent.amountPaidForSecurities.p2 = You do not need to provide details about conversion or exchange rates, or how valuations of non-monetary items were reached.
 agent.amountPaidForSecurities.hint = For example, £600 or £193.54
 agent.amountPaidForSecurities.change.hidden = Change the amount the buyer paid for the securities
 
