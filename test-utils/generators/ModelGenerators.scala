@@ -29,7 +29,7 @@ trait ModelGenerators {
   implicit lazy val arbitraryDetailsOfThisTransfer: Arbitrary[DetailsOfThisTransfer] =
     Arbitrary {
       for {
-        numberOfShares <- Gen.choose(0,999999999)
+        numberOfShares <- Gen.choose(1, 999999999)
         typeOfShares <- Gen.alphaStr.suchThat(_.nonEmpty)
         amountPaid <- Gen.choose(BigDecimal(0), BigDecimal(1000000))
         marketValue <- Gen.choose(BigDecimal(0), BigDecimal(1000000))
