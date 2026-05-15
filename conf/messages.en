@@ -360,7 +360,7 @@ fileUpload.error.emptyFile.download.text = Download the template file.
 fileUpload.upload.another = Upload a different file
 
 fileUpload.redirectError.emptyFile = Select a file to upload
-fileUpload.redirectError.EntityTooLarge = The selected file must be smaller than 1GB
+fileUpload.redirectError.EntityTooLarge = The selected file must be smaller than 100mb
 fileUpload.redirectError.generic = The selected file could not be uploaded – try again
 fileUpload.redirectError.InvalidArgument = The selected file must be a .csv or a .xlsx
 

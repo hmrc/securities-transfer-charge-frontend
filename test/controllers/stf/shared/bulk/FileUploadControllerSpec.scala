@@ -98,7 +98,7 @@ class FileUploadControllerSpec extends SpecBase with MockitoSugar {
             s"$onUploadErrorRoute?errorCode=EntityTooLarge&errorMessage=some+message"
           )
 
-          val expectedError = Some("The selected file must be smaller than 1GB")
+          val expectedError = Some("The selected file must be smaller than 100mb")
 
           val result = route(application, request).value
 
