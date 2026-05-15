@@ -573,3 +573,4 @@ agent.totalMarketValue.error.aboveMaximum = The market value of the securities m
 agent.totalMarketValue.change.hidden = Change the market value of the securities
 agent.totalMarketValue.hint = For example, £600 or £193.54
 agent.totalMarketValue.error.negative = The market value of the securities must be 0 or more
+agent.totalMarketValue.checkYourAnswersLabel = What is the total market value of the securities?
