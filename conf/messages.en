@@ -559,6 +559,10 @@ fileUpload.error.type.title = You cannot upload this file type
 fileUpload.error.type.p = The template file you upload must be a .csv or a .xlsx
 fileUpload.error.type.backlink = Back to file upload
 
+fileUploaded.error.virus.title = Your file contains a virus
+fileUploaded.error.virus.heading = Your file contains a virus
+fileUploaded.error.virus.p = The file you have uploaded contains a virus, you will need to upload a different file.
+
 agent.totalMarketValue.title = What is the total market value of the securities?
 agent.totalMarketValue.heading = What is the total market value of the securities?
 agent.totalMarketValue.checkYourAnswersLabel = What is the total market value of the securities?
