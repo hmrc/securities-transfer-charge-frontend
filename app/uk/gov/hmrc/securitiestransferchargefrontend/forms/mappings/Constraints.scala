@@ -134,10 +134,10 @@ trait Constraints {
         }
     }
 
-  def requiredIf(requireMarketValue: Boolean): Constraint[Option[BigDecimal]] =
+  def requiredIf(requireMarketValue: Boolean, affinityKey:String): Constraint[Option[BigDecimal]] =
     Constraint("constraint.requiredIf") {
       case None if requireMarketValue =>
-        Invalid("detailsOfThisTransfer.error.marketValue.required")
+        Invalid(s"${affinityKey}.detailsOfThisTransfer.error.marketValue.required")
       case _ =>
         Valid
     }  

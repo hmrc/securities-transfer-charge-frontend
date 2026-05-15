@@ -14,28 +14,28 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.individuals.single
+package uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.agents.single
 
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, Call, MessagesControllerComponents}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
-import uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.shared.SaveAndReturnButton.isReturn
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.actions.*
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.actions.requests.StcDataRequest
+import uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.shared.SaveAndReturnButton.isReturn
 import uk.gov.hmrc.securitiestransferchargefrontend.forms.stf.shared.DetailsOfThisTransferFormProvider
 import uk.gov.hmrc.securitiestransferchargefrontend.models.stf.DetailsOfThisTransfer
 import uk.gov.hmrc.securitiestransferchargefrontend.models.{Mode, UserAnswers}
 import uk.gov.hmrc.securitiestransferchargefrontend.navigation.Navigator
 import uk.gov.hmrc.securitiestransferchargefrontend.pages.stf.single.DetailsOfThisTransferPage
 import uk.gov.hmrc.securitiestransferchargefrontend.utils.CommonHelpers.requireMarketValue
-import uk.gov.hmrc.securitiestransferchargefrontend.views.html.stf.individuals.single.DetailsOfThisTransferView
+import uk.gov.hmrc.securitiestransferchargefrontend.views.html.stf.agents.single.DetailsOfThisTransferView
 
 import javax.inject.{Inject, Named}
 import scala.concurrent.{ExecutionContext, Future}
 
 class DetailsOfThisTransferController @Inject()(
                                                  override val messagesApi: MessagesApi,
-                                                 @Named("individuals") navigator: Navigator,
+                                                 @Named("agents") navigator: Navigator,
                                                  stcAuthEnrolled: StcAuthEnrolledAction,
                                                  getData: StcDataRetrievalAction,
                                                  requireData: StcDataRequiredAction,

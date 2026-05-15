@@ -31,6 +31,7 @@ class StcConditionalRowValidator @Inject()(
     messagesApi.preferred(Seq(Lang("en")))
 
   private val marketValueMaximum = BigDecimal(999999999)
+  private val typeOfShareMaxLength = 100
 
   def validate(
                 row: ParsedStcRow,
@@ -131,6 +132,14 @@ class StcConditionalRowValidator @Inject()(
                 row.rowNumber,
                 "typeOfShares",
                 messages("fileUpload.error.typeOfShares.required")
+              )
+            )
+          case Some(value) if value.length > typeOfShareMaxLength =>
+            Seq(
+              support.error(
+                row.rowNumber,
+                "typeOfShares",
+                messages("fileUpload.error.typeOfShares.maxLength")
               )
             )
 

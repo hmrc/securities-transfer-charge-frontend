@@ -171,6 +171,14 @@ class StfAgentNavigatorSpec extends SpecBase with ScalaFutures {
       }
     }
 
+    "must go from WhatTypeOfSecuritiesPage to DetailsOfThisTransferPage when 'Shares' is selected" in {
+      val answers = emptyUserAnswers.set(WhatTypeOfSecuritiesPage, WhatTypeOfSecurities.Shares).get
+      val result = navigator.nextPage(WhatTypeOfSecuritiesPage, NormalMode, answers)(fakeRequest)
+      whenReady(result) { res =>
+        res mustBe agentSingleRoutes.DetailsOfThisTransferController.onPageLoad(NormalMode)
+      }
+    }
+
     "must go from OtherSecuritiesTypePage to AmountPaidForSecuritiesPage" in {
       val answers = emptyUserAnswers.set(OtherSecuritiesTypePage, "Bonds").get
       val result = navigator.nextPage(OtherSecuritiesTypePage, NormalMode, answers)(fakeRequest)
@@ -287,6 +295,11 @@ class StfAgentNavigatorSpec extends SpecBase with ScalaFutures {
       "must go from the AmountPaidForSecuritiesPage to OtherSecuritiesTypePage" in {
         val result = navigator.previousPage(AmountPaidForSecuritiesPage, NormalMode, emptyUserAnswers)
         result mustBe agentSingleRoutes.OtherSecuritiesTypeController.onPageLoad(NormalMode)
+      }
+
+      "must go from the DetailsOfThisTransferPage to WhatTypeOfSecurities" in {
+        val result = navigator.previousPage(DetailsOfThisTransferPage, NormalMode, emptyUserAnswers)
+        result mustBe agentSingleRoutes.WhatTypeOfSecuritiesController.onPageLoad(NormalMode)
       }
 
       "must go from the TotalMarketValuePage to AmountPaidForSecuritiesPage" in {

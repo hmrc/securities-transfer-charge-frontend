@@ -26,22 +26,36 @@ import javax.inject.Inject
 
 class DetailsOfThisTransferFormProvider @Inject() extends Mappings {
 
-  def apply(requireMarketValue: Boolean = true): Form[DetailsOfThisTransfer] =
+  private val maxNumOfShares = 999999999
+  private val minNumOfShares = 1
+  private val maxCurrency: BigDecimal = BigDecimal(999999999)
+
+  def apply(requireMarketValue: Boolean = true, affinityKey:String): Form[DetailsOfThisTransfer] =
     Form(
       mapping(
-        "numberOfShares" -> text("detailsOfThisTransfer.error.numberOfShares.required")
-          .verifying(maxLength(100, "detailsOfThisTransfer.error.numberOfShares.length")),
-        "typeOfShares" -> text("detailsOfThisTransfer.error.typeOfShares.required")
-          .verifying(maxLength(100, "detailsOfThisTransfer.error.typeOfShares.length")),
+        "numberOfShares" -> int(
+          s"${affinityKey}.detailsOfThisTransfer.error.numberOfShares.required",
+          "detailsOfThisTransfer.error.numberOfShares.wholeNumber",
+          s"${affinityKey}.detailsOfThisTransfer.error.numberOfShares.nonNumeric"
+        ).verifying("detailsOfThisTransfer.error.numberOfShares.min",
+          _ >= minNumOfShares
+        ).verifying("detailsOfThisTransfer.error.numberOfShares.max",
+          _ <= maxNumOfShares
+        ),
+        "typeOfShares" -> text(s"${affinityKey}.detailsOfThisTransfer.error.typeOfShares.required")
+          .verifying(maxLength(100, s"${affinityKey}.detailsOfThisTransfer.error.typeOfShares.length")),
         "amountPaid" ->
-          currency("detailsOfThisTransfer.error.amountPaid.required",
-            "detailsOfThisTransfer.error.amountPaid.invalidNumeric",
-            "detailsOfThisTransfer.error.amountPaid.nonNumeric")
-            .verifying(inRange(BigDecimal(0), BigDecimal(100000000), "detailsOfThisTransfer.error.amountPaid.outOfRange")),
-        "marketValue" -> optional(currency("detailsOfThisTransfer.error.marketValue.required",
-          "detailsOfThisTransfer.error.marketValue.invalidNumeric",
-          "detailsOfThisTransfer.error.marketValue.nonNumeric")
-          .verifying(inRange(BigDecimal(0), BigDecimal(100000000), "detailsOfThisTransfer.error.marketValue.outOfRange"))).verifying(requiredIf(requireMarketValue))
+          currency(s"${affinityKey}.detailsOfThisTransfer.error.amountPaid.required",
+            s"${affinityKey}.detailsOfThisTransfer.error.amountPaid.invalidNumeric",
+            s"${affinityKey}.detailsOfThisTransfer.error.amountPaid.nonNumeric",
+          s"${affinityKey}.detailsOfThisTransfer.error.amountPaid.negative")
+            .verifying(maximumCurrency(maxCurrency, s"${affinityKey}.detailsOfThisTransfer.error.amountPaid.aboveMaximum")),
+        "marketValue" -> optional(currency(s"${affinityKey}.detailsOfThisTransfer.error.marketValue.required",
+          s"${affinityKey}.detailsOfThisTransfer.error.marketValue.invalidNumeric",
+          s"${affinityKey}.detailsOfThisTransfer.error.marketValue.nonNumeric",
+          s"${affinityKey}.detailsOfThisTransfer.error.marketValue.negative")
+          .verifying(maximumCurrency(maxCurrency, s"${affinityKey}.detailsOfThisTransfer.error.marketValue.aboveMaximum")))
+          .verifying(requiredIf(requireMarketValue,affinityKey))
       )(DetailsOfThisTransfer.apply)(x => Some((x.numberOfShares, x.typeOfShares, x.amountPaid, x.marketValue)))
     )
 }

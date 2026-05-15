@@ -17,7 +17,7 @@
 package base
 
 import base.Fixtures.FakeAlfConnector
-import base.stubs.{OrganisationStubStcAuthEnrolledAction, StubSessionRepository, StubStcAuthEnrolledAction, StubStcDataRequiredAction, StubStcDataRetrievalAction}
+import base.stubs.{AgentStubStcAuthEnrolledAction, OrganisationStubStcAuthEnrolledAction, StubSessionRepository, StubStcAuthEnrolledAction, StubStcDataRequiredAction, StubStcDataRetrievalAction}
 import clients.FakeSaveAndReturnClient
 import controllers.actions.*
 import org.scalatest.concurrent.{IntegrationPatience, ScalaFutures}
@@ -97,6 +97,15 @@ trait SpecBase
 
   def messages(app: Application): Messages = app.injector.instanceOf[MessagesApi].preferred(FakeRequest())
 
+  private def stcAuthEnrolledActionClass(
+                                          affinityGroup: AffinityGroup
+                                        ): Class[_ <: StcAuthEnrolledAction] =
+    affinityGroup match {
+      case AffinityGroup.Agent => classOf[AgentStubStcAuthEnrolledAction]
+      case AffinityGroup.Individual => classOf[StubStcAuthEnrolledAction]
+      case AffinityGroup.Organisation => classOf[OrganisationStubStcAuthEnrolledAction]
+    }
+
   protected def applicationBuilder(userAnswers: Option[UserAnswers] = None,
                                    affinityGroup: AffinityGroup = AffinityGroup.Individual,
                                    saveAndReturnClient: SaveAndReturnClient = FakeSaveAndReturnClient(),
@@ -105,12 +114,7 @@ trait SpecBase
     new GuiceApplicationBuilder()
       .overrides(
         bind[IdentifierAction].to[FakeIdentifierAction],
-        bind[StcAuthEnrolledAction].to(
-          if (affinityGroup == AffinityGroup.Organisation)
-            classOf[OrganisationStubStcAuthEnrolledAction]
-          else
-            classOf[StubStcAuthEnrolledAction]
-        ),
+        bind[StcAuthEnrolledAction].to(stcAuthEnrolledActionClass(affinityGroup)),
         bind[StcDataRetrievalAction].to[StubStcDataRetrievalAction],
         bind[DataRequiredAction].to[DataRequiredActionImpl],
         bind[StcDataRequiredAction].toInstance(StubStcDataRequiredAction(userAnswers)),

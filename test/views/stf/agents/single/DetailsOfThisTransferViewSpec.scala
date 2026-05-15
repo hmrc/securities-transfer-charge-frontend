@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package views.stf.individuals.single
+package views.stf.agents.single
 
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
@@ -22,7 +22,7 @@ import play.api.Application
 import play.api.mvc.Call
 import uk.gov.hmrc.securitiestransferchargefrontend.forms.stf.shared.DetailsOfThisTransferFormProvider
 import uk.gov.hmrc.securitiestransferchargefrontend.models.NormalMode
-import uk.gov.hmrc.securitiestransferchargefrontend.views.html.stf.individuals.single.DetailsOfThisTransferView
+import uk.gov.hmrc.securitiestransferchargefrontend.views.html.stf.agents.single.DetailsOfThisTransferView
 import views.ViewBaseSpec
 
 
@@ -35,7 +35,7 @@ class DetailsOfThisTransferViewSpec extends ViewBaseSpec {
   private val formProvider = new  DetailsOfThisTransferFormProvider()
   private val testBackLinkRoute: Call = Call("GET", "/back-link")
 
-  private val form = formProvider(affinityKey = affinityGroupKeyInd)
+  private val form = formProvider(affinityKey = affinityGroupKeyAgent)
 
   def view(requireMarketValue:Boolean): Document = Jsoup.parse(
     viewInstance(form, NormalMode, testBackLinkRoute,requireMarketValue)(fakeRequest, messages).body
