@@ -71,6 +71,14 @@ class ForwardRoutes(answerPersistenceService: AnswerPersistenceService,
     }
     case TaxRatePage => userAnswers => dataRequired(TaxRatePage, userAnswers, agentSingleRoutes.WhatTypeOfSecuritiesController.onPageLoad(NormalMode))
     case OtherSecuritiesTypePage => userAnswers => dataRequired(OtherSecuritiesTypePage, userAnswers, agentSingleRoutes.AmountPaidForSecuritiesController.onPageLoad(NormalMode))
+    case AmountPaidForSecuritiesPage => userAnswers =>
+      dataDependent(ConnectedPersonsPage, userAnswers) { isConnected =>
+        if (isConnected)
+          agentSingleRoutes.TotalMarketValueController.onPageLoad(NormalMode)
+        else
+          defaultPage
+      }
+    case TotalMarketValuePage => userAnswers => dataRequired(TotalMarketValuePage, userAnswers, defaultPage)
     case WhatTypeOfSecuritiesPage => userAnswers =>
       dataDependent(WhatTypeOfSecuritiesPage, userAnswers) {
         case WhatTypeOfSecurities.Shares => defaultPage

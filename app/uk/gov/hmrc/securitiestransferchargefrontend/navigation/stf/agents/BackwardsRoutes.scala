@@ -54,6 +54,7 @@ class BackwardsRoutes(defaultPage: Call):
     case WhatTypeOfSecuritiesPage => _ => agentSingleRoutes.TaxRateController.onPageLoad(NormalMode)
     case OtherSecuritiesTypePage  => _ => agentSingleRoutes.WhatTypeOfSecuritiesController.onPageLoad(NormalMode)
     case AmountPaidForSecuritiesPage => _ => agentSingleRoutes.OtherSecuritiesTypeController.onPageLoad(NormalMode)
+    case TotalMarketValuePage => _ => agentSingleRoutes.AmountPaidForSecuritiesController.onPageLoad(NormalMode)
 
     case _ => _ => defaultPage
   }

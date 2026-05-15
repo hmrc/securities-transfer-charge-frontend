@@ -558,3 +558,14 @@ fileUploaded.error.emptyFile.p = Check you have uploaded the correct file.
 fileUpload.error.type.title = You cannot upload this file type
 fileUpload.error.type.p = The template file you upload must be a .csv or a .xlsx
 fileUpload.error.type.backlink = Back to file upload
+
+agent.totalMarketValue.title = What is the total market value of the securities?
+agent.totalMarketValue.heading = What is the total market value of the securities?
+agent.totalMarketValue.checkYourAnswersLabel = What is the total market value of the securities?
+agent.totalMarketValue.error.nonNumeric = The market value of the securities must be a number and can include up to two decimal places, like 30 or 28.60
+agent.totalMarketValue.error.required = Enter the total market value of the securities
+agent.totalMarketValue.error.invalidNumeric = The market value of the securities must be a number and can include up to two decimal places, like 30 or 28.60
+agent.totalMarketValue.error.aboveMaximum = The market value of the securities must be lower than £999,999,999
+agent.totalMarketValue.change.hidden = Change the market value of the securities
+agent.totalMarketValue.hint = For example, £600 or £193.54
+agent.totalMarketValue.error.negative = The market value of the securities must be 0 or more
