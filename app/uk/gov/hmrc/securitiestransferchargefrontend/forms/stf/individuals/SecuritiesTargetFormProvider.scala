@@ -30,6 +30,7 @@ class SecuritiesTargetFormProvider @Inject() extends Mappings {
       "businessName" -> text("securitiesTarget.error.businessName.required")
         .verifying(maxLength(160, "securitiesTarget.error.businessName.length")),
        "crn" -> validatedOptionalText("securitiesTarget.error.crn.length", 8)
+         .verifying("securitiesTarget.error.crn.invalid", crn => crn.forall(s => s.matches("^[a-zA-Z0-9]{8}$")))
      )(SecuritiesTarget.apply)(x => Some((x.businessName, x.crn)))
    )
  }
