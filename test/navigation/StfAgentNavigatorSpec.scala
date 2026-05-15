@@ -179,6 +179,26 @@ class StfAgentNavigatorSpec extends SpecBase with ScalaFutures {
       }
     }
 
+    "must go from AmountPaidForSecuritiesPage to TotalMarketValuePage when connected persons is true" in {
+      val answers = emptyUserAnswers.set(ConnectedPersonsPage, true).get.set(AmountPaidForSecuritiesPage, BigDecimal(1000)).get
+
+      val result = navigator.nextPage(AmountPaidForSecuritiesPage, NormalMode, answers)(fakeRequest)
+
+      whenReady(result) { res =>
+        res mustBe agentSingleRoutes.TotalMarketValueController.onPageLoad(NormalMode)
+      }
+    }
+
+    "must go from AmountPaidForSecuritiesPage to default page when connected persons is false" in {
+      val answers = emptyUserAnswers.set(ConnectedPersonsPage, false).get.set(AmountPaidForSecuritiesPage, BigDecimal(1000)).get
+
+      val result = navigator.nextPage(AmountPaidForSecuritiesPage, NormalMode, answers)(fakeRequest)
+
+      whenReady(result) { res =>
+        res mustBe navigator.defaultPage
+      }
+    }
+
     "Previous Pages" - {
 
       "must go from a page that doesn't exist in the previous route map to Journey Recovery" in {
@@ -267,6 +287,11 @@ class StfAgentNavigatorSpec extends SpecBase with ScalaFutures {
       "must go from the AmountPaidForSecuritiesPage to OtherSecuritiesTypePage" in {
         val result = navigator.previousPage(AmountPaidForSecuritiesPage, NormalMode, emptyUserAnswers)
         result mustBe agentSingleRoutes.OtherSecuritiesTypeController.onPageLoad(NormalMode)
+      }
+
+      "must go from the TotalMarketValuePage to AmountPaidForSecuritiesPage" in {
+        val result = navigator.previousPage(TotalMarketValuePage, NormalMode, emptyUserAnswers)
+        result mustBe agentSingleRoutes.AmountPaidForSecuritiesController.onPageLoad(NormalMode)
       }
     }
   }
