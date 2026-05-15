@@ -28,12 +28,12 @@ class TotalMarketValueFormProviderSpec extends CurrencyFieldBehaviours {
 
   private val form = new TotalMarketValueFormProvider()()
 
+  private val minimum = BigDecimal(0)
+  private val maximum = BigDecimal("999999999")
+
   ".value" - {
 
     val fieldName = "value"
-
-    val minimum = 0
-    val maximum = Int.MaxValue
 
     val validDataGenerator: Gen[String] =
       Gen
@@ -62,6 +62,16 @@ class TotalMarketValueFormProviderSpec extends CurrencyFieldBehaviours {
         fieldName,
         "agent.totalMarketValue.error.aboveMaximum",
         Seq(currencyFormat(maximum))
+      )
+    )
+
+    behave like currencyFieldWithMinimum(
+      form,
+      fieldName,
+      minimum,
+      FormError(
+        fieldName,
+        "agent.totalMarketValue.error.negative"
       )
     )
 

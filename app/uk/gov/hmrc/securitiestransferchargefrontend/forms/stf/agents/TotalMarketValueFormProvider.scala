@@ -23,6 +23,8 @@ import javax.inject.Inject
 
 class TotalMarketValueFormProvider @Inject() extends Mappings {
 
+  private val maxValue = BigDecimal("999999999")
+
   def apply(): Form[BigDecimal] =
     Form(
       "value" -> currency(
@@ -31,6 +33,6 @@ class TotalMarketValueFormProvider @Inject() extends Mappings {
         "agent.totalMarketValue.error.nonNumeric",
         "agent.totalMarketValue.error.negative",
       )
-      .verifying(maximumCurrency(Int.MaxValue, "agent.totalMarketValue.error.aboveMaximum"))
+      .verifying(maximumCurrency(maxValue, "agent.totalMarketValue.error.aboveMaximum"))
     )
 }

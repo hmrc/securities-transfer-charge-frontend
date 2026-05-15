@@ -24,6 +24,7 @@ import play.api.data.Form
 import play.api.inject.bind
 import play.api.test.FakeRequest
 import play.api.test.Helpers.*
+import uk.gov.hmrc.auth.core.AffinityGroup
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.routes
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.agents.single.routes as agentSingleRoutes
 import uk.gov.hmrc.securitiestransferchargefrontend.forms.stf.agents.TotalMarketValueFormProvider
@@ -34,13 +35,12 @@ import uk.gov.hmrc.securitiestransferchargefrontend.repositories.SessionReposito
 import uk.gov.hmrc.securitiestransferchargefrontend.views.html.stf.agents.single.TotalMarketValueView
 
 import scala.concurrent.Future
+import scala.language.postfixOps
 
 class TotalMarketValueControllerSpec extends SpecBase with MockitoSugar {
 
   val formProvider = new TotalMarketValueFormProvider()
   val form: Form[BigDecimal] = formProvider()
-
-  lazy val totalMarketValuePageRoute: String = agentSingleRoutes.TotalMarketValueController.onPageLoad(NormalMode).url
 
   val validAnswer = 0
 
@@ -50,7 +50,7 @@ class TotalMarketValueControllerSpec extends SpecBase with MockitoSugar {
 
     "must return OK and the correct view for a GET" in {
 
-      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers))
+      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers), affinityGroup = AffinityGroup.Agent)
         .overrides(bind[Navigator].qualifiedWith("agents").toInstance(getNavigator))
         .build()
 
@@ -70,7 +70,7 @@ class TotalMarketValueControllerSpec extends SpecBase with MockitoSugar {
 
       val userAnswers = emptyUserAnswers.set(TotalMarketValuePage, validAnswer).success.value
 
-      val application = applicationBuilder(userAnswers = Some(userAnswers))
+      val application = applicationBuilder(userAnswers = Some(userAnswers), affinityGroup = AffinityGroup.Agent)
         .overrides(bind[Navigator].qualifiedWith("agents").toInstance(getNavigator))
         .build()
 
@@ -93,13 +93,13 @@ class TotalMarketValueControllerSpec extends SpecBase with MockitoSugar {
       when(mockSessionRepository.set(any())) thenReturn Future.successful(())
 
       val application =
-        applicationBuilder(userAnswers = Some(emptyUserAnswers), sessionRepository = mockSessionRepository)
+        applicationBuilder(userAnswers = Some(emptyUserAnswers), sessionRepository = mockSessionRepository, affinityGroup = AffinityGroup.Agent)
           .overrides(bind[Navigator].qualifiedWith("agents").toInstance(getNavigator))
           .build()
 
       running(application) {
         val request =
-          FakeRequest(POST, totalMarketValuePageRoute)
+          FakeRequest(POST, totalMarketValueRoute)
             .withFormUrlEncodedBody(("value", validAnswer.toString))
 
         val result = route(application, request).value
@@ -112,7 +112,7 @@ class TotalMarketValueControllerSpec extends SpecBase with MockitoSugar {
     "must return a Bad Request and errors when invalid data is submitted" in {
 
       val application =
-        applicationBuilder(userAnswers = Some(emptyUserAnswers))
+        applicationBuilder(userAnswers = Some(emptyUserAnswers), affinityGroup = AffinityGroup.Agent)
           .overrides(bind[Navigator].qualifiedWith("agents").toInstance(getNavigator))
           .build()
           
@@ -134,7 +134,7 @@ class TotalMarketValueControllerSpec extends SpecBase with MockitoSugar {
 
     "must redirect to Journey Recovery for a GET if no existing data is found" in {
 
-      val application = applicationBuilder(userAnswers = None).build()
+      val application = applicationBuilder(userAnswers = None, affinityGroup = AffinityGroup.Agent).build()
 
       running(application) {
         val request = FakeRequest(GET, totalMarketValueRoute)
@@ -148,7 +148,7 @@ class TotalMarketValueControllerSpec extends SpecBase with MockitoSugar {
 
     "must redirect to Journey Recovery for a POST if no existing data is found" in {
 
-      val application = applicationBuilder(userAnswers = None).build()
+      val application = applicationBuilder(userAnswers = None, affinityGroup = AffinityGroup.Agent).build()
 
       running(application) {
         val request =
