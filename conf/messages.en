@@ -200,19 +200,18 @@ amountPaidForSecurities.change.hidden = amountPaidForSecurities
 individual.detailsOfThisTransfer.error.numberOfShares.required = Enter the number of shares you are buying
 individual.detailsOfThisTransfer.error.numberOfShares.nonNumeric = The amount of shares you are buying must be a number
 individual.detailsOfThisTransfer.error.typeOfShares.required = Enter the type or class of shares you are buying
-individual.detailsOfThisTransfer.error.amountPaid.required = Enter the amount you paid for the shares
+individual.detailsOfThisTransfer.error.amountPaid.required = Enter the amount you paid for the shares in pounds
 individual.detailsOfThisTransfer.error.amountPaid.invalidNumeric = The amount you paid for the shares must be a number and can include up to two decimal places, like 30 or 28.60
 individual.detailsOfThisTransfer.error.amountPaid.nonNumeric = The amount you paid for the shares must be a number and can include up to two decimal places, like 30 or 28.60
 individual.detailsOfThisTransfer.error.amountPaid.negative = The amount you paid for the shares must be 0 or more
 individual.detailsOfThisTransfer.error.amountPaid.aboveMaximum = The amount you paid for the shares must be £999,999,999 or below
 
-individual.detailsOfThisTransfer.error.marketValue.required = Enter the market value of the shares you are buying
+individual.detailsOfThisTransfer.error.marketValue.required = Enter the market value of the shares you are buying in pounds
 individual.detailsOfThisTransfer.error.marketValue.invalidNumeric = The market value of the shares must be a number and can include up to two decimal places, like 30 or 28.60
 individual.detailsOfThisTransfer.error.marketValue.nonNumeric = The market value of the shares must be a number and can include up to two decimal places, like 30 or 28.60
 individual.detailsOfThisTransfer.error.marketValue.negative = The market value of the shares must be 0 or more
 individual.detailsOfThisTransfer.error.marketValue.aboveMaximum = The market value of the shares must be £999,999,999 or below
 individual.detailsOfThisTransfer.error.typeOfShares.length = The type or class of shares you are buying must be 100 characters or fewer
-individual.detailsOfThisTransfer.error.typeOfShares.length = Todo
 
 detailsOfThisTransfer.title = What are the details of this transfer?
 detailsOfThisTransfer.heading = What are the details of this transfer?
@@ -458,13 +457,13 @@ org.detailsOfThisTransfer.error.numberOfShares.required = Enter the number of sh
 org.detailsOfThisTransfer.error.numberOfShares.nonNumeric = The amount of shares the business is buying must be a number
 org.detailsOfThisTransfer.error.typeOfShares.required = Enter the type or class of shares the business is buying
 org.detailsOfThisTransfer.error.typeOfShares.length = The type or class of shares the business is purchasing must be 100 characters or fewer
-org.detailsOfThisTransfer.error.amountPaid.required = Enter the amount the business paid for the shares
+org.detailsOfThisTransfer.error.amountPaid.required = Enter the amount the business paid for the shares in pounds
 org.detailsOfThisTransfer.error.amountPaid.invalidNumeric = The amount the business paid for the shares must be a number and can include up to two decimal places, like 30 or 28.60
 org.detailsOfThisTransfer.error.amountPaid.nonNumeric = The amount the business paid for the shares must be a number and can include up to two decimal places, like 30 or 28.60
 org.detailsOfThisTransfer.error.amountPaid.negative = The amount the business paid for the shares must be 0 or more
 org.detailsOfThisTransfer.error.amountPaid.aboveMaximum = The amount the business paid for the shares must be £999,999,999 or below
 
-org.detailsOfThisTransfer.error.marketValue.required = Enter the market value of the shares the business is buying
+org.detailsOfThisTransfer.error.marketValue.required = Enter the market value of the shares the business is buying in pounds
 org.detailsOfThisTransfer.error.marketValue.invalidNumeric = The market value of the shares must be a number and can include up to two decimal places, like 30 or 28.60
 org.detailsOfThisTransfer.error.marketValue.nonNumeric = The market value of the shares must be a number and can include up to two decimal places, like 30 or 28.60
 org.detailsOfThisTransfer.error.marketValue.negative = The market value of the shares must be 0 or more
@@ -577,7 +576,7 @@ agent.otherSecuritiesType.error.required = Enter the type of securities the buye
 agent.otherSecuritiesType.change.hidden = Change the type of securities the buyer is purchasing
 agent.otherSecuritiesType.error.length = The type of securities the buyer is purchasing must be 255 characters or fewer
 
-agent.detailsOfThisTransfer.error.numberOfShares.required = Enter the number of shares the buyer is purchasing
+agent.detailsOfThisTransfer.error.numberOfShares.required = Enter the number of shares the buyer is purchasing in pounds
 agent.detailsOfThisTransfer.error.numberOfShares.nonNumeric = The amount of shares must be a number
 agent.detailsOfThisTransfer.error.typeOfShares.required = Enter the type or class of shares the buyer is purchasing
 agent.detailsOfThisTransfer.error.typeOfShares.length = The type or class of shares the buyer is purchasing must be 100 characters or fewer
