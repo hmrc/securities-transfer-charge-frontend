@@ -212,7 +212,6 @@ individual.detailsOfThisTransfer.error.marketValue.nonNumeric = The market value
 individual.detailsOfThisTransfer.error.marketValue.negative = The market value of the shares must be 0 or more
 individual.detailsOfThisTransfer.error.marketValue.aboveMaximum = The market value of the shares must be £999,999,999 or below
 individual.detailsOfThisTransfer.error.typeOfShares.length = The type or class of shares you are buying must be 100 characters or fewer
-individual.detailsOfThisTransfer.error.typeOfShares.length = Todo
 
 detailsOfThisTransfer.title = What are the details of this transfer?
 detailsOfThisTransfer.heading = What are the details of this transfer?
