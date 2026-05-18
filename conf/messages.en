@@ -595,7 +595,7 @@ agent.detailsOfThisTransfer.error.amountPaid.aboveMaximum = The amount paid for 
 
 fileUploaded.error.emptyFile.title = The file you have uploaded is empty
 fileUploaded.error.emptyFile.heading = The file you have uploaded is empty
-fileUploaded.error.emptyFile.p = Check you have uploaded the correct file.
+fileUploaded.error.emptyFile.p = Check you are uploading the correct file.
 
 fileUpload.error.type.title = You cannot upload this file type
 fileUpload.error.type.p = The template file you upload must be a .csv or a .xlsx
