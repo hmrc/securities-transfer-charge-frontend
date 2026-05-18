@@ -576,7 +576,7 @@ agent.otherSecuritiesType.error.required = Enter the type of securities the buye
 agent.otherSecuritiesType.change.hidden = Change the type of securities the buyer is purchasing
 agent.otherSecuritiesType.error.length = The type of securities the buyer is purchasing must be 255 characters or fewer
 
-agent.detailsOfThisTransfer.error.numberOfShares.required = Enter the number of shares the buyer is purchasing in pounds
+agent.detailsOfThisTransfer.error.numberOfShares.required = Enter the number of shares the buyer is purchasing
 agent.detailsOfThisTransfer.error.numberOfShares.nonNumeric = The amount of shares must be a number
 agent.detailsOfThisTransfer.error.typeOfShares.required = Enter the type or class of shares the buyer is purchasing
 agent.detailsOfThisTransfer.error.typeOfShares.length = The type or class of shares the buyer is purchasing must be 100 characters or fewer
