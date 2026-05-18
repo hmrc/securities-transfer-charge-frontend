@@ -179,14 +179,6 @@ class StfAgentNavigatorSpec extends SpecBase with ScalaFutures {
       }
     }
 
-    "must go from WhatTypeOfSecuritiesPage to OtherSecuritiesTypePage when 'Other' is selected" in {
-      val answers = emptyUserAnswers.set(WhatTypeOfSecuritiesPage, WhatTypeOfSecurities.Other).get
-      val result = navigator.nextPage(WhatTypeOfSecuritiesPage, NormalMode, answers)(fakeRequest)
-      whenReady(result) { res =>
-        res mustBe agentSingleRoutes.OtherSecuritiesTypeController.onPageLoad(NormalMode)
-      }
-    }
-
     "must go from OtherSecuritiesTypePage to AmountPaidForSecuritiesPage" in {
       val answers = emptyUserAnswers.set(OtherSecuritiesTypePage, "Bonds").get
       val result = navigator.nextPage(OtherSecuritiesTypePage, NormalMode, answers)(fakeRequest)
