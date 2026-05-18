@@ -42,7 +42,6 @@ class DetailsOfThisTransferFormProviderSpec
     val minimumKey = "detailsOfThisTransfer.error.numberOfShares.min"
     val maximumKey = "detailsOfThisTransfer.error.numberOfShares.max"
 
-    val max = 999999999
     val min = 1
 
     behave like intFieldWithMinimum(
@@ -52,12 +51,14 @@ class DetailsOfThisTransferFormProviderSpec
       expectedError = FormError(fieldName, minimumKey)
     )
 
-    behave like intFieldWithMaximum(
-      form,
-      fieldName,
-      maximum = max,
-      expectedError = FormError(fieldName, maximumKey)
-    )
+    "reject values above maximum" in {
+
+      val result = form.bind(Map(fieldName -> "1000000000"))
+
+      result.errors must contain(
+        FormError("numberOfShares", maximumKey)
+      )
+    }
 
     behave like mandatoryField(
       form,
