@@ -49,6 +49,11 @@ class FileUploadedController @Inject()(
         case Some(fileUpload) if fileUpload.status == UpscanJourneyStatus.Ready =>
           processReadyUpload(reference, fileUpload)
 
+        case Some(fileUpload) if fileUpload.status == UpscanJourneyStatus.Failed &&
+          fileUpload.failureReason.contains("QUARANTINE") &&
+          fileUpload.message.exists(_.contains("EncryptedDoc")) =>
+          Future.successful(Redirect(routes.EncryptedFileErrorController.onPageLoad()))  
+
         case Some(fileUpload) =>
           Future.successful(Ok(view(fileUpload)))
 
