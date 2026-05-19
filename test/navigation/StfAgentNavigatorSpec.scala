@@ -25,12 +25,13 @@ import uk.gov.hmrc.securitiestransferchargefrontend.config.FrontendAppConfig
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.agents.routes as agentRoutes
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.agents.single.routes as agentSingleRoutes
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.shared.routes as sharedRoutes
-import uk.gov.hmrc.securitiestransferchargefrontend.models.stf.{AgentReference, HowToNotifyAboutSecuritiesTransfer, SecuritiesTarget, TaxRate, WhatTypeOfSecurities}
+import uk.gov.hmrc.securitiestransferchargefrontend.models.stf.{AgentReference, DetailsOfThisTransfer, HowToNotifyAboutSecuritiesTransfer, SecuritiesTarget, TaxRate, WhatTypeOfSecurities}
 import uk.gov.hmrc.securitiestransferchargefrontend.models.{NormalMode, UserAnswers}
 import uk.gov.hmrc.securitiestransferchargefrontend.navigation.stf.agents.StfAgentNavigator
 import uk.gov.hmrc.securitiestransferchargefrontend.pages.Page
 import uk.gov.hmrc.securitiestransferchargefrontend.pages.stf.shared.HowToNotifyAboutSecuritiesTransferPage
 import uk.gov.hmrc.securitiestransferchargefrontend.pages.stf.single.*
+import uk.gov.hmrc.securitiestransferchargefrontend.controllers.routes
 
 import java.time.LocalDate
 
@@ -38,6 +39,13 @@ class StfAgentNavigatorSpec extends SpecBase with ScalaFutures {
 
   private val mockConfig: FrontendAppConfig = mock[FrontendAppConfig]
   when(mockConfig.firstChargingPoint).thenReturn(LocalDate.of(2026, 1, 1))
+
+  val detailsOfThisTransfer: DetailsOfThisTransfer = DetailsOfThisTransfer(numberOfShares = 25,
+    typeOfShares = "stocks",
+    amountPaid = BigDecimal(100),
+    marketValue = Some(BigDecimal(10000)))
+
+  val validAnswer = 0
   
   val navigator = new StfAgentNavigator(mockConfig, StubAnswerPersistenceService())
 
@@ -179,6 +187,14 @@ class StfAgentNavigatorSpec extends SpecBase with ScalaFutures {
       }
     }
 
+    "must go from DetailsOfThisTransferPage to CYA Page" in {
+      val answers = emptyUserAnswers.set(DetailsOfThisTransferPage, detailsOfThisTransfer).get
+      val result = navigator.nextPage(DetailsOfThisTransferPage, NormalMode, answers)(fakeRequest)
+      whenReady(result) { res =>
+        res mustBe routes.CheckYourAnswersController.onPageLoad()
+      }
+    }
+
     "must go from OtherSecuritiesTypePage to AmountPaidForSecuritiesPage" in {
       val answers = emptyUserAnswers.set(OtherSecuritiesTypePage, "Bonds").get
       val result = navigator.nextPage(OtherSecuritiesTypePage, NormalMode, answers)(fakeRequest)
@@ -197,15 +213,26 @@ class StfAgentNavigatorSpec extends SpecBase with ScalaFutures {
       }
     }
 
-    "must go from AmountPaidForSecuritiesPage to default page when connected persons is false" in {
+    "must go from AmountPaidForSecuritiesPage to CYA when connected persons is false" in {
       val answers = emptyUserAnswers.set(ConnectedPersonsPage, false).get.set(AmountPaidForSecuritiesPage, BigDecimal(1000)).get
 
       val result = navigator.nextPage(AmountPaidForSecuritiesPage, NormalMode, answers)(fakeRequest)
 
       whenReady(result) { res =>
-        res mustBe navigator.defaultPage
+        res mustBe routes.CheckYourAnswersController.onPageLoad()
       }
     }
+
+    "must go from TotalMarketValuePage to CYA Page" in {
+      val answers = emptyUserAnswers.set(TotalMarketValuePage, validAnswer).get
+
+      val result = navigator.nextPage(TotalMarketValuePage, NormalMode, answers)(fakeRequest)
+
+      whenReady(result) { res =>
+        res mustBe routes.CheckYourAnswersController.onPageLoad()
+      }
+    }
+
 
     "Previous Pages" - {
 
