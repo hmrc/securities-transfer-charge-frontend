@@ -78,9 +78,9 @@ class ForwardRoutes(answerPersistenceService: AnswerPersistenceService,
         if (isConnected)
           agentSingleRoutes.TotalMarketValueController.onPageLoad(NormalMode)
         else
-          defaultPage
+          routes.CheckYourAnswersController.onPageLoad()
       }
-    case TotalMarketValuePage => userAnswers => dataRequired(TotalMarketValuePage, userAnswers, defaultPage)
+    case TotalMarketValuePage => userAnswers => dataRequired(TotalMarketValuePage, userAnswers, routes.CheckYourAnswersController.onPageLoad())
     case WhatTypeOfSecuritiesPage => userAnswers =>
       dataDependent(WhatTypeOfSecuritiesPage, userAnswers) {
         case WhatTypeOfSecurities.Shares => agentSingleRoutes.DetailsOfThisTransferController.onPageLoad(NormalMode)
