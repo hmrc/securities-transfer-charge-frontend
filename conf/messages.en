@@ -615,3 +615,7 @@ agent.totalMarketValue.change.hidden = Change the market value of the securities
 agent.totalMarketValue.hint = For example, £600 or £193.54
 agent.totalMarketValue.error.negative = The market value of the securities must be 0 or more
 agent.totalMarketValue.checkYourAnswersLabel = What is the total market value of the securities?
+
+bulk.fileUpload.error.title = There was a problem uploading your file
+bulk.fileUpload.error.heading = There was a problem uploading your file
+bulk.fileUpload.error.p = The selected file could not be uploaded, try again.
