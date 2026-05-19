@@ -88,7 +88,7 @@ class UpscanFileDownloadConnectorSpec extends SpecBase with BeforeAndAfterAll wi
       )
 
       val result =
-        connector.download(s"http://localhost:${wireMockServer.port()}/file")
+        connector.download(s"http://localhost:$wireMockPort/file")
 
       whenReady(result.failed) { ex =>
         ex mustBe a[UpscanDownloadException]
