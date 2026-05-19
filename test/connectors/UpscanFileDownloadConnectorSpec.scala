@@ -22,7 +22,7 @@ import org.scalatest.BeforeAndAfterAll
 import org.scalatest.time.{Millis, Seconds, Span}
 import play.api.Application
 import play.api.inject.guice.GuiceApplicationBuilder
-import uk.gov.hmrc.securitiestransferchargefrontend.connectors.UpscanFileDownloadConnectorImpl
+import uk.gov.hmrc.securitiestransferchargefrontend.connectors.{UpscanDownloadException, UpscanFileDownloadConnectorImpl}
 import utils.WireMockHelper
 
 import java.io.InputStream
@@ -87,11 +87,13 @@ class UpscanFileDownloadConnectorSpec extends SpecBase with BeforeAndAfterAll wi
           )
       )
 
-      val thrown = the[Exception] thrownBy {
-        connector.download(s"http://localhost:$wireMockPort/file").futureValue
-      }
+      val result =
+        connector.download(s"http://localhost:${wireMockServer.port()}/file")
 
-      thrown.getMessage must include("500")
+      whenReady(result.failed) { ex =>
+        ex mustBe a[UpscanDownloadException]
+        ex.getMessage must include("Failed to download uploaded file")
+      }
     }
   }
 }
