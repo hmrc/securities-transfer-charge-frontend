@@ -23,7 +23,7 @@
 
 @()(implicit request: Request[_],messages: Messages)
 
-@layout(pageTitle = titleNoForm(messages("bulk.fileUpload.error.title"))) {
+@layout(pageTitle = titleNoForm(messages("bulk.fileUpload.error.title")), backLinkUrl = Some(routes.FileUploadController.onPageLoad().url)) {
 
     <h1 class="govuk-heading-l">
         @messages("bulk.fileUpload.error.heading")
