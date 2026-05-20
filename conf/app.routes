@@ -250,7 +250,7 @@ POST       /stf/agent/securities-type                           uk.gov.hmrc.secu
 GET        /stf/agent/change/securities-type                    uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.agents.single.WhatTypeOfSecuritiesController.onPageLoad(mode: Mode = CheckMode)
 POST       /stf/agent/change/securities-type                    uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.agents.single.WhatTypeOfSecuritiesController.onSubmit(mode: Mode = CheckMode)
 
-GET        /stf/bulk-processing                           uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.shared.bulk.FileProcessingController.onPageLoad()
+GET        /stf/bulk-processing                           uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.shared.bulk.FileProcessingController.onPageLoad(key:String)
 
 GET        /stf/agent/share-details                             uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.agents.single.DetailsOfThisTransferController.onPageLoad(mode: Mode = NormalMode)
 POST       /stf/agent/share-details                             uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.agents.single.DetailsOfThisTransferController.onSubmit(mode: Mode = NormalMode)

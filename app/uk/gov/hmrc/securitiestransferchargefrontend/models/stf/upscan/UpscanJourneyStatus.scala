@@ -23,8 +23,14 @@ sealed trait UpscanJourneyStatus
 object UpscanJourneyStatus {
 
   case object Ready extends UpscanJourneyStatus
+
   case object Initiated extends UpscanJourneyStatus
-  case object Failed    extends UpscanJourneyStatus
+
+  case object Failed extends UpscanJourneyStatus
+
+  case object Processing extends UpscanJourneyStatus
+
+  case object Completed extends UpscanJourneyStatus
 
   implicit val format: Format[UpscanJourneyStatus] = new Format[UpscanJourneyStatus] {
 
@@ -33,6 +39,8 @@ object UpscanJourneyStatus {
         case "Initiated" => JsSuccess(Initiated)
         case "Failed" => JsSuccess(Failed)
         case "Ready" => JsSuccess(Ready)
+        case "Processing" => JsSuccess(Processing)
+        case "Completed" => JsSuccess(Completed)
         case other => JsError(s"Invalid UpscanJourneyStatus: $other")
       }
 

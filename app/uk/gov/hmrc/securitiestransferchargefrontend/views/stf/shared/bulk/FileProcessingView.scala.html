@@ -23,6 +23,9 @@
 @()(implicit request: Request[_], messages: Messages)
 
 @layout(pageTitle = titleNoForm(messages("fileUpload.processing.title")),showBackLink = false) {
+
+    <meta http-equiv="refresh" content="1">
+
     <div class="loading-spinner-wrapper">
         <div class="loading-spinner">
             <div class="loading-spinner__spinner" aria-live="polite" role="status"></div>

@@ -45,6 +45,8 @@ trait UpscanJourneyRepository {
 
   def delete(reference:String):Future[Unit]
 
+  def updateStatus(reference: String, status: UpscanJourneyStatus): Future[Unit]
+
 }
 
 @Singleton
@@ -101,4 +103,10 @@ class UpscanJourneyRepositoryImpl @Inject()(
   override def find(reference:String): Future[Option[FileUpload]] = collection.find(byReference(reference)).map(_.fileUpload).headOption()
 
   override def delete(reference: String): Future[Unit] = collection.deleteOne(byReference(reference)).toFuture().map(_=>())
+
+  override def updateStatus(reference: String, status: UpscanJourneyStatus): Future[Unit] =
+    collection.updateOne(
+      byReference(reference),
+      combine(set("fileUpload.status", status.toString)))
+      .toFuture().map(_=> ())
 }

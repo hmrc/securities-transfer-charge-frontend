@@ -22,7 +22,7 @@ import play.api.i18n.Lang
 import play.api.mvc.RequestHeader
 import uk.gov.hmrc.play.bootstrap.config.ServicesConfig
 
-import java.time.LocalDate
+import java.time.{Duration, LocalDate}
 
 @Singleton
 class FrontendAppConfig @Inject() (configuration: Configuration, servicesConfig: ServicesConfig) {
@@ -117,6 +117,7 @@ class FrontendAppConfig @Inject() (configuration: Configuration, servicesConfig:
   
   val upscanBaseUrl: String = servicesConfig.baseUrl("upscan-initiate")
   val upscanCallbackUrl: String =  s"$stfBaseUrl$basePath/stf/upscan-callback"
-  val upscanUploadSuccessfulUrl: String = s"$host$basePath/stf/file-uploaded"
+  val upscanUploadSuccessfulUrl: String = s"$host$basePath/stf/bulk-processing"
   val upscanUploadFailureUrl: String = s"$host$basePath/stf/upload-template/problem"
+  val fileProcessingTimeout: Duration = Duration.ofSeconds(configuration.get[Long]("file-processing.timeout-seconds"))
 }
