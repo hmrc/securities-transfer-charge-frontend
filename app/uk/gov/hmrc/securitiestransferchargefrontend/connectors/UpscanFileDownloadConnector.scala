@@ -27,6 +27,9 @@ import java.io.{ByteArrayInputStream, InputStream}
 import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
 
+final case class UpscanDownloadException(message: String, cause: Throwable)
+  extends RuntimeException(message, cause)
+
 trait UpscanFileDownloadConnector {
   def download(downloadUrl: String)(implicit hc: HeaderCarrier): Future[InputStream]
 }
@@ -45,11 +48,17 @@ class UpscanFileDownloadConnectorImpl @Inject()(
           .runFold(ByteString.empty)(_ ++ _)
           .map(bytes => new ByteArrayInputStream(bytes.toArray): InputStream)
       }
-      .recoverWith { case ex =>
-        logger.warn(
-          s"[UpscanFileDownloadConnectorImpl][download] Failed to download uploaded file from URL. Reason: ${ex.getMessage}",
-          ex
-        )
-        Future.failed(ex)
+      .recoverWith {
+        case ex =>
+          logger.warn(
+            s"[UpscanFileDownloadConnectorImpl][download] Failed to download uploaded file from URL. Reason: ${ex.getMessage}",
+            ex
+          )
+          Future.failed(
+            UpscanDownloadException(
+              s"Failed to download uploaded file",
+              ex
+            )
+          )
       }
 }
