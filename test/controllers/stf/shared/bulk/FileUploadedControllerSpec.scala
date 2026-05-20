@@ -25,7 +25,7 @@ import play.api.test.FakeRequest
 import play.api.test.Helpers.*
 import play.api.{Application, inject}
 import uk.gov.hmrc.http.HeaderCarrier
-import uk.gov.hmrc.securitiestransferchargefrontend.connectors.{SubscriptionConnector, SubscriptionStatusErrorException}
+import uk.gov.hmrc.securitiestransferchargefrontend.connectors.{SubscriptionConnector, SubscriptionStatusErrorException, UpscanDownloadException}
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.routes
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.shared.bulk.routes as bulkRoutes
 import uk.gov.hmrc.securitiestransferchargefrontend.models.stf.fileupload.{FileParseError, StcRowValidationError}
@@ -87,7 +87,7 @@ class FileUploadedControllerSpec extends SpecBase with MockitoSugar with FileUpl
 
       running(app) {
         val request = FakeRequest(GET, fileUploadedRoute(testKey))
-        val result  = route(app, request).value
+        val result = route(app, request).value
 
         val view = app.injector.instanceOf[FileUploadedView]
 
@@ -122,7 +122,7 @@ class FileUploadedControllerSpec extends SpecBase with MockitoSugar with FileUpl
 
       running(app) {
         val request = FakeRequest(GET, fileUploadedRoute(testKey))
-        val result  = route(app, request).value
+        val result = route(app, request).value
 
         status(result) mustBe SEE_OTHER
         redirectLocation(result).value mustBe bulkRoutes.UploadedFileErrorController.onPageLoad(testKey).url
@@ -145,7 +145,7 @@ class FileUploadedControllerSpec extends SpecBase with MockitoSugar with FileUpl
 
       running(app) {
         val request = FakeRequest(GET, fileUploadedRoute(testKey))
-        val result  = route(app, request).value
+        val result = route(app, request).value
 
         status(result) mustBe SEE_OTHER
         redirectLocation(result).value mustBe bulkRoutes.FormattingErrorController.onPageLoad().url
@@ -166,7 +166,7 @@ class FileUploadedControllerSpec extends SpecBase with MockitoSugar with FileUpl
 
       running(app) {
         val request = FakeRequest(GET, fileUploadedRoute(testKey))
-        val result  = route(app, request).value
+        val result = route(app, request).value
 
         status(result) mustBe SEE_OTHER
         redirectLocation(result).value mustBe bulkRoutes.FormattingErrorController.onPageLoad().url
@@ -186,7 +186,7 @@ class FileUploadedControllerSpec extends SpecBase with MockitoSugar with FileUpl
 
       running(app) {
         val request = FakeRequest(GET, fileUploadedRoute(testKey))
-        val result  = route(app, request).value
+        val result = route(app, request).value
 
         val view = app.injector.instanceOf[FileUploadedView]
 
@@ -206,7 +206,7 @@ class FileUploadedControllerSpec extends SpecBase with MockitoSugar with FileUpl
 
       running(app) {
         val request = FakeRequest(GET, fileUploadedRoute(testKey))
-        val result  = route(app, request).value
+        val result = route(app, request).value
 
         status(result) mustBe SEE_OTHER
         redirectLocation(result).value mustBe routes.JourneyRecoveryController.onPageLoad().url
@@ -233,6 +233,30 @@ class FileUploadedControllerSpec extends SpecBase with MockitoSugar with FileUpl
         status(result) mustBe SEE_OTHER
         redirectLocation(result).value mustBe routes.JourneyRecoveryController.onPageLoad().url
       }
+    }
+  }
+
+  "must redirect to the upload error page for an upscan download exception" in {
+
+    when(mockRepository.find(anyArg()))
+      .thenReturn(Future.successful(Some(testFileUpload)))
+
+    when(mockStcUpscanProcessingService.process(eqTo(testFileUpload))(using anyArg[HeaderCarrier]))
+      .thenReturn(Future.failed(
+        UpscanDownloadException("Failed to download uploaded file",
+          new RuntimeException("Connection timeout")))
+      )
+
+    val app = application
+
+    running(app) {
+      val request = FakeRequest(GET, fileUploadedRoute(testKey))
+      val result = route(app, request).value
+
+      status(result) mustBe SEE_OTHER
+      redirectLocation(result).value mustBe bulkRoutes.BulkUploadErrorController.onPageLoad().url
+
+      verify(mockSubscriptionConnector, never()).getAndStoreSubscription(anyArg())(using anyArg[HeaderCarrier])
     }
   }
 }
