@@ -282,6 +282,27 @@ class FileUploadedControllerSpec extends SpecBase with MockitoSugar with FileUpl
         verify(mockStcUpscanProcessingService, never()).process(anyArg())(using anyArg[HeaderCarrier])
       }
     }
+
+    "must redirect to the empty file error page when file upload is found and processing returns an EmptyFile error" in {
+
+      when(mockRepository.find(anyArg()))
+        .thenReturn(Future.successful(Some(testFileUpload)))
+
+      when(mockStcUpscanProcessingService.process(eqTo(testFileUpload))(using anyArg[HeaderCarrier]))
+        .thenReturn(Future.successful(Left(FileParseError.EmptyFile)))
+
+      val app = application
+
+      running(app) {
+        val request = FakeRequest(GET, fileUploadedRoute(testKey))
+        val result = route(app, request).value
+
+        status(result) mustBe SEE_OTHER
+        redirectLocation(result).value mustBe bulkRoutes.BulkUploadFileEmptyController.onPageLoad().url
+
+        verify(mockSubscriptionConnector, never()).getAndStoreSubscription(anyArg())(using anyArg[HeaderCarrier])
+      }
+    }
   }
 
   "must redirect to the upload error page for an upscan download exception" in {

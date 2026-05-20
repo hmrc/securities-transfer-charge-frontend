@@ -70,6 +70,12 @@ class FileUploadedController @Inject()(
 
   private def processReadyUpload(reference: String, fileUpload: FileUpload)(implicit request: StcAuthorisedRequest[_]): Future[Result] =
     stcUpscanProcessingService.process(fileUpload).flatMap {
+
+      case Left(FileParseError.EmptyFile) =>
+        Future.successful(
+          Redirect(routes.BulkUploadFileEmptyController.onPageLoad())
+        )
+        
       case Left(_: FileParseError) =>
         Future.successful(
           Redirect(routes.FormattingErrorController.onPageLoad())
