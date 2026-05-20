@@ -234,6 +234,30 @@ class FileUploadedControllerSpec extends SpecBase with MockitoSugar with FileUpl
         redirectLocation(result).value mustBe routes.JourneyRecoveryController.onPageLoad().url
       }
     }
+
+    "must redirect to the EncryptedFileErrorController when an encrypted file is quarantined" in {
+
+      val encryptedUpload = testFileUpload.copy(
+        status = UpscanJourneyStatus.Failed,
+        failureReason = Some("QUARANTINE"),
+        message = Some("PUA.Doc.Packed.EncryptedDoc-6563700-0")
+      )
+
+      when(mockRepository.find(anyArg()))
+        .thenReturn(Future.successful(Some(encryptedUpload)))
+
+      val app = application
+
+      running(app) {
+        val request = FakeRequest(GET, fileUploadedRoute(testKey))
+        val result = route(app, request).value
+
+        status(result) mustBe SEE_OTHER
+        redirectLocation(result).value mustBe bulkRoutes.EncryptedFileErrorController.onPageLoad().url
+
+        verify(mockStcUpscanProcessingService, never()).process(anyArg())(using anyArg[HeaderCarrier])
+      }
+    }
   }
 
   "must redirect to the upload error page for an upscan download exception" in {

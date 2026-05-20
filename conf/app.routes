@@ -280,3 +280,5 @@ GET        /stf/agent/total-market-value                    uk.gov.hmrc.securiti
 POST       /stf/agent/total-market-value                    uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.agents.single.TotalMarketValueController.onSubmit(mode: Mode = NormalMode)
 GET        /stf/agent/change/total-market-value             uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.agents.single.TotalMarketValueController.onPageLoad(mode: Mode = CheckMode)
 POST       /stf/agent/change/total-market-value             uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.agents.single.TotalMarketValueController.onSubmit(mode: Mode = CheckMode)
+
+GET        /stf/bulk-error-password                            uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.shared.bulk.EncryptedFileErrorController.onPageLoad()
