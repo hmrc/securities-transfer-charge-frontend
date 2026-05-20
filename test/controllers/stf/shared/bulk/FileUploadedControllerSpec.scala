@@ -258,6 +258,30 @@ class FileUploadedControllerSpec extends SpecBase with MockitoSugar with FileUpl
         verify(mockStcUpscanProcessingService, never()).process(anyArg())(using anyArg[HeaderCarrier])
       }
     }
+
+    "must redirect to the BulkUploadVirusErrorController when an uploaded file has a virus" in {
+
+      val encryptedUpload = testFileUpload.copy(
+        status = UpscanJourneyStatus.Failed,
+        failureReason = Some("QUARANTINE"),
+        message = Some("e.g. This file has a virus")
+      )
+
+      when(mockRepository.find(anyArg()))
+        .thenReturn(Future.successful(Some(encryptedUpload)))
+
+      val app = application
+
+      running(app) {
+        val request = FakeRequest(GET, fileUploadedRoute(testKey))
+        val result = route(app, request).value
+
+        status(result) mustBe SEE_OTHER
+        redirectLocation(result).value mustBe bulkRoutes.BulkUploadVirusErrorController.onPageLoad().url
+
+        verify(mockStcUpscanProcessingService, never()).process(anyArg())(using anyArg[HeaderCarrier])
+      }
+    }
   }
 
   "must redirect to the upload error page for an upscan download exception" in {
