@@ -58,7 +58,7 @@ class FileUploadedController @Inject()(
         case Some(fileUpload) if fileUpload.status == UpscanJourneyStatus.Failed &&
           fileUpload.failureReason.contains("QUARANTINE") &&
           fileUpload.message.exists(_.toLowerCase().contains("virus")) =>
-          Future.successful(Redirect(routes.BulkUploadVirusErrorController.onPageLoad()))  
+          Future.successful(Redirect(routes.BulkUploadVirusErrorController.onPageLoad()))
 
         case Some(fileUpload) =>
           Future.successful(Ok(view(fileUpload)))
@@ -71,7 +71,7 @@ class FileUploadedController @Inject()(
   private def processReadyUpload(reference: String, fileUpload: FileUpload)(implicit request: StcAuthorisedRequest[_]): Future[Result] =
     stcUpscanProcessingService.process(fileUpload).flatMap {
 
-      case Left(FileParseError.RowLimitExceeded(_,_)) =>
+      case Left(_: FileParseError.RowLimitExceeded) =>
         Future.successful(
           Redirect(routes.BulkRowsErrorController.onPageLoad())
         )
@@ -79,11 +79,6 @@ class FileUploadedController @Inject()(
       case Left(FileParseError.EmptyFile) =>
         Future.successful(
           Redirect(routes.BulkUploadFileEmptyController.onPageLoad())
-        )
-        
-      case Left(_: FileParseError) =>
-        Future.successful(
-          Redirect(routes.FormattingErrorController.onPageLoad())
         )
 
       case Right(validationResponse) if validationResponse.tooManyBlockingErrors =>
@@ -107,6 +102,7 @@ class FileUploadedController @Inject()(
           .recover {
             case _ => Redirect(JourneyRecoveryController.onPageLoad())
           }
+      case _ => Future.successful(Redirect(JourneyRecoveryController.onPageLoad()))
     }.recover {
       case _: UpscanDownloadException =>
         Redirect(routes.BulkUploadErrorController.onPageLoad())

@@ -154,7 +154,8 @@ class FileUploadedControllerSpec extends SpecBase with MockitoSugar with FileUpl
       }
     }
 
-    "must redirect to the formatting error page when file upload is found and processing returns a parse error" in {
+    //TODO we need the correct  page for this it should not go to formatting error page
+    "must redirect to the journey recovery page when file upload is found and processing returns a parse error" in {
 
       when(mockRepository.find(anyArg()))
         .thenReturn(Future.successful(Some(testFileUpload)))
@@ -169,7 +170,7 @@ class FileUploadedControllerSpec extends SpecBase with MockitoSugar with FileUpl
         val result = route(app, request).value
 
         status(result) mustBe SEE_OTHER
-        redirectLocation(result).value mustBe bulkRoutes.FormattingErrorController.onPageLoad().url
+        redirectLocation(result).value mustBe routes.JourneyRecoveryController.onPageLoad().url
 
         verify(mockSubscriptionConnector, never()).getAndStoreSubscription(anyArg())(using anyArg[HeaderCarrier])
       }
