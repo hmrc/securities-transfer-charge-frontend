@@ -71,6 +71,11 @@ class FileUploadedController @Inject()(
   private def processReadyUpload(reference: String, fileUpload: FileUpload)(implicit request: StcAuthorisedRequest[_]): Future[Result] =
     stcUpscanProcessingService.process(fileUpload).flatMap {
 
+      case Left(FileParseError.RowLimitExceeded(_,_)) =>
+        Future.successful(
+          Redirect(routes.BulkRowsErrorController.onPageLoad())
+        )
+
       case Left(FileParseError.EmptyFile) =>
         Future.successful(
           Redirect(routes.BulkUploadFileEmptyController.onPageLoad())
