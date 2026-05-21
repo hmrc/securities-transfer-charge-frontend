@@ -119,4 +119,8 @@ class FrontendAppConfig @Inject() (configuration: Configuration, servicesConfig:
   val upscanCallbackUrl: String =  s"$stfBaseUrl$basePath/stf/upscan-callback"
   val upscanUploadSuccessfulUrl: String = s"$host$basePath/stf/file-uploaded"
   val upscanUploadFailureUrl: String = s"$host$basePath/stf/upload-template/problem"
+  
+  // Refresh
+  val spinnerPageRefreshInterval: Int = configuration.get[Int]("page-refresh.spinner.interval")
+  val spinnerPageRefreshTimeout: Int = configuration.get[Int]("page-refresh.spinner.timeout")
 }
