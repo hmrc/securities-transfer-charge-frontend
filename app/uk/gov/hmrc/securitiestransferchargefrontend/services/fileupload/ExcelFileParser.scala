@@ -17,7 +17,7 @@
 package uk.gov.hmrc.securitiestransferchargefrontend.services.fileupload
 
 import uk.gov.hmrc.securitiestransferchargefrontend.config.FileUploadConfig
-import org.apache.poi.ss.usermodel.{Cell, CellType, DateUtil}
+import org.apache.poi.ss.usermodel.{Cell, CellType, DateUtil, Row}
 import org.apache.poi.xssf.usermodel.XSSFWorkbook
 import uk.gov.hmrc.securitiestransferchargefrontend.models.stf.fileupload.FileParseError.{InvalidXlsx, MissingWorksheet, RowLimitExceeded}
 import uk.gov.hmrc.securitiestransferchargefrontend.models.stf.fileupload.{FileParseError, ParsedCell, ParsedFile, ParsedRow, UploadedFile}
@@ -30,6 +30,11 @@ import scala.util.Try
 
 @Singleton
 class ExcelFileParser @Inject()(config: FileUploadConfig) extends FileParser {
+
+  private def isEmptyRow(row: Row): Boolean =
+    row.cellIterator().asScala.forall { cell =>
+      cell.toString.trim.isEmpty
+    }
 
   private val dateFormatter = DateTimeFormatter.ISO_LOCAL_DATE
 
@@ -44,7 +49,7 @@ class ExcelFileParser @Inject()(config: FileUploadConfig) extends FileParser {
             .toRight(MissingWorksheet(config.expectedWorksheetName))
 
         sheet.flatMap { worksheet =>
-          val allRows = worksheet.iterator().asScala.toSeq
+          val allRows =  worksheet.iterator().asScala.toSeq.filterNot(isEmptyRow)
 
           if (allRows.isEmpty) {
             Left(InvalidXlsx("The file is empty"))
