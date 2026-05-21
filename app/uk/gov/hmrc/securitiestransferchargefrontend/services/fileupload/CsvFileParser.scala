@@ -21,7 +21,7 @@ import uk.gov.hmrc.securitiestransferchargefrontend.config.FileUploadConfig
 import java.io.InputStreamReader
 import java.nio.charset.StandardCharsets
 import javax.inject.{Inject, Singleton}
-import org.apache.commons.csv.{CSVFormat, CSVParser}
+import org.apache.commons.csv.{CSVFormat, CSVParser, CSVRecord}
 import uk.gov.hmrc.securitiestransferchargefrontend.models.stf.fileupload.FileParseError.{InvalidCsv, RowLimitExceeded}
 import uk.gov.hmrc.securitiestransferchargefrontend.models.stf.fileupload.{FileParseError, ParsedCell, ParsedFile, ParsedRow, UploadedFile}
 
@@ -30,6 +30,9 @@ import scala.util.Try
 
 @Singleton
 class CsvFileParser @Inject()(config: FileUploadConfig) extends FileParser {
+
+  private def isEmptyRecord(record: CSVRecord): Boolean =
+    record.iterator().asScala.forall(_.trim.isEmpty)
 
   override def parse(file: UploadedFile): Either[FileParseError, ParsedFile] =
     Try {
@@ -40,8 +43,8 @@ class CsvFileParser @Inject()(config: FileUploadConfig) extends FileParser {
       )
 
       try {
-        val records = parser.getRecords.asScala.toSeq
-
+        val records = parser.getRecords.asScala.toSeq.filterNot(isEmptyRecord)
+        
         if (records.isEmpty) {
           Left(InvalidCsv("The file is empty"))
         } else if (records.size > config.maxRows) {
