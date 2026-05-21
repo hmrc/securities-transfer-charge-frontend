@@ -624,3 +624,7 @@ fileUploaded.error.encryptedFile.p = The file you have uploaded is password-prot
 bulk.fileUpload.error.title = There was a problem uploading your file
 bulk.fileUpload.error.heading = There was a problem uploading your file
 bulk.fileUpload.error.p = The selected file could not be uploaded, try again.
+
+bulk.fileUpload.timeout.title = There was a problem uploading your file
+bulk.fileUpload.timeout.heading = There was a problem uploading your file
+bulk.fileUpload.timeout.p = The file you uploaded took too long to upload. Try uploading a smaller file, or check your internet connection and try again.

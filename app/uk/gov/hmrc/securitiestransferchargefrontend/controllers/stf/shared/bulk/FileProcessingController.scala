@@ -17,10 +17,11 @@
 package uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.shared.bulk
 
 import play.api.i18n.{I18nSupport, MessagesApi}
-import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
+import play.api.mvc.{Action, AnyContent, MessagesControllerComponents, Request}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
+import uk.gov.hmrc.securitiestransferchargefrontend.config.FrontendAppConfig
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.actions.*
-import uk.gov.hmrc.securitiestransferchargefrontend.views.html.stf.shared.bulk.FileProcessingView
+import uk.gov.hmrc.securitiestransferchargefrontend.views.html.stf.shared.bulk.{FileProcessingView, TimeoutView}
 
 import javax.inject.Inject
 
@@ -28,11 +29,28 @@ class FileProcessingController @Inject()(
                                          override val messagesApi: MessagesApi,
                                          stcAuthEnrolled: StcAuthEnrolledAction,
                                          view: FileProcessingView,
-                                         val controllerComponents: MessagesControllerComponents
+                                         timeoutView: TimeoutView,
+                                         val controllerComponents: MessagesControllerComponents,
+                                         appConfig: FrontendAppConfig
                                         ) extends FrontendBaseController with I18nSupport {
 
+  private val retryCountKey = "retryCount"
+  private val refreshInterval = appConfig.spinnerPageRefreshInterval
+  private val maxRetries = appConfig.spinnerPageRefreshTimeout / appConfig.spinnerPageRefreshInterval
+  private val currentCount: Request => Int = _.session.get(retryCountKey).map(_.toInt).getOrElse(0)
+  
   def onPageLoad(): Action[AnyContent] =
     stcAuthEnrolled { implicit request =>
-      Ok(view())
+      val updatedCount = currentCount(request) + 1
+      if (updatedCount > maxRetries) {
+        Redirect(routes.FileProcessingController.onTimeout())
+      } else {
+        Ok(view(refreshInterval)).withSession(request.session + (retryCountKey -> updatedCount.toString))
+      }
+    }
+
+  def onTimeout(): Action[AnyContent] =
+    stcAuthEnrolled { implicit request =>
+      Ok(timeoutView())
     }
 }
