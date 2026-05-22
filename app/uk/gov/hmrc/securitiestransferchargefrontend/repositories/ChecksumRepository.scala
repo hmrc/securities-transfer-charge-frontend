@@ -52,8 +52,7 @@ class ChecksumRepositoryImpl @Inject()(
       IndexModel(
         Indexes.ascending("checksum"),
         IndexOptions()
-          .name("checksum_unique_idx")
-          .unique(true)
+          .name("checksum_idx")
       )
     )
   )
