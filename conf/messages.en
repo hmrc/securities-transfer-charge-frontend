@@ -631,4 +631,4 @@ bulk.rows.error.p = There were too many rows in your uploaded file. The number o
 
 bulk.duplicate.error.title = You have uploaded this file before
 bulk.duplicate.error.heading = You have uploaded this file before
-bulk.duplicate.error.p = This file has been uploaded in the last 30 days, check you have the correct file.
+bulk.duplicate.error.p = This file has been uploaded in the last {0} days, check you have the correct file.

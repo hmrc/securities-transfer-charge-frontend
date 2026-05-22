@@ -16,9 +16,12 @@
 
 @import uk.gov.hmrc.securitiestransferchargefrontend.views.html.templates
 @import uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.shared.bulk.routes
+@import uk.gov.hmrc.securitiestransferchargefrontend.config.FrontendAppConfig
+
 
 @this(
-    layout: templates.Layout
+    layout: templates.Layout,
+    config: FrontendAppConfig
 )
 
 @()(implicit request: Request[_],messages: Messages)
@@ -30,7 +33,7 @@
     </h1>
 
     <p class="govuk-body">
-        @messages("bulk.duplicate.error.p")
+        @messages("bulk.duplicate.error.p",config.checksumTtl)
     </p>
 
     <p class="govuk-body">

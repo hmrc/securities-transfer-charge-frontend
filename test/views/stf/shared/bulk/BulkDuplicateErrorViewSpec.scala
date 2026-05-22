@@ -19,6 +19,7 @@ package views.stf.shared.bulk
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
 import play.api.Application
+import uk.gov.hmrc.securitiestransferchargefrontend.config.FrontendAppConfig
 import uk.gov.hmrc.securitiestransferchargefrontend.views.html.stf.shared.bulk.BulkDuplicateErrorView
 import views.ViewBaseSpec
 
@@ -28,12 +29,14 @@ class BulkDuplicateErrorViewSpec extends ViewBaseSpec {
 
   private val viewInstance = app.injector.instanceOf[BulkDuplicateErrorView]
 
+  private val config = app.injector.instanceOf[FrontendAppConfig]
+
   def view(): Document = Jsoup.parse(viewInstance()(fakeRequest, messages).body)
 
   object ExpectedContent {
     val title: String = messages("bulk.duplicate.error.title")
     val heading: String = messages("bulk.duplicate.error.heading")
-    val paragraph: String = messages("bulk.duplicate.error.p")
+    val paragraph: String = messages("bulk.duplicate.error.p",config.checksumTtl)
   }
 
   "BulkDuplicateErrorView" - {

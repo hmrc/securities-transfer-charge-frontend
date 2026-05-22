@@ -30,7 +30,7 @@ trait ChecksumRepository {
 
   def exists(checksum: String): Future[Boolean]
 
-  def upsert(record: UploadedFileChecksum): Future[Unit]
+  def insert(record: UploadedFileChecksum): Future[Unit]
 }
 
 @Singleton
@@ -62,13 +62,9 @@ class ChecksumRepositoryImpl @Inject()(
   private def byChecksum(checksum: String) =
     Filters.equal("checksum", checksum)
 
-  override def upsert(record: UploadedFileChecksum): Future[Unit] =
+  override def insert(record: UploadedFileChecksum): Future[Unit] =
     collection
-      .replaceOne(
-        byChecksum(record.checksum),
-        record,
-        ReplaceOptions().upsert(true)
-      )
+      .insertOne(record)
       .toFuture()
       .map(_ => ())
 
@@ -79,4 +75,9 @@ class ChecksumRepositoryImpl @Inject()(
         byChecksum(checksum)
       ).toFuture().map(_ > 0)
 
+  def dropCollection(): Future[Unit] =
+    collection
+      .drop()
+      .toFuture()
+      .map(_ => ())
 }
