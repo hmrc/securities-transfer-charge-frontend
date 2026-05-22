@@ -28,7 +28,7 @@ import uk.gov.hmrc.securitiestransferchargefrontend.navigation.stf.agents.StfAge
 import uk.gov.hmrc.securitiestransferchargefrontend.navigation.stf.individuals.StfNavigator
 import uk.gov.hmrc.securitiestransferchargefrontend.navigation.stf.organisations.StfOrgNavigator
 import uk.gov.hmrc.securitiestransferchargefrontend.navigation.{Navigator, PersistentNavigator}
-import uk.gov.hmrc.securitiestransferchargefrontend.repositories.{SessionRepository, SessionRepositoryImpl, SubscriptionDataRepository, SubscriptionDataRepositoryImpl, UpscanJourneyRepository, UpscanJourneyRepositoryImpl, ValidationErrorRepository, ValidationErrorRepositoryImpl}
+import uk.gov.hmrc.securitiestransferchargefrontend.repositories.{ChecksumRepository, ChecksumRepositoryImpl, SessionRepository, SessionRepositoryImpl, SubscriptionDataRepository, SubscriptionDataRepositoryImpl, UpscanJourneyRepository, UpscanJourneyRepositoryImpl, ValidationErrorRepository, ValidationErrorRepositoryImpl}
 import uk.gov.hmrc.securitiestransferchargefrontend.services.*
 import uk.gov.hmrc.securitiestransferchargefrontend.services.fileupload.*
 
@@ -61,6 +61,7 @@ class Module extends AbstractModule {
     bind(classOf[UpscanInitiateConnector]).to(classOf[UpscanInitiateConnectorImpl])
     bind(classOf[UpscanFileDownloadConnector]).to(classOf[UpscanFileDownloadConnectorImpl])
     bind(classOf[UpscanJourneyRepository]).to(classOf[UpscanJourneyRepositoryImpl])
+    bind(classOf[ChecksumRepository]).to(classOf[ChecksumRepositoryImpl])
     bind(classOf[RegistrationClient]).to(classOf[RegistrationClientImpl]).asEagerSingleton()
     bind(classOf[AnswerPersistenceService]).to(classOf[AnswerPersistenceServiceImpl])
     bind(classOf[UpscanFileDownloadService]).to(classOf[UpscanFileDownloadServiceImpl])
