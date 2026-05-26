@@ -41,14 +41,11 @@ class BackwardsRoutes(defaultPage: Call):
     case StfSellerAddressPage => _ => agentSingleRoutes.NameOfSellerController.onPageLoad(NormalMode)
     case ConnectedPersonsPage => _ => agentSingleRoutes.StfSellerAddressController.onPageLoad()
     case ApplyingForReliefPage => _ => agentSingleRoutes.ConnectedPersonsController.onPageLoad(NormalMode)
-
     case WhatReliefAreYouApplyingForPage => _ => agentSingleRoutes.ApplyingForReliefController.onPageLoad(NormalMode)
-
     case SecuritiesTargetPage => userAnswers => dataDependent(ApplyingForReliefPage, userAnswers) {
       case true  => agentSingleRoutes.WhatReliefAreYouApplyingForController.onPageLoad(NormalMode)
       case false => agentSingleRoutes.ApplyingForReliefController.onPageLoad(NormalMode)
     }
-
     case ChargingPointPage => _ => agentSingleRoutes.SecuritiesTargetController.onPageLoad(NormalMode)
     case TaxRatePage       => _ => agentSingleRoutes.ChargingPointController.onPageLoad(NormalMode)
     case WhatTypeOfSecuritiesPage => _ => agentSingleRoutes.TaxRateController.onPageLoad(NormalMode)
@@ -56,6 +53,5 @@ class BackwardsRoutes(defaultPage: Call):
     case AmountPaidForSecuritiesPage => _ => agentSingleRoutes.OtherSecuritiesTypeController.onPageLoad(NormalMode)
     case DetailsOfThisTransferPage => _ => agentSingleRoutes.WhatTypeOfSecuritiesController.onPageLoad(NormalMode)
     case TotalMarketValuePage => _ => agentSingleRoutes.AmountPaidForSecuritiesController.onPageLoad(NormalMode)
-
     case _ => _ => defaultPage
   }
