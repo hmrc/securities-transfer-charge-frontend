@@ -46,7 +46,7 @@ class SecuritiesTargetControllerSpec extends SpecBase with MockitoSugar {
 
     "must return OK and the correct view for a GET" in {
 
-      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers))
+      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers), affinityGroup = orgAffinity)
         .overrides(bind[Navigator].qualifiedWith("organisations").toInstance(getNavigator))
         .build()
 
@@ -69,7 +69,7 @@ class SecuritiesTargetControllerSpec extends SpecBase with MockitoSugar {
       when(mockSessionRepository.set(any())) thenReturn Future.successful(())
 
       val application =
-        applicationBuilder(userAnswers = Some(emptyUserAnswers), sessionRepository = mockSessionRepository)
+        applicationBuilder(userAnswers = Some(emptyUserAnswers), sessionRepository = mockSessionRepository, affinityGroup = orgAffinity)
           .build()
 
       running(application) {
@@ -86,7 +86,7 @@ class SecuritiesTargetControllerSpec extends SpecBase with MockitoSugar {
 
     "must return a Bad Request and errors when invalid data is submitted in the Business name field" in {
 
-      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers))
+      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers), affinityGroup = orgAffinity)
         .overrides(bind[Navigator].qualifiedWith("organisations").toInstance(getNavigator))
         .build()
 
@@ -108,7 +108,7 @@ class SecuritiesTargetControllerSpec extends SpecBase with MockitoSugar {
 
     "must return a Bad Request and errors when invalid data is submitted in the CRN field" in {
 
-      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers))
+      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers), affinityGroup = orgAffinity)
         .overrides(bind[Navigator].qualifiedWith("organisations").toInstance(getNavigator))
         .build()
 
@@ -130,7 +130,7 @@ class SecuritiesTargetControllerSpec extends SpecBase with MockitoSugar {
 
     "must redirect to Journey Recovery for a GET if no existing data is found" in {
 
-      val application = applicationBuilder(userAnswers = None).build()
+      val application = applicationBuilder(userAnswers = None, affinityGroup = orgAffinity).build()
 
       running(application) {
         val request = FakeRequest(GET, securitiesTargetRoute)
@@ -144,7 +144,7 @@ class SecuritiesTargetControllerSpec extends SpecBase with MockitoSugar {
 
     "must redirect to Journey Recovery for a POST if no existing data is found" in {
 
-      val application = applicationBuilder(userAnswers = None).build()
+      val application = applicationBuilder(userAnswers = None, affinityGroup = orgAffinity).build()
 
       running(application) {
         val request =

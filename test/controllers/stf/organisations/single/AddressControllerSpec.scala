@@ -29,7 +29,7 @@ class AddressControllerSpec extends SpecBase with MockitoSugar {
 
     "onPageLoad should redirect to ALF" in {
       
-      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers))
+      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers), affinityGroup = orgAffinity)
         .build()
 
       running(application) {
@@ -41,7 +41,7 @@ class AddressControllerSpec extends SpecBase with MockitoSugar {
     }
 
     "onReturn should retrieve address and redirect" in {
-      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers))
+      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers), affinityGroup = orgAffinity)
         .build()
 
       running(application) {

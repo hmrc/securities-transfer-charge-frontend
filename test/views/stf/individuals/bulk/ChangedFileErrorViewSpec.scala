@@ -25,7 +25,7 @@ import views.ViewBaseSpec
 
 class ChangedFileErrorViewSpec extends ViewBaseSpec {
 
-  override def fakeApplication(): Application = applicationBuilder().build()
+  override def fakeApplication(): Application = applicationBuilder(affinityGroup = individualAffinity).build()
 
   private val viewInstance         = app.injector.instanceOf[ChangedFileErrorView]
 

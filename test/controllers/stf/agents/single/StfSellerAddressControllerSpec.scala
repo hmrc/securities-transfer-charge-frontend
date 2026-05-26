@@ -20,7 +20,6 @@ import base.SpecBase
 import org.scalatestplus.mockito.MockitoSugar
 import play.api.test.FakeRequest
 import play.api.test.Helpers.*
-import uk.gov.hmrc.auth.core.AffinityGroup
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.agents.single.routes as agentSingleRoutes
 import uk.gov.hmrc.securitiestransferchargefrontend.models.NormalMode
 
@@ -29,7 +28,7 @@ class StfSellerAddressControllerSpec extends SpecBase with MockitoSugar {
   "AddressController" - {
 
     "onPageLoad should redirect to ALF" in {
-      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers), AffinityGroup.Agent)
+      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers), affinityGroup = agentAffinity)
         .build()
 
       running(application) {
@@ -41,7 +40,7 @@ class StfSellerAddressControllerSpec extends SpecBase with MockitoSugar {
     }
 
     "onReturn should retrieve address and redirect" in {
-      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers), AffinityGroup.Agent)
+      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers), affinityGroup = agentAffinity)
         .build()
 
       running(application) {

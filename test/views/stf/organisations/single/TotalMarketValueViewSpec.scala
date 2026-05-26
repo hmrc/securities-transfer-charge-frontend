@@ -45,7 +45,7 @@ import views.ViewBaseSpec
 class TotalMarketValueViewSpec extends ViewBaseSpec {
 
   override def fakeApplication(): Application =
-    applicationBuilder().build()
+    applicationBuilder(affinityGroup = orgAffinity).build()
 
   private val viewInstance = app.injector.instanceOf[TotalMarketValueView]
   private val formProvider = new TotalMarketValueFormProvider()

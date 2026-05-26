@@ -28,7 +28,7 @@ import views.ViewBaseSpec
 class ApplyingForReliefViewSpec extends ViewBaseSpec {
 
   override def fakeApplication(): Application =
-    applicationBuilder().build()
+    applicationBuilder(affinityGroup = individualAffinity).build()
 
   private val viewInstance = app.injector.instanceOf[ApplyingForReliefView]
   private val formProvider = new ApplyingForReliefFormProvider()

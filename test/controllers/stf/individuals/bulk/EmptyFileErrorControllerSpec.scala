@@ -31,7 +31,7 @@ class EmptyFileErrorControllerSpec extends SpecBase with MockitoSugar {
 
     "must return OK and the correct view for a GET" in {
       
-      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers))
+      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers), affinityGroup = individualAffinity)
         .build()
       
       running(application) {
