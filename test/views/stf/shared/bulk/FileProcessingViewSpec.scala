@@ -18,17 +18,17 @@ package views.stf.shared.bulk
 
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
-import play.api.Application
+import uk.gov.hmrc.securitiestransferchargefrontend.config.FrontendAppConfig
 import uk.gov.hmrc.securitiestransferchargefrontend.views.html.stf.shared.bulk.FileProcessingView
 import views.ViewBaseSpec
 
 class FileProcessingViewSpec extends ViewBaseSpec {
 
-  override def fakeApplication(): Application = applicationBuilder().build()
-
   private val viewInstance = app.injector.instanceOf[FileProcessingView]
-
-  def view(): Document = Jsoup.parse(viewInstance()(fakeRequest, messages).body)
+  private val appConfig = app.injector.instanceOf[FrontendAppConfig]
+  private val refreshInterval = appConfig.spinnerPageRefreshInterval
+  
+  def view(): Document = Jsoup.parse(viewInstance(refreshInterval)(fakeRequest, messages).body)
 
   object ExpectedContent {
     val title: String = messages("fileUpload.processing.title")
