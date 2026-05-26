@@ -21,31 +21,34 @@ import play.api.mvc.{Action, AnyContent, MessagesControllerComponents, Request}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import uk.gov.hmrc.securitiestransferchargefrontend.config.FrontendAppConfig
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.actions.*
-import uk.gov.hmrc.securitiestransferchargefrontend.views.html.stf.shared.bulk.{FileProcessingView, TimeoutView}
+import uk.gov.hmrc.securitiestransferchargefrontend.services.fileupload.processing.FileProcessingRefreshCounterFactory
+import uk.gov.hmrc.securitiestransferchargefrontend.views.html.stf.shared.bulk.{BulkUploadErrorView, FileProcessingView}
 
 import javax.inject.Inject
 
 class FileProcessingController @Inject()(
-                                         override val messagesApi: MessagesApi,
-                                         stcAuthEnrolled: StcAuthEnrolledAction,
-                                         view: FileProcessingView,
-                                         timeoutView: TimeoutView,
-                                         val controllerComponents: MessagesControllerComponents,
-                                         appConfig: FrontendAppConfig
+                                          override val messagesApi: MessagesApi,
+                                          stcAuthEnrolled: StcAuthEnrolledAction,
+                                          spinnerView: FileProcessingView,
+                                          timeoutView: BulkUploadErrorView,
+                                          createCounter: FileProcessingRefreshCounterFactory,
+                                          val controllerComponents: MessagesControllerComponents,
+                                          appConfig: FrontendAppConfig
                                         ) extends FrontendBaseController with I18nSupport {
+
 
   private val retryCountKey = "retryCount"
   private val refreshInterval = appConfig.spinnerPageRefreshInterval
-  private val maxRetries = appConfig.spinnerPageRefreshTimeout / appConfig.spinnerPageRefreshInterval
-  private val currentCount: Request => Int = _.session.get(retryCountKey).map(_.toInt).getOrElse(0)
-  
+
+  def currentCount: Request[_] => Int = _.session.get(retryCountKey).map(_.toInt).getOrElse(0)
+
   def onPageLoad(): Action[AnyContent] =
     stcAuthEnrolled { implicit request =>
-      val updatedCount = currentCount(request) + 1
-      if (updatedCount > maxRetries) {
+      val counter = createCounter(request)
+      if (counter.isTimedOut) {
         Redirect(routes.FileProcessingController.onTimeout())
       } else {
-        Ok(view(refreshInterval)).withSession(request.session + (retryCountKey -> updatedCount.toString))
+        counter.withIncrementedCounter(Ok(spinnerView(refreshInterval)))
       }
     }
 
