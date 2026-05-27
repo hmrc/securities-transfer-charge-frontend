@@ -69,7 +69,7 @@ class FileUploadedController @Inject()(
     }
 
   private def processReadyUpload(reference: String, fileUpload: FileUpload)(implicit request: StcAuthorisedRequest[_]): Future[Result] =
-    stcUpscanProcessingService.process(fileUpload).flatMap {
+    stcUpscanProcessingService.process(fileUpload, request.affinityGroup).flatMap {
 
       case Left(_: FileParseError.RowLimitExceeded) =>
         Future.successful(
@@ -104,7 +104,6 @@ class FileUploadedController @Inject()(
               routes.UploadedFileErrorController.onPageLoad(reference)
             )
           }
-
 
       case Right(_) =>
         subscriptionConnector.getAndStoreSubscription(request.subscriptionId)

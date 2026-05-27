@@ -76,8 +76,8 @@ class FileUploadedControllerSpec extends SpecBase with MockitoSugar with FileUpl
 
       when(mockRepository.find(anyArg()))
         .thenReturn(Future.successful(Some(testFileUpload)))
-
-      when(mockStcUpscanProcessingService.process(eqTo(testFileUpload))(using anyArg[HeaderCarrier]))
+      
+      when(mockStcUpscanProcessingService.process(eqTo(testFileUpload), anyArg())(using anyArg[HeaderCarrier]))
         .thenReturn(Future.successful(Right(successfulValidationResponse)))
 
       when(mockSubscriptionConnector.getAndStoreSubscription(anyArg())(using anyArg[HeaderCarrier]))
@@ -114,8 +114,8 @@ class FileUploadedControllerSpec extends SpecBase with MockitoSugar with FileUpl
 
       when(mockRepository.find(anyArg()))
         .thenReturn(Future.successful(Some(testFileUpload)))
-
-      when(mockStcUpscanProcessingService.process(eqTo(testFileUpload))(using anyArg[HeaderCarrier]))
+      
+      when(mockStcUpscanProcessingService.process(eqTo(testFileUpload), anyArg())(using anyArg[HeaderCarrier]))
         .thenReturn(Future.successful(Right(validationResponse)))
 
       val app = application
@@ -137,8 +137,8 @@ class FileUploadedControllerSpec extends SpecBase with MockitoSugar with FileUpl
 
       when(mockRepository.find(anyArg()))
         .thenReturn(Future.successful(Some(testFileUpload)))
-
-      when(mockStcUpscanProcessingService.process(eqTo(testFileUpload))(using anyArg[HeaderCarrier]))
+      
+      when(mockStcUpscanProcessingService.process(eqTo(testFileUpload), anyArg())(using anyArg[HeaderCarrier]))
         .thenReturn(Future.successful(Right(validationResponse)))
 
       val app = application
@@ -154,13 +154,12 @@ class FileUploadedControllerSpec extends SpecBase with MockitoSugar with FileUpl
       }
     }
 
-    //TODO we need the correct  page for this it should not go to formatting error page
     "must redirect to the journey recovery page when file upload is found and processing returns a parse error" in {
 
       when(mockRepository.find(anyArg()))
         .thenReturn(Future.successful(Some(testFileUpload)))
-
-      when(mockStcUpscanProcessingService.process(eqTo(testFileUpload))(using anyArg[HeaderCarrier]))
+      
+      when(mockStcUpscanProcessingService.process(eqTo(testFileUpload), anyArg())(using anyArg[HeaderCarrier]))
         .thenReturn(Future.successful(Left(FileParseError.UnsupportedMimeType("application/pdf"))))
 
       val app = application
@@ -193,8 +192,8 @@ class FileUploadedControllerSpec extends SpecBase with MockitoSugar with FileUpl
 
         status(result) mustBe OK
         contentAsString(result) mustBe view(initiatedUpload)(request, messages(app)).toString
-
-        verify(mockStcUpscanProcessingService, never()).process(anyArg())(using anyArg[HeaderCarrier])
+        
+        verify(mockStcUpscanProcessingService, never()).process(anyArg(), anyArg())(using anyArg[HeaderCarrier])
       }
     }
 
@@ -218,8 +217,8 @@ class FileUploadedControllerSpec extends SpecBase with MockitoSugar with FileUpl
 
       when(mockRepository.find(anyArg()))
         .thenReturn(Future.successful(Some(testFileUpload)))
-
-      when(mockStcUpscanProcessingService.process(eqTo(testFileUpload))(using anyArg[HeaderCarrier]))
+      
+      when(mockStcUpscanProcessingService.process(eqTo(testFileUpload), anyArg())(using anyArg[HeaderCarrier]))
         .thenReturn(Future.successful(Right(successfulValidationResponse)))
 
       when(mockSubscriptionConnector.getAndStoreSubscription(anyArg())(using anyArg[HeaderCarrier]))
@@ -255,8 +254,8 @@ class FileUploadedControllerSpec extends SpecBase with MockitoSugar with FileUpl
 
         status(result) mustBe SEE_OTHER
         redirectLocation(result).value mustBe bulkRoutes.EncryptedFileErrorController.onPageLoad().url
-
-        verify(mockStcUpscanProcessingService, never()).process(anyArg())(using anyArg[HeaderCarrier])
+        
+        verify(mockStcUpscanProcessingService, never()).process(anyArg(), anyArg())(using anyArg[HeaderCarrier])
       }
     }
 
@@ -279,8 +278,8 @@ class FileUploadedControllerSpec extends SpecBase with MockitoSugar with FileUpl
 
         status(result) mustBe SEE_OTHER
         redirectLocation(result).value mustBe bulkRoutes.BulkUploadVirusErrorController.onPageLoad().url
-
-        verify(mockStcUpscanProcessingService, never()).process(anyArg())(using anyArg[HeaderCarrier])
+        
+        verify(mockStcUpscanProcessingService, never()).process(anyArg(), anyArg())(using anyArg[HeaderCarrier])
       }
     }
 
@@ -288,8 +287,8 @@ class FileUploadedControllerSpec extends SpecBase with MockitoSugar with FileUpl
 
       when(mockRepository.find(anyArg()))
         .thenReturn(Future.successful(Some(testFileUpload)))
-
-      when(mockStcUpscanProcessingService.process(eqTo(testFileUpload))(using anyArg[HeaderCarrier]))
+      
+      when(mockStcUpscanProcessingService.process(eqTo(testFileUpload), anyArg())(using anyArg[HeaderCarrier]))
         .thenReturn(Future.successful(Left(FileParseError.EmptyFile)))
 
       val app = application
@@ -309,8 +308,8 @@ class FileUploadedControllerSpec extends SpecBase with MockitoSugar with FileUpl
 
       when(mockRepository.find(anyArg()))
         .thenReturn(Future.successful(Some(testFileUpload)))
-
-      when(mockStcUpscanProcessingService.process(eqTo(testFileUpload))(using anyArg[HeaderCarrier]))
+      
+      when(mockStcUpscanProcessingService.process(eqTo(testFileUpload), anyArg())(using anyArg[HeaderCarrier]))
         .thenReturn(Future.successful(Left(FileParseError.InvalidTemplate)))
 
       val app = application
@@ -331,8 +330,8 @@ class FileUploadedControllerSpec extends SpecBase with MockitoSugar with FileUpl
 
     when(mockRepository.find(anyArg()))
       .thenReturn(Future.successful(Some(testFileUpload)))
-
-    when(mockStcUpscanProcessingService.process(eqTo(testFileUpload))(using anyArg[HeaderCarrier]))
+    
+    when(mockStcUpscanProcessingService.process(eqTo(testFileUpload), anyArg())(using anyArg[HeaderCarrier]))
       .thenReturn(Future.successful(Left(FileParseError.RowLimitExceeded(actual = 1000, max = 50))))
 
     val app = application
@@ -348,13 +347,12 @@ class FileUploadedControllerSpec extends SpecBase with MockitoSugar with FileUpl
     }
   }
 
-
   "must redirect to the upload error page for an upscan download exception" in {
 
     when(mockRepository.find(anyArg()))
       .thenReturn(Future.successful(Some(testFileUpload)))
-
-    when(mockStcUpscanProcessingService.process(eqTo(testFileUpload))(using anyArg[HeaderCarrier]))
+    
+    when(mockStcUpscanProcessingService.process(eqTo(testFileUpload), anyArg())(using anyArg[HeaderCarrier]))
       .thenReturn(Future.failed(
         UpscanDownloadException("Failed to download uploaded file",
           new RuntimeException("Connection timeout")))

@@ -23,6 +23,7 @@ import org.scalatest.matchers.must.Matchers.mustBe
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpec
 import org.scalatestplus.mockito.MockitoSugar
+import uk.gov.hmrc.auth.core.AffinityGroup
 import uk.gov.hmrc.securitiestransferchargefrontend.models.stf.fileupload.*
 import uk.gov.hmrc.securitiestransferchargefrontend.services.fileupload.{FileParsingService, StcUploadParsingService}
 
@@ -65,6 +66,8 @@ class StcUploadParsingServiceSpec extends AnyWordSpec with Matchers with EitherV
     inputStream = new ByteArrayInputStream("irrelevant".getBytes(StandardCharsets.UTF_8))
   )
 
+  private val testAffinityGroup = AffinityGroup.Individual
+
   "parse" should {
 
     "skip template rows before firstDataRow and drop completely empty rows" in {
@@ -93,7 +96,7 @@ class StcUploadParsingServiceSpec extends AnyWordSpec with Matchers with EitherV
 
       when(fileParsingService.parse(any[UploadedFile])).thenReturn(Right(parsedFile))
 
-      val result = service.parse(uploadedFile)
+      val result = service.parse(uploadedFile, testAffinityGroup)
 
       result.value.rows mustBe Seq(dataRow)
       verify(fileParsingService).parse(uploadedFile)
@@ -117,7 +120,7 @@ class StcUploadParsingServiceSpec extends AnyWordSpec with Matchers with EitherV
 
       when(fileParsingService.parse(any[UploadedFile])).thenReturn(Right(parsedFile))
 
-      val result = service.parse(uploadedFile)
+      val result = service.parse(uploadedFile, testAffinityGroup)
 
       result.value.rows mustBe Seq(dataRow1, dataRow2)
     }
@@ -137,7 +140,7 @@ class StcUploadParsingServiceSpec extends AnyWordSpec with Matchers with EitherV
 
       when(fileParsingService.parse(any[UploadedFile])).thenReturn(Right(parsedFile))
 
-      service.parse(uploadedFile) mustBe Left(FileParseError.EmptyFile)
+      service.parse(uploadedFile, testAffinityGroup) mustBe Left(FileParseError.EmptyFile)
     }
 
     "return EmptyFile when the parsed file contains only template rows" in {
@@ -153,7 +156,7 @@ class StcUploadParsingServiceSpec extends AnyWordSpec with Matchers with EitherV
 
       when(fileParsingService.parse(any[UploadedFile])).thenReturn(Right(parsedFile))
 
-      service.parse(uploadedFile) mustBe Left(FileParseError.EmptyFile)
+      service.parse(uploadedFile, testAffinityGroup) mustBe Left(FileParseError.EmptyFile)
     }
 
     "return InvalidTemplate when row 1 (headers) hash does not match" in {
@@ -168,7 +171,7 @@ class StcUploadParsingServiceSpec extends AnyWordSpec with Matchers with EitherV
 
       when(fileParsingService.parse(any[UploadedFile])).thenReturn(Right(parsedFile))
 
-      service.parse(uploadedFile) mustBe Left(FileParseError.InvalidTemplate)
+      service.parse(uploadedFile, testAffinityGroup) mustBe Left(FileParseError.InvalidTemplate)
     }
 
     "return InvalidTemplate when row 2 hash does not match" in {
@@ -183,7 +186,7 @@ class StcUploadParsingServiceSpec extends AnyWordSpec with Matchers with EitherV
 
       when(fileParsingService.parse(any[UploadedFile])).thenReturn(Right(parsedFile))
 
-      service.parse(uploadedFile) mustBe Left(FileParseError.InvalidTemplate)
+      service.parse(uploadedFile, testAffinityGroup) mustBe Left(FileParseError.InvalidTemplate)
     }
 
     "return InvalidTemplate when row 3 hash does not match" in {
@@ -198,14 +201,14 @@ class StcUploadParsingServiceSpec extends AnyWordSpec with Matchers with EitherV
 
       when(fileParsingService.parse(any[UploadedFile])).thenReturn(Right(parsedFile))
 
-      service.parse(uploadedFile) mustBe Left(FileParseError.InvalidTemplate)
+      service.parse(uploadedFile, testAffinityGroup) mustBe Left(FileParseError.InvalidTemplate)
     }
 
     "propagate file parsing errors" in {
       when(fileParsingService.parse(any[UploadedFile]))
         .thenReturn(Left(FileParseError.InvalidXlsx("broken workbook")))
 
-      service.parse(uploadedFile) mustBe Left(FileParseError.InvalidXlsx("broken workbook"))
+      service.parse(uploadedFile, testAffinityGroup) mustBe Left(FileParseError.InvalidXlsx("broken workbook"))
     }
   }
 }
