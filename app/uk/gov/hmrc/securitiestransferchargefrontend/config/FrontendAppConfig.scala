@@ -94,6 +94,7 @@ class FrontendAppConfig @Inject() (configuration: Configuration, servicesConfig:
 
   val upscanTtl: Long = configuration.get[Int]("mongodb.upscanTimeToLiveInHours")
   val validationErrorTtl: Long = configuration.get[Int]("mongodb.validationErrorTimeToLiveInHours")
+  val checksumTtl: Long = configuration.get[Int]("mongodb.checksumTimeToLiveInDays")
 
   private val saveAndReturnService =
     configuration.get[Service]("microservice.services.securities-transfer-charge-save-and-return")
