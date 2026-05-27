@@ -33,5 +33,10 @@ class FileUploadConfig @Inject()(configuration: Configuration) {
       .getOrElse("Sheet1")
 
   val firstDataRow: Int =
-    configuration.getOptional[Int]("file-upload.first-data-row").getOrElse(3)
+    configuration.getOptional[Int]("file-upload.first-data-row").getOrElse(4)
+
+  val expectedRow1Hash: String = configuration.get[String]("file-upload.template-hashes.individuals.stf.row1")
+  val expectedRow2Hash: String = configuration.get[String]("file-upload.template-hashes.individuals.stf.row2")
+  val expectedRow3Hash: String = configuration.get[String]("file-upload.template-hashes.individuals.stf.row3")
+
 }

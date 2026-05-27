@@ -632,3 +632,10 @@ bulk.rows.error.p = There were too many rows in your uploaded file. The number o
 bulk.duplicate.error.title = You have uploaded this file before
 bulk.duplicate.error.heading = You have uploaded this file before
 bulk.duplicate.error.p = This file has been uploaded in the last {0} days, check you have the correct file.
+
+fileUpload.error.invalidTemplate.title = The template file you uploaded has been changed
+fileUpload.error.invalidTemplate.heading = The template file you uploaded has been changed
+fileUpload.error.invalidTemplate.p.start = You must
+fileUpload.error.invalidTemplate.p.link = use the template file
+fileUpload.error.invalidTemplate.p.end = to record details of the transfers, and upload this file.
+fileUpload.error.invalidTemplate.p2 = Remember, do not edit the first two rows, or change the order of columns in the template.
