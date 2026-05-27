@@ -213,6 +213,16 @@ individual.detailsOfThisTransfer.error.marketValue.negative = The market value o
 individual.detailsOfThisTransfer.error.marketValue.aboveMaximum = The market value of the shares must be £999,999,999 or below
 individual.detailsOfThisTransfer.error.typeOfShares.length = The type or class of shares you are buying must be 100 characters or fewer
 
+individual.securitiesTarget.error.businessName.required = Enter the name of the business you’re buying securities in
+individual.securitiesTarget.error.businessName.length = Business name must be 160 characters or fewer
+individual.securitiesTarget.error.crn.length = The company registration number must be 8 characters
+individual.securitiesTarget.error.crn.invalid = Company registration number can only be numbers or letters
+
+individual.chargingPoint.error.required.all = Enter the date you bought these securities
+individual.chargingPoint.error.futureDate = The day you bought the securities must be today’s date or a date in the past
+individual.amountPaidForSecurities.error.required = Enter the amount you paid for the securities
+
+
 detailsOfThisTransfer.title = What are the details of this transfer?
 detailsOfThisTransfer.heading = What are the details of this transfer?
 detailsOfThisTransfer.numberOfShares = Number of shares
@@ -286,7 +296,8 @@ org.securitiesTarget.crn.hint = This is also called a company number.<br>For exa
 org.securitiesTarget.checkYourAnswersLabel = What business are you buying these securities in?
 org.securitiesTarget.error.businessName.required = Enter the name of the business the securities are in
 org.securitiesTarget.error.businessName.length = Business name must be 160 characters or fewer
-org.securitiesTarget.error.crn.length = Company Reference Number must be 8 characters or fewer
+org.securitiesTarget.error.crn.length = Company reference number must be 8 characters or fewer
+org.securitiesTarget.error.crn.invalid = Company registration number can only be numbers or letters
 org.securitiesTarget.businessName.change.hidden = Change which business the securities are being bought in
 org.securitiesTarget.crn.change.hidden = CRN
 
@@ -482,24 +493,40 @@ fileUpload.error.sellerPostcode.invalid = Enter a real postcode, like AA1 1AA
 fileUpload.error.sellerCountry.length = Country must be 50 characters or fewer
 fileUpload.error.sellerCountry.invalidCharacters = Country can only include letters, numbers and the following characters: , . - ’
 
-fileUpload.error.connectedPersons.invalid = Enter ‘yes’ if you and the buyer are connected persons
-fileUpload.error.applyingForRelief.invalid = Enter ‘yes’ if you are applying for a relief, or ‘no’ if you are not applying for a relief
-fileUpload.error.whatReliefAreYouApplyingFor.invalid = Enter the name of the relief you are applying for. See a full list of reliefs (opens in new tab).
+individual.fileUpload.error.connectedPersons.invalid = Enter ‘yes’ if you and the buyer are connected persons
+org.fileUpload.error.connectedPersons.invalid = Enter ‘yes’ if the business and the buyer are connected persons
+individual.fileUpload.error.applyingForRelief.invalid = Enter ‘yes’ if you are applying for a relief, or ‘no’ if you are not applying for a relief
+org.fileUpload.error.applyingForRelief.invalid = Enter ‘yes’ if the business is applying for a relief, or ‘no’ if the business is not applying for a relief
+individual.fileUpload.error.whatReliefAreYouApplyingFor.invalid = Enter the name of the relief you are applying for. See a <a target="_blank" href="#" class="govuk-link">full list of reliefs (opens in new tab)</a>.
+org.fileUpload.error.whatReliefAreYouApplyingFor.invalid = Enter the name of the relief the business is applying for. See a <a target="_blank" href="#" class="govuk-link">full list of reliefs (opens in new tab)</a>.
+agent.fileUpload.error.whatReliefAreYouApplyingFor.invalid = Enter the name of the relief the buyer is applying for. See a <a target="_blank" href="#" class="govuk-link">full list of reliefs (opens in new tab)</a>.
 
 fileUpload.error.chargingPoint.invalidCharacters = The date you bought the securities can only contain numbers and letters
 fileUpload.error.taxRate.invalid = Enter a tax rate of ‘0.5%’ or ‘1.5%’
 
-fileUpload.error.whatTypeOfSecurities.required = Enter the type of securities you are buying
-fileUpload.error.typeOfShares.required = If you are buying shares, enter the type of shares
-fileUpload.error.typeOfShares.maxLength = The type or class of shares you are buying must be 100 characters or fewer
+individual.fileUpload.error.whatTypeOfSecurities.required = Enter the type of securities you are buying
+org.fileUpload.error.whatTypeOfSecurities.required = Enter the type of securities the business is buying
+individual.fileUpload.error.typeOfShares.required = If you are buying shares, enter the type of shares
+org.fileUpload.error.typeOfShares.required = If the business is buying shares, enter the type of shares
 
-fileUpload.error.securitiesQuantity.required = Enter the number of shares you are buying
-fileUpload.error.securitiesQuantity.nonNumeric = The amount of shares you are buying must be a number
-fileUpload.error.securitiesQuantity.minimum = The number of shares must be at least 1
-fileUpload.error.securitiesQuantity.maximum = The number of shares you are buying must be below 999,999,999
+individual.error.typeOfShares.maxLength = The type of shares you are buying must be 255 characters or fewer
+org.error.typeOfShares.maxLength = The type of shares the business is purchasing must be 255 characters or fewer
 
-fileUpload.error.amountPaidForSecurities.nonNumeric = The amount you paid for the securities must be a number
-fileUpload.error.amountPaidForSecurities.maximum = The amount you paid for the securities must be £999,999,999 or below
+individual.fileUpload.error.securitiesQuantity.required = Enter the number of shares you are buying
+individual.fileUpload.error.securitiesQuantity.nonNumeric = The amount of shares you are buying must be a number
+individual.fileUpload.error.securitiesQuantity.minimum = The number of shares must be at least 1
+individual.fileUpload.error.securitiesQuantity.maximum = The number of shares you are buying must be below 999,999,999
+
+org.fileUpload.error.securitiesQuantity.required = Enter the number of shares the business is buying
+org.fileUpload.error.securitiesQuantity.nonNumeric = The amount of shares must be a number
+org.fileUpload.error.securitiesQuantity.minimum = The number of shares must be at least 1
+org.fileUpload.error.securitiesQuantity.maximum = The number of shares must be below 999,999,999
+
+individual.fileUpload.error.amountPaidForSecurities.nonNumeric = The amount you paid for the securities must be a number
+individual.fileUpload.error.amountPaidForSecurities.maximum = The amount you paid for the securities must be £999,999,999 or below
+
+org.fileUpload.error.amountPaidForSecurities.nonNumeric = The amount paid for the securities must be a number
+org.fileUpload.error.amountPaidForSecurities.maximum = The amount paid for the securities must be £999,999,999 or below
 
 fileUpload.error.totalMarketValue.nonNumeric = The market value of the securities must be a number
 fileUpload.error.totalMarketValue.maximum = The market value of the securities must be £999,999,999 or below

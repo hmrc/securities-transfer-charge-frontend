@@ -51,7 +51,7 @@
       rows = errors.map { error =>
         Seq(
           TableRow(content = Text(error.cell)),
-          TableRow(content = Text(error.error))
+          TableRow(content = HtmlContent(error.error))
         )
       }
     )

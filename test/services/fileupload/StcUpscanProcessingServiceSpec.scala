@@ -16,12 +16,10 @@
 
 package services.fileupload
 
+import base.SpecBase
 import org.mockito.ArgumentMatchers.{any, eq as eqTo}
 import org.mockito.Mockito.{verify, when}
 import org.scalatest.EitherValues
-import org.scalatest.concurrent.ScalaFutures
-import org.scalatest.matchers.should.Matchers
-import org.scalatest.wordspec.AnyWordSpec
 import org.scalatestplus.mockito.MockitoSugar
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.securitiestransferchargefrontend.models.stf.fileupload.*
@@ -31,13 +29,10 @@ import uk.gov.hmrc.securitiestransferchargefrontend.services.fileupload.*
 import java.io.ByteArrayInputStream
 import java.nio.charset.StandardCharsets
 import java.time.{Instant, LocalDate}
-import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
-class StcUpscanProcessingServiceSpec extends AnyWordSpec with Matchers with EitherValues with ScalaFutures with MockitoSugar {
-
-  implicit val hc: HeaderCarrier = HeaderCarrier()
-
+class StcUpscanProcessingServiceSpec extends SpecBase with EitherValues  with MockitoSugar {
+  
   private val upscanFileDownloadService = mock[UpscanFileDownloadService]
   private val stcUploadProcessingService = mock[StcUploadProcessingService]
 
@@ -99,20 +94,20 @@ class StcUpscanProcessingServiceSpec extends AnyWordSpec with Matchers with Eith
     rows = Seq(ValidatedStcRow(parsedRow, Seq.empty))
   )
 
-  "process" should {
+  "process" - {
 
     "download and process a ready upload successfully" in {
       when(upscanFileDownloadService.toUploadedFile(eqTo(fileUpload))(any[HeaderCarrier]))
         .thenReturn(Future.successful(uploadedFile))
-      when(stcUploadProcessingService.process(eqTo(uploadedFile)))
+      when(stcUploadProcessingService.process(eqTo(uploadedFile),eqTo(affinityGroupKeyInd)))
         .thenReturn(Right(validationResponse))
 
-      val result = service.process(fileUpload).futureValue
+      val result = service.process(fileUpload,affinityGroupKeyInd).futureValue
 
-      result.value shouldBe validationResponse
+      result.value mustBe validationResponse
 
       verify(upscanFileDownloadService).toUploadedFile(eqTo(fileUpload))(any[HeaderCarrier])
-      verify(stcUploadProcessingService).process(eqTo(uploadedFile))
+      verify(stcUploadProcessingService).process(eqTo(uploadedFile),eqTo(affinityGroupKeyInd))
     }
 
     "return the parse error when processing fails" in {
@@ -120,30 +115,30 @@ class StcUpscanProcessingServiceSpec extends AnyWordSpec with Matchers with Eith
 
       when(upscanFileDownloadService.toUploadedFile(eqTo(fileUpload))(any[HeaderCarrier]))
         .thenReturn(Future.successful(uploadedFile))
-      when(stcUploadProcessingService.process(eqTo(uploadedFile)))
+      when(stcUploadProcessingService.process(eqTo(uploadedFile),eqTo(affinityGroupKeyInd)))
         .thenReturn(Left(parseError))
 
-      val result = service.process(fileUpload).futureValue
+      val result = service.process(fileUpload,affinityGroupKeyInd).futureValue
 
-      result.left.value shouldBe parseError
+      result.left.value mustBe parseError
     }
 
     "fail when the upload status is not Ready" in {
       val initiatedUpload = fileUpload.copy(status = UpscanJourneyStatus.Initiated)
 
-      val exception = service.process(initiatedUpload).failed.futureValue
+      val exception = service.process(initiatedUpload,affinityGroupKeyInd).failed.futureValue
 
-      exception shouldBe a[IllegalArgumentException]
-      exception.getMessage shouldBe "Cannot process upload unless status is Ready. Current status: Initiated"
+      exception mustBe a[IllegalArgumentException]
+      exception.getMessage mustBe "Cannot process upload unless status is Ready. Current status: Initiated"
     }
 
     "fail when the upload status is Failed" in {
       val failedUpload = fileUpload.copy(status = UpscanJourneyStatus.Failed)
 
-      val exception = service.process(failedUpload).failed.futureValue
+      val exception = service.process(failedUpload,affinityGroupKeyInd).failed.futureValue
 
-      exception shouldBe a[IllegalArgumentException]
-      exception.getMessage shouldBe "Cannot process upload unless status is Ready. Current status: Failed"
+      exception mustBe a[IllegalArgumentException]
+      exception.getMessage mustBe "Cannot process upload unless status is Ready. Current status: Failed"
     }
   }
 }

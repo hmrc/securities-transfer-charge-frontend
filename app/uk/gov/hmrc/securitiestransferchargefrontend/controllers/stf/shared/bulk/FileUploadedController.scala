@@ -45,9 +45,12 @@ class FileUploadedController @Inject()(
 
   def onPageLoad(reference: String): Action[AnyContent] =
     stcAuthEnrolled.async { implicit request =>
+
+      val affinityKey = request.affinityGroupKey
+
       upscanJourneyRepository.find(reference).flatMap {
         case Some(fileUpload) if fileUpload.status == UpscanJourneyStatus.Ready =>
-          processReadyUpload(reference, fileUpload)
+          processReadyUpload(reference, fileUpload,affinityKey)
 
         case Some(fileUpload) if fileUpload.status == UpscanJourneyStatus.Failed &&
           fileUpload.failureReason.contains("QUARANTINE") &&
@@ -68,8 +71,8 @@ class FileUploadedController @Inject()(
       }
     }
 
-  private def processReadyUpload(reference: String, fileUpload: FileUpload)(implicit request: StcAuthorisedRequest[_]): Future[Result] =
-    stcUpscanProcessingService.process(fileUpload).flatMap {
+  private def processReadyUpload(reference: String, fileUpload: FileUpload, affinityKey:String)(implicit request: StcAuthorisedRequest[_]): Future[Result] =
+    stcUpscanProcessingService.process(fileUpload,affinityKey).flatMap {
 
       case Left(_: FileParseError.RowLimitExceeded) =>
         Future.successful(

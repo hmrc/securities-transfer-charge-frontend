@@ -16,36 +16,17 @@
 
 package services.fileupload
 
-import org.scalatest.matchers.must.Matchers
-import org.scalatest.wordspec.AnyWordSpec
+import base.SpecBase
 import play.api.i18n.MessagesApi
-import play.api.test.Helpers.stubMessagesApi
-import uk.gov.hmrc.securitiestransferchargefrontend.forms.stf.individuals.*
-import uk.gov.hmrc.securitiestransferchargefrontend.forms.stf.shared.NameOfSellerFormProvider
+import uk.gov.hmrc.securitiestransferchargefrontend.forms.stf.shared.{NameOfSellerFormProvider,SecuritiesTargetFormProvider}
 import uk.gov.hmrc.securitiestransferchargefrontend.models.stf.fileupload.{ParsedCell, ParsedRow}
 import uk.gov.hmrc.securitiestransferchargefrontend.services.fileupload.*
 
-class StcRowValidationServiceSpec extends AnyWordSpec with Matchers {
+class StcRowValidationServiceSpec extends SpecBase {
 
-  private val messagesApi: MessagesApi = stubMessagesApi(Map(
-    "en" -> Map(
-      "nameOfSeller.error.required" -> "Enter the seller's full name",
-      "fileUpload.error.sellerAddressInUK.invalid" -> "Enter ‘yes’ if the seller lives in the UK, or ‘no’ if the seller does not live in the UK",
-      "fileUpload.error.connectedPersons.invalid" -> "Enter ‘yes’ if you and the buyer are connected persons",
-      "fileUpload.error.applyingForRelief.invalid" -> "Enter ‘yes’ if you are applying for a relief, or ‘no’ if you are not applying for a relief",
-      "securitiesTarget.error.businessName.required" -> "Enter the name of the business you're buying securities in",
-      "chargingPoint.error.required.all" -> "Enter the date you bought the securities",
-      "fileUpload.error.taxRate.invalid" -> "Enter a tax rate of ‘0.5%’ or ‘1.5%’",
-      "fileUpload.error.whatTypeOfSecurities.required" -> "Enter the type of securities you are buying",
-      "fileUpload.error.securitiesQuantity.required" -> "Enter the number of shares you are buying",
-      "fileUpload.error.securitiesQuantity.minimum" -> "The number of shares must be at least 1",
-      "fileUpload.error.securitiesQuantity.maximum" -> "The number of shares you are buying must be below 999,999,999",
-      "amountPaidForSecurities.error.required" -> "Enter the amount you paid for the securities",
-      "fileUpload.error.sellerAddressLine1.required" -> "Enter the first line of your address",
-      "fileUpload.error.sellerPostcode.required" -> "Enter a postcode",
-      "fileUpload.error.totalMarketValue.maximum" -> "The market value of the securities must be £999,999,999 or below"
-    )
-  ))
+  private val app = applicationBuilder().build()
+
+  private val messagesApi: MessagesApi = app.injector.instanceOf[MessagesApi]
 
   private val support = new StcValidationSupport
 
@@ -89,7 +70,7 @@ class StcRowValidationServiceSpec extends AnyWordSpec with Matchers {
   implicit val columnIndex: ColumnIndexBuilder = new ColumnIndexBuilder(headers)
 
 
-  "StcRowValidationService.validateAll" must {
+  "StcRowValidationService.validateAll" - {
 
     "return no errors for a valid row" in {
 
@@ -115,7 +96,7 @@ class StcRowValidationServiceSpec extends AnyWordSpec with Matchers {
         )
       )
 
-      val result = service.validateAll(Seq(row), headers)
+      val result = service.validateAll(Seq(row), headers,affinityGroupKeyInd)
 
       result.head.validationErrors mustBe Seq.empty
     }
@@ -144,7 +125,7 @@ class StcRowValidationServiceSpec extends AnyWordSpec with Matchers {
         )
 
 
-      val result = service.validateAll(Seq(row), headers)
+      val result = service.validateAll(Seq(row), headers,affinityGroupKeyInd)
 
       val errors = result.head.validationErrors.map(_.fieldName)
 
