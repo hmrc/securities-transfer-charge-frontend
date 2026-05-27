@@ -94,7 +94,7 @@ class StcRowValidationServiceSpec extends AnyWordSpec with Matchers {
     "return no errors for a valid row" in {
 
       val row = ParsedRow(
-        rowNumber = 3,
+        rowNumber = 4,
         cells = Seq(
           ParsedCell(columnIndex.find(StcColumns.sellerName).getOrElse(-1), "Seller Ltd"),
           ParsedCell(columnIndex.find(StcColumns.sellerAddressInUK).getOrElse(-1), "yes"),
@@ -123,7 +123,7 @@ class StcRowValidationServiceSpec extends AnyWordSpec with Matchers {
     "combine basic and conditional validation errors" in {
 
       val row = ParsedRow(
-        rowNumber = 3,
+        rowNumber = 4,
         cells = Seq(
           ParsedCell(columnIndex.find(StcColumns.sellerName).getOrElse(-1), ""),
           ParsedCell(columnIndex.find(StcColumns.sellerAddressInUK).getOrElse(-1), "yes"),

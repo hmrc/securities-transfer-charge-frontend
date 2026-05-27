@@ -75,6 +75,11 @@ class FileUploadedController @Inject()(
         Future.successful(
           Redirect(routes.BulkUploadFileEmptyController.onPageLoad())
         )
+
+      case Left(FileParseError.InvalidTemplate) =>
+        Future.successful(
+          Redirect(routes.BulkUploadInvalidTemplateController.onPageLoad())
+        )
         
       case Left(_: FileParseError) =>
         Future.successful(

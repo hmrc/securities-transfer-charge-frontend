@@ -54,8 +54,6 @@ class ExcelFileParser @Inject()(config: FileUploadConfig) extends FileParser {
 
             val headerRow = allRows.head
 
-
-
             val headers =
               (0 until config.maxColumns).map { i =>
                 Option(headerRow.getCell(i))
@@ -64,13 +62,11 @@ class ExcelFileParser @Inject()(config: FileUploadConfig) extends FileParser {
                   .trim
               }
 
-
             val dataRows = allRows.tail
 
-
-            val parsedRows = dataRows.zipWithIndex.map { case (row, idx) =>
+            val parsedRows = dataRows.map { row =>
               ParsedRow(
-                rowNumber = idx + 2,
+                rowNumber = row.getRowNum + 1,
                 cells = (0 until config.maxColumns).map { i =>
                   val value = Option(row.getCell(i))
                     .map(extractCellValue)
@@ -81,7 +77,6 @@ class ExcelFileParser @Inject()(config: FileUploadConfig) extends FileParser {
                 }
               )
             }
-
 
             Right(
               ParsedFile(

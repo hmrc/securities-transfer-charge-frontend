@@ -624,3 +624,11 @@ fileUploaded.error.encryptedFile.p = The file you have uploaded is password-prot
 bulk.fileUpload.error.title = There was a problem uploading your file
 bulk.fileUpload.error.heading = There was a problem uploading your file
 bulk.fileUpload.error.p = The selected file could not be uploaded, try again.
+
+
+fileUpload.error.invalidTemplate.title = The template file you uploaded has been changed
+fileUpload.error.invalidTemplate.heading = The template file you uploaded has been changed
+fileUpload.error.invalidTemplate.p.start = You must
+fileUpload.error.invalidTemplate.p.link = use the template file
+fileUpload.error.invalidTemplate.p.end = to record details of the transfers, and upload this file.
+fileUpload.error.invalidTemplate.p2 = Remember, do not edit the first two rows, or change the order of columns in the template.

@@ -16,6 +16,8 @@
 
 package uk.gov.hmrc.securitiestransferchargefrontend.services.fileupload
 
+import java.nio.charset.StandardCharsets
+import java.security.MessageDigest
 import javax.inject.{Inject, Singleton}
 import uk.gov.hmrc.securitiestransferchargefrontend.config.FileUploadConfig
 import uk.gov.hmrc.securitiestransferchargefrontend.models.stf.fileupload.{FileParseError, ParsedFile, UploadedFile}
@@ -29,15 +31,46 @@ class StcUploadParsingService @Inject()(
   def parse(uploadedFile: UploadedFile): Either[FileParseError, ParsedFile] =
     fileParsingService.parse(uploadedFile).flatMap { parsedFile =>
 
-      val dataRows =
-        parsedFile.rows
-          .filter(_.rowNumber >= fileUploadConfig.firstDataRow)
-          .filterNot(_.isCompletelyEmpty)
-
-      if (dataRows.isEmpty) {
-        Left(FileParseError.EmptyFile)
+      if (!isTemplateValid(parsedFile)) {
+        Left(FileParseError.InvalidTemplate)
       } else {
-        Right(parsedFile.copy(rows = dataRows))
+        val dataRows =
+          parsedFile.rows
+            .filter(_.rowNumber >= fileUploadConfig.firstDataRow)
+            .filterNot(_.isCompletelyEmpty)
+
+        if (dataRows.isEmpty) {
+          Left(FileParseError.EmptyFile)
+        } else {
+          Right(parsedFile.copy(rows = dataRows))
+        }
       }
     }
+
+  private def isTemplateValid(parsedFile: ParsedFile): Boolean = {
+    val row1Valid = hashRow(parsedFile.headers) == fileUploadConfig.expectedRow1Hash
+
+    def isRowValid(rowNum: Int, expectedHash: String): Boolean = {
+      parsedFile.rows.find(_.rowNumber == rowNum) match {
+        case Some(row) =>
+          val orderedCells = row.cells.sortBy(_.columnIndex).map(_.rawValue)
+          hashRow(orderedCells) == expectedHash
+        case None =>
+          false
+      }
+    }
+
+    val row2Valid = isRowValid(2, fileUploadConfig.expectedRow2Hash)
+    val row3Valid = isRowValid(3, fileUploadConfig.expectedRow3Hash)
+
+    row1Valid && row2Valid && row3Valid
+  }
+
+  private def hashRow(cells: Seq[String]): String = {
+    val normalisedString = cells.map(_.trim).mkString("|")
+    val digest = MessageDigest.getInstance("SHA-256")
+    val hashBytes = digest.digest(normalisedString.getBytes(StandardCharsets.UTF_8))
+
+    hashBytes.map("%02x".format(_)).mkString
+  }
 }
