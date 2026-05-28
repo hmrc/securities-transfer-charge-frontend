@@ -71,13 +71,13 @@ final class StcAuthEnrolledActionImpl @Inject()(
             _ <- retrievalFilter.enrolledForStc(enrolments)
             subscriptionId <- retrievalFilter.subscriptionIdPresent(enrolments)
             rawCredentialId <- retrievalFilter.providerIdPresentFilter(maybeCredentials)
-            credentialsId = CredentialId(rawCredentialId)
+            credentialId = CredentialId(rawCredentialId)
           } yield StcAuthorisedRequest(
             request,
             internalId,
             affinityGroup,
             subscriptionId,
-            credentialsId
+            credentialId
           )
 
         maybeRequest.fold(identity, block)

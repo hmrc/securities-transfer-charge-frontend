@@ -17,9 +17,9 @@
 package services
 
 import base.Fixtures.{testAuditType, testCredentialId, testInternalId, testSubmissionId}
-import org.mockito.ArgumentMatchers.any
+import org.mockito.ArgumentMatchers.{any, eq as eqTo}
+import org.mockito.Mockito
 import org.mockito.Mockito.{times, verify, when}
-import org.mockito.{ArgumentCaptor, Mockito}
 import org.scalatest.BeforeAndAfterEach
 import org.scalatest.freespec.AnyFreeSpec
 import org.scalatest.matchers.must.Matchers
@@ -28,11 +28,10 @@ import play.api.libs.json.Json
 import uk.gov.hmrc.auth.core.AffinityGroup.{Agent, Individual, Organisation}
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.play.audit.http.connector.AuditConnector
-import uk.gov.hmrc.play.audit.model.ExtendedDataEvent
 import uk.gov.hmrc.securitiestransferchargefrontend.config.FrontendAppConfig
+import uk.gov.hmrc.securitiestransferchargefrontend.domain.CredentialId
 import uk.gov.hmrc.securitiestransferchargefrontend.models.audit.{AuditModel, JourneyStatus}
 import uk.gov.hmrc.securitiestransferchargefrontend.services.AuditService
-import uk.gov.hmrc.securitiestransferchargefrontend.domain.CredentialId
 
 import scala.concurrent.ExecutionContext.Implicits.global
 
@@ -51,10 +50,7 @@ class AuditServiceSpec extends AnyFreeSpec with Matchers with MockitoSugar with 
     Agent
   )
 
-  private val service = new AuditService(
-    mockAppConfig,
-    mockAuditConnector
-  )
+  private val service = new AuditService(mockAuditConnector)
 
   override def beforeEach(): Unit = {
     Mockito.reset(mockAuditConnector)
@@ -82,10 +78,6 @@ class AuditServiceSpec extends AnyFreeSpec with Matchers with MockitoSugar with 
 
           service.audit(auditModel)
 
-          val eventCaptor: ArgumentCaptor[ExtendedDataEvent] = ArgumentCaptor.forClass(classOf[ExtendedDataEvent])
-
-          verify(mockAuditConnector, times(1)).sendExtendedEvent(eventCaptor.capture())(any(), any())
-
           val expectedJson = Json.obj(
             "journeyStatus"  -> journeyStatus.toString,
             "internalId"   -> testInternalId,
@@ -94,11 +86,11 @@ class AuditServiceSpec extends AnyFreeSpec with Matchers with MockitoSugar with 
             "submissionId" -> testSubmissionId
           )
 
-          val event = eventCaptor.getValue
 
-          event.auditSource mustBe appName
-          event.auditType mustBe testAuditType
-          event.detail mustBe expectedJson
+          verify(mockAuditConnector, times(1)).sendExplicitAudit(
+            eqTo(testAuditType),
+            eqTo(expectedJson)
+          )(any(), any())
         }
       }
     }

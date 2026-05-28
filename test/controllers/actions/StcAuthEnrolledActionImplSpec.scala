@@ -97,7 +97,7 @@ class StcAuthEnrolledActionImplSpec extends SpecBase {
             req.internalId mustBe Fixtures.testInternalId
             req.affinityGroup mustBe AffinityGroup.Organisation
             req.subscriptionId mustBe Fixtures.testSubscriptionId
-            req.credentialsId mustBe Fixtures.testCredentialId
+            req.credentialId mustBe Fixtures.testCredentialId
             Future.successful(Results.Ok)
           })
 

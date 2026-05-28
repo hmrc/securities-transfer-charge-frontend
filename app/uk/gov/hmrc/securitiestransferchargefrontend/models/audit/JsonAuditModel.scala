@@ -16,9 +16,9 @@
 
 package uk.gov.hmrc.securitiestransferchargefrontend.models.audit
 
-import play.api.libs.json.JsValue
+import play.api.libs.json.JsObject
 
 trait JsonAuditModel {
   val auditType: String
-  val detail: JsValue
+  val detail: JsObject
 }

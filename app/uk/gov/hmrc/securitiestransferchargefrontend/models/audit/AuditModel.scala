@@ -16,7 +16,7 @@
 
 package uk.gov.hmrc.securitiestransferchargefrontend.models.audit
 
-import play.api.libs.json.{JsValue, Json}
+import play.api.libs.json.{JsObject, Json}
 import uk.gov.hmrc.auth.core.AffinityGroup
 import uk.gov.hmrc.securitiestransferchargefrontend.domain.{CredentialId, SubmissionId}
 
@@ -30,7 +30,7 @@ case class AuditModel(
 
   override val auditType: String = "StockTransferFormStatus"
 
-  override val detail: JsValue = Json.obj(
+  override val detail: JsObject = Json.obj(
     "journeyStatus" -> journeyStatus.toString,
     "internalId" -> internalId,
     "affinityGroup" -> affinityGroup,
