@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package navigation
+package navigation.stf
 
 import base.stubs.StubAnswerPersistenceService
 import base.{Fixtures, SpecBase}
