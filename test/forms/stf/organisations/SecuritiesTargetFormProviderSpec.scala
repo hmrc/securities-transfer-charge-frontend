@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package forms.stf.individuals
+package forms.stf.organisations
 
 import base.SpecBase
 import forms.behaviours.StringFieldBehaviours
@@ -23,15 +23,15 @@ import uk.gov.hmrc.securitiestransferchargefrontend.forms.stf.shared.SecuritiesT
 
 class SecuritiesTargetFormProviderSpec extends StringFieldBehaviours with SpecBase {
 
-  private val individualAffinityKey = affinityGroupKeyInd
+  private val orgAffinityKey = affinityGroupKeyOrg
 
-  val form = new SecuritiesTargetFormProvider()(affinityKey = individualAffinityKey)
+  val form = new SecuritiesTargetFormProvider()(affinityKey = orgAffinityKey)
 
   ".BusinessName" - {
 
     val fieldName = "businessName"
-    val requiredKey = s"$individualAffinityKey.securitiesTarget.error.businessName.required"
-    val lengthKey = s"$individualAffinityKey.securitiesTarget.error.businessName.length"
+    val requiredKey = s"$orgAffinityKey.securitiesTarget.error.businessName.required"
+    val lengthKey = s"$orgAffinityKey.securitiesTarget.error.businessName.length"
     val maxLength = 160
 
 
@@ -58,7 +58,7 @@ class SecuritiesTargetFormProviderSpec extends StringFieldBehaviours with SpecBa
   ".crn" - {
 
     val fieldName = "crn"
-    val lengthKey = s"$individualAffinityKey.securitiesTarget.error.crn.length"
+    val lengthKey = s"$orgAffinityKey.securitiesTarget.error.crn.length"
     val maxLength = 8
 
     behave like fieldThatBindsValidData(

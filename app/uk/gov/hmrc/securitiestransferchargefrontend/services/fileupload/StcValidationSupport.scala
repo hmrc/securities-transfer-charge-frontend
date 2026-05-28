@@ -18,6 +18,8 @@ package uk.gov.hmrc.securitiestransferchargefrontend.services.fileupload
 
 import play.api.data.{Form, FormError}
 import uk.gov.hmrc.securitiestransferchargefrontend.models.stf.fileupload.{ParsedRow, StcRowValidationError}
+
+import java.time.LocalDate
 import javax.inject.Singleton
 import scala.util.matching.Regex
 
@@ -39,6 +41,10 @@ class StcValidationSupport {
 
   private val ukPostcodePattern: Regex =
     """(?i)^[A-Z]{1,2}\d[A-Z\d]?\s?\d[A-Z]{2}$""".r
+
+  val typeOfShareMaxLength = 255
+  val maxCurrency: BigDecimal = BigDecimal(999999999)
+  val dateToday: LocalDate = LocalDate.now()
 
   
   def bindSingleValue[A](form: Form[A], rawValue: String): Seq[FormError] =

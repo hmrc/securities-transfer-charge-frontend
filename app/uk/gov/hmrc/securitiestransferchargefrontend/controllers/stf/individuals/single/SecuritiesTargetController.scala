@@ -16,14 +16,14 @@
 
 package uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.individuals.single
 
-import play.api.data.Form
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, Call, MessagesControllerComponents}
 import play.twirl.api.Html
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
-import uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.shared.SaveAndReturnButton.isReturn
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.actions.*
-import uk.gov.hmrc.securitiestransferchargefrontend.forms.stf.individuals.SecuritiesTargetFormProvider
+import uk.gov.hmrc.securitiestransferchargefrontend.controllers.actions.requests.StcDataRequest
+import uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.shared.SaveAndReturnButton.isReturn
+import uk.gov.hmrc.securitiestransferchargefrontend.forms.stf.shared.SecuritiesTargetFormProvider
 import uk.gov.hmrc.securitiestransferchargefrontend.models.stf.SecuritiesTarget
 import uk.gov.hmrc.securitiestransferchargefrontend.models.{Mode, UserAnswers}
 import uk.gov.hmrc.securitiestransferchargefrontend.navigation.Navigator
@@ -44,7 +44,8 @@ class SecuritiesTargetController @Inject()(
                                       view: SecuritiesTargetView
                                      )(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport {
 
-  val form: Form[SecuritiesTarget] = formProvider()
+  private def form(implicit request: StcDataRequest[_]) =
+    formProvider(request.request.affinityGroupKey)
 
   lazy val backLinkCall: Mode => UserAnswers => Call =
     mode => userAnswers => navigator.previousPage(SecuritiesTargetPage, mode, userAnswers)

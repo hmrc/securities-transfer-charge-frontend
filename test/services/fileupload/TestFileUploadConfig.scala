@@ -34,9 +34,9 @@ object TestFileUploadConfig {
         "file-upload.max-rows" -> maxRows,
         "file-upload.xlsx.expected-worksheet" -> expectedWorksheetName,
         "file-upload.first-data-row" -> firstDataRow,
-        "file-upload.template-hashes.individuals.stf.row1" -> row1Hash,
-        "file-upload.template-hashes.individuals.stf.row2" -> row2Hash,
-        "file-upload.template-hashes.individuals.stf.row3" -> row3Hash
+        "file-upload.template-hashes.individual.stf.row1" -> row1Hash,
+        "file-upload.template-hashes.individual.stf.row2" -> row2Hash,
+        "file-upload.template-hashes.individual.stf.row3" -> row3Hash
       )
     )
 }

@@ -16,16 +16,14 @@
 
 package services.fileupload
 
-import org.scalatest.matchers.must.Matchers
-import org.scalatest.wordspec.AnyWordSpec
+import base.SpecBase
 import play.api.i18n.MessagesApi
-import play.api.test.Helpers.stubMessagesApi
 import uk.gov.hmrc.securitiestransferchargefrontend.models.stf.fileupload.*
 import uk.gov.hmrc.securitiestransferchargefrontend.services.fileupload.*
 
 import java.time.LocalDate
 
-class StcConditionalRowValidatorSpec extends AnyWordSpec with Matchers {
+class StcConditionalRowValidatorSpec extends SpecBase {
 
   private implicit val cols: ColumnIndexBuilder = new ColumnIndexBuilder(Seq.empty)
 
@@ -58,38 +56,9 @@ class StcConditionalRowValidatorSpec extends AnyWordSpec with Matchers {
       purchaseForCancellation = None
     )
 
-  private val messagesApi: MessagesApi = stubMessagesApi(
-    Map(
-      "en" -> Map(
-        "fileUpload.error.whatReliefAreYouApplyingFor.invalid" ->
-          "Enter the name of the relief you are applying for. See a full list of reliefs (opens in new tab).",
-        "fileUpload.error.typeOfShares.required" ->
-          "If you are buying shares, enter the type of shares",
-        "fileUpload.error.sellerAddressLine1.required" ->
-          "Enter the first line of your address",
-        "fileUpload.error.sellerAddressLine1.length" ->
-          "Address line 1 must be 50 characters or fewer",
-        "fileUpload.error.sellerAddressLine1.invalidCharacters" ->
-          "Address line 1 can only include letters, numbers and the following characters: , . - '",
-        "fileUpload.error.sellerAddressLine2.length" ->
-          "Address line 2 must be fewer than 50 characters long",
-        "fileUpload.error.sellerAddressLine2.invalidCharacters" ->
-          "Address line 2 can only include letters, numbers and the following characters: , . - '",
-        "fileUpload.error.sellerPostcode.required" ->
-          "Enter a postcode",
-        "fileUpload.error.sellerPostcode.invalid" ->
-          "Enter a real postcode, like AA1 1AA",
-        "fileUpload.error.sellerCountry.length" ->
-          "Country must be 50 characters or fewer",
-        "fileUpload.error.sellerCountry.invalidCharacters" ->
-          "Country can only include letters, numbers and the following characters: , . - '",
-        "totalMarketValue.error.required" ->
-          "Enter the total market value of the securities",
-        "fileUpload.error.totalMarketValue.maximum" ->
-          "The market value of the securities must be £999,999,999 or below"
-      )
-    )
-  )
+  private val app = applicationBuilder().build()
+
+  private val messagesApi: MessagesApi = app.injector.instanceOf[MessagesApi]
 
   private val validator =
     new StcConditionalRowValidator(
@@ -97,10 +66,10 @@ class StcConditionalRowValidatorSpec extends AnyWordSpec with Matchers {
       messagesApi = messagesApi
     )
 
-  "StcConditionalRowValidator.validate STF" must {
+  "StcConditionalRowValidator.validate STF" - {
 
     "return no errors for a valid conditional row" in {
-      val result = validator.validate(validParsedRow, StcTemplate.STF)
+      val result = validator.validate(validParsedRow, StcTemplate.STF,affinityGroupKeyInd)
       result mustBe Seq.empty
     }
 
@@ -109,7 +78,7 @@ class StcConditionalRowValidatorSpec extends AnyWordSpec with Matchers {
         validParsedRow.copy(
           applyingForRelief = Some(true),
           whatReliefAreYouApplyingFor = None
-        ), StcTemplate.STF
+        ), StcTemplate.STF,affinityGroupKeyInd
       )
 
       result.exists(_.fieldName == "whatReliefAreYouApplyingFor") mustBe true
@@ -120,7 +89,7 @@ class StcConditionalRowValidatorSpec extends AnyWordSpec with Matchers {
         validParsedRow.copy(
           applyingForRelief = Some(true),
           whatReliefAreYouApplyingFor = Some("Made Up Relief")
-        ), StcTemplate.STF
+        ), StcTemplate.STF,affinityGroupKeyInd
       )
 
       result.exists(_.fieldName == "whatReliefAreYouApplyingFor") mustBe true
@@ -131,7 +100,7 @@ class StcConditionalRowValidatorSpec extends AnyWordSpec with Matchers {
         validParsedRow.copy(
           whatTypeOfSecurities = Some("shares"),
           typeOfShares = None
-        ), StcTemplate.STF
+        ), StcTemplate.STF,affinityGroupKeyInd
       )
 
       result.exists(_.fieldName == "typeOfShares") mustBe true
@@ -142,7 +111,7 @@ class StcConditionalRowValidatorSpec extends AnyWordSpec with Matchers {
         validParsedRow.copy(
           whatTypeOfSecurities = Some("Loan notes"),
           typeOfShares = None
-        ), StcTemplate.STF
+        ), StcTemplate.STF,affinityGroupKeyInd
       )
 
       result.map(_.fieldName) must not contain "typeOfShares"
@@ -153,7 +122,7 @@ class StcConditionalRowValidatorSpec extends AnyWordSpec with Matchers {
         validParsedRow.copy(
           sellerAddressInUK = Some(true),
           sellerAddressLine1 = None
-        ), StcTemplate.STF
+        ), StcTemplate.STF,affinityGroupKeyInd
       )
 
       result.exists(_.fieldName == "sellerAddressLine1") mustBe true
@@ -164,7 +133,7 @@ class StcConditionalRowValidatorSpec extends AnyWordSpec with Matchers {
         validParsedRow.copy(
           sellerAddressInUK = Some(true),
           sellerAddressLine1 = Some("Address @@@")
-        ), StcTemplate.STF
+        ), StcTemplate.STF,affinityGroupKeyInd
       )
 
       result.exists(_.fieldName == "sellerAddressLine1") mustBe true
@@ -175,7 +144,7 @@ class StcConditionalRowValidatorSpec extends AnyWordSpec with Matchers {
         validParsedRow.copy(
           sellerAddressInUK = Some(true),
           sellerPostcode = None
-        ), StcTemplate.STF
+        ), StcTemplate.STF,affinityGroupKeyInd
       )
 
       result.exists(_.fieldName == "sellerPostcode") mustBe true
@@ -186,7 +155,7 @@ class StcConditionalRowValidatorSpec extends AnyWordSpec with Matchers {
         validParsedRow.copy(
           sellerAddressInUK = Some(true),
           sellerPostcode = Some("not a postcode")
-        ), StcTemplate.STF
+        ), StcTemplate.STF,affinityGroupKeyInd
       )
 
       result.exists(_.fieldName == "sellerPostcode") mustBe true
@@ -199,7 +168,7 @@ class StcConditionalRowValidatorSpec extends AnyWordSpec with Matchers {
         validParsedRow.copy(
           sellerAddressInUK = Some(false),
           sellerCountry = Some(longCountry)
-        ), StcTemplate.STF
+        ), StcTemplate.STF,affinityGroupKeyInd
       )
 
       result.exists(_.fieldName == "sellerCountry") mustBe true
@@ -210,7 +179,7 @@ class StcConditionalRowValidatorSpec extends AnyWordSpec with Matchers {
         validParsedRow.copy(
           connectedPersons = Some(true),
           totalMarketValue = None
-        ), StcTemplate.STF
+        ), StcTemplate.STF,affinityGroupKeyInd
       )
 
       result.exists(_.fieldName == "totalMarketValue") mustBe true
@@ -221,17 +190,17 @@ class StcConditionalRowValidatorSpec extends AnyWordSpec with Matchers {
         validParsedRow.copy(
           connectedPersons = Some(true),
           totalMarketValue = Some(BigDecimal(1000000000))
-        ), StcTemplate.STF
+        ), StcTemplate.STF,affinityGroupKeyInd
       )
 
       result.exists(_.fieldName == "totalMarketValue") mustBe true
     }
   }
 
-  "StcConditionalRowValidator.validate SH03" must {
+  "StcConditionalRowValidator.validate SH03" - {
 
     "return no errors for a valid conditional row" in {
-      val result = validator.validate(validParsedRow, StcTemplate.SH03)
+      val result = validator.validate(validParsedRow, StcTemplate.SH03,affinityGroupKeyInd)
       result mustBe Seq.empty
     }
 
@@ -240,7 +209,7 @@ class StcConditionalRowValidatorSpec extends AnyWordSpec with Matchers {
         validParsedRow.copy(
           applyingForRelief = Some(true),
           whatReliefAreYouApplyingFor = None
-        ), StcTemplate.SH03
+        ), StcTemplate.SH03,affinityGroupKeyInd
       )
 
       result.exists(_.fieldName == "whatReliefAreYouApplyingFor") mustBe true

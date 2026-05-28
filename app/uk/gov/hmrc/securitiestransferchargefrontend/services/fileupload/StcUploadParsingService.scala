@@ -16,12 +16,12 @@
 
 package uk.gov.hmrc.securitiestransferchargefrontend.services.fileupload
 
+import uk.gov.hmrc.securitiestransferchargefrontend.config.FileUploadConfig
+import uk.gov.hmrc.securitiestransferchargefrontend.models.stf.fileupload.{FileParseError, ParsedFile, UploadedFile}
+
 import java.nio.charset.StandardCharsets
 import java.security.MessageDigest
 import javax.inject.{Inject, Singleton}
-import uk.gov.hmrc.auth.core.AffinityGroup
-import uk.gov.hmrc.securitiestransferchargefrontend.config.FileUploadConfig
-import uk.gov.hmrc.securitiestransferchargefrontend.models.stf.fileupload.{FileParseError, ParsedFile, UploadedFile}
 
 @Singleton
 class StcUploadParsingService @Inject()(
@@ -29,10 +29,10 @@ class StcUploadParsingService @Inject()(
                                          fileParsingService: FileParsingService
                                        ) {
 
-  def parse(uploadedFile: UploadedFile, affinityGroup: AffinityGroup): Either[FileParseError, ParsedFile] =
+  def parse(uploadedFile: UploadedFile, affinityKey:String): Either[FileParseError, ParsedFile] =
     fileParsingService.parse(uploadedFile).flatMap { parsedFile =>
 
-      if (!isTemplateValid(parsedFile, affinityGroup)) {
+      if (!isTemplateValid(parsedFile, affinityKey)) {
         Left(FileParseError.InvalidTemplate)
       } else {
         val dataRows =
@@ -48,10 +48,10 @@ class StcUploadParsingService @Inject()(
       }
     }
 
-  private def isTemplateValid(parsedFile: ParsedFile, affinityGroup: AffinityGroup): Boolean = {
-    val expectedRow1 = fileUploadConfig.expectedTemplateHash(affinityGroup, "stf", 1)
-    val expectedRow2 = fileUploadConfig.expectedTemplateHash(affinityGroup, "stf", 2)
-    val expectedRow3 = fileUploadConfig.expectedTemplateHash(affinityGroup, "stf", 3)
+  private def isTemplateValid(parsedFile: ParsedFile, affinityKey:String): Boolean = {
+    val expectedRow1 = fileUploadConfig.expectedTemplateHash(affinityKey, "stf", 1)
+    val expectedRow2 = fileUploadConfig.expectedTemplateHash(affinityKey, "stf", 2)
+    val expectedRow3 = fileUploadConfig.expectedTemplateHash(affinityKey, "stf", 3)
 
     val row1Valid = hashRow(parsedFile.headers) == expectedRow1
 
