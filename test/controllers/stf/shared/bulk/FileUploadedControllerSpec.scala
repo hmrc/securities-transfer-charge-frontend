@@ -159,7 +159,7 @@ class FileUploadedControllerSpec extends SpecBase with MockitoSugar with FileUpl
       when(mockRepository.find(anyArg()))
         .thenReturn(Future.successful(Some(testFileUpload)))
 
-      when(mockStcUpscanProcessingService.process(eqTo(testFileUpload))(using anyArg[HeaderCarrier]))
+      when(mockStcUpscanProcessingService.process(eqTo(testFileUpload),eqTo(affinityGroupKeyInd))(using anyArg[HeaderCarrier]))
         .thenReturn(Future.successful(Left(FileParseError.UnsupportedMimeType("application/pdf"))))
 
       val app = application
