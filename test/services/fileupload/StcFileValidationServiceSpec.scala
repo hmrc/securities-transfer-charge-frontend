@@ -126,7 +126,7 @@ class StcFileValidationServiceSpec extends SpecBase {
       when(
         stcRowValidationService.validateAll(
           Seq(parsedRow1, parsedRow2),
-          headers, affinityGroupKeyInd
+          headers, affinityGroupKeyInd, 25
         )
       ).thenReturn(Seq(validatedRow1, validatedRow2))
 

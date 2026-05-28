@@ -16,9 +16,10 @@
 
 package uk.gov.hmrc.securitiestransferchargefrontend.services.fileupload
 
-import uk.gov.hmrc.securitiestransferchargefrontend.models.stf.fileupload.{ParsedRow, ParsedStcRow, ValidatedStcRow}
+import uk.gov.hmrc.securitiestransferchargefrontend.models.stf.fileupload.{ParsedRow, ValidatedStcRow}
 
 import javax.inject.{Inject, Singleton}
+import scala.annotation.tailrec
 
 @Singleton
 class StcRowValidationService @Inject()(
@@ -29,33 +30,47 @@ class StcRowValidationService @Inject()(
   def validateAll(
                    rows: Seq[ParsedRow],
                    headers: Seq[String],
-                   affinityKey:String
+                   affinityKey: String,
+                   maxErrorsAllowed: Int
                  ): Seq[ValidatedStcRow] = {
 
     implicit val columnIndex: ColumnIndexBuilder = new ColumnIndexBuilder(headers)
     val mapper = new StcRowMapper(columnIndex)
-
-    val parsedRows: Seq[ParsedStcRow] =
-      rows.map(mapper.map)
-
     val template = detectTemplate(headers)
 
-    parsedRows.map { parsedRow =>
+    @tailrec
+    def processRows(
+                     remaining: List[ParsedRow],
+                     accumulated: List[ValidatedStcRow],
+                     blockingErrorCount: Int
+                   ): Seq[ValidatedStcRow] = {
 
-      ValidatedStcRow(
-        parsedRow = parsedRow,
-        validationErrors =
-          stcBasicRowValidator.validate(parsedRow, template,affinityKey) ++
-            stcConditionalRowValidator.validate(parsedRow, template, affinityKey)
-      )
+      remaining match {
+        case Nil =>
+          accumulated.reverse
+
+        case _ if blockingErrorCount > maxErrorsAllowed =>
+          accumulated.reverse
+
+        case head :: tail =>
+          val parsedRow = mapper.map(head)
+
+          val errors =
+            stcBasicRowValidator.validate(parsedRow, template, affinityKey) ++
+              stcConditionalRowValidator.validate(parsedRow, template, affinityKey)
+
+          val updatedErrorCount =
+            blockingErrorCount + errors.count(_.blocking)
+
+          processRows(tail, ValidatedStcRow(parsedRow, errors) :: accumulated, updatedErrorCount)
+      }
     }
+
+    processRows(rows.toList, Nil, 0)
   }
 
-
   private def detectTemplate(headers: Seq[String]): StcTemplate = {
-
     val normalised = headers.map(_.trim.toLowerCase).toSet
-
     val templates = Seq(StcTemplate.SH03, StcTemplate.STF)
 
     templates.find { template =>

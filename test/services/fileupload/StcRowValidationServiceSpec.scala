@@ -18,7 +18,7 @@ package services.fileupload
 
 import base.SpecBase
 import play.api.i18n.MessagesApi
-import uk.gov.hmrc.securitiestransferchargefrontend.forms.stf.shared.{NameOfSellerFormProvider,SecuritiesTargetFormProvider}
+import uk.gov.hmrc.securitiestransferchargefrontend.forms.stf.shared.{NameOfSellerFormProvider, SecuritiesTargetFormProvider}
 import uk.gov.hmrc.securitiestransferchargefrontend.models.stf.fileupload.{ParsedCell, ParsedRow}
 import uk.gov.hmrc.securitiestransferchargefrontend.services.fileupload.*
 
@@ -44,8 +44,6 @@ class StcRowValidationServiceSpec extends SpecBase {
       )
     )
 
-
-
   private val headers: Seq[String] =
     Seq(
       "STF",
@@ -67,8 +65,8 @@ class StcRowValidationServiceSpec extends SpecBase {
       StcColumns.typeOfShares,
       StcColumns.typeOfShares
     )
-  implicit val columnIndex: ColumnIndexBuilder = new ColumnIndexBuilder(headers)
 
+  implicit val columnIndex: ColumnIndexBuilder = new ColumnIndexBuilder(headers)
 
   "StcRowValidationService.validateAll" - {
 
@@ -96,7 +94,7 @@ class StcRowValidationServiceSpec extends SpecBase {
         )
       )
 
-      val result = service.validateAll(Seq(row), headers,affinityGroupKeyInd)
+      val result = service.validateAll(Seq(row), headers, affinityGroupKeyInd, 25)
 
       result.head.validationErrors mustBe Seq.empty
     }
@@ -121,11 +119,11 @@ class StcRowValidationServiceSpec extends SpecBase {
           ParsedCell(columnIndex.find(StcColumns.typeOfShares).getOrElse(-1), ""),
           ParsedCell(columnIndex.find(StcColumns.securitiesQuantity).getOrElse(-1), "100"),
           ParsedCell(columnIndex.find(StcColumns.amountPaidForSecurities).getOrElse(-1), "1000"),
-          ParsedCell(columnIndex.find(StcColumns.totalMarketValue).getOrElse(-1), ""))
+          ParsedCell(columnIndex.find(StcColumns.totalMarketValue).getOrElse(-1), "")
         )
+      )
 
-
-      val result = service.validateAll(Seq(row), headers,affinityGroupKeyInd)
+      val result = service.validateAll(Seq(row), headers, affinityGroupKeyInd, 25)
 
       val errors = result.head.validationErrors.map(_.fieldName)
 
@@ -137,6 +135,47 @@ class StcRowValidationServiceSpec extends SpecBase {
         "totalMarketValue",
         "typeOfShares"
       )
+    }
+
+    "stop processing rows once maxErrorsAllowed is exceeded" in {
+
+      val badRowTemplate = ParsedRow(
+        rowNumber = 4,
+        cells = Seq(
+          ParsedCell(columnIndex.find(StcColumns.sellerName).getOrElse(-1), ""),
+          ParsedCell(columnIndex.find(StcColumns.sellerAddressInUK).getOrElse(-1), "yes"),
+          ParsedCell(columnIndex.find(StcColumns.sellerAddressLine1).getOrElse(-1), ""),
+          ParsedCell(columnIndex.find(StcColumns.sellerPostcode).getOrElse(-1), ""),
+          ParsedCell(columnIndex.find(StcColumns.connectedPersons).getOrElse(-1), "yes"),
+          ParsedCell(columnIndex.find(StcColumns.applyingForRelief).getOrElse(-1), "yes"),
+          ParsedCell(columnIndex.find(StcColumns.whatRelief).getOrElse(-1), ""),
+          ParsedCell(columnIndex.find(StcColumns.securitiesTarget).getOrElse(-1), "Target Ltd"),
+          ParsedCell(columnIndex.find(StcColumns.companyRegistrationNumber).getOrElse(-1), "12345678"),
+          ParsedCell(columnIndex.find(StcColumns.chargingPoint).getOrElse(-1), "20/11/2025"),
+          ParsedCell(columnIndex.find(StcColumns.taxRate).getOrElse(-1), "0.5%"),
+          ParsedCell(columnIndex.find(StcColumns.whatTypeOfSecurities).getOrElse(-1), "shares"),
+          ParsedCell(columnIndex.find(StcColumns.typeOfShares).getOrElse(-1), ""),
+          ParsedCell(columnIndex.find(StcColumns.securitiesQuantity).getOrElse(-1), "100"),
+          ParsedCell(columnIndex.find(StcColumns.amountPaidForSecurities).getOrElse(-1), "1000"),
+          ParsedCell(columnIndex.find(StcColumns.totalMarketValue).getOrElse(-1), "")
+        )
+      )
+
+      val badRow1 = badRowTemplate.copy(rowNumber = 4)
+      val badRow2 = badRowTemplate.copy(rowNumber = 5)
+      val badRow3 = badRowTemplate.copy(rowNumber = 6)
+
+      val maxErrorsAllowed = 10
+
+      val result = service.validateAll(
+        Seq(badRow1, badRow2, badRow3),
+        headers,
+        affinityGroupKeyInd,
+        maxErrorsAllowed
+      )
+
+      result.size mustBe 2
+      result.map(_.parsedRow.rowNumber) mustBe Seq(4, 5)
     }
   }
 }

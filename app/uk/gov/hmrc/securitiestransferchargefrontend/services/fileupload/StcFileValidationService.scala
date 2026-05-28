@@ -27,9 +27,9 @@ class StcFileValidationService @Inject()(
                                           stcRowValidationService: StcRowValidationService
                                         ) {
 
-  def validate(rows: Seq[ParsedRow], headers: Seq[String], affinityKey:String): StcFileValidationResponse = {
+  def validate(rows: Seq[ParsedRow], headers: Seq[String], affinityKey: String): StcFileValidationResponse = {
     StcFileValidationResponse(
-      rows = stcRowValidationService.validateAll(rows, headers, affinityKey),
+      rows = stcRowValidationService.validateAll(rows, headers, affinityKey, config.maxErrorsAllowed),
       maxErrorsAllowed = config.maxErrorsAllowed
     )
   }
