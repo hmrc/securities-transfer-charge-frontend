@@ -23,7 +23,7 @@ import play.api.mvc.*
 import play.api.test.Helpers.*
 import play.api.test.{FakeRequest, Helpers}
 import uk.gov.hmrc.auth.core.*
-import uk.gov.hmrc.auth.core.retrieve.~
+import uk.gov.hmrc.auth.core.retrieve.{Credentials, ~}
 import uk.gov.hmrc.securitiestransferchargefrontend.config.FrontendAppConfig
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.actions.filters.RetrievalFilter
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.actions.{StcAuthEnrolledAction, StcAuthEnrolledActionImpl}
@@ -34,17 +34,18 @@ import scala.concurrent.Future
 class StcAuthEnrolledActionImplSpec extends SpecBase {
 
   type RetrievalType =
-    Option[String] ~ Enrolments ~ Option[AffinityGroup]
+    Option[String] ~ Enrolments ~ Option[AffinityGroup] ~ Option[Credentials]
 
-  private val enrolmentKey  = "HMRC-STC-ORG"
+  private val enrolmentKey = "HMRC-STC-ORG"
   private val identifierKey = "STCID"
 
   def buildRetrieval(
                       maybeInternalId: Option[String] = Some(Fixtures.testInternalId),
                       enrolments: Enrolments = Fixtures.enrolledForStc,
-                      maybeAffinityGroup: Option[AffinityGroup] = Some(AffinityGroup.Organisation)
+                      maybeAffinityGroup: Option[AffinityGroup] = Some(AffinityGroup.Organisation),
+                      maybeCredentials: Option[Credentials] = Some(Credentials(Fixtures.testCredentialId.value, "providerType"))
                     ): RetrievalType =
-    new ~(new ~(maybeInternalId, enrolments), maybeAffinityGroup)
+    new~(new~(new~(maybeInternalId, enrolments), maybeAffinityGroup), maybeCredentials)
 
   def testSetup(
                  application: Application,
@@ -95,7 +96,8 @@ class StcAuthEnrolledActionImplSpec extends SpecBase {
           action.invokeBlock(FakeRequest(), { req =>
             req.internalId mustBe Fixtures.testInternalId
             req.affinityGroup mustBe AffinityGroup.Organisation
-            req.subscriptionId  mustBe Fixtures.testSubscriptionId
+            req.subscriptionId mustBe Fixtures.testSubscriptionId
+            req.credentialsId mustBe Fixtures.testCredentialId
             Future.successful(Results.Ok)
           })
 
