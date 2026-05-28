@@ -16,9 +16,9 @@
 
 package uk.gov.hmrc.securitiestransferchargefrontend.config
 
-import javax.inject.{Inject, Singleton}
 import play.api.Configuration
-import uk.gov.hmrc.auth.core.AffinityGroup
+
+import javax.inject.{Inject, Singleton}
 
 @Singleton
 class FileUploadConfig @Inject()(configuration: Configuration) {
@@ -36,15 +36,9 @@ class FileUploadConfig @Inject()(configuration: Configuration) {
   val firstDataRow: Int =
     configuration.getOptional[Int]("file-upload.first-data-row").getOrElse(4)
 
-  def expectedTemplateHash(affinityGroup: AffinityGroup, templateType: String, row: Int): String = {
-    val groupKey = affinityGroup match {
-      case AffinityGroup.Individual => "individuals"
-      case AffinityGroup.Organisation => "organisations"
-      case AffinityGroup.Agent => "agents"
-      case _ => "individuals"
-    }
-
-    configuration.get[String](s"file-upload.template-hashes.$groupKey.$templateType.row$row")
+  def expectedTemplateHash(affinityKey:String, templateType: String, row: Int): String = {
+    
+    configuration.get[String](s"file-upload.template-hashes.$affinityKey.$templateType.row$row")
   }
 
 }

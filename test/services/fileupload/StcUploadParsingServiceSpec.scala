@@ -23,7 +23,6 @@ import org.scalatest.matchers.must.Matchers.mustBe
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpec
 import org.scalatestplus.mockito.MockitoSugar
-import uk.gov.hmrc.auth.core.AffinityGroup
 import uk.gov.hmrc.securitiestransferchargefrontend.models.stf.fileupload.*
 import uk.gov.hmrc.securitiestransferchargefrontend.services.fileupload.{FileParsingService, StcUploadParsingService}
 
@@ -66,7 +65,7 @@ class StcUploadParsingServiceSpec extends AnyWordSpec with Matchers with EitherV
     inputStream = new ByteArrayInputStream("irrelevant".getBytes(StandardCharsets.UTF_8))
   )
 
-  private val testAffinityGroup = AffinityGroup.Individual
+  private val testAffinityGroup = "individual"
 
   "parse" should {
 
