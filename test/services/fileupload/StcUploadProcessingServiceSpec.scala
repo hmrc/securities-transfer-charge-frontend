@@ -16,10 +16,12 @@
 
 package services.fileupload
 
+import org.mockito.ArgumentMatchers.eq as eqTo
 import org.mockito.Mockito.when
 import org.scalatest.matchers.must.Matchers
 import org.scalatest.wordspec.AnyWordSpec
 import org.scalatestplus.mockito.MockitoSugar
+import uk.gov.hmrc.auth.core.AffinityGroup
 import uk.gov.hmrc.securitiestransferchargefrontend.models.stf.fileupload.*
 import uk.gov.hmrc.securitiestransferchargefrontend.services.fileupload.{StcFileValidationService, StcUploadParsingService, StcUploadProcessingService}
 
@@ -35,6 +37,8 @@ class StcUploadProcessingServiceSpec extends AnyWordSpec with Matchers with Mock
       stcUploadParsingService = stcUploadParsingService,
       stcFileValidationService = stcFileValidationService
     )
+  
+  private val testAffinityGroup = AffinityGroup.Individual
 
   private val uploadedFile = UploadedFile(
     fileName = "test.csv",
@@ -96,20 +100,20 @@ class StcUploadProcessingServiceSpec extends AnyWordSpec with Matchers with Mock
   "StcUploadProcessingService.process" must {
 
     "parse then validate the uploaded file" in {
-      when(stcUploadParsingService.parse(uploadedFile))
+      when(stcUploadParsingService.parse(eqTo(uploadedFile), eqTo(testAffinityGroup)))
         .thenReturn(Right(parsedFile))
 
       when(stcFileValidationService.validate(parsedFile.rows, parsedFile.headers))
         .thenReturn(validationResponse)
-
-      service.process(uploadedFile) mustBe Right(validationResponse)
+      
+      service.process(uploadedFile, testAffinityGroup) mustBe Right(validationResponse)
     }
 
     "return parse errors without validating" in {
-      when(stcUploadParsingService.parse(uploadedFile))
+      when(stcUploadParsingService.parse(eqTo(uploadedFile), eqTo(testAffinityGroup)))
         .thenReturn(Left(FileParseError.EmptyFile))
-
-      service.process(uploadedFile) mustBe Left(FileParseError.EmptyFile)
+      
+      service.process(uploadedFile, testAffinityGroup) mustBe Left(FileParseError.EmptyFile)
     }
   }
 }
