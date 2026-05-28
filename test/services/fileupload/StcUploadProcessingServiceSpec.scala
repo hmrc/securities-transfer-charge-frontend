@@ -44,7 +44,7 @@ class StcUploadProcessingServiceSpec extends SpecBase with MockitoSugar {
   private val headers = Seq("nameOfSeller")
 
   private val parsedRow = ParsedRow(
-    rowNumber = 3,
+    rowNumber = 4,
     cells = Seq(
       ParsedCell(1, "Seller Ltd")
     )
@@ -61,7 +61,7 @@ class StcUploadProcessingServiceSpec extends SpecBase with MockitoSugar {
     rows = Seq(
       ValidatedStcRow(
         parsedRow = ParsedStcRow(
-          rowNumber = 3,
+          rowNumber = 4,
           sellerName = Some("Seller 1"),
           sellerAddressInUK = None,
           sellerAddressLine1 = None,

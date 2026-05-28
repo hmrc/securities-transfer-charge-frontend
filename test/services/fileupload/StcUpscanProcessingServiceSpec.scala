@@ -32,7 +32,7 @@ import java.time.{Instant, LocalDate}
 import scala.concurrent.Future
 
 class StcUpscanProcessingServiceSpec extends SpecBase with EitherValues  with MockitoSugar {
-  
+
   private val upscanFileDownloadService = mock[UpscanFileDownloadService]
   private val stcUploadProcessingService = mock[StcUploadProcessingService]
 

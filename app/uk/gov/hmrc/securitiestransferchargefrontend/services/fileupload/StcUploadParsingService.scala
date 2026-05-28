@@ -16,7 +16,10 @@
 
 package uk.gov.hmrc.securitiestransferchargefrontend.services.fileupload
 
+import java.nio.charset.StandardCharsets
+import java.security.MessageDigest
 import javax.inject.{Inject, Singleton}
+import uk.gov.hmrc.auth.core.AffinityGroup
 import uk.gov.hmrc.securitiestransferchargefrontend.config.FileUploadConfig
 import uk.gov.hmrc.securitiestransferchargefrontend.models.stf.fileupload.{FileParseError, ParsedFile, UploadedFile}
 
@@ -26,18 +29,53 @@ class StcUploadParsingService @Inject()(
                                          fileParsingService: FileParsingService
                                        ) {
 
-  def parse(uploadedFile: UploadedFile): Either[FileParseError, ParsedFile] =
+  def parse(uploadedFile: UploadedFile, affinityGroup: AffinityGroup): Either[FileParseError, ParsedFile] =
     fileParsingService.parse(uploadedFile).flatMap { parsedFile =>
 
-      val dataRows =
-        parsedFile.rows
-          .filter(_.rowNumber >= fileUploadConfig.firstDataRow)
-          .filterNot(_.isCompletelyEmpty)
-
-      if (dataRows.isEmpty) {
-        Left(FileParseError.EmptyFile)
+      if (!isTemplateValid(parsedFile, affinityGroup)) {
+        Left(FileParseError.InvalidTemplate)
       } else {
-        Right(parsedFile.copy(rows = dataRows))
+        val dataRows =
+          parsedFile.rows
+            .filter(_.rowNumber >= fileUploadConfig.firstDataRow)
+            .filterNot(_.isCompletelyEmpty)
+
+        if (dataRows.isEmpty) {
+          Left(FileParseError.EmptyFile)
+        } else {
+          Right(parsedFile.copy(rows = dataRows))
+        }
       }
     }
+
+  private def isTemplateValid(parsedFile: ParsedFile, affinityGroup: AffinityGroup): Boolean = {
+    val expectedRow1 = fileUploadConfig.expectedTemplateHash(affinityGroup, "stf", 1)
+    val expectedRow2 = fileUploadConfig.expectedTemplateHash(affinityGroup, "stf", 2)
+    val expectedRow3 = fileUploadConfig.expectedTemplateHash(affinityGroup, "stf", 3)
+
+    val row1Valid = hashRow(parsedFile.headers) == expectedRow1
+
+    def isRowValid(rowNum: Int, expectedHash: String): Boolean = {
+      parsedFile.rows.find(_.rowNumber == rowNum) match {
+        case Some(row) =>
+          val orderedCells = row.cells.sortBy(_.columnIndex).map(_.rawValue)
+          hashRow(orderedCells) == expectedHash
+        case None =>
+          false
+      }
+    }
+
+    val row2Valid = isRowValid(2, expectedRow2)
+    val row3Valid = isRowValid(3, expectedRow3)
+
+    row1Valid && row2Valid && row3Valid
+  }
+
+  private def hashRow(cells: Seq[String]): String = {
+    val normalisedString = cells.map(_.trim).mkString("|")
+    val digest = MessageDigest.getInstance("SHA-256")
+    val hashBytes = digest.digest(normalisedString.getBytes(StandardCharsets.UTF_8))
+
+    hashBytes.map("%02x".format(_)).mkString
+  }
 }

@@ -84,6 +84,16 @@ class FileUploadedController @Inject()(
           Redirect(routes.BulkUploadFileEmptyController.onPageLoad())
         )
 
+      case Left(FileParseError.InvalidTemplate) =>
+        Future.successful(
+          Redirect(routes.BulkUploadInvalidTemplateController.onPageLoad())
+        )
+
+      case Left(_: FileParseError) =>
+        Future.successful(
+          Redirect(JourneyRecoveryController.onPageLoad())
+        )
+
       case Right(validationResponse) if validationResponse.tooManyBlockingErrors =>
         Future.successful(
           Redirect(routes.FormattingErrorController.onPageLoad())
@@ -98,14 +108,13 @@ class FileUploadedController @Inject()(
             )
           }
 
-
       case Right(_) =>
         subscriptionConnector.getAndStoreSubscription(request.subscriptionId)
           .map(_ => Ok(view(fileUpload)))
           .recover {
             case _ => Redirect(JourneyRecoveryController.onPageLoad())
           }
-      case _ => Future.successful(Redirect(JourneyRecoveryController.onPageLoad()))
+
     }.recover {
       case _: UpscanDownloadException =>
         Redirect(routes.BulkUploadErrorController.onPageLoad())

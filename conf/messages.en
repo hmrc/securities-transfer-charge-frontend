@@ -358,13 +358,6 @@ formattingError.p2 = The errors may include things like incorrect formatting of 
 formattingError.p3 = These will need to be corrected before your file can be uploaded again.
 formattingError.p4 = Check the instructions in the template file for more guidance.
 
-changedFileError.title = There is a problem with your uploaded file
-changedFileError.heading = There is a problem with your uploaded file
-changedFileError.p1 = The header rows or columns have been changed.
-changedFileError.p2 = Correct the errors then you can upload the file again, or upload a different file.
-changedFileError.p3 = Remember, do not edit the first two rows of the template, or change the order of the columns.
-changedFileError.download.text = Download the template file
-
 fileUpload.title = Upload your file
 fileUpload.heading = Upload your file
 fileUpload.label = Upload a file
@@ -654,8 +647,15 @@ bulk.fileUpload.error.p = The selected file could not be uploaded, try again.
 
 bulk.rows.error.title = There was a problem uploading your file
 bulk.rows.error.heading = There was a problem uploading your file
-bulk.rows.error.p = There were too many rows in your uploaded file. The number of rows must be 10,000 or fewer.
+bulk.rows.error.p = There are too many rows in your uploaded file. The number of rows must be 10,000 or fewer.
 
 bulk.duplicate.error.title = You have uploaded this file before
 bulk.duplicate.error.heading = You have uploaded this file before
 bulk.duplicate.error.p = This file has been uploaded in the last {0} days, check you have the correct file.
+
+fileUpload.error.invalidTemplate.title = The template file you uploaded has been changed
+fileUpload.error.invalidTemplate.heading = The template file you uploaded has been changed
+fileUpload.error.invalidTemplate.p.start = You must
+fileUpload.error.invalidTemplate.p.link = use the template file
+fileUpload.error.invalidTemplate.p.end = to record details of the transfers, and upload this file.
+fileUpload.error.invalidTemplate.p2 = Remember, do not edit the first two rows, or change the order of columns in the template.
