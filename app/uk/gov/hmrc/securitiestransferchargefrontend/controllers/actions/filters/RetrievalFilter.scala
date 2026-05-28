@@ -17,6 +17,7 @@
 package uk.gov.hmrc.securitiestransferchargefrontend.controllers.actions.filters
 
 import play.api.mvc.Result
+import uk.gov.hmrc.auth.core.retrieve.Credentials
 import uk.gov.hmrc.auth.core.{AffinityGroup, Enrolments}
 import uk.gov.hmrc.securitiestransferchargefrontend.config.FrontendAppConfig
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.Redirects
@@ -30,19 +31,19 @@ type RetrievalFilterFunction[A, B] = A => RetrievalFilterResult[B]
 
 
 class RetrievalFilter @Inject()(
-                                    appConfig: FrontendAppConfig,
-                                    redirects: Redirects
-                                  ) {
+                                 appConfig: FrontendAppConfig,
+                                 redirects: Redirects
+                               ) {
 
-  import redirects._
+  import redirects.*
 
   val internalIdPresent: RetrievalFilterFunction[Option[String], String] =
     case Some(id) => Right(id)
-    case None     => Left(redirectToUnauthorisedF)
+    case None => Left(redirectToUnauthorisedF)
 
   val affinityGroupPresent: RetrievalFilterFunction[Option[AffinityGroup], AffinityGroup] =
     case Some(ag) => Right(ag)
-    case None     => Left(redirectToUnauthorisedF)
+    case None => Left(redirectToUnauthorisedF)
 
   val enrolledForStc: RetrievalFilterFunction[Enrolments, Unit] = enrolments =>
     enrolments
@@ -55,7 +56,13 @@ class RetrievalFilter @Inject()(
     enrolments
       .getEnrolment(appConfig.stcEnrolmentKey)
       .flatMap(_.getIdentifier(appConfig.stcIdentifierKey))
-      .map(id  => SubscriptionId(id.value))
+      .map(id => SubscriptionId(id.value))
       .map(Right(_))
       .getOrElse(Left(redirectToJourneyRecoveryF))
+
+  val providerIdPresentFilter: RetrievalFilterFunction[Option[Credentials], String] = {
+    case Some(Credentials(providerId, _)) => Right(providerId)
+    case _ => Left(redirectToUnauthorisedF)
+  }
+
 }
