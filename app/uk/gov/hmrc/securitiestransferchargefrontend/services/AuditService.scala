@@ -32,6 +32,6 @@ class AuditService @Inject()(
     auditConnector.sendExplicitAudit(
       auditType = eventData.auditType,
       detail = eventData.detail
-    )()
+    )
   }
 }
