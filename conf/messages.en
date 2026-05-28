@@ -627,7 +627,7 @@ bulk.fileUpload.error.p = The selected file could not be uploaded, try again.
 
 bulk.rows.error.title = There was a problem uploading your file
 bulk.rows.error.heading = There was a problem uploading your file
-bulk.rows.error.p = There were too many rows in your uploaded file. The number of rows must be 10,000 or fewer.
+bulk.rows.error.p = There are too many rows in your uploaded file. The number of rows must be 10,000 or fewer.
 
 bulk.duplicate.error.title = You have uploaded this file before
 bulk.duplicate.error.heading = You have uploaded this file before
