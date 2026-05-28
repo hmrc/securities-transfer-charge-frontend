@@ -31,7 +31,7 @@ import java.nio.charset.StandardCharsets
 import java.time.{Instant, LocalDate}
 import scala.concurrent.Future
 
-class StcUpscanProcessingServiceSpec extends SpecBase with EitherValues  with MockitoSugar {
+class StcUpscanProcessingServiceSpec extends SpecBase with EitherValues with MockitoSugar {
 
   private val upscanFileDownloadService = mock[UpscanFileDownloadService]
   private val stcUploadProcessingService = mock[StcUploadProcessingService]
@@ -91,7 +91,8 @@ class StcUpscanProcessingServiceSpec extends SpecBase with EitherValues  with Mo
   )
 
   private val validationResponse = StcFileValidationResponse(
-    rows = Seq(ValidatedStcRow(parsedRow, Seq.empty))
+    rows = Seq(ValidatedStcRow(parsedRow, Seq.empty)),
+    maxErrorsAllowed = 25
   )
 
   "process" - {
@@ -99,15 +100,15 @@ class StcUpscanProcessingServiceSpec extends SpecBase with EitherValues  with Mo
     "download and process a ready upload successfully" in {
       when(upscanFileDownloadService.toUploadedFile(eqTo(fileUpload))(any[HeaderCarrier]))
         .thenReturn(Future.successful(uploadedFile))
-      when(stcUploadProcessingService.process(eqTo(uploadedFile),eqTo(affinityGroupKeyInd)))
+      when(stcUploadProcessingService.process(eqTo(uploadedFile), eqTo(affinityGroupKeyInd)))
         .thenReturn(Right(validationResponse))
 
-      val result = service.process(fileUpload,affinityGroupKeyInd).futureValue
+      val result = service.process(fileUpload, affinityGroupKeyInd).futureValue
 
       result.value mustBe validationResponse
 
       verify(upscanFileDownloadService).toUploadedFile(eqTo(fileUpload))(any[HeaderCarrier])
-      verify(stcUploadProcessingService).process(eqTo(uploadedFile),eqTo(affinityGroupKeyInd))
+      verify(stcUploadProcessingService).process(eqTo(uploadedFile), eqTo(affinityGroupKeyInd))
     }
 
     "return the parse error when processing fails" in {
@@ -115,10 +116,10 @@ class StcUpscanProcessingServiceSpec extends SpecBase with EitherValues  with Mo
 
       when(upscanFileDownloadService.toUploadedFile(eqTo(fileUpload))(any[HeaderCarrier]))
         .thenReturn(Future.successful(uploadedFile))
-      when(stcUploadProcessingService.process(eqTo(uploadedFile),eqTo(affinityGroupKeyInd)))
+      when(stcUploadProcessingService.process(eqTo(uploadedFile), eqTo(affinityGroupKeyInd)))
         .thenReturn(Left(parseError))
 
-      val result = service.process(fileUpload,affinityGroupKeyInd).futureValue
+      val result = service.process(fileUpload, affinityGroupKeyInd).futureValue
 
       result.left.value mustBe parseError
     }
@@ -126,7 +127,7 @@ class StcUpscanProcessingServiceSpec extends SpecBase with EitherValues  with Mo
     "fail when the upload status is not Ready" in {
       val initiatedUpload = fileUpload.copy(status = UpscanJourneyStatus.Initiated)
 
-      val exception = service.process(initiatedUpload,affinityGroupKeyInd).failed.futureValue
+      val exception = service.process(initiatedUpload, affinityGroupKeyInd).failed.futureValue
 
       exception mustBe a[IllegalArgumentException]
       exception.getMessage mustBe "Cannot process upload unless status is Ready. Current status: Initiated"
@@ -135,7 +136,7 @@ class StcUpscanProcessingServiceSpec extends SpecBase with EitherValues  with Mo
     "fail when the upload status is Failed" in {
       val failedUpload = fileUpload.copy(status = UpscanJourneyStatus.Failed)
 
-      val exception = service.process(failedUpload,affinityGroupKeyInd).failed.futureValue
+      val exception = service.process(failedUpload, affinityGroupKeyInd).failed.futureValue
 
       exception mustBe a[IllegalArgumentException]
       exception.getMessage mustBe "Cannot process upload unless status is Ready. Current status: Failed"

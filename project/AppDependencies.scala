@@ -11,7 +11,8 @@ object AppDependencies {
     "uk.gov.hmrc"       %% "bootstrap-frontend-play-30"    % bootstrapVersion,
     "uk.gov.hmrc.mongo" %% "hmrc-mongo-play-30"            % hmrcMongoVersion,
     "org.apache.poi"    % "poi-ooxml"                     % "5.5.1",
-    "org.apache.commons" % "commons-csv"                  % "1.14.1"
+    "org.apache.commons" % "commons-csv"                  % "1.14.1",
+    "com.github.pjfanning" % "excel-streaming-reader"     % "5.2.0"
 
   )
 

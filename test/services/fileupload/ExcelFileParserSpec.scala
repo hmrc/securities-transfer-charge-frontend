@@ -156,6 +156,7 @@ class ExcelFileParserSpec extends AnyWordSpec with Matchers with EitherValues {
         header.createCell(0).setCellValue("header")
 
         sheet.createRow(1).createCell(0).setCellValue("row1")
+        sheet.createRow(2).createCell(0).setCellValue("row2")
       }
 
       val parser = new ExcelFileParser(TestFileUploadConfig.config(maxRows = 1))

@@ -16,9 +16,9 @@
 
 package uk.gov.hmrc.securitiestransferchargefrontend.services.fileupload
 
+import com.github.pjfanning.xlsx.StreamingReader
 import uk.gov.hmrc.securitiestransferchargefrontend.config.FileUploadConfig
-import org.apache.poi.ss.usermodel.{Cell, CellType, DateUtil, Row}
-import org.apache.poi.xssf.usermodel.XSSFWorkbook
+import org.apache.poi.ss.usermodel.{Cell, CellType, DateUtil, Row, Workbook}
 import uk.gov.hmrc.securitiestransferchargefrontend.models.stf.fileupload.FileParseError.{InvalidXlsx, MissingWorksheet, RowLimitExceeded}
 import uk.gov.hmrc.securitiestransferchargefrontend.models.stf.fileupload.{FileParseError, ParsedCell, ParsedFile, ParsedRow, UploadedFile}
 
@@ -31,16 +31,19 @@ import scala.util.Try
 @Singleton
 class ExcelFileParser @Inject()(config: FileUploadConfig) extends FileParser {
 
+  private val dateFormatter = DateTimeFormatter.ISO_LOCAL_DATE
+  
   private def isEmptyRow(row: Row): Boolean =
     row.cellIterator().asScala.forall { cell =>
-      cell.toString.trim.isEmpty
+      extractCellValue(cell).isEmpty
     }
-
-  private val dateFormatter = DateTimeFormatter.ISO_LOCAL_DATE
 
   override def parse(file: UploadedFile): Either[FileParseError, ParsedFile] =
     Try {
-      val workbook = new XSSFWorkbook(file.inputStream)
+      val workbook: Workbook = StreamingReader.builder()
+        .rowCacheSize(100)
+        .bufferSize(4096)
+        .open(file.inputStream)
 
       try {
         val sheet =
@@ -49,16 +52,13 @@ class ExcelFileParser @Inject()(config: FileUploadConfig) extends FileParser {
             .toRight(MissingWorksheet(config.expectedWorksheetName))
 
         sheet.flatMap { worksheet =>
-          val allRows =  worksheet.iterator().asScala.toSeq.filterNot(isEmptyRow)
+          val rowIterator = worksheet.iterator().asScala.filterNot(isEmptyRow)
 
-          if (allRows.isEmpty) {
-            Left(InvalidXlsx("The file is empty"))
-          } else if (allRows.size > config.maxRows) {
-            Left(RowLimitExceeded(allRows.size, config.maxRows))
+          if (!rowIterator.hasNext) {
+            Left(InvalidXlsx("The file is empty or only contains empty rows"))
           } else {
-
-            val headerRow = allRows.head
-
+            
+            val headerRow = rowIterator.next()
             val headers =
               (0 until config.maxColumns).map { i =>
                 Option(headerRow.getCell(i))
@@ -66,31 +66,36 @@ class ExcelFileParser @Inject()(config: FileUploadConfig) extends FileParser {
                   .getOrElse("")
                   .trim
               }
+            
+            val dataRows = rowIterator.take(config.maxRows + 1).toList
 
-            val dataRows = allRows.tail
+            if (dataRows.size > config.maxRows) {
+              Left(RowLimitExceeded(config.maxRows + 1, config.maxRows))
+            } else {
 
-            val parsedRows = dataRows.map { row =>
-              ParsedRow(
-                rowNumber = row.getRowNum + 1,
-                cells = (0 until config.maxColumns).map { i =>
-                  val value = Option(row.getCell(i))
-                    .map(extractCellValue)
-                    .getOrElse("")
-                    .trim
+              val parsedRows = dataRows.map { row =>
+                ParsedRow(
+                  rowNumber = row.getRowNum + 1,
+                  cells = (0 until config.maxColumns).map { i =>
+                    val value = Option(row.getCell(i))
+                      .map(extractCellValue)
+                      .getOrElse("")
+                      .trim
 
-                  ParsedCell(i, value)
-                }
+                    ParsedCell(i, value)
+                  }
+                )
+              }
+
+              Right(
+                ParsedFile(
+                  fileName = file.fileName,
+                  mimeType = file.mimeType,
+                  headers = headers,
+                  rows = parsedRows
+                )
               )
             }
-
-            Right(
-              ParsedFile(
-                fileName = file.fileName,
-                mimeType = file.mimeType,
-                headers = headers,
-                rows = parsedRows
-              )
-            )
           }
         }
       } finally {

@@ -19,13 +19,13 @@ package base
 import uk.gov.hmrc.securitiestransferchargefrontend.models.stf.fileupload.{ParsedStcRow, StcFileValidationResponse, StcRowValidationError, ValidatedStcRow}
 import uk.gov.hmrc.securitiestransferchargefrontend.models.stf.upscan.{FileUpload, UpscanJourneyStatus}
 
-
 trait FileUploadFixtures {
 
   val reference = "test-reference"
 
   val successfulValidationResponse: StcFileValidationResponse = StcFileValidationResponse(
-    rows = Seq.empty
+    rows = Seq.empty,
+    maxErrorsAllowed = 25
   )
 
   def readyFileUpload(reference: String = "ref123"): FileUpload =
@@ -42,7 +42,7 @@ trait FileUploadFixtures {
     FileUpload(
       reference = reference,
       status = UpscanJourneyStatus.Failed
-    )  
+    )
 
   def parsedStcRow(rowNumber: Int = 6): ParsedStcRow =
     ParsedStcRow(
@@ -73,14 +73,18 @@ trait FileUploadFixtures {
       purchaseForCancellation = Some(false)
     )
 
-  def validationResponseWithErrors(errors: Seq[StcRowValidationError]): StcFileValidationResponse =
+  def validationResponseWithErrors(
+                                    errors: Seq[StcRowValidationError],
+                                    maxErrorsAllowed: Int = 25
+                                  ): StcFileValidationResponse =
     StcFileValidationResponse(
       rows = Seq(
         ValidatedStcRow(
           parsedRow = parsedStcRow(),
           validationErrors = errors
         )
-      )
+      ),
+      maxErrorsAllowed = maxErrorsAllowed
     )
 
   val blockingValidationErrors: Seq[StcRowValidationError] =
@@ -99,7 +103,7 @@ trait FileUploadFixtures {
         message = "Enter the first line of your address",
         blocking = true
       )
-    )  
+    )
 
   def withBlockingErrors(count: Int): Seq[StcRowValidationError] =
     (1 to count).map { i =>

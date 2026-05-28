@@ -19,14 +19,16 @@ package services.fileupload
 import base.SpecBase
 import org.mockito.Mockito.when
 import org.scalatestplus.mockito.MockitoSugar.mock
+import uk.gov.hmrc.securitiestransferchargefrontend.config.FileUploadConfig
 import uk.gov.hmrc.securitiestransferchargefrontend.models.stf.fileupload.*
 import uk.gov.hmrc.securitiestransferchargefrontend.services.fileupload.*
 
-class StcFileValidationServiceSpec extends SpecBase{
-  
-  private val stcRowValidationService = mock[StcRowValidationService]
+class StcFileValidationServiceSpec extends SpecBase {
 
-  private val service = new StcFileValidationService(stcRowValidationService)
+  private val stcRowValidationService = mock[StcRowValidationService]
+  private val mockConfig = mock[FileUploadConfig]
+
+  private val service = new StcFileValidationService(mockConfig, stcRowValidationService)
 
   private val headers: Seq[String] =
     Seq("sellerName")
@@ -119,16 +121,19 @@ class StcFileValidationServiceSpec extends SpecBase{
 
     "validate each parsed row and return a file validation response" in {
 
+      when(mockConfig.maxErrorsAllowed).thenReturn(25)
+
       when(
         stcRowValidationService.validateAll(
           Seq(parsedRow1, parsedRow2),
-          headers,affinityGroupKeyInd
+          headers, affinityGroupKeyInd
         )
       ).thenReturn(Seq(validatedRow1, validatedRow2))
 
-      val result = service.validate(Seq(parsedRow1, parsedRow2), headers,affinityGroupKeyInd)
+      val result = service.validate(Seq(parsedRow1, parsedRow2), headers, affinityGroupKeyInd)
 
       result.rows mustBe Seq(validatedRow1, validatedRow2)
+      result.maxErrorsAllowed mustBe 25
       result.hasErrors mustBe true
       result.hasBlockingErrors mustBe true
       result.validRows mustBe Seq(validatedRow1.parsedRow)

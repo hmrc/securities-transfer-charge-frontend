@@ -89,26 +89,27 @@ class StcUploadProcessingServiceSpec extends SpecBase with MockitoSugar {
         ),
         validationErrors = Seq.empty
       )
-    )
+    ),
+    maxErrorsAllowed = 25
   )
 
   "StcUploadProcessingService.process" - {
 
     "parse then validate the uploaded file" in {
-      when(stcUploadParsingService.parse(uploadedFile,affinityGroupKeyInd))
+      when(stcUploadParsingService.parse(uploadedFile, affinityGroupKeyInd))
         .thenReturn(Right(parsedFile))
 
-      when(stcFileValidationService.validate(parsedFile.rows, parsedFile.headers,affinityGroupKeyInd))
+      when(stcFileValidationService.validate(parsedFile.rows, parsedFile.headers, affinityGroupKeyInd))
         .thenReturn(validationResponse)
 
-      service.process(uploadedFile,affinityGroupKeyInd) mustBe Right(validationResponse)
+      service.process(uploadedFile, affinityGroupKeyInd) mustBe Right(validationResponse)
     }
 
     "return parse errors without validating" in {
-      when(stcUploadParsingService.parse(uploadedFile,affinityGroupKeyInd))
+      when(stcUploadParsingService.parse(uploadedFile, affinityGroupKeyInd))
         .thenReturn(Left(FileParseError.EmptyFile))
 
-      service.process(uploadedFile,affinityGroupKeyInd) mustBe Left(FileParseError.EmptyFile)
+      service.process(uploadedFile, affinityGroupKeyInd) mustBe Left(FileParseError.EmptyFile)
     }
   }
 }
