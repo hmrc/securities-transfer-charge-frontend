@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package models.fileupload
+package models.stf.fileupload
 
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpec

@@ -45,7 +45,7 @@ class StfNavigatorSpec extends SpecBase with ScalaFutures {
   
   val navigator = new StfNavigator(mockConfig, StubAnswerPersistenceService())
 
-  "Navigator" - {
+  "StfNavigator" - {
 
     "in Normal mode" - {
 

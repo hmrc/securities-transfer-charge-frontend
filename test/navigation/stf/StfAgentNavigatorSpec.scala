@@ -49,7 +49,7 @@ class StfAgentNavigatorSpec extends SpecBase with ScalaFutures {
   
   val navigator = new StfAgentNavigator(mockConfig, StubAnswerPersistenceService())
 
-  "AgentNavigator" - {
+  "StfAgentNavigator" - {
 
     "in Normal mode" - {
 
