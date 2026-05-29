@@ -43,4 +43,3 @@ class TemplateInstructionsControllerSpec extends SpecBase {
     }
   }
 }
-//Check for the application builder in org after PR no.162 has been merged
