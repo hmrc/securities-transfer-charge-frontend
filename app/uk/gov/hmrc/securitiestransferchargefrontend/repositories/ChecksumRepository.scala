@@ -46,7 +46,7 @@ class ChecksumRepositoryImpl @Inject()(
       IndexModel(
         Indexes.ascending("uploadedAt"),
         IndexOptions()
-          .name("uploadedAt_ttl_idx")
+          .name("checksum_uploadedAt_ttl_idx")
           .expireAfter(appConfig.checksumTtl, TimeUnit.DAYS)
       ),
       IndexModel(

@@ -17,8 +17,7 @@
 package uk.gov.hmrc.securitiestransferchargefrontend.services.fileupload
 
 import play.api.i18n.{Lang, Messages, MessagesApi}
-import uk.gov.hmrc.securitiestransferchargefrontend.forms.stf.individuals.*
-import uk.gov.hmrc.securitiestransferchargefrontend.forms.stf.shared.NameOfSellerFormProvider
+import uk.gov.hmrc.securitiestransferchargefrontend.forms.stf.shared.{NameOfSellerFormProvider, SecuritiesTargetFormProvider}
 import uk.gov.hmrc.securitiestransferchargefrontend.models.stf.fileupload.{ParsedStcRow, StcRowValidationError}
 
 import javax.inject.Inject
@@ -34,41 +33,40 @@ class StcBasicRowValidator @Inject()(
   private implicit val messages: Messages =
     messagesApi.preferred(Seq(Lang("en")))
 
-  private val amountMaximum = BigDecimal(999999999)
-
   def validate(
                 row: ParsedStcRow,
-                template: StcTemplate
+                template: StcTemplate,
+                affinityKey:String
               )(implicit cols: ColumnIndexBuilder): Seq[StcRowValidationError] = {
 
     template match {
 
       case StcTemplate.STF =>
-        validateSTF(row)
+        validateSTF(row,affinityKey)
 
       case StcTemplate.SH03 =>
-        validateSH03(row)
+        validateSH03(row,affinityKey)
     }
   }
 
-  def validateSTF(row: ParsedStcRow)(implicit cols: ColumnIndexBuilder): Seq[StcRowValidationError] =
+  def validateSTF(row: ParsedStcRow,affinityKey:String)(implicit cols: ColumnIndexBuilder): Seq[StcRowValidationError] =
     validateNameOfSeller(row) ++
       validateSellerAddressInUk(row) ++
-      validateConnectedPersons(row) ++
-      validateApplyingForRelief(row) ++
-      validateSecuritiesTarget(row) ++
-      validateChargingPoint(row) ++
+      validateConnectedPersons(row,affinityKey) ++
+      validateApplyingForRelief(row,affinityKey) ++
+      validateSecuritiesTarget(row,affinityKey) ++
+      validateChargingPoint(row,affinityKey) ++
       validateTaxRate(row) ++
-      validateWhatTypeOfSecurities(row) ++
-      validateSecuritiesQuantity(row) ++
-      validateAmountPaidForSecurities(row)
+      validateWhatTypeOfSecurities(row,affinityKey) ++
+      validateSecuritiesQuantity(row,affinityKey) ++
+      validateAmountPaidForSecurities(row,affinityKey)
 
 
-  def validateSH03(row: ParsedStcRow)(implicit cols: ColumnIndexBuilder): Seq[StcRowValidationError] =
-    validateWhatTypeOfSecurities(row) ++
-      validateSecuritiesQuantity(row) ++
-      validateAmountPaidForSecurities(row) ++
-      validateChargingPoint(row) ++
+  def validateSH03(row: ParsedStcRow,affinityKey:String)(implicit cols: ColumnIndexBuilder): Seq[StcRowValidationError] =
+    validateWhatTypeOfSecurities(row,affinityKey) ++
+      validateSecuritiesQuantity(row,affinityKey) ++
+      validateAmountPaidForSecurities(row,affinityKey) ++
+      validateChargingPoint(row,affinityKey) ++
       validateMaxSharePrice(row) ++
       validateMinSharePrice(row) ++
       validateSharePurchaseReason(row) ++
@@ -108,7 +106,8 @@ class StcBasicRowValidator @Inject()(
   }
 
   private def validateChargingPoint(
-                                     row: ParsedStcRow
+                                     row: ParsedStcRow,
+                                     affinityKey:String
                                    )(implicit cols: ColumnIndexBuilder): Seq[StcRowValidationError] = {
 
     row.chargingPoint match {
@@ -118,16 +117,24 @@ class StcBasicRowValidator @Inject()(
           support.error(
             row.rowNumber,
             "chargingPoint",
-            messages("chargingPoint.error.required.all")
+            messages(s"$affinityKey.chargingPoint.error.required.all")
           )
         )
 
+      case Some(date) if date.isAfter(support.dateToday) =>
+        Seq(
+          support.error(
+            row.rowNumber,
+            "chargingPoint",
+            messages(s"$affinityKey.chargingPoint.error.futureDate")
+          )
+        )
       case Some(_) =>
         Seq.empty
     }
   }
 
-  private def validateWhatTypeOfSecurities(row: ParsedStcRow)(implicit cols: ColumnIndexBuilder): Seq[StcRowValidationError] =
+  private def validateWhatTypeOfSecurities(row: ParsedStcRow,affinityKey:String)(implicit cols: ColumnIndexBuilder): Seq[StcRowValidationError] =
     row.whatTypeOfSecurities.map(_.trim) match {
 
       case None | Some("") =>
@@ -135,7 +142,7 @@ class StcBasicRowValidator @Inject()(
           support.error(
             row.rowNumber,
             "whatTypeOfSecurities",
-            messages("fileUpload.error.whatTypeOfSecurities.required")
+            messages(s"$affinityKey.fileUpload.error.whatTypeOfSecurities.required")
           )
         )
 
@@ -143,7 +150,8 @@ class StcBasicRowValidator @Inject()(
     }
 
   private def validateSecuritiesQuantity(
-                                          row: ParsedStcRow
+                                          row: ParsedStcRow,
+                                          affinityKey:String
                                         )(implicit cols: ColumnIndexBuilder): Seq[StcRowValidationError] = {
 
     row.securitiesQuantity match {
@@ -153,7 +161,7 @@ class StcBasicRowValidator @Inject()(
           support.error(
             row.rowNumber,
             "securitiesQuantity",
-            messages("fileUpload.error.securitiesQuantity.required")
+            messages(s"$affinityKey.fileUpload.error.securitiesQuantity.required")
           )
         )
 
@@ -162,7 +170,7 @@ class StcBasicRowValidator @Inject()(
           support.error(
             row.rowNumber,
             "securitiesQuantity",
-            messages("fileUpload.error.securitiesQuantity.minimum")
+            messages(s"$affinityKey.fileUpload.error.securitiesQuantity.minimum")
           )
         )
 
@@ -171,7 +179,7 @@ class StcBasicRowValidator @Inject()(
           support.error(
             row.rowNumber,
             "securitiesQuantity",
-            messages("fileUpload.error.securitiesQuantity.maximum")
+            messages(s"$affinityKey.fileUpload.error.securitiesQuantity.maximum")
           )
         )
 
@@ -181,7 +189,8 @@ class StcBasicRowValidator @Inject()(
   }
 
   private def validateAmountPaidForSecurities(
-                                               row: ParsedStcRow
+                                               row: ParsedStcRow,
+                                               affinityKey:String
                                              )(implicit cols: ColumnIndexBuilder): Seq[StcRowValidationError] = {
 
     row.amountPaidForSecurities match {
@@ -191,16 +200,16 @@ class StcBasicRowValidator @Inject()(
           support.error(
             row.rowNumber,
             "amountPaidForSecurities",
-            messages("amountPaidForSecurities.error.required")
+            messages(s"$affinityKey.amountPaidForSecurities.error.required")
           )
         )
 
-      case Some(v) if v > amountMaximum =>
+      case Some(v) if v > support.maxCurrency =>
         Seq(
           support.error(
             row.rowNumber,
             "amountPaidForSecurities",
-            messages("fileUpload.error.amountPaidForSecurities.maximum")
+            messages(s"$affinityKey.fileUpload.error.amountPaidForSecurities.maximum")
           )
         )
 
@@ -230,7 +239,8 @@ class StcBasicRowValidator @Inject()(
   }
 
   private def validateConnectedPersons(
-                                        row: ParsedStcRow
+                                        row: ParsedStcRow,
+                                        affinityKey:String
                                       )(implicit cols: ColumnIndexBuilder): Seq[StcRowValidationError] = {
 
     row.connectedPersons match {
@@ -243,14 +253,15 @@ class StcBasicRowValidator @Inject()(
           support.error(
             row.rowNumber,
             "connectedPersons",
-            messages("fileUpload.error.connectedPersons.invalid")
+            messages(s"$affinityKey.fileUpload.error.connectedPersons.invalid")
           )
         )
     }
   }
 
   private def validateApplyingForRelief(
-                                         row: ParsedStcRow
+                                         row: ParsedStcRow,
+                                         affinityKey:String
                                        )(implicit cols: ColumnIndexBuilder): Seq[StcRowValidationError] = {
 
     row.applyingForRelief match {
@@ -263,17 +274,18 @@ class StcBasicRowValidator @Inject()(
           support.error(
             row.rowNumber,
             "applyingForRelief",
-            messages("fileUpload.error.applyingForRelief.invalid")
+            messages(s"$affinityKey.fileUpload.error.applyingForRelief.invalid")
           )
         )
     }
   }
 
   private def validateSecuritiesTarget(
-                                        row: ParsedStcRow
+                                        row: ParsedStcRow,
+                                        affinityKey:String
                                       )(implicit cols: ColumnIndexBuilder): Seq[StcRowValidationError] = {
 
-    val boundForm = securitiesTargetFormProvider().bind(
+    val boundForm = securitiesTargetFormProvider(affinityKey = affinityKey).bind(
       Map(
         "businessName" -> row.securitiesTarget.getOrElse(""),
         "crn" -> row.companyRegistrationNumber.getOrElse("")
@@ -281,33 +293,13 @@ class StcBasicRowValidator @Inject()(
     )
 
     boundForm.errors.map { formError =>
-
       val fieldName =
         if (formError.key.contains("crn"))
           "companyRegistrationNumber"
         else
           "securitiesTarget"
 
-      val message =
-        formError.message match {
-
-          case "securitiesTarget.error.businessName.required" =>
-            messages("securitiesTarget.error.businessName.required")
-
-          case "securitiesTarget.error.businessName.length" =>
-            messages("securitiesTarget.error.businessName.length")
-
-          case "securitiesTarget.error.crn.length" =>
-            messages("securitiesTarget.error.crn.length")
-
-          case _ if fieldName == "companyRegistrationNumber" =>
-            messages("securitiesTarget.error.crn.length")
-
-          case _ =>
-            messages("securitiesTarget.error.businessName.required")
-        }
-
-      support.error(row.rowNumber, fieldName, message)
+      support.error(row.rowNumber, fieldName,  messages(formError.message))
     }
   }
 
@@ -326,7 +318,7 @@ class StcBasicRowValidator @Inject()(
           )
         )
 
-      case Some(v) if v > amountMaximum =>
+      case Some(v) if v > support.maxCurrency =>
         Seq(
           support.error(
             row.rowNumber,
@@ -355,7 +347,7 @@ class StcBasicRowValidator @Inject()(
           )
         )
 
-      case Some(v) if v > amountMaximum =>
+      case Some(v) if v > support.maxCurrency =>
         Seq(
           support.error(
             row.rowNumber,

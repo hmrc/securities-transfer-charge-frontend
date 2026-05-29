@@ -24,7 +24,7 @@ import uk.gov.hmrc.securitiestransferchargefrontend.views.html.stf.shared.bulk.B
 
 class BulkUploadFileEmptyControllerSpec extends SpecBase {
 
-  "BulkUploadFileEmpty Controller" - {
+  "BulkUploadFileEmptyController" - {
 
     "must return OK and the correct view for a GET" in {
 

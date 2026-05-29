@@ -16,22 +16,26 @@
 
 package controllers.stf.shared
 
-import base.SpecBase
+import base.Fixtures.{testCredentialId, testSubmissionId}
+import base.{AuditTestSupport, SpecBase}
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.{verify, when}
 import org.scalatestplus.mockito.MockitoSugar
 import play.api.inject.bind
 import play.api.test.FakeRequest
 import play.api.test.Helpers.*
+import uk.gov.hmrc.auth.core.AffinityGroup
 import uk.gov.hmrc.securitiestransferchargefrontend.clients.{SaveAndReturnClient, SubmissionIdClient}
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.shared.routes
 import uk.gov.hmrc.securitiestransferchargefrontend.domain.SubmissionId
+import uk.gov.hmrc.securitiestransferchargefrontend.models.audit.JourneyStatus.SubmissionStart
 import uk.gov.hmrc.securitiestransferchargefrontend.navigation.Navigator
+import uk.gov.hmrc.securitiestransferchargefrontend.services.AuditService
 import uk.gov.hmrc.securitiestransferchargefrontend.views.html.stf.shared.SubmissionsDashboardView
 
 import scala.concurrent.Future
 
-class SubmissionsDashboardControllerSpec extends SpecBase with MockitoSugar {
+class SubmissionsDashboardControllerSpec extends SpecBase with MockitoSugar with AuditTestSupport {
 
   lazy val submissionsDashboardRoute: String =
     routes.SubmissionsDashboardController.onPageLoad().url
@@ -113,71 +117,47 @@ class SubmissionsDashboardControllerSpec extends SpecBase with MockitoSugar {
 
     "POST onSubmit" - {
 
-      "must generate a submissionId and redirect using navigator" in {
+      Seq(
+        AffinityGroup.Individual,
+        AffinityGroup.Organisation,
+        AffinityGroup.Agent
+      ).foreach { affinityGroup =>
 
-        val mockIdClient = mock[SubmissionIdClient]
+        s"must generate submissionId, audit event and redirect for $affinityGroup" in {
 
-        val generatedSubmissionId = SubmissionId("STC-111111111")
+          val mockIdClient = mock[SubmissionIdClient]
+          val mockAuditService = mock[AuditService]
 
-        when(mockIdClient.nextSubmissionId()(any()))
-          .thenReturn(Future.successful(generatedSubmissionId))
+          val generatedSubmissionId = testSubmissionId
 
-        val application =
-          applicationBuilder()
-            .overrides(
-              bind[SubmissionIdClient].toInstance(mockIdClient),
-              bind[Navigator].qualifiedWith("individuals").toInstance(getNavigator),
-              bind[Navigator].qualifiedWith("organisations").toInstance(getNavigator)
-            )
-            .build()
+          when(mockIdClient.nextSubmissionId()(any())).thenReturn(Future.successful(generatedSubmissionId))
 
-        running(application) {
+          val application =
+            applicationBuilder(affinityGroup = affinityGroup)
+              .overrides(
+                bind[SubmissionIdClient].toInstance(mockIdClient),
+                bind[AuditService].toInstance(mockAuditService),
+                bind[Navigator].qualifiedWith("individuals").toInstance(getNavigator),
+                bind[Navigator].qualifiedWith("organisations").toInstance(getNavigator),
+                bind[Navigator].qualifiedWith("agents").toInstance(getNavigator)
+              )
+              .build()
 
-          val request = FakeRequest(POST, submissionsDashboardSubmitRoute)
+          running(application) {
 
-          val result = route(application, request).value
+            val request = FakeRequest(POST, submissionsDashboardSubmitRoute)
 
-          status(result) mustEqual SEE_OTHER
+            val result = route(application, request).value
 
-          redirectLocation(result).value mustEqual testNextPage.url
+            status(result) mustEqual SEE_OTHER
+            redirectLocation(result).value mustEqual testNextPage.url
 
-          verify(mockIdClient).nextSubmissionId()(any())
+            verify(mockIdClient).nextSubmissionId()(any())
+
+            verifyAudit(mockAuditService, SubmissionStart, affinityGroup, testCredentialId, testSubmissionId)
+          }
         }
       }
-
-
-      "must generate a submissionId and redirect when affinity group is Organisation" in {
-
-        val mockIdClient = mock[SubmissionIdClient]
-
-        val generatedSubmissionId = SubmissionId("STC-222222222")
-
-        when(mockIdClient.nextSubmissionId()(any()))
-          .thenReturn(Future.successful(generatedSubmissionId))
-
-        val application =
-          applicationBuilder()
-            .configure("test.affinityGroup" -> "Organisation")
-            .overrides(
-              bind[SubmissionIdClient].toInstance(mockIdClient),
-              bind[Navigator].qualifiedWith("individuals").toInstance(getNavigator),
-              bind[Navigator].qualifiedWith("organisations").toInstance(getNavigator)
-            )
-            .build()
-
-        running(application) {
-
-          val request = FakeRequest(POST, submissionsDashboardSubmitRoute)
-
-          val result = route(application, request).value
-
-          status(result) mustEqual SEE_OTHER
-          redirectLocation(result).value mustEqual testNextPage.url
-
-          verify(mockIdClient).nextSubmissionId()(any())
-        }
-      }
-
 
       "must fail when submission ID generation fails" in {
 

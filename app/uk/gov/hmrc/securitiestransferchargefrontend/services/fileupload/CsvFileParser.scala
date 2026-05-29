@@ -56,7 +56,8 @@ class CsvFileParser @Inject()(config: FileUploadConfig) extends FileParser {
 
           val headers: Seq[String] =
             (0 until config.maxColumns).map { colIndex =>
-              headerValues.lift(colIndex).getOrElse("").trim
+              val rawValue = headerValues.lift(colIndex).getOrElse("").trim
+              if (colIndex == 0) rawValue.replace("\uFEFF", "") else rawValue
             }
 
           val dataRecords = records.tail

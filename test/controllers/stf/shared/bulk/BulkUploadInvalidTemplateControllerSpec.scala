@@ -14,28 +14,28 @@
  * limitations under the License.
  */
 
-package controllers.stf.individuals.bulk
+package controllers.stf.shared.bulk
 
 import base.SpecBase
 import play.api.test.FakeRequest
 import play.api.test.Helpers.*
-import uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.individuals.bulk.routes
-import uk.gov.hmrc.securitiestransferchargefrontend.views.html.stf.individuals.bulk.ChangedFileErrorView
+import uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.shared.bulk.routes
+import uk.gov.hmrc.securitiestransferchargefrontend.views.html.stf.shared.bulk.BulkUploadInvalidTemplateView
 
-class ChangedFileErrorControllerSpec extends SpecBase {
+class BulkUploadInvalidTemplateControllerSpec extends SpecBase {
 
-  "ChangedFileError Controller" - {
+  "BulkUploadInvalidTemplateController" - {
 
     "must return OK and the correct view for a GET" in {
 
       val application = applicationBuilder(userAnswers = Some(emptyUserAnswers), affinityGroup = individualAffinity).build()
 
       running(application) {
-        val request = FakeRequest(GET, routes.ChangedFileErrorController.onPageLoad().url)
+        val request = FakeRequest(GET, routes.BulkUploadInvalidTemplateController.onPageLoad().url)
 
         val result = route(application, request).value
 
-        val view = application.injector.instanceOf[ChangedFileErrorView]
+        val view = application.injector.instanceOf[BulkUploadInvalidTemplateView]
 
         status(result) mustEqual OK
         contentAsString(result) mustEqual view()(request, messages(application)).toString
