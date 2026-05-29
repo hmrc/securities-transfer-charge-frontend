@@ -17,7 +17,7 @@
 package uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.shared.bulk
 
 import play.api.i18n.{I18nSupport, MessagesApi}
-import play.api.mvc.{Action, AnyContent, MessagesControllerComponents, Request}
+import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import uk.gov.hmrc.securitiestransferchargefrontend.config.FrontendAppConfig
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.actions.*
@@ -37,10 +37,7 @@ class FileProcessingController @Inject()(
                                         ) extends FrontendBaseController with I18nSupport {
 
 
-  private val retryCountKey = "retryCount"
   private val refreshInterval = appConfig.spinnerPageRefreshInterval
-
-  def currentCount: Request[_] => Int = _.session.get(retryCountKey).map(_.toInt).getOrElse(0)
 
   def onPageLoad(): Action[AnyContent] =
     stcAuthEnrolled { implicit request =>
