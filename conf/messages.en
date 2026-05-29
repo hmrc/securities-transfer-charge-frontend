@@ -387,7 +387,7 @@ org.templateInstructions.step1 = Download the template
 org.templateInstructions.step2 = Complete the template, using one row for each type of securities the business is buying
 org.templateInstructions.step3 = Upload your file on the next page as a .xlsx or .csv
 org.templateInstructions.p2 = Remember, do not edit the first two rows, or change the order of the columns.
-org.templateInstructions.p3.span1 = Once you have uploaded and submitted your file, it may take a few minutes to process before showing as on your dashboard. You can then pay any charges due.
+org.templateInstructions.p3 = Once you have uploaded and submitted your file, it may take a few minutes to process before showing as on your dashboard. You can then pay any charges due.
 org.return-to-dashboard.link = Return to dashboard
 
 uploadedFileError.title = There is a problem with your uploaded file
@@ -659,3 +659,12 @@ fileUpload.error.invalidTemplate.p.start = You must
 fileUpload.error.invalidTemplate.p.link = use the template file
 fileUpload.error.invalidTemplate.p.end = to record details of the transfers, and upload this file.
 fileUpload.error.invalidTemplate.p2 = Remember, do not edit the first two rows, or change the order of columns in the template.
+
+agent.templateInstructions.title = How to use the template
+agent.templateInstructions.heading = How to use the template
+agent.templateInstructions.p1 = Use the template to tell us about more than one securities transfer at a time.
+agent.templateInstructions.step1 = Download the template
+agent.templateInstructions.step2 = Complete the template, using one row for each transfer between a buyer and seller
+agent.templateInstructions.step3 = Upload the file on the next page as a .xlsx or .csv
+agent.templateInstructions.p2 = Remember, do not edit the first two rows, or change the order of the columns.
+agent.templateInstructions.p3 = Once you have uploaded and submitted the file, it may take a few minutes to process before showing as 'ready to pay' on your dashboard. You can then pay the charges due.
