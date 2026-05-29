@@ -24,7 +24,6 @@ import play.api.data.Form
 import play.api.inject.bind
 import play.api.test.FakeRequest
 import play.api.test.Helpers.*
-import uk.gov.hmrc.auth.core.AffinityGroup
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.securitiestransferchargefrontend.clients.SaveAndReturnClient
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.routes
@@ -52,7 +51,7 @@ class WhatTypeOfSecuritiesControllerSpec extends SpecBase with MockitoSugar {
 
       val application = applicationBuilder(
         userAnswers = Some(emptyUserAnswers),
-        affinityGroup = AffinityGroup.Agent
+        affinityGroup = agentAffinity
       )
         .overrides(bind[Navigator].qualifiedWith("agents").toInstance(getNavigator))
         .build()
@@ -75,7 +74,7 @@ class WhatTypeOfSecuritiesControllerSpec extends SpecBase with MockitoSugar {
 
       val application = applicationBuilder(
         userAnswers = Some(userAnswers),
-        affinityGroup = AffinityGroup.Agent
+        affinityGroup = agentAffinity
       )
         .overrides(bind[Navigator].qualifiedWith("agents").toInstance(getNavigator))
         .build()
@@ -102,7 +101,7 @@ class WhatTypeOfSecuritiesControllerSpec extends SpecBase with MockitoSugar {
       val application =
         applicationBuilder(
           userAnswers = Some(emptyUserAnswers),
-          affinityGroup = AffinityGroup.Agent
+          affinityGroup = agentAffinity
         )
           .build()
 
@@ -121,7 +120,7 @@ class WhatTypeOfSecuritiesControllerSpec extends SpecBase with MockitoSugar {
 
       val application = applicationBuilder(
         userAnswers = Some(emptyUserAnswers),
-        affinityGroup = AffinityGroup.Agent
+        affinityGroup = agentAffinity
       )
         .overrides(bind[Navigator].qualifiedWith("agents").toInstance(getNavigator))
         .build()
@@ -146,7 +145,7 @@ class WhatTypeOfSecuritiesControllerSpec extends SpecBase with MockitoSugar {
 
       val application = applicationBuilder(
         userAnswers = None,
-        affinityGroup = AffinityGroup.Agent
+        affinityGroup = agentAffinity
       ).build()
 
       running(application) {
@@ -163,7 +162,7 @@ class WhatTypeOfSecuritiesControllerSpec extends SpecBase with MockitoSugar {
 
       val application = applicationBuilder(
         userAnswers = None,
-        affinityGroup = AffinityGroup.Agent
+        affinityGroup = agentAffinity
       ).build()
 
       running(application) {
