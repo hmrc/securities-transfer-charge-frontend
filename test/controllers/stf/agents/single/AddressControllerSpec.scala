@@ -42,7 +42,7 @@ class AddressControllerSpec extends SpecBase with MockitoSugar {
     }
 
     "onReturn should retrieve address and redirect" in {
-      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers), AffinityGroup.Agent)
+      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers), affinityGroup = agentAffinity)
         .build()
 
       running(application) {

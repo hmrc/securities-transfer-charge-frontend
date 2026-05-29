@@ -20,9 +20,9 @@
     layout: templates.Layout
 )
 
-@()(implicit request: Request[_], messages: Messages)
+@(refreshInterval: Int)(implicit request: Request[_], messages: Messages)
 
-@layout(pageTitle = titleNoForm(messages("fileUpload.processing.title")),showBackLink = false) {
+@layout(pageTitle = titleNoForm(messages("fileUpload.processing.title")),showBackLink = false, refreshInterval = Some(refreshInterval)) {
     <div class="loading-spinner-wrapper">
         <div class="loading-spinner">
             <div class="loading-spinner__spinner" aria-live="polite" role="status"></div>

@@ -116,7 +116,7 @@ class SessionRepositorySpec
     }
 
     "must return unit when there is no record to remove" in {
-      val result = repository.clear("id that does not exist").futureValue
+      val result: Unit = repository.clear("id that does not exist").futureValue
 
       result mustEqual ()
     }

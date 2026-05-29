@@ -26,7 +26,7 @@ import views.ViewBaseSpec
 class EmptyFileErrorViewSpec extends ViewBaseSpec {
 
   override def fakeApplication(): Application =
-    applicationBuilder().build()
+    applicationBuilder(affinityGroup = orgAffinity).build()
 
   private val viewInstance = app.injector.instanceOf[EmptyFileErrorView]
 

@@ -19,20 +19,39 @@ package uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.shared.bulk
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
+import uk.gov.hmrc.securitiestransferchargefrontend.config.FrontendAppConfig
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.actions.*
-import uk.gov.hmrc.securitiestransferchargefrontend.views.html.stf.shared.bulk.FileProcessingView
+import uk.gov.hmrc.securitiestransferchargefrontend.services.fileupload.processing.FileProcessingRefreshCounterFactory
+import uk.gov.hmrc.securitiestransferchargefrontend.views.html.stf.shared.bulk.{BulkUploadErrorView, FileProcessingView}
 
 import javax.inject.Inject
 
 class FileProcessingController @Inject()(
-                                         override val messagesApi: MessagesApi,
-                                         stcAuthEnrolled: StcAuthEnrolledAction,
-                                         view: FileProcessingView,
-                                         val controllerComponents: MessagesControllerComponents
+                                          override val messagesApi: MessagesApi,
+                                          stcAuthEnrolled: StcAuthEnrolledAction,
+                                          spinnerView: FileProcessingView,
+                                          timeoutView: BulkUploadErrorView,
+                                          createCounter: FileProcessingRefreshCounterFactory,
+                                          val controllerComponents: MessagesControllerComponents,
+                                          appConfig: FrontendAppConfig
                                         ) extends FrontendBaseController with I18nSupport {
+
+
+  private val refreshInterval = appConfig.spinnerPageRefreshInterval
 
   def onPageLoad(): Action[AnyContent] =
     stcAuthEnrolled { implicit request =>
-      Ok(view())
+      val counter = createCounter(request)
+      if (counter.isTimedOut) {
+        val result = Redirect(routes.FileProcessingController.onTimeout())
+        counter.reset(result)
+      } else {
+        counter.withIncrementedCounter(Ok(spinnerView(refreshInterval)))
+      }
+    }
+
+  def onTimeout(): Action[AnyContent] =
+    stcAuthEnrolled { implicit request =>
+      Ok(timeoutView())
     }
 }

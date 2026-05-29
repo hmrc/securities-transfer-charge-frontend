@@ -52,7 +52,7 @@ class ConfirmAddressControllerSpec extends SpecBase {
       when(mockAddressService.extractConfirmableAddress(subscription)).thenReturn(confirmableAddress)
 
       val application =
-        applicationBuilder(userAnswers = Some(emptyUserAnswers))
+        applicationBuilder(userAnswers = Some(emptyUserAnswers), affinityGroup = orgAffinity)
           .overrides(
             inject.bind[SubscriptionConnector].toInstance(mockSubscriptionConnector),
             inject.bind[AddressService].toInstance(mockAddressService),
@@ -87,7 +87,7 @@ class ConfirmAddressControllerSpec extends SpecBase {
       ).thenReturn(confirmableAddress)
       
       val application =
-        applicationBuilder(userAnswers = Some(emptyUserAnswers))
+        applicationBuilder(userAnswers = Some(emptyUserAnswers), affinityGroup = orgAffinity)
           .overrides(
             inject.bind[SubscriptionDataRepository].toInstance(mockSubscriptionDataRepository),
             inject.bind[AddressService].toInstance(mockAddressService),
@@ -114,7 +114,7 @@ class ConfirmAddressControllerSpec extends SpecBase {
         .thenReturn(Future.successful(None))
 
       val application =
-        applicationBuilder(userAnswers = Some(emptyUserAnswers))
+        applicationBuilder(userAnswers = Some(emptyUserAnswers), affinityGroup = orgAffinity)
           .overrides(
             inject.bind[SubscriptionDataRepository].toInstance(mockSubscriptionDataRepository)
           )

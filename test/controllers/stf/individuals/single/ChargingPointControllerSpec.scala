@@ -67,7 +67,7 @@ class ChargingPointControllerSpec extends SpecBase with MockitoSugar {
 
     "must return OK and the correct view for a GET" in {
 
-      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers))
+      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers), affinityGroup = individualAffinity)
         .overrides(bind[Navigator].qualifiedWith("individuals").toInstance(getNavigator))
         .build()
 
@@ -105,7 +105,7 @@ class ChargingPointControllerSpec extends SpecBase with MockitoSugar {
 
       when(mockSessionRepository.set(any())) thenReturn Future.successful(true)
 
-      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers))
+      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers), affinityGroup = individualAffinity)
         .overrides(bind[Navigator].qualifiedWith("individuals").toInstance(getNavigator))
         .build()
 
@@ -119,7 +119,7 @@ class ChargingPointControllerSpec extends SpecBase with MockitoSugar {
 
     "must return a Bad Request and errors when invalid data is submitted" in {
 
-      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers))
+      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers), affinityGroup = individualAffinity)
         .overrides(bind[Navigator].qualifiedWith("individuals").toInstance(getNavigator))
         .build()
 
@@ -141,7 +141,7 @@ class ChargingPointControllerSpec extends SpecBase with MockitoSugar {
 
     "must redirect to Journey Recovery for a GET if no existing data is found" in {
 
-      val application = applicationBuilder(userAnswers = None).build()
+      val application = applicationBuilder(userAnswers = None, affinityGroup = individualAffinity).build()
 
       running(application) {
         val result = route(application, getRequest()).value
@@ -153,7 +153,7 @@ class ChargingPointControllerSpec extends SpecBase with MockitoSugar {
 
     "must redirect to Journey Recovery for a POST if no existing data is found" in {
 
-      val application = applicationBuilder(userAnswers = None).build()
+      val application = applicationBuilder(userAnswers = None, affinityGroup = individualAffinity).build()
 
       running(application) {
         val result = route(application, postRequest()).value

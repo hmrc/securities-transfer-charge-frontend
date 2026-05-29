@@ -23,7 +23,6 @@ import play.api.inject.bind
 import play.api.mvc.Call
 import play.api.test.FakeRequest
 import play.api.test.Helpers.*
-import uk.gov.hmrc.auth.core.AffinityGroup
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.routes
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.agents.single.routes as agentRoutes
 import uk.gov.hmrc.securitiestransferchargefrontend.forms.stf.shared.NameOfSellerFormProvider
@@ -47,7 +46,7 @@ class NameOfSellerControllerSpec extends SpecBase with MockitoSugar {
 
     "must return OK and the correct view for a GET" in {
 
-      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers), AffinityGroup.Agent)
+      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers), affinityGroup = agentAffinity)
         .overrides(
           bind[Navigator].qualifiedWith("agents").toInstance(getNavigator))
         .build()
@@ -68,7 +67,7 @@ class NameOfSellerControllerSpec extends SpecBase with MockitoSugar {
 
       val userAnswers = UserAnswers(userAnswersId, submissionId).set(NameOfSellerPage, "answer").success.value
 
-      val application = applicationBuilder(userAnswers = Some(userAnswers), AffinityGroup.Agent)
+      val application = applicationBuilder(userAnswers = Some(userAnswers), affinityGroup = agentAffinity)
         .overrides(bind[Navigator].qualifiedWith("agents").toInstance(getNavigator))
         .build()
 
@@ -86,7 +85,7 @@ class NameOfSellerControllerSpec extends SpecBase with MockitoSugar {
 
     "must redirect to the next page when valid data is submitted" in {
       val application =
-        applicationBuilder(userAnswers = Some(emptyUserAnswers), AffinityGroup.Agent)
+        applicationBuilder(userAnswers = Some(emptyUserAnswers), affinityGroup = agentAffinity)
           .build()
 
       running(application) {
@@ -103,7 +102,7 @@ class NameOfSellerControllerSpec extends SpecBase with MockitoSugar {
 
     "must return a Bad Request and errors when invalid data is submitted" in {
 
-      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers), AffinityGroup.Agent)
+      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers), affinityGroup = agentAffinity)
         .overrides(bind[Navigator].qualifiedWith("agents").toInstance(getNavigator))
         .build()
 
@@ -125,7 +124,7 @@ class NameOfSellerControllerSpec extends SpecBase with MockitoSugar {
 
     "must redirect to Journey Recovery for a GET if no existing data is found" in {
 
-      val application = applicationBuilder(userAnswers = None, AffinityGroup.Agent).build()
+      val application = applicationBuilder(userAnswers = None, affinityGroup = agentAffinity).build()
 
       running(application) {
         val request = FakeRequest(GET, nameOfSellerRoute)
@@ -139,7 +138,7 @@ class NameOfSellerControllerSpec extends SpecBase with MockitoSugar {
 
     "must redirect to Journey Recovery for a POST if no existing data is found" in {
 
-      val application = applicationBuilder(userAnswers = None, AffinityGroup.Agent).build()
+      val application = applicationBuilder(userAnswers = None, affinityGroup = agentAffinity).build()
 
       running(application) {
         val request =
