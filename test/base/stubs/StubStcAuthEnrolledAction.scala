@@ -47,7 +47,8 @@ class StubStcAuthEnrolledAction @Inject() (
         request,
         testInternalId,
         affinityGroup,
-        testSubscriptionId
+        testSubscriptionId,
+        testCredentialId
       )
     )
 }

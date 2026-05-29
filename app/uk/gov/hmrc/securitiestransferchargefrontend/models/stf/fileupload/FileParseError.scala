@@ -49,4 +49,8 @@ object FileParseError {
   case object EmptyFile extends FileParseError {
     override val message: String = "The uploaded file is empty"
   }
+
+  case object InvalidTemplate extends FileParseError {
+    override val message: String = "The template file has been altered"
+  }
 }

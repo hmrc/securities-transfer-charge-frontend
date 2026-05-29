@@ -29,6 +29,7 @@ import java.nio.charset.StandardCharsets
 class CsvFileParserSpec extends AnyWordSpec with Matchers with EitherValues {
 
   private val maxColumns = 27
+
   private val parser = new CsvFileParser(TestFileUploadConfig.config())
 
   private def uploadedFile(csv: String): UploadedFile =

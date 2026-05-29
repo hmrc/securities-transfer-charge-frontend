@@ -16,15 +16,14 @@
 
 package services.fileupload
 
+import base.SpecBase
 import org.mockito.Mockito.when
-import org.scalatest.matchers.must.Matchers
-import org.scalatest.wordspec.AnyWordSpec
-import org.scalatestplus.mockito.MockitoSugar
+import org.scalatestplus.mockito.MockitoSugar.mock
 import uk.gov.hmrc.securitiestransferchargefrontend.models.stf.fileupload.*
 import uk.gov.hmrc.securitiestransferchargefrontend.services.fileupload.*
 
-class StcFileValidationServiceSpec extends AnyWordSpec with Matchers with MockitoSugar {
-
+class StcFileValidationServiceSpec extends SpecBase{
+  
   private val stcRowValidationService = mock[StcRowValidationService]
 
   private val service = new StcFileValidationService(stcRowValidationService)
@@ -116,18 +115,18 @@ class StcFileValidationServiceSpec extends AnyWordSpec with Matchers with Mockit
       )
     )
 
-  "StcFileValidationService.validate" must {
+  "StcFileValidationService.validate" - {
 
     "validate each parsed row and return a file validation response" in {
 
       when(
         stcRowValidationService.validateAll(
           Seq(parsedRow1, parsedRow2),
-          headers
+          headers,affinityGroupKeyInd
         )
       ).thenReturn(Seq(validatedRow1, validatedRow2))
 
-      val result = service.validate(Seq(parsedRow1, parsedRow2), headers)
+      val result = service.validate(Seq(parsedRow1, parsedRow2), headers,affinityGroupKeyInd)
 
       result.rows mustBe Seq(validatedRow1, validatedRow2)
       result.hasErrors mustBe true

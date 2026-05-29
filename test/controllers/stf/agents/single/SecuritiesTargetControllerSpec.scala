@@ -26,7 +26,7 @@ import play.api.test.FakeRequest
 import play.api.test.Helpers.*
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.routes
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.agents.single.routes as agentRoutes
-import uk.gov.hmrc.securitiestransferchargefrontend.forms.stf.agents.SecuritiesTargetFormProvider
+import uk.gov.hmrc.securitiestransferchargefrontend.forms.stf.shared.SecuritiesTargetFormProvider
 import uk.gov.hmrc.securitiestransferchargefrontend.models.NormalMode
 import uk.gov.hmrc.securitiestransferchargefrontend.models.stf.SecuritiesTarget
 import uk.gov.hmrc.securitiestransferchargefrontend.navigation.Navigator
@@ -38,7 +38,7 @@ import scala.concurrent.Future
 class SecuritiesTargetControllerSpec extends SpecBase with MockitoSugar {
   
   val formProvider = new SecuritiesTargetFormProvider()
-  val form: Form[SecuritiesTarget] = formProvider()
+  val form: Form[SecuritiesTarget] = formProvider(affinityKey = affinityGroupKeyAgent)
 
   lazy val securitiesTargetRoute: String = agentRoutes.SecuritiesTargetController.onPageLoad(NormalMode).url
   

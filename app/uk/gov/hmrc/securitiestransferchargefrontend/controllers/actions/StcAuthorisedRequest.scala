@@ -18,13 +18,14 @@ package uk.gov.hmrc.securitiestransferchargefrontend.controllers.actions
 
 import play.api.mvc.{Request, WrappedRequest}
 import uk.gov.hmrc.auth.core.AffinityGroup
-import uk.gov.hmrc.securitiestransferchargefrontend.domain.SubscriptionId
+import uk.gov.hmrc.securitiestransferchargefrontend.domain.{CredentialId, SubscriptionId}
 
 final case class StcAuthorisedRequest[A](
                                           request: Request[A],
                                           internalId: String,
                                           affinityGroup: AffinityGroup,
-                                          subscriptionId: SubscriptionId
+                                          subscriptionId: SubscriptionId,
+                                          credentialId: CredentialId
                                         ) extends WrappedRequest[A](request) {
   lazy val affinityGroupKey: String =
     affinityGroup match {

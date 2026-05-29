@@ -16,8 +16,9 @@
 
 package uk.gov.hmrc.securitiestransferchargefrontend.config
 
-import javax.inject.{Inject, Singleton}
 import play.api.Configuration
+
+import javax.inject.{Inject, Singleton}
 
 @Singleton
 class FileUploadConfig @Inject()(configuration: Configuration) {
@@ -33,5 +34,11 @@ class FileUploadConfig @Inject()(configuration: Configuration) {
       .getOrElse("Sheet1")
 
   val firstDataRow: Int =
-    configuration.getOptional[Int]("file-upload.first-data-row").getOrElse(3)
+    configuration.getOptional[Int]("file-upload.first-data-row").getOrElse(4)
+
+  def expectedTemplateHash(affinityKey:String, templateType: String, row: Int): String = {
+    
+    configuration.get[String](s"file-upload.template-hashes.$affinityKey.$templateType.row$row")
+  }
+
 }
