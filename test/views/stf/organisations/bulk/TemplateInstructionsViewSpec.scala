@@ -19,13 +19,14 @@ package views.stf.organisations.bulk
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
 import play.api.Application
+import uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.shared.bulk.routes as bulkRoutes
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.shared.routes
 import uk.gov.hmrc.securitiestransferchargefrontend.views.html.stf.organisations.bulk.TemplateInstructionsView
 import views.ViewBaseSpec
 
 class TemplateInstructionsViewSpec extends ViewBaseSpec {
 
-  override def fakeApplication(): Application = applicationBuilder().build()
+  override def fakeApplication(): Application = applicationBuilder(affinityGroup = orgAffinity).build()
 
   private val viewInstance         = app.injector.instanceOf[TemplateInstructionsView]
 
@@ -34,23 +35,23 @@ class TemplateInstructionsViewSpec extends ViewBaseSpec {
   )
 
   object ExpectedContent {
-    val title = messages("org.templateInstructions.title")
-    val heading = messages("org.templateInstructions.heading")
+    val title: String = messages("org.templateInstructions.title")
+    val heading: String = messages("org.templateInstructions.heading")
     val caption: String = messages("transfer.details.caption")
 
-    val para1Value = messages("org.templateInstructions.p1")
+    val para1Value: String = messages("org.templateInstructions.p1")
 
-    val step1 = messages("org.templateInstructions.step1")
+    val step1: String = messages("org.templateInstructions.step1")
     val downloadHref = "/securities-transfer-charge/assets/Bulk_Securities_Transfer_Charge_template_v1b.xlsx"
     val downloadFileName = "Bulk Securities Transfer Charge template v1b.xlsx"
 
-    val step2 = messages("org.templateInstructions.step2")
-    val step3 = messages("org.templateInstructions.step3")
-    val para2Value = messages("org.templateInstructions.p2")
-    val para3Span1 = messages("org.templateInstructions.p3.span1")
+    val step2: String = messages("org.templateInstructions.step2")
+    val step3: String = messages("org.templateInstructions.step3")
+    val para2Value: String = messages("org.templateInstructions.p2")
+    val para3Value: String = messages("org.templateInstructions.p3")
 
-    val continue = messages("site.continue")
-    val returnLink = messages("org.return-to-dashboard.link")
+    val continue: String = messages("site.continue")
+    val returnLink: String = messages("org.return-to-dashboard.link")
   }
 
   "The TemplateInstructionsView" - {
@@ -97,16 +98,17 @@ class TemplateInstructionsViewSpec extends ViewBaseSpec {
         templateInstructionsView.para(2) mustBe Some(ExpectedContent.para2Value)
       }
 
-      "display the correct third paragraph with 'STC dashboard' link that takes user back to the submission dashboard page" in {
+      "display the correct third paragraph " in {
         val paragraph = templateInstructionsView.select("p.govuk-body").last()
         val spans = paragraph.select("span")
-        spans.get(0).text() mustBe ExpectedContent.para3Span1
+        spans.get(0).text() mustBe ExpectedContent.para3Value
       }
 
 
       "have a continue button" in {
         val continueButton = templateInstructionsView.select(".govuk-button").first()
         continueButton.text() mustBe ExpectedContent.continue
+        continueButton.attr("href") mustBe bulkRoutes.FileUploadController.onPageLoad().url
       }
 
       "have a link to return back to the submission dashboard page" in {

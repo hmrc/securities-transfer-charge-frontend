@@ -27,6 +27,7 @@ import uk.gov.hmrc.securitiestransferchargefrontend.connectors.AlfAddressConnect
 import uk.gov.hmrc.securitiestransferchargefrontend.domain.{SubmissionId, SubscriptionId}
 import uk.gov.hmrc.securitiestransferchargefrontend.models.stf.{AlfAddress, AlfConfirmedAddress, ConfirmableAddress, Country, UploadedFileError}
 import uk.gov.hmrc.securitiestransferchargefrontend.models.UserAnswers
+import uk.gov.hmrc.securitiestransferchargefrontend.domain.CredentialId
 
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -36,6 +37,8 @@ object Fixtures {
   val stcIdentifierKey: String = "STCID"
   val testSubscriptionId: SubscriptionId = SubscriptionId("XAST1234567890")
   val testInternalId = "test-user-808"
+  val testCredentialId: CredentialId = CredentialId("5534386044069226")
+  val testAuditType = "StockTransferFormStatus"
   val testSubmissionId: SubmissionId = SubmissionId("STC-424242424")
 
   val affinityGroupIndividual: AffinityGroup.Individual.type = AffinityGroup.Individual

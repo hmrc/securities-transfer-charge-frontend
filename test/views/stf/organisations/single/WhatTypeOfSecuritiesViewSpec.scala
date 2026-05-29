@@ -19,17 +19,15 @@ package views.stf.organisations.single
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
 import play.api.Application
-import play.api.mvc.Call
 import uk.gov.hmrc.securitiestransferchargefrontend.forms.stf.organisations.WhatTypeOfSecuritiesFormProvider
 import uk.gov.hmrc.securitiestransferchargefrontend.models.NormalMode
 import uk.gov.hmrc.securitiestransferchargefrontend.views.html.stf.organisations.single.WhatTypeOfSecuritiesView
 import views.ViewBaseSpec
 
-
 class WhatTypeOfSecuritiesViewSpec extends ViewBaseSpec {
 
   override def fakeApplication(): Application =
-    applicationBuilder().build()
+    applicationBuilder(affinityGroup = orgAffinity).build()
 
   private val viewInstance = app.injector.instanceOf[WhatTypeOfSecuritiesView]
   private val formProvider = new WhatTypeOfSecuritiesFormProvider()

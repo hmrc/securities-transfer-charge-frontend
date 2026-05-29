@@ -32,7 +32,6 @@ import uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.organisation
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.organisations.routes as orgRoutes
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.routes
 import uk.gov.hmrc.securitiestransferchargefrontend.navigation.Navigator
-import uk.gov.hmrc.auth.core.AffinityGroup
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.securitiestransferchargefrontend.clients.SaveAndReturnClient
 import uk.gov.hmrc.securitiestransferchargefrontend.models.stf.HowToNotifyAboutSecuritiesTransfer
@@ -54,7 +53,7 @@ class HowToNotifyAboutSecuritiesTransferControllerSpec extends SpecBase {
       val application =
         applicationBuilder(
           userAnswers = Some(emptyUserAnswers),
-          affinityGroup = AffinityGroup.Organisation
+          affinityGroup = orgAffinity
         )
           .overrides(bind[Navigator].qualifiedWith("organisations").toInstance(getNavigator))
           .build()
@@ -77,7 +76,7 @@ class HowToNotifyAboutSecuritiesTransferControllerSpec extends SpecBase {
       val application =
         applicationBuilder(
           userAnswers = Some(userAnswers),
-          affinityGroup = AffinityGroup.Organisation
+          affinityGroup = orgAffinity
         )
           .overrides(bind[Navigator].qualifiedWith("organisations").toInstance(getNavigator))
           .build()
@@ -99,7 +98,7 @@ class HowToNotifyAboutSecuritiesTransferControllerSpec extends SpecBase {
       val application =
         applicationBuilder(
           userAnswers = Some(emptyUserAnswers),
-          affinityGroup = AffinityGroup.Organisation
+          affinityGroup = orgAffinity
         )
           .overrides(bind[Navigator].qualifiedWith("organisations").toInstance(getNavigator))
           .build()
@@ -123,7 +122,7 @@ class HowToNotifyAboutSecuritiesTransferControllerSpec extends SpecBase {
       val application =
         applicationBuilder(
           userAnswers = None,
-          affinityGroup = AffinityGroup.Organisation
+          affinityGroup = orgAffinity
         )
           .overrides(bind[Navigator].qualifiedWith("organisations").toInstance(getNavigator))
           .build()
@@ -142,7 +141,7 @@ class HowToNotifyAboutSecuritiesTransferControllerSpec extends SpecBase {
       val application =
         applicationBuilder(
           userAnswers = Some(emptyUserAnswers),
-          affinityGroup = AffinityGroup.Organisation
+          affinityGroup = orgAffinity
         )
           .overrides(bind[Navigator].qualifiedWith("organisations").toInstance(getNavigator))
           .build()
@@ -162,7 +161,7 @@ class HowToNotifyAboutSecuritiesTransferControllerSpec extends SpecBase {
     "must redirect to agent reference page when one at a time is selected" in {
       val saveAndReturnClient = mock[SaveAndReturnClient]
 
-      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers), saveAndReturnClient = saveAndReturnClient)
+      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers), saveAndReturnClient = saveAndReturnClient, affinityGroup = orgAffinity)
         .build()
 
       when(saveAndReturnClient.save(any[UserAnswers]())(any[HeaderCarrier]()))
@@ -183,7 +182,7 @@ class HowToNotifyAboutSecuritiesTransferControllerSpec extends SpecBase {
     "must redirect to Template instruction page when more than one at a time is selected" in {
       val saveAndReturnClient = mock[SaveAndReturnClient]
 
-      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers), saveAndReturnClient = saveAndReturnClient)
+      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers), saveAndReturnClient = saveAndReturnClient, affinityGroup = orgAffinity)
         .build()
 
       when(saveAndReturnClient.save(any[UserAnswers]())(any[HeaderCarrier]()))

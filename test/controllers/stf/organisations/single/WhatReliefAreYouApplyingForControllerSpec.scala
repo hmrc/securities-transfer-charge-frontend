@@ -47,7 +47,7 @@ class WhatReliefAreYouApplyingForControllerSpec extends SpecBase with MockitoSug
 
     "must return OK and the correct view for a GET" in {
 
-      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers))
+      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers), affinityGroup = orgAffinity)
         .overrides(bind[Navigator].qualifiedWith("organisations").toInstance(getNavigator))
         .build()
 
@@ -69,7 +69,7 @@ class WhatReliefAreYouApplyingForControllerSpec extends SpecBase with MockitoSug
 
       val userAnswers = UserAnswers(userAnswersId,submissionId).set(WhatReliefAreYouApplyingForPage, "answer").success.value
 
-      val application = applicationBuilder(userAnswers = Some(userAnswers))
+      val application = applicationBuilder(userAnswers = Some(userAnswers), affinityGroup = orgAffinity)
         .overrides(bind[Navigator].qualifiedWith("organisations").toInstance(getNavigator))
         .build()
 
@@ -94,7 +94,7 @@ class WhatReliefAreYouApplyingForControllerSpec extends SpecBase with MockitoSug
         .thenReturn(Future.successful(()))
 
       val application =
-        applicationBuilder(userAnswers = Some(emptyUserAnswers))
+        applicationBuilder(userAnswers = Some(emptyUserAnswers), affinityGroup = orgAffinity)
           .build()
 
       running(application) {
@@ -110,7 +110,7 @@ class WhatReliefAreYouApplyingForControllerSpec extends SpecBase with MockitoSug
 
     "must return a Bad Request and errors when invalid data is submitted" in {
 
-      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers))
+      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers), affinityGroup = orgAffinity)
       .overrides(bind[Navigator].qualifiedWith("organisations").toInstance(getNavigator))
       .build()
 
@@ -134,7 +134,7 @@ class WhatReliefAreYouApplyingForControllerSpec extends SpecBase with MockitoSug
 
     "must redirect to Journey Recovery for a GET if no existing data is found" in {
 
-      val application = applicationBuilder(userAnswers = None).build()
+      val application = applicationBuilder(userAnswers = None, affinityGroup = orgAffinity).build()
 
       running(application) {
         val request = FakeRequest(GET, whatReliefAreYouApplyingForRoute)
@@ -148,7 +148,7 @@ class WhatReliefAreYouApplyingForControllerSpec extends SpecBase with MockitoSug
 
     "must redirect to Journey Recovery for a POST if no existing data is found" in {
 
-      val application = applicationBuilder(userAnswers = None).build()
+      val application = applicationBuilder(userAnswers = None, affinityGroup = orgAffinity).build()
 
       running(application) {
         val request =
