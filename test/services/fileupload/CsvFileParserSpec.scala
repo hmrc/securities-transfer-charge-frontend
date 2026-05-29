@@ -19,8 +19,7 @@ package services.fileupload
 import org.scalatest.EitherValues
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpec
-import uk.gov.hmrc.securitiestransferchargefrontend.models.stf.fileupload.FileParseError.RowLimitExceeded
-import uk.gov.hmrc.securitiestransferchargefrontend.models.stf.fileupload.{ParsedCell, UploadedFile}
+import uk.gov.hmrc.securitiestransferchargefrontend.models.stf.fileupload.{FileParseError, ParsedCell, ParsedRow, UploadedFile}
 import uk.gov.hmrc.securitiestransferchargefrontend.services.fileupload.CsvFileParser
 
 import java.io.ByteArrayInputStream
@@ -42,34 +41,36 @@ class CsvFileParserSpec extends AnyWordSpec with Matchers with EitherValues {
   private def blankCells(fromIndex: Int): Seq[ParsedCell] =
     (fromIndex until maxColumns).map(index => ParsedCell(index, ""))
 
-  "parse" should {
+  private def parseFully(csv: String): Either[FileParseError, (Seq[String], Seq[ParsedRow])] =
+    parser.withParsedStream(uploadedFile(csv)) { (headers, rowStream) =>
+      Right((headers, rowStream.toList))
+    }
 
-    "parse a simple CSV file into ParsedFile" in {
+  "withParsedStream" should {
+
+    "stream the headers and rows of a simple CSV file" in {
       val csv =
         """name,amount,date
           |Bill,100,2026-03-23
           |Bob,200,2026-03-24
           |""".stripMargin
 
-      val result = parser.parse(uploadedFile(csv)).value
+      val (headers, rows) = parseFully(csv).value
 
-      result.fileName shouldBe "test.csv"
-      result.mimeType shouldBe "text/csv"
-
-      result.headers shouldBe Seq("name", "amount", "date") ++
+      headers shouldBe Seq("name", "amount", "date") ++
         Seq.fill(maxColumns - 3)("")
 
-      result.rows.size shouldBe 2
+      rows.size shouldBe 2
 
-      result.rows.head.rowNumber shouldBe 2
-      result.rows.head.cells shouldBe Seq(
+      rows.head.rowNumber shouldBe 2
+      rows.head.cells shouldBe Seq(
         ParsedCell(0, "Bill"),
         ParsedCell(1, "100"),
         ParsedCell(2, "2026-03-23")
       ) ++ blankCells(fromIndex = 3)
 
-      result.rows(1).rowNumber shouldBe 3
-      result.rows(1).cells shouldBe Seq(
+      rows(1).rowNumber shouldBe 3
+      rows(1).cells shouldBe Seq(
         ParsedCell(0, "Bob"),
         ParsedCell(1, "200"),
         ParsedCell(2, "2026-03-24")
@@ -82,9 +83,9 @@ class CsvFileParserSpec extends AnyWordSpec with Matchers with EitherValues {
           |"Bill","1, High Street"
           |""".stripMargin
 
-      val result = parser.parse(uploadedFile(csv)).value
+      val (_, rows) = parseFully(csv).value
 
-      result.rows.head.cells shouldBe Seq(
+      rows.head.cells shouldBe Seq(
         ParsedCell(0, "Bill"),
         ParsedCell(1, "1, High Street")
       ) ++ blankCells(fromIndex = 2)
@@ -96,9 +97,9 @@ class CsvFileParserSpec extends AnyWordSpec with Matchers with EitherValues {
           | Bill , 100
           |""".stripMargin
 
-      val result = parser.parse(uploadedFile(csv)).value
+      val (_, rows) = parseFully(csv).value
 
-      result.rows.head.cells shouldBe Seq(
+      rows.head.cells shouldBe Seq(
         ParsedCell(0, "Bill"),
         ParsedCell(1, "100")
       ) ++ blankCells(fromIndex = 2)
@@ -110,12 +111,12 @@ class CsvFileParserSpec extends AnyWordSpec with Matchers with EitherValues {
           |Bill
           |""".stripMargin
 
-      val result = parser.parse(uploadedFile(csv)).value
+      val (headers, rows) = parseFully(csv).value
 
-      result.headers shouldBe Seq("name") ++
+      headers shouldBe Seq("name") ++
         Seq.fill(maxColumns - 1)("")
 
-      result.rows.head.cells shouldBe Seq(
+      rows.head.cells shouldBe Seq(
         ParsedCell(0, "Bill")
       ) ++ blankCells(fromIndex = 1)
     }
@@ -129,28 +130,15 @@ class CsvFileParserSpec extends AnyWordSpec with Matchers with EitherValues {
            |$row
            |""".stripMargin
 
-      val result = parser.parse(uploadedFile(csv)).value
+      val (headers, rows) = parseFully(csv).value
 
-      result.headers should have size maxColumns
-      result.rows.head.cells should have size maxColumns
+      headers should have size maxColumns
+      rows.head.cells should have size maxColumns
 
-      result.headers shouldBe (1 to maxColumns).map(i => s"col$i")
-      result.rows.head.cells shouldBe (0 until maxColumns).map { index =>
+      headers shouldBe (1 to maxColumns).map(i => s"col$i")
+      rows.head.cells shouldBe (0 until maxColumns).map { index =>
         ParsedCell(index, s"value${index + 1}")
       }
-    }
-
-    "return RowLimitExceeded when the row count exceeds the configured maximum" in {
-      val parser = new CsvFileParser(TestFileUploadConfig.config(maxRows = 1))
-
-      val csv =
-        """name
-          |Bill
-          |Bob
-          |""".stripMargin
-
-      parser.parse(uploadedFile(csv)).left.value shouldBe
-        RowLimitExceeded(3, 1)
     }
   }
 }

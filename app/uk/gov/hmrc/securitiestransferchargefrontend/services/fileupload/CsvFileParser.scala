@@ -22,11 +22,10 @@ import java.io.InputStreamReader
 import java.nio.charset.StandardCharsets
 import javax.inject.{Inject, Singleton}
 import org.apache.commons.csv.{CSVFormat, CSVParser, CSVRecord}
-import uk.gov.hmrc.securitiestransferchargefrontend.models.stf.fileupload.FileParseError.{InvalidCsv, RowLimitExceeded}
-import uk.gov.hmrc.securitiestransferchargefrontend.models.stf.fileupload.{FileParseError, ParsedCell, ParsedFile, ParsedRow, UploadedFile}
+import uk.gov.hmrc.securitiestransferchargefrontend.models.stf.fileupload.FileParseError.InvalidCsv
+import uk.gov.hmrc.securitiestransferchargefrontend.models.stf.fileupload.{FileParseError, ParsedCell, ParsedRow, UploadedFile}
 
 import scala.jdk.CollectionConverters.*
-import scala.util.Try
 
 @Singleton
 class CsvFileParser @Inject()(config: FileUploadConfig) extends FileParser {
@@ -34,37 +33,27 @@ class CsvFileParser @Inject()(config: FileUploadConfig) extends FileParser {
   private def isEmptyRecord(record: CSVRecord): Boolean =
     record.iterator().asScala.forall(_.trim.isEmpty)
 
-  override def parse(file: UploadedFile): Either[FileParseError, ParsedFile] =
-    Try {
+  override def withParsedStream[A](file: UploadedFile)(block: (Seq[String], Iterator[ParsedRow]) => Either[FileParseError, A]): Either[FileParseError, A] = {
+    try {
       val reader = new InputStreamReader(file.inputStream, StandardCharsets.UTF_8)
-      val parser = CSVParser.parse(
-        reader,
-        CSVFormat.DEFAULT
-      )
+      val parser = CSVParser.parse(reader, CSVFormat.DEFAULT)
 
       try {
-        val records = parser.getRecords.asScala.toSeq.filterNot(isEmptyRecord)
-        
-        if (records.isEmpty) {
-          Left(InvalidCsv("The file is empty"))
-        } else if (records.size > config.maxRows) {
-          Left(RowLimitExceeded(records.size, config.maxRows))
-        } else {
+        val rowIterator = parser.iterator().asScala.filterNot(isEmptyRecord)
 
-          val headerRecord = records.head
+        if (!rowIterator.hasNext) {
+          Left(InvalidCsv("The file is empty"))
+        } else {
+          val headerRecord = rowIterator.next()
           val headerValues = headerRecord.iterator().asScala.toSeq
 
-          val headers: Seq[String] =
-            (0 until config.maxColumns).map { colIndex =>
-              val rawValue = headerValues.lift(colIndex).getOrElse("").trim
-              if (colIndex == 0) rawValue.replace("\uFEFF", "") else rawValue
-            }
+          val headers: Seq[String] = (0 until config.maxColumns).map { colIndex =>
+            val rawValue = headerValues.lift(colIndex).getOrElse("").trim
+            if (colIndex == 0) rawValue.replace("\uFEFF", "") else rawValue
+          }
 
-          val dataRecords = records.tail
-
-          val rows = dataRecords.zipWithIndex.map { case (record, index) =>
+          val lazyParsedRows = rowIterator.zipWithIndex.map { case (record, index) =>
             val values = record.iterator().asScala.toSeq
-
             ParsedRow(
               rowNumber = index + 2,
               cells = (0 until config.maxColumns).map { colIndex =>
@@ -76,20 +65,15 @@ class CsvFileParser @Inject()(config: FileUploadConfig) extends FileParser {
             )
           }
 
-          Right(
-            ParsedFile(
-              fileName = file.fileName,
-              mimeType = file.mimeType,
-              headers = headers,
-              rows = rows
-            )
-          )
+          block(headers, lazyParsedRows)
         }
       } finally {
         parser.close()
         reader.close()
+        file.inputStream.close()
       }
-    }.getOrElse {
-      Left(InvalidCsv(s"Unable to parse file ${file.fileName}"))
+    } catch {
+      case _: Exception => Left(InvalidCsv(s"Unable to parse file ${file.fileName}"))
     }
+  }
 }

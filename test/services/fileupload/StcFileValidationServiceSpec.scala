@@ -117,26 +117,35 @@ class StcFileValidationServiceSpec extends SpecBase {
       )
     )
 
-  "StcFileValidationService.validate" - {
+  "StcFileValidationService.validateStream" - {
 
     "validate each parsed row and return a file validation response" in {
 
+      val rowStream = Seq(parsedRow1, parsedRow2).iterator
+
       when(mockConfig.maxErrorsAllowed).thenReturn(25)
+      when(mockConfig.maxRows).thenReturn(10000)
 
       when(
-        stcRowValidationService.validateAll(
-          Seq(parsedRow1, parsedRow2),
-          headers, affinityGroupKeyInd, 25
+        stcRowValidationService.validateStream(
+          rowStream,
+          headers,
+          affinityGroupKeyInd,
+          25,
+          10000
         )
-      ).thenReturn(Seq(validatedRow1, validatedRow2))
+      ).thenReturn(Right(Seq(validatedRow1, validatedRow2)))
 
-      val result = service.validate(Seq(parsedRow1, parsedRow2), headers, affinityGroupKeyInd)
+      val result = service.validateStream(rowStream, headers, affinityGroupKeyInd)
 
-      result.rows mustBe Seq(validatedRow1, validatedRow2)
-      result.maxErrorsAllowed mustBe 25
-      result.hasErrors mustBe true
-      result.hasBlockingErrors mustBe true
-      result.validRows mustBe Seq(validatedRow1.parsedRow)
+      result.isRight mustBe true
+      val response = result.toOption.get
+
+      response.rows mustBe Seq(validatedRow1, validatedRow2)
+      response.maxErrorsAllowed mustBe 25
+      response.hasErrors mustBe true
+      response.hasBlockingErrors mustBe true
+      response.validRows mustBe Seq(validatedRow1.parsedRow)
     }
   }
 }

@@ -19,7 +19,7 @@ package services.fileupload
 import base.SpecBase
 import play.api.i18n.MessagesApi
 import uk.gov.hmrc.securitiestransferchargefrontend.forms.stf.shared.{NameOfSellerFormProvider, SecuritiesTargetFormProvider}
-import uk.gov.hmrc.securitiestransferchargefrontend.models.stf.fileupload.{ParsedCell, ParsedRow}
+import uk.gov.hmrc.securitiestransferchargefrontend.models.stf.fileupload.{FileParseError, ParsedCell, ParsedRow}
 import uk.gov.hmrc.securitiestransferchargefrontend.services.fileupload.*
 
 class StcRowValidationServiceSpec extends SpecBase {
@@ -68,7 +68,7 @@ class StcRowValidationServiceSpec extends SpecBase {
 
   implicit val columnIndex: ColumnIndexBuilder = new ColumnIndexBuilder(headers)
 
-  "StcRowValidationService.validateAll" - {
+  "StcRowValidationService.validateStream" - {
 
     "return no errors for a valid row" in {
 
@@ -94,9 +94,10 @@ class StcRowValidationServiceSpec extends SpecBase {
         )
       )
 
-      val result = service.validateAll(Seq(row), headers, affinityGroupKeyInd, 25)
+      val result = service.validateStream(Seq(row).iterator, headers, affinityGroupKeyInd, 25, 10000)
 
-      result.head.validationErrors mustBe Seq.empty
+      result.isRight mustBe true
+      result.toOption.get.head.validationErrors mustBe Seq.empty
     }
 
     "combine basic and conditional validation errors" in {
@@ -123,9 +124,10 @@ class StcRowValidationServiceSpec extends SpecBase {
         )
       )
 
-      val result = service.validateAll(Seq(row), headers, affinityGroupKeyInd, 25)
+      val result = service.validateStream(Seq(row).iterator, headers, affinityGroupKeyInd, 25, 10000)
 
-      val errors = result.head.validationErrors.map(_.fieldName)
+      result.isRight mustBe true
+      val errors = result.toOption.get.head.validationErrors.map(_.fieldName)
 
       errors must contain allOf(
         "sellerName",
@@ -167,15 +169,34 @@ class StcRowValidationServiceSpec extends SpecBase {
 
       val maxErrorsAllowed = 10
 
-      val result = service.validateAll(
-        Seq(badRow1, badRow2, badRow3),
+      val result = service.validateStream(
+        Seq(badRow1, badRow2, badRow3).iterator,
         headers,
         affinityGroupKeyInd,
-        maxErrorsAllowed
+        maxErrorsAllowed,
+        10000
       )
 
-      result.size mustBe 2
-      result.map(_.parsedRow.rowNumber) mustBe Seq(4, 5)
+      result.isRight mustBe true
+      val rows = result.toOption.get
+      rows.size mustBe 2
+      rows.map(_.parsedRow.rowNumber) mustBe Seq(4, 5)
+    }
+
+    "return RowLimitExceeded when the processed row count exceeds the maxRows limit" in {
+
+      val row = ParsedRow(rowNumber = 4, cells = Seq.empty)
+      val row2 = ParsedRow(rowNumber = 5, cells = Seq.empty)
+
+      val result = service.validateStream(
+        Seq(row, row2).iterator,
+        headers,
+        affinityGroupKeyInd,
+        maxErrorsAllowed = 25,
+        maxRows = 1
+      )
+
+      result mustBe Left(FileParseError.RowLimitExceeded(2, 1))
     }
   }
 }

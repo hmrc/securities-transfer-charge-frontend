@@ -16,7 +16,7 @@
 
 package uk.gov.hmrc.securitiestransferchargefrontend.services.fileupload
 
-import uk.gov.hmrc.securitiestransferchargefrontend.models.stf.fileupload.{ParsedRow, ValidatedStcRow}
+import uk.gov.hmrc.securitiestransferchargefrontend.models.stf.fileupload.{FileParseError, ParsedRow, ValidatedStcRow}
 
 import javax.inject.{Inject, Singleton}
 import scala.annotation.tailrec
@@ -27,12 +27,13 @@ class StcRowValidationService @Inject()(
                                          stcConditionalRowValidator: StcConditionalRowValidator
                                        ) {
 
-  def validateAll(
-                   rows: Seq[ParsedRow],
-                   headers: Seq[String],
-                   affinityKey: String,
-                   maxErrorsAllowed: Int
-                 ): Seq[ValidatedStcRow] = {
+  def validateStream(
+                      rowStream: Iterator[ParsedRow],
+                      headers: Seq[String],
+                      affinityKey: String,
+                      maxErrorsAllowed: Int,
+                      maxRows: Int
+                    ): Either[FileParseError, Seq[ValidatedStcRow]] = {
 
     implicit val columnIndex: ColumnIndexBuilder = new ColumnIndexBuilder(headers)
     val mapper = new StcRowMapper(columnIndex)
@@ -40,33 +41,29 @@ class StcRowValidationService @Inject()(
 
     @tailrec
     def processRows(
-                     remaining: List[ParsedRow],
                      accumulated: List[ValidatedStcRow],
-                     blockingErrorCount: Int
-                   ): Seq[ValidatedStcRow] = {
+                     blockingErrorCount: Int,
+                     processedRowCount: Int
+                   ): Either[FileParseError, Seq[ValidatedStcRow]] = {
 
-      remaining match {
-        case Nil =>
-          accumulated.reverse
+      if (processedRowCount > maxRows) {
+        Left(FileParseError.RowLimitExceeded(processedRowCount, maxRows))
+      } else if (blockingErrorCount > maxErrorsAllowed || !rowStream.hasNext) {
+        Right(accumulated.reverse)
+      } else {
+        val parsedRow = mapper.map(rowStream.next())
 
-        case _ if blockingErrorCount > maxErrorsAllowed =>
-          accumulated.reverse
+        val errors =
+          stcBasicRowValidator.validate(parsedRow, template, affinityKey) ++
+            stcConditionalRowValidator.validate(parsedRow, template, affinityKey)
 
-        case head :: tail =>
-          val parsedRow = mapper.map(head)
+        val updatedErrorCount = blockingErrorCount + errors.count(_.blocking)
 
-          val errors =
-            stcBasicRowValidator.validate(parsedRow, template, affinityKey) ++
-              stcConditionalRowValidator.validate(parsedRow, template, affinityKey)
-
-          val updatedErrorCount =
-            blockingErrorCount + errors.count(_.blocking)
-
-          processRows(tail, ValidatedStcRow(parsedRow, errors) :: accumulated, updatedErrorCount)
+        processRows(ValidatedStcRow(parsedRow, errors) :: accumulated, updatedErrorCount, processedRowCount + 1)
       }
     }
 
-    processRows(rows.toList, Nil, 0)
+    processRows(Nil, 0, 0)
   }
 
   private def detectTemplate(headers: Seq[String]): StcTemplate = {
