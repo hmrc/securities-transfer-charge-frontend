@@ -25,9 +25,9 @@
 @layout(pageTitle = titleNoForm(messages("fileUpload.processing.title")),showBackLink = false) {
     <div class="loading-spinner-wrapper">
         <div class="loading-spinner">
-            <div class="loading-spinner__spinner" aria-live="polite" role="status"></div>
+            <div class="loading-spinner__spinner" aria-hidden="true"></div>
 
-            <div class="loading-spinner__content">
+            <div class="loading-spinner__content"  role="status" aria-live="polite">
                 <h1 class="govuk-heading-m">
                     @messages("fileUpload.processing.title")
                 </h1>
