@@ -29,7 +29,7 @@ import views.ViewBaseSpec
 class WhatReliefAreYouApplyingForViewSpec extends ViewBaseSpec {
 
   override def fakeApplication(): Application =
-    applicationBuilder().build()
+    applicationBuilder(affinityGroup = individualAffinity).build()
 
   private val viewInstance = app.injector.instanceOf[WhatReliefAreYouApplyingForView]
   private val source = app.injector.instanceOf[ReliefsDataSource]

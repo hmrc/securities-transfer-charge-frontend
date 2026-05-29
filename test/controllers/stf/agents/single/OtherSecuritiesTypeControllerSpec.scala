@@ -134,7 +134,7 @@ class OtherSecuritiesTypeControllerSpec extends SpecBase with MockitoSugar {
 
     "must redirect to Journey Recovery for a POST if no existing data is found" in {
 
-      val application = applicationBuilder(userAnswers = None,affinityGroup = agentAffinity).build()
+      val application = applicationBuilder(userAnswers = None, affinityGroup = agentAffinity).build()
 
       running(application) {
         val request =
