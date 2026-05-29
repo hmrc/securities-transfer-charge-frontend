@@ -46,7 +46,8 @@ class FileProcessingController @Inject()(
     stcAuthEnrolled { implicit request =>
       val counter = createCounter(request)
       if (counter.isTimedOut) {
-        Redirect(routes.FileProcessingController.onTimeout())
+        val result = Redirect(routes.FileProcessingController.onTimeout())
+        counter.reset(result)
       } else {
         counter.withIncrementedCounter(Ok(spinnerView(refreshInterval)))
       }

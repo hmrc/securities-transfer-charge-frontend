@@ -25,7 +25,8 @@ import javax.inject.Inject
 trait FileProcessingRefreshCounter:
   def currentCount: Int
   def isTimedOut: Boolean
-  def withIncrementedCounter: Result => Result
+  def withIncrementedCounter(in: Result): Result
+  def reset(in: Result): Result
 
 final class SessionFileProcessingRefreshCounter(appConfig: FrontendAppConfig, request: Request[?]) extends FileProcessingRefreshCounter:
 
@@ -37,8 +38,11 @@ final class SessionFileProcessingRefreshCounter(appConfig: FrontendAppConfig, re
   override def isTimedOut: Boolean =
     currentCount >= maxRetries
 
-  override def withIncrementedCounter: Result => Result = result =>
-    result.withSession(request.session + (retryCountKey -> (currentCount + 1).toString))
+  override def withIncrementedCounter(in: Result): Result =
+    in.withSession(request.session + (retryCountKey -> (currentCount + 1).toString))
+
+  override def reset(in: Result): Result =
+    in.withSession(request.session - retryCountKey)
 
 trait FileProcessingRefreshCounterFactory:
   def apply(request: Request[?]): FileProcessingRefreshCounter

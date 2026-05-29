@@ -17,8 +17,9 @@
 package controllers.stf.shared.bulk
 
 import base.SpecBase
+import org.mockito.ArgumentMatchers.any
 import org.scalatestplus.mockito.MockitoSugar
-import play.api.mvc.Request
+import play.api.mvc.{Request, Result}
 import play.api.test.FakeRequest
 import play.api.test.Helpers.*
 import uk.gov.hmrc.securitiestransferchargefrontend.config.FrontendAppConfig
@@ -26,7 +27,8 @@ import uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.shared.bulk.
 import uk.gov.hmrc.securitiestransferchargefrontend.services.fileupload.processing.{FileProcessingRefreshCounter, FileProcessingRefreshCounterFactory}
 import uk.gov.hmrc.securitiestransferchargefrontend.views.html.stf.shared.bulk.FileProcessingView
 import play.api.inject.bind
-import org.mockito.Mockito.when
+import org.mockito.Mockito.*
+import play.api.mvc.Results.NoContent
 
 class MockFileProcessingRefreshCounterFactory(counter: FileProcessingRefreshCounter) extends FileProcessingRefreshCounterFactory {
   override def apply(request: Request[?]): FileProcessingRefreshCounter = counter
@@ -57,8 +59,27 @@ class FileProcessingControllerSpec extends SpecBase with MockitoSugar {
 
   "must return the timed out view if the number of retries is exceeded" in {
 
+    val application =
+      applicationBuilder(userAnswers = Some(emptyUserAnswers))
+        .build()
+
+    running(application) {
+      val request = FakeRequest(GET, routes.FileProcessingController.onPageLoad().url).withSession(("retryCount", "1000"))
+      val result = route(application, request).value
+
+      status(result) mustEqual SEE_OTHER
+      redirectLocation(result).value mustEqual routes.FileProcessingController.onTimeout().url
+    }
+  }
+
+  "must reset the retry count if the number of retries is exceeded" in {
+
     val mockCounter = mock[FileProcessingRefreshCounter]
     when(mockCounter.isTimedOut).thenReturn(true)
+
+    val result: Result = NoContent
+    doReturn(result).when(mockCounter).reset(any[Result])
+
     val factory = new MockFileProcessingRefreshCounterFactory(mockCounter)
     val application =
       applicationBuilder(userAnswers = Some(emptyUserAnswers))
@@ -68,10 +89,9 @@ class FileProcessingControllerSpec extends SpecBase with MockitoSugar {
     running(application) {
 
       val request = FakeRequest(GET, routes.FileProcessingController.onPageLoad().url)
-      val result = route(application, request).value
-      status(result) mustEqual SEE_OTHER
-      redirectLocation(result).value mustEqual routes.FileProcessingController.onTimeout().url
+      route(application, request).value
+      verify(mockCounter, times(1)).reset(any[Result])
+
     }
   }
 }
-
