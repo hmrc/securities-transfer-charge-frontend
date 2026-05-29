@@ -28,7 +28,8 @@ class StcRowValidationService @Inject()(
 
   def validateAll(
                    rows: Seq[ParsedRow],
-                   headers: Seq[String]
+                   headers: Seq[String],
+                   affinityKey:String
                  ): Seq[ValidatedStcRow] = {
 
     implicit val columnIndex: ColumnIndexBuilder = new ColumnIndexBuilder(headers)
@@ -44,8 +45,8 @@ class StcRowValidationService @Inject()(
       ValidatedStcRow(
         parsedRow = parsedRow,
         validationErrors =
-          stcBasicRowValidator.validate(parsedRow, template) ++
-            stcConditionalRowValidator.validate(parsedRow, template)
+          stcBasicRowValidator.validate(parsedRow, template,affinityKey) ++
+            stcConditionalRowValidator.validate(parsedRow, template, affinityKey)
       )
     }
   }

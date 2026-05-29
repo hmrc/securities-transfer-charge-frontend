@@ -14,25 +14,25 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.organisations.bulk
+package uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.shared.bulk
 
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.actions.*
-import uk.gov.hmrc.securitiestransferchargefrontend.views.html.stf.organisations.bulk.ChangedFileErrorView
+import uk.gov.hmrc.securitiestransferchargefrontend.views.html.stf.shared.bulk.BulkUploadInvalidTemplateView
 
 import javax.inject.Inject
 
-class ChangedFileErrorController @Inject()(
-                                       override val messagesApi: MessagesApi,
-                                       stcAuthEnrolled: StcAuthEnrolledAction,
-                                       val controllerComponents: MessagesControllerComponents,
-                                       view: ChangedFileErrorView
-                                     ) extends FrontendBaseController with I18nSupport {
+class BulkUploadInvalidTemplateController @Inject()(
+                                               override val messagesApi: MessagesApi,
+                                               stcAuthEnrolled: StcAuthEnrolledAction,
+                                               view: BulkUploadInvalidTemplateView,
+                                               val controllerComponents: MessagesControllerComponents
+                                             ) extends FrontendBaseController with I18nSupport {
 
-  def onPageLoad: Action[AnyContent] = stcAuthEnrolled {
-    implicit request =>
+  def onPageLoad(): Action[AnyContent] =
+    stcAuthEnrolled { implicit request =>
       Ok(view())
-  }
+    }
 }

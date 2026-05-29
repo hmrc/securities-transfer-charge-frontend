@@ -24,13 +24,19 @@ object TestFileUploadConfig {
   def config(
               maxRows: Int = 1000,
               expectedWorksheetName: String = "Sheet1",
-              firstDataRow: Int = 3
+              firstDataRow: Int = 4,
+              row1Hash: String = "dummy-hash-1",
+              row2Hash: String = "dummy-hash-2",
+              row3Hash: String = "dummy-hash-3"
             ): FileUploadConfig =
     new FileUploadConfig(
       Configuration(
         "file-upload.max-rows" -> maxRows,
         "file-upload.xlsx.expected-worksheet" -> expectedWorksheetName,
-        "file-upload.first-data-row" -> firstDataRow
+        "file-upload.first-data-row" -> firstDataRow,
+        "file-upload.template-hashes.individual.stf.row1" -> row1Hash,
+        "file-upload.template-hashes.individual.stf.row2" -> row2Hash,
+        "file-upload.template-hashes.individual.stf.row3" -> row3Hash
       )
     )
 }
