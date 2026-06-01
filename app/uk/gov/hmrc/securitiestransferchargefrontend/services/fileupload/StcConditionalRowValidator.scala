@@ -33,7 +33,7 @@ class StcConditionalRowValidator @Inject()(
   def validate(
                 row: ParsedStcRow,
                 template: StcTemplate,
-                affinityKey:String
+                affinityKey: String
               )(implicit cols: ColumnIndexBuilder): Seq[StcRowValidationError] = {
 
     template match {
@@ -42,28 +42,28 @@ class StcConditionalRowValidator @Inject()(
         validateSTF(row, affinityKey)
 
       case StcTemplate.SH03 =>
-        validateSH03(row,affinityKey)
+        validateSH03(row, affinityKey)
     }
   }
 
   def validateSTF(
                    row: ParsedStcRow,
-                   affinityKey:String
+                   affinityKey: String
                  )(implicit cols: ColumnIndexBuilder): Seq[StcRowValidationError] =
-    validateReliefType(row,affinityKey) ++
-      validateTypeOfShares(row,affinityKey) ++
+    validateReliefType(row, affinityKey) ++
+      validateTypeOfShares(row, affinityKey) ++
       validateSellerAddress(row) ++
       validateTotalMarketValue(row)
 
   def validateSH03(
                     row: ParsedStcRow,
-                    affinityKey:String
+                    affinityKey: String
                   )(implicit cols: ColumnIndexBuilder): Seq[StcRowValidationError] =
-    validateReliefType(row,affinityKey)
+    validateReliefType(row, affinityKey)
 
   private def validateReliefType(
                                   row: ParsedStcRow,
-                                  affinityKey:String
+                                  affinityKey: String
                                 )(implicit cols: ColumnIndexBuilder): Seq[StcRowValidationError] = {
 
     row.applyingForRelief match {
@@ -110,7 +110,7 @@ class StcConditionalRowValidator @Inject()(
 
   private def validateTypeOfShares(
                                     row: ParsedStcRow,
-                                    affinityKey:String
+                                    affinityKey: String
                                   )(implicit cols: ColumnIndexBuilder): Seq[StcRowValidationError] = {
 
     row.whatTypeOfSecurities match {
@@ -158,7 +158,14 @@ class StcConditionalRowValidator @Inject()(
                                      row: ParsedStcRow
                                    )(implicit cols: ColumnIndexBuilder): Seq[StcRowValidationError] = {
 
+    val addressFields = Seq(
+      "sellerAddressLine2" -> row.sellerAddressLine2,
+      "sellerAddressLine3" -> row.sellerAddressLine3,
+      "sellerAddressLine4" -> row.sellerAddressLine4
+    )
+
     row.sellerAddressInUK match {
+
 
       case Some(true) =>
         support.validateRequiredText(
@@ -170,16 +177,17 @@ class StcConditionalRowValidator @Inject()(
           Some(messages("fileUpload.error.sellerAddressLine1.length")),
           Some(support.addressPattern),
           Some(messages("fileUpload.error.sellerAddressLine1.invalidCharacters"))
-        ) ++
+        ) ++ addressFields.flatMap { case (fieldName, value) =>
           support.validateOptionalText(
-            row.sellerAddressLine2,
+            value,
             row.rowNumber,
-            "sellerAddressLine2",
-            Some(support.addressLineMaxLength),
-            Some(messages("fileUpload.error.sellerAddressLine2.length")),
+            fieldName,
+            Some(support.optAddressLineMaxLength),
+            Some(messages(s"fileUpload.error.$fieldName.length")),
             Some(support.addressPattern),
-            Some(messages("fileUpload.error.sellerAddressLine2.invalidCharacters"))
-          ) ++
+            Some(messages(s"fileUpload.error.$fieldName.invalidCharacters"))
+          )
+        } ++
           validateSellerPostcode(row)
 
       case Some(false) =>
