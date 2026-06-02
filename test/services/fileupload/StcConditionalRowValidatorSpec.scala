@@ -128,15 +128,92 @@ class StcConditionalRowValidatorSpec extends SpecBase {
       result.exists(_.fieldName == "sellerAddressLine1") mustBe true
     }
 
-    "validate UK seller address line 1 invalid characters" in {
-      val result = validator.validate(
-        validParsedRow.copy(
-          sellerAddressInUK = Some(true),
-          sellerAddressLine1 = Some("Address @@@")
-        ), StcTemplate.STF,affinityGroupKeyInd
+    "validate UK seller address lines invalid characters" in {
+
+      val testCases = Seq(
+        "sellerAddressLine1" -> ((row: ParsedStcRow) =>
+          row.copy(sellerAddressInUK = Some(true), sellerAddressLine1 = Some("Address @@@"))),
+
+        "sellerAddressLine2" -> ((row: ParsedStcRow) =>
+          row.copy(sellerAddressInUK = Some(true), sellerAddressLine2 = Some("Address @@@"))),
+
+        "sellerAddressLine3" -> ((row: ParsedStcRow) =>
+          row.copy(sellerAddressInUK = Some(true), sellerAddressLine3 = Some("Address @@@"))),
+
+        "sellerAddressLine4" -> ((row: ParsedStcRow) =>
+          row.copy(sellerAddressInUK = Some(true), sellerAddressLine4 = Some("Address @@@")))
       )
 
-      result.exists(_.fieldName == "sellerAddressLine1") mustBe true
+      testCases.foreach { case (fieldName, modifyRow) =>
+        val result = validator.validate(
+          modifyRow(validParsedRow),
+          StcTemplate.STF,
+          affinityGroupKeyInd
+        )
+
+        result.exists(_.fieldName == fieldName) mustBe true
+      }
+    }
+
+    "validate UK seller address lines max length" in {
+
+      val over100Chars =
+        "Flat 12B, Riverside Court, 45 High Street, London, Flat 12B, Riverside Court, 45 High Street, London, UK"
+
+      val over40Chars =
+        "Flat 12B, Riverside Court, 45 High Street, London"
+
+      val testCases = Seq(
+        (
+          "sellerAddressLine1",
+          (row: ParsedStcRow) =>
+            row.copy(
+              sellerAddressInUK = Some(true),
+              sellerAddressLine1 = Some(over100Chars)
+            ),
+          "must be 100 characters or fewer"
+        ),
+        (
+          "sellerAddressLine2",
+          (row: ParsedStcRow) =>
+            row.copy(
+              sellerAddressInUK = Some(true),
+              sellerAddressLine2 = Some(over40Chars)
+            ),
+          "must be fewer than 40 characters long"
+        ),
+        (
+          "sellerAddressLine3",
+          (row: ParsedStcRow) =>
+            row.copy(
+              sellerAddressInUK = Some(true),
+              sellerAddressLine3 = Some(over40Chars)
+            ),
+          "must be fewer than 40 characters long"
+        ),
+        (
+          "sellerAddressLine4",
+          (row: ParsedStcRow) =>
+            row.copy(
+              sellerAddressInUK = Some(true),
+              sellerAddressLine4 = Some(over40Chars)
+            ),
+          "must be fewer than 40 characters long"
+        )
+      )
+
+      testCases.foreach { case (fieldName, modifyRow, expectedMessage) =>
+        val result = validator.validate(
+          modifyRow(validParsedRow),
+          StcTemplate.STF,
+          affinityGroupKeyInd
+        )
+
+        val error = result.find(_.fieldName == fieldName)
+
+        error mustBe defined
+        error.get.message must include(expectedMessage)
+      }
     }
 
     "validate UK seller postcode required" in {

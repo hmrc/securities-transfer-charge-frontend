@@ -26,7 +26,8 @@ import scala.util.matching.Regex
 @Singleton
 class StcValidationSupport {
 
-  val addressLineMaxLength = 50
+  val addressLineMaxLength = 100
+  val optAddressLineMaxLength = 40
   val postcodeMaxLength    = 10
   val countryMaxLength     = 50
 

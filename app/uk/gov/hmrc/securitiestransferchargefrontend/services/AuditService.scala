@@ -16,22 +16,27 @@
 
 package uk.gov.hmrc.securitiestransferchargefrontend.services
 
+import play.api.Logging
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.play.audit.http.connector.AuditConnector
 import uk.gov.hmrc.securitiestransferchargefrontend.models.audit.JsonAuditModel
 
 import javax.inject.Inject
 import scala.concurrent.ExecutionContext
+import scala.util.{Failure, Success, Try}
 
 class AuditService @Inject()(
                               auditConnector: AuditConnector
-                            )(implicit ec: ExecutionContext) {
+                            )(implicit ec: ExecutionContext) extends Logging {
 
-  def audit(eventData: JsonAuditModel)(implicit hc: HeaderCarrier): Unit = {
-
-    auditConnector.sendExplicitAudit(
-      auditType = eventData.auditType,
-      detail = eventData.detail
-    )
-  }
+  def audit(eventData: JsonAuditModel)(implicit hc: HeaderCarrier): Unit =
+    Try {
+      auditConnector.sendExplicitAudit(
+        auditType = eventData.auditType,
+        detail = eventData.detail
+      )
+    } match {
+      case Success(_) => ()
+      case Failure(exception) => logger.warn(s"Failed to send audit event [${eventData.auditType}]", exception)
+    }
 }

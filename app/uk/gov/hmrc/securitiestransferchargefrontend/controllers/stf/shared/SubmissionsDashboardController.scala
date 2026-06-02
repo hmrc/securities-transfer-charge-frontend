@@ -24,7 +24,7 @@ import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import uk.gov.hmrc.securitiestransferchargefrontend.clients.{SaveAndReturnClient, SubmissionIdClient}
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.actions.{StcAuthEnrolledAction, StcDataRetrievalAction}
 import uk.gov.hmrc.securitiestransferchargefrontend.models.audit.AuditModel
-import uk.gov.hmrc.securitiestransferchargefrontend.models.audit.JourneyStatus.SubmissionStart
+import uk.gov.hmrc.securitiestransferchargefrontend.models.audit.JourneyStatus.StartSubmission
 import uk.gov.hmrc.securitiestransferchargefrontend.models.{NormalMode, UserAnswers}
 import uk.gov.hmrc.securitiestransferchargefrontend.navigation.Navigator
 import uk.gov.hmrc.securitiestransferchargefrontend.pages.stf.shared.SubmissionsDashboardPage
@@ -80,7 +80,7 @@ class SubmissionsDashboardController @Inject()(
             individualsNavigator.nextPage(SubmissionsDashboardPage, NormalMode, emptyAnswers)
         }
       } yield {
-        auditService.audit(AuditModel(SubmissionStart, userId, innerRequest.affinityGroup, innerRequest.credentialId, submissionId))
+        auditService.audit(AuditModel(StartSubmission, userId, innerRequest.affinityGroup, innerRequest.credentialId, submissionId))
         Redirect(call)
       }
   }

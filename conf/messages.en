@@ -476,10 +476,14 @@ org.detailsOfThisTransfer.error.marketValue.aboveMaximum = The market value of t
 
 fileUpload.error.sellerAddressInUK.invalid = Enter ‘yes’ if the seller lives in the UK, or ‘no’ if the seller does not live in the UK
 fileUpload.error.sellerAddressLine1.required = Enter the first line of your address
-fileUpload.error.sellerAddressLine1.length = Address line 1 must be 50 characters or fewer
+fileUpload.error.sellerAddressLine1.length = Address line 1 must be 100 characters or fewer
 fileUpload.error.sellerAddressLine1.invalidCharacters = Address line 1 can only include letters, numbers and the following characters: , . - ’
-fileUpload.error.sellerAddressLine2.length = Address line 2 must be fewer than 50 characters long
+fileUpload.error.sellerAddressLine2.length = Address line 2 must be fewer than 40 characters long
 fileUpload.error.sellerAddressLine2.invalidCharacters = Address line 2 can only include letters, numbers and the following characters: , . - ’
+fileUpload.error.sellerAddressLine3.length = Address line 3 must be fewer than 40 characters long
+fileUpload.error.sellerAddressLine3.invalidCharacters = Address line 3 can only include letters, numbers and the following characters: , . - ’
+fileUpload.error.sellerAddressLine4.length = Address line 4 must be fewer than 40 characters long
+fileUpload.error.sellerAddressLine4.invalidCharacters = Address line 4 can only include letters, numbers and the following characters: , . - ’
 fileUpload.error.sellerPostcode.required = Enter a postcode
 fileUpload.error.sellerPostcode.notFound = Your postcode cannot be found, check it is correct
 fileUpload.error.sellerPostcode.invalid = Enter a real postcode, like AA1 1AA
@@ -658,7 +662,7 @@ fileUpload.error.invalidTemplate.heading = The template file you uploaded has be
 fileUpload.error.invalidTemplate.p.start = You must
 fileUpload.error.invalidTemplate.p.link = use the template file
 fileUpload.error.invalidTemplate.p.end = to record details of the transfers, and upload this file.
-fileUpload.error.invalidTemplate.p2 = Remember, do not edit the first two rows, or change the order of columns in the template.
+fileUpload.error.invalidTemplate.p2 = Remember, do not edit the first two rows, or change the order of the columns in the template.
 
 agent.templateInstructions.title = How to use the template
 agent.templateInstructions.heading = How to use the template
