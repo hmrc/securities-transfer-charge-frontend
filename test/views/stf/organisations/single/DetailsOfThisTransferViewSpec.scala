@@ -29,7 +29,7 @@ import views.ViewBaseSpec
 class DetailsOfThisTransferViewSpec extends ViewBaseSpec {
 
   override def fakeApplication(): Application =
-    applicationBuilder().build()
+    applicationBuilder(affinityGroup = orgAffinity).build()
 
   private val viewInstance = app.injector.instanceOf[DetailsOfThisTransferView]
   private val formProvider = new  DetailsOfThisTransferFormProvider()

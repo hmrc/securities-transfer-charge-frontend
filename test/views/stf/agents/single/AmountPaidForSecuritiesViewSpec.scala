@@ -29,7 +29,7 @@ import scala.language.postfixOps
 
 class AmountPaidForSecuritiesViewSpec extends ViewBaseSpec {
 
-  override def fakeApplication(): Application = applicationBuilder().build()
+  override def fakeApplication(): Application = applicationBuilder(affinityGroup = agentAffinity).build()
   
   private val viewInstance         = app.injector.instanceOf[AmountPaidForSecuritiesView]
   private val formProvider = new AmountPaidForSecuritiesFormProvider()

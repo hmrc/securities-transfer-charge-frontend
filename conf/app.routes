@@ -248,7 +248,8 @@ POST       /stf/agent/securities-type                           uk.gov.hmrc.secu
 GET        /stf/agent/change/securities-type                    uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.agents.single.WhatTypeOfSecuritiesController.onPageLoad(mode: Mode = CheckMode)
 POST       /stf/agent/change/securities-type                    uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.agents.single.WhatTypeOfSecuritiesController.onSubmit(mode: Mode = CheckMode)
 
-GET        /stf/bulk-processing                           uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.shared.bulk.FileProcessingController.onPageLoad()
+GET        /stf/bulk-processing                             uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.shared.bulk.FileProcessingController.onPageLoad()
+GET        /stf/bulk-processing-timeout                     uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.shared.bulk.FileProcessingController.onTimeout()
 
 GET        /stf/agent/share-details                             uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.agents.single.DetailsOfThisTransferController.onPageLoad(mode: Mode = NormalMode)
 POST       /stf/agent/share-details                             uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.agents.single.DetailsOfThisTransferController.onSubmit(mode: Mode = NormalMode)
@@ -281,6 +282,8 @@ POST       /stf/agent/total-market-value                    uk.gov.hmrc.securiti
 GET        /stf/agent/change/total-market-value             uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.agents.single.TotalMarketValueController.onPageLoad(mode: Mode = CheckMode)
 POST       /stf/agent/change/total-market-value             uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.agents.single.TotalMarketValueController.onSubmit(mode: Mode = CheckMode)
 
-GET        /stf/bulk-error-password                            uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.shared.bulk.EncryptedFileErrorController.onPageLoad()
+GET        /stf/bulk-error-password                        uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.shared.bulk.EncryptedFileErrorController.onPageLoad()
 
-GET        /stf/bulk-error-template                            uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.shared.bulk.BulkUploadInvalidTemplateController.onPageLoad()
+GET        /stf/bulk-error-template                        uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.shared.bulk.BulkUploadInvalidTemplateController.onPageLoad()
+
+GET        /stf/agent/template                             uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.agents.bulk.TemplateInstructionsController.onPageLoad()

@@ -31,6 +31,7 @@ import uk.gov.hmrc.securitiestransferchargefrontend.navigation.{Navigator, Persi
 import uk.gov.hmrc.securitiestransferchargefrontend.repositories.{ChecksumRepository, ChecksumRepositoryImpl, SessionRepository, SessionRepositoryImpl, SubscriptionDataRepository, SubscriptionDataRepositoryImpl, UpscanJourneyRepository, UpscanJourneyRepositoryImpl, ValidationErrorRepository, ValidationErrorRepositoryImpl}
 import uk.gov.hmrc.securitiestransferchargefrontend.services.*
 import uk.gov.hmrc.securitiestransferchargefrontend.services.fileupload.*
+import uk.gov.hmrc.securitiestransferchargefrontend.services.fileupload.processing.{DefaultFileProcessingRefreshCounterFactory, FileProcessingRefreshCounterFactory}
 
 import java.time.{Clock, ZoneOffset}
 
@@ -38,6 +39,8 @@ class Module extends AbstractModule {
 
   override def configure(): Unit = {
 
+    bind(classOf[FileProcessingRefreshCounterFactory]).to(classOf[DefaultFileProcessingRefreshCounterFactory]).asEagerSingleton()
+    
     bind(classOf[DataRetrievalAction]).to(classOf[DataRetrievalActionImpl]).asEagerSingleton()
     bind(classOf[DataRequiredAction]).to(classOf[DataRequiredActionImpl]).asEagerSingleton()
 

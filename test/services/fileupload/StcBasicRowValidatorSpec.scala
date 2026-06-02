@@ -16,37 +16,19 @@
 
 package services.fileupload
 
-import org.scalatest.matchers.must.Matchers
-import org.scalatest.wordspec.AnyWordSpec
+import base.SpecBase
 import play.api.i18n.MessagesApi
-import play.api.test.Helpers.stubMessagesApi
-import uk.gov.hmrc.securitiestransferchargefrontend.forms.stf.individuals.*
-import uk.gov.hmrc.securitiestransferchargefrontend.forms.stf.shared.NameOfSellerFormProvider
+import uk.gov.hmrc.securitiestransferchargefrontend.forms.stf.shared.{NameOfSellerFormProvider,SecuritiesTargetFormProvider}
 import uk.gov.hmrc.securitiestransferchargefrontend.models.stf.fileupload.*
 import uk.gov.hmrc.securitiestransferchargefrontend.services.fileupload.*
 
 import java.time.LocalDate
 
-class StcBasicRowValidatorSpec extends AnyWordSpec with Matchers {
+class StcBasicRowValidatorSpec extends SpecBase {
 
-  private val messagesApi: MessagesApi = stubMessagesApi(
-    Map(
-      "en" -> Map(
-        "nameOfSeller.error.required" -> "Enter the seller's full name",
-        "fileUpload.error.sellerAddressInUK.invalid" -> "Enter ‘yes’ if the seller lives in the UK, or ‘no’ if the seller does not live in the UK",
-        "fileUpload.error.connectedPersons.invalid" -> "Enter ‘yes’ if you and the buyer are connected persons",
-        "fileUpload.error.applyingForRelief.invalid" -> "Enter ‘yes’ if you are applying for a relief, or ‘no’ if you are not applying for a relief",
-        "chargingPoint.error.required.all" -> "Enter the date you bought the securities",
-        "fileUpload.error.taxRate.invalid" -> "Enter a tax rate of ‘0.5%’ or ‘1.5%’",
-        "fileUpload.error.whatTypeOfSecurities.required" -> "Enter the type of securities you are buying",
-        "fileUpload.error.securitiesQuantity.required" -> "Enter the number of shares you are buying",
-        "fileUpload.error.securitiesQuantity.minimum" -> "The number of shares must be at least 1",
-        "fileUpload.error.securitiesQuantity.maximum" -> "The number of shares you are buying must be below 999,999,999",
-        "amountPaidForSecurities.error.required" -> "Enter the amount you paid for the securities",
-        "fileUpload.error.amountPaidForSecurities.maximum" -> "The amount you paid for the securities must be £999,999,999 or below"
-      )
-    )
-  )
+  private val app = applicationBuilder().build()
+
+  private val messagesApi: MessagesApi = app.injector.instanceOf[MessagesApi]
 
   private val validRow: ParsedStcRow =
     ParsedStcRow(
@@ -98,10 +80,10 @@ class StcBasicRowValidatorSpec extends AnyWordSpec with Matchers {
       "amountPaidForSecurities"
     ))
 
-  "StcBasicRowValidator.validate" must {
+  "StcBasicRowValidator.validate" - {
 
     "return no errors for a valid row" in {
-      val result = validator.validate(validRow, StcTemplate.STF)
+      val result = validator.validate(validRow, StcTemplate.STF, affinityGroupKeyInd)
 
       result mustBe Seq.empty
     }
@@ -109,7 +91,7 @@ class StcBasicRowValidatorSpec extends AnyWordSpec with Matchers {
     "return seller name required error" in {
       val result = validator.validate(
         validRow.copy(sellerName = None),
-        StcTemplate.STF
+        StcTemplate.STF, affinityGroupKeyInd
       )
 
       result.exists(_.fieldName == "sellerName") mustBe true
@@ -118,7 +100,7 @@ class StcBasicRowValidatorSpec extends AnyWordSpec with Matchers {
     "return seller address in uk missing error" in {
       val result = validator.validate(
         validRow.copy(sellerAddressInUK = None),
-        StcTemplate.STF
+        StcTemplate.STF, affinityGroupKeyInd
       )
 
       result.exists(_.fieldName == "sellerAddressInUK") mustBe true
@@ -127,7 +109,7 @@ class StcBasicRowValidatorSpec extends AnyWordSpec with Matchers {
     "return connected persons missing error" in {
       val result = validator.validate(
         validRow.copy(connectedPersons = None),
-        StcTemplate.STF
+        StcTemplate.STF, affinityGroupKeyInd
       )
 
       result.exists(_.fieldName == "connectedPersons") mustBe true
@@ -136,7 +118,7 @@ class StcBasicRowValidatorSpec extends AnyWordSpec with Matchers {
     "return applying for relief missing error" in {
       val result = validator.validate(
         validRow.copy(applyingForRelief = None),
-        StcTemplate.STF
+        StcTemplate.STF, affinityGroupKeyInd
       )
 
       result.exists(_.fieldName == "applyingForRelief") mustBe true
@@ -145,7 +127,7 @@ class StcBasicRowValidatorSpec extends AnyWordSpec with Matchers {
     "return charging point required error" in {
       val result = validator.validate(
         validRow.copy(chargingPoint = None),
-        StcTemplate.STF
+        StcTemplate.STF, affinityGroupKeyInd
       )
 
       result.exists(_.fieldName == "chargingPoint") mustBe true
@@ -154,7 +136,7 @@ class StcBasicRowValidatorSpec extends AnyWordSpec with Matchers {
     "return tax rate invalid when missing" in {
       val result = validator.validate(
         validRow.copy(taxRate = None),
-        StcTemplate.STF
+        StcTemplate.STF, affinityGroupKeyInd
       )
 
       result.exists(_.fieldName == "taxRate") mustBe true
@@ -163,7 +145,7 @@ class StcBasicRowValidatorSpec extends AnyWordSpec with Matchers {
     "return what type of securities required error" in {
       val result = validator.validate(
         validRow.copy(whatTypeOfSecurities = None),
-        StcTemplate.STF
+        StcTemplate.STF, affinityGroupKeyInd
       )
 
       result.exists(_.fieldName == "whatTypeOfSecurities") mustBe true
@@ -172,7 +154,7 @@ class StcBasicRowValidatorSpec extends AnyWordSpec with Matchers {
     "return securities quantity required error" in {
       val result = validator.validate(
         validRow.copy(securitiesQuantity = None),
-        StcTemplate.STF
+        StcTemplate.STF, affinityGroupKeyInd
       )
 
       result.exists(_.fieldName == "securitiesQuantity") mustBe true
@@ -181,7 +163,7 @@ class StcBasicRowValidatorSpec extends AnyWordSpec with Matchers {
     "return securities quantity minimum error" in {
       val result = validator.validate(
         validRow.copy(securitiesQuantity = Some(BigDecimal(0))),
-        StcTemplate.STF
+        StcTemplate.STF, affinityGroupKeyInd
       )
 
       result.exists(_.fieldName == "securitiesQuantity") mustBe true
@@ -190,7 +172,7 @@ class StcBasicRowValidatorSpec extends AnyWordSpec with Matchers {
     "return securities quantity maximum error" in {
       val result = validator.validate(
         validRow.copy(securitiesQuantity = Some(BigDecimal(999999999))),
-        StcTemplate.STF
+        StcTemplate.STF, affinityGroupKeyInd
       )
 
       result.exists(_.fieldName == "securitiesQuantity") mustBe true
@@ -199,7 +181,7 @@ class StcBasicRowValidatorSpec extends AnyWordSpec with Matchers {
     "return amount paid required error" in {
       val result = validator.validate(
         validRow.copy(amountPaidForSecurities = None),
-        StcTemplate.STF
+        StcTemplate.STF, affinityGroupKeyInd
       )
 
       result.exists(_.fieldName == "amountPaidForSecurities") mustBe true
@@ -208,7 +190,7 @@ class StcBasicRowValidatorSpec extends AnyWordSpec with Matchers {
     "return amount paid maximum error" in {
       val result = validator.validate(
         validRow.copy(amountPaidForSecurities = Some(BigDecimal(1000000000))),
-        StcTemplate.STF
+        StcTemplate.STF, affinityGroupKeyInd
       )
 
       result.exists(_.fieldName == "amountPaidForSecurities") mustBe true

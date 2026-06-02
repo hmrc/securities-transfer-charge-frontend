@@ -27,6 +27,7 @@ import uk.gov.hmrc.play.http.HeaderCarrierConverter
 import uk.gov.hmrc.securitiestransferchargefrontend.config.FrontendAppConfig
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.actions.filters.RetrievalFilter
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.{Redirects, routes}
+import uk.gov.hmrc.securitiestransferchargefrontend.domain.CredentialId
 
 import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
@@ -49,7 +50,8 @@ final class StcAuthEnrolledActionImpl @Inject()(
   private val retrievals =
     Retrievals.internalId and
       Retrievals.allEnrolments and
-      Retrievals.affinityGroup
+      Retrievals.affinityGroup and
+      Retrievals.credentials
 
   override def invokeBlock[A](
                                request: Request[A],
@@ -60,7 +62,7 @@ final class StcAuthEnrolledActionImpl @Inject()(
       HeaderCarrierConverter.fromRequestAndSession(request, request.session)
 
     authorised().retrieve(retrievals) {
-      case maybeInternalId ~ enrolments ~ maybeAffinityGroup =>
+      case maybeInternalId ~ enrolments ~ maybeAffinityGroup ~ maybeCredentials =>
 
         val maybeRequest =
           for {
@@ -68,11 +70,14 @@ final class StcAuthEnrolledActionImpl @Inject()(
             affinityGroup <- retrievalFilter.affinityGroupPresent(maybeAffinityGroup)
             _ <- retrievalFilter.enrolledForStc(enrolments)
             subscriptionId <- retrievalFilter.subscriptionIdPresent(enrolments)
+            rawCredentialId <- retrievalFilter.providerIdPresentFilter(maybeCredentials)
+            credentialId = CredentialId(rawCredentialId)
           } yield StcAuthorisedRequest(
             request,
             internalId,
             affinityGroup,
-            subscriptionId
+            subscriptionId,
+            credentialId
           )
 
         maybeRequest.fold(identity, block)

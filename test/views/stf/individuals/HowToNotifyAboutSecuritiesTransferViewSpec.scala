@@ -30,7 +30,7 @@ import scala.language.postfixOps
 
 class HowToNotifyAboutSecuritiesTransferViewSpec extends ViewBaseSpec {
 
-  override def fakeApplication(): Application = applicationBuilder().build()
+  override def fakeApplication(): Application = applicationBuilder(affinityGroup = individualAffinity).build()
   
   private val viewInstance         = app.injector.instanceOf[HowToNotifyAboutSecuritiesTransferView]
   private val formProvider = new HowToNotifyAboutSecuritiesTransferFormProvider()

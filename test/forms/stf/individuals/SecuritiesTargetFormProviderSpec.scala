@@ -16,19 +16,22 @@
 
 package forms.stf.individuals
 
+import base.SpecBase
 import forms.behaviours.StringFieldBehaviours
 import play.api.data.FormError
-import uk.gov.hmrc.securitiestransferchargefrontend.forms.stf.individuals.SecuritiesTargetFormProvider
+import uk.gov.hmrc.securitiestransferchargefrontend.forms.stf.shared.SecuritiesTargetFormProvider
 
-class SecuritiesTargetFormProviderSpec extends StringFieldBehaviours {
+class SecuritiesTargetFormProviderSpec extends StringFieldBehaviours with SpecBase {
 
-  val form = new SecuritiesTargetFormProvider()()
+  private val individualAffinityKey = affinityGroupKeyInd
+
+  val form = new SecuritiesTargetFormProvider()(affinityKey = individualAffinityKey)
 
   ".BusinessName" - {
 
     val fieldName = "businessName"
-    val requiredKey = "securitiesTarget.error.businessName.required"
-    val lengthKey = "securitiesTarget.error.businessName.length"
+    val requiredKey = s"$individualAffinityKey.securitiesTarget.error.businessName.required"
+    val lengthKey = s"$individualAffinityKey.securitiesTarget.error.businessName.length"
     val maxLength = 160
 
 
@@ -55,7 +58,7 @@ class SecuritiesTargetFormProviderSpec extends StringFieldBehaviours {
   ".crn" - {
 
     val fieldName = "crn"
-    val lengthKey = "securitiesTarget.error.crn.length"
+    val lengthKey = s"$individualAffinityKey.securitiesTarget.error.crn.length"
     val maxLength = 8
 
     behave like fieldThatBindsValidData(
@@ -70,6 +73,6 @@ class SecuritiesTargetFormProviderSpec extends StringFieldBehaviours {
       maxLength,
       lengthError = FormError(fieldName, lengthKey)
     )
-
+    
   }
 }

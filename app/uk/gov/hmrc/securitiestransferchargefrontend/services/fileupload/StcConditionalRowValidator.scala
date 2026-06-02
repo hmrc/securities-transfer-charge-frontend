@@ -30,39 +30,40 @@ class StcConditionalRowValidator @Inject()(
   private implicit val messages: Messages =
     messagesApi.preferred(Seq(Lang("en")))
 
-  private val marketValueMaximum = BigDecimal(999999999)
-  private val typeOfShareMaxLength = 100
-
   def validate(
                 row: ParsedStcRow,
-                template: StcTemplate
+                template: StcTemplate,
+                affinityKey: String
               )(implicit cols: ColumnIndexBuilder): Seq[StcRowValidationError] = {
 
     template match {
 
       case StcTemplate.STF =>
-        validateSTF(row)
+        validateSTF(row, affinityKey)
 
       case StcTemplate.SH03 =>
-        validateSH03(row)
+        validateSH03(row, affinityKey)
     }
   }
 
   def validateSTF(
-                   row: ParsedStcRow
+                   row: ParsedStcRow,
+                   affinityKey: String
                  )(implicit cols: ColumnIndexBuilder): Seq[StcRowValidationError] =
-    validateReliefType(row) ++
-      validateTypeOfShares(row) ++
+    validateReliefType(row, affinityKey) ++
+      validateTypeOfShares(row, affinityKey) ++
       validateSellerAddress(row) ++
       validateTotalMarketValue(row)
 
   def validateSH03(
-                    row: ParsedStcRow
+                    row: ParsedStcRow,
+                    affinityKey: String
                   )(implicit cols: ColumnIndexBuilder): Seq[StcRowValidationError] =
-    validateReliefType(row)
+    validateReliefType(row, affinityKey)
 
   private def validateReliefType(
-                                  row: ParsedStcRow
+                                  row: ParsedStcRow,
+                                  affinityKey: String
                                 )(implicit cols: ColumnIndexBuilder): Seq[StcRowValidationError] = {
 
     row.applyingForRelief match {
@@ -76,7 +77,7 @@ class StcConditionalRowValidator @Inject()(
               support.error(
                 row.rowNumber,
                 "whatReliefAreYouApplyingFor",
-                messages("fileUpload.error.whatReliefAreYouApplyingFor.invalid")
+                messages(s"$affinityKey.fileUpload.error.whatReliefAreYouApplyingFor.invalid")
               )
             )
 
@@ -85,7 +86,7 @@ class StcConditionalRowValidator @Inject()(
               support.error(
                 row.rowNumber,
                 "whatReliefAreYouApplyingFor",
-                messages("fileUpload.error.whatReliefAreYouApplyingFor.invalid")
+                messages(s"$affinityKey.fileUpload.error.whatReliefAreYouApplyingFor.invalid")
               )
             )
 
@@ -94,7 +95,7 @@ class StcConditionalRowValidator @Inject()(
               support.error(
                 row.rowNumber,
                 "whatReliefAreYouApplyingFor",
-                messages("fileUpload.error.whatReliefAreYouApplyingFor.invalid")
+                messages(s"$affinityKey.fileUpload.error.whatReliefAreYouApplyingFor.invalid")
               )
             )
 
@@ -108,7 +109,8 @@ class StcConditionalRowValidator @Inject()(
   }
 
   private def validateTypeOfShares(
-                                    row: ParsedStcRow
+                                    row: ParsedStcRow,
+                                    affinityKey: String
                                   )(implicit cols: ColumnIndexBuilder): Seq[StcRowValidationError] = {
 
     row.whatTypeOfSecurities match {
@@ -122,7 +124,7 @@ class StcConditionalRowValidator @Inject()(
               support.error(
                 row.rowNumber,
                 "typeOfShares",
-                messages("fileUpload.error.typeOfShares.required")
+                messages(s"$affinityKey.fileUpload.error.typeOfShares.required")
               )
             )
 
@@ -131,15 +133,15 @@ class StcConditionalRowValidator @Inject()(
               support.error(
                 row.rowNumber,
                 "typeOfShares",
-                messages("fileUpload.error.typeOfShares.required")
+                messages(s"$affinityKey.fileUpload.error.typeOfShares.required")
               )
             )
-          case Some(value) if value.length > typeOfShareMaxLength =>
+          case Some(value) if value.length > support.typeOfShareMaxLength =>
             Seq(
               support.error(
                 row.rowNumber,
                 "typeOfShares",
-                messages("fileUpload.error.typeOfShares.maxLength")
+                messages(s"$affinityKey.fileUpload.error.typeOfShares.maxLength")
               )
             )
 
@@ -156,7 +158,14 @@ class StcConditionalRowValidator @Inject()(
                                      row: ParsedStcRow
                                    )(implicit cols: ColumnIndexBuilder): Seq[StcRowValidationError] = {
 
+    val addressFields = Seq(
+      "sellerAddressLine2" -> row.sellerAddressLine2,
+      "sellerAddressLine3" -> row.sellerAddressLine3,
+      "sellerAddressLine4" -> row.sellerAddressLine4
+    )
+
     row.sellerAddressInUK match {
+
 
       case Some(true) =>
         support.validateRequiredText(
@@ -168,16 +177,17 @@ class StcConditionalRowValidator @Inject()(
           Some(messages("fileUpload.error.sellerAddressLine1.length")),
           Some(support.addressPattern),
           Some(messages("fileUpload.error.sellerAddressLine1.invalidCharacters"))
-        ) ++
+        ) ++ addressFields.flatMap { case (fieldName, value) =>
           support.validateOptionalText(
-            row.sellerAddressLine2,
+            value,
             row.rowNumber,
-            "sellerAddressLine2",
-            Some(support.addressLineMaxLength),
-            Some(messages("fileUpload.error.sellerAddressLine2.length")),
+            fieldName,
+            Some(support.optAddressLineMaxLength),
+            Some(messages(s"fileUpload.error.$fieldName.length")),
             Some(support.addressPattern),
-            Some(messages("fileUpload.error.sellerAddressLine2.invalidCharacters"))
-          ) ++
+            Some(messages(s"fileUpload.error.$fieldName.invalidCharacters"))
+          )
+        } ++
           validateSellerPostcode(row)
 
       case Some(false) =>
@@ -252,7 +262,7 @@ class StcConditionalRowValidator @Inject()(
               )
             )
 
-          case Some(value) if value > marketValueMaximum =>
+          case Some(value) if value > support.maxCurrency =>
             Seq(
               support.error(
                 row.rowNumber,
