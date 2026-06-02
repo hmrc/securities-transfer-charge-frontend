@@ -23,14 +23,16 @@ sealed trait JourneyStatus
 
 object JourneyStatus {
 
-  case object SubmissionStart extends WithName("Start") with JourneyStatus
+  case object StartSubmission extends WithName("Start") with JourneyStatus
+  case object ContinueSubmission extends WithName("Continue") with JourneyStatus
 
-  val values: Seq[JourneyStatus] = Seq(SubmissionStart)
+  val values: Seq[JourneyStatus] = Seq(StartSubmission, ContinueSubmission)
 
   val enumerable: Enumerable[JourneyStatus] = Enumerable(values.map(v => v.toString -> v): _*)
 
   implicit def reads: Reads[JourneyStatus] = Reads[JourneyStatus] {
-    case JsString(SubmissionStart.toString) => JsSuccess(SubmissionStart)
+    case JsString(StartSubmission.toString) => JsSuccess(StartSubmission)
+    case JsString(ContinueSubmission.toString) => JsSuccess(ContinueSubmission)
     case _ => JsError("error.invalid")
   }
 

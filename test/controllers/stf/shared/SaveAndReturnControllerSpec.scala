@@ -16,79 +16,115 @@
 
 package controllers.stf.shared
 
-import base.SpecBase
-import base.stubs.StubStcAuthEnrolledAction
-import org.mockito.ArgumentMatchers.any
-import org.mockito.Mockito.when
+import base.Fixtures.{testCredentialId, testInternalId, testSubmissionId}
+import base.stubs.{AgentStubStcAuthEnrolledAction, OrganisationStubStcAuthEnrolledAction, StubStcAuthEnrolledAction}
+import base.{AuditTestSupport, SpecBase}
+import org.mockito.ArgumentMatchers.{any, eq as eqTo}
+import org.mockito.Mockito.{doReturn, reset, when}
+import org.scalatest.BeforeAndAfterEach
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatestplus.mockito.MockitoSugar
 import play.api.http.Status.SEE_OTHER
 import play.api.i18n.MessagesApi
 import play.api.mvc.{AnyContentAsEmpty, Call, MessagesControllerComponents, PlayBodyParsers}
 import play.api.test.FakeRequest
-import uk.gov.hmrc.securitiestransferchargefrontend.controllers.actions.StcAuthEnrolledAction
+import uk.gov.hmrc.auth.core.AffinityGroup
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.shared.SaveAndReturnController
 import uk.gov.hmrc.securitiestransferchargefrontend.domain.SubmissionId
 import uk.gov.hmrc.securitiestransferchargefrontend.models.UserAnswers
-import uk.gov.hmrc.securitiestransferchargefrontend.navigation.stf.individuals.StfNavigator
+import uk.gov.hmrc.securitiestransferchargefrontend.models.audit.JourneyStatus.ContinueSubmission
+import uk.gov.hmrc.securitiestransferchargefrontend.navigation.PersistentNavigator
 import uk.gov.hmrc.securitiestransferchargefrontend.pages.stf.shared.SaveAndReturnPage
+import uk.gov.hmrc.securitiestransferchargefrontend.services.AuditService
 
-import scala.concurrent.*
+import scala.concurrent.Future
 
-class SaveAndReturnControllerSpec extends SpecBase with MockitoSugar with ScalaFutures {
+class SaveAndReturnControllerSpec extends SpecBase with MockitoSugar with ScalaFutures with AuditTestSupport with BeforeAndAfterEach {
 
   implicit val testRequest: FakeRequest[AnyContentAsEmpty.type] = fakeRequest
-  val testSubmissionId = "STC900"
-  val testUserAnswers: UserAnswers = UserAnswers.empty("User123")(SubmissionId("test"))
-  val testCall: Call = Call("GET", "/test-page")
 
-  val mockMessagesApi: MessagesApi = mock[MessagesApi]
-  val mockControllerComponents: MessagesControllerComponents = mock[MessagesControllerComponents]
-  val mockBodyParsers: PlayBodyParsers = mock[PlayBodyParsers]
-  val stcAuthEnrolledAction: StcAuthEnrolledAction = StubStcAuthEnrolledAction(mockBodyParsers)
+  private val testUserAnswers = UserAnswers(testInternalId, testSubmissionId)
+  private val testCall = Call("GET", "/test-page")
+  private val mockMessagesApi = mock[MessagesApi]
+  private val mockControllerComponents = mock[MessagesControllerComponents]
+  private val mockBodyParsers = mock[PlayBodyParsers]
+  private val mockNavigator = mock[PersistentNavigator]
+  private val mockAuditService = mock[AuditService]
 
-  val mockNavigator: StfNavigator = mock[StfNavigator]
-
-  def testSetup(maybeUserAnswers: Option[UserAnswers]): SaveAndReturnController = {
-    maybeUserAnswers.fold
-      ( when(mockNavigator.restore(any(), any())(any())).thenReturn(Future.failed(new RuntimeException("No user answers"))) )
-      ( ua => when(mockNavigator.restore(any(), any())(any())).thenReturn(Future.successful(ua)) )
-
-    new SaveAndReturnController(mockMessagesApi, mockControllerComponents, stcAuthEnrolledAction, mockNavigator)(ec)
+  override def beforeEach(): Unit = {
+    reset(mockNavigator, mockAuditService)
+    super.beforeEach()
   }
+
+  private def testSetup(affinityGroup: AffinityGroup): SaveAndReturnController = {
+
+    val authAction = affinityGroup match {
+      case AffinityGroup.Organisation => OrganisationStubStcAuthEnrolledAction(mockBodyParsers)
+      case AffinityGroup.Agent => AgentStubStcAuthEnrolledAction(mockBodyParsers)
+      case _ => StubStcAuthEnrolledAction(mockBodyParsers)
+    }
+
+    new SaveAndReturnController(mockMessagesApi, mockControllerComponents, authAction, mockNavigator, mockAuditService)(ec)
+  }
+
   "SaveAndReturnController" - {
 
-    "Fail if no user answers are available from the server" in {
-      val controller = testSetup(None)
-      val action = controller.restore(testSubmissionId)
-      val result = action.apply(testRequest)
-      whenReady(result.failed) { exception =>
-        exception mustBe a[RuntimeException]
-        exception.getMessage mustBe "No user answers"
-      }
-    }
+    "restore" - {
 
-    "Return the starting page if no next page is available in the user answers" in {
-      when(mockNavigator.errorPage(SaveAndReturnPage)).thenReturn(testCall)
-      val controller = testSetup(Some(testUserAnswers))
-      val action = controller.restore(testSubmissionId)
-      val result = action.apply(testRequest)
-      whenReady(result) { res =>
-        res.header.status mustBe SEE_OTHER
-        res.header.headers("Location") mustEqual testCall.url
-      }
-    }
+      "must fail when restore fails" in {
 
-    "Succeed with the supplied page if user answers are available and a next page is present" in {
-      val userAnswersWithNextPage = testUserAnswers.setNextPage(testCall)
-      val controller = testSetup(Some(userAnswersWithNextPage))
-      val action = controller.restore(testSubmissionId)
-      val result = action.apply(testRequest)
-      whenReady(result) { res =>
-        res.header.status mustBe SEE_OTHER
-        res.header.headers("Location") mustEqual testCall.url
+        doReturn(Future.failed(new RuntimeException("No user answers"))).when(mockNavigator).restore(any[SubmissionId], any[String])(any())
+
+        val result = testSetup(AffinityGroup.Individual).restore(testSubmissionId.value).apply(testRequest)
+
+        whenReady(result.failed) {
+          ex => ex.getMessage mustBe "No user answers"
+        }
+      }
+
+      "must redirect to error page when next page is unavailable" in {
+
+        doReturn(Future.successful(testUserAnswers)).when(mockNavigator).restore(any[SubmissionId], any[String])(any())
+
+        when(mockNavigator.errorPage(SaveAndReturnPage)).thenReturn(testCall)
+
+        val result = testSetup(AffinityGroup.Individual).restore(testSubmissionId.value).apply(testRequest)
+
+        whenReady(result) { response =>
+          response.header.status mustBe SEE_OTHER
+          response.header.headers("Location") mustBe testCall.url
+        }
+      }
+
+      Seq(
+        AffinityGroup.Individual,
+        AffinityGroup.Organisation,
+        AffinityGroup.Agent
+      ).foreach { affinityGroup =>
+
+        s"must audit ContinueSubmission and redirect for $affinityGroup" in {
+
+          val userAnswers = testUserAnswers.setNextPage(testCall)
+
+          doReturn(Future.successful(userAnswers)).when(mockNavigator).restore(eqTo(testSubmissionId), eqTo(testInternalId))(any())
+
+          val result = testSetup(affinityGroup).restore(testSubmissionId.value).apply(testRequest)
+
+          whenReady(result) { response =>
+
+            response.header.status mustBe SEE_OTHER
+            response.header.headers("Location") mustBe testCall.url
+
+            verifyAudit(
+              mockAuditService,
+              ContinueSubmission,
+              affinityGroup,
+              testCredentialId,
+              testSubmissionId
+            )
+          }
+        }
       }
     }
   }
-
 }

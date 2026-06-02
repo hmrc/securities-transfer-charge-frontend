@@ -28,7 +28,7 @@ import uk.gov.hmrc.auth.core.AffinityGroup
 import uk.gov.hmrc.securitiestransferchargefrontend.clients.{SaveAndReturnClient, SubmissionIdClient}
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.shared.routes
 import uk.gov.hmrc.securitiestransferchargefrontend.domain.SubmissionId
-import uk.gov.hmrc.securitiestransferchargefrontend.models.audit.JourneyStatus.SubmissionStart
+import uk.gov.hmrc.securitiestransferchargefrontend.models.audit.JourneyStatus.StartSubmission
 import uk.gov.hmrc.securitiestransferchargefrontend.navigation.Navigator
 import uk.gov.hmrc.securitiestransferchargefrontend.services.AuditService
 import uk.gov.hmrc.securitiestransferchargefrontend.views.html.stf.shared.SubmissionsDashboardView
@@ -154,7 +154,7 @@ class SubmissionsDashboardControllerSpec extends SpecBase with MockitoSugar with
 
             verify(mockIdClient).nextSubmissionId()(any())
 
-            verifyAudit(mockAuditService, SubmissionStart, affinityGroup, testCredentialId, testSubmissionId)
+            verifyAudit(mockAuditService, StartSubmission, affinityGroup, testCredentialId, testSubmissionId)
           }
         }
       }
