@@ -21,8 +21,11 @@ import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.actions.StcAuthEnrolledAction
 import uk.gov.hmrc.securitiestransferchargefrontend.domain.SubmissionId
+import uk.gov.hmrc.securitiestransferchargefrontend.models.audit.AuditModel
+import uk.gov.hmrc.securitiestransferchargefrontend.models.audit.JourneyStatus.ContinueSubmission
 import uk.gov.hmrc.securitiestransferchargefrontend.navigation.PersistentNavigator
 import uk.gov.hmrc.securitiestransferchargefrontend.pages.stf.shared.SaveAndReturnPage
+import uk.gov.hmrc.securitiestransferchargefrontend.services.AuditService
 
 import javax.inject.{Inject, Named}
 import scala.concurrent.ExecutionContext
@@ -30,7 +33,8 @@ import scala.concurrent.ExecutionContext
 class SaveAndReturnController @Inject()( override val messagesApi: MessagesApi,
                                          val controllerComponents: MessagesControllerComponents,
                                          stcAuthEnrolled: StcAuthEnrolledAction,
-                                         @Named("individuals") navigator: PersistentNavigator)
+                                         @Named("individuals") navigator: PersistentNavigator,
+                                         auditService: AuditService)
                                        ( implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport:
 
   def restore(submissionId: String): Action[AnyContent] =
@@ -38,5 +42,8 @@ class SaveAndReturnController @Inject()( override val messagesApi: MessagesApi,
       for {
         userAnswers <- navigator.restore(SubmissionId(submissionId), request.internalId)
         nextPage     = userAnswers.nextPage.getOrElse(navigator.errorPage(SaveAndReturnPage))
-      } yield Redirect(nextPage)
+      } yield  {
+        auditService.audit(AuditModel(ContinueSubmission, request.internalId, request.affinityGroup, request.credentialId, SubmissionId(submissionId)))
+        Redirect(nextPage)
+      }
     }

@@ -24,25 +24,21 @@ import org.scalatest.BeforeAndAfterEach
 import org.scalatest.freespec.AnyFreeSpec
 import org.scalatest.matchers.must.Matchers
 import org.scalatestplus.mockito.MockitoSugar
-import play.api.libs.json.Json
+import play.api.libs.json.{JsObject, Json}
 import uk.gov.hmrc.auth.core.AffinityGroup.{Agent, Individual, Organisation}
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.play.audit.http.connector.AuditConnector
-import uk.gov.hmrc.securitiestransferchargefrontend.config.FrontendAppConfig
-import uk.gov.hmrc.securitiestransferchargefrontend.domain.CredentialId
 import uk.gov.hmrc.securitiestransferchargefrontend.models.audit.{AuditModel, JourneyStatus}
 import uk.gov.hmrc.securitiestransferchargefrontend.services.AuditService
 
+import scala.concurrent.ExecutionContext
 import scala.concurrent.ExecutionContext.Implicits.global
 
 class AuditServiceSpec extends AnyFreeSpec with Matchers with MockitoSugar with BeforeAndAfterEach {
 
   private val mockAuditConnector: AuditConnector = mock[AuditConnector]
-  private val mockAppConfig: FrontendAppConfig   = mock[FrontendAppConfig]
 
   implicit private val headerCarrier: HeaderCarrier = HeaderCarrier()
-
-  private val appName      = "securities-transfer-charge-frontend"
 
   private val affinityGroups = Seq(
     Individual,
@@ -54,7 +50,6 @@ class AuditServiceSpec extends AnyFreeSpec with Matchers with MockitoSugar with 
 
   override def beforeEach(): Unit = {
     Mockito.reset(mockAuditConnector)
-    Mockito.reset(mockAppConfig)
     super.beforeEach()
   }
 
@@ -65,8 +60,6 @@ class AuditServiceSpec extends AnyFreeSpec with Matchers with MockitoSugar with 
       JourneyStatus.values.foreach { journeyStatus =>
 
         s"must send an audit event for affinity group [$affinityGroup] and journey type [$journeyStatus]" in {
-
-          when(mockAppConfig.appName).thenReturn(appName)
 
           val auditModel = AuditModel.build(
             journeyStatus = journeyStatus,
@@ -79,8 +72,8 @@ class AuditServiceSpec extends AnyFreeSpec with Matchers with MockitoSugar with 
           service.audit(auditModel)
 
           val expectedJson = Json.obj(
-            "journeyStatus"  -> journeyStatus.toString,
-            "internalId"   -> testInternalId,
+            "journeyStatus" -> journeyStatus.toString,
+            "internalId" -> testInternalId,
             "affinityGroup" -> affinityGroup.toString,
             "credentialId" -> testCredentialId,
             "submissionId" -> testSubmissionId
@@ -93,6 +86,27 @@ class AuditServiceSpec extends AnyFreeSpec with Matchers with MockitoSugar with 
           )(any(), any())
         }
       }
+    }
+
+    "must not throw exception when audit connector fails" in {
+
+      val auditModel = AuditModel.build(
+        journeyStatus = JourneyStatus.ContinueSubmission,
+        internalId = testInternalId,
+        affinityGroup = uk.gov.hmrc.auth.core.AffinityGroup.Individual,
+        credentialId = testCredentialId,
+        submissionId = testSubmissionId
+      )
+
+      when(mockAuditConnector
+        .sendExplicitAudit(any[String], any[JsObject])(any[HeaderCarrier], any[ExecutionContext]))
+        .thenThrow(new RuntimeException("Failed"))
+
+      noException shouldBe thrownBy {
+        service.audit(auditModel)
+      }
+
+      verify(mockAuditConnector, times(1)).sendExplicitAudit(any[String], any[JsObject])(any[HeaderCarrier], any[ExecutionContext])
     }
   }
 }
