@@ -18,7 +18,7 @@ package controllers.stf.shared.bulk
 
 import base.SpecBase
 import org.mockito.ArgumentMatchers.any
-import org.mockito.Mockito.when
+import org.mockito.Mockito.{never, verify, when}
 import org.scalatestplus.mockito.MockitoSugar
 import play.api.inject
 import play.api.test.FakeRequest
@@ -27,6 +27,7 @@ import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.securitiestransferchargefrontend.connectors.UpscanInitiateConnector
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.shared.bulk.routes
 import uk.gov.hmrc.securitiestransferchargefrontend.models.stf.upscan.{UploadRequest, UpscanInitiateResponse}
+import uk.gov.hmrc.securitiestransferchargefrontend.repositories.UpscanJourneyRepository
 import uk.gov.hmrc.securitiestransferchargefrontend.views.html.stf.shared.bulk.FileUploadView
 
 import scala.concurrent.Future
@@ -72,44 +73,58 @@ class FileUploadControllerSpec extends SpecBase with MockitoSugar {
 
     "onUploadError" - {
 
-      "must return BAD_REQUEST and render the view with error message" in {
+      "must delete the mongo document and redirect to the BulkUploadErrorController" in {
 
-        val mockConnector = mock[UpscanInitiateConnector]
+        val mockRepository = mock[UpscanJourneyRepository]
 
-        val reference = "file1"
-        val uploadRequest =
-          UploadRequest("http://someUrl.com", Map("key" -> "1234"))
-
-        val initiateResponse =
-          UpscanInitiateResponse(reference, uploadRequest)
-
-        when(mockConnector.initiate()(any[HeaderCarrier])).thenReturn(Future.successful(initiateResponse))
-
+        when(mockRepository.delete("1234"))
+          .thenReturn(Future.successful(()))
 
         val application = applicationBuilder(userAnswers = Some(emptyUserAnswers))
           .overrides(
-            inject.bind[UpscanInitiateConnector].toInstance(mockConnector),
+            inject.bind[UpscanJourneyRepository].toInstance(mockRepository)
           )
           .build()
 
         running(application) {
-          val request = FakeRequest(
-            GET,
-            s"$onUploadErrorRoute?errorCode=EntityTooLarge&errorMessage=some+message"
-          )
 
-          val expectedError = Some("The selected file must be smaller than 100mb")
+          val request =
+            FakeRequest(GET, s"$onUploadErrorRoute?key=1234")
 
           val result = route(application, request).value
 
+          status(result) mustEqual SEE_OTHER
 
-          val view = application.injector.instanceOf[FileUploadView]
+          redirectLocation(result).value mustEqual
+            routes.BulkUploadErrorController.onPageLoad().url
 
-          status(result) mustEqual BAD_REQUEST
-          contentAsString(result) mustEqual view(uploadRequest, expectedError)(
-            request,
-            messages(application)
-          ).toString
+          verify(mockRepository).delete("1234")
+        }
+      }
+
+      "must redirect to the BulkUploadErrorController when no key is supplied" in {
+
+        val mockRepository = mock[UpscanJourneyRepository]
+
+        val application = applicationBuilder(userAnswers = Some(emptyUserAnswers))
+          .overrides(
+            inject.bind[UpscanJourneyRepository].toInstance(mockRepository)
+          )
+          .build()
+
+        running(application) {
+
+          val request =
+            FakeRequest(GET, onUploadErrorRoute)
+
+          val result = route(application, request).value
+
+          status(result) mustEqual SEE_OTHER
+
+          redirectLocation(result).value mustEqual
+            routes.BulkUploadErrorController.onPageLoad().url
+
+          verify(mockRepository, never()).delete(any[String])
         }
       }
     }
