@@ -17,8 +17,8 @@
 package uk.gov.hmrc.securitiestransferchargefrontend.controllers.actions.filters
 
 import play.api.mvc.Result
+import uk.gov.hmrc.auth.core.Enrolments
 import uk.gov.hmrc.auth.core.retrieve.Credentials
-import uk.gov.hmrc.auth.core.{AffinityGroup, Enrolments}
 import uk.gov.hmrc.securitiestransferchargefrontend.config.FrontendAppConfig
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.Redirects
 import uk.gov.hmrc.securitiestransferchargefrontend.domain.SubscriptionId
@@ -37,12 +37,8 @@ class RetrievalFilter @Inject()(
 
   import redirects.*
 
-  val internalIdPresent: RetrievalFilterFunction[Option[String], String] =
-    case Some(id) => Right(id)
-    case None => Left(redirectToUnauthorisedF)
-
-  val affinityGroupPresent: RetrievalFilterFunction[Option[AffinityGroup], AffinityGroup] =
-    case Some(ag) => Right(ag)
+  def isPresent[A]: RetrievalFilterFunction[Option[A], A] =
+    case Some(a) => Right(a)
     case None => Left(redirectToUnauthorisedF)
 
   val enrolledForStc: RetrievalFilterFunction[Enrolments, Unit] = enrolments =>
