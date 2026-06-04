@@ -23,6 +23,7 @@ import uk.gov.hmrc.securitiestransferchargefrontend.connectors.UpscanInitiateCon
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.actions.*
 import uk.gov.hmrc.securitiestransferchargefrontend.models.stf.upscan.*
 import uk.gov.hmrc.securitiestransferchargefrontend.repositories.UpscanJourneyRepository
+import uk.gov.hmrc.securitiestransferchargefrontend.services.fileupload.processing.FileProcessingRefreshCounterFactory
 import uk.gov.hmrc.securitiestransferchargefrontend.views.html.stf.shared.bulk.FileUploadView
 
 import javax.inject.Inject
@@ -33,13 +34,16 @@ class FileUploadController @Inject()(
                                       stcAuthEnrolled: StcAuthEnrolledAction,
                                       val controllerComponents: MessagesControllerComponents,
                                       view: FileUploadView,
+                                      fileProcessingRefreshCounterFactory: FileProcessingRefreshCounterFactory,
                                       upscanInitiateConnector: UpscanInitiateConnector,
                                       upscanJourneyRepository: UpscanJourneyRepository
                                     )(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport {
 
   def onPageLoad(): Action[AnyContent] = stcAuthEnrolled.async { implicit request =>
     prepareUpload().map { response =>
-      Ok(view(response.uploadRequest))
+      val uploadView = view(response.uploadRequest)
+      val counter = fileProcessingRefreshCounterFactory(request)
+      counter.reset(Ok(uploadView))
     }
   }
 
