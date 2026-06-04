@@ -17,12 +17,17 @@
 package controllers.stf.shared.bulk
 
 import base.SpecBase
+<<<<<<< Updated upstream
 import org.mockito.ArgumentMatchers.{any, eq as eqTo}
 import org.mockito.Mockito.*
 import org.scalatestplus.mockito.MockitoSugar
 import play.api.inject.bind
 import play.api.mvc.Results.NoContent
 import play.api.mvc.{Request, Result}
+=======
+import org.scalatestplus.mockito.MockitoSugar
+import play.api.mvc.{Request, Session}
+>>>>>>> Stashed changes
 import play.api.test.FakeRequest
 import play.api.test.Helpers.*
 import uk.gov.hmrc.securitiestransferchargefrontend.config.FrontendAppConfig
@@ -459,5 +464,39 @@ class FileProcessingControllerSpec extends SpecBase with MockitoSugar {
       }
     }
   }
+<<<<<<< Updated upstream
+=======
+
+  "must return the timed out view if the number of retries is exceeded" in {
+
+    val application =
+      applicationBuilder(userAnswers = Some(emptyUserAnswers))
+        .build()
+
+    running(application) {
+      val request = FakeRequest(GET, routes.FileProcessingController.onPageLoad().url).withSession(("retryCount", "1000"))
+      val result = route(application, request).value
+
+      status(result) mustEqual SEE_OTHER
+      redirectLocation(result).value mustEqual routes.FileProcessingController.onTimeout().url
+    }
+  }
+
+  "must reset the retry count if the number of retries is exceeded" in {
+
+    val application =
+      applicationBuilder(userAnswers = Some(emptyUserAnswers))
+        .build()
+
+    running(application) {
+      val request = FakeRequest(GET, routes.FileProcessingController.onPageLoad().url).withSession(("retryCount", "1000"))
+      val result = route(application, request).value
+
+      status(result) mustEqual SEE_OTHER
+      redirectLocation(result).value mustEqual routes.FileProcessingController.onTimeout().url
+      session(result).get("retryCount") mustBe None
+    }
+  }
+>>>>>>> Stashed changes
 }
 
