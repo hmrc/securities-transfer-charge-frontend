@@ -21,6 +21,7 @@ import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.{never, verify, when}
 import org.scalatestplus.mockito.MockitoSugar
 import play.api.inject
+import play.api.mvc.Result
 import play.api.test.FakeRequest
 import play.api.test.Helpers.*
 import uk.gov.hmrc.http.HeaderCarrier
@@ -28,6 +29,7 @@ import uk.gov.hmrc.securitiestransferchargefrontend.connectors.UpscanInitiateCon
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.shared.bulk.routes
 import uk.gov.hmrc.securitiestransferchargefrontend.models.stf.upscan.{UploadRequest, UpscanInitiateResponse}
 import uk.gov.hmrc.securitiestransferchargefrontend.repositories.UpscanJourneyRepository
+import uk.gov.hmrc.securitiestransferchargefrontend.services.fileupload.processing.{FileProcessingRefreshCounter, FileProcessingRefreshCounterFactory}
 import uk.gov.hmrc.securitiestransferchargefrontend.views.html.stf.shared.bulk.FileUploadView
 
 import scala.concurrent.Future
@@ -48,12 +50,18 @@ class FileUploadControllerSpec extends SpecBase with MockitoSugar {
       "must return OK and the correct view for a GET" in {
 
         val mockUpscanInitiateConnector = mock[UpscanInitiateConnector]
+        val mockCounter = mock[FileProcessingRefreshCounter]
+        val mockCounterFactory = mock[FileProcessingRefreshCounterFactory]
 
 
         when(mockUpscanInitiateConnector.initiate()(any[HeaderCarrier]())).thenReturn(Future.successful(upscanInitiateResponse))
+        when(mockCounterFactory.apply(any())).thenReturn(mockCounter)
+        when(mockCounter.reset(any[Result])).thenAnswer(inv => inv.getArgument[Result](0))
 
         val application = applicationBuilder(userAnswers = Some(emptyUserAnswers))
-          .overrides(inject.bind[UpscanInitiateConnector].to(mockUpscanInitiateConnector))
+          .overrides(
+            inject.bind[UpscanInitiateConnector].to(mockUpscanInitiateConnector),
+            inject.bind[FileProcessingRefreshCounterFactory].to(mockCounterFactory))
           .build()
 
 
@@ -66,6 +74,7 @@ class FileUploadControllerSpec extends SpecBase with MockitoSugar {
 
           status(result) mustEqual OK
           contentAsString(result) mustEqual view(uploadRequest)(request, messages(application)).toString
+          verify(mockCounter).reset(any[Result])
         }
       }
     }
