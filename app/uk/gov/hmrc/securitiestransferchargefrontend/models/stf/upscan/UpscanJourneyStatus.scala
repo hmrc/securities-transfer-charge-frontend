@@ -25,6 +25,15 @@ object UpscanJourneyStatus {
   case object Ready extends UpscanJourneyStatus
   case object Initiated extends UpscanJourneyStatus
   case object Failed    extends UpscanJourneyStatus
+  case object Processing    extends UpscanJourneyStatus
+  case object Completed    extends UpscanJourneyStatus
+  case object RowLimitExceeded    extends UpscanJourneyStatus
+  case object EmptyFile    extends UpscanJourneyStatus
+  case object TooManyErrors    extends UpscanJourneyStatus
+  case object FormatingErrors    extends UpscanJourneyStatus
+  case object UpscanDownloadError   extends UpscanJourneyStatus
+  case object InvalidTemplate   extends UpscanJourneyStatus
+  case object FileParseError   extends UpscanJourneyStatus
 
   implicit val format: Format[UpscanJourneyStatus] = new Format[UpscanJourneyStatus] {
 
@@ -33,6 +42,15 @@ object UpscanJourneyStatus {
         case "Initiated" => JsSuccess(Initiated)
         case "Failed" => JsSuccess(Failed)
         case "Ready" => JsSuccess(Ready)
+        case "Processing" => JsSuccess(Processing)
+        case "Completed" => JsSuccess(Completed)
+        case "RowLimitExceeded" => JsSuccess(RowLimitExceeded)
+        case "EmptyFile" => JsSuccess(EmptyFile)
+        case "TooManyErrors" => JsSuccess(TooManyErrors)
+        case "FormatingErrors" => JsSuccess(FormatingErrors)
+        case "UpscanDownloadError" => JsSuccess(UpscanDownloadError)
+        case "InvalidTemplate" => JsSuccess(InvalidTemplate)
+        case "FileParseError" => JsSuccess(FileParseError)
         case other => JsError(s"Invalid UpscanJourneyStatus: $other")
       }
 
