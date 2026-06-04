@@ -375,11 +375,6 @@ fileUpload.redirectError.EntityTooLarge = The selected file must be smaller than
 fileUpload.redirectError.generic = The selected file could not be uploaded – try again
 fileUpload.redirectError.InvalidArgument = The selected file must be a .csv or a .xlsx
 
-fileUploaded.title = File uploaded
-fileUploaded.heading = File uploaded
-fileUploaded.reference = File reference
-fileUploaded.status = Status
-
 org.templateInstructions.title = How to use the template
 org.templateInstructions.heading = How to use the template
 org.templateInstructions.p1 = Use the template to tell us about more than one securities transfer at a time.
