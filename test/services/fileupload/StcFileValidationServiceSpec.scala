@@ -17,31 +17,24 @@
 package services.fileupload
 
 import base.SpecBase
+import org.mockito.ArgumentMatchers.{any, eq => eqTo}
 import org.mockito.Mockito.when
 import org.scalatestplus.mockito.MockitoSugar.mock
+import uk.gov.hmrc.securitiestransferchargefrontend.config.FileUploadConfig
 import uk.gov.hmrc.securitiestransferchargefrontend.models.stf.fileupload.*
 import uk.gov.hmrc.securitiestransferchargefrontend.services.fileupload.*
 
-class StcFileValidationServiceSpec extends SpecBase{
-  
+class StcFileValidationServiceSpec extends SpecBase {
+
   private val stcRowValidationService = mock[StcRowValidationService]
+  private val mockConfig = mock[FileUploadConfig]
 
-  private val service = new StcFileValidationService(stcRowValidationService)
+  private val service = new StcFileValidationService(mockConfig, stcRowValidationService)
 
-  private val headers: Seq[String] =
-    Seq("sellerName")
+  private val headers: Seq[String] = Seq("sellerName")
 
-  private val parsedRow1 =
-    ParsedRow(
-      rowNumber = 3,
-      cells = Seq(ParsedCell(StcUploadColumn.sellerName, "Seller 1"))
-    )
-
-  private val parsedRow2 =
-    ParsedRow(
-      rowNumber = 4,
-      cells = Seq(ParsedCell(StcUploadColumn.sellerName, ""))
-    )
+  private val parsedRow1 = ParsedRow(rowNumber = 3, cells = Seq(ParsedCell(StcUploadColumn.sellerName, "Seller 1")))
+  private val parsedRow2 = ParsedRow(rowNumber = 4, cells = Seq(ParsedCell(StcUploadColumn.sellerName, "")))
 
   private val validatedRow1 =
     ValidatedStcRow(
@@ -73,7 +66,7 @@ class StcFileValidationServiceSpec extends SpecBase{
         purchaseForCancellation = None
       ),
       validationErrors = Seq.empty
-    )
+  )
 
   private val validatedRow2 =
     ValidatedStcRow(
@@ -115,23 +108,30 @@ class StcFileValidationServiceSpec extends SpecBase{
       )
     )
 
-  "StcFileValidationService.validate" - {
+  "StcFileValidationService.validateStream" - {
 
     "validate each parsed row and return a file validation response" in {
+      val rowStream = Seq(parsedRow1, parsedRow2).iterator
+
+      when(mockConfig.maxErrorsAllowed).thenReturn(25)
+      when(mockConfig.maxRows).thenReturn(10000)
 
       when(
-        stcRowValidationService.validateAll(
-          Seq(parsedRow1, parsedRow2),
-          headers,affinityGroupKeyInd
+        stcRowValidationService.validateStream(
+          any(), eqTo(headers), eqTo(affinityGroupKeyInd), eqTo(25), eqTo(10000)
         )
-      ).thenReturn(Seq(validatedRow1, validatedRow2))
+      ).thenReturn(Right(Seq(validatedRow1, validatedRow2)))
 
-      val result = service.validate(Seq(parsedRow1, parsedRow2), headers,affinityGroupKeyInd)
+      val result = service.validateStream(rowStream, headers, affinityGroupKeyInd)
 
-      result.rows mustBe Seq(validatedRow1, validatedRow2)
-      result.hasErrors mustBe true
-      result.hasBlockingErrors mustBe true
-      result.validRows mustBe Seq(validatedRow1.parsedRow)
+      result.isRight mustBe true
+      val response = result.toOption.get
+
+      response.rows mustBe Seq(validatedRow1, validatedRow2)
+      response.maxErrorsAllowed mustBe 25
+      response.hasErrors mustBe true
+      response.hasBlockingErrors mustBe true
+      response.validRows mustBe Seq(validatedRow1.parsedRow)
     }
   }
 }

@@ -19,13 +19,13 @@ package base
 import uk.gov.hmrc.securitiestransferchargefrontend.models.stf.fileupload.{ParsedStcRow, StcFileValidationResponse, StcRowValidationError, ValidatedStcRow}
 import uk.gov.hmrc.securitiestransferchargefrontend.models.stf.upscan.{FileUpload, UpscanJourneyStatus}
 
-
 trait FileUploadFixtures {
 
   val reference = "test-reference"
 
   val successfulValidationResponse: StcFileValidationResponse = StcFileValidationResponse(
-    rows = Seq.empty
+    rows = Seq.empty,
+    maxErrorsAllowed = 25
   )
 
   def readyFileUpload(reference: String = "ref123"): FileUpload =
@@ -80,7 +80,8 @@ trait FileUploadFixtures {
           parsedRow = parsedStcRow(),
           validationErrors = errors
         )
-      )
+      ),
+      maxErrorsAllowed = 25
     )
 
   val blockingValidationErrors: Seq[StcRowValidationError] =

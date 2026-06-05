@@ -20,8 +20,7 @@ import org.apache.poi.xssf.usermodel.XSSFWorkbook
 import org.scalatest.EitherValues
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpec
-import uk.gov.hmrc.securitiestransferchargefrontend.models.stf.fileupload.FileParseError.RowLimitExceeded
-import uk.gov.hmrc.securitiestransferchargefrontend.models.stf.fileupload.{ParsedCell, UploadedFile}
+import uk.gov.hmrc.securitiestransferchargefrontend.models.stf.fileupload.{FileParseError, ParsedCell, ParsedRow, UploadedFile}
 import uk.gov.hmrc.securitiestransferchargefrontend.services.fileupload.ExcelFileParser
 
 import java.io.{ByteArrayInputStream, ByteArrayOutputStream}
@@ -58,7 +57,12 @@ class ExcelFileParserSpec extends AnyWordSpec with Matchers with EitherValues {
   private def blankHeaders(fromIndex: Int): Seq[String] =
     (fromIndex until maxColumns).map(_ => "")
 
-  "parse" should {
+  private def parseFully(bytes: Array[Byte]): Either[FileParseError, (Seq[String], Seq[ParsedRow])] =
+    parser.withParsedStream(uploadedFile(bytes)) { (headers, rowStream) =>
+      Right((headers, rowStream.toList))
+    }
+
+  "withParsedStream" should {
 
     "parse string, numeric, boolean and date cells" in {
       val bytes = workbookBytes { workbook =>
@@ -86,17 +90,17 @@ class ExcelFileParserSpec extends AnyWordSpec with Matchers with EitherValues {
         dateCell.setCellStyle(dateStyle)
       }
 
-      val result = parser.parse(uploadedFile(bytes)).value
+      val (headers, rows) = parseFully(bytes).value
 
-      result.headers shouldBe Seq(
+      headers shouldBe Seq(
         "name", "amount", "flag", "date"
       ) ++ blankHeaders(4)
 
-      result.rows.size shouldBe 1
+      rows.size shouldBe 1
 
-      result.rows.head.rowNumber shouldBe 2
+      rows.head.rowNumber shouldBe 2
 
-      result.rows.head.cells shouldBe Seq(
+      rows.head.cells shouldBe Seq(
         ParsedCell(0, "Bob"),
         ParsedCell(1, "123.45"),
         ParsedCell(2, "true"),
@@ -115,11 +119,11 @@ class ExcelFileParserSpec extends AnyWordSpec with Matchers with EitherValues {
         row.createCell(0).setCellValue("Bob")
       }
 
-      val result = parser.parse(uploadedFile(bytes)).value
+      val (headers, rows) = parseFully(bytes).value
 
-      result.headers shouldBe Seq("name") ++ blankHeaders(1)
+      headers shouldBe Seq("name") ++ blankHeaders(1)
 
-      result.rows.head.cells shouldBe Seq(
+      rows.head.cells shouldBe Seq(
         ParsedCell(0, "Bob")
       ) ++ blankCells(1)
     }
@@ -137,30 +141,15 @@ class ExcelFileParserSpec extends AnyWordSpec with Matchers with EitherValues {
         }
       }
 
-      val result = parser.parse(uploadedFile(bytes)).value
+      val (headers, rows) = parseFully(bytes).value
 
-      result.headers should have size maxColumns
-      result.rows.size shouldBe 1
-      result.rows.head.cells should have size maxColumns
+      headers should have size maxColumns
+      rows.size shouldBe 1
+      rows.head.cells should have size maxColumns
 
-      result.rows.head.cells shouldBe (0 until maxColumns).map { index =>
+      rows.head.cells shouldBe (0 until maxColumns).map { index =>
         ParsedCell(index, s"value${index + 1}")
       }
-    }
-
-    "return RowLimitExceeded when the row count exceeds the configured maximum" in {
-      val bytes = workbookBytes { workbook =>
-        val sheet = workbook.createSheet("Sheet1")
-
-        val header = sheet.createRow(0)
-        header.createCell(0).setCellValue("header")
-
-        sheet.createRow(1).createCell(0).setCellValue("row1")
-      }
-
-      val parser = new ExcelFileParser(TestFileUploadConfig.config(maxRows = 1))
-
-      parser.parse(uploadedFile(bytes)).left.value shouldBe RowLimitExceeded(2, 1)
     }
   }
 }

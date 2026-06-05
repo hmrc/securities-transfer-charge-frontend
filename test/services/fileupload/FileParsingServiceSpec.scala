@@ -16,17 +16,15 @@
 
 package services.fileupload
 
-import org.mockito.ArgumentMatchers.any
+import org.mockito.ArgumentMatchers.{any, eq => eqTo}
 import org.mockito.Mockito.{verify, when}
 import org.scalatest.EitherValues
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpec
 import org.scalatestplus.mockito.MockitoSugar
 import uk.gov.hmrc.securitiestransferchargefrontend.models.stf.fileupload.FileParseError.UnsupportedMimeType
-import uk.gov.hmrc.securitiestransferchargefrontend.models.stf.fileupload.{ParsedFile, UploadedFile}
-import uk.gov.hmrc.securitiestransferchargefrontend.services.fileupload.FileParserSelector
-import uk.gov.hmrc.securitiestransferchargefrontend.services.fileupload.FileParser
-import uk.gov.hmrc.securitiestransferchargefrontend.services.fileupload.FileParsingService
+import uk.gov.hmrc.securitiestransferchargefrontend.models.stf.fileupload.{FileParseError, ParsedRow, UploadedFile}
+import uk.gov.hmrc.securitiestransferchargefrontend.services.fileupload.{FileParser, FileParserSelector, FileParsingService}
 
 import java.io.ByteArrayInputStream
 import java.nio.charset.StandardCharsets
@@ -39,27 +37,25 @@ class FileParsingServiceSpec extends AnyWordSpec with Matchers with EitherValues
     inputStream = new ByteArrayInputStream("header\nvalue".getBytes(StandardCharsets.UTF_8))
   )
 
-  private val parsedFile = ParsedFile(
-    fileName = "test.csv",
-    mimeType = "text/csv",
-    rows = Seq(),
-    headers = Seq()
-  )
+  private val dummyBlock: (Seq[String], Iterator[ParsedRow]) => Either[FileParseError, String] =
+    (_, _) => Right("Stream processed successfully")
 
-  "parse" should {
+  "withParsedStream" should {
 
-    "select the parser and delegate parsing successfully" in {
+    "select the parser and delegate the streaming block successfully" in {
       val fileParserSelector = mock[FileParserSelector]
       val parser             = mock[FileParser]
       val service            = new FileParsingService(fileParserSelector)
 
       when(fileParserSelector.select("text/csv")).thenReturn(Right(parser))
-      when(parser.parse(any[UploadedFile])).thenReturn(Right(parsedFile))
 
-      service.parse(uploadedFile).value shouldBe parsedFile
+      when(parser.withParsedStream[String](eqTo(uploadedFile))(any()))
+        .thenReturn(Right("Stream Processed Successfully"))
+
+      service.withParsedStream(uploadedFile)(dummyBlock).value shouldBe "Stream Processed Successfully"
 
       verify(fileParserSelector).select("text/csv")
-      verify(parser).parse(uploadedFile)
+      verify(parser).withParsedStream[String](eqTo(uploadedFile))(any())
     }
 
     "return the selector error when the mime type is unsupported" in {
@@ -68,7 +64,7 @@ class FileParsingServiceSpec extends AnyWordSpec with Matchers with EitherValues
 
       when(fileParserSelector.select("text/csv")).thenReturn(Left(UnsupportedMimeType("text/csv")))
 
-      service.parse(uploadedFile).left.value shouldBe UnsupportedMimeType("text/csv")
+      service.withParsedStream(uploadedFile)(dummyBlock).left.value shouldBe UnsupportedMimeType("text/csv")
 
       verify(fileParserSelector).select("text/csv")
     }
