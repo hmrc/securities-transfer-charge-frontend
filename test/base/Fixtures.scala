@@ -37,6 +37,7 @@ object Fixtures {
   val stcIdentifierKey: String = "STCID"
   val testSubscriptionId: SubscriptionId = SubscriptionId("XAST1234567890")
   val testInternalId = "test-user-808"
+  val testGroupIdentifier = "test-group-id-123"
   val testCredentialId: CredentialId = CredentialId("5534386044069226")
   val testAuditType = "StockTransferFormStatus"
   val testSubmissionId: SubmissionId = SubmissionId("STC-424242424")

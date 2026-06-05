@@ -34,18 +34,19 @@ import scala.concurrent.Future
 class StcAuthEnrolledActionImplSpec extends SpecBase {
 
   type RetrievalType =
-    Option[String] ~ Enrolments ~ Option[AffinityGroup] ~ Option[Credentials]
+    Option[String] ~ Option[String] ~ Enrolments ~ Option[AffinityGroup] ~ Option[Credentials]
 
   private val enrolmentKey = "HMRC-STC-ORG"
   private val identifierKey = "STCID"
 
   def buildRetrieval(
                       maybeInternalId: Option[String] = Some(Fixtures.testInternalId),
+                      maybeGroupIdentifier: Option[String] = Some(Fixtures.testGroupIdentifier),
                       enrolments: Enrolments = Fixtures.enrolledForStc,
                       maybeAffinityGroup: Option[AffinityGroup] = Some(AffinityGroup.Organisation),
                       maybeCredentials: Option[Credentials] = Some(Credentials(Fixtures.testCredentialId.value, "providerType"))
                     ): RetrievalType =
-    new~(new~(new~(maybeInternalId, enrolments), maybeAffinityGroup), maybeCredentials)
+    new~(new~(new~(new~(maybeInternalId, maybeGroupIdentifier), enrolments), maybeAffinityGroup), maybeCredentials)
 
   def testSetup(
                  application: Application,
