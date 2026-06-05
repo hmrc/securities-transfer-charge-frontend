@@ -21,7 +21,6 @@ import org.mockito.ArgumentMatchers.{any, eq as eqTo}
 import org.mockito.Mockito.*
 import org.scalatestplus.mockito.MockitoSugar
 import play.api.inject.bind
-import play.api.mvc.Results.NoContent
 import play.api.mvc.{Request, Result}
 import play.api.test.FakeRequest
 import play.api.test.Helpers.*
@@ -103,7 +102,7 @@ class FileProcessingControllerSpec extends SpecBase with MockitoSugar {
       }
     }
 
-    "must redirect to timeout page when the counter timed out" in {
+    "must redirect to timeout page when the counter timed out and clear the session var" in {
 
       val counter = mock[FileProcessingRefreshCounter]
       when(counter.isTimedOut).thenReturn(true)
@@ -117,37 +116,16 @@ class FileProcessingControllerSpec extends SpecBase with MockitoSugar {
 
       running(app) {
 
-        val request = FakeRequest(GET, routes.FileProcessingController.onPageLoad(reference).url)
+        val request =
+          FakeRequest(GET, routes.FileProcessingController.onPageLoad(reference).url)
+            .withSession("retryCount" -> "50")
         val result = route(app, request).value
 
         status(result) mustEqual SEE_OTHER
         redirectLocation(result).value mustEqual
           routes.FileProcessingController.onTimeout().url
 
-        verify(counter).reset(any[Result])
-      }
-    }
-
-    "must reset the retry count if the number of retries is exceeded" in {
-
-      val mockCounter = mock[FileProcessingRefreshCounter]
-      when(mockCounter.isTimedOut).thenReturn(true)
-
-      val result: Result = NoContent
-      doReturn(result).when(mockCounter).reset(any[Result])
-
-      val factory = new MockFileProcessingRefreshCounterFactory(mockCounter)
-      val application =
-        applicationBuilder(userAnswers = Some(emptyUserAnswers))
-          .overrides(bind[FileProcessingRefreshCounterFactory].toInstance(factory))
-          .build()
-
-      running(application) {
-
-        val request = FakeRequest(GET, routes.FileProcessingController.onPageLoad(reference).url)
-        route(application, request).value
-        verify(mockCounter, times(1)).reset(any[Result])
-
+        session(result).get("retryCount") mustBe None
       }
     }
 
@@ -460,4 +438,3 @@ class FileProcessingControllerSpec extends SpecBase with MockitoSugar {
     }
   }
 }
-
