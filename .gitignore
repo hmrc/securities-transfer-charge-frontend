@@ -1,5 +1,4 @@
-.*
-
+.bsp
 !.gitignore
 !.scalafmt.conf
 bin
