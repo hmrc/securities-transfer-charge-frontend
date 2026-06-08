@@ -31,7 +31,8 @@ trait StcUpscanProcessingService {
 @Singleton
 class StcUpscanProcessingServiceImpl @Inject()(
                                                 upscanFileDownloadConnector: UpscanFileDownloadConnector,
-                                                stcUploadProcessingService: StcUploadProcessingService
+                                                stcUploadProcessingService: StcUploadProcessingService,
+                                                fileParserSelector: FileParserSelector
                                               )(implicit ec: ExecutionContext) extends StcUpscanProcessingService {
 
   override def process(fileUpload: FileUpload, affinityKey: String)(implicit hc: HeaderCarrier): Future[Either[FileParseError, StcFileValidationResponse]] = {
@@ -42,18 +43,26 @@ class StcUpscanProcessingServiceImpl @Inject()(
         )
       )
     } else {
-      val downloadUrl = fileUpload.downloadUrl.getOrElse(throw new RuntimeException("Missing download URL from Upscan payload"))
-      val fileName = fileUpload.uploadDetails.map(_.fileName).getOrElse("unknown.xlsx")
-      val mimeType = fileUpload.uploadDetails.map(_.fileMimeType).getOrElse("application/octet-stream")
+      val mimeType = fileUpload.uploadDetails.map(_.fileMimeType).getOrElse("")
+      
+      fileParserSelector.select(mimeType) match {
 
-      upscanFileDownloadConnector.download(downloadUrl).map { inputStream =>
-        val uploadedFile = UploadedFile(
-          fileName = fileName,
-          mimeType = mimeType,
-          inputStream = inputStream
-        )
+        case Left(error) =>
+          Future.successful(Left(error))
 
-        stcUploadProcessingService.process(uploadedFile, affinityKey)
+        case Right(_) =>
+          val downloadUrl = fileUpload.downloadUrl.getOrElse(throw new RuntimeException("Missing download URL from Upscan payload"))
+          val fileName = fileUpload.uploadDetails.map(_.fileName).getOrElse("unknown.xlsx")
+
+          upscanFileDownloadConnector.download(downloadUrl).map { inputStream =>
+            val uploadedFile = UploadedFile(
+              fileName = fileName,
+              mimeType = mimeType,
+              inputStream = inputStream
+            )
+
+            stcUploadProcessingService.process(uploadedFile, affinityKey)
+          }
       }
     }
   }

@@ -18,7 +18,8 @@ package services.fileupload
 
 import base.SpecBase
 import org.mockito.ArgumentMatchers.{any, eq => eqTo}
-import org.mockito.Mockito.{verify, when}
+import org.mockito.Mockito.{never, verify, when}
+import org.scalatest.OneInstancePerTest
 import org.scalatest.EitherValues
 import org.scalatestplus.mockito.MockitoSugar
 import uk.gov.hmrc.http.HeaderCarrier
@@ -32,14 +33,17 @@ import java.nio.charset.StandardCharsets
 import java.time.Instant
 import scala.concurrent.Future
 
-class StcUpscanProcessingServiceSpec extends SpecBase with EitherValues with MockitoSugar {
-
+class StcUpscanProcessingServiceSpec extends SpecBase with EitherValues with MockitoSugar with OneInstancePerTest {
+  
   private val upscanFileDownloadConnector = mock[UpscanFileDownloadConnector]
   private val stcUploadProcessingService = mock[StcUploadProcessingService]
+  private val fileParserSelector = mock[FileParserSelector]
+  private val mockFileParser = mock[FileParser]
 
   private val service = new StcUpscanProcessingServiceImpl(
     upscanFileDownloadConnector,
-    stcUploadProcessingService
+    stcUploadProcessingService,
+    fileParserSelector
   )
 
   private val uploadDetails = UpscanCallbackRequest.UploadDetails(
@@ -66,6 +70,9 @@ class StcUpscanProcessingServiceSpec extends SpecBase with EitherValues with Moc
 
     "download and process a ready upload successfully via the stream" in {
       val inputStream = new ByteArrayInputStream("irrelevant".getBytes(StandardCharsets.UTF_8))
+      
+      when(fileParserSelector.select(eqTo("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")))
+        .thenReturn(Right(mockFileParser))
 
       when(upscanFileDownloadConnector.download(eqTo("https://example.com/download/ref-123"))(any[HeaderCarrier]))
         .thenReturn(Future.successful(inputStream))
@@ -77,23 +84,26 @@ class StcUpscanProcessingServiceSpec extends SpecBase with EitherValues with Moc
 
       result.value mustBe validationResponse
 
+      verify(fileParserSelector).select(eqTo("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"))
       verify(upscanFileDownloadConnector).download(eqTo("https://example.com/download/ref-123"))(any[HeaderCarrier])
       verify(stcUploadProcessingService).process(any[UploadedFile], eqTo(affinityGroupKeyInd))
     }
 
-    "return the parse error when the stream parsing fails" in {
+    "fail fast and return the parse error without downloading when MIME type is unsupported" in {
       val parseError = FileParseError.UnsupportedMimeType("application/pdf")
-      val inputStream = new ByteArrayInputStream("irrelevant".getBytes(StandardCharsets.UTF_8))
-
-      when(upscanFileDownloadConnector.download(any[String])(any[HeaderCarrier]))
-        .thenReturn(Future.successful(inputStream))
-
-      when(stcUploadProcessingService.process(any[UploadedFile], eqTo(affinityGroupKeyInd)))
+      
+      val pdfUploadDetails = uploadDetails.copy(fileMimeType = "application/pdf")
+      val pdfUpload = fileUpload.copy(uploadDetails = Some(pdfUploadDetails))
+      
+      when(fileParserSelector.select(eqTo("application/pdf")))
         .thenReturn(Left(parseError))
 
-      val result = service.process(fileUpload, affinityGroupKeyInd).futureValue
-
+      val result = service.process(pdfUpload, affinityGroupKeyInd).futureValue
+      
       result.left.value mustBe parseError
+      
+      verify(upscanFileDownloadConnector, never()).download(any[String])(any[HeaderCarrier])
+      verify(stcUploadProcessingService, never()).process(any[UploadedFile], any[String])
     }
 
     "fail when the upload status is not Ready" in {
