@@ -35,6 +35,7 @@ import uk.gov.hmrc.securitiestransferchargefrontend.pages.stf.single.OtherSecuri
 import uk.gov.hmrc.securitiestransferchargefrontend.views.html.stf.individuals.single.OtherSecuritiesTypeView
 
 import scala.concurrent.Future
+import base.Fixtures.testUserAnswers
 
 class OtherSecuritiesTypeControllerSpec extends SpecBase with MockitoSugar {
 
@@ -66,7 +67,7 @@ class OtherSecuritiesTypeControllerSpec extends SpecBase with MockitoSugar {
 
     "must populate the view correctly on a GET when the question has previously been answered" in {
 
-      val userAnswers = UserAnswers(userAnswersId,submissionId).set(OtherSecuritiesTypePage, "answer").success.value
+      val userAnswers = testUserAnswers.set(OtherSecuritiesTypePage, "answer").success.value
 
       val application = applicationBuilder(userAnswers = Some(userAnswers), affinityGroup = individualAffinity)
         .overrides(bind[Navigator].qualifiedWith("individuals").toInstance(getNavigator))

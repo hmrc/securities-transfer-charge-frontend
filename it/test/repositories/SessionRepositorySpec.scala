@@ -16,6 +16,7 @@
 
 package repositories
 
+import base.Fixtures.*
 import org.mockito.Mockito.when
 import org.mongodb.scala.model.Filters
 import org.scalactic.source.Position
@@ -29,7 +30,7 @@ import play.api.libs.json.Json
 import uk.gov.hmrc.mdc.MdcExecutionContext
 import uk.gov.hmrc.mongo.test.DefaultPlayMongoRepositorySupport
 import uk.gov.hmrc.securitiestransferchargefrontend.config.FrontendAppConfig
-import uk.gov.hmrc.securitiestransferchargefrontend.domain.SubmissionId
+import uk.gov.hmrc.securitiestransferchargefrontend.domain.{SubmissionId, UserId}
 import uk.gov.hmrc.securitiestransferchargefrontend.models.UserAnswers
 import uk.gov.hmrc.securitiestransferchargefrontend.repositories.SessionRepositoryImpl
 
@@ -49,7 +50,7 @@ class SessionRepositorySpec
   private val instant = Instant.now.truncatedTo(ChronoUnit.MILLIS)
   private val stubClock: Clock = Clock.fixed(instant, ZoneId.systemDefault)
 
-  private val userAnswers = UserAnswers("id", SubmissionId("sub-01"), None, Json.obj("foo" -> "bar"), Instant.ofEpochSecond(1))
+  private val userAnswers = UserAnswers(testInternalId, testGroupIdentifier, SubmissionId("sub-01"), None, Json.obj("foo" -> "bar"), Instant.ofEpochSecond(1))
 
   private val mockAppConfig = mock[FrontendAppConfig]
   when(mockAppConfig.cacheTtl) thenReturn 1L
@@ -97,7 +98,7 @@ class SessionRepositorySpec
 
       "must return None" in {
 
-        repository.get("id that does not exist").futureValue must not be defined
+        repository.get(UserId("id that does not exist")).futureValue must not be defined
       }
     }
 
@@ -116,7 +117,7 @@ class SessionRepositorySpec
     }
 
     "must return unit when there is no record to remove" in {
-      val result: Unit = repository.clear("id that does not exist").futureValue
+      val result: Unit = repository.clear(UserId("id that does not exist")).futureValue
 
       result mustEqual ()
     }
@@ -145,7 +146,7 @@ class SessionRepositorySpec
 
       "must return unit" in {
 
-        repository.keepAlive("id that does not exist").futureValue mustEqual ()
+        repository.keepAlive(UserId("id that does not exist")).futureValue mustEqual ()
       }
     }
 

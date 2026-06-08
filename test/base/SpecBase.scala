@@ -35,7 +35,7 @@ import uk.gov.hmrc.securitiestransferchargefrontend.clients.SaveAndReturnClient
 import uk.gov.hmrc.securitiestransferchargefrontend.clients.registration.Subscription
 import uk.gov.hmrc.securitiestransferchargefrontend.connectors.AlfAddressConnector
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.actions.*
-import uk.gov.hmrc.securitiestransferchargefrontend.domain.SubmissionId
+import uk.gov.hmrc.securitiestransferchargefrontend.domain.{GroupIdentifier, SubmissionId, UserId}
 import uk.gov.hmrc.securitiestransferchargefrontend.models.requests.DataRequest
 import uk.gov.hmrc.securitiestransferchargefrontend.models.{Mode, UserAnswers}
 import uk.gov.hmrc.securitiestransferchargefrontend.navigation.Navigator
@@ -56,7 +56,8 @@ trait SpecBase
 
   implicit val ec: ExecutionContext = ExecutionContext.global
   implicit val hc: HeaderCarrier = HeaderCarrier()
-  val userAnswersId: String = "id"
+  val testUserId: UserId = UserId("id")
+  val testGroupIdentifier: GroupIdentifier = GroupIdentifier("group-123")
   val sessionId = "sessionId1234"
   val submissionId: SubmissionId = SubmissionId("STC-123456789")
   val userId = "internalId"
@@ -79,7 +80,7 @@ trait SpecBase
     emailAddress = "some@email.com"
   )
 
-  def emptyUserAnswers: UserAnswers = UserAnswers.empty(userAnswersId)(submissionId)
+  def emptyUserAnswers: UserAnswers = UserAnswers.empty(testUserId)(testGroupIdentifier)(submissionId)
 
   val testBackLinkRoute: Call = Call("GET", "/back-link")
   val testNextPage = Call("GET", "/next-page")

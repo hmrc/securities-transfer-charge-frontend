@@ -27,7 +27,7 @@ import play.api.test.Helpers.*
 import uk.gov.hmrc.auth.core.AffinityGroup
 import uk.gov.hmrc.securitiestransferchargefrontend.clients.{SaveAndReturnClient, SubmissionIdClient}
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.shared.routes
-import uk.gov.hmrc.securitiestransferchargefrontend.domain.SubmissionId
+import uk.gov.hmrc.securitiestransferchargefrontend.domain.{SubmissionId, UserId}
 import uk.gov.hmrc.securitiestransferchargefrontend.models.audit.JourneyStatus.StartSubmission
 import uk.gov.hmrc.securitiestransferchargefrontend.navigation.Navigator
 import uk.gov.hmrc.securitiestransferchargefrontend.services.AuditService
@@ -51,7 +51,7 @@ class SubmissionsDashboardControllerSpec extends SpecBase with MockitoSugar with
 
         val mockSaveAndReturnClient = mock[SaveAndReturnClient]
 
-        when(mockSaveAndReturnClient.list(any[String])(any()))
+        when(mockSaveAndReturnClient.list(any[UserId])(any()))
           .thenReturn(Future.successful(List.empty))
 
         val application =
@@ -74,7 +74,7 @@ class SubmissionsDashboardControllerSpec extends SpecBase with MockitoSugar with
               messages(application)
             ).toString
 
-          verify(mockSaveAndReturnClient).list(any[String])(any())
+          verify(mockSaveAndReturnClient).list(any[UserId])(any())
         }
       }
 
@@ -87,7 +87,7 @@ class SubmissionsDashboardControllerSpec extends SpecBase with MockitoSugar with
           SubmissionId("STC-987654321")
         )
 
-        when(mockSaveAndReturnClient.list(any[String])(any()))
+        when(mockSaveAndReturnClient.list(any[UserId])(any()))
           .thenReturn(Future.successful(submissionIds))
 
         val application =
@@ -110,7 +110,7 @@ class SubmissionsDashboardControllerSpec extends SpecBase with MockitoSugar with
               messages(application)
             ).toString
 
-          verify(mockSaveAndReturnClient).list(any[String])(any())
+          verify(mockSaveAndReturnClient).list(any[UserId])(any())
         }
       }
     }

@@ -40,8 +40,8 @@ class StcAuthEnrolledActionImplSpec extends SpecBase {
   private val identifierKey = "STCID"
 
   def buildRetrieval(
-                      maybeInternalId: Option[String] = Some(Fixtures.testInternalId),
-                      maybeGroupIdentifier: Option[String] = Some(Fixtures.testGroupIdentifier),
+                      maybeInternalId: Option[String] = Some(Fixtures.testInternalId.value),
+                      maybeGroupIdentifier: Option[String] = Some(Fixtures.testGroupIdentifier.value),
                       enrolments: Enrolments = Fixtures.enrolledForStc,
                       maybeAffinityGroup: Option[AffinityGroup] = Some(AffinityGroup.Organisation),
                       maybeCredentials: Option[Credentials] = Some(Credentials(Fixtures.testCredentialId.value, "providerType"))
@@ -95,7 +95,7 @@ class StcAuthEnrolledActionImplSpec extends SpecBase {
 
         val result =
           action.invokeBlock(FakeRequest(), { req =>
-            req.internalId mustBe Fixtures.testInternalId
+            req.internalId mustBe Fixtures.testInternalId.value
             req.affinityGroup mustBe AffinityGroup.Organisation
             req.subscriptionId mustBe Fixtures.testSubscriptionId
             req.credentialId mustBe Fixtures.testCredentialId

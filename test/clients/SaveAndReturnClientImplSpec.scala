@@ -17,7 +17,7 @@
 package clients
 
 
-import base.SpecBase
+import base.{Fixtures, SpecBase}
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.when
 import org.scalatest.matchers.should.Matchers.*
@@ -27,7 +27,7 @@ import uk.gov.hmrc.http.client.{HttpClientV2, RequestBuilder}
 import uk.gov.hmrc.http.{HeaderCarrier, HttpResponse}
 import uk.gov.hmrc.securitiestransferchargefrontend.clients.SaveAndReturnClientImpl
 import uk.gov.hmrc.securitiestransferchargefrontend.config.FrontendAppConfig
-import uk.gov.hmrc.securitiestransferchargefrontend.domain.SubmissionId
+import uk.gov.hmrc.securitiestransferchargefrontend.domain.{SubmissionId, UserId}
 import uk.gov.hmrc.securitiestransferchargefrontend.models.UserAnswers
 
 import java.net.URL
@@ -49,9 +49,9 @@ class SaveAndReturnClientImplSpec extends SpecBase {
 
     val client = new SaveAndReturnClientImpl(mockHttp, mockConfig)
 
-    val testUserId = "user1"
-    val testSubmissionId: SubmissionId = SubmissionId("sub1")
-    val testUserAnswers: UserAnswers = UserAnswers(testUserId, testSubmissionId)
+    val testUserId: UserId = Fixtures.testInternalId
+    val testSubmissionId: SubmissionId = Fixtures.testSubmissionId
+    val testUserAnswers: UserAnswers = Fixtures.emptyUserAnswers
 
     when(mockHttp.post(any[URL])(any[HeaderCarrier]))
       .thenReturn(mockRequestBuilder)
