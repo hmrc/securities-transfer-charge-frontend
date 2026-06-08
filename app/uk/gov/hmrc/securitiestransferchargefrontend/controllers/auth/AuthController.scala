@@ -21,6 +21,7 @@ import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import uk.gov.hmrc.securitiestransferchargefrontend.config.FrontendAppConfig
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.actions.IdentifierAction
+import uk.gov.hmrc.securitiestransferchargefrontend.domain.UserId
 import uk.gov.hmrc.securitiestransferchargefrontend.repositories.SessionRepository
 
 import javax.inject.Inject
@@ -37,7 +38,7 @@ class AuthController @Inject()(
   def signOut(): Action[AnyContent] = identify.async {
     implicit request =>
       sessionRepository
-        .clear(request.userId)
+        .clear(UserId(request.userId))
         .map {
           _ =>
             Redirect(config.signOutUrl, Map("continue" -> Seq(config.exitSurveyUrl)))
@@ -47,7 +48,7 @@ class AuthController @Inject()(
   def signOutNoSurvey(): Action[AnyContent] = identify.async {
     implicit request =>
     sessionRepository
-      .clear(request.userId)
+      .clear(UserId(request.userId))
       .map {
         _ =>
         Redirect(config.signOutUrl, Map("continue" -> Seq(routes.SignedOutController.onPageLoad().url)))

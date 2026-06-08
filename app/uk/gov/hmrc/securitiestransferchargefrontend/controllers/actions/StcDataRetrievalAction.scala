@@ -19,6 +19,7 @@ package uk.gov.hmrc.securitiestransferchargefrontend.controllers.actions
 import com.google.inject.Inject
 import play.api.mvc.ActionTransformer
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.actions.requests.StcOptionalDataRequest
+import uk.gov.hmrc.securitiestransferchargefrontend.domain.UserId
 import uk.gov.hmrc.securitiestransferchargefrontend.repositories.SessionRepository
 
 import scala.concurrent.{ExecutionContext, Future}
@@ -36,7 +37,7 @@ class StcDataRetrievalActionImpl @Inject()(
   override protected def transform[A](
                                        request: StcAuthorisedRequest[A]
                                      ): Future[StcOptionalDataRequest[A]] =
-    sessionRepository.get(request.internalId).map { answers =>
+    sessionRepository.get(UserId(request.internalId)).map { answers =>
       StcOptionalDataRequest(request, answers)
     }
 }

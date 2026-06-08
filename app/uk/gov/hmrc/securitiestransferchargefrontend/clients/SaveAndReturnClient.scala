@@ -24,7 +24,7 @@ import uk.gov.hmrc.http.HttpReads.Implicits.*
 import uk.gov.hmrc.http.client.HttpClientV2
 import uk.gov.hmrc.http.{HeaderCarrier, HttpResponse, StringContextOps}
 import uk.gov.hmrc.securitiestransferchargefrontend.config.FrontendAppConfig
-import uk.gov.hmrc.securitiestransferchargefrontend.domain.SubmissionId
+import uk.gov.hmrc.securitiestransferchargefrontend.domain.{SubmissionId, UserId}
 import uk.gov.hmrc.securitiestransferchargefrontend.models.UserAnswers
 
 import javax.inject.Inject
@@ -35,9 +35,9 @@ import scala.util.Failure
 trait SaveAndReturnClient:
   def save(userAnswers: UserAnswers)(implicit hc: HeaderCarrier): Future[Unit]
 
-  def retrieve(userId: String, submissionId: SubmissionId)(implicit hc: HeaderCarrier): Future[UserAnswers]
+  def retrieve(userId: UserId, submissionId: SubmissionId)(implicit hc: HeaderCarrier): Future[UserAnswers]
 
-  def list(userId: String)(implicit hc: HeaderCarrier): Future[List[SubmissionId]]
+  def list(userId: UserId)(implicit hc: HeaderCarrier): Future[List[SubmissionId]]
 
 
 class SaveAndReturnClientImpl @Inject(http: HttpClientV2, config: FrontendAppConfig)(implicit ec: ExecutionContext) extends SaveAndReturnClient with Logging {
@@ -64,7 +64,7 @@ class SaveAndReturnClientImpl @Inject(http: HttpClientV2, config: FrontendAppCon
   }
 
   override def retrieve(
-                         userId: String,
+                         userId: UserId,
                          submissionId: SubmissionId
                        )(implicit hc: HeaderCarrier): Future[UserAnswers] = {
 
@@ -76,14 +76,14 @@ class SaveAndReturnClientImpl @Inject(http: HttpClientV2, config: FrontendAppCon
       }
   }
 
-  override def list(userId: String)(implicit hc: HeaderCarrier): Future[List[SubmissionId]] = {
+  override def list(userId: UserId)(implicit hc: HeaderCarrier): Future[List[SubmissionId]] = {
 
     http
       .get(url"$userAnswersPath/$userId")
       .execute[List[SubmissionId]]
       .andThen {
         case Failure(e) =>
-          logger.error(s"Failed to retrieve submissionIds for userId=$userId", e)
+          logger.error(s"Failed to retrieve submissionIds for userId=${userId.value}", e)
       }
   }
 

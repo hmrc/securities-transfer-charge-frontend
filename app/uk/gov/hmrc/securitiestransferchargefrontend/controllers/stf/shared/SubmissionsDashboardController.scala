@@ -23,6 +23,7 @@ import uk.gov.hmrc.auth.core.AffinityGroup
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import uk.gov.hmrc.securitiestransferchargefrontend.clients.{SaveAndReturnClient, SubmissionIdClient}
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.actions.{StcAuthEnrolledAction, StcDataRetrievalAction}
+import uk.gov.hmrc.securitiestransferchargefrontend.domain.{GroupIdentifier, UserId}
 import uk.gov.hmrc.securitiestransferchargefrontend.models.audit.AuditModel
 import uk.gov.hmrc.securitiestransferchargefrontend.models.audit.JourneyStatus.StartSubmission
 import uk.gov.hmrc.securitiestransferchargefrontend.models.{NormalMode, UserAnswers}
@@ -51,7 +52,7 @@ class SubmissionsDashboardController @Inject()(
   def onPageLoad(): Action[AnyContent] =
     (stcAuthEnrolled andThen getData).async { implicit request =>
 
-      val userId = request.request.internalId
+      val userId = UserId(request.request.internalId)
 
       saveAndReturnClient.list(userId).map { submissionIds =>
         Ok(view(submissionIds))
@@ -63,11 +64,12 @@ class SubmissionsDashboardController @Inject()(
     implicit request =>
 
       val innerRequest = request.request
-      val userId = innerRequest.internalId
+      val userId = UserId(innerRequest.internalId)
+      val group = GroupIdentifier(innerRequest.groupIdenfifier)
 
       for {
         submissionId <- idClient.nextSubmissionId()
-        emptyAnswers = UserAnswers.empty(userId)(submissionId)
+        emptyAnswers = UserAnswers.empty(userId)(group)(submissionId)
 
         call <- innerRequest.affinityGroup match {
           case AffinityGroup.Organisation =>
