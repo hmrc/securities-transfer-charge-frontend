@@ -23,6 +23,7 @@ import uk.gov.hmrc.securitiestransferchargefrontend.connectors.UpscanInitiateCon
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.actions.*
 import uk.gov.hmrc.securitiestransferchargefrontend.models.stf.upscan.*
 import uk.gov.hmrc.securitiestransferchargefrontend.repositories.UpscanJourneyRepository
+import uk.gov.hmrc.securitiestransferchargefrontend.services.fileupload.processing.FileProcessingRefreshCounterFactory
 import uk.gov.hmrc.securitiestransferchargefrontend.views.html.stf.shared.bulk.FileUploadView
 
 import javax.inject.Inject
@@ -34,25 +35,25 @@ class FileUploadController @Inject()(
                                       val controllerComponents: MessagesControllerComponents,
                                       view: FileUploadView,
                                       upscanInitiateConnector: UpscanInitiateConnector,
-                                      upscanJourneyRepository: UpscanJourneyRepository
+                                      upscanJourneyRepository: UpscanJourneyRepository,
+                                      fileProcessingRefreshCounterFactory: FileProcessingRefreshCounterFactory,
+
                                     )(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport {
 
   def onPageLoad(): Action[AnyContent] = stcAuthEnrolled.async { implicit request =>
     prepareUpload().map { response =>
-      Ok(view(response.uploadRequest))
+      val uploadView = view(response.uploadRequest)
+      val counter = fileProcessingRefreshCounterFactory(request)
+      counter.reset(Ok(uploadView))
     }
   }
 
   def onUploadError(): Action[AnyContent] = stcAuthEnrolled.async { implicit request =>
 
-    val maybeError = UpscanUploadError.errorMessage(request)
-
     val removeOldDocument = request.getQueryString("key").map(upscanJourneyRepository.delete).getOrElse(Future.unit)
-
     for {
-      _<- removeOldDocument
-      initiateResponse <- prepareUpload()
-    } yield BadRequest(view(initiateResponse.uploadRequest, maybeError))
+      _ <- removeOldDocument.recover { case _ => () }
+    } yield Redirect(routes.BulkUploadErrorController.onPageLoad())
 
   }
 

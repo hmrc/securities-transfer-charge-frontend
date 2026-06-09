@@ -180,7 +180,6 @@ GET        /stf/bulk-empty                                uk.gov.hmrc.securities
 GET        /stf/bulk-error-list/:reference                uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.shared.bulk.UploadedFileErrorController.onPageLoad(reference: String)
 
 GET        /stf/upload-template                           uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.shared.bulk.FileUploadController.onPageLoad()
-GET        /stf/file-uploaded                             uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.shared.bulk.FileUploadedController.onPageLoad(key:String)
 GET        /stf/upload-template/problem                   uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.shared.bulk.FileUploadController.onUploadError()
 POST       /stf/upscan-callback                           uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.shared.bulk.UpscanCallbackController.callback()
 
@@ -248,7 +247,7 @@ POST       /stf/agent/securities-type                           uk.gov.hmrc.secu
 GET        /stf/agent/change/securities-type                    uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.agents.single.WhatTypeOfSecuritiesController.onPageLoad(mode: Mode = CheckMode)
 POST       /stf/agent/change/securities-type                    uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.agents.single.WhatTypeOfSecuritiesController.onSubmit(mode: Mode = CheckMode)
 
-GET        /stf/bulk-processing                             uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.shared.bulk.FileProcessingController.onPageLoad()
+GET        /stf/bulk-processing                             uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.shared.bulk.FileProcessingController.onPageLoad(key: String)
 GET        /stf/bulk-processing-timeout                     uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.shared.bulk.FileProcessingController.onTimeout()
 
 GET        /stf/agent/share-details                             uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.agents.single.DetailsOfThisTransferController.onPageLoad(mode: Mode = NormalMode)

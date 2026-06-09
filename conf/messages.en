@@ -375,11 +375,6 @@ fileUpload.redirectError.EntityTooLarge = The selected file must be smaller than
 fileUpload.redirectError.generic = The selected file could not be uploaded – try again
 fileUpload.redirectError.InvalidArgument = The selected file must be a .csv or a .xlsx
 
-fileUploaded.title = File uploaded
-fileUploaded.heading = File uploaded
-fileUploaded.reference = File reference
-fileUploaded.status = Status
-
 org.templateInstructions.title = How to use the template
 org.templateInstructions.heading = How to use the template
 org.templateInstructions.p1 = Use the template to tell us about more than one securities transfer at a time.
@@ -506,8 +501,8 @@ org.fileUpload.error.whatTypeOfSecurities.required = Enter the type of securitie
 individual.fileUpload.error.typeOfShares.required = If you are buying shares, enter the type of shares
 org.fileUpload.error.typeOfShares.required = If the business is buying shares, enter the type of shares
 
-individual.error.typeOfShares.maxLength = The type of shares you are buying must be 255 characters or fewer
-org.error.typeOfShares.maxLength = The type of shares the business is purchasing must be 255 characters or fewer
+individual.fileUpload.error.typeOfShares.maxLength = The type of shares you are buying must be 255 characters or fewer
+org.fileUpload.error.typeOfShares.maxLength = The type of shares the business is purchasing must be 255 characters or fewer
 
 individual.fileUpload.error.securitiesQuantity.required = Enter the number of shares you are buying
 individual.fileUpload.error.securitiesQuantity.nonNumeric = The amount of shares you are buying must be a number
