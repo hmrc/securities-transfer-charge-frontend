@@ -26,9 +26,6 @@ final case class StcFileValidationResponse(
   val hasBlockingErrors: Boolean =
     rows.exists(_.hasBlockingErrors)
 
-  val hasErrors: Boolean =
-    rows.exists(_.hasErrors)
-
   val validRows: Seq[ParsedStcRow] =
     rows.filterNot(_.hasBlockingErrors).map(_.parsedRow)
 
@@ -40,9 +37,6 @@ final case class StcFileValidationResponse(
 
   lazy val blockingErrors: Seq[StcRowValidationError] =
     if (tooManyBlockingErrors) Seq.empty else allBlockingErrors.toList
-
-  lazy val nonBlockingErrors: Seq[StcRowValidationError] =
-    rows.flatMap(_.validationErrors.filterNot(_.blocking))
 }
 
 object StcFileValidationResponse {

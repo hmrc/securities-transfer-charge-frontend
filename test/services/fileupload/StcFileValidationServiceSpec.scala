@@ -129,7 +129,6 @@ class StcFileValidationServiceSpec extends SpecBase {
 
       response.rows mustBe Seq(validatedRow1, validatedRow2)
       response.maxErrorsAllowed mustBe 25
-      response.hasErrors mustBe true
       response.hasBlockingErrors mustBe true
       response.validRows mustBe Seq(validatedRow1.parsedRow)
     }
