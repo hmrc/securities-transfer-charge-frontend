@@ -109,6 +109,8 @@ class FileProcessingController @Inject()(
 
       case UpscanJourneyStatus.Failed if isVirusFailure(fileUpload) => Future.successful(Redirect(routes.BulkUploadVirusErrorController.onPageLoad()))
 
+      case UpscanJourneyStatus.Failed if isInvalidFileTypeFailure(fileUpload) => Future.successful(Redirect(routes.FileTypeErrorController.onPageLoad()))
+
       case UpscanJourneyStatus.Failed  => Future.successful(Redirect(routes.BulkUploadErrorController.onPageLoad()))
 
       case UpscanJourneyStatus.Completed => Future.successful(Redirect(JourneyRecoveryController.onPageLoad()))
