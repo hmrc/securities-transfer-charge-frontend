@@ -21,6 +21,7 @@ import org.apache.poi.ss.usermodel.{Cell, CellType, DateUtil, Row, Workbook}
 import uk.gov.hmrc.securitiestransferchargefrontend.config.FileUploadConfig
 import uk.gov.hmrc.securitiestransferchargefrontend.models.stf.fileupload.FileParseError.{InvalidXlsx, MissingWorksheet}
 import uk.gov.hmrc.securitiestransferchargefrontend.models.stf.fileupload.{FileParseError, ParsedCell, ParsedRow, UploadedFile}
+import uk.gov.hmrc.securitiestransferchargefrontend.config.FrontendAppConfig
 
 import java.time.ZoneId
 import java.time.format.DateTimeFormatter
@@ -28,7 +29,7 @@ import javax.inject.{Inject, Singleton}
 import scala.jdk.CollectionConverters.*
 
 @Singleton
-class ExcelFileParser @Inject()(config: FileUploadConfig) extends FileParser {
+class ExcelFileParser @Inject()(config: FileUploadConfig, appConfig: FrontendAppConfig) extends FileParser {
 
   private val dateFormatter = DateTimeFormatter.ISO_LOCAL_DATE
 
@@ -40,8 +41,8 @@ class ExcelFileParser @Inject()(config: FileUploadConfig) extends FileParser {
   override def withParsedStream[A](file: UploadedFile)(block: (Seq[String], Iterator[ParsedRow]) => Either[FileParseError, A]): Either[FileParseError, A] = {
     try {
       val workbook: Workbook = StreamingReader.builder()
-        .rowCacheSize(100)
-        .bufferSize(4096)
+        .rowCacheSize(appConfig.rowCacheSize)
+        .bufferSize(appConfig.bufferSizeBytes)
         .open(file.inputStream)
 
       try {

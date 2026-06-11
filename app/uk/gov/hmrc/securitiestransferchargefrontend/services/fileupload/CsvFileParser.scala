@@ -29,6 +29,8 @@ import scala.jdk.CollectionConverters.*
 @Singleton
 class CsvFileParser @Inject()(config: FileUploadConfig) extends FileParser {
 
+  private val byteOrderMark = "\uFEFF"
+
   private def isEmptyRecord(record: CSVRecord): Boolean =
     record.iterator().asScala.forall(_.trim.isEmpty)
 
@@ -48,7 +50,7 @@ class CsvFileParser @Inject()(config: FileUploadConfig) extends FileParser {
 
           val headers: Seq[String] = (0 until config.maxColumns).map { colIndex =>
             val rawValue = headerValues.lift(colIndex).getOrElse("").trim
-            if (colIndex == 0) rawValue.replace("\uFEFF", "") else rawValue
+            if (colIndex == 0) rawValue.replace(byteOrderMark, "") else rawValue
           }
 
           val lazyParsedRows = rowIterator.zipWithIndex.map { case (record, index) =>

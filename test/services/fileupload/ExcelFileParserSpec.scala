@@ -20,6 +20,9 @@ import org.apache.poi.xssf.usermodel.XSSFWorkbook
 import org.scalatest.EitherValues
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpec
+import org.scalatestplus.mockito.MockitoSugar
+import org.mockito.Mockito.when
+import uk.gov.hmrc.securitiestransferchargefrontend.config.FrontendAppConfig
 import uk.gov.hmrc.securitiestransferchargefrontend.models.stf.fileupload.{FileParseError, ParsedCell, ParsedRow, UploadedFile}
 import uk.gov.hmrc.securitiestransferchargefrontend.services.fileupload.ExcelFileParser
 
@@ -27,10 +30,15 @@ import java.io.{ByteArrayInputStream, ByteArrayOutputStream}
 import java.time.{LocalDate, ZoneId}
 import java.util.Date
 
-class ExcelFileParserSpec extends AnyWordSpec with Matchers with EitherValues {
+class ExcelFileParserSpec extends AnyWordSpec with Matchers with EitherValues with MockitoSugar {
 
   private val maxColumns = 27
-  private val parser = new ExcelFileParser(TestFileUploadConfig.config())
+
+  private val mockAppConfig = mock[FrontendAppConfig]
+  when(mockAppConfig.rowCacheSize).thenReturn(100)
+  when(mockAppConfig.bufferSizeBytes).thenReturn(4096)
+
+  private val parser = new ExcelFileParser(TestFileUploadConfig.config(), mockAppConfig)
 
   private def workbookBytes(build: XSSFWorkbook => Unit): Array[Byte] = {
     val workbook = new XSSFWorkbook()
