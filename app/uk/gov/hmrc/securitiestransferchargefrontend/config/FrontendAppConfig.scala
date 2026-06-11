@@ -121,6 +121,10 @@ class FrontendAppConfig @Inject() (configuration: Configuration, servicesConfig:
   val upscanUploadSuccessfulUrl: String = s"$host$basePath/stf/bulk-processing"
   val upscanUploadFailureUrl: String = s"$host$basePath/stf/upload-template/problem"
 
+  // File streamer
+  val rowCacheSize: Int = configuration.get[Int]("file-upload.xlsx.row-cache-size")
+  val bufferSizeBytes: Int = configuration.get[Int]("file-upload.xlsx.buffer-size-bytes")
+
   // Refresh
   val spinnerPageRefreshInterval: Int = configuration.get[Int]("page-refresh.spinner.interval")
   val spinnerPageRefreshTimeout: Int = configuration.get[Int]("page-refresh.spinner.timeout")

@@ -52,13 +52,6 @@ class StcUploadParsingServiceSpec extends AnyWordSpec with Matchers with EitherV
     row3Hash = hashRow(validRow3Cells)
   )
 
-  private val fileParsingService = mock[FileParsingService]
-
-  private val service = new StcUploadParsingService(
-    fileUploadConfig = fileUploadConfig,
-    fileParsingService = fileParsingService
-  )
-
   private val uploadedFile = UploadedFile(
     fileName = "test.xlsx",
     mimeType = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
@@ -67,147 +60,105 @@ class StcUploadParsingServiceSpec extends AnyWordSpec with Matchers with EitherV
 
   private val testAffinityGroup = "individual"
 
-  "parse" should {
+  trait Setup {
+    val fileParsingService: FileParsingService = mock[FileParsingService]
 
-    "skip template rows before firstDataRow and drop completely empty rows" in {
-      val dataRow = ParsedRow(
-        4,
-        Seq(
-          ParsedCell(1, "10 Downing Street"),
-          ParsedCell(7, "Bob Seller")
-        )
-      )
+    val service = new StcUploadParsingService(
+      fileUploadConfig = fileUploadConfig,
+      fileParsingService = fileParsingService
+    )
 
-      val emptyDataRow = ParsedRow(
-        5,
-        Seq(
-          ParsedCell(1, ""),
-          ParsedCell(7, " ")
-        )
-      )
+    def mockStream(headers: Seq[String], rows: Seq[ParsedRow]): Unit = {
+      when(fileParsingService.withParsedStream[Seq[ParsedRow]](any[UploadedFile])(any()))
+        .thenAnswer { invocation =>
+          val block = invocation.getArgument(1).asInstanceOf[(Seq[String], Iterator[ParsedRow]) => Either[FileParseError, Seq[ParsedRow]]]
+          block(headers, rows.iterator)
+        }
+    }
+  }
 
-      val parsedFile = ParsedFile(
-        fileName = "test.xlsx",
-        mimeType = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-        headers = validRow1Cells,
-        rows = Seq(validRow2, validRow3, dataRow, emptyDataRow)
-      )
+  "withVerifiedTemplateStream" should {
 
-      when(fileParsingService.parse(any[UploadedFile])).thenReturn(Right(parsedFile))
+    "skip template rows before firstDataRow and drop completely empty rows" in new Setup {
+      val dataRow = ParsedRow(4, Seq(ParsedCell(1, "10 Downing Street"), ParsedCell(7, "Bob Seller")))
+      val emptyDataRow = ParsedRow(5, Seq(ParsedCell(1, ""), ParsedCell(7, " ")))
 
-      val result = service.parse(uploadedFile, testAffinityGroup)
+      mockStream(validRow1Cells, Seq(validRow2, validRow3, dataRow, emptyDataRow))
 
-      result.value.rows mustBe Seq(dataRow)
-      verify(fileParsingService).parse(uploadedFile)
+      val result: Either[FileParseError, List[ParsedRow]] = service.withVerifiedTemplateStream(uploadedFile, testAffinityGroup) { (_, stream) =>
+        Right(stream.toList)
+      }
+
+      result.value mustBe Seq(dataRow)
+      verify(fileParsingService).withParsedStream[Seq[ParsedRow]](any[UploadedFile])(any())
     }
 
-    "keep multiple non-empty data rows from firstDataRow onwards" in {
+    "keep multiple non-empty data rows from firstDataRow onwards" in new Setup {
       val dataRow1 = ParsedRow(4, Seq(ParsedCell(7, "Seller 1")))
       val dataRow2 = ParsedRow(5, Seq(ParsedCell(7, "Seller 2")))
 
-      val parsedFile = ParsedFile(
-        "test.xlsx",
-        "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-        headers = validRow1Cells,
-        rows = Seq(
-          validRow2,
-          validRow3,
-          dataRow1,
-          dataRow2
-        )
-      )
+      mockStream(validRow1Cells, Seq(validRow2, validRow3, dataRow1, dataRow2))
 
-      when(fileParsingService.parse(any[UploadedFile])).thenReturn(Right(parsedFile))
+      val result: Either[FileParseError, List[ParsedRow]] = service.withVerifiedTemplateStream(uploadedFile, testAffinityGroup) { (_, stream) =>
+        Right(stream.toList)
+      }
 
-      val result = service.parse(uploadedFile, testAffinityGroup)
-
-      result.value.rows mustBe Seq(dataRow1, dataRow2)
+      result.value mustBe Seq(dataRow1, dataRow2)
     }
 
-    "return EmptyFile when there are no data rows after filtering" in {
-      val parsedFile = ParsedFile(
-        "test.xlsx",
-        "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-        headers = validRow1Cells,
-        rows = Seq(
-          validRow2,
-          validRow3,
-          ParsedRow(4, Seq(ParsedCell(1, ""))),
-          ParsedRow(5, Seq(ParsedCell(1, " ")))
-        )
-      )
+    "return EmptyFile when there are no data rows after filtering" in new Setup {
+      mockStream(validRow1Cells, Seq(validRow2, validRow3, ParsedRow(4, Seq(ParsedCell(1, ""))), ParsedRow(5, Seq(ParsedCell(1, " ")))))
 
-      when(fileParsingService.parse(any[UploadedFile])).thenReturn(Right(parsedFile))
+      val result: Either[FileParseError, List[ParsedRow]] = service.withVerifiedTemplateStream(uploadedFile, testAffinityGroup) { (_, stream) => Right(stream.toList) }
 
-      service.parse(uploadedFile, testAffinityGroup) mustBe Left(FileParseError.EmptyFile)
+      result mustBe Left(FileParseError.EmptyFile)
     }
 
-    "return EmptyFile when the parsed file contains only template rows" in {
-      val parsedFile = ParsedFile(
-        "test.xlsx",
-        "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-        headers = validRow1Cells,
-        rows = Seq(
-          validRow2,
-          validRow3
-        )
-      )
+    "return EmptyFile when the parsed file contains only template rows" in new Setup {
+      mockStream(validRow1Cells, Seq(validRow2, validRow3))
 
-      when(fileParsingService.parse(any[UploadedFile])).thenReturn(Right(parsedFile))
+      val result: Either[FileParseError, List[ParsedRow]] = service.withVerifiedTemplateStream(uploadedFile, testAffinityGroup) { (_, stream) => Right(stream.toList) }
 
-      service.parse(uploadedFile, testAffinityGroup) mustBe Left(FileParseError.EmptyFile)
+      result mustBe Left(FileParseError.EmptyFile)
     }
 
-    "return InvalidTemplate when row 1 (headers) hash does not match" in {
-      val invalidHeaders = Seq("InvalidHeader1", "Header2")
+    "return InvalidTemplate when row 1 (headers) hash does not match" in new Setup {
+      val invalidHeaders: Seq[String] = Seq("InvalidHeader1", "Header2")
 
-      val parsedFile = ParsedFile(
-        "test.xlsx",
-        "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-        headers = invalidHeaders,
-        rows = Seq(validRow2, validRow3, ParsedRow(4, Seq(ParsedCell(1, "Data"))))
-      )
+      mockStream(invalidHeaders, Seq(validRow2, validRow3, ParsedRow(4, Seq(ParsedCell(1, "Data")))))
 
-      when(fileParsingService.parse(any[UploadedFile])).thenReturn(Right(parsedFile))
+      val result: Either[FileParseError, List[ParsedRow]] = service.withVerifiedTemplateStream(uploadedFile, testAffinityGroup) { (_, stream) => Right(stream.toList) }
 
-      service.parse(uploadedFile, testAffinityGroup) mustBe Left(FileParseError.InvalidTemplate)
+      result mustBe Left(FileParseError.InvalidTemplate)
     }
 
-    "return InvalidTemplate when row 2 hash does not match" in {
+    "return InvalidTemplate when row 2 hash does not match" in new Setup {
       val invalidRow2 = ParsedRow(2, Seq(ParsedCell(0, "Invalid Question"), ParsedCell(1, "Question 2")))
 
-      val parsedFile = ParsedFile(
-        "test.xlsx",
-        "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-        headers = validRow1Cells,
-        rows = Seq(invalidRow2, validRow3, ParsedRow(4, Seq(ParsedCell(1, "Data"))))
-      )
+      mockStream(validRow1Cells, Seq(invalidRow2, validRow3, ParsedRow(4, Seq(ParsedCell(1, "Data")))))
 
-      when(fileParsingService.parse(any[UploadedFile])).thenReturn(Right(parsedFile))
+      val result: Either[FileParseError, List[ParsedRow]] = service.withVerifiedTemplateStream(uploadedFile, testAffinityGroup) { (_, stream) => Right(stream.toList) }
 
-      service.parse(uploadedFile, testAffinityGroup) mustBe Left(FileParseError.InvalidTemplate)
+      result mustBe Left(FileParseError.InvalidTemplate)
     }
 
-    "return InvalidTemplate when row 3 hash does not match" in {
+    "return InvalidTemplate when row 3 hash does not match" in new Setup {
       val invalidRow3 = ParsedRow(3, Seq(ParsedCell(0, "Invalid Hint"), ParsedCell(1, "Hint 2")))
 
-      val parsedFile = ParsedFile(
-        "test.xlsx",
-        "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-        headers = validRow1Cells,
-        rows = Seq(validRow2, invalidRow3, ParsedRow(4, Seq(ParsedCell(1, "Data"))))
-      )
+      mockStream(validRow1Cells, Seq(validRow2, invalidRow3, ParsedRow(4, Seq(ParsedCell(1, "Data")))))
 
-      when(fileParsingService.parse(any[UploadedFile])).thenReturn(Right(parsedFile))
+      val result: Either[FileParseError, List[ParsedRow]] = service.withVerifiedTemplateStream(uploadedFile, testAffinityGroup) { (_, stream) => Right(stream.toList) }
 
-      service.parse(uploadedFile, testAffinityGroup) mustBe Left(FileParseError.InvalidTemplate)
+      result mustBe Left(FileParseError.InvalidTemplate)
     }
 
-    "propagate file parsing errors" in {
-      when(fileParsingService.parse(any[UploadedFile]))
+    "propagate file parsing errors" in new Setup {
+      when(fileParsingService.withParsedStream[Seq[ParsedRow]](any[UploadedFile])(any()))
         .thenReturn(Left(FileParseError.InvalidXlsx("broken workbook")))
 
-      service.parse(uploadedFile, testAffinityGroup) mustBe Left(FileParseError.InvalidXlsx("broken workbook"))
+      val result: Either[FileParseError, List[ParsedRow]] = service.withVerifiedTemplateStream(uploadedFile, testAffinityGroup) { (_, stream) => Right(stream.toList) }
+
+      result mustBe Left(FileParseError.InvalidXlsx("broken workbook"))
     }
   }
 }

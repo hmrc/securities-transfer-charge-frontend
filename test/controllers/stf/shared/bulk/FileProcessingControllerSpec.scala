@@ -436,5 +436,26 @@ class FileProcessingControllerSpec extends SpecBase with MockitoSugar {
         redirectLocation(result).value mustEqual JourneyRecoveryController.onPageLoad().url
       }
     }
+
+    "must redirect for a failed upload (Invalid file type)" in {
+
+      val counter = mockCounter()
+      val repository = mock[UpscanJourneyRepository]
+      val service = mock[ProcessingService]
+
+      val upload = fakeUpload(UpscanJourneyStatus.Failed).copy(failureReason = Some("REJECTED"), message = Some("mime type"))
+
+      when(repository.find(reference)).thenReturn(Future.successful(Some(upload)))
+
+      val app = buildApp(counter, repository, service)
+
+      running(app) {
+
+        val result = route(app, FakeRequest(GET, routes.FileProcessingController.onPageLoad(reference).url)).value
+
+        status(result) mustEqual SEE_OTHER
+        redirectLocation(result).value mustEqual routes.FileTypeErrorController.onPageLoad().url
+      }
+    }
   }
 }
