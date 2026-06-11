@@ -16,17 +16,23 @@
 
 package uk.gov.hmrc.securitiestransferchargefrontend.services.fileupload
 
+import uk.gov.hmrc.securitiestransferchargefrontend.config.FileUploadConfig
+import uk.gov.hmrc.securitiestransferchargefrontend.models.stf.fileupload.{FileParseError, ParsedRow, StcFileValidationResponse}
+
 import javax.inject.{Inject, Singleton}
-import uk.gov.hmrc.securitiestransferchargefrontend.models.stf.fileupload.{ParsedRow, StcFileValidationResponse}
 
 @Singleton
 class StcFileValidationService @Inject()(
+                                          config: FileUploadConfig,
                                           stcRowValidationService: StcRowValidationService
                                         ) {
 
-  def validate(rows: Seq[ParsedRow], headers: Seq[String], affinityKey:String): StcFileValidationResponse = {
-    StcFileValidationResponse(
-      rows = stcRowValidationService.validateAll(rows, headers, affinityKey)
-    )
+  def validateStream(rowStream: Iterator[ParsedRow], headers: Seq[String], affinityKey: String): Either[FileParseError, StcFileValidationResponse] = {
+    stcRowValidationService.validateStream(rowStream, headers, affinityKey, config.maxErrorsAllowed, config.maxRows).map { rows =>
+      StcFileValidationResponse(
+        rows = rows,
+        maxErrorsAllowed = config.maxErrorsAllowed
+      )
+    }
   }
 }

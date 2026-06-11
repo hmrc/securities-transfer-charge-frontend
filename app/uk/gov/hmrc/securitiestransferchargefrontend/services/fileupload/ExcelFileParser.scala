@@ -16,95 +16,78 @@
 
 package uk.gov.hmrc.securitiestransferchargefrontend.services.fileupload
 
+import com.github.pjfanning.xlsx.StreamingReader
+import org.apache.poi.ss.usermodel.{Cell, CellType, DateUtil, Row, Workbook}
 import uk.gov.hmrc.securitiestransferchargefrontend.config.FileUploadConfig
-import org.apache.poi.ss.usermodel.{Cell, CellType, DateUtil, Row}
-import org.apache.poi.xssf.usermodel.XSSFWorkbook
-import uk.gov.hmrc.securitiestransferchargefrontend.models.stf.fileupload.FileParseError.{InvalidXlsx, MissingWorksheet, RowLimitExceeded}
-import uk.gov.hmrc.securitiestransferchargefrontend.models.stf.fileupload.{FileParseError, ParsedCell, ParsedFile, ParsedRow, UploadedFile}
+import uk.gov.hmrc.securitiestransferchargefrontend.models.stf.fileupload.FileParseError.{InvalidXlsx, MissingWorksheet}
+import uk.gov.hmrc.securitiestransferchargefrontend.models.stf.fileupload.{FileParseError, ParsedCell, ParsedRow, UploadedFile}
+import uk.gov.hmrc.securitiestransferchargefrontend.config.FrontendAppConfig
 
 import java.time.ZoneId
 import java.time.format.DateTimeFormatter
 import javax.inject.{Inject, Singleton}
 import scala.jdk.CollectionConverters.*
-import scala.util.Try
 
 @Singleton
-class ExcelFileParser @Inject()(config: FileUploadConfig) extends FileParser {
-
-  private def isEmptyRow(row: Row): Boolean =
-    row.cellIterator().asScala.forall { cell =>
-      cell.toString.trim.isEmpty
-    }
+class ExcelFileParser @Inject()(config: FileUploadConfig, appConfig: FrontendAppConfig) extends FileParser {
 
   private val dateFormatter = DateTimeFormatter.ISO_LOCAL_DATE
 
-  override def parse(file: UploadedFile): Either[FileParseError, ParsedFile] =
-    Try {
-      val workbook = new XSSFWorkbook(file.inputStream)
+  private def isEmptyRow(row: Row): Boolean =
+    row.cellIterator().asScala.forall { cell =>
+      extractCellValue(cell).isEmpty
+    }
+
+  override def withParsedStream[A](file: UploadedFile)(block: (Seq[String], Iterator[ParsedRow]) => Either[FileParseError, A]): Either[FileParseError, A] = {
+    try {
+      val workbook: Workbook = StreamingReader.builder()
+        .rowCacheSize(appConfig.rowCacheSize)
+        .bufferSize(appConfig.bufferSizeBytes)
+        .open(file.inputStream)
 
       try {
-        val sheet =
-          Option(workbook.getSheet(config.expectedWorksheetName))
-            .orElse(Option(workbook.getSheetAt(0)))
-            .toRight(MissingWorksheet(config.expectedWorksheetName))
+        val sheet = Option(workbook.getSheet(config.expectedWorksheetName))
+          .orElse(Option(workbook.getSheetAt(0)))
+          .toRight(MissingWorksheet(config.expectedWorksheetName))
 
-        sheet.flatMap { worksheet =>
-          val allRows =  worksheet.iterator().asScala.toSeq.filterNot(isEmptyRow)
+        sheet match {
+          case Left(error) => Left(error)
+          case Right(worksheet) =>
+            val rowIterator = worksheet.iterator().asScala.filterNot(isEmptyRow)
 
-          if (allRows.isEmpty) {
-            Left(InvalidXlsx("The file is empty"))
-          } else if (allRows.size > config.maxRows) {
-            Left(RowLimitExceeded(allRows.size, config.maxRows))
-          } else {
-
-            val headerRow = allRows.head
-
-            val headers =
-              (0 until config.maxColumns).map { i =>
-                Option(headerRow.getCell(i))
-                  .map(extractCellValue)
-                  .getOrElse("")
-                  .trim
+            if (!rowIterator.hasNext) {
+              Left(InvalidXlsx("The file is empty or only contains empty rows"))
+            } else {
+              val headerRow = rowIterator.next()
+              val headers = (0 until config.maxColumns).map { i =>
+                Option(headerRow.getCell(i)).map(extractCellValue).getOrElse("").trim
               }
 
-            val dataRows = allRows.tail
+              val lazyParsedRows = rowIterator.map { row =>
+                ParsedRow(
+                  rowNumber = row.getRowNum + 1,
+                  cells = (0 until config.maxColumns).map { i =>
+                    val value = Option(row.getCell(i)).map(extractCellValue).getOrElse("").trim
+                    ParsedCell(i, value)
+                  }
+                )
+              }
 
-            val parsedRows = dataRows.map { row =>
-              ParsedRow(
-                rowNumber = row.getRowNum + 1,
-                cells = (0 until config.maxColumns).map { i =>
-                  val value = Option(row.getCell(i))
-                    .map(extractCellValue)
-                    .getOrElse("")
-                    .trim
-
-                  ParsedCell(i, value)
-                }
-              )
+              block(headers, lazyParsedRows)
             }
-
-            Right(
-              ParsedFile(
-                fileName = file.fileName,
-                mimeType = file.mimeType,
-                headers = headers,
-                rows = parsedRows
-              )
-            )
-          }
         }
       } finally {
         workbook.close()
         file.inputStream.close()
       }
-    }.getOrElse {
-      Left(InvalidXlsx(s"Unable to parse file ${file.fileName}"))
+    } catch {
+      case _: Exception => Left(InvalidXlsx(s"Unable to parse file ${file.fileName}"))
     }
+  }
 
   private def extractCellValue(cell: Cell): String =
     cell.getCellType match {
       case CellType.STRING => cell.getStringCellValue
-
       case CellType.NUMERIC =>
         if (DateUtil.isCellDateFormatted(cell)) {
           cell.getDateCellValue.toInstant
@@ -133,7 +116,6 @@ class ExcelFileParser @Inject()(config: FileUploadConfig) extends FileParser {
           case CellType.BOOLEAN => cell.getBooleanCellValue.toString
           case _                => ""
         }
-
       case CellType.BLANK => ""
       case _              => ""
     }

@@ -23,8 +23,6 @@ final case class ValidatedStcRow(
                                   validationErrors: Seq[StcRowValidationError]
                                 ) {
   val hasBlockingErrors: Boolean = validationErrors.exists(_.blocking)
-
-  val hasErrors: Boolean = validationErrors.nonEmpty
 }
 
 object ValidatedStcRow {

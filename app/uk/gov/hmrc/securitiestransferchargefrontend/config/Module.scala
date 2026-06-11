@@ -67,7 +67,6 @@ class Module extends AbstractModule {
     bind(classOf[ChecksumRepository]).to(classOf[ChecksumRepositoryImpl])
     bind(classOf[RegistrationClient]).to(classOf[RegistrationClientImpl]).asEagerSingleton()
     bind(classOf[AnswerPersistenceService]).to(classOf[AnswerPersistenceServiceImpl])
-    bind(classOf[UpscanFileDownloadService]).to(classOf[UpscanFileDownloadServiceImpl])
     bind(classOf[StcUpscanProcessingService]).to(classOf[StcUpscanProcessingServiceImpl])
     bind(classOf[Navigator])
       .annotatedWith(Names.named("organisations"))

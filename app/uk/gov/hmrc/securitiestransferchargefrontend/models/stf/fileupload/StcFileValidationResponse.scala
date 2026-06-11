@@ -19,25 +19,24 @@ package uk.gov.hmrc.securitiestransferchargefrontend.models.stf.fileupload
 import play.api.libs.json.{Json, OFormat}
 
 final case class StcFileValidationResponse(
-                                            rows: Seq[ValidatedStcRow]
+                                            rows: Seq[ValidatedStcRow],
+                                            maxErrorsAllowed: Int
                                           ) {
+
   val hasBlockingErrors: Boolean =
     rows.exists(_.hasBlockingErrors)
-
-  val hasErrors: Boolean =
-    rows.exists(_.hasErrors)
 
   val validRows: Seq[ParsedStcRow] =
     rows.filterNot(_.hasBlockingErrors).map(_.parsedRow)
 
-  val blockingErrors: Seq[StcRowValidationError] =
-    rows.flatMap(_.validationErrors.filter(_.blocking))
-
-  val nonBlockingErrors: Seq[StcRowValidationError] =
-    rows.flatMap(_.validationErrors.filterNot(_.blocking))
+  private def allBlockingErrors: Iterator[StcRowValidationError] =
+    rows.iterator.flatMap(_.validationErrors.filter(_.blocking))
 
   val tooManyBlockingErrors: Boolean =
-    blockingErrors.size >= 26
+    allBlockingErrors.take(maxErrorsAllowed + 1).size > maxErrorsAllowed
+
+  lazy val blockingErrors: Seq[StcRowValidationError] =
+    if (tooManyBlockingErrors) Seq.empty else allBlockingErrors.toList
 }
 
 object StcFileValidationResponse {

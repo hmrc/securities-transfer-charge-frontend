@@ -19,15 +19,17 @@ package services.fileupload
 import org.scalatest.EitherValues
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpec
-import uk.gov.hmrc.securitiestransferchargefrontend.services.fileupload.ExcelFileParser
-import uk.gov.hmrc.securitiestransferchargefrontend.services.fileupload.CsvFileParser
-import uk.gov.hmrc.securitiestransferchargefrontend.services.fileupload.FileParserSelector
+import org.scalatestplus.mockito.MockitoSugar
+import uk.gov.hmrc.securitiestransferchargefrontend.config.FrontendAppConfig
 import uk.gov.hmrc.securitiestransferchargefrontend.models.stf.fileupload.FileParseError.UnsupportedMimeType
+import uk.gov.hmrc.securitiestransferchargefrontend.services.fileupload.{CsvFileParser, ExcelFileParser, FileParserSelector}
 
-class FileParserSelectorSpec extends AnyWordSpec with Matchers with EitherValues {
+class FileParserSelectorSpec extends AnyWordSpec with Matchers with EitherValues with MockitoSugar {
+
+  private val mockAppConfig = mock[FrontendAppConfig]
 
   private val csvParser   = new CsvFileParser(TestFileUploadConfig.config())
-  private val excelParser = new ExcelFileParser(TestFileUploadConfig.config())
+  private val excelParser = new ExcelFileParser(TestFileUploadConfig.config(), mockAppConfig)
   private val selector    = new FileParserSelector(csvParser, excelParser)
 
   "select" should {

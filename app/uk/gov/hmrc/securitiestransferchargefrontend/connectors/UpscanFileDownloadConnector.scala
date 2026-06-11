@@ -17,13 +17,13 @@
 package uk.gov.hmrc.securitiestransferchargefrontend.connectors
 
 import org.apache.pekko.stream.Materializer
-import org.apache.pekko.util.ByteString
+import org.apache.pekko.stream.scaladsl.StreamConverters
 import play.api.Logging
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.http.StringContextOps
 import uk.gov.hmrc.http.client.{HttpClientV2, readSource}
 
-import java.io.{ByteArrayInputStream, InputStream}
+import java.io.InputStream
 import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -43,10 +43,8 @@ class UpscanFileDownloadConnectorImpl @Inject()(
     http
       .get(url"$downloadUrl")
       .stream()
-      .flatMap { source =>
-        source
-          .runFold(ByteString.empty)(_ ++ _)
-          .map(bytes => new ByteArrayInputStream(bytes.toArray): InputStream)
+      .map { source =>
+        source.runWith(StreamConverters.asInputStream())
       }
       .recoverWith {
         case ex =>
