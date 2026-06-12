@@ -24,9 +24,12 @@ import play.api.inject.bind
 import play.api.mvc.{Request, Result}
 import play.api.test.FakeRequest
 import play.api.test.Helpers.*
+import uk.gov.hmrc.auth.core.AffinityGroup
 import uk.gov.hmrc.securitiestransferchargefrontend.config.FrontendAppConfig
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.routes.JourneyRecoveryController
+import uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.agents.bulk.routes as bulkRoutes
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.shared.bulk.routes
+import uk.gov.hmrc.securitiestransferchargefrontend.models.NormalMode
 import uk.gov.hmrc.securitiestransferchargefrontend.models.stf.upscan.{FileUpload, UpscanJourneyStatus}
 import uk.gov.hmrc.securitiestransferchargefrontend.repositories.UpscanJourneyRepository
 import uk.gov.hmrc.securitiestransferchargefrontend.services.fileupload.processing.{FileProcessingRefreshCounter, FileProcessingRefreshCounterFactory, ProcessingService}
@@ -397,23 +400,33 @@ class FileProcessingControllerSpec extends SpecBase with MockitoSugar {
       }
     }
 
-    "must redirect for a successful upload and validation" in {
+    "must redirect for a successful upload and validation for " in {
+      Seq(
+        AffinityGroup.Individual,
+        AffinityGroup.Organisation,
+        AffinityGroup.Agent
+      ).foreach {affinityGroup =>
+        val counter = mockCounter()
+        val repository = mock[UpscanJourneyRepository]
+        val service = mock[ProcessingService]
 
-      val counter = mockCounter()
-      val repository = mock[UpscanJourneyRepository]
-      val service = mock[ProcessingService]
+        when(repository.find(reference))
+          .thenReturn(Future.successful(Some(fakeUpload(UpscanJourneyStatus.Completed))))
 
-      when(repository.find(reference))
-        .thenReturn(Future.successful(Some(fakeUpload(UpscanJourneyStatus.Completed))))
+        val app = buildApp(counter, repository, service)
 
-      val app = buildApp(counter, repository, service)
+        running(app) {
 
-      running(app) {
+          val result = route(app, FakeRequest(GET, routes.FileProcessingController.onPageLoad(reference).url)).value
 
-        val result = route(app, FakeRequest(GET, routes.FileProcessingController.onPageLoad(reference).url)).value
+          status(result) mustEqual SEE_OTHER
 
-        status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual JourneyRecoveryController.onPageLoad().url
+          if (affinityGroup == AffinityGroup.Agent) {
+            redirectLocation(result).value mustEqual bulkRoutes.AgentReferenceController.onPageLoad(NormalMode).url
+          } else {
+            redirectLocation(result).value mustEqual JourneyRecoveryController.onPageLoad().url
+            }
+        }
       }
     }
 

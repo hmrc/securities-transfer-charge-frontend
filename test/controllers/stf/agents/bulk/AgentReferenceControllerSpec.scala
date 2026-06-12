@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package controllers.stf.agents.single
+package controllers.stf.agents.bulk
 
 import base.SpecBase
 import org.mockito.ArgumentMatchers.any
@@ -27,15 +27,15 @@ import play.api.test.FakeRequest
 import play.api.test.Helpers.*
 import uk.gov.hmrc.auth.core.AffinityGroup
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.routes
-import uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.agents.single.routes as agentRoutes
+import uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.agents.bulk.routes as agentRoutes
 import uk.gov.hmrc.securitiestransferchargefrontend.forms.stf.agents.AgentReferenceFormProvider
-import uk.gov.hmrc.securitiestransferchargefrontend.models.{NormalMode, UserAnswers}
 import uk.gov.hmrc.securitiestransferchargefrontend.models.stf.AgentReference
-import uk.gov.hmrc.securitiestransferchargefrontend.models.stf.HowToNotifyAboutSecuritiesTransfer.OneAtATime
+import uk.gov.hmrc.securitiestransferchargefrontend.models.stf.HowToNotifyAboutSecuritiesTransfer.MoreThanOneAtATime
+import uk.gov.hmrc.securitiestransferchargefrontend.models.{NormalMode, UserAnswers}
 import uk.gov.hmrc.securitiestransferchargefrontend.navigation.Navigator
 import uk.gov.hmrc.securitiestransferchargefrontend.pages.stf.shared.{AgentReferencePage, HowToNotifyAboutSecuritiesTransferPage}
 import uk.gov.hmrc.securitiestransferchargefrontend.repositories.SessionRepository
-import uk.gov.hmrc.securitiestransferchargefrontend.views.html.stf.agents.single.AgentReferenceView
+import uk.gov.hmrc.securitiestransferchargefrontend.views.html.stf.agents.bulk.AgentReferenceView
 
 import scala.concurrent.Future
 import scala.util.Random
@@ -71,7 +71,7 @@ class AgentReferenceControllerSpec extends SpecBase with MockitoSugar {
 
     "must populate the view correctly on a GET when the question has previously been answered" in {
 
-      val userAnswers = UserAnswers(userAnswersId, submissionId).set(AgentReferencePage,AgentReference(Some("answer"))).success.value
+      val userAnswers = UserAnswers(userAnswersId, submissionId).set(AgentReferencePage, AgentReference(Some("answer"))).success.value
 
       val application = applicationBuilder(userAnswers = Some(userAnswers), affinityGroup = agentAffinity)
         .overrides(bind[Navigator].qualifiedWith("agents").toInstance(getNavigator))
@@ -90,8 +90,7 @@ class AgentReferenceControllerSpec extends SpecBase with MockitoSugar {
     }
 
     "must redirect to the next page when valid data is submitted" in {
-      val updatedAnswers = emptyUserAnswers.set(HowToNotifyAboutSecuritiesTransferPage, OneAtATime).success.value
-
+      val updatedAnswers = emptyUserAnswers.set(HowToNotifyAboutSecuritiesTransferPage, MoreThanOneAtATime).success.value
       val mockSessionRepository = mock[SessionRepository]
 
       when(mockSessionRepository.set(any())) thenReturn Future.successful(())
@@ -108,7 +107,7 @@ class AgentReferenceControllerSpec extends SpecBase with MockitoSugar {
         val result = route(application, request).value
 
         status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual agentRoutes.NameOfBuyerController.onPageLoad(NormalMode).url
+        redirectLocation(result).value mustEqual routes.CheckYourAnswersController.onPageLoad().url
       }
     }
 
@@ -121,7 +120,7 @@ class AgentReferenceControllerSpec extends SpecBase with MockitoSugar {
       running(application) {
 
         val invalidValue = Random.alphanumeric.take(260).mkString
-        
+
         val request =
           FakeRequest(POST, agentReferenceRoute)
             .withFormUrlEncodedBody(("value", invalidValue))

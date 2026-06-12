@@ -26,12 +26,11 @@ import uk.gov.hmrc.securitiestransferchargefrontend.models.stf.HowToNotifyAboutS
 import uk.gov.hmrc.securitiestransferchargefrontend.models.{NormalMode, UserAnswers}
 import uk.gov.hmrc.securitiestransferchargefrontend.navigation.PersistentNavigationHelper
 import uk.gov.hmrc.securitiestransferchargefrontend.pages.Page
-import uk.gov.hmrc.securitiestransferchargefrontend.pages.stf.shared.{HowToNotifyAboutSecuritiesTransferPage, SubmissionsDashboardPage}
+import uk.gov.hmrc.securitiestransferchargefrontend.pages.stf.shared.{AgentReferencePage, HowToNotifyAboutSecuritiesTransferPage, SubmissionsDashboardPage}
 import uk.gov.hmrc.securitiestransferchargefrontend.pages.stf.single.*
 import uk.gov.hmrc.securitiestransferchargefrontend.services.AnswerPersistenceService
 import uk.gov.hmrc.securitiestransferchargefrontend.models.stf.WhatTypeOfSecurities
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.routes
-
 
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -56,7 +55,12 @@ class ForwardRoutes(answerPersistenceService: AnswerPersistenceService,
         case MoreThanOneAtATime => agentBulkRoutes.TemplateInstructionsController.onPageLoad()
       }
     }
-    case AgentReferencePage => userAnswers => dataRequired(AgentReferencePage, userAnswers, agentSingleRoutes.NameOfBuyerController.onPageLoad(NormalMode))
+    case AgentReferencePage => userAnswers => {
+      dataDependent(HowToNotifyAboutSecuritiesTransferPage, userAnswers) {
+        case OneAtATime => agentSingleRoutes.NameOfBuyerController.onPageLoad(NormalMode)
+        case MoreThanOneAtATime => routes.CheckYourAnswersController.onPageLoad()
+      }
+    }
     case NameOfBuyerPage => userAnswers => dataRequired(NameOfBuyerPage, userAnswers, agentSingleRoutes.AddressController.onPageLoad())
     case StfBuyersAddressPage => userAnswers => dataRequired(StfBuyersAddressPage, userAnswers, agentSingleRoutes.NameOfSellerController.onPageLoad(NormalMode))
     case NameOfSellerPage => userAnswers => dataRequired(NameOfSellerPage, userAnswers, agentSingleRoutes.StfSellerAddressController.onPageLoad())

@@ -635,7 +635,6 @@ agent.totalMarketValue.hint = For example, £600 or £193.54
 agent.totalMarketValue.error.negative = The market value of the securities must be 0 or more
 agent.totalMarketValue.checkYourAnswersLabel = What is the total market value of the securities?
 
-
 fileUploaded.error.encryptedFile.title = There was a problem uploading your file
 fileUploaded.error.encryptedFile.heading = There was a problem uploading your file
 fileUploaded.error.encryptedFile.p = The file you have uploaded is password-protected. Check you have the right file, or remove the password and upload it again.
