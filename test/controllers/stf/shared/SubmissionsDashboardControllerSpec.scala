@@ -51,7 +51,7 @@ class SubmissionsDashboardControllerSpec extends SpecBase with MockitoSugar with
 
         val mockSaveAndReturnClient = mock[SaveAndReturnClient]
 
-        when(mockSaveAndReturnClient.list(any[UserId])(any()))
+        when(mockSaveAndReturnClient.listByUser(any[UserId])(any()))
           .thenReturn(Future.successful(List.empty))
 
         val application =
@@ -74,7 +74,7 @@ class SubmissionsDashboardControllerSpec extends SpecBase with MockitoSugar with
               messages(application)
             ).toString
 
-          verify(mockSaveAndReturnClient).list(any[UserId])(any())
+          verify(mockSaveAndReturnClient).listByUser(any[UserId])(any())
         }
       }
 
@@ -87,7 +87,7 @@ class SubmissionsDashboardControllerSpec extends SpecBase with MockitoSugar with
           SubmissionId("STC-987654321")
         )
 
-        when(mockSaveAndReturnClient.list(any[UserId])(any()))
+        when(mockSaveAndReturnClient.listByUser(any[UserId])(any()))
           .thenReturn(Future.successful(submissionIds))
 
         val application =
@@ -110,7 +110,7 @@ class SubmissionsDashboardControllerSpec extends SpecBase with MockitoSugar with
               messages(application)
             ).toString
 
-          verify(mockSaveAndReturnClient).list(any[UserId])(any())
+          verify(mockSaveAndReturnClient).listByUser(any[UserId])(any())
         }
       }
     }

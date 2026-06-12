@@ -111,12 +111,12 @@ class FrontendAppConfig @Inject() (configuration: Configuration, servicesConfig:
     s"$saveAndReturnBaseUrl$saveAndReturnBasePath"
 
   enum SaveAndReturnRetrievalType {
-    case UserId, UserIdAndGroupId
+    case UserOnly, UserAndGroup
   }
 
   val saveAndReturnRetrieval: SaveAndReturnRetrievalType =
     if (configuration.get[Boolean]("microservice.save-and-return-uses-user-id-only"))
-      SaveAndReturnRetrievalType.UserId else SaveAndReturnRetrievalType.UserIdAndGroupId
+      SaveAndReturnRetrievalType.UserOnly else SaveAndReturnRetrievalType.UserAndGroup
 
   lazy val connectedPersonsInformationUrl: String = configuration.get[String]("urls.external.connectedPersonsInformation")
   val stfBaseUrl: String = servicesConfig.baseUrl("securities-transfer-charge-frontend")

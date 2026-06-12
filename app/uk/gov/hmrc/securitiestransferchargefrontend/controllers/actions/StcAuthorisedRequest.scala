@@ -23,7 +23,7 @@ import uk.gov.hmrc.securitiestransferchargefrontend.domain.{CredentialId, Subscr
 final case class StcAuthorisedRequest[A](
                                           request: Request[A],
                                           internalId: String,
-                                          groupIdenfifier: String,
+                                          groupIdentifier: String,
                                           affinityGroup: AffinityGroup,
                                           subscriptionId: SubscriptionId,
                                           credentialId: CredentialId

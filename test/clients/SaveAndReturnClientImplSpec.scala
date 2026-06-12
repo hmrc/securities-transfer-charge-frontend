@@ -96,7 +96,7 @@ class SaveAndReturnClientImplSpec extends SpecBase {
           .thenReturn(Future.successful(testUserAnswers))
 
 
-        val result: UserAnswers = client.retrieve(testUserId, testSubmissionId).futureValue
+        val result: UserAnswers = client.retrieve(testSubmissionId).futureValue
 
         result mustBe testUserAnswers
       }
@@ -107,7 +107,7 @@ class SaveAndReturnClientImplSpec extends SpecBase {
         when(mockRequestBuilder.execute[UserAnswers](any(), any()))
           .thenReturn(Future.failed(exception))
 
-        val result: Future[UserAnswers] = client.retrieve(testUserId, testSubmissionId)
+        val result: Future[UserAnswers] = client.retrieve(testSubmissionId)
 
         result.failed.futureValue mustBe exception
       }
@@ -124,7 +124,7 @@ class SaveAndReturnClientImplSpec extends SpecBase {
           .thenReturn(Future.successful(submissionIds))
 
 
-        val result: List[SubmissionId] = client.list(testUserId).futureValue
+        val result: List[SubmissionId] = client.listByUser(testUserId).futureValue
 
         result mustBe submissionIds
       }
@@ -135,7 +135,7 @@ class SaveAndReturnClientImplSpec extends SpecBase {
         when(mockRequestBuilder.execute[List[SubmissionId]](any(), any()))
           .thenReturn(Future.failed(exception))
 
-        val result: Future[List[SubmissionId]] = client.list(testUserId)
+        val result: Future[List[SubmissionId]] = client.listByUser(testUserId)
 
         result.failed.futureValue mustBe exception
       }

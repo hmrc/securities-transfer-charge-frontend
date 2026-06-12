@@ -41,7 +41,7 @@ class AnswerPersistenceServiceImpl @Inject()(sessionRepository: SessionRepositor
 
   override def load(submissionId: SubmissionId, userId: UserId)(implicit hc: HeaderCarrier): Future[UserAnswers] =
     for {
-      userAnswers <- saveAndReturnClient.retrieve(userId, submissionId)
+      userAnswers <- saveAndReturnClient.retrieve(submissionId)
       _           <- sessionRepository.clear(userId)
       _           <- sessionRepository.set(userAnswers)
     } yield userAnswers

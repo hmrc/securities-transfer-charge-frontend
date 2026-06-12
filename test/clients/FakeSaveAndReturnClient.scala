@@ -31,10 +31,11 @@ class FakeSaveAndReturnClient extends SaveAndReturnClient:
 
   override def save(userAnswers: UserAnswers)(implicit hc: HeaderCarrier): Future[Unit] = Future.successful(())
 
-  override def retrieve(userId: UserId, submissionId: SubmissionId)(implicit hc: HeaderCarrier): Future[UserAnswers] = Future.successful(stubUserAnswers)
+  override def retrieve(submissionId: SubmissionId)(implicit hc: HeaderCarrier): Future[UserAnswers] = Future.successful(stubUserAnswers)
 
-  override def list(userId: UserId)(implicit hc: HeaderCarrier): Future[List[SubmissionId]] = Future.successful(List(stubSubmissionId))
-  
+  override def listByUser(userId: UserId)(implicit hc: HeaderCarrier): Future[List[SubmissionId]] = Future.successful(List(stubSubmissionId))
+
+  override def listByGroup(groupIdentifier: GroupIdentifier)(implicit hc: HeaderCarrier): Future[List[SubmissionId]] = Future.successful(List(stubSubmissionId)) 
 object FakeSaveAndReturnClient:
   def apply(): SaveAndReturnClient = new FakeSaveAndReturnClient
 
