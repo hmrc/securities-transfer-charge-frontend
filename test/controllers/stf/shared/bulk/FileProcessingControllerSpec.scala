@@ -23,7 +23,7 @@ import org.scalatestplus.mockito.MockitoSugar
 import play.api.inject.bind
 import play.api.mvc.{Request, Result}
 import play.api.test.FakeRequest
-import play.api.test.Helpers.*
+import play.api.test.Helpers.{redirectLocation, *}
 import uk.gov.hmrc.auth.core.AffinityGroup
 import uk.gov.hmrc.securitiestransferchargefrontend.config.FrontendAppConfig
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.routes.JourneyRecoveryController
@@ -52,9 +52,10 @@ class FileProcessingControllerSpec extends SpecBase with MockitoSugar {
   private def buildApp(
                         counter: FileProcessingRefreshCounter,
                         repository: UpscanJourneyRepository,
-                        service: ProcessingService
+                        service: ProcessingService,
+                        affinityGroup: AffinityGroup = AffinityGroup.Individual
                       ) =
-    applicationBuilder(userAnswers = Some(emptyUserAnswers))
+    applicationBuilder(userAnswers = Some(emptyUserAnswers), affinityGroup)
       .overrides(
         bind[FileProcessingRefreshCounterFactory]
           .toInstance(new MockFileProcessingRefreshCounterFactory(counter)),
@@ -400,33 +401,35 @@ class FileProcessingControllerSpec extends SpecBase with MockitoSugar {
       }
     }
 
-    "must redirect for a successful upload and validation for " in {
       Seq(
         AffinityGroup.Individual,
         AffinityGroup.Organisation,
         AffinityGroup.Agent
       ).foreach {affinityGroup =>
-        val counter = mockCounter()
-        val repository = mock[UpscanJourneyRepository]
-        val service = mock[ProcessingService]
+        s"must redirect for a successful upload and validation for $affinityGroup" in {
 
-        when(repository.find(reference))
-          .thenReturn(Future.successful(Some(fakeUpload(UpscanJourneyStatus.Completed))))
+          val counter = mockCounter()
+          val repository = mock[UpscanJourneyRepository]
+          val service = mock[ProcessingService]
 
-        val app = buildApp(counter, repository, service)
+          when(repository.find(reference))
+            .thenReturn(Future.successful(Some(fakeUpload(UpscanJourneyStatus.Completed))))
 
-        running(app) {
+          val app = buildApp(counter, repository, service, affinityGroup)
 
-          val result = route(app, FakeRequest(GET, routes.FileProcessingController.onPageLoad(reference).url)).value
+          running(app) {
 
-          status(result) mustEqual SEE_OTHER
+            val result = route(app, FakeRequest(GET, routes.FileProcessingController.onPageLoad(reference).url)).value
 
-          if (affinityGroup == AffinityGroup.Agent) {
-            redirectLocation(result).value mustEqual bulkRoutes.AgentReferenceController.onPageLoad(NormalMode).url
-          } else {
-            redirectLocation(result).value mustEqual JourneyRecoveryController.onPageLoad().url
+            status(result) mustEqual SEE_OTHER
+
+            affinityGroup match {
+              case AffinityGroup.Agent =>
+                redirectLocation(result).value mustEqual bulkRoutes.AgentReferenceController.onPageLoad(NormalMode).url
+              case _ =>
+                redirectLocation(result).value mustEqual JourneyRecoveryController.onPageLoad().url
             }
-        }
+          }
       }
     }
 
