@@ -260,7 +260,7 @@ class StfAgentNavigatorSpec extends SpecBase with ScalaFutures {
         }
       }
 
-      "must go from the AgentReferencePage to CYA Page if it is in single upload" in {
+      "must go from the AgentReferencePage to CYA Page if it is in bulk upload" in {
         val answers = emptyUserAnswers.set(HowToNotifyAboutSecuritiesTransferPage, HowToNotifyAboutSecuritiesTransfer.MoreThanOneAtATime).get.set(AgentReferencePage, AgentReference(Some("HMRC"))).get
         val result = navigator.nextPage(AgentReferencePage, NormalMode, answers)(fakeRequest)
         whenReady(result) { res =>
