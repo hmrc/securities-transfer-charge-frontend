@@ -16,19 +16,15 @@
 
 package uk.gov.hmrc.securitiestransferchargefrontend.services.fileupload
 
-import uk.gov.hmrc.securitiestransferchargefrontend.models.stf.fileupload.{FileParseError, ParsedFile, UploadedFile}
-import uk.gov.hmrc.securitiestransferchargefrontend.services.fileupload.FileParserSelector
-
+import uk.gov.hmrc.securitiestransferchargefrontend.models.stf.fileupload.{FileParseError, ParsedRow, UploadedFile}
 import javax.inject.{Inject, Singleton}
 
 @Singleton
-class FileParsingService @Inject()(
-                                    fileParserSelector: FileParserSelector
-                                  ) {
+class FileParsingService @Inject()(fileParserSelector: FileParserSelector) {
 
-  def parse(uploadedFile: UploadedFile): Either[FileParseError, ParsedFile] =
+  def withParsedStream[A](uploadedFile: UploadedFile)(block: (Seq[String], Iterator[ParsedRow]) => Either[FileParseError, A]): Either[FileParseError, A] =
     for {
       parser <- fileParserSelector.select(uploadedFile.mimeType)
-      parsed <- parser.parse(uploadedFile)
-    } yield parsed
+      result <- parser.withParsedStream(uploadedFile)(block)
+    } yield result
 }

@@ -17,6 +17,7 @@
 package services.fileupload
 
 import base.SpecBase
+import org.mockito.ArgumentMatchers.{any, eq => eqTo}
 import org.mockito.Mockito.when
 import org.scalatestplus.mockito.MockitoSugar
 import uk.gov.hmrc.securitiestransferchargefrontend.models.stf.fileupload.*
@@ -48,13 +49,6 @@ class StcUploadProcessingServiceSpec extends SpecBase with MockitoSugar {
     cells = Seq(
       ParsedCell(1, "Seller Ltd")
     )
-  )
-
-  private val parsedFile = ParsedFile(
-    fileName = "test.csv",
-    mimeType = "text/csv",
-    headers = headers,
-    rows = Seq(parsedRow)
   )
 
   private val validationResponse = StcFileValidationResponse(
@@ -89,26 +83,40 @@ class StcUploadProcessingServiceSpec extends SpecBase with MockitoSugar {
         ),
         validationErrors = Seq.empty
       )
-    )
+    ),
+    maxErrorsAllowed = 25
   )
 
   "StcUploadProcessingService.process" - {
 
-    "parse then validate the uploaded file" in {
-      when(stcUploadParsingService.parse(uploadedFile,affinityGroupKeyInd))
-        .thenReturn(Right(parsedFile))
+    "parse then validate the uploaded file stream" in {
+      val rowStream = Seq(parsedRow).iterator
 
-      when(stcFileValidationService.validate(parsedFile.rows, parsedFile.headers,affinityGroupKeyInd))
-        .thenReturn(validationResponse)
+      when(
+        stcUploadParsingService.withVerifiedTemplateStream[StcFileValidationResponse](
+          eqTo(uploadedFile),
+          eqTo(affinityGroupKeyInd)
+        )(any())
+      ).thenAnswer { invocation =>
+        val block = invocation.getArgument(2).asInstanceOf[(Seq[String], Iterator[ParsedRow]) => Either[FileParseError, StcFileValidationResponse]]
+        block(headers, rowStream)
+      }
 
-      service.process(uploadedFile,affinityGroupKeyInd) mustBe Right(validationResponse)
+      when(stcFileValidationService.validateStream(rowStream, headers, affinityGroupKeyInd))
+        .thenReturn(Right(validationResponse))
+
+      service.process(uploadedFile, affinityGroupKeyInd) mustBe Right(validationResponse)
     }
 
     "return parse errors without validating" in {
-      when(stcUploadParsingService.parse(uploadedFile,affinityGroupKeyInd))
-        .thenReturn(Left(FileParseError.EmptyFile))
+      when(
+        stcUploadParsingService.withVerifiedTemplateStream[StcFileValidationResponse](
+          eqTo(uploadedFile),
+          eqTo(affinityGroupKeyInd)
+        )(any())
+      ).thenReturn(Left(FileParseError.EmptyFile))
 
-      service.process(uploadedFile,affinityGroupKeyInd) mustBe Left(FileParseError.EmptyFile)
+      service.process(uploadedFile, affinityGroupKeyInd) mustBe Left(FileParseError.EmptyFile)
     }
   }
 }

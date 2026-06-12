@@ -36,6 +36,9 @@ class FileUploadConfig @Inject()(configuration: Configuration) {
   val firstDataRow: Int =
     configuration.getOptional[Int]("file-upload.first-data-row").getOrElse(4)
 
+  val maxErrorsAllowed: Int =
+    configuration.getOptional[Int]("file-upload.max-errors-allowed").getOrElse(25)
+
   def expectedTemplateHash(affinityKey:String, templateType: String, row: Int): String = {
     
     configuration.get[String](s"file-upload.template-hashes.$affinityKey.$templateType.row$row")

@@ -30,4 +30,8 @@ object FileProcessingHelper {
       fileUpload.failureReason.contains("QUARANTINE") &&
       fileUpload.message.exists(_.toLowerCase.contains("virus"))
 
+  def isInvalidFileTypeFailure(fileUpload: FileUpload): Boolean =
+    fileUpload.status == UpscanJourneyStatus.Failed &&
+      fileUpload.failureReason.contains("REJECTED") &&
+      fileUpload.message.exists(_.toLowerCase.contains("mime type"))
 }
