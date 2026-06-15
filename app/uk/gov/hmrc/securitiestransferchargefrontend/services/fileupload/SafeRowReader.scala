@@ -41,6 +41,9 @@ object SafeRowReader {
   def readDate(row: ParsedRow, idx: Option[Int]): Option[LocalDate] =
     idx.flatMap(i => unwrap(ParsedRowReader.readDate(row, i)))
 
+  def readParsedDate(row: ParsedRow, idx: Option[Int]): ParsedValue[LocalDate] =
+    idx.map(i => ParsedRowReader.readDate(row, i)).getOrElse(ParsedValue.Missing)  
+
   private def unwrap[A](parsed: ParsedValue[A]): Option[A] =
     parsed match {
       case Valid(value) => Some(value)

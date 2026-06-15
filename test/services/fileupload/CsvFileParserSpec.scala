@@ -29,7 +29,7 @@ class CsvFileParserSpec extends AnyWordSpec with Matchers with EitherValues {
 
   private val maxColumns = 27
 
-  private val parser = new CsvFileParser(TestFileUploadConfig.config())
+  private val parser = new CsvFileParser()
 
   private def uploadedFile(csv: String): UploadedFile =
     UploadedFile(
@@ -42,7 +42,7 @@ class CsvFileParserSpec extends AnyWordSpec with Matchers with EitherValues {
     (fromIndex until maxColumns).map(index => ParsedCell(index, ""))
 
   private def parseFully(csv: String): Either[FileParseError, (Seq[String], Seq[ParsedRow])] =
-    parser.withParsedStream(uploadedFile(csv)) { (headers, rowStream) =>
+    parser.withParsedStream(uploadedFile(csv), maxColumns) { (headers, rowStream) =>
       Right((headers, rowStream.toList))
     }
 

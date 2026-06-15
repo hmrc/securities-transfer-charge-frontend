@@ -22,6 +22,7 @@ import org.mockito.Mockito.when
 import org.scalatestplus.mockito.MockitoSugar.mock
 import uk.gov.hmrc.securitiestransferchargefrontend.config.FileUploadConfig
 import uk.gov.hmrc.securitiestransferchargefrontend.models.stf.fileupload.*
+import uk.gov.hmrc.securitiestransferchargefrontend.models.stf.fileupload.ParsedValue.Missing
 import uk.gov.hmrc.securitiestransferchargefrontend.services.fileupload.*
 
 class StcFileValidationServiceSpec extends SpecBase {
@@ -53,7 +54,7 @@ class StcFileValidationServiceSpec extends SpecBase {
         whatReliefAreYouApplyingFor = None,
         securitiesTarget = None,
         companyRegistrationNumber = None,
-        chargingPoint = None,
+        chargingPoint = Missing,
         taxRate = None,
         whatTypeOfSecurities = None,
         typeOfShares = None,
@@ -66,7 +67,7 @@ class StcFileValidationServiceSpec extends SpecBase {
         purchaseForCancellation = None
       ),
       validationErrors = Seq.empty
-  )
+    )
 
   private val validatedRow2 =
     ValidatedStcRow(
@@ -85,7 +86,7 @@ class StcFileValidationServiceSpec extends SpecBase {
         whatReliefAreYouApplyingFor = None,
         securitiesTarget = None,
         companyRegistrationNumber = None,
-        chargingPoint = None,
+        chargingPoint = ParsedValue.Missing,
         taxRate = None,
         whatTypeOfSecurities = None,
         typeOfShares = None,
@@ -118,11 +119,11 @@ class StcFileValidationServiceSpec extends SpecBase {
 
       when(
         stcRowValidationService.validateStream(
-          any(), eqTo(headers), eqTo(affinityGroupKeyInd), eqTo(25), eqTo(10000)
+          any(), eqTo(headers), eqTo(affinityGroupKeyInd), eqTo("stf"), eqTo(25), eqTo(10000)
         )
       ).thenReturn(Right(Seq(validatedRow1, validatedRow2)))
 
-      val result = service.validateStream(rowStream, headers, affinityGroupKeyInd)
+      val result = service.validateStream(rowStream, headers, affinityGroupKeyInd, "stf")
 
       result.isRight mustBe true
       val response = result.toOption.get

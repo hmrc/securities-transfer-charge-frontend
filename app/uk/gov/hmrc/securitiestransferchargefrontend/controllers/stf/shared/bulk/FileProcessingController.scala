@@ -56,7 +56,7 @@ class FileProcessingController @Inject()(
       val counter = createCounter(request)
 
       if (counter.isTimedOut) {
-        
+
         val result = Redirect(routes.FileProcessingController.onTimeout())
         Future.successful(counter.reset(result))
 
@@ -86,11 +86,12 @@ class FileProcessingController @Inject()(
                           )(implicit request: StcAuthorisedRequest[_]): Future[Result] =
     fileUpload.status match {
 
-      case UpscanJourneyStatus.Ready => processingService.processReadyUpload(reference, fileUpload, affinityKey)
+      case UpscanJourneyStatus.Ready =>
+        processingService.processReadyUpload(reference, fileUpload, affinityKey, "stf")
         Future.successful(spinnerPage(counter))
 
       case UpscanJourneyStatus.Processing | UpscanJourneyStatus.Initiated => Future.successful(spinnerPage(counter))
-      
+
       case UpscanJourneyStatus.RowLimitExceeded => Future.successful(Redirect(routes.BulkRowsErrorController.onPageLoad()))
 
       case UpscanJourneyStatus.EmptyFile => Future.successful(Redirect(routes.BulkUploadFileEmptyController.onPageLoad()))
@@ -114,6 +115,6 @@ class FileProcessingController @Inject()(
       case UpscanJourneyStatus.Failed  => Future.successful(Redirect(routes.BulkUploadErrorController.onPageLoad()))
 
       case UpscanJourneyStatus.Completed => Future.successful(Redirect(JourneyRecoveryController.onPageLoad()))
-      
+
     }
 }

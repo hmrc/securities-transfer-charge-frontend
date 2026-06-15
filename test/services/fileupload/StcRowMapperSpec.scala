@@ -102,7 +102,7 @@ class StcRowMapperSpec extends AnyWordSpec with Matchers {
       result.whatReliefAreYouApplyingFor mustBe Some("Group relief")
       result.securitiesTarget mustBe Some("Example Holdings Ltd")
       result.companyRegistrationNumber mustBe Some("12345678")
-      result.chargingPoint mustBe Some(LocalDate.of(2026, 3, 23))
+      result.chargingPoint mustBe ParsedValue.Valid(LocalDate.of(2026, 3, 23))
       result.taxRate mustBe Some(BigDecimal("0.5"))
       result.whatTypeOfSecurities mustBe Some("Shares")
       result.typeOfShares mustBe Some("Ordinary")

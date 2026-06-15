@@ -508,6 +508,7 @@ individual.fileUpload.error.securitiesQuantity.required = Enter the number of sh
 individual.fileUpload.error.securitiesQuantity.nonNumeric = The amount of shares you are buying must be a number
 individual.fileUpload.error.securitiesQuantity.minimum = The number of shares must be at least 1
 individual.fileUpload.error.securitiesQuantity.maximum = The number of shares you are buying must be below 999,999,999
+individual.fileUpload.error.securitiesQuantity.wholeNumber = The number of shares you are buying must be a whole number
 
 org.fileUpload.error.securitiesQuantity.required = Enter the number of shares the business is buying
 org.fileUpload.error.securitiesQuantity.nonNumeric = The amount of shares must be a number

@@ -22,9 +22,9 @@ import javax.inject.{Inject, Singleton}
 @Singleton
 class FileParsingService @Inject()(fileParserSelector: FileParserSelector) {
 
-  def withParsedStream[A](uploadedFile: UploadedFile)(block: (Seq[String], Iterator[ParsedRow]) => Either[FileParseError, A]): Either[FileParseError, A] =
+  def withParsedStream[A](uploadedFile: UploadedFile, expectedColumns: Int)(block: (Seq[String], Iterator[ParsedRow]) => Either[FileParseError, A]): Either[FileParseError, A] =
     for {
       parser <- fileParserSelector.select(uploadedFile.mimeType)
-      result <- parser.withParsedStream(uploadedFile)(block)
+      result <- parser.withParsedStream(uploadedFile, expectedColumns)(block)
     } yield result
 }

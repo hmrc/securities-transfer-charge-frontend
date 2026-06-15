@@ -17,24 +17,23 @@
 package uk.gov.hmrc.securitiestransferchargefrontend.services.fileupload
 
 import org.apache.commons.csv.{CSVFormat, CSVParser, CSVRecord}
-import uk.gov.hmrc.securitiestransferchargefrontend.config.FileUploadConfig
 import uk.gov.hmrc.securitiestransferchargefrontend.models.stf.fileupload.FileParseError.InvalidCsv
 import uk.gov.hmrc.securitiestransferchargefrontend.models.stf.fileupload.{FileParseError, ParsedCell, ParsedRow, UploadedFile}
 
 import java.io.InputStreamReader
 import java.nio.charset.StandardCharsets
-import javax.inject.{Inject, Singleton}
+import javax.inject.Singleton
 import scala.jdk.CollectionConverters.*
 
 @Singleton
-class CsvFileParser @Inject()(config: FileUploadConfig) extends FileParser {
+class CsvFileParser extends FileParser {
 
   private val byteOrderMark = "\uFEFF"
 
   private def isEmptyRecord(record: CSVRecord): Boolean =
     record.iterator().asScala.forall(_.trim.isEmpty)
 
-  override def withParsedStream[A](file: UploadedFile)(block: (Seq[String], Iterator[ParsedRow]) => Either[FileParseError, A]): Either[FileParseError, A] = {
+  override def withParsedStream[A](file: UploadedFile, expectedColumns: Int)(block: (Seq[String], Iterator[ParsedRow]) => Either[FileParseError, A]): Either[FileParseError, A] = {
     try {
       val reader = new InputStreamReader(file.inputStream, StandardCharsets.UTF_8)
       val parser = CSVParser.parse(reader, CSVFormat.DEFAULT)
@@ -48,7 +47,7 @@ class CsvFileParser @Inject()(config: FileUploadConfig) extends FileParser {
           val headerRecord = rowIterator.next()
           val headerValues = headerRecord.iterator().asScala.toSeq
 
-          val headers: Seq[String] = (0 until config.maxColumns).map { colIndex =>
+          val headers: Seq[String] = (0 until expectedColumns).map { colIndex =>
             val rawValue = headerValues.lift(colIndex).getOrElse("").trim
             if (colIndex == 0) rawValue.replace(byteOrderMark, "") else rawValue
           }
@@ -57,7 +56,7 @@ class CsvFileParser @Inject()(config: FileUploadConfig) extends FileParser {
             val values = record.iterator().asScala.toSeq
             ParsedRow(
               rowNumber = index + 2,
-              cells = (0 until config.maxColumns).map { colIndex =>
+              cells = (0 until expectedColumns).map { colIndex =>
                 ParsedCell(colIndex, values.lift(colIndex).getOrElse("").trim)
               }
             )

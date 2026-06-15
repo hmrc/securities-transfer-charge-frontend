@@ -140,7 +140,7 @@ class FileProcessingControllerSpec extends SpecBase with MockitoSugar {
       when(repository.find(reference))
         .thenReturn(Future.successful(Some(upload)))
 
-      when(service.processReadyUpload(any(), any(), any())(any(),any(),any()))
+      when(service.processReadyUpload(any(), any(), any(), any())(any(), any(), any()))
         .thenReturn(Future.successful(()))
 
       val app = buildApp(counter, repository, service)
@@ -153,7 +153,7 @@ class FileProcessingControllerSpec extends SpecBase with MockitoSugar {
         status(result) mustEqual OK
 
         verify(service)
-          .processReadyUpload(eqTo(reference), eqTo(upload), any[String])(any(),any(),any())
+          .processReadyUpload(eqTo(reference), eqTo(upload), any[String], eqTo("stf"))(any(), any(), any())
 
         verify(counter).withIncrementedCounter(any[Result])
       }

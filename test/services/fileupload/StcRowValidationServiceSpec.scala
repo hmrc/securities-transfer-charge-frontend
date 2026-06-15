@@ -91,7 +91,7 @@ class StcRowValidationServiceSpec extends SpecBase {
         )
       )
 
-      val result = service.validateStream(Seq(row).iterator, headers, affinityGroupKeyInd, 25, 10000)
+      val result = service.validateStream(Seq(row).iterator, headers, affinityGroupKeyInd, "stf", 25, 10000)
 
       result.isRight mustBe true
       result.toOption.get.head.validationErrors mustBe Seq.empty
@@ -120,7 +120,7 @@ class StcRowValidationServiceSpec extends SpecBase {
         )
       )
 
-      val result = service.validateStream(Seq(row).iterator, headers, affinityGroupKeyInd, 25, 10000)
+      val result = service.validateStream(Seq(row).iterator, headers, affinityGroupKeyInd, "stf", 25, 10000)
 
       result.isRight mustBe true
       val errors = result.toOption.get.head.validationErrors.map(_.fieldName)
@@ -166,6 +166,7 @@ class StcRowValidationServiceSpec extends SpecBase {
         Seq(badRow1, badRow2, badRow3).iterator,
         headers,
         affinityGroupKeyInd,
+        "stf",
         maxErrorsAllowed = 10,
         maxRows = 10000
       )
@@ -184,6 +185,7 @@ class StcRowValidationServiceSpec extends SpecBase {
         Seq(row1, row2).iterator,
         headers,
         affinityGroupKeyInd,
+        "stf",
         maxErrorsAllowed = 25,
         maxRows = 1
       )

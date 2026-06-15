@@ -83,7 +83,7 @@ object RowTransforms {
         qualifyAsTreasuryShares = None, // SH03 only
         maxPricePaid = None, // // SH03 only
         minPricePaid = None, // // SH03 only
-        originalChargingPoint = required(row.chargingPoint, "chargingPoint", row.rowNumber),
+        originalChargingPoint = required(row.chargingPoint.toOption, "chargingPoint", row.rowNumber),
         considerationActual = required(row.amountPaidForSecurities, "amountPaidForSecurities", row.rowNumber),
         isConnectedPartiesTransactions = connectedPersons,
         companyName = required(row.securitiesTarget, "securitiesTarget", row.rowNumber),

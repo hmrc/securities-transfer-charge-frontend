@@ -19,7 +19,7 @@ package models.submission
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpec
 import uk.gov.hmrc.securitiestransferchargefrontend.models.stf
-import uk.gov.hmrc.securitiestransferchargefrontend.models.stf.fileupload.{ParsedStcRow, ValidatedStcRow}
+import uk.gov.hmrc.securitiestransferchargefrontend.models.stf.fileupload.{ParsedStcRow, ValidatedStcRow, ParsedValue}
 import uk.gov.hmrc.securitiestransferchargefrontend.models.submission.*
 
 import java.time.LocalDate
@@ -56,7 +56,7 @@ class RowTransformsSpec extends AnyWordSpec with Matchers {
       whatReliefAreYouApplyingFor = Some("Group relief"),
       securitiesTarget = Some("Example Holdings Ltd"),
       companyRegistrationNumber = Some("12345678"),
-      chargingPoint = Some(LocalDate.of(2026, 3, 23)),
+      chargingPoint = ParsedValue.Valid(LocalDate.of(2026, 3, 23)),
       taxRate = Some(BigDecimal("1.5")),
       whatTypeOfSecurities = Some("Shares"),
       typeOfShares = Some("Ordinary Shares"),

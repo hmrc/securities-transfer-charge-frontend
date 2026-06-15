@@ -31,13 +31,19 @@ class StcRowValidationService @Inject()(
                       rowStream: Iterator[ParsedRow],
                       headers: Seq[String],
                       affinityKey: String,
+                      templateType: String,
                       maxErrorsAllowed: Int,
                       maxRows: Int
                     ): Either[FileParseError, Seq[ValidatedStcRow]] = {
 
     implicit val columnIndex: ColumnIndexBuilder = new ColumnIndexBuilder(headers)
     val mapper = new StcRowMapper(columnIndex)
-    val template = detectTemplate(headers)
+
+    val template = templateType.toLowerCase match {
+      case "stf"  => StcTemplate.STF
+      case "sh03" => StcTemplate.SH03
+      case other  => throw new IllegalArgumentException(s"Unsupported template type: $other")
+    }
 
     @tailrec
     def processRows(
@@ -64,18 +70,5 @@ class StcRowValidationService @Inject()(
     }
 
     processRows(Nil, 0, 0)
-  }
-
-  private def detectTemplate(headers: Seq[String]): StcTemplate = {
-    val normalised = headers.map(_.trim.toLowerCase).toSet
-    val templates = Seq(StcTemplate.SH03, StcTemplate.STF)
-
-    templates.find { template =>
-      template.identifyingFields
-        .map(_.toLowerCase)
-        .subsetOf(normalised)
-    }.getOrElse {
-      throw new IllegalArgumentException("Unable to determine file template")
-    }
   }
 }

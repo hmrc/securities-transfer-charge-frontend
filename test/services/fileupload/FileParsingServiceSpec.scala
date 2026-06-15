@@ -30,6 +30,8 @@ import java.io.ByteArrayInputStream
 import java.nio.charset.StandardCharsets
 
 class FileParsingServiceSpec extends AnyWordSpec with Matchers with EitherValues with MockitoSugar {
+  
+  val maxColumns = 27
 
   private val uploadedFile = UploadedFile(
     fileName = "test.csv",
@@ -49,13 +51,13 @@ class FileParsingServiceSpec extends AnyWordSpec with Matchers with EitherValues
 
       when(fileParserSelector.select("text/csv")).thenReturn(Right(parser))
 
-      when(parser.withParsedStream[String](eqTo(uploadedFile))(any()))
+      when(parser.withParsedStream[String](eqTo(uploadedFile), eqTo(maxColumns))(any()))
         .thenReturn(Right("Stream Processed Successfully"))
 
-      service.withParsedStream(uploadedFile)(dummyBlock).value shouldBe "Stream Processed Successfully"
+      service.withParsedStream(uploadedFile, maxColumns)(dummyBlock).value shouldBe "Stream Processed Successfully"
 
       verify(fileParserSelector).select("text/csv")
-      verify(parser).withParsedStream[String](eqTo(uploadedFile))(any())
+      verify(parser).withParsedStream[String](eqTo(uploadedFile), eqTo(maxColumns))(any())
     }
 
     "return the selector error when the mime type is unsupported" in {
@@ -64,7 +66,7 @@ class FileParsingServiceSpec extends AnyWordSpec with Matchers with EitherValues
 
       when(fileParserSelector.select("text/csv")).thenReturn(Left(UnsupportedMimeType("text/csv")))
 
-      service.withParsedStream(uploadedFile)(dummyBlock).left.value shouldBe UnsupportedMimeType("text/csv")
+      service.withParsedStream(uploadedFile, maxColumns)(dummyBlock).left.value shouldBe UnsupportedMimeType("text/csv")
 
       verify(fileParserSelector).select("text/csv")
     }

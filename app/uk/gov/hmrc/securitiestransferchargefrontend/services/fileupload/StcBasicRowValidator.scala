@@ -18,7 +18,7 @@ package uk.gov.hmrc.securitiestransferchargefrontend.services.fileupload
 
 import play.api.i18n.{Lang, Messages, MessagesApi}
 import uk.gov.hmrc.securitiestransferchargefrontend.forms.stf.shared.{NameOfSellerFormProvider, SecuritiesTargetFormProvider}
-import uk.gov.hmrc.securitiestransferchargefrontend.models.stf.fileupload.{ParsedStcRow, StcRowValidationError}
+import uk.gov.hmrc.securitiestransferchargefrontend.models.stf.fileupload.{ParsedStcRow, StcRowValidationError, ParsedValue}
 
 import javax.inject.Inject
 
@@ -107,29 +107,42 @@ class StcBasicRowValidator @Inject()(
 
   private def validateChargingPoint(
                                      row: ParsedStcRow,
-                                     affinityKey:String
+                                     affinityKey: String
                                    )(implicit cols: ColumnIndexBuilder): Seq[StcRowValidationError] = {
+
+    def msgKey(suffix: String): String =
+      if (affinityKey == "individual") suffix else s"$affinityKey.$suffix"
 
     row.chargingPoint match {
 
-      case None =>
+      case ParsedValue.Missing =>
         Seq(
           support.error(
             row.rowNumber,
             "chargingPoint",
-            messages(s"$affinityKey.chargingPoint.error.required.all")
+            messages(msgKey("chargingPoint.error.required.all"))
           )
         )
 
-      case Some(date) if date.isAfter(support.dateToday) =>
+      case ParsedValue.Invalid(_, _) =>
         Seq(
           support.error(
             row.rowNumber,
             "chargingPoint",
-            messages(s"$affinityKey.chargingPoint.error.futureDate")
+            messages(msgKey("chargingPoint.error.invalid"))
           )
         )
-      case Some(_) =>
+
+      case ParsedValue.Valid(date) if date.isAfter(support.dateToday) =>
+        Seq(
+          support.error(
+            row.rowNumber,
+            "chargingPoint",
+            messages(msgKey("chargingPoint.error.futureDate"))
+          )
+        )
+
+      case ParsedValue.Valid(_) =>
         Seq.empty
     }
   }
@@ -162,6 +175,15 @@ class StcBasicRowValidator @Inject()(
             row.rowNumber,
             "securitiesQuantity",
             messages(s"$affinityKey.fileUpload.error.securitiesQuantity.required")
+          )
+        )
+
+      case Some(value) if !value.isWhole =>
+        Seq(
+          support.error(
+            row.rowNumber,
+            "securitiesQuantity",
+            messages(s"detailsOfThisTransfer.error.numberOfShares.wholeNumber")
           )
         )
 

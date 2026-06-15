@@ -35,7 +35,7 @@ case class ParsedStcRow(
                          whatReliefAreYouApplyingFor: Option[String],
                          securitiesTarget: Option[String],
                          companyRegistrationNumber: Option[String],
-                         chargingPoint: Option[LocalDate],
+                         chargingPoint: ParsedValue[LocalDate],
                          taxRate: Option[BigDecimal],
                          whatTypeOfSecurities: Option[String],
                          typeOfShares: Option[String],

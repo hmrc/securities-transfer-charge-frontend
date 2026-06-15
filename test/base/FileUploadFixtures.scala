@@ -16,6 +16,7 @@
 
 package base
 
+import uk.gov.hmrc.securitiestransferchargefrontend.models.stf.fileupload.ParsedValue.Missing
 import uk.gov.hmrc.securitiestransferchargefrontend.models.stf.fileupload.{ParsedStcRow, StcFileValidationResponse, StcRowValidationError, ValidatedStcRow}
 import uk.gov.hmrc.securitiestransferchargefrontend.models.stf.upscan.{FileUpload, UpscanJourneyStatus}
 
@@ -60,7 +61,7 @@ trait FileUploadFixtures {
       whatReliefAreYouApplyingFor = Some(""),
       securitiesTarget = Some(""),
       companyRegistrationNumber = Some(""),
-      chargingPoint = None,
+      chargingPoint = Missing,
       taxRate = None,
       whatTypeOfSecurities = Some(""),
       typeOfShares = Some(""),

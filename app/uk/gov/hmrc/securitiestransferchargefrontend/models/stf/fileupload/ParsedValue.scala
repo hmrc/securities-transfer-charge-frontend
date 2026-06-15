@@ -19,7 +19,12 @@ package uk.gov.hmrc.securitiestransferchargefrontend.models.stf.fileupload
 import play.api.libs.functional.syntax._
 import play.api.libs.json._
 
-sealed trait ParsedValue[+A]
+sealed trait ParsedValue[+A] {
+  def toOption: Option[A] = this match {
+    case ParsedValue.Valid(value) => Some(value)
+    case _                        => None
+  }
+}
 
 object ParsedValue {
 

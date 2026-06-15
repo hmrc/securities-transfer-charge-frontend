@@ -27,8 +27,8 @@ class StcFileValidationService @Inject()(
                                           stcRowValidationService: StcRowValidationService
                                         ) {
 
-  def validateStream(rowStream: Iterator[ParsedRow], headers: Seq[String], affinityKey: String): Either[FileParseError, StcFileValidationResponse] = {
-    stcRowValidationService.validateStream(rowStream, headers, affinityKey, config.maxErrorsAllowed, config.maxRows).map { rows =>
+  def validateStream(rowStream: Iterator[ParsedRow], headers: Seq[String], affinityKey: String, templateType: String): Either[FileParseError, StcFileValidationResponse] = {
+    stcRowValidationService.validateStream(rowStream, headers, affinityKey, templateType, config.maxErrorsAllowed, config.maxRows).map { rows =>
       StcFileValidationResponse(
         rows = rows,
         maxErrorsAllowed = config.maxErrorsAllowed

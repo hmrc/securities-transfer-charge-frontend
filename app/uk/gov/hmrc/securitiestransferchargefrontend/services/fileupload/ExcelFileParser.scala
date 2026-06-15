@@ -38,7 +38,7 @@ class ExcelFileParser @Inject()(config: FileUploadConfig, appConfig: FrontendApp
       extractCellValue(cell).isEmpty
     }
 
-  override def withParsedStream[A](file: UploadedFile)(block: (Seq[String], Iterator[ParsedRow]) => Either[FileParseError, A]): Either[FileParseError, A] = {
+  override def withParsedStream[A](file: UploadedFile, expectedColumns: Int)(block: (Seq[String], Iterator[ParsedRow]) => Either[FileParseError, A]): Either[FileParseError, A] = {
     try {
       val workbook: Workbook = StreamingReader.builder()
         .rowCacheSize(appConfig.rowCacheSize)
@@ -59,14 +59,14 @@ class ExcelFileParser @Inject()(config: FileUploadConfig, appConfig: FrontendApp
               Left(InvalidXlsx("The file is empty or only contains empty rows"))
             } else {
               val headerRow = rowIterator.next()
-              val headers = (0 until config.maxColumns).map { i =>
+              val headers = (0 until expectedColumns).map { i =>
                 Option(headerRow.getCell(i)).map(extractCellValue).getOrElse("").trim
               }
 
               val lazyParsedRows = rowIterator.map { row =>
                 ParsedRow(
                   rowNumber = row.getRowNum + 1,
-                  cells = (0 until config.maxColumns).map { i =>
+                  cells = (0 until expectedColumns).map { i =>
                     val value = Option(row.getCell(i)).map(extractCellValue).getOrElse("").trim
                     ParsedCell(i, value)
                   }
