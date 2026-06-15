@@ -49,7 +49,7 @@ class ChargingPointControllerSpec extends SpecBase with MockitoSugar {
   val validAnswer: LocalDate = LocalDate.now(ZoneOffset.UTC)
 
   lazy val chargingPointRoute: String = orgSingleRoutes.ChargingPointController.onPageLoad(NormalMode).url
-  override val emptyUserAnswers = UserAnswers(userAnswersId, submissionId)
+  override val emptyUserAnswers = UserAnswers(testUserId, testGroupIdentifier, submissionId)
 
 
   def getRequest(): FakeRequest[AnyContentAsEmpty.type] =
@@ -82,7 +82,7 @@ class ChargingPointControllerSpec extends SpecBase with MockitoSugar {
 
     "must populate the view correctly on a GET when the question has previously been answered" in {
 
-      val userAnswers = UserAnswers(userAnswersId, submissionId).set(ChargingPointPage, validAnswer).success.value
+      val userAnswers = UserAnswers(testUserId, testGroupIdentifier, submissionId).set(ChargingPointPage, validAnswer).success.value
 
       val application = applicationBuilder(userAnswers = Some(userAnswers), affinityGroup = orgAffinity)
         .overrides(bind[Navigator].qualifiedWith("organisations").toInstance(getNavigator))

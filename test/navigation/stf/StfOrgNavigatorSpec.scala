@@ -51,7 +51,7 @@ class StfOrgNavigatorSpec extends SpecBase with ScalaFutures {
 
       "must go from a page that doesn't exist in the route map to default page" in {
         case object UnknownPage extends Page
-        val result = navigator.nextPage(UnknownPage, NormalMode, UserAnswers("id", submissionId))(fakeRequest)
+        val result = navigator.nextPage(UnknownPage, NormalMode, UserAnswers(testUserId, testGroupIdentifier, submissionId))(fakeRequest)
         whenReady(result) { res =>
           res mustBe navigator.defaultPage
         }
@@ -59,7 +59,7 @@ class StfOrgNavigatorSpec extends SpecBase with ScalaFutures {
 
       "must go from any page to the dashboard page if isReturn is true" in {
         case object AnyPage extends Page
-        val result = navigator.nextPage(AnyPage, NormalMode, UserAnswers("id", submissionId), true)(fakeRequest)
+        val result = navigator.nextPage(AnyPage, NormalMode, UserAnswers(testUserId, testGroupIdentifier, submissionId), true)(fakeRequest)
         whenReady(result) { res =>
           res mustBe navigator.dashboardPage
         }
@@ -249,7 +249,7 @@ class StfOrgNavigatorSpec extends SpecBase with ScalaFutures {
       "must go from a page that doesn't exist in the edit route map to CheckYourAnswers" in {
 
         case object UnknownPage extends Page
-        val result = navigator.nextPage(UnknownPage, CheckMode, UserAnswers("id", submissionId))(fakeRequest)
+        val result = navigator.nextPage(UnknownPage, CheckMode, UserAnswers(testUserId, testGroupIdentifier, submissionId))(fakeRequest)
         whenReady(result) { res =>
           res mustBe routes.CheckYourAnswersController.onPageLoad()
         }

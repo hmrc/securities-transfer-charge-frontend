@@ -16,8 +16,9 @@
 
 package base.stubs
 
+import base.Fixtures.testGroupIdentifier
 import uk.gov.hmrc.http.HeaderCarrier
-import uk.gov.hmrc.securitiestransferchargefrontend.domain.SubmissionId
+import uk.gov.hmrc.securitiestransferchargefrontend.domain.{SubmissionId, UserId}
 import uk.gov.hmrc.securitiestransferchargefrontend.models.UserAnswers
 import uk.gov.hmrc.securitiestransferchargefrontend.services.AnswerPersistenceService
 
@@ -27,8 +28,8 @@ class StubAnswerPersistenceService extends AnswerPersistenceService:
   def save(userAnswers: UserAnswers)(implicit hc: HeaderCarrier): Future[Unit] =
     Future.successful(())
 
-  override def load(submissionId: SubmissionId, userId: String)(implicit hc: HeaderCarrier): Future[UserAnswers] =
-    Future.successful(UserAnswers.empty(userId)(submissionId))
+  override def load(submissionId: SubmissionId, userId: UserId)(implicit hc: HeaderCarrier): Future[UserAnswers] =
+    Future.successful(UserAnswers.empty(userId)(testGroupIdentifier)(submissionId))
 
 object StubAnswerPersistenceService:
   def apply(): StubAnswerPersistenceService = new StubAnswerPersistenceService

@@ -60,7 +60,7 @@ class NameOfBuyerControllerSpec extends SpecBase with MockitoSugar {
 
     "must populate the view correctly on a GET when the question has previously been answered" in {
 
-      val userAnswers = UserAnswers(userAnswersId, submissionId).set(NameOfBuyerPage, "answer").success.value
+      val userAnswers = UserAnswers(testUserId, testGroupIdentifier, submissionId).set(NameOfBuyerPage, "answer").success.value
 
       val application = applicationBuilder(userAnswers = Some(userAnswers), affinityGroup = agentAffinity)
         .overrides(bind[Navigator].qualifiedWith("agents").toInstance(getNavigator))

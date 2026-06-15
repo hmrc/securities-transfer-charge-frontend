@@ -14,13 +14,20 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.securitiestransferchargefrontend.navigation
+package uk.gov.hmrc.securitiestransferchargefrontend.domain
 
-import play.api.mvc.Request
-import uk.gov.hmrc.securitiestransferchargefrontend.domain.{SubmissionId, UserId}
-import uk.gov.hmrc.securitiestransferchargefrontend.models.UserAnswers
+import play.api.libs.json.{Reads, Writes}
 
-import scala.concurrent.Future
+opaque type GroupIdentifier = String
 
-trait PersistentNavigator extends Navigator:
-  def restore(submissionId: SubmissionId, userId: UserId)(implicit request: Request[?]): Future[UserAnswers]
+object GroupIdentifier:
+  def apply(v: String): GroupIdentifier = v
+
+  extension (id: GroupIdentifier)
+    def value: String = id
+
+  given groupIdentifierReads: Reads[GroupIdentifier] =
+    Reads.StringReads.map(GroupIdentifier.apply)
+
+  given groupIdentifierWrites: Writes[GroupIdentifier] =
+    Writes.StringWrites.contramap[GroupIdentifier](_.value)

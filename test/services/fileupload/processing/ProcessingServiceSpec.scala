@@ -282,7 +282,8 @@ class ProcessingServiceSpec extends SpecBase with MockitoSugar with BeforeAndAft
       implicit val request: StcAuthorisedRequest[AnyContentAsEmpty.type] =
         StcAuthorisedRequest(
           FakeRequest(),
-          internalId = "some-id",
+          internalId = testUserId.value,
+          groupIdentifier = testGroupIdentifier.value,
           affinityGroup = individualAffinity,
           subscriptionId = SubscriptionId("STC-GFGF"),
           credentialId = CredentialId("some id")

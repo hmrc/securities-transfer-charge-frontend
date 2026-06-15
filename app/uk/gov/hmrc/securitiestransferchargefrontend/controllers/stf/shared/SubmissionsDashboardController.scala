@@ -20,9 +20,12 @@ import play.api.Logging
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import uk.gov.hmrc.auth.core.AffinityGroup
+import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import uk.gov.hmrc.securitiestransferchargefrontend.clients.{SaveAndReturnClient, SubmissionIdClient}
+import uk.gov.hmrc.securitiestransferchargefrontend.config.FrontendAppConfig
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.actions.{StcAuthEnrolledAction, StcDataRetrievalAction}
+import uk.gov.hmrc.securitiestransferchargefrontend.domain.{GroupIdentifier, SubmissionId, UserId}
 import uk.gov.hmrc.securitiestransferchargefrontend.models.audit.AuditModel
 import uk.gov.hmrc.securitiestransferchargefrontend.models.audit.JourneyStatus.StartSubmission
 import uk.gov.hmrc.securitiestransferchargefrontend.models.{NormalMode, UserAnswers}
@@ -32,11 +35,12 @@ import uk.gov.hmrc.securitiestransferchargefrontend.services.AuditService
 import uk.gov.hmrc.securitiestransferchargefrontend.views.html.stf.shared.SubmissionsDashboardView
 
 import javax.inject.{Inject, Named}
-import scala.concurrent.ExecutionContext
+import scala.concurrent.{ExecutionContext, Future}
 
 class SubmissionsDashboardController @Inject()(
                                                 override val messagesApi: MessagesApi,
                                                 val controllerComponents: MessagesControllerComponents,
+                                                appConfig: FrontendAppConfig,
                                                 stcAuthEnrolled: StcAuthEnrolledAction,
                                                 getData: StcDataRetrievalAction,
                                                 view: SubmissionsDashboardView,
@@ -51,23 +55,32 @@ class SubmissionsDashboardController @Inject()(
   def onPageLoad(): Action[AnyContent] =
     (stcAuthEnrolled andThen getData).async { implicit request =>
 
-      val userId = request.request.internalId
-
-      saveAndReturnClient.list(userId).map { submissionIds =>
+      val userId = UserId(request.request.internalId)
+      val groupIdentifier = GroupIdentifier(request.request.groupIdentifier)
+      listSubmissionIds(userId, groupIdentifier).map { submissionIds =>
         Ok(view(submissionIds))
       }
     }
 
 
+  private def listSubmissionIds(userId: UserId, groupIdentifier: GroupIdentifier)(implicit headerCarrier: HeaderCarrier): Future[List[SubmissionId]] = {
+    import appConfig.SaveAndReturnRetrievalType._
+    appConfig.saveAndReturnRetrieval match {
+      case UserOnly     => saveAndReturnClient.listByUser(userId)
+      case UserAndGroup => saveAndReturnClient.listByGroup(groupIdentifier)
+    }
+  }
+  
   def onSubmit(): Action[AnyContent] = (stcAuthEnrolled andThen getData).async {
     implicit request =>
 
       val innerRequest = request.request
-      val userId = innerRequest.internalId
+      val userId = UserId(innerRequest.internalId)
+      val group = GroupIdentifier(innerRequest.groupIdentifier)
 
       for {
         submissionId <- idClient.nextSubmissionId()
-        emptyAnswers = UserAnswers.empty(userId)(submissionId)
+        emptyAnswers = UserAnswers.empty(userId)(group)(submissionId)
 
         call <- innerRequest.affinityGroup match {
           case AffinityGroup.Organisation =>

@@ -16,6 +16,7 @@
 
 package controllers.stf.organisations.single
 
+import base.Fixtures.testUserAnswers
 import base.SpecBase
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.when
@@ -70,7 +71,7 @@ class WhatTypeOfSecuritiesControllerSpec extends SpecBase with MockitoSugar {
 
     "must populate the view correctly on a GET when the question has previously been answered" in {
 
-      val userAnswers = UserAnswers(userAnswersId,submissionId).set(WhatTypeOfSecuritiesPage, WhatTypeOfSecurities.values.head).success.value
+      val userAnswers = testUserAnswers.set(WhatTypeOfSecuritiesPage, WhatTypeOfSecurities.values.head).success.value
 
       val application = applicationBuilder(
         userAnswers = Some(userAnswers),

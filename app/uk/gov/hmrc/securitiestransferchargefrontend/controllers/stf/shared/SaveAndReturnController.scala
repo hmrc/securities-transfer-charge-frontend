@@ -20,7 +20,7 @@ import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.actions.StcAuthEnrolledAction
-import uk.gov.hmrc.securitiestransferchargefrontend.domain.SubmissionId
+import uk.gov.hmrc.securitiestransferchargefrontend.domain.{SubmissionId, UserId}
 import uk.gov.hmrc.securitiestransferchargefrontend.models.audit.AuditModel
 import uk.gov.hmrc.securitiestransferchargefrontend.models.audit.JourneyStatus.ContinueSubmission
 import uk.gov.hmrc.securitiestransferchargefrontend.navigation.PersistentNavigator
@@ -39,11 +39,12 @@ class SaveAndReturnController @Inject()( override val messagesApi: MessagesApi,
 
   def restore(submissionId: String): Action[AnyContent] =
     stcAuthEnrolled.async { implicit request =>
+      val userId = UserId(request.internalId)
       for {
-        userAnswers <- navigator.restore(SubmissionId(submissionId), request.internalId)
+        userAnswers <- navigator.restore(SubmissionId(submissionId), userId)
         nextPage     = userAnswers.nextPage.getOrElse(navigator.errorPage(SaveAndReturnPage))
       } yield  {
-        auditService.audit(AuditModel(ContinueSubmission, request.internalId, request.affinityGroup, request.credentialId, SubmissionId(submissionId)))
+        auditService.audit(AuditModel(ContinueSubmission, userId, request.affinityGroup, request.credentialId, SubmissionId(submissionId)))
         Redirect(nextPage)
       }
     }

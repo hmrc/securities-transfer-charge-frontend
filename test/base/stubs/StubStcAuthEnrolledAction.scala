@@ -45,7 +45,8 @@ class StubStcAuthEnrolledAction @Inject() (
     block(
       StcAuthorisedRequest(
         request,
-        testInternalId,
+        testInternalId.value,
+        testGroupIdentifier.value,
         affinityGroup,
         testSubscriptionId,
         testCredentialId

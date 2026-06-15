@@ -25,6 +25,7 @@ import uk.gov.hmrc.mongo.play.json.PlayMongoRepository
 import uk.gov.hmrc.mongo.play.json.formats.MongoJavatimeFormats
 import uk.gov.hmrc.securitiestransferchargefrontend.config.FrontendAppConfig
 import uk.gov.hmrc.securitiestransferchargefrontend.models.UserAnswers
+import uk.gov.hmrc.securitiestransferchargefrontend.domain.*
 
 import java.time.{Clock, Instant}
 import java.util.concurrent.TimeUnit
@@ -32,10 +33,10 @@ import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
 
 trait SessionRepository:
-  def get(id: String): Future[Option[UserAnswers]]
+  def get(id: UserId): Future[Option[UserAnswers]]
   def set(answers: UserAnswers): Future[Unit]
-  def clear(id: String): Future[Unit]
-  def keepAlive(id: String): Future[Unit]
+  def clear(id: UserId): Future[Unit]
+  def keepAlive(id: UserId): Future[Unit]
 
 
 @Singleton
@@ -60,9 +61,9 @@ class SessionRepositoryImpl @Inject()(
 
   implicit val instantFormat: Format[Instant] = MongoJavatimeFormats.instantFormat
 
-  private def byId(id: String): Bson = Filters.equal("_id", id)
+  private def byId(id: UserId): Bson = Filters.equal("_id", id.value)
 
-  def keepAlive(id: String): Future[Unit] = Mdc.preservingMdc {
+  def keepAlive(id: UserId): Future[Unit] = Mdc.preservingMdc {
     collection
       .updateOne(
         filter = byId(id),
@@ -72,7 +73,7 @@ class SessionRepositoryImpl @Inject()(
       .map(_ => ())
   }
 
-  def get(id: String): Future[Option[UserAnswers]] = Mdc.preservingMdc {
+  def get(id: UserId): Future[Option[UserAnswers]] = Mdc.preservingMdc {
     keepAlive(id).flatMap {
       _ =>
         collection
@@ -95,7 +96,7 @@ class SessionRepositoryImpl @Inject()(
       .map(_ => ())
   }
 
-  def clear(id: String): Future[Unit] = Mdc.preservingMdc {
+  def clear(id: UserId): Future[Unit] = Mdc.preservingMdc {
     collection
       .deleteOne(byId(id))
       .toFuture()

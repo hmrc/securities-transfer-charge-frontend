@@ -35,6 +35,7 @@ import uk.gov.hmrc.securitiestransferchargefrontend.pages.stf.single.ConnectedPe
 import uk.gov.hmrc.securitiestransferchargefrontend.views.html.stf.organisations.single.ConnectedPersonsView
 
 import scala.concurrent.Future
+import base.Fixtures.testUserAnswers
 
 class ConnectedPersonsControllerSpec extends SpecBase with MockitoSugar {
   
@@ -65,7 +66,7 @@ class ConnectedPersonsControllerSpec extends SpecBase with MockitoSugar {
 
     "must populate the view correctly on a GET when the question has previously been answered" in {
 
-      val userAnswers = UserAnswers(userAnswersId,submissionId).set(ConnectedPersonsPage, true).success.value
+      val userAnswers = testUserAnswers.set(ConnectedPersonsPage, true).success.value
 
       val application = applicationBuilder(userAnswers = Some(userAnswers), affinityGroup = orgAffinity)
         .overrides(bind[Navigator].qualifiedWith("organisations").toInstance(getNavigator))

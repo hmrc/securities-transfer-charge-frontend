@@ -30,7 +30,7 @@ import play.api.mvc.{AnyContentAsEmpty, Call, MessagesControllerComponents, Play
 import play.api.test.FakeRequest
 import uk.gov.hmrc.auth.core.AffinityGroup
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.shared.SaveAndReturnController
-import uk.gov.hmrc.securitiestransferchargefrontend.domain.SubmissionId
+import uk.gov.hmrc.securitiestransferchargefrontend.domain.{SubmissionId, UserId}
 import uk.gov.hmrc.securitiestransferchargefrontend.models.UserAnswers
 import uk.gov.hmrc.securitiestransferchargefrontend.models.audit.JourneyStatus.ContinueSubmission
 import uk.gov.hmrc.securitiestransferchargefrontend.navigation.PersistentNavigator
@@ -43,7 +43,7 @@ class SaveAndReturnControllerSpec extends SpecBase with MockitoSugar with ScalaF
 
   implicit val testRequest: FakeRequest[AnyContentAsEmpty.type] = fakeRequest
 
-  private val testUserAnswers = UserAnswers(testInternalId, testSubmissionId)
+  private val testUserAnswers = UserAnswers(testInternalId, testGroupIdentifier, testSubmissionId)
   private val testCall = Call("GET", "/test-page")
   private val mockMessagesApi = mock[MessagesApi]
   private val mockControllerComponents = mock[MessagesControllerComponents]
@@ -73,7 +73,7 @@ class SaveAndReturnControllerSpec extends SpecBase with MockitoSugar with ScalaF
 
       "must fail when restore fails" in {
 
-        doReturn(Future.failed(new RuntimeException("No user answers"))).when(mockNavigator).restore(any[SubmissionId], any[String])(any())
+        doReturn(Future.failed(new RuntimeException("No user answers"))).when(mockNavigator).restore(any[SubmissionId], any[UserId])(any())
 
         val result = testSetup(AffinityGroup.Individual).restore(testSubmissionId.value).apply(testRequest)
 
@@ -84,7 +84,7 @@ class SaveAndReturnControllerSpec extends SpecBase with MockitoSugar with ScalaF
 
       "must redirect to error page when next page is unavailable" in {
 
-        doReturn(Future.successful(testUserAnswers)).when(mockNavigator).restore(any[SubmissionId], any[String])(any())
+        doReturn(Future.successful(testUserAnswers)).when(mockNavigator).restore(any[SubmissionId], any[UserId])(any())
 
         when(mockNavigator.errorPage(SaveAndReturnPage)).thenReturn(testCall)
 

@@ -46,7 +46,7 @@ class DetailsOfThisTransferControllerSpec extends SpecBase with MockitoSugar {
     amountPaid = BigDecimal(100),
     marketValue = Some(BigDecimal(10000)))
 
-  val userAnswers: UserAnswers = UserAnswers(userAnswersId, submissionId)
+  val userAnswers: UserAnswers = UserAnswers(testUserId, testGroupIdentifier, submissionId)
 
   "DetailsOfThisTransfer Controller" - {
 
