@@ -110,9 +110,6 @@ class StcBasicRowValidator @Inject()(
                                      affinityKey: String
                                    )(implicit cols: ColumnIndexBuilder): Seq[StcRowValidationError] = {
 
-    def msgKey(suffix: String): String =
-      if (affinityKey == "individual") suffix else s"$affinityKey.$suffix"
-
     row.chargingPoint match {
 
       case ParsedValue.Missing =>
@@ -120,7 +117,7 @@ class StcBasicRowValidator @Inject()(
           support.error(
             row.rowNumber,
             "chargingPoint",
-            messages(msgKey("chargingPoint.error.required.all"))
+            messages(s"$affinityKey.chargingPoint.error.required.all")
           )
         )
 
@@ -129,7 +126,7 @@ class StcBasicRowValidator @Inject()(
           support.error(
             row.rowNumber,
             "chargingPoint",
-            messages(msgKey("chargingPoint.error.invalid"))
+            messages(s"$affinityKey.chargingPoint.error.invalid")
           )
         )
 
@@ -138,7 +135,7 @@ class StcBasicRowValidator @Inject()(
           support.error(
             row.rowNumber,
             "chargingPoint",
-            messages(msgKey("chargingPoint.error.futureDate"))
+            messages(s"$affinityKey.chargingPoint.error.futureDate")
           )
         )
 

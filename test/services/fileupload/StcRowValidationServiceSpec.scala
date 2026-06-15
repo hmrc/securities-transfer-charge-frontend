@@ -192,5 +192,20 @@ class StcRowValidationServiceSpec extends SpecBase {
 
       result mustBe Left(FileParseError.RowLimitExceeded(2, 1))
     }
+
+    "return InvalidTemplate when an unsupported template type string is passed" in {
+      val row = ParsedRow(rowNumber = 4, cells = Seq.empty)
+
+      val result = service.validateStream(
+        Seq(row).iterator,
+        headers,
+        affinityGroupKeyInd,
+        templateType = "invalid-template-type",
+        maxErrorsAllowed = 25,
+        maxRows = 10000
+      )
+
+      result mustBe Left(FileParseError.InvalidTemplate)
+    }
   }
 }

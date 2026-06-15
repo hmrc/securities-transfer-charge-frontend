@@ -39,36 +39,38 @@ class StcRowValidationService @Inject()(
     implicit val columnIndex: ColumnIndexBuilder = new ColumnIndexBuilder(headers)
     val mapper = new StcRowMapper(columnIndex)
 
-    val template = templateType.toLowerCase match {
-      case "stf"  => StcTemplate.STF
-      case "sh03" => StcTemplate.SH03
-      case other  => throw new IllegalArgumentException(s"Unsupported template type: $other")
+    val resolvedTemplate = templateType.toLowerCase match {
+      case "stf"  => Right(StcTemplate.STF)
+      case "sh03" => Right(StcTemplate.SH03)
+      case _      => Left(FileParseError.InvalidTemplate)
     }
 
-    @tailrec
-    def processRows(
-                     accumulated: List[ValidatedStcRow],
-                     blockingErrorCount: Int,
-                     processedRowCount: Int
-                   ): Either[FileParseError, Seq[ValidatedStcRow]] = {
+    resolvedTemplate.flatMap { template =>
+      @tailrec
+      def processRows(
+                       accumulated: List[ValidatedStcRow],
+                       blockingErrorCount: Int,
+                       processedRowCount: Int
+                     ): Either[FileParseError, Seq[ValidatedStcRow]] = {
 
-      if (processedRowCount > maxRows) {
-        Left(FileParseError.RowLimitExceeded(processedRowCount, maxRows))
-      } else if (blockingErrorCount > maxErrorsAllowed || !rowStream.hasNext) {
-        Right(accumulated.reverse)
-      } else {
-        val parsedRow = mapper.map(rowStream.next())
+        if (processedRowCount > maxRows) {
+          Left(FileParseError.RowLimitExceeded(processedRowCount, maxRows))
+        } else if (blockingErrorCount > maxErrorsAllowed || !rowStream.hasNext) {
+          Right(accumulated.reverse)
+        } else {
+          val parsedRow = mapper.map(rowStream.next())
 
-        val errors =
-          stcBasicRowValidator.validate(parsedRow, template, affinityKey) ++
-            stcConditionalRowValidator.validate(parsedRow, template, affinityKey)
+          val errors =
+            stcBasicRowValidator.validate(parsedRow, template, affinityKey) ++
+              stcConditionalRowValidator.validate(parsedRow, template, affinityKey)
 
-        val updatedErrorCount = blockingErrorCount + errors.count(_.blocking)
+          val updatedErrorCount = blockingErrorCount + errors.count(_.blocking)
 
-        processRows(ValidatedStcRow(parsedRow, errors) :: accumulated, updatedErrorCount, processedRowCount + 1)
+          processRows(ValidatedStcRow(parsedRow, errors) :: accumulated, updatedErrorCount, processedRowCount + 1)
+        }
       }
-    }
 
-    processRows(Nil, 0, 0)
+      processRows(Nil, 0, 0)
+    }
   }
 }

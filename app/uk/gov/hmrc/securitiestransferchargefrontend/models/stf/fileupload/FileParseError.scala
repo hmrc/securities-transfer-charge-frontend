@@ -53,4 +53,8 @@ object FileParseError {
   case object InvalidTemplate extends FileParseError {
     override val message: String = "The template file has been altered"
   }
+
+  final case class UnsupportedTemplateType(templateType: String) extends FileParseError {
+    override val message: String = s"Unsupported template type: $templateType"
+  }
 }

@@ -48,7 +48,7 @@ class StcUploadParsingService @Inject()(
           }.toList
 
           val allHeaderCells = headers ++ additionalHeaderRows.flatMap(_.cells.sortBy(_.columnIndex).map(_.rawValue))
-          
+
           if (hashBlock(allHeaderCells) != templateDef.signature) {
             Left(FileParseError.InvalidTemplate)
           } else {

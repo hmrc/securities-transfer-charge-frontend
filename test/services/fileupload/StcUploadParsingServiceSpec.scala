@@ -16,7 +16,7 @@
 
 package services.fileupload
 
-import org.mockito.ArgumentMatchers.any
+import org.mockito.ArgumentMatchers.{any, eq => eqTo}
 import org.mockito.Mockito.{verify, when}
 import org.scalatest.EitherValues
 import org.scalatest.matchers.must.Matchers.mustBe
@@ -91,7 +91,7 @@ class StcUploadParsingServiceSpec extends AnyWordSpec with Matchers with EitherV
       }
 
       result.value mustBe Seq(dataRow)
-      verify(fileParsingService).withParsedStream[Seq[ParsedRow]](any[UploadedFile], any[Int])(any())
+      verify(fileParsingService).withParsedStream[Seq[ParsedRow]](any[UploadedFile], eqTo(27))(any())
     }
 
     "keep multiple non-empty data rows from firstDataRow onwards" in new Setup {
@@ -153,6 +153,16 @@ class StcUploadParsingServiceSpec extends AnyWordSpec with Matchers with EitherV
       result mustBe Left(FileParseError.InvalidTemplate)
     }
 
+    "return InvalidTemplate when no template configuration is found for the given journey keys" in new Setup {
+      when(fileUploadConfig.template(eqTo(testAffinityGroup), eqTo("unknown"))).thenReturn(None)
+
+      mockStream(validRow1Cells, Seq(validRow2, validRow3, ParsedRow(4, Seq(ParsedCell(1, "Data")))))
+
+      val result: Either[FileParseError, List[ParsedRow]] = service.withVerifiedTemplateStream(uploadedFile, testAffinityGroup, "unknown") { (_, stream) => Right(stream.toList) }
+
+      result mustBe Left(FileParseError.InvalidTemplate)
+    }
+
     "propagate file parsing errors" in new Setup {
       when(fileParsingService.withParsedStream[Seq[ParsedRow]](any[UploadedFile], any[Int])(any()))
         .thenReturn(Left(FileParseError.InvalidXlsx("broken workbook")))
@@ -160,6 +170,29 @@ class StcUploadParsingServiceSpec extends AnyWordSpec with Matchers with EitherV
       val result: Either[FileParseError, List[ParsedRow]] = service.withVerifiedTemplateStream(uploadedFile, testAffinityGroup, "stf") { (_, stream) => Right(stream.toList) }
 
       result mustBe Left(FileParseError.InvalidXlsx("broken workbook"))
+    }
+
+    "lookup config properties and pass expected columns dynamically to the parser selector channel" in new Setup {
+      val mockConfig: FileUploadConfig = mock[FileUploadConfig]
+      val mockParser: FileParsingService = mock[FileParsingService]
+      val currentService = new StcUploadParsingService(mockConfig, mockParser)
+
+      when(mockConfig.firstDataRow).thenReturn(4)
+
+      when(mockConfig.template(eqTo("individual"), eqTo("stf"))).thenReturn(
+        Some(TemplateDefinition(expectedColumns = 27, signature = "ind-hash"))
+      )
+      when(mockConfig.template(eqTo("org"), eqTo("stf"))).thenReturn(
+        Some(TemplateDefinition(expectedColumns = 21, signature = "org-hash"))
+      )
+
+      when(mockParser.withParsedStream[Unit](any(), any())(any())).thenReturn(Right(()))
+
+      currentService.withVerifiedTemplateStream(uploadedFile, "individual", "stf") { (_, _) => Right(()) }
+      verify(mockParser).withParsedStream[Unit](eqTo(uploadedFile), eqTo(27))(any())
+
+      currentService.withVerifiedTemplateStream(uploadedFile, "org", "stf") { (_, _) => Right(()) }
+      verify(mockParser).withParsedStream[Unit](eqTo(uploadedFile), eqTo(21))(any())
     }
   }
 }
