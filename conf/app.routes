@@ -286,3 +286,8 @@ GET        /stf/bulk-error-password                        uk.gov.hmrc.securitie
 GET        /stf/bulk-error-template                        uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.shared.bulk.BulkUploadInvalidTemplateController.onPageLoad()
 
 GET        /stf/agent/template                             uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.agents.bulk.TemplateInstructionsController.onPageLoad()
+
+GET        /stf/agent/bulk/add-reference                   uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.agents.bulk.AgentReferenceController.onPageLoad(mode: Mode = NormalMode)
+POST       /stf/agent/bulk/add-reference                   uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.agents.bulk.AgentReferenceController.onSubmit(mode: Mode = NormalMode)
+GET        /stf/agent/bulk/change/add-reference            uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.agents.bulk.AgentReferenceController.onPageLoad(mode: Mode = CheckMode)
+POST       /stf/agent/bulk/change/add-reference            uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.agents.bulk.AgentReferenceController.onSubmit(mode: Mode = CheckMode)

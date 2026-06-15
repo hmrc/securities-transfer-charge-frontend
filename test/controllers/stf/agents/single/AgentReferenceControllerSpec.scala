@@ -31,8 +31,9 @@ import uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.agents.singl
 import uk.gov.hmrc.securitiestransferchargefrontend.forms.stf.agents.AgentReferenceFormProvider
 import uk.gov.hmrc.securitiestransferchargefrontend.models.{NormalMode, UserAnswers}
 import uk.gov.hmrc.securitiestransferchargefrontend.models.stf.AgentReference
+import uk.gov.hmrc.securitiestransferchargefrontend.models.stf.HowToNotifyAboutSecuritiesTransfer.OneAtATime
 import uk.gov.hmrc.securitiestransferchargefrontend.navigation.Navigator
-import uk.gov.hmrc.securitiestransferchargefrontend.pages.stf.single.AgentReferencePage
+import uk.gov.hmrc.securitiestransferchargefrontend.pages.stf.shared.{AgentReferencePage, HowToNotifyAboutSecuritiesTransferPage}
 import uk.gov.hmrc.securitiestransferchargefrontend.repositories.SessionRepository
 import uk.gov.hmrc.securitiestransferchargefrontend.views.html.stf.agents.single.AgentReferenceView
 
@@ -70,7 +71,7 @@ class AgentReferenceControllerSpec extends SpecBase with MockitoSugar {
 
     "must populate the view correctly on a GET when the question has previously been answered" in {
 
-      val userAnswers = UserAnswers(userAnswersId, submissionId).set(AgentReferencePage,AgentReference(Some("answer"))).success.value
+      val userAnswers = UserAnswers(testUserId, testGroupIdentifier, submissionId).set(AgentReferencePage,AgentReference(Some("answer"))).success.value
 
       val application = applicationBuilder(userAnswers = Some(userAnswers), affinityGroup = agentAffinity)
         .overrides(bind[Navigator].qualifiedWith("agents").toInstance(getNavigator))
@@ -89,13 +90,14 @@ class AgentReferenceControllerSpec extends SpecBase with MockitoSugar {
     }
 
     "must redirect to the next page when valid data is submitted" in {
+      val updatedAnswers = emptyUserAnswers.set(HowToNotifyAboutSecuritiesTransferPage, OneAtATime).success.value
 
       val mockSessionRepository = mock[SessionRepository]
 
       when(mockSessionRepository.set(any())) thenReturn Future.successful(())
 
       val application =
-        applicationBuilder(userAnswers = Some(emptyUserAnswers), AffinityGroup.Agent, sessionRepository = mockSessionRepository)
+        applicationBuilder(userAnswers = Some(updatedAnswers), AffinityGroup.Agent, sessionRepository = mockSessionRepository)
           .build()
 
       running(application) {

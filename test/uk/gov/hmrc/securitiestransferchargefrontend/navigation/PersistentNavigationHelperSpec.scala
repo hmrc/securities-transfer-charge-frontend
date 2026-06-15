@@ -37,7 +37,7 @@ class PersistentNavigationHelperSpec extends SpecBase with MockitoSugar with Sca
   val testPage: Page & Gettable[Boolean] & Settable[Boolean] = new Page with Gettable[Boolean] with Settable[Boolean] {
     override def path: JsPath = JsPath \ "test"
   }
-  private val emptyUserAnswers = UserAnswers.empty("test-id")(submissionId)
+  private val emptyUserAnswers = UserAnswers.empty(testUserId)(testGroupIdentifier)(submissionId)
   private val userAnswers = emptyUserAnswers.set(testPage, true).get
   private val errorCall = routes.JourneyRecoveryController.onPageLoad()
   private val testCall = individualsRoutes.HowToNotifyAboutSecuritiesTransferController.onPageLoad(NormalMode)

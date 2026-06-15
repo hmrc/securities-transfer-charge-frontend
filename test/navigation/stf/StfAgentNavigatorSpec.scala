@@ -26,12 +26,13 @@ import uk.gov.hmrc.securitiestransferchargefrontend.controllers.routes
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.agents.routes as agentRoutes
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.agents.single.routes as agentSingleRoutes
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.agents.bulk.routes as agentBulkRoutes
+import uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.shared.bulk.routes as bulkSharedRoutes
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.shared.routes as sharedRoutes
 import uk.gov.hmrc.securitiestransferchargefrontend.models.stf.*
 import uk.gov.hmrc.securitiestransferchargefrontend.models.{CheckMode, NormalMode, UserAnswers}
 import uk.gov.hmrc.securitiestransferchargefrontend.navigation.stf.agents.StfAgentNavigator
 import uk.gov.hmrc.securitiestransferchargefrontend.pages.Page
-import uk.gov.hmrc.securitiestransferchargefrontend.pages.stf.shared.{HowToNotifyAboutSecuritiesTransferPage, SubmissionsDashboardPage}
+import uk.gov.hmrc.securitiestransferchargefrontend.pages.stf.shared.{AgentReferencePage, HowToNotifyAboutSecuritiesTransferPage, SubmissionsDashboardPage}
 import uk.gov.hmrc.securitiestransferchargefrontend.pages.stf.single.*
 
 import java.time.LocalDate
@@ -56,7 +57,7 @@ class StfAgentNavigatorSpec extends SpecBase with ScalaFutures {
 
       "must go from a page that doesn't exist in the route map to default page" in {
         case object UnknownPage extends Page
-        val result = navigator.nextPage(UnknownPage, NormalMode, UserAnswers("id", submissionId))(fakeRequest)
+        val result = navigator.nextPage(UnknownPage, NormalMode, UserAnswers(testUserId, testGroupIdentifier, submissionId))(fakeRequest)
         whenReady(result) { res =>
           res mustBe navigator.defaultPage
         }
@@ -64,7 +65,7 @@ class StfAgentNavigatorSpec extends SpecBase with ScalaFutures {
 
       "must go from any page to the dashboard page if isReturn is true" in {
         case object AnyPage extends Page
-        val result = navigator.nextPage(AnyPage, NormalMode, UserAnswers("id", submissionId), true)(fakeRequest)
+        val result = navigator.nextPage(AnyPage, NormalMode, UserAnswers(testUserId, testGroupIdentifier, submissionId), true)(fakeRequest)
         whenReady(result) { res =>
           res mustBe navigator.dashboardPage
         }
@@ -93,8 +94,8 @@ class StfAgentNavigatorSpec extends SpecBase with ScalaFutures {
         }
       }
 
-      "must go from the AgentReferencePage to NameOfBuyerPage when one at a time is selected" in {
-        val answers = emptyUserAnswers.set(AgentReferencePage, AgentReference(Some("HMRC"))).get
+      "must go from the AgentReferencePage to NameOfBuyerPage if it is in single upload" in {
+        val answers = emptyUserAnswers.set(HowToNotifyAboutSecuritiesTransferPage, HowToNotifyAboutSecuritiesTransfer.OneAtATime).get.set(AgentReferencePage, AgentReference(Some("HMRC"))).get
         val result = navigator.nextPage(AgentReferencePage, NormalMode, answers)(fakeRequest)
         whenReady(result) { res =>
           res mustBe agentSingleRoutes.NameOfBuyerController.onPageLoad(NormalMode)
@@ -258,6 +259,14 @@ class StfAgentNavigatorSpec extends SpecBase with ScalaFutures {
           res mustBe routes.CheckYourAnswersController.onPageLoad()
         }
       }
+
+      "must go from the AgentReferencePage to CYA Page if it is in bulk upload" in {
+        val answers = emptyUserAnswers.set(HowToNotifyAboutSecuritiesTransferPage, HowToNotifyAboutSecuritiesTransfer.MoreThanOneAtATime).get.set(AgentReferencePage, AgentReference(Some("HMRC"))).get
+        val result = navigator.nextPage(AgentReferencePage, NormalMode, answers)(fakeRequest)
+        whenReady(result) { res =>
+          res mustBe routes.CheckYourAnswersController.onPageLoad()
+        }
+      }
     }
 
     "in Check mode" - {
@@ -265,7 +274,7 @@ class StfAgentNavigatorSpec extends SpecBase with ScalaFutures {
       "must go from a page that doesn't exist in the edit route map to CheckYourAnswers" in {
 
         case object UnknownPage extends Page
-        val result = navigator.nextPage(UnknownPage, CheckMode, UserAnswers("id", submissionId))(fakeRequest)
+        val result = navigator.nextPage(UnknownPage, CheckMode, UserAnswers(testUserId, testGroupIdentifier, submissionId))(fakeRequest)
         whenReady(result) { res =>
           res mustBe routes.CheckYourAnswersController.onPageLoad()
         }
@@ -285,9 +294,15 @@ class StfAgentNavigatorSpec extends SpecBase with ScalaFutures {
         result mustBe sharedRoutes.SubmissionsDashboardController.onPageLoad()
       }
 
-      "must go from the AgentReferencePage to HowToNotifyAboutSecuritiesTransferPage" in {
-        val result = navigator.previousPage(AgentReferencePage, NormalMode, emptyUserAnswers)
+      "must go from the AgentReferencePage to HowToNotifyAboutSecuritiesTransferPage if it is in single journey" in {
+        val answers = emptyUserAnswers.set(HowToNotifyAboutSecuritiesTransferPage, HowToNotifyAboutSecuritiesTransfer.OneAtATime).get
+        val result = navigator.previousPage(AgentReferencePage, NormalMode, answers)
         result mustBe agentRoutes.HowToNotifyAboutSecuritiesTransferController.onPageLoad(NormalMode)
+      }
+      "must go from the AgentReferencePage to HowToNotifyAboutSecuritiesTransferPage if it is in bulk journey" in {
+        val answers = emptyUserAnswers.set(HowToNotifyAboutSecuritiesTransferPage, HowToNotifyAboutSecuritiesTransfer.MoreThanOneAtATime).get
+        val result = navigator.previousPage(AgentReferencePage, NormalMode, answers)
+        result mustBe bulkSharedRoutes.FileUploadController.onPageLoad()
       }
 
       "must go from the NameOfBuyerPage to AgentReferencePage" in {

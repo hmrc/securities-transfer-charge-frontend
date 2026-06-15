@@ -14,15 +14,20 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.securitiestransferchargefrontend.pages.stf.single
+package uk.gov.hmrc.securitiestransferchargefrontend.domain
 
-import play.api.libs.json.JsPath
-import uk.gov.hmrc.securitiestransferchargefrontend.models.stf.AgentReference
-import uk.gov.hmrc.securitiestransferchargefrontend.pages.QuestionPage
+import play.api.libs.json.{Reads, Writes}
 
-case object AgentReferencePage extends QuestionPage[AgentReference] {
+opaque type UserId = String
 
-  override def path: JsPath = JsPath \ toString
+object UserId:
+  def apply(v: String): UserId = v
 
-  override def toString: String = "agentReference"
-}
+  extension (id: UserId)
+    def value: String = id
+
+  given userIdReads: Reads[UserId] =
+    Reads.StringReads.map(UserId.apply)
+
+  given userIdWrites: Writes[UserId] =
+    Writes.StringWrites.contramap[UserId](_.value)

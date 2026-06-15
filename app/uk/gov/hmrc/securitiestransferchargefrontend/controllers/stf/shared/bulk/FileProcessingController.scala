@@ -18,10 +18,13 @@ package uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.shared.bulk
 
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents, Result}
+import uk.gov.hmrc.auth.core.AffinityGroup
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import uk.gov.hmrc.securitiestransferchargefrontend.config.FrontendAppConfig
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.actions.*
+import uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.agents.bulk.routes as bulkRoutes
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.routes.JourneyRecoveryController
+import uk.gov.hmrc.securitiestransferchargefrontend.models.NormalMode
 import uk.gov.hmrc.securitiestransferchargefrontend.models.stf.upscan.{FileUpload, UpscanJourneyStatus}
 import uk.gov.hmrc.securitiestransferchargefrontend.repositories.UpscanJourneyRepository
 import uk.gov.hmrc.securitiestransferchargefrontend.services.fileupload.processing.FileProcessingHelper.*
@@ -114,7 +117,9 @@ class FileProcessingController @Inject()(
 
       case UpscanJourneyStatus.Failed  => Future.successful(Redirect(routes.BulkUploadErrorController.onPageLoad()))
 
-      case UpscanJourneyStatus.Completed => Future.successful(Redirect(JourneyRecoveryController.onPageLoad()))
-
+      case UpscanJourneyStatus.Completed => request.affinityGroup match {
+        case AffinityGroup.Agent => Future.successful(Redirect(bulkRoutes.AgentReferenceController.onPageLoad(NormalMode)))
+        case _ => Future.successful(Redirect(JourneyRecoveryController.onPageLoad()))
+      }
     }
 }

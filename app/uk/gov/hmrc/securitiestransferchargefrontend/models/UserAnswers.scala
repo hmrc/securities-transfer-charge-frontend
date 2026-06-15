@@ -19,14 +19,15 @@ package uk.gov.hmrc.securitiestransferchargefrontend.models
 import play.api.libs.json.*
 import play.api.mvc.Call
 import uk.gov.hmrc.mongo.play.json.formats.MongoJavatimeFormats
-import uk.gov.hmrc.securitiestransferchargefrontend.domain.SubmissionId
+import uk.gov.hmrc.securitiestransferchargefrontend.domain.{GroupIdentifier, SubmissionId, UserId}
 import uk.gov.hmrc.securitiestransferchargefrontend.queries.{Gettable, Settable}
 
 import java.time.Instant
 import scala.language.postfixOps
 import scala.util.{Failure, Success, Try}
 
-case class UserAnswers(userId: String,
+case class UserAnswers(userId: UserId,
+                       groupIdentifier: GroupIdentifier,
                        submissionId: SubmissionId,
                        nextPage: Option[Call] = None,
                        data: JsObject = Json.obj(),
@@ -73,7 +74,8 @@ case class UserAnswers(userId: String,
 object UserAnswers {
   import play.api.libs.functional.syntax.*
 
-  val empty: String => SubmissionId => UserAnswers = userId => submissionId => UserAnswers(userId, submissionId)
+  val empty: UserId => GroupIdentifier => SubmissionId => UserAnswers =
+    userId => groupIdentifier => submissionId => UserAnswers(userId, groupIdentifier, submissionId)
 
   implicit val callFormat: Format[Call] = new Format[Call] {
 
@@ -99,7 +101,8 @@ object UserAnswers {
   }
 
   val reads: Reads[UserAnswers] = (
-      (__ \ "_id").read[String] and
+      (__ \ "_id").read[UserId] and
+      (__ \ "groupIdentifier").read[GroupIdentifier] and
       (__ \ "submissionId").read[SubmissionId] and
       (__ \ "nextPage").readNullable[Call] and
       (__ \ "data").read[JsObject] and
@@ -107,12 +110,13 @@ object UserAnswers {
     ) (UserAnswers.apply _)
 
   val writes: OWrites[UserAnswers] = (
-      (__ \ "_id").write[String] and
+    (__ \ "_id").write[UserId] and
+      (__ \ "groupIdentifier").write[GroupIdentifier] and
       (__ \ "submissionId").write[SubmissionId] and
       (__ \ "nextPage").writeNullable[Call] and
       (__ \ "data").write[JsObject] and
       (__ \ "lastUpdated").write(MongoJavatimeFormats.instantFormat)
-    ) (ua => (ua.userId, ua.submissionId, ua.nextPage, ua.data, ua.lastUpdated))
+    ) (ua => (ua.userId, ua.groupIdentifier, ua.submissionId, ua.nextPage, ua.data, ua.lastUpdated))
 
   implicit val format: OFormat[UserAnswers] = OFormat(reads, writes)
 }

@@ -14,13 +14,15 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.securitiestransferchargefrontend.navigation
+package uk.gov.hmrc.securitiestransferchargefrontend.pages.stf.shared
 
-import play.api.mvc.Request
-import uk.gov.hmrc.securitiestransferchargefrontend.domain.{SubmissionId, UserId}
-import uk.gov.hmrc.securitiestransferchargefrontend.models.UserAnswers
+import play.api.libs.json.JsPath
+import uk.gov.hmrc.securitiestransferchargefrontend.models.stf.AgentReference
+import uk.gov.hmrc.securitiestransferchargefrontend.pages.QuestionPage
 
-import scala.concurrent.Future
+case object AgentReferencePage extends QuestionPage[AgentReference] {
 
-trait PersistentNavigator extends Navigator:
-  def restore(submissionId: SubmissionId, userId: UserId)(implicit request: Request[?]): Future[UserAnswers]
+  override def path: JsPath = JsPath \ toString
+
+  override def toString: String = "agentReference"
+}

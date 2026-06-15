@@ -35,6 +35,7 @@ import uk.gov.hmrc.securitiestransferchargefrontend.pages.stf.single.WhatReliefA
 import uk.gov.hmrc.securitiestransferchargefrontend.views.html.stf.individuals.single.WhatReliefAreYouApplyingForView
 
 import scala.concurrent.Future
+import base.Fixtures.testUserAnswers
 
 class WhatReliefAreYouApplyingForControllerSpec extends SpecBase with MockitoSugar {
   
@@ -67,7 +68,7 @@ class WhatReliefAreYouApplyingForControllerSpec extends SpecBase with MockitoSug
 
     "must populate the view correctly on a GET when the question has previously been answered" in {
 
-      val userAnswers = UserAnswers(userAnswersId,submissionId).set(WhatReliefAreYouApplyingForPage, "answer").success.value
+      val userAnswers = testUserAnswers.set(WhatReliefAreYouApplyingForPage, "answer").success.value
 
       val application = applicationBuilder(userAnswers = Some(userAnswers), affinityGroup = individualAffinity)
         .overrides(bind[Navigator].qualifiedWith("individuals").toInstance(getNavigator))

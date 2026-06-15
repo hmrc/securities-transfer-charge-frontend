@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.agents.single
+package uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.agents.bulk
 
 import play.api.data.Form
 import play.api.i18n.{I18nSupport, MessagesApi}
@@ -24,25 +24,25 @@ import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.actions.*
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.shared.SaveAndReturnButton.isReturn
 import uk.gov.hmrc.securitiestransferchargefrontend.forms.stf.agents.AgentReferenceFormProvider
-import uk.gov.hmrc.securitiestransferchargefrontend.models.stf.AgentReference
 import uk.gov.hmrc.securitiestransferchargefrontend.models.{Mode, UserAnswers}
+import uk.gov.hmrc.securitiestransferchargefrontend.models.stf.AgentReference
 import uk.gov.hmrc.securitiestransferchargefrontend.navigation.Navigator
 import uk.gov.hmrc.securitiestransferchargefrontend.pages.stf.shared.AgentReferencePage
-import uk.gov.hmrc.securitiestransferchargefrontend.views.html.stf.agents.single.AgentReferenceView
+import uk.gov.hmrc.securitiestransferchargefrontend.views.html.stf.agents.bulk.AgentReferenceView
 
 import javax.inject.{Inject, Named}
 import scala.concurrent.{ExecutionContext, Future}
 
 class AgentReferenceController @Inject()(
-                                        override val messagesApi: MessagesApi,
-                                        @Named("agents") navigator: Navigator,
-                                        stcAuthEnrolled: StcAuthEnrolledAction,
-                                        getData: StcDataRetrievalAction,
-                                        requireData: StcDataRequiredAction,
-                                        formProvider: AgentReferenceFormProvider,
-                                        val controllerComponents: MessagesControllerComponents,
-                                        view: AgentReferenceView
-                                    )(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport {
+                                          override val messagesApi: MessagesApi,
+                                          @Named("agents") navigator: Navigator,
+                                          stcAuthEnrolled: StcAuthEnrolledAction,
+                                          getData: StcDataRetrievalAction,
+                                          requireData: StcDataRequiredAction,
+                                          formProvider: AgentReferenceFormProvider,
+                                          val controllerComponents: MessagesControllerComponents,
+                                          view: AgentReferenceView
+                                        )(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport {
 
   val form: Form[AgentReference] = formProvider()
 

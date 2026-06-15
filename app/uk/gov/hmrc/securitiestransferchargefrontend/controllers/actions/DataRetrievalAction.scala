@@ -16,8 +16,9 @@
 
 package uk.gov.hmrc.securitiestransferchargefrontend.controllers.actions
 
-import uk.gov.hmrc.securitiestransferchargefrontend.models.requests.{OptionalDataRequest}
+import uk.gov.hmrc.securitiestransferchargefrontend.models.requests.OptionalDataRequest
 import play.api.mvc.ActionTransformer
+import uk.gov.hmrc.securitiestransferchargefrontend.domain.UserId
 import uk.gov.hmrc.securitiestransferchargefrontend.models.requests.IdentifierRequest
 import uk.gov.hmrc.securitiestransferchargefrontend.repositories.SessionRepository
 
@@ -30,7 +31,7 @@ class DataRetrievalActionImpl @Inject()(
 
   override protected def transform[A](request: IdentifierRequest[A]): Future[OptionalDataRequest[A]] = {
 
-    sessionRepository.get(request.userId).map {
+    sessionRepository.get(UserId(request.userId)).map {
       OptionalDataRequest(request.request, request.userId, _)
     }
   }

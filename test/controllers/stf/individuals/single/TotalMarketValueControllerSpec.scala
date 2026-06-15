@@ -16,6 +16,7 @@
 
 package controllers.stf.individuals.single
 
+import base.Fixtures.testUserAnswers
 import base.SpecBase
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.when
@@ -28,7 +29,7 @@ import uk.gov.hmrc.securitiestransferchargefrontend.controllers.routes
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.individuals.single.routes as individualRoutes
 import uk.gov.hmrc.securitiestransferchargefrontend.domain.SubmissionId
 import uk.gov.hmrc.securitiestransferchargefrontend.forms.stf.individuals.TotalMarketValueFormProvider
-import uk.gov.hmrc.securitiestransferchargefrontend.models.{NormalMode, UserAnswers}
+import uk.gov.hmrc.securitiestransferchargefrontend.models.NormalMode
 import uk.gov.hmrc.securitiestransferchargefrontend.navigation.Navigator
 import uk.gov.hmrc.securitiestransferchargefrontend.pages.stf.single.TotalMarketValuePage
 import uk.gov.hmrc.securitiestransferchargefrontend.repositories.SessionRepository
@@ -68,7 +69,7 @@ class TotalMarketValueControllerSpec extends SpecBase with MockitoSugar {
 
     "must populate the view correctly on a GET when the question has previously been answered" in {
 
-      val userAnswers = UserAnswers.empty(userAnswersId)(testSubmissionId).set(TotalMarketValuePage, validAnswer).success.value
+      val userAnswers = testUserAnswers.set(TotalMarketValuePage, validAnswer).success.value
 
       val application = applicationBuilder(userAnswers = Some(userAnswers), affinityGroup = individualAffinity)
         .overrides(bind[Navigator].qualifiedWith("individuals").toInstance(getNavigator))

@@ -16,6 +16,7 @@
 
 package controllers.stf.agents.single
 
+import base.Fixtures.testUserAnswers
 import base.SpecBase
 import org.scalatestplus.mockito.MockitoSugar
 import play.api.data.Form
@@ -25,7 +26,7 @@ import play.api.test.Helpers.*
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.routes
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.agents.single.routes as agentsSingleRoutes
 import uk.gov.hmrc.securitiestransferchargefrontend.forms.stf.agents.OtherSecuritiesTypeFormProvider
-import uk.gov.hmrc.securitiestransferchargefrontend.models.{NormalMode, UserAnswers}
+import uk.gov.hmrc.securitiestransferchargefrontend.models.NormalMode
 import uk.gov.hmrc.securitiestransferchargefrontend.navigation.Navigator
 import uk.gov.hmrc.securitiestransferchargefrontend.pages.stf.single.OtherSecuritiesTypePage
 import uk.gov.hmrc.securitiestransferchargefrontend.views.html.stf.agents.single.OtherSecuritiesTypeView
@@ -60,7 +61,7 @@ class OtherSecuritiesTypeControllerSpec extends SpecBase with MockitoSugar {
 
     "must populate the view correctly on a GET when the question has previously been answered" in {
 
-      val userAnswers = UserAnswers(userAnswersId,submissionId).set(OtherSecuritiesTypePage, "answer").success.value
+      val userAnswers = testUserAnswers.set(OtherSecuritiesTypePage, "answer").success.value
 
       val application = applicationBuilder(userAnswers = Some(userAnswers), affinityGroup = agentAffinity)
         .overrides(bind[Navigator].qualifiedWith("agents").toInstance(getNavigator))

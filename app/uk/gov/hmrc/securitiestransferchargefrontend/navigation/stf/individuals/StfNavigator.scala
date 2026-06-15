@@ -22,7 +22,7 @@ import uk.gov.hmrc.play.http.HeaderCarrierConverter
 import uk.gov.hmrc.securitiestransferchargefrontend.config.FrontendAppConfig
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.routes
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.shared.routes as sharedRoutes
-import uk.gov.hmrc.securitiestransferchargefrontend.domain.SubmissionId
+import uk.gov.hmrc.securitiestransferchargefrontend.domain.{SubmissionId, UserId}
 import uk.gov.hmrc.securitiestransferchargefrontend.models.UserAnswers
 import uk.gov.hmrc.securitiestransferchargefrontend.navigation.{AbstractModeNavigator, PersistentNavigator}
 import uk.gov.hmrc.securitiestransferchargefrontend.pages.*
@@ -55,7 +55,7 @@ class StfNavigator @Inject()(appConfig: FrontendAppConfig,
 
   val checkRouteMap: Page => UserAnswers => Call = _ => _ => routes.CheckYourAnswersController.onPageLoad()
 
-  def restore(submissionId: SubmissionId, userId: String)(implicit request: Request[?]): Future[UserAnswers] = {
+  def restore(submissionId: SubmissionId, userId: UserId)(implicit request: Request[?]): Future[UserAnswers] = {
     implicit val hc: HeaderCarrier = HeaderCarrierConverter.fromRequestAndSession(request, request.session)
     answerPersistenceService.load(submissionId, userId)
   }

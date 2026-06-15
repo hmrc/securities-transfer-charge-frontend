@@ -16,6 +16,7 @@
 
 package base.stubs
 
+import uk.gov.hmrc.securitiestransferchargefrontend.domain.UserId
 import uk.gov.hmrc.securitiestransferchargefrontend.models.UserAnswers
 import uk.gov.hmrc.securitiestransferchargefrontend.repositories.SessionRepository
 
@@ -23,13 +24,13 @@ import scala.concurrent.Future
 
 class StubSessionRepository extends SessionRepository:
 
-  override def get(id: String): Future[Option[UserAnswers]] = Future.successful(None)
+  override def get(id: UserId): Future[Option[UserAnswers]] = Future.successful(None)
 
   override def set(answers: UserAnswers): Future[Unit] = Future.successful(())
 
-  override def clear(id: String): Future[Unit] = Future.successful(())
+  override def clear(id: UserId): Future[Unit] = Future.successful(())
 
-  override def keepAlive(id: String): Future[Unit] = Future.successful(())
+  override def keepAlive(id: UserId): Future[Unit] = Future.successful(())
 
 object StubSessionRepository:
   def apply(): SessionRepository = new StubSessionRepository
@@ -37,13 +38,13 @@ object StubSessionRepository:
 class StubFailingSessionRepository extends SessionRepository:
   val failure = new RuntimeException("FAILED")
   
-  override def get(id: String): Future[Option[UserAnswers]] = Future.failed(failure)
+  override def get(id: UserId): Future[Option[UserAnswers]] = Future.failed(failure)
 
   override def set(answers: UserAnswers): Future[Unit] = Future.successful(())
 
-  override def clear(id: String): Future[Unit] = Future.successful(())
+  override def clear(id: UserId): Future[Unit] = Future.successful(())
 
-  override def keepAlive(id: String): Future[Unit] = Future.successful(())
+  override def keepAlive(id: UserId): Future[Unit] = Future.successful(())
 
 object StubFailingSessionRepository:
   def apply(): SessionRepository = new StubFailingSessionRepository
