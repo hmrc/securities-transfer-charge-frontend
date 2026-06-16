@@ -32,7 +32,7 @@ import java.util.Date
 
 class ExcelFileParserSpec extends AnyWordSpec with Matchers with EitherValues with MockitoSugar {
 
-  private val maxColumns = 28
+  private val maxColumns = 27
 
   private val mockAppConfig = mock[FrontendAppConfig]
   when(mockAppConfig.rowCacheSize).thenReturn(100)
