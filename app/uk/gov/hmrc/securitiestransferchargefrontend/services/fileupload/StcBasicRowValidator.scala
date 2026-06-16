@@ -17,8 +17,8 @@
 package uk.gov.hmrc.securitiestransferchargefrontend.services.fileupload
 
 import play.api.i18n.{Lang, Messages, MessagesApi}
-import uk.gov.hmrc.securitiestransferchargefrontend.forms.stf.shared.{NameOfSellerFormProvider, SecuritiesTargetFormProvider}
-import uk.gov.hmrc.securitiestransferchargefrontend.models.stf.fileupload.{ParsedStcRow, StcRowValidationError, ParsedValue}
+import uk.gov.hmrc.securitiestransferchargefrontend.forms.stf.shared.{AmountPaidForSecuritiesFormProvider, NameOfBuyerFormProvider, NameOfSellerFormProvider, SecuritiesTargetFormProvider}
+import uk.gov.hmrc.securitiestransferchargefrontend.models.stf.fileupload.{ParsedStcRow, ParsedValue, StcRowValidationError}
 
 import javax.inject.Inject
 
@@ -27,7 +27,9 @@ class StcBasicRowValidator @Inject()(
                                       support: StcValidationSupport,
                                       messagesApi: MessagesApi,
                                       nameOfSellerFormProvider: NameOfSellerFormProvider,
-                                      securitiesTargetFormProvider: SecuritiesTargetFormProvider
+                                      securitiesTargetFormProvider: SecuritiesTargetFormProvider,
+                                      nameOfBuyerFormProvider: NameOfBuyerFormProvider,
+                                      amountPaidForSecuritiesFormProvider: AmountPaidForSecuritiesFormProvider
                                     ) {
 
   private implicit val messages: Messages =
@@ -42,10 +44,13 @@ class StcBasicRowValidator @Inject()(
     template match {
 
       case StcTemplate.STF =>
-        validateSTF(row,affinityKey)
+        validateSTF(row, affinityKey)
 
       case StcTemplate.SH03 =>
-        validateSH03(row,affinityKey)
+        validateSH03(row, affinityKey)
+
+      case StcTemplate.STFAgent =>
+        validateAgentSTF(row, affinityKey)
     }
   }
 
@@ -71,6 +76,20 @@ class StcBasicRowValidator @Inject()(
       validateMinSharePrice(row) ++
       validateSharePurchaseReason(row) ++
       validatePurchasedForCancellation(row)
+
+  def validateAgentSTF(row: ParsedStcRow, affinityKey: String)(implicit cols: ColumnIndexBuilder): Seq[StcRowValidationError] =
+    validateNameOfBuyer(row) ++
+      validateBuyerAddressInUk(row) ++
+      validateNameOfSeller(row) ++
+      validateSellerAddressInUk(row) ++
+      validateConnectedPersons(row, affinityKey) ++
+      validateApplyingForRelief(row, affinityKey) ++
+      validateSecuritiesTarget(row, affinityKey) ++
+      validateChargingPoint(row, affinityKey) ++
+      validateTaxRate(row) ++
+      validateWhatTypeOfSecurities(row, affinityKey) ++
+      validateSecuritiesQuantity(row, affinityKey) ++
+      validateAmountPaidForSecurities(row, affinityKey)
 
 
   private def validateNameOfSeller(row: ParsedStcRow)(implicit cols: ColumnIndexBuilder): Seq[StcRowValidationError] = {
@@ -107,7 +126,7 @@ class StcBasicRowValidator @Inject()(
 
   private def validateChargingPoint(
                                      row: ParsedStcRow,
-                                     affinityKey: String
+                                     affinityKey:String
                                    )(implicit cols: ColumnIndexBuilder): Seq[StcRowValidationError] = {
 
     row.chargingPoint match {
@@ -144,7 +163,7 @@ class StcBasicRowValidator @Inject()(
     }
   }
 
-  private def validateWhatTypeOfSecurities(row: ParsedStcRow,affinityKey:String)(implicit cols: ColumnIndexBuilder): Seq[StcRowValidationError] =
+  private def validateWhatTypeOfSecurities(row: ParsedStcRow, affinityKey: String)(implicit cols: ColumnIndexBuilder): Seq[StcRowValidationError] =
     row.whatTypeOfSecurities.map(_.trim) match {
 
       case None | Some("") =>
@@ -161,7 +180,7 @@ class StcBasicRowValidator @Inject()(
 
   private def validateSecuritiesQuantity(
                                           row: ParsedStcRow,
-                                          affinityKey:String
+                                          affinityKey: String
                                         )(implicit cols: ColumnIndexBuilder): Seq[StcRowValidationError] = {
 
     row.securitiesQuantity match {
@@ -209,31 +228,15 @@ class StcBasicRowValidator @Inject()(
 
   private def validateAmountPaidForSecurities(
                                                row: ParsedStcRow,
-                                               affinityKey:String
+                                               affinityKey: String
                                              )(implicit cols: ColumnIndexBuilder): Seq[StcRowValidationError] = {
 
-    row.amountPaidForSecurities match {
+    val form = amountPaidForSecuritiesFormProvider(affinityKey).bind(
+      Map("value" -> row.amountPaidForSecurities.getOrElse(""))
+    )
 
-      case None =>
-        Seq(
-          support.error(
-            row.rowNumber,
-            "amountPaidForSecurities",
-            messages(s"$affinityKey.amountPaidForSecurities.error.required")
-          )
-        )
-
-      case Some(v) if v > support.maxCurrency =>
-        Seq(
-          support.error(
-            row.rowNumber,
-            "amountPaidForSecurities",
-            messages(s"$affinityKey.fileUpload.error.amountPaidForSecurities.maximum")
-          )
-        )
-
-      case _ =>
-        Seq.empty
+    form.errors.map { e =>
+      support.error(row.rowNumber, "amountPaidForSecurities", messages(e.message))
     }
   }
 
@@ -259,7 +262,7 @@ class StcBasicRowValidator @Inject()(
 
   private def validateConnectedPersons(
                                         row: ParsedStcRow,
-                                        affinityKey:String
+                                        affinityKey: String
                                       )(implicit cols: ColumnIndexBuilder): Seq[StcRowValidationError] = {
 
     row.connectedPersons match {
@@ -280,7 +283,7 @@ class StcBasicRowValidator @Inject()(
 
   private def validateApplyingForRelief(
                                          row: ParsedStcRow,
-                                         affinityKey:String
+                                         affinityKey: String
                                        )(implicit cols: ColumnIndexBuilder): Seq[StcRowValidationError] = {
 
     row.applyingForRelief match {
@@ -301,7 +304,7 @@ class StcBasicRowValidator @Inject()(
 
   private def validateSecuritiesTarget(
                                         row: ParsedStcRow,
-                                        affinityKey:String
+                                        affinityKey: String
                                       )(implicit cols: ColumnIndexBuilder): Seq[StcRowValidationError] = {
 
     val boundForm = securitiesTargetFormProvider(affinityKey = affinityKey).bind(
@@ -318,7 +321,7 @@ class StcBasicRowValidator @Inject()(
         else
           "securitiesTarget"
 
-      support.error(row.rowNumber, fieldName,  messages(formError.message))
+      support.error(row.rowNumber, fieldName, messages(formError.message))
     }
   }
 
@@ -425,6 +428,35 @@ class StcBasicRowValidator @Inject()(
             "purchasedForCancellation",
             messages("purchasedForCancellation.invalid")
           )
+        )
+    }
+  }
+
+  private def validateNameOfBuyer(row: ParsedStcRow)(implicit cols: ColumnIndexBuilder): Seq[StcRowValidationError] = {
+
+    val errors = support.bindSingleValue(
+      nameOfBuyerFormProvider(),
+      row.buyerName.getOrElse("")
+    )
+
+    errors.map { e =>
+      support.error(row.rowNumber, "buyerName", messages(e.message))
+    }
+  }
+
+
+  private def validateBuyerAddressInUk(
+                                        row: ParsedStcRow
+                                      )(implicit cols: ColumnIndexBuilder): Seq[StcRowValidationError] = {
+
+    row.buyerAddressInUK match {
+
+      case Some(_) =>
+        Seq.empty
+
+      case None =>
+        Seq(
+          support.error(row.rowNumber, "buyerAddressInUK", messages("fileUpload.error.buyerAddressInUK.invalid"))
         )
     }
   }

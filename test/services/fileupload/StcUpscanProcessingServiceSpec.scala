@@ -17,10 +17,9 @@
 package services.fileupload
 
 import base.SpecBase
-import org.mockito.ArgumentMatchers.{any, eq => eqTo}
+import org.mockito.ArgumentMatchers.{any, eq as eqTo}
 import org.mockito.Mockito.{never, verify, when}
-import org.scalatest.OneInstancePerTest
-import org.scalatest.EitherValues
+import org.scalatest.{EitherValues, OneInstancePerTest}
 import org.scalatestplus.mockito.MockitoSugar
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.securitiestransferchargefrontend.connectors.UpscanFileDownloadConnector

@@ -18,7 +18,7 @@ package services.fileupload
 
 import base.SpecBase
 import play.api.i18n.{Lang, Messages, MessagesApi}
-import uk.gov.hmrc.securitiestransferchargefrontend.forms.stf.shared.{NameOfSellerFormProvider, SecuritiesTargetFormProvider}
+import uk.gov.hmrc.securitiestransferchargefrontend.forms.stf.shared.{AmountPaidForSecuritiesFormProvider, NameOfBuyerFormProvider, NameOfSellerFormProvider, SecuritiesTargetFormProvider}
 import uk.gov.hmrc.securitiestransferchargefrontend.models.stf.fileupload.*
 import uk.gov.hmrc.securitiestransferchargefrontend.models.stf.fileupload.ParsedValue.{Invalid, Missing, Valid}
 import uk.gov.hmrc.securitiestransferchargefrontend.services.fileupload.*
@@ -30,12 +30,20 @@ class StcBasicRowValidatorSpec extends SpecBase {
   private val app = applicationBuilder().build()
 
   private val messagesApi: MessagesApi = app.injector.instanceOf[MessagesApi]
-
   private implicit val messages: Messages = messagesApi.preferred(Seq(Lang("en")))
+
 
   private val validRow: ParsedStcRow =
     ParsedStcRow(
       rowNumber = 3,
+      buyerName = Some("Bob buyer"),
+      buyerAddressInUK= Some(true),
+      buyerAddressLine1= Some("1 Seller Street"),
+      buyerAddressLine2= Some("Seller District"),
+      buyerAddressLine3= Some("Seller City"),
+      buyerAddressLine4= None,
+      buyerPostcode= Some("AA1 1AA"),
+      buyerCountry= Some("United Kingdom"),
       sellerName = Some("Seller Ltd"),
       sellerAddressInUK = Some(true),
       sellerAddressLine1 = Some("1 Test"),
@@ -54,8 +62,8 @@ class StcBasicRowValidatorSpec extends SpecBase {
       whatTypeOfSecurities = Some("Shares"),
       typeOfShares = Some("Ordinary"),
       securitiesQuantity = Some(BigDecimal(10000)),
-      amountPaidForSecurities = Some(BigDecimal(15000)),
-      totalMarketValue = Some(BigDecimal(20000)),
+      amountPaidForSecurities = Some("15000"),
+      totalMarketValue = Some("20000"),
       minSharePrice = None,
       maxSharePrice = None,
       sharePurchaseReason = None,
@@ -67,7 +75,9 @@ class StcBasicRowValidatorSpec extends SpecBase {
       support = new StcValidationSupport,
       messagesApi = messagesApi,
       nameOfSellerFormProvider = new NameOfSellerFormProvider,
-      securitiesTargetFormProvider = new SecuritiesTargetFormProvider
+      securitiesTargetFormProvider = new SecuritiesTargetFormProvider,
+      nameOfBuyerFormProvider = new NameOfBuyerFormProvider,
+      amountPaidForSecuritiesFormProvider = new AmountPaidForSecuritiesFormProvider
     )
 
   private implicit val columnIndex: ColumnIndexBuilder =
@@ -132,7 +142,7 @@ class StcBasicRowValidatorSpec extends SpecBase {
         validRow.copy(securitiesQuantity = Some(BigDecimal("10.5"))),
         StcTemplate.STF, "org"
       )
-      
+
       result.exists(e =>
         e.fieldName == "securitiesQuantity" &&
           e.message == "The number of shares must be a whole number between 1 and 999,999,999"
@@ -231,7 +241,7 @@ class StcBasicRowValidatorSpec extends SpecBase {
 
     "return amount paid maximum error" in {
       val result = validator.validate(
-        validRow.copy(amountPaidForSecurities = Some(BigDecimal(1000000000))),
+        validRow.copy(amountPaidForSecurities = Some("1000000000")),
         StcTemplate.STF, affinityGroupKeyInd
       )
 

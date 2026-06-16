@@ -43,6 +43,14 @@ class RowTransformsSpec extends AnyWordSpec with Matchers {
   private val validatedRow = ValidatedStcRow(
     parsedRow = ParsedStcRow(
       rowNumber = 3,
+      buyerName = Some("Bob buyer"),
+      buyerAddressInUK= Some(true),
+      buyerAddressLine1= Some("1 Seller Street"),
+      buyerAddressLine2= Some("Seller District"),
+      buyerAddressLine3= Some("Seller City"),
+      buyerAddressLine4= None,
+      buyerPostcode= Some("AA1 1AA"),
+      buyerCountry= Some("United Kingdom"),
       sellerName = Some("Bob Seller"),
       sellerAddressInUK = Some(true),
       sellerAddressLine1 = Some("1 Seller Street"),
@@ -61,8 +69,8 @@ class RowTransformsSpec extends AnyWordSpec with Matchers {
       whatTypeOfSecurities = Some("Shares"),
       typeOfShares = Some("Ordinary Shares"),
       securitiesQuantity = Some(BigDecimal("1000")),
-      amountPaidForSecurities = Some(BigDecimal("5000.25")),
-      totalMarketValue = Some(BigDecimal("6000")),
+      amountPaidForSecurities = Some("5000.25"),
+      totalMarketValue = Some("6000"),
       minSharePrice = Some(BigDecimal("100")), 
       maxSharePrice = Some(BigDecimal("1000")), 
       sharePurchaseReason = Some("cancellation"), 
@@ -132,7 +140,7 @@ class RowTransformsSpec extends AnyWordSpec with Matchers {
     }
 
     "throw when seller country is missing" in {
-      val rowMissingSellerCountry = validatedRow.copy(parsedRow = validatedRow.parsedRow.copy(sellerCountry = None))
+      val rowMissingSellerCountry = validatedRow.copy(parsedRow = validatedRow.parsedRow.copy(sellerCountry = None, sellerAddressInUK = Some(false)))
 
       an[IllegalArgumentException] shouldBe thrownBy {
         RowTransforms.fromValidatedStcRowToStfRequest(rowMissingSellerCountry, individualData)

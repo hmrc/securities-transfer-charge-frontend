@@ -197,6 +197,18 @@ amountPaidForSecurities.error.aboveMaximum = amountPaidForSecurities must be {0}
 amountPaidForSecurities.error.belowMinimum = amountPaidForSecurities must be {0} or more
 amountPaidForSecurities.change.hidden = amountPaidForSecurities
 
+individual.amountPaidForSecurities.error.nonNumeric = The amount you paid for the securities must be a number
+individual.amountPaidForSecurities.error.required = Enter the amount you paid for the securities
+individual.amountPaidForSecurities.error.invalidNumeric = The amount you paid for these securities must be a positive number like 600 or 193.54
+individual.amountPaidForSecurities.error.aboveMaximum = The amount you paid for the securities must be £999,999,999 or below
+individual.amountPaidForSecurities.error.negative = The amount you paid for these securities must be a positive number like 600 or 193.54
+
+individual.totalMarketValue.error.nonNumeric = The market value of the securities must be a number and can include up to two decimal places, like 30 or 28.60
+individual.totalMarketValue.error.required = Enter the total market value of the securities
+individual.totalMarketValue.error.invalidNumeric = The market value of the securities must be a number and can include up to two decimal places, like 30 or 28.60
+individual.totalMarketValue.error.aboveMaximum = The market value of the securities must be lower than £999,999,999
+individual.totalMarketValue.error.negative = The market value of the securities must be 0 or more
+
 individual.detailsOfThisTransfer.error.numberOfShares.required = Enter the number of shares you are buying
 individual.detailsOfThisTransfer.error.numberOfShares.nonNumeric = The amount of shares you are buying must be a number
 individual.detailsOfThisTransfer.error.typeOfShares.required = Enter the type or class of shares you are buying
@@ -312,7 +324,7 @@ org.amountPaidForSecurities.hint = For example, £600 or £193.54
 org.amountPaidForSecurities.error.nonNumeric = The amount paid for the securities must be a number
 org.amountPaidForSecurities.error.required = Enter the amount the business paid for the securities
 org.amountPaidForSecurities.error.invalidNumeric = The amount the business paid for these securities must be a positive number like 600 or 193.54
-org.amountPaidForSecurities.error.aboveMaximum = The amount paid for the securities must be lower than {0}
+org.amountPaidForSecurities.error.aboveMaximum = The amount the business paid for the securities must be £999,999,999 or below
 org.amountPaidForSecurities.error.negative = The amount the business paid for these securities must be a positive number like 600 or 193.54
 org.amountPaidForSecurities.change.hidden = Change the amount the business paid for the securities
 
@@ -333,10 +345,11 @@ org.whatTypeOfSecurities.change.hidden = Change what type of securities the busi
 org.totalMarketValue.title = What is the total market value of these securities?
 org.totalMarketValue.heading = What is the total market value of these securities?
 org.totalMarketValue.checkYourAnswersLabel = What is the total market value of these securities?
-org.totalMarketValue.error.nonNumeric = The market value of the securities must be a number
+org.totalMarketValue.error.nonNumeric = The market value of the securities must be a number and can include up to two decimal places, like 30 or 28.60
 org.totalMarketValue.error.required = Enter the total market value of the securities
-org.totalMarketValue.error.invalidNumeric = Enter the total market value using up to two decimal places
-org.totalMarketValue.error.aboveMaximum = The market value must be {0} or less
+org.totalMarketValue.error.invalidNumeric = The market value of the securities must be a number and can include up to two decimal places, like 30 or 28.60
+org.totalMarketValue.error.aboveMaximum = The market value of the securities must be lower than £999,999,999
+org.totalMarketValue.error.negative = The market value of the securities must be 0 or more
 org.totalMarketValue.error.belowMinimum = The market value must be {0} or more
 org.totalMarketValue.change.hidden = Change the market value of the securities
 org.totalMarketValue.hint = For example, £600 or £193.54
@@ -442,7 +455,7 @@ agent.securitiesTarget.crn.hint = This is also called a company number. For exam
 agent.securitiesTarget.checkYourAnswersLabel = What business are the securities bought in?
 agent.securitiesTarget.error.businessName.required = Enter the name of the business the securities are in
 agent.securitiesTarget.error.businessName.length = Business name must be 160 characters or fewer
-agent.securitiesTarget.error.crn.length = Company registration number must 8 characters long
+agent.securitiesTarget.error.crn.length = Company registration number must be 8 characters
 agent.securitiesTarget.error.crn.invalid = Company registration number can only be numbers or letters
 agent.securitiesTarget.businessName.change.hidden = BusinessName
 agent.securitiesTarget.crn.change.hidden = CRN
@@ -487,10 +500,27 @@ fileUpload.error.sellerPostcode.invalid = Enter a real postcode, like AA1 1AA
 fileUpload.error.sellerCountry.length = Country must be 50 characters or fewer
 fileUpload.error.sellerCountry.invalidCharacters = Country can only include letters, numbers and the following characters: , . - ’
 
+fileUpload.error.buyerAddressInUK.invalid = Enter ‘yes’ if the buyer lives in the UK, or ‘no’ if the buyer does not live in the UK
+fileUpload.error.buyerAddressLine1.required = Enter the first line of the buyer’s address
+fileUpload.error.buyerAddressLine1.length = Address line 1 must be 100 characters or fewer
+fileUpload.error.buyerAddressLine1.invalidCharacters = Address line 1 can only include letters, numbers and the following characters: , . - ’
+fileUpload.error.buyerAddressLine2.length = Address line 2 must be fewer than 40 characters long
+fileUpload.error.buyerAddressLine2.invalidCharacters = Address line 2 can only include letters, numbers and the following characters: , . - ’
+fileUpload.error.buyerAddressLine3.length = Address line 3 must be fewer than 40 characters long
+fileUpload.error.buyerAddressLine3.invalidCharacters = Address line 3 can only include letters, numbers and the following characters: , . - ’
+fileUpload.error.buyerAddressLine4.length = Address line 4 must be fewer than 40 characters long
+fileUpload.error.buyerAddressLine4.invalidCharacters = Address line 4 can only include letters, numbers and the following characters: , . - ’
+fileUpload.error.buyerPostcode.required = Enter a postcode
+fileUpload.error.buyerPostcode.invalid = Enter a real postcode, like AA1 1AA
+fileUpload.error.buyerCountry.length = Country must be 50 characters or fewer
+fileUpload.error.buyerCountry.invalidCharacters = Country can only include letters, numbers and the following characters: , . - ’
+
 individual.fileUpload.error.connectedPersons.invalid = Enter ‘yes’ if you and the buyer are connected persons
 org.fileUpload.error.connectedPersons.invalid = Enter ‘yes’ if the business and the buyer are connected persons
+agent.fileUpload.error.connectedPersons.invalid = Enter ‘yes’ if the buyer and seller are connected persons, or ‘no’ if they are not connected
 individual.fileUpload.error.applyingForRelief.invalid = Enter ‘yes’ if you are applying for a relief, or ‘no’ if you are not applying for a relief
 org.fileUpload.error.applyingForRelief.invalid = Enter ‘yes’ if the business is applying for a relief, or ‘no’ if the business is not applying for a relief
+agent.fileUpload.error.applyingForRelief.invalid = Enter ‘yes’ if the buyer is applying for a relief, or ‘no’ if the buyer is not applying for a relief
 individual.fileUpload.error.whatReliefAreYouApplyingFor.invalid = Enter the name of the relief you are applying for. See a <a target="_blank" href="#" class="govuk-link">full list of reliefs (opens in new tab)</a>.
 org.fileUpload.error.whatReliefAreYouApplyingFor.invalid = Enter the name of the relief the business is applying for. See a <a target="_blank" href="#" class="govuk-link">full list of reliefs (opens in new tab)</a>.
 agent.fileUpload.error.whatReliefAreYouApplyingFor.invalid = Enter the name of the relief the buyer is applying for. See a <a target="_blank" href="#" class="govuk-link">full list of reliefs (opens in new tab)</a>.
@@ -500,11 +530,14 @@ fileUpload.error.taxRate.invalid = Enter a tax rate of ‘0.5%’ or ‘1.5%’
 
 individual.fileUpload.error.whatTypeOfSecurities.required = Enter the type of securities you are buying
 org.fileUpload.error.whatTypeOfSecurities.required = Enter the type of securities the business is buying
+agent.fileUpload.error.whatTypeOfSecurities.required = Enter the type of securities the buyer is purchasing
 individual.fileUpload.error.typeOfShares.required = If you are buying shares, enter the type of shares
 org.fileUpload.error.typeOfShares.required = If the business is buying shares, enter the type of shares
+agent.fileUpload.error.typeOfShares.required = If the buyer is purchasing shares, enter the type of shares
 
 individual.fileUpload.error.typeOfShares.maxLength = The type of shares you are buying must be 255 characters or fewer
 org.fileUpload.error.typeOfShares.maxLength = The type of shares the business is purchasing must be 255 characters or fewer
+agent.fileUpload.error.typeOfShares.maxLength = The type of shares the buyer is purchasing must be 255 characters or fewer
 
 individual.fileUpload.error.securitiesQuantity.required = Enter the number of shares you are buying
 individual.fileUpload.error.securitiesQuantity.nonNumeric = The amount of shares you are buying must be a number
@@ -517,14 +550,18 @@ org.fileUpload.error.securitiesQuantity.nonNumeric = The amount of shares must b
 org.fileUpload.error.securitiesQuantity.minimum = The number of shares must be at least 1
 org.fileUpload.error.securitiesQuantity.maximum = The number of shares must be below 999,999,999
 
-individual.fileUpload.error.amountPaidForSecurities.nonNumeric = The amount you paid for the securities must be a number
-individual.fileUpload.error.amountPaidForSecurities.maximum = The amount you paid for the securities must be £999,999,999 or below
+agent.fileUpload.error.securitiesQuantity.required = Enter the number of shares the buyer is purchasing
+agent.fileUpload.error.securitiesQuantity.nonNumeric = The amount of shares must be a number
+agent.fileUpload.error.securitiesQuantity.minimum = The number of shares must be at least 1
+agent.fileUpload.error.securitiesQuantity.maximum = The number of shares must be below 999,999,999
 
-org.fileUpload.error.amountPaidForSecurities.nonNumeric = The amount paid for the securities must be a number
-org.fileUpload.error.amountPaidForSecurities.maximum = The amount paid for the securities must be £999,999,999 or below
+individual.fileUpload.chargingPoint.error.required = Enter the date you bought the securities
+org.fileUpload.chargingPoint.error.required = Enter the date the business bought the securities
+agent.fileUpload.chargingPoint.error.required = Enter the date the buyer purchased the securities
 
-fileUpload.error.totalMarketValue.nonNumeric = The market value of the securities must be a number
-fileUpload.error.totalMarketValue.maximum = The market value of the securities must be £999,999,999 or below
+individual.fileUpload.chargingPoint.error.futureDate = The day you bought the securities must be today’s date or a date in the past
+org.fileUpload.chargingPoint.error.futureDate = The day the business bought the securities must be today’s date or a date in the past
+agent.fileUpload.chargingPoint.error.futureDate = The day the buyer purchased the securities must be today’s date or a date in the past
 
 minSharePrice.error.required = Enter an amount in £
 minSharePrice.error.maximum = The minimum share price must be below 999,999,999

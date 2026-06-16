@@ -49,4 +49,5 @@ object StcColumns {
   val buyerAddressLine4 = "buyerAddressLine4"
   val buyerPostcode = "buyerPostcode"
   val buyerCountry = "buyerCountry"
+  val buyerName = "buyerName"
 }

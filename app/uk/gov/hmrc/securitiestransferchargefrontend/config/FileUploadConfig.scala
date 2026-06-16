@@ -27,7 +27,7 @@ class FileUploadConfig @Inject()(configuration: Configuration) {
 
   val maxRows: Int =
     configuration.get[Int]("file-upload.max-rows")
-
+  
   val expectedWorksheetName: String =
     configuration.getOptional[String]("file-upload.xlsx.expected-worksheet")
       .getOrElse("Sheet1")

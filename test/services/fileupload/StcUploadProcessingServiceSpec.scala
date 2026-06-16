@@ -56,6 +56,14 @@ class StcUploadProcessingServiceSpec extends SpecBase with MockitoSugar {
       ValidatedStcRow(
         parsedRow = ParsedStcRow(
           rowNumber = 4,
+          buyerName = Some("Bob buyer"),
+          buyerAddressInUK= Some(true),
+          buyerAddressLine1= Some("1 Seller Street"),
+          buyerAddressLine2= Some("Seller District"),
+          buyerAddressLine3= Some("Seller City"),
+          buyerAddressLine4= None,
+          buyerPostcode= Some("AA1 1AA"),
+          buyerCountry= Some("United Kingdom"),
           sellerName = Some("Seller 1"),
           sellerAddressInUK = None,
           sellerAddressLine1 = None,

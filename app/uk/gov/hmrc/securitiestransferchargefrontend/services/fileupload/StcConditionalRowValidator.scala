@@ -17,6 +17,7 @@
 package uk.gov.hmrc.securitiestransferchargefrontend.services.fileupload
 
 import play.api.i18n.{Lang, Messages, MessagesApi}
+import uk.gov.hmrc.securitiestransferchargefrontend.forms.stf.shared.TotalMarketValueFormProvider
 import uk.gov.hmrc.securitiestransferchargefrontend.models.stf.fileupload.{ParsedStcRow, StcRowValidationError}
 
 import javax.inject.{Inject, Singleton}
@@ -24,7 +25,8 @@ import javax.inject.{Inject, Singleton}
 @Singleton
 class StcConditionalRowValidator @Inject()(
                                             support: StcValidationSupport,
-                                            messagesApi: MessagesApi
+                                            messagesApi: MessagesApi,
+                                            totalMarketValueFormProvider: TotalMarketValueFormProvider
                                           ) {
 
   private implicit val messages: Messages =
@@ -43,8 +45,22 @@ class StcConditionalRowValidator @Inject()(
 
       case StcTemplate.SH03 =>
         validateSH03(row, affinityKey)
+
+      case StcTemplate.STFAgent =>
+        validateAgentSTF(row, affinityKey)
     }
   }
+
+  def validateAgentSTF(
+                        row: ParsedStcRow,
+                        affinityKey: String
+                      )(implicit cols: ColumnIndexBuilder): Seq[StcRowValidationError] =
+    validateReliefType(row, affinityKey) ++
+      validateTypeOfShares(row, affinityKey) ++
+      validateBuyerAddress(row) ++
+      validateSellerAddress(row) ++
+      validateTotalMarketValue(row, affinityKey)
+
 
   def validateSTF(
                    row: ParsedStcRow,
@@ -53,7 +69,7 @@ class StcConditionalRowValidator @Inject()(
     validateReliefType(row, affinityKey) ++
       validateTypeOfShares(row, affinityKey) ++
       validateSellerAddress(row) ++
-      validateTotalMarketValue(row)
+      validateTotalMarketValue(row, affinityKey)
 
   def validateSH03(
                     row: ParsedStcRow,
@@ -188,7 +204,16 @@ class StcConditionalRowValidator @Inject()(
             Some(messages(s"fileUpload.error.$fieldName.invalidCharacters"))
           )
         } ++
-          validateSellerPostcode(row)
+          validateSellerPostcode(row) ++
+          support.validateOptionalText(
+            row.sellerCountry,
+            row.rowNumber,
+            "sellerCountry",
+            Some(support.countryMaxLength),
+            Some(messages("fileUpload.error.sellerCountry.length")),
+            Some(support.countryPattern),
+            Some(messages("fileUpload.error.sellerCountry.invalidCharacters"))
+          )
 
       case Some(false) =>
         support.validateOptionalText(
@@ -245,35 +270,120 @@ class StcConditionalRowValidator @Inject()(
   }
 
   private def validateTotalMarketValue(
-                                        row: ParsedStcRow
+                                        row: ParsedStcRow,
+                                        affinityKey: String
                                       )(implicit cols: ColumnIndexBuilder): Seq[StcRowValidationError] = {
 
     row.connectedPersons match {
 
       case Some(true) =>
-        row.totalMarketValue match {
+        val form = totalMarketValueFormProvider(affinityKey).bind(
+          Map("value" -> row.totalMarketValue.getOrElse(""))
+        )
 
-          case None =>
-            Seq(
-              support.error(
-                row.rowNumber,
-                "totalMarketValue",
-                messages("totalMarketValue.error.required")
-              )
-            )
-
-          case Some(value) if value > support.maxCurrency =>
-            Seq(
-              support.error(
-                row.rowNumber,
-                "totalMarketValue",
-                messages("fileUpload.error.totalMarketValue.maximum")
-              )
-            )
-
-          case _ =>
-            Seq.empty
+        form.errors.map { e =>
+          support.error(row.rowNumber, "totalMarketValue", messages(e.message))
         }
+
+      case _ =>
+        Seq.empty
+    }
+  }
+
+
+  private def validateBuyerAddress(
+                                    row: ParsedStcRow
+                                  )(implicit cols: ColumnIndexBuilder): Seq[StcRowValidationError] = {
+
+    val addressFields = Seq(
+      "buyerAddressLine2" -> row.buyerAddressLine2,
+      "buyerAddressLine3" -> row.buyerAddressLine3,
+      "buyerAddressLine4" -> row.buyerAddressLine4
+    )
+
+    row.buyerAddressInUK match {
+
+
+      case Some(true) =>
+        support.validateRequiredText(
+          row.buyerAddressLine1,
+          row.rowNumber,
+          "buyerAddressLine1",
+          messages("fileUpload.error.buyerAddressLine1.required"),
+          Some(support.addressLineMaxLength),
+          Some(messages("fileUpload.error.buyerAddressLine1.length")),
+          Some(support.addressPattern),
+          Some(messages("fileUpload.error.buyerAddressLine1.invalidCharacters"))
+        ) ++ addressFields.flatMap { case (fieldName, value) =>
+          support.validateOptionalText(
+            value,
+            row.rowNumber,
+            fieldName,
+            Some(support.optAddressLineMaxLength),
+            Some(messages(s"fileUpload.error.$fieldName.length")),
+            Some(support.addressPattern),
+            Some(messages(s"fileUpload.error.$fieldName.invalidCharacters"))
+          )
+        } ++
+          validateBuyerPostcode(row) ++
+          support.validateOptionalText(
+            row.buyerCountry,
+            row.rowNumber,
+            "buyerCountry",
+            Some(support.countryMaxLength),
+            Some(messages("fileUpload.error.buyerCountry.length")),
+            Some(support.countryPattern),
+            Some(messages("fileUpload.error.buyerCountry.invalidCharacters"))
+          )
+
+      case Some(false) =>
+        support.validateOptionalText(
+          row.buyerCountry,
+          row.rowNumber,
+          "buyerCountry",
+          Some(support.countryMaxLength),
+          Some(messages("fileUpload.error.buyerCountry.length")),
+          Some(support.countryPattern),
+          Some(messages("fileUpload.error.buyerCountry.invalidCharacters"))
+        )
+
+      case _ =>
+        Seq.empty
+    }
+  }
+
+  private def validateBuyerPostcode(
+                                     row: ParsedStcRow
+                                   )(implicit cols: ColumnIndexBuilder): Seq[StcRowValidationError] = {
+
+    row.buyerPostcode match {
+
+      case None =>
+        Seq(
+          support.error(
+            row.rowNumber,
+            "buyerPostcode",
+            messages("fileUpload.error.buyerPostcode.required")
+          )
+        )
+
+      case Some(v) if v.trim.isEmpty =>
+        Seq(
+          support.error(
+            row.rowNumber,
+            "buyerPostcode",
+            messages("fileUpload.error.buyerPostcode.required")
+          )
+        )
+
+      case Some(v) if !support.looksLikeUkPostcode(v) =>
+        Seq(
+          support.error(
+            row.rowNumber,
+            "buyerPostcode",
+            messages("fileUpload.error.buyerPostcode.invalid")
+          )
+        )
 
       case _ =>
         Seq.empty

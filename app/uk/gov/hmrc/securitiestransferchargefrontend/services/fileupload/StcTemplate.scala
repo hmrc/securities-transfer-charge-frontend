@@ -23,4 +23,6 @@ object StcTemplate {
   case object STF extends StcTemplate
 
   case object SH03 extends StcTemplate
+
+  case object STFAgent extends StcTemplate
 }
