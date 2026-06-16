@@ -555,7 +555,6 @@ agent.fileUpload.error.securitiesQuantity.nonNumeric = The amount of shares must
 agent.fileUpload.error.securitiesQuantity.minimum = The number of shares must be at least 1
 agent.fileUpload.error.securitiesQuantity.maximum = The number of shares must be below 999,999,999
 
-
 individual.fileUpload.chargingPoint.error.required = Enter the date you bought the securities
 org.fileUpload.chargingPoint.error.required = Enter the date the business bought the securities
 agent.fileUpload.chargingPoint.error.required = Enter the date the buyer purchased the securities
@@ -563,8 +562,6 @@ agent.fileUpload.chargingPoint.error.required = Enter the date the buyer purchas
 individual.fileUpload.chargingPoint.error.futureDate = The day you bought the securities must be today’s date or a date in the past
 org.fileUpload.chargingPoint.error.futureDate = The day the business bought the securities must be today’s date or a date in the past
 agent.fileUpload.chargingPoint.error.futureDate = The day the buyer purchased the securities must be today’s date or a date in the past
-
-
 
 minSharePrice.error.required = Enter an amount in £
 minSharePrice.error.maximum = The minimum share price must be below 999,999,999
