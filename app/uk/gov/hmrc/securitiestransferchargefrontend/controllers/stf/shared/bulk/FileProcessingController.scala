@@ -24,6 +24,7 @@ import uk.gov.hmrc.securitiestransferchargefrontend.config.FrontendAppConfig
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.actions.*
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.agents.bulk.routes as bulkRoutes
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.routes.JourneyRecoveryController
+import uk.gov.hmrc.securitiestransferchargefrontend.controllers.routes.CheckYourAnswersController
 import uk.gov.hmrc.securitiestransferchargefrontend.models.NormalMode
 import uk.gov.hmrc.securitiestransferchargefrontend.models.stf.upscan.{FileUpload, UpscanJourneyStatus}
 import uk.gov.hmrc.securitiestransferchargefrontend.repositories.UpscanJourneyRepository
@@ -119,7 +120,7 @@ class FileProcessingController @Inject()(
 
       case UpscanJourneyStatus.Completed => request.affinityGroup match {
         case AffinityGroup.Agent => Future.successful(Redirect(bulkRoutes.AgentReferenceController.onPageLoad(NormalMode)))
-        case _ => Future.successful(Redirect(JourneyRecoveryController.onPageLoad()))
+        case _ => Future.successful(Redirect(CheckYourAnswersController.onPageLoad()))
       }
     }
 }

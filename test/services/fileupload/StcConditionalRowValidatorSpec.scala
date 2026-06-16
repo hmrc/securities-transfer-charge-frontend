@@ -18,6 +18,7 @@ package services.fileupload
 
 import base.SpecBase
 import play.api.i18n.MessagesApi
+import uk.gov.hmrc.securitiestransferchargefrontend.forms.stf.shared.TotalMarketValueFormProvider
 import uk.gov.hmrc.securitiestransferchargefrontend.models.stf.fileupload.*
 import uk.gov.hmrc.securitiestransferchargefrontend.services.fileupload.*
 
@@ -30,6 +31,14 @@ class StcConditionalRowValidatorSpec extends SpecBase {
   private val validParsedRow: ParsedStcRow =
     ParsedStcRow(
       rowNumber = 3,
+      buyerName = Some("Bob buyer"),
+      buyerAddressInUK= Some(true),
+      buyerAddressLine1= Some("1 Seller Street"),
+      buyerAddressLine2= Some("Seller District"),
+      buyerAddressLine3= Some("Seller City"),
+      buyerAddressLine4= None,
+      buyerPostcode= Some("AA1 1AA"),
+      buyerCountry= Some("United Kingdom"),
       sellerName = Some("Seller Ltd"),
       sellerAddressInUK = Some(true),
       sellerAddressLine1 = Some("1 Seller Street"),
@@ -48,7 +57,7 @@ class StcConditionalRowValidatorSpec extends SpecBase {
       whatTypeOfSecurities = Some("shares"),
       typeOfShares = Some("Ordinary Shares"),
       securitiesQuantity = Some(BigDecimal(100)),
-      amountPaidForSecurities = Some(BigDecimal(1000)),
+      amountPaidForSecurities = Some("1000"),
       totalMarketValue = None,
       minSharePrice = None,
       maxSharePrice = None,
@@ -63,7 +72,8 @@ class StcConditionalRowValidatorSpec extends SpecBase {
   private val validator =
     new StcConditionalRowValidator(
       support = new StcValidationSupport,
-      messagesApi = messagesApi
+      messagesApi = messagesApi,
+      totalMarketValueFormProvider = new TotalMarketValueFormProvider
     )
 
   "StcConditionalRowValidator.validate STF" - {
@@ -266,7 +276,7 @@ class StcConditionalRowValidatorSpec extends SpecBase {
       val result = validator.validate(
         validParsedRow.copy(
           connectedPersons = Some(true),
-          totalMarketValue = Some(BigDecimal(1000000000))
+          totalMarketValue = Some("1000000000")
         ), StcTemplate.STF,affinityGroupKeyInd
       )
 

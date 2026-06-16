@@ -18,7 +18,7 @@ package services.fileupload
 
 import base.SpecBase
 import play.api.i18n.MessagesApi
-import uk.gov.hmrc.securitiestransferchargefrontend.forms.stf.shared.{NameOfSellerFormProvider, SecuritiesTargetFormProvider}
+import uk.gov.hmrc.securitiestransferchargefrontend.forms.stf.shared.*
 import uk.gov.hmrc.securitiestransferchargefrontend.models.stf.fileupload.{FileParseError, ParsedCell, ParsedRow}
 import uk.gov.hmrc.securitiestransferchargefrontend.services.fileupload.*
 
@@ -34,13 +34,18 @@ class StcRowValidationServiceSpec extends SpecBase {
         support = support,
         messagesApi = messagesApi,
         nameOfSellerFormProvider = new NameOfSellerFormProvider,
-        securitiesTargetFormProvider = new SecuritiesTargetFormProvider
+        securitiesTargetFormProvider = new SecuritiesTargetFormProvider,
+        nameOfBuyerFormProvider = new NameOfBuyerFormProvider,
+        amountPaidForSecuritiesFormProvider = new AmountPaidForSecuritiesFormProvider
       ),
       stcConditionalRowValidator = new StcConditionalRowValidator(
         support = support,
-        messagesApi = messagesApi
+        messagesApi = messagesApi,
+        totalMarketValueFormProvider = new TotalMarketValueFormProvider
       )
     )
+
+
 
   private val headers: Seq[String] =
     Seq(

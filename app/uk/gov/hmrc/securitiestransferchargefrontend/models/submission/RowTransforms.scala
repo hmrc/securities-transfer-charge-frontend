@@ -79,12 +79,12 @@ object RowTransforms {
         descriptionOfSecurity = getDescriptionOfSecurity,
         numberOfShares = required(row.securitiesQuantity, "securitiesQuantity", row.rowNumber).toInt,
         nominalValue = None, // SH03 only
-        marketValue = marketValue,
+        marketValue = marketValue.map(s=> BigDecimal(s)),
         qualifyAsTreasuryShares = None, // SH03 only
         maxPricePaid = None, // // SH03 only
         minPricePaid = None, // // SH03 only
         originalChargingPoint = required(row.chargingPoint.toOption, "chargingPoint", row.rowNumber),
-        considerationActual = required(row.amountPaidForSecurities, "amountPaidForSecurities", row.rowNumber),
+        considerationActual = required(row.amountPaidForSecurities.map(s => BigDecimal(s)), "amountPaidForSecurities", row.rowNumber),
         isConnectedPartiesTransactions = connectedPersons,
         companyName = required(row.securitiesTarget, "securitiesTarget", row.rowNumber),
         companyRegistrationNumber = row.companyRegistrationNumber,
@@ -99,7 +99,7 @@ object RowTransforms {
         addr3 = row.sellerAddressLine3,
         addr4 = row.sellerAddressLine4,
         postcode = required(row.sellerPostcode, "sellerPostcode", row.rowNumber),
-        country = required(row.sellerCountry, "sellerCountry", row.rowNumber)
+        country = sellerCountry(row.sellerAddressInUK,row.sellerCountry,row.rowNumber)
       ),
       otherSellers = None, // No way to enter multiple sellers atm
       mainBuyerDetails = SingleTransferBuyerDetails(
@@ -144,6 +144,9 @@ object RowTransforms {
         )
     }
   }
+
+  private def sellerCountry(sellerAddressInUK: Option[Boolean], sellerCountry: Option[String], rowNumber: Int): String =
+    if (sellerAddressInUK.contains(true)) "United Kingdom" else required(sellerCountry, "sellerCountry", rowNumber)
     
   private def taxRateFrom(rate: BigDecimal): BuyerTaxRate =
     if rate == BigDecimal("1.5") then BuyerTaxRate.OneAndHalfPercent else BuyerTaxRate.HalfPercent

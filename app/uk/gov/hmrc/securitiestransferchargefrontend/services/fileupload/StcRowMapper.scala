@@ -28,6 +28,28 @@ class StcRowMapper(columnIndex: ColumnIndexBuilder) {
   def map(row: ParsedRow): ParsedStcRow =
     ParsedStcRow(
       rowNumber = row.rowNumber,
+      buyerName =
+        readString(row, columnIndex.find(StcColumns.buyerName)),
+
+      buyerAddressInUK =
+        readBoolean(row, columnIndex.find(StcColumns.buyerAddressInUK)),
+
+      buyerAddressLine1 =
+        readString(row, columnIndex.find(StcColumns.buyerAddressLine1)),
+
+      buyerAddressLine2 =
+        readString(row, columnIndex.find(StcColumns.buyerAddressLine2)),
+
+      buyerAddressLine3 =
+        readString(row, columnIndex.find(StcColumns.buyerAddressLine3)),
+
+      buyerAddressLine4 =
+        readString(row, columnIndex.find(StcColumns.buyerAddressLine4)),
+      buyerPostcode =
+        readString(row, columnIndex.find(StcColumns.buyerPostcode)),
+
+      buyerCountry =
+        readString(row, columnIndex.find(StcColumns.buyerCountry)),
 
       sellerName =
         readString(row, columnIndex.find(StcColumns.sellerName)),
@@ -84,10 +106,10 @@ class StcRowMapper(columnIndex: ColumnIndexBuilder) {
         readBigDecimal(row, columnIndex.find(StcColumns.securitiesQuantity)),
 
       amountPaidForSecurities =
-        readBigDecimal(row, columnIndex.find(StcColumns.amountPaidForSecurities)),
+        readString(row, columnIndex.find(StcColumns.amountPaidForSecurities)),
 
       totalMarketValue =
-        readBigDecimal(row, columnIndex.find(StcColumns.totalMarketValue)),
+        readString(row, columnIndex.find(StcColumns.totalMarketValue)),
 
       minSharePrice =
         readBigDecimal(row, columnIndex.find(StcColumns.minSharePrice)),

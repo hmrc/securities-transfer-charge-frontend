@@ -26,6 +26,14 @@ import java.time.LocalDate
 class StcRowMapperSpec extends AnyWordSpec with Matchers {
 
   private val headers: Seq[String] = Seq(
+    StcColumns.buyerName,
+    StcColumns.buyerAddressInUK,
+    StcColumns.buyerAddressLine1,
+    StcColumns.buyerAddressLine2,
+    StcColumns.buyerAddressLine3,
+    StcColumns.buyerAddressLine4,
+    StcColumns.buyerPostcode,
+    StcColumns.buyerCountry,
     StcColumns.sellerName,
     StcColumns.sellerAddressInUK,
     StcColumns.sellerAddressLine1,
@@ -64,39 +72,58 @@ class StcRowMapperSpec extends AnyWordSpec with Matchers {
       val row = ParsedRow(
         rowNumber = 3,
         cells = Seq(
-          ParsedCell(0, "Bob Seller"),
+          ParsedCell(0, "Bob Buyer"),
           ParsedCell(1, "yes"),
-          ParsedCell(2, "1 Seller Street"),
-          ParsedCell(3, "Seller District"),
-          ParsedCell(4, "Seller City"),
+          ParsedCell(2, "1 Buyer Street"),
+          ParsedCell(3, "Buyer District"),
+          ParsedCell(4, "Buyer City"),
           ParsedCell(5, ""),
-          ParsedCell(6, "LS1 1AA"),
+          ParsedCell(6, "AA1 1AA"),
           ParsedCell(7, "United Kingdom"),
-          ParsedCell(8, "no"),
+          ParsedCell(8, "Bob Seller"),
           ParsedCell(9, "yes"),
-          ParsedCell(10, "Group relief"),
-          ParsedCell(11, "Example Holdings Ltd"),
-          ParsedCell(12, "12345678"),
-          ParsedCell(13, "2026-03-23"),
-          ParsedCell(14, "0.5%"),
-          ParsedCell(15, "Shares"),
-          ParsedCell(16, "Ordinary"),
-          ParsedCell(17, "1000"),
-          ParsedCell(18, "5000.25"),
-          ParsedCell(19, "6000"),
-          ParsedCell(20, "7000"),
-          ParsedCell(21, "8000"),
-          ParsedCell(22, "treasury"),
-          ParsedCell(23, "false")
+          ParsedCell(10, "1 Seller Street"),
+          ParsedCell(11, "Seller District"),
+          ParsedCell(12, "Seller City"),
+          ParsedCell(13, ""),
+          ParsedCell(14, "LS1 1AA"),
+          ParsedCell(15, "United Kingdom"),
+          ParsedCell(16, "no"),
+          ParsedCell(17, "yes"),
+          ParsedCell(18, "Group relief"),
+          ParsedCell(19, "Example Holdings Ltd"),
+          ParsedCell(20, "12345678"),
+          ParsedCell(21, "2026-03-23"),
+          ParsedCell(22, "0.5%"),
+          ParsedCell(23, "Shares"),
+          ParsedCell(24, "Ordinary"),
+          ParsedCell(25, "1000"),
+          ParsedCell(26, "5000.25"),
+          ParsedCell(27, "6000"),
+          ParsedCell(28, "7000"),
+          ParsedCell(29, "8000"),
+          ParsedCell(30, "treasury"),
+          ParsedCell(31, "false")
         )
       )
 
       val result = mapper.map(row)
 
       result.rowNumber mustBe 3
+      result.buyerName mustBe Some("Bob Buyer")
+      result.buyerAddressInUK mustBe Some(true)
+      result.buyerAddressLine1 mustBe Some("1 Buyer Street")
+      result.buyerAddressLine2 mustBe Some("Buyer District")
+      result.buyerAddressLine3 mustBe Some("Buyer City")
+      result.buyerPostcode mustBe Some("AA1 1AA")
+      result.buyerCountry mustBe Some("United Kingdom")
       result.sellerName mustBe Some("Bob Seller")
       result.sellerAddressInUK mustBe Some(true)
+      result.sellerAddressLine1 mustBe Some("1 Seller Street")
+      result.sellerAddressLine2 mustBe Some("Seller District")
+      result.sellerAddressLine3 mustBe Some("Seller City")
       result.sellerPostcode mustBe Some("LS1 1AA")
+      result.sellerCountry mustBe Some("United Kingdom")
       result.connectedPersons mustBe Some(false)
       result.applyingForRelief mustBe Some(true)
       result.whatReliefAreYouApplyingFor mustBe Some("Group relief")
@@ -107,8 +134,8 @@ class StcRowMapperSpec extends AnyWordSpec with Matchers {
       result.whatTypeOfSecurities mustBe Some("Shares")
       result.typeOfShares mustBe Some("Ordinary")
       result.securitiesQuantity mustBe Some(BigDecimal("1000"))
-      result.amountPaidForSecurities mustBe Some(BigDecimal("5000.25"))
-      result.totalMarketValue mustBe Some(BigDecimal("6000"))
+      result.amountPaidForSecurities mustBe Some("5000.25")
+      result.totalMarketValue mustBe Some("6000")
       result.sharePurchaseReason mustBe Some("treasury")
       result.purchaseForCancellation mustBe Some(false)
     }

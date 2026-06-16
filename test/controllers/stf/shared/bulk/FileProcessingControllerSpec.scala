@@ -27,6 +27,7 @@ import play.api.test.Helpers.{redirectLocation, *}
 import uk.gov.hmrc.auth.core.AffinityGroup
 import uk.gov.hmrc.securitiestransferchargefrontend.config.FrontendAppConfig
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.routes.JourneyRecoveryController
+import uk.gov.hmrc.securitiestransferchargefrontend.controllers.routes.CheckYourAnswersController
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.agents.bulk.routes as bulkRoutes
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.shared.bulk.routes
 import uk.gov.hmrc.securitiestransferchargefrontend.models.NormalMode
@@ -427,7 +428,7 @@ class FileProcessingControllerSpec extends SpecBase with MockitoSugar {
               case AffinityGroup.Agent =>
                 redirectLocation(result).value mustEqual bulkRoutes.AgentReferenceController.onPageLoad(NormalMode).url
               case _ =>
-                redirectLocation(result).value mustEqual JourneyRecoveryController.onPageLoad().url
+                redirectLocation(result).value mustEqual CheckYourAnswersController.onPageLoad().url
             }
           }
       }
