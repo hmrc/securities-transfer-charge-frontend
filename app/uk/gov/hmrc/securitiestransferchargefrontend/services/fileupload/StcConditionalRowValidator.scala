@@ -57,8 +57,8 @@ class StcConditionalRowValidator @Inject()(
                       )(implicit cols: ColumnIndexBuilder): Seq[StcRowValidationError] =
     validateReliefType(row, affinityKey) ++
       validateTypeOfShares(row, affinityKey) ++
-      validateSellerAddress(row) ++
       validateBuyerAddress(row) ++
+      validateSellerAddress(row) ++
       validateTotalMarketValue(row, affinityKey)
 
 
