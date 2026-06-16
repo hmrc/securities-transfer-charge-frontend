@@ -17,9 +17,10 @@
 package services.fileupload
 
 import base.SpecBase
-import play.api.i18n.MessagesApi
-import uk.gov.hmrc.securitiestransferchargefrontend.forms.stf.shared.{NameOfSellerFormProvider,SecuritiesTargetFormProvider}
+import play.api.i18n.{Lang, Messages, MessagesApi}
+import uk.gov.hmrc.securitiestransferchargefrontend.forms.stf.shared.{NameOfSellerFormProvider, SecuritiesTargetFormProvider}
 import uk.gov.hmrc.securitiestransferchargefrontend.models.stf.fileupload.*
+import uk.gov.hmrc.securitiestransferchargefrontend.models.stf.fileupload.ParsedValue.{Invalid, Missing, Valid}
 import uk.gov.hmrc.securitiestransferchargefrontend.services.fileupload.*
 
 import java.time.LocalDate
@@ -29,6 +30,8 @@ class StcBasicRowValidatorSpec extends SpecBase {
   private val app = applicationBuilder().build()
 
   private val messagesApi: MessagesApi = app.injector.instanceOf[MessagesApi]
+
+  private implicit val messages: Messages = messagesApi.preferred(Seq(Lang("en")))
 
   private val validRow: ParsedStcRow =
     ParsedStcRow(
@@ -46,7 +49,7 @@ class StcBasicRowValidatorSpec extends SpecBase {
       whatReliefAreYouApplyingFor = None,
       securitiesTarget = Some("Target Ltd"),
       companyRegistrationNumber = Some("12345678"),
-      chargingPoint = Some(LocalDate.of(2025, 11, 20)),
+      chargingPoint = ParsedValue.Valid(LocalDate.of(2025, 11, 20)),
       taxRate = Some(BigDecimal("0.5")),
       whatTypeOfSecurities = Some("Shares"),
       typeOfShares = Some("Ordinary"),
@@ -88,6 +91,54 @@ class StcBasicRowValidatorSpec extends SpecBase {
       result mustBe Seq.empty
     }
 
+    "return charging point required error when missing" in {
+      val result = validator.validate(
+        validRow.copy(chargingPoint = Missing),
+        StcTemplate.STF, "org"
+      )
+
+      result.exists(e => e.fieldName == "chargingPoint" && e.message == messages("org.chargingPoint.error.required.all")) mustBe true
+    }
+
+    "return charging point invalid error when date is unparsable" in {
+      val result = validator.validate(
+        validRow.copy(chargingPoint = Invalid("32/13/2026", "not a valid date")),
+        StcTemplate.STF, "org"
+      )
+
+      result.exists(e => e.fieldName == "chargingPoint" && e.message == messages("org.chargingPoint.error.invalid")) mustBe true
+    }
+
+    "return charging point future date error when date is in the future" in {
+      val result = validator.validate(
+        validRow.copy(chargingPoint = Valid(LocalDate.now().plusDays(5))),
+        StcTemplate.STF, "org"
+      )
+
+      result.exists(e => e.fieldName == "chargingPoint" && e.message == messages("org.chargingPoint.error.futureDate")) mustBe true
+    }
+
+    "drop the prefix for charging point invalid error when affinityKey is 'individual'" in {
+      val result = validator.validate(
+        validRow.copy(chargingPoint = Invalid("32/13/2026", "not a valid date")),
+        StcTemplate.STF, "individual"
+      )
+
+      result.exists(e => e.fieldName == "chargingPoint" && e.message == messages("chargingPoint.error.invalid")) mustBe true
+    }
+
+    "return securities quantity whole number error when a decimal is provided" in {
+      val result = validator.validate(
+        validRow.copy(securitiesQuantity = Some(BigDecimal("10.5"))),
+        StcTemplate.STF, "org"
+      )
+      
+      result.exists(e =>
+        e.fieldName == "securitiesQuantity" &&
+          e.message == "The number of shares must be a whole number between 1 and 999,999,999"
+      ) mustBe true
+    }
+
     "return seller name required error" in {
       val result = validator.validate(
         validRow.copy(sellerName = None),
@@ -122,15 +173,6 @@ class StcBasicRowValidatorSpec extends SpecBase {
       )
 
       result.exists(_.fieldName == "applyingForRelief") mustBe true
-    }
-
-    "return charging point required error" in {
-      val result = validator.validate(
-        validRow.copy(chargingPoint = None),
-        StcTemplate.STF, affinityGroupKeyInd
-      )
-
-      result.exists(_.fieldName == "chargingPoint") mustBe true
     }
 
     "return tax rate invalid when missing" in {

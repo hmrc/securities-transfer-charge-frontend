@@ -28,7 +28,7 @@ class FileParserSelectorSpec extends AnyWordSpec with Matchers with EitherValues
 
   private val mockAppConfig = mock[FrontendAppConfig]
 
-  private val csvParser   = new CsvFileParser(TestFileUploadConfig.config())
+  private val csvParser   = new CsvFileParser
   private val excelParser = new ExcelFileParser(TestFileUploadConfig.config(), mockAppConfig)
   private val selector    = new FileParserSelector(csvParser, excelParser)
 

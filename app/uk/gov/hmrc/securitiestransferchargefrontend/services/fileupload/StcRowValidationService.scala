@@ -31,51 +31,46 @@ class StcRowValidationService @Inject()(
                       rowStream: Iterator[ParsedRow],
                       headers: Seq[String],
                       affinityKey: String,
+                      templateType: String,
                       maxErrorsAllowed: Int,
                       maxRows: Int
                     ): Either[FileParseError, Seq[ValidatedStcRow]] = {
 
     implicit val columnIndex: ColumnIndexBuilder = new ColumnIndexBuilder(headers)
     val mapper = new StcRowMapper(columnIndex)
-    val template = detectTemplate(headers)
 
-    @tailrec
-    def processRows(
-                     accumulated: List[ValidatedStcRow],
-                     blockingErrorCount: Int,
-                     processedRowCount: Int
-                   ): Either[FileParseError, Seq[ValidatedStcRow]] = {
-
-      if (processedRowCount > maxRows) {
-        Left(FileParseError.RowLimitExceeded(processedRowCount, maxRows))
-      } else if (blockingErrorCount > maxErrorsAllowed || !rowStream.hasNext) {
-        Right(accumulated.reverse)
-      } else {
-        val parsedRow = mapper.map(rowStream.next())
-
-        val errors =
-          stcBasicRowValidator.validate(parsedRow, template, affinityKey) ++
-            stcConditionalRowValidator.validate(parsedRow, template, affinityKey)
-
-        val updatedErrorCount = blockingErrorCount + errors.count(_.blocking)
-
-        processRows(ValidatedStcRow(parsedRow, errors) :: accumulated, updatedErrorCount, processedRowCount + 1)
-      }
+    val resolvedTemplate = templateType.toLowerCase match {
+      case "stf"  => Right(StcTemplate.STF)
+      case "sh03" => Right(StcTemplate.SH03)
+      case _      => Left(FileParseError.InvalidTemplate)
     }
 
-    processRows(Nil, 0, 0)
-  }
+    resolvedTemplate.flatMap { template =>
+      @tailrec
+      def processRows(
+                       accumulated: List[ValidatedStcRow],
+                       blockingErrorCount: Int,
+                       processedRowCount: Int
+                     ): Either[FileParseError, Seq[ValidatedStcRow]] = {
 
-  private def detectTemplate(headers: Seq[String]): StcTemplate = {
-    val normalised = headers.map(_.trim.toLowerCase).toSet
-    val templates = Seq(StcTemplate.SH03, StcTemplate.STF)
+        if (processedRowCount > maxRows) {
+          Left(FileParseError.RowLimitExceeded(processedRowCount, maxRows))
+        } else if (blockingErrorCount > maxErrorsAllowed || !rowStream.hasNext) {
+          Right(accumulated.reverse)
+        } else {
+          val parsedRow = mapper.map(rowStream.next())
 
-    templates.find { template =>
-      template.identifyingFields
-        .map(_.toLowerCase)
-        .subsetOf(normalised)
-    }.getOrElse {
-      throw new IllegalArgumentException("Unable to determine file template")
+          val errors =
+            stcBasicRowValidator.validate(parsedRow, template, affinityKey) ++
+              stcConditionalRowValidator.validate(parsedRow, template, affinityKey)
+
+          val updatedErrorCount = blockingErrorCount + errors.count(_.blocking)
+
+          processRows(ValidatedStcRow(parsedRow, errors) :: accumulated, updatedErrorCount, processedRowCount + 1)
+        }
+      }
+
+      processRows(Nil, 0, 0)
     }
   }
 }

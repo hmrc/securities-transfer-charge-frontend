@@ -25,7 +25,7 @@ import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
 
 trait StcUpscanProcessingService {
-  def process(fileUpload: FileUpload, affinityKey: String)(implicit hc: HeaderCarrier): Future[Either[FileParseError, StcFileValidationResponse]]
+  def process(fileUpload: FileUpload, affinityKey: String, templateType: String)(implicit hc: HeaderCarrier): Future[Either[FileParseError, StcFileValidationResponse]]
 }
 
 @Singleton
@@ -35,7 +35,7 @@ class StcUpscanProcessingServiceImpl @Inject()(
                                                 fileParserSelector: FileParserSelector
                                               )(implicit ec: ExecutionContext) extends StcUpscanProcessingService {
 
-  override def process(fileUpload: FileUpload, affinityKey: String)(implicit hc: HeaderCarrier): Future[Either[FileParseError, StcFileValidationResponse]] = {
+  override def process(fileUpload: FileUpload, affinityKey: String, templateType: String)(implicit hc: HeaderCarrier): Future[Either[FileParseError, StcFileValidationResponse]] = {
     if (fileUpload.status != UpscanJourneyStatus.Ready) {
       Future.failed(
         new IllegalArgumentException(
@@ -44,7 +44,7 @@ class StcUpscanProcessingServiceImpl @Inject()(
       )
     } else {
       val mimeType = fileUpload.uploadDetails.map(_.fileMimeType).getOrElse("")
-      
+
       fileParserSelector.select(mimeType) match {
 
         case Left(error) =>
@@ -61,7 +61,7 @@ class StcUpscanProcessingServiceImpl @Inject()(
               inputStream = inputStream
             )
 
-            stcUploadProcessingService.process(uploadedFile, affinityKey)
+            stcUploadProcessingService.process(uploadedFile, affinityKey, templateType)
           }
       }
     }

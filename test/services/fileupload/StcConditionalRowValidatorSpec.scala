@@ -43,7 +43,7 @@ class StcConditionalRowValidatorSpec extends SpecBase {
       whatReliefAreYouApplyingFor = None,
       securitiesTarget = Some("Target Ltd"),
       companyRegistrationNumber = Some("12345678"),
-      chargingPoint = Some(LocalDate.of(2025, 11, 20)),
+      chargingPoint = ParsedValue.Valid(LocalDate.of(2025, 11, 20)),
       taxRate = Some(BigDecimal("0.5")),
       whatTypeOfSecurities = Some("shares"),
       typeOfShares = Some("Ordinary Shares"),

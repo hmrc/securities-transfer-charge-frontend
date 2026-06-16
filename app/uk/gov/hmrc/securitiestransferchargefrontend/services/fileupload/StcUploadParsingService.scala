@@ -29,36 +29,42 @@ class StcUploadParsingService @Inject()(
                                          fileParsingService: FileParsingService
                                        ) {
 
-  def withVerifiedTemplateStream[A](uploadedFile: UploadedFile, affinityKey: String)(block: (Seq[String], Iterator[ParsedRow]) => Either[FileParseError, A]): Either[FileParseError, A] = {
-    fileParsingService.withParsedStream(uploadedFile) { (headers, lazyRowIterator) =>
+  def withVerifiedTemplateStream[A](
+                                     uploadedFile: UploadedFile,
+                                     affinityKey: String,
+                                     templateType: String
+                                   )(block: (Seq[String], Iterator[ParsedRow]) => Either[FileParseError, A]): Either[FileParseError, A] = {
 
-      val expectedRow1 = fileUploadConfig.expectedTemplateHash(affinityKey, "stf", 1)
-      val expectedRow2 = fileUploadConfig.expectedTemplateHash(affinityKey, "stf", 2)
-      val expectedRow3 = fileUploadConfig.expectedTemplateHash(affinityKey, "stf", 3)
-
-      val row1Valid = hashRow(headers) == expectedRow1
-
-      val templateRowsCount = fileUploadConfig.firstDataRow - 2
-      val prepRows = (1 to templateRowsCount).flatMap(_ => if (lazyRowIterator.hasNext) Some(lazyRowIterator.next()) else None).toList
-
-      val row2Valid = prepRows.find(_.rowNumber == 2).exists(r => hashRow(r.cells.sortBy(_.columnIndex).map(_.rawValue)) == expectedRow2)
-      val row3Valid = prepRows.find(_.rowNumber == 3).exists(r => hashRow(r.cells.sortBy(_.columnIndex).map(_.rawValue)) == expectedRow3)
-
-      if (!(row1Valid && row2Valid && row3Valid)) {
+    fileUploadConfig.template(affinityKey, templateType) match {
+      case None =>
         Left(FileParseError.InvalidTemplate)
-      } else {
-        val dataStream = lazyRowIterator.filterNot(_.isCompletelyEmpty)
 
-        if (!dataStream.hasNext) {
-          Left(FileParseError.EmptyFile)
-        } else {
-          block(headers, dataStream)
+      case Some(templateDef) =>
+        fileParsingService.withParsedStream(uploadedFile, templateDef.expectedColumns) { (headers, lazyRowIterator) =>
+
+          val additionalHeaderRowsCount = fileUploadConfig.firstDataRow - 2
+          val additionalHeaderRows = (1 to additionalHeaderRowsCount).flatMap { _ =>
+            if (lazyRowIterator.hasNext) Some(lazyRowIterator.next()) else None
+          }.toList
+
+          val allHeaderCells = headers ++ additionalHeaderRows.flatMap(_.cells.sortBy(_.columnIndex).map(_.rawValue))
+
+          if (hashBlock(allHeaderCells) != templateDef.signature) {
+            Left(FileParseError.InvalidTemplate)
+          } else {
+            val dataStream = lazyRowIterator.filterNot(_.isCompletelyEmpty)
+
+            if (!dataStream.hasNext) {
+              Left(FileParseError.EmptyFile)
+            } else {
+              block(headers, dataStream)
+            }
+          }
         }
-      }
     }
   }
 
-  private def hashRow(cells: Seq[String]): String = {
+  private def hashBlock(cells: Seq[String]): String = {
     val normalisedString = cells.map(_.trim).mkString("|")
     val digest = MessageDigest.getInstance("SHA-256")
     val hashBytes = digest.digest(normalisedString.getBytes(StandardCharsets.UTF_8))

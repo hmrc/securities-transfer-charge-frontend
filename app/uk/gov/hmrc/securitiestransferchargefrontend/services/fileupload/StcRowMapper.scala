@@ -69,7 +69,7 @@ class StcRowMapper(columnIndex: ColumnIndexBuilder) {
         readString(row, columnIndex.find(StcColumns.companyRegistrationNumber)),
 
       chargingPoint =
-        readDate(row, columnIndex.find(StcColumns.chargingPoint)),
+        readParsedDate(row, columnIndex.find(StcColumns.chargingPoint)),
 
       taxRate =
         readTaxRate(row, columnIndex.find(StcColumns.taxRate)),

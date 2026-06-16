@@ -20,14 +20,13 @@ import play.api.Configuration
 
 import javax.inject.{Inject, Singleton}
 
+case class TemplateDefinition(expectedColumns: Int, signature: String)
+
 @Singleton
 class FileUploadConfig @Inject()(configuration: Configuration) {
 
   val maxRows: Int =
     configuration.get[Int]("file-upload.max-rows")
-
-  val maxColumns: Int =
-    configuration.getOptional[Int]("file-upload.max-columns").getOrElse(27)  
 
   val expectedWorksheetName: String =
     configuration.getOptional[String]("file-upload.xlsx.expected-worksheet")
@@ -39,9 +38,10 @@ class FileUploadConfig @Inject()(configuration: Configuration) {
   val maxErrorsAllowed: Int =
     configuration.getOptional[Int]("file-upload.max-errors-allowed").getOrElse(25)
 
-  def expectedTemplateHash(affinityKey:String, templateType: String, row: Int): String = {
-    
-    configuration.get[String](s"file-upload.template-hashes.$affinityKey.$templateType.row$row")
+  def template(affinityKey: String, templateType: String): Option[TemplateDefinition] = {
+    for {
+      cols <- configuration.getOptional[Int](s"file-upload.templates.$affinityKey.$templateType.expected-columns")
+      sig  <- configuration.getOptional[String](s"file-upload.templates.$affinityKey.$templateType.signature")
+    } yield TemplateDefinition(cols, sig)
   }
-
 }

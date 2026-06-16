@@ -34,7 +34,7 @@ import java.time.Instant
 import scala.concurrent.Future
 
 class StcUpscanProcessingServiceSpec extends SpecBase with EitherValues with MockitoSugar with OneInstancePerTest {
-  
+
   private val upscanFileDownloadConnector = mock[UpscanFileDownloadConnector]
   private val stcUploadProcessingService = mock[StcUploadProcessingService]
   private val fileParserSelector = mock[FileParserSelector]
@@ -70,46 +70,46 @@ class StcUpscanProcessingServiceSpec extends SpecBase with EitherValues with Moc
 
     "download and process a ready upload successfully via the stream" in {
       val inputStream = new ByteArrayInputStream("irrelevant".getBytes(StandardCharsets.UTF_8))
-      
+
       when(fileParserSelector.select(eqTo("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")))
         .thenReturn(Right(mockFileParser))
 
       when(upscanFileDownloadConnector.download(eqTo("https://example.com/download/ref-123"))(any[HeaderCarrier]))
         .thenReturn(Future.successful(inputStream))
 
-      when(stcUploadProcessingService.process(any[UploadedFile], eqTo(affinityGroupKeyInd)))
+      when(stcUploadProcessingService.process(any[UploadedFile], eqTo(affinityGroupKeyInd), eqTo("stf")))
         .thenReturn(Right(validationResponse))
 
-      val result = service.process(fileUpload, affinityGroupKeyInd).futureValue
+      val result = service.process(fileUpload, affinityGroupKeyInd, "stf").futureValue
 
       result.value mustBe validationResponse
 
       verify(fileParserSelector).select(eqTo("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"))
       verify(upscanFileDownloadConnector).download(eqTo("https://example.com/download/ref-123"))(any[HeaderCarrier])
-      verify(stcUploadProcessingService).process(any[UploadedFile], eqTo(affinityGroupKeyInd))
+      verify(stcUploadProcessingService).process(any[UploadedFile], eqTo(affinityGroupKeyInd), eqTo("stf"))
     }
 
     "fail fast and return the parse error without downloading when MIME type is unsupported" in {
       val parseError = FileParseError.UnsupportedMimeType("application/pdf")
-      
+
       val pdfUploadDetails = uploadDetails.copy(fileMimeType = "application/pdf")
       val pdfUpload = fileUpload.copy(uploadDetails = Some(pdfUploadDetails))
-      
+
       when(fileParserSelector.select(eqTo("application/pdf")))
         .thenReturn(Left(parseError))
 
-      val result = service.process(pdfUpload, affinityGroupKeyInd).futureValue
-      
+      val result = service.process(pdfUpload, affinityGroupKeyInd, "stf").futureValue
+
       result.left.value mustBe parseError
-      
+
       verify(upscanFileDownloadConnector, never()).download(any[String])(any[HeaderCarrier])
-      verify(stcUploadProcessingService, never()).process(any[UploadedFile], any[String])
+      verify(stcUploadProcessingService, never()).process(any[UploadedFile], any[String], any[String])
     }
 
     "fail when the upload status is not Ready" in {
       val initiatedUpload = fileUpload.copy(status = UpscanJourneyStatus.Initiated)
 
-      val exception = service.process(initiatedUpload, affinityGroupKeyInd).failed.futureValue
+      val exception = service.process(initiatedUpload, affinityGroupKeyInd, "stf").failed.futureValue
 
       exception mustBe a[IllegalArgumentException]
       exception.getMessage mustBe "Cannot process upload unless status is Ready. Current status: Initiated"
@@ -118,7 +118,7 @@ class StcUpscanProcessingServiceSpec extends SpecBase with EitherValues with Moc
     "fail when the upload status is Failed" in {
       val failedUpload = fileUpload.copy(status = UpscanJourneyStatus.Failed)
 
-      val exception = service.process(failedUpload, affinityGroupKeyInd).failed.futureValue
+      val exception = service.process(failedUpload, affinityGroupKeyInd, "stf").failed.futureValue
 
       exception mustBe a[IllegalArgumentException]
       exception.getMessage mustBe "Cannot process upload unless status is Ready. Current status: Failed"

@@ -69,7 +69,7 @@ class StcUploadProcessingServiceSpec extends SpecBase with MockitoSugar {
           whatReliefAreYouApplyingFor = None,
           securitiesTarget = None,
           companyRegistrationNumber = None,
-          chargingPoint = None,
+          chargingPoint = ParsedValue.Missing,
           taxRate = None,
           whatTypeOfSecurities = None,
           typeOfShares = None,
@@ -95,28 +95,30 @@ class StcUploadProcessingServiceSpec extends SpecBase with MockitoSugar {
       when(
         stcUploadParsingService.withVerifiedTemplateStream[StcFileValidationResponse](
           eqTo(uploadedFile),
-          eqTo(affinityGroupKeyInd)
+          eqTo(affinityGroupKeyInd),
+          eqTo("stf")
         )(any())
       ).thenAnswer { invocation =>
-        val block = invocation.getArgument(2).asInstanceOf[(Seq[String], Iterator[ParsedRow]) => Either[FileParseError, StcFileValidationResponse]]
+        val block = invocation.getArgument(3).asInstanceOf[(Seq[String], Iterator[ParsedRow]) => Either[FileParseError, StcFileValidationResponse]]
         block(headers, rowStream)
       }
 
-      when(stcFileValidationService.validateStream(rowStream, headers, affinityGroupKeyInd))
+      when(stcFileValidationService.validateStream(rowStream, headers, affinityGroupKeyInd, "stf"))
         .thenReturn(Right(validationResponse))
 
-      service.process(uploadedFile, affinityGroupKeyInd) mustBe Right(validationResponse)
+      service.process(uploadedFile, affinityGroupKeyInd, "stf") mustBe Right(validationResponse)
     }
 
     "return parse errors without validating" in {
       when(
         stcUploadParsingService.withVerifiedTemplateStream[StcFileValidationResponse](
           eqTo(uploadedFile),
-          eqTo(affinityGroupKeyInd)
+          eqTo(affinityGroupKeyInd),
+          eqTo("stf")
         )(any())
       ).thenReturn(Left(FileParseError.EmptyFile))
 
-      service.process(uploadedFile, affinityGroupKeyInd) mustBe Left(FileParseError.EmptyFile)
+      service.process(uploadedFile, affinityGroupKeyInd, "stf") mustBe Left(FileParseError.EmptyFile)
     }
   }
 }

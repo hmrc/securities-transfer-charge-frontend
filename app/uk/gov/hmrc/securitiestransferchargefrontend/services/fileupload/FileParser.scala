@@ -19,5 +19,5 @@ package uk.gov.hmrc.securitiestransferchargefrontend.services.fileupload
 import uk.gov.hmrc.securitiestransferchargefrontend.models.stf.fileupload.{FileParseError, ParsedRow, UploadedFile}
 
 trait FileParser {
-  def withParsedStream[A](file: UploadedFile)(block: (Seq[String], Iterator[ParsedRow]) => Either[FileParseError, A]): Either[FileParseError, A]
+  def withParsedStream[A](file: UploadedFile, expectedColumns: Int)(block: (Seq[String], Iterator[ParsedRow]) => Either[FileParseError, A]): Either[FileParseError, A]
 }

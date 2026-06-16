@@ -16,19 +16,11 @@
 
 package uk.gov.hmrc.securitiestransferchargefrontend.services.fileupload
 
-sealed trait StcTemplate {
-  def identifyingFields: Set[String]
-}
+sealed trait StcTemplate
 
 object StcTemplate {
 
-  case object STF extends StcTemplate {
+  case object STF extends StcTemplate
 
-    val identifyingFields: Set[String] = Set("STF")
-  }
-
-  case object SH03 extends StcTemplate {
-
-    val identifyingFields: Set[String] = Set("SH03")
-  }
+  case object SH03 extends StcTemplate
 }

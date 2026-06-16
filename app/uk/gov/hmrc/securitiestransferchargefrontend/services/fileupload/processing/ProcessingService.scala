@@ -36,10 +36,15 @@ class ProcessingService @Inject()(
                                    subscriptionConnector: SubscriptionConnector
                                  ) {
 
-  def processReadyUpload(reference: String, fileUpload: FileUpload, affinityKey:String)(implicit request: StcAuthorisedRequest[_], hc: HeaderCarrier, ec: ExecutionContext): Future[Unit] =
+  def processReadyUpload(
+                          reference: String,
+                          fileUpload: FileUpload,
+                          affinityKey: String,
+                          templateType: String
+                        )(implicit request: StcAuthorisedRequest[_], hc: HeaderCarrier, ec: ExecutionContext): Future[Unit] =
     upscanJourneyRepository.updateStatus(reference, Processing).flatMap { _ =>
 
-      stcUpscanProcessingService.process(fileUpload,affinityKey).flatMap {
+      stcUpscanProcessingService.process(fileUpload, affinityKey, templateType).flatMap {
 
         case Left(_: FileParseError.RowLimitExceeded) =>
           upscanJourneyRepository.updateStatus(reference, RowLimitExceeded)

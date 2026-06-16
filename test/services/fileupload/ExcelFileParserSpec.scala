@@ -66,7 +66,7 @@ class ExcelFileParserSpec extends AnyWordSpec with Matchers with EitherValues wi
     (fromIndex until maxColumns).map(_ => "")
 
   private def parseFully(bytes: Array[Byte]): Either[FileParseError, (Seq[String], Seq[ParsedRow])] =
-    parser.withParsedStream(uploadedFile(bytes)) { (headers, rowStream) =>
+    parser.withParsedStream(uploadedFile(bytes), maxColumns) { (headers, rowStream) =>
       Right((headers, rowStream.toList))
     }
 
