@@ -18,8 +18,9 @@ package models.submission
 
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpec
+import uk.gov.hmrc.securitiestransferchargefrontend.domain.TransferType
 import uk.gov.hmrc.securitiestransferchargefrontend.models.stf
-import uk.gov.hmrc.securitiestransferchargefrontend.models.stf.fileupload.{ParsedStcRow, ValidatedStcRow, ParsedValue}
+import uk.gov.hmrc.securitiestransferchargefrontend.models.stf.fileupload.{ParsedStcRow, ParsedValue, ValidatedStcRow}
 import uk.gov.hmrc.securitiestransferchargefrontend.models.submission.*
 
 import java.time.LocalDate
