@@ -17,6 +17,7 @@
 @import uk.gov.hmrc.securitiestransferchargefrontend.viewmodels.InputWidth._
 @import uk.gov.hmrc.securitiestransferchargefrontend.viewmodels.LabelSize.Large
 @import uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.agents.bulk.routes
+@import uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.shared.routes as sharedRoutes
 @import uk.gov.hmrc.securitiestransferchargefrontend.views.html.components.SaveAndReturnButton
 @import uk.gov.hmrc.securitiestransferchargefrontend.views.html.templates
 
@@ -33,7 +34,7 @@
 
 @layout(pageTitle = title(form, messages("agentReference.title")), backLinkUrl = Some(backLinkCall.url)) {
     <div id="caption-heading" class="govuk-caption-l">
-        @messages("agent.details.caption")
+        @messages("submission.details.caption")
     </div>
 
     @formHelper(action = routes.AgentReferenceController.onSubmit(mode)) {
@@ -48,15 +49,20 @@
                 label = LabelViewModel(messages("agentReference.heading")).asPageHeading(Large)
             )
             .withWidth(Full)
-            .withHint(HintViewModel(messages("agentReference.hint")))
+            .withHint(HintViewModel(messages("bulk.agentReference.hint")))
         )
 
-        @govukButton(
-            ButtonViewModel(
-                messages("site.save-and-continue.button")
+
+        <div class="govuk-button-group">
+            @govukButton(
+                ButtonViewModel(
+                    messages("site.continue")
+                )
             )
-        )
 
-        @saveAndReturnButton()
+            <a class="govuk-link" href="@sharedRoutes.SubmissionsDashboardController.onPageLoad().url">
+                @messages("return-to-dashboard.link")
+            </a>
+        </div>
     }
 }
