@@ -707,3 +707,6 @@ agent.templateInstructions.step2 = Complete the template, using one row for each
 agent.templateInstructions.step3 = Upload the file on the next page as a .xlsx or .csv
 agent.templateInstructions.p2 = Remember, do not edit the first two rows, or change the order of the columns.
 agent.templateInstructions.p3 = Once you have uploaded and submitted the file, it may take a few minutes to process before showing as ‘ready to pay’ on your dashboard. You can then pay the charges due.
+
+bulk.agentReference.hint = You can add a reference for your own records and to help you find this submission later. It will not be used by HMRC
+submission.details.caption = Submission details
