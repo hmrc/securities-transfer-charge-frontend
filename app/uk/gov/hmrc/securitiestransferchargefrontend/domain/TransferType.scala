@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.securitiestransferchargefrontend.models.submission
+package uk.gov.hmrc.securitiestransferchargefrontend.domain
 
 import play.api.libs.json.*
 

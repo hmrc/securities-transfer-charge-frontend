@@ -16,6 +16,7 @@
 
 package uk.gov.hmrc.securitiestransferchargefrontend.models.submission
 
+import uk.gov.hmrc.securitiestransferchargefrontend.domain.TransferType
 import uk.gov.hmrc.securitiestransferchargefrontend.models.stf
 import uk.gov.hmrc.securitiestransferchargefrontend.models.stf.fileupload.ValidatedStcRow
 

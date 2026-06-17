@@ -44,14 +44,14 @@ class AgentReferenceViewSpec extends ViewBaseSpec {
   object ExpectedContent {
     val title: String = messages("agentReference.title")
     val heading: String = messages("agentReference.heading")
-    val caption: String = messages("agent.details.caption")
-    val hint: String = messages("agentReference.hint")
-    val saveAndContinue: String = messages("site.save-and-continue.button")
-    val saveAndReturn: String = messages("site.save-and-return.button")
+    val caption: String = messages("submission.details.caption")
+    val hint: String = messages("bulk.agentReference.hint")
+    val continue: String = messages("site.continue")
+    val returnLink: String = messages("return-to-dashboard.link")
   }
 
   "The SecuritiesTargetView" - {
-    
+
       val agentReferenceView = view()
 
       "have the correct title" in {
@@ -72,13 +72,12 @@ class AgentReferenceViewSpec extends ViewBaseSpec {
 
       "have a save and continue button" in {
         val buttons = agentReferenceView.select(".govuk-button")
-        buttons.get(0).text() mustBe ExpectedContent.saveAndContinue
+        buttons.get(0).text() mustBe ExpectedContent.continue
       }
 
-      "have a save and return button" in {
-        val buttons = agentReferenceView.select(".govuk-button")
-        buttons.get(1).text() mustBe ExpectedContent.saveAndReturn
+      "have a link to return back to the submission dashboard page" in {
+        val returnLink = agentReferenceView.select(".govuk-button-group a.govuk-link").first()
+        returnLink.text() mustBe ExpectedContent.returnLink
       }
   }
-
 }

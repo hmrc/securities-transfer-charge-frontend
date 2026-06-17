@@ -17,6 +17,7 @@
 package uk.gov.hmrc.securitiestransferchargefrontend.models.submission
 
 import play.api.libs.json.{Json, Reads, Writes}
+import uk.gov.hmrc.securitiestransferchargefrontend.domain.TransferType
 import uk.gov.hmrc.securitiestransferchargefrontend.models.stf
 
 import java.time.LocalDate
