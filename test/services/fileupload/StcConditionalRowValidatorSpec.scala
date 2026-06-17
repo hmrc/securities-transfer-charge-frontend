@@ -284,6 +284,82 @@ class StcConditionalRowValidatorSpec extends SpecBase {
     }
   }
 
+  "reject country max length for seller address" in {
+    val longCountry = "a" * 51
+
+    val result = validator.validate(
+      validParsedRow.copy(
+        sellerAddressInUK = Some(false),
+        sellerCountry = Some(longCountry)
+      ), StcTemplate.STFAgent, affinityGroupKeyAgent
+    )
+
+    result.exists(_.fieldName == "sellerCountry") mustBe true
+  }
+
+  "reject an invalid country for seller address" in {
+    val invalidCountry = "%%%%%%"
+
+    val result = validator.validate(
+      validParsedRow.copy(
+        sellerAddressInUK = Some(false),
+        sellerCountry = Some(invalidCountry)
+      ), StcTemplate.STFAgent, affinityGroupKeyAgent
+    )
+
+    result.exists(_.fieldName == "sellerCountry") mustBe true
+  }
+
+  "reject missing country for seller address" in {
+
+    val result = validator.validate(
+      validParsedRow.copy(
+        sellerAddressInUK = Some(false),
+        sellerCountry = None
+      ), StcTemplate.STFAgent, affinityGroupKeyAgent
+    )
+
+    result.exists(_.fieldName == "sellerCountry") mustBe true
+  }
+
+  "reject country max length for buyer address" in {
+    val longCountry = "a" * 51
+
+    val result = validator.validate(
+      validParsedRow.copy(
+        buyerAddressInUK = Some(false),
+        buyerCountry = Some(longCountry)
+      ), StcTemplate.STFAgent, affinityGroupKeyAgent
+    )
+
+    result.exists(_.fieldName == "buyerCountry") mustBe true
+  }
+
+  "reject an invalid country for buyer address" in {
+    val invalidCountry = "%%%%%%"
+
+    val result = validator.validate(
+      validParsedRow.copy(
+        buyerAddressInUK = Some(false),
+        buyerCountry = Some(invalidCountry)
+      ), StcTemplate.STFAgent, affinityGroupKeyAgent
+    )
+
+    result.exists(_.fieldName == "buyerCountry") mustBe true
+  }
+
+  "reject missing country for buyer address" in {
+
+    val result = validator.validate(
+      validParsedRow.copy(
+        buyerAddressInUK = Some(false),
+        buyerCountry = None
+      ), StcTemplate.STFAgent, affinityGroupKeyAgent
+    )
+
+    result.exists(_.fieldName == "buyerCountry") mustBe true
+  }
+
   "StcConditionalRowValidator.validate SH03" - {
 
     "return no errors for a valid conditional row" in {
