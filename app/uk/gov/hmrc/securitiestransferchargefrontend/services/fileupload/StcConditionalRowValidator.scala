@@ -174,59 +174,12 @@ class StcConditionalRowValidator @Inject()(
                                      row: ParsedStcRow
                                    )(implicit cols: ColumnIndexBuilder): Seq[StcRowValidationError] = {
 
-    val addressFields = Seq(
-      "sellerAddressLine2" -> row.sellerAddressLine2,
-      "sellerAddressLine3" -> row.sellerAddressLine3,
-      "sellerAddressLine4" -> row.sellerAddressLine4
-    )
-
-    row.sellerAddressInUK match {
-
-      case Some(true) =>
-        support.validateRequiredText(
-          row.sellerAddressLine1,
-          row.rowNumber,
-          "sellerAddressLine1",
-          messages("fileUpload.error.sellerAddressLine1.required"),
-          Some(support.addressLineMaxLength),
-          Some(messages("fileUpload.error.sellerAddressLine1.length")),
-          Some(support.addressPattern),
-          Some(messages("fileUpload.error.sellerAddressLine1.invalidCharacters"))
-        ) ++ addressFields.flatMap { case (fieldName, value) =>
-          support.validateOptionalText(
-            value,
-            row.rowNumber,
-            fieldName,
-            Some(support.optAddressLineMaxLength),
-            Some(messages(s"fileUpload.error.$fieldName.length")),
-            Some(support.addressPattern),
-            Some(messages(s"fileUpload.error.$fieldName.invalidCharacters"))
-          )
-        } ++
-          validateSellerPostcode(row) ++
-          support.validateOptionalText(
-            row.sellerCountry,
-            row.rowNumber,
-            "sellerCountry",
-            Some(support.countryMaxLength),
-            Some(messages("fileUpload.error.sellerCountry.length")),
-            Some(support.countryPattern),
-            Some(messages("fileUpload.error.sellerCountry.invalidCharacters"))
-          )
-
-      case Some(false) =>
-        support.validateOptionalText(
-          row.sellerCountry,
-          row.rowNumber,
-          "sellerCountry",
-          Some(support.countryMaxLength),
-          Some(messages("fileUpload.error.sellerCountry.length")),
-          Some(support.countryPattern),
-          Some(messages("fileUpload.error.sellerCountry.invalidCharacters"))
-        )
-
-      case _ =>
-        Seq.empty
+    row.sellerAddressInUK.fold(Seq.empty[StcRowValidationError]) { inUK =>
+      if (inUK) {
+        sellerAddressLinesValidation(row) ++ validateSellerPostcode(row)
+      } else {
+        sellerAddressLinesValidation(row) ++ validateSellerCountry(row)
+      }
     }
   }
 
@@ -294,60 +247,12 @@ class StcConditionalRowValidator @Inject()(
                                     row: ParsedStcRow
                                   )(implicit cols: ColumnIndexBuilder): Seq[StcRowValidationError] = {
 
-    val addressFields = Seq(
-      "buyerAddressLine2" -> row.buyerAddressLine2,
-      "buyerAddressLine3" -> row.buyerAddressLine3,
-      "buyerAddressLine4" -> row.buyerAddressLine4
-    )
-
-    row.buyerAddressInUK match {
-
-
-      case Some(true) =>
-        support.validateRequiredText(
-          row.buyerAddressLine1,
-          row.rowNumber,
-          "buyerAddressLine1",
-          messages("fileUpload.error.buyerAddressLine1.required"),
-          Some(support.addressLineMaxLength),
-          Some(messages("fileUpload.error.buyerAddressLine1.length")),
-          Some(support.addressPattern),
-          Some(messages("fileUpload.error.buyerAddressLine1.invalidCharacters"))
-        ) ++ addressFields.flatMap { case (fieldName, value) =>
-          support.validateOptionalText(
-            value,
-            row.rowNumber,
-            fieldName,
-            Some(support.optAddressLineMaxLength),
-            Some(messages(s"fileUpload.error.$fieldName.length")),
-            Some(support.addressPattern),
-            Some(messages(s"fileUpload.error.$fieldName.invalidCharacters"))
-          )
-        } ++
-          validateBuyerPostcode(row) ++
-          support.validateOptionalText(
-            row.buyerCountry,
-            row.rowNumber,
-            "buyerCountry",
-            Some(support.countryMaxLength),
-            Some(messages("fileUpload.error.buyerCountry.length")),
-            Some(support.countryPattern),
-            Some(messages("fileUpload.error.buyerCountry.invalidCharacters"))
-          )
-
-      case Some(false) =>
-        support.validateOptionalText(
-          row.buyerCountry,
-          row.rowNumber,
-          "buyerCountry",
-          Some(support.countryMaxLength),
-          Some(messages("fileUpload.error.buyerCountry.length")),
-          Some(support.countryPattern),
-          Some(messages("fileUpload.error.buyerCountry.invalidCharacters"))
-        )
-
-      case _ =>
-        Seq.empty
+    row.buyerAddressInUK.fold(Seq.empty[StcRowValidationError]) { inUK =>
+      if (inUK) {
+        buyerAddressLinesValidation(row) ++ validateBuyerPostcode(row)
+      } else {
+        buyerAddressLinesValidation(row) ++ validateBuyerCountry(row)
+      }
     }
   }
 
@@ -386,6 +291,138 @@ class StcConditionalRowValidator @Inject()(
 
       case _ =>
         Seq.empty
+    }
+  }
+
+  private def validateSellerCountry(
+                                     row: ParsedStcRow
+                                   )(implicit cols: ColumnIndexBuilder): Seq[StcRowValidationError] = {
+
+    row.sellerCountry match {
+
+      case Some(v) if v.length > support.countryMaxLength =>
+        Seq(
+          support.error(
+            row.rowNumber,
+            "sellerCountry",
+            messages("fileUpload.error.sellerCountry.length")
+          )
+        )
+
+      case Some(v) if !support.looksLikeCountry(v) =>
+        Seq(
+          support.error(
+            row.rowNumber,
+            "sellerCountry",
+            messages("fileUpload.error.sellerCountry.invalidCharacters")
+          )
+        )
+
+      case None =>
+        Seq(
+          support.error(
+            row.rowNumber,
+            "sellerCountry",
+            messages("fileUpload.error.sellerCountry.required")
+          )
+        )
+      case _ => Seq.empty
+    }
+  }
+
+  private def validateBuyerCountry(
+                                    row: ParsedStcRow
+                                  )(implicit cols: ColumnIndexBuilder): Seq[StcRowValidationError] = {
+
+    row.buyerCountry match {
+
+      case Some(v) if v.length > support.countryMaxLength =>
+        Seq(
+          support.error(
+            row.rowNumber,
+            "buyerCountry",
+            messages("fileUpload.error.buyerCountry.length")
+          )
+        )
+
+      case Some(v) if !support.looksLikeCountry(v) =>
+        Seq(
+          support.error(
+            row.rowNumber,
+            "buyerCountry",
+            messages("fileUpload.error.buyerCountry.invalidCharacters")
+          )
+        )
+
+      case None =>
+        Seq(
+          support.error(
+            row.rowNumber,
+            "buyerCountry",
+            messages("fileUpload.error.buyerCountry.required")
+          )
+        )
+      case _ => Seq.empty
+    }
+  }
+
+  private def sellerAddressLinesValidation(row: ParsedStcRow)(implicit cols: ColumnIndexBuilder) = {
+
+    val addressFields = Seq(
+      "sellerAddressLine2" -> row.sellerAddressLine2,
+      "sellerAddressLine3" -> row.sellerAddressLine3,
+      "sellerAddressLine4" -> row.sellerAddressLine4
+    )
+
+    support.validateRequiredText(
+      row.sellerAddressLine1,
+      row.rowNumber,
+      "sellerAddressLine1",
+      messages("fileUpload.error.sellerAddressLine1.required"),
+      Some(support.addressLineMaxLength),
+      Some(messages("fileUpload.error.sellerAddressLine1.length")),
+      Some(support.addressPattern),
+      Some(messages("fileUpload.error.sellerAddressLine1.invalidCharacters"))
+    ) ++ addressFields.flatMap { case (fieldName, value) =>
+      support.validateOptionalText(
+        value,
+        row.rowNumber,
+        fieldName,
+        Some(support.optAddressLineMaxLength),
+        Some(messages(s"fileUpload.error.$fieldName.length")),
+        Some(support.addressPattern),
+        Some(messages(s"fileUpload.error.$fieldName.invalidCharacters"))
+      )
+    }
+  }
+
+  private def buyerAddressLinesValidation(row: ParsedStcRow)(implicit cols: ColumnIndexBuilder) = {
+
+    val addressFields = Seq(
+      "buyerAddressLine2" -> row.buyerAddressLine2,
+      "buyerAddressLine3" -> row.buyerAddressLine3,
+      "buyerAddressLine4" -> row.buyerAddressLine4
+    )
+
+    support.validateRequiredText(
+      row.buyerAddressLine1,
+      row.rowNumber,
+      "buyerAddressLine1",
+      messages("fileUpload.error.buyerAddressLine1.required"),
+      Some(support.addressLineMaxLength),
+      Some(messages("fileUpload.error.buyerAddressLine1.length")),
+      Some(support.addressPattern),
+      Some(messages("fileUpload.error.buyerAddressLine1.invalidCharacters"))
+    ) ++ addressFields.flatMap { case (fieldName, value) =>
+      support.validateOptionalText(
+        value,
+        row.rowNumber,
+        fieldName,
+        Some(support.optAddressLineMaxLength),
+        Some(messages(s"fileUpload.error.$fieldName.length")),
+        Some(support.addressPattern),
+        Some(messages(s"fileUpload.error.$fieldName.invalidCharacters"))
+      )
     }
   }
 }

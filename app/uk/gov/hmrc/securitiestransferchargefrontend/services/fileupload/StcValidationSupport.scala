@@ -146,6 +146,9 @@ class StcValidationSupport {
   def looksLikeUkPostcode(value: String): Boolean =
     ukPostcodePattern.pattern.matcher(value.trim).matches()
 
+  def looksLikeCountry(value: String): Boolean =
+    countryPattern.pattern.matcher(value.trim).matches()  
+
   private def validateTextValue(
                                  rowNumber: Int,
                                  fieldName: String,
