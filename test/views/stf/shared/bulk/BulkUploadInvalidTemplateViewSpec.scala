@@ -29,7 +29,7 @@ class BulkUploadInvalidTemplateViewSpec extends ViewBaseSpec with JsoupHelper {
 
   private val viewInstance = app.injector.instanceOf[BulkUploadInvalidTemplateView]
 
-  def view(): Document = Jsoup.parse(viewInstance()(fakeRequest, messages).body)
+  def view(): Document = Jsoup.parse(viewInstance("https://example.com/template")(fakeRequest, messages).body)
 
   object ExpectedContent {
     val title: String = messages("fileUpload.error.invalidTemplate.title")

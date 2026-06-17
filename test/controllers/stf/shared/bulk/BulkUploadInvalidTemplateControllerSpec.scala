@@ -19,7 +19,9 @@ package controllers.stf.shared.bulk
 import base.SpecBase
 import play.api.test.FakeRequest
 import play.api.test.Helpers.*
+import uk.gov.hmrc.auth.core.AffinityGroup
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.shared.bulk.routes
+import uk.gov.hmrc.securitiestransferchargefrontend.utils.CommonHelpers
 import uk.gov.hmrc.securitiestransferchargefrontend.views.html.stf.shared.bulk.BulkUploadInvalidTemplateView
 
 class BulkUploadInvalidTemplateControllerSpec extends SpecBase {
@@ -38,7 +40,7 @@ class BulkUploadInvalidTemplateControllerSpec extends SpecBase {
         val view = application.injector.instanceOf[BulkUploadInvalidTemplateView]
 
         status(result) mustEqual OK
-        contentAsString(result) mustEqual view()(request, messages(application)).toString
+        contentAsString(result) mustEqual view(CommonHelpers.linkToTemplateForStf(AffinityGroup.Individual))(request, messages(application)).toString
       }
     }
   }

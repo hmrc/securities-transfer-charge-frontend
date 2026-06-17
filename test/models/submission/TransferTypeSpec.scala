@@ -19,7 +19,7 @@ package models.submission
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpec
 import play.api.libs.json.{JsBoolean, JsNumber, JsString, JsValue, Json}
-import uk.gov.hmrc.securitiestransferchargefrontend.models.submission.*
+import uk.gov.hmrc.securitiestransferchargefrontend.domain.TransferType
 
 class TransferTypeSpec extends AnyWordSpec with Matchers:
 

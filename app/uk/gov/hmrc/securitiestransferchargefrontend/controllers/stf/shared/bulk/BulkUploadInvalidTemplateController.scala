@@ -20,6 +20,7 @@ import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.actions.*
+import uk.gov.hmrc.securitiestransferchargefrontend.utils.CommonHelpers.linkToTemplateForStf
 import uk.gov.hmrc.securitiestransferchargefrontend.views.html.stf.shared.bulk.BulkUploadInvalidTemplateView
 
 import javax.inject.Inject
@@ -33,6 +34,7 @@ class BulkUploadInvalidTemplateController @Inject()(
 
   def onPageLoad(): Action[AnyContent] =
     stcAuthEnrolled { implicit request =>
-      Ok(view())
+      val templateUrl = linkToTemplateForStf(request.affinityGroup)
+      Ok(view(templateUrl))
     }
 }

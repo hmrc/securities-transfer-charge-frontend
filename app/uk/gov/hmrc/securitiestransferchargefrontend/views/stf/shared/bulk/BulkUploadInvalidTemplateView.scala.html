@@ -21,7 +21,7 @@
 layout: templates.Layout
 )
 
-@()(implicit request: Request[_], messages: Messages)
+@(templateUrl: String)(implicit request: Request[_], messages: Messages)
 
 @layout(pageTitle = titleNoForm(messages("fileUpload.error.invalidTemplate.title"))) {
 
@@ -30,7 +30,7 @@ layout: templates.Layout
 </h1>
 
 <p class="govuk-body">
-    @messages("fileUpload.error.invalidTemplate.p.start") <a class="govuk-link" href="#">@messages("fileUpload.error.invalidTemplate.p.link")</a> @messages("fileUpload.error.invalidTemplate.p.end")
+    @messages("fileUpload.error.invalidTemplate.p.start") <a class="govuk-link" href="@templateUrl">@messages("fileUpload.error.invalidTemplate.p.link")</a> @messages("fileUpload.error.invalidTemplate.p.end")
 </p>
 
 <p class="govuk-body">
