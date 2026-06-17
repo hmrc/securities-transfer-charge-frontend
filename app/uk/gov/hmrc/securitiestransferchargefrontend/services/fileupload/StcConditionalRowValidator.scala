@@ -354,7 +354,7 @@ class StcConditionalRowValidator @Inject()(
         Seq(
           support.error(
             row.rowNumber,
-            "sellerCountry",
+            "buyerCountry",
             messages("fileUpload.error.buyerCountry.required")
           )
         )
