@@ -182,7 +182,6 @@ class StcConditionalRowValidator @Inject()(
 
     row.sellerAddressInUK match {
 
-
       case Some(true) =>
         support.validateRequiredText(
           row.sellerAddressLine1,

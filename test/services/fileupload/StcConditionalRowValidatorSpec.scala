@@ -56,7 +56,7 @@ class StcConditionalRowValidatorSpec extends SpecBase {
       taxRate = Some(BigDecimal("0.5")),
       whatTypeOfSecurities = Some("shares"),
       typeOfShares = Some("Ordinary Shares"),
-      securitiesQuantity = Some(BigDecimal(100)),
+      securitiesQuantity = Some("100"),
       amountPaidForSecurities = Some("1000"),
       totalMarketValue = None,
       minSharePrice = None,
@@ -181,7 +181,7 @@ class StcConditionalRowValidatorSpec extends SpecBase {
               sellerAddressInUK = Some(true),
               sellerAddressLine1 = Some(over100Chars)
             ),
-          "must be 100 characters or fewer"
+          "must be 50 characters or fewer"
         ),
         (
           "sellerAddressLine2",

@@ -19,6 +19,7 @@ package uk.gov.hmrc.securitiestransferchargefrontend.services.fileupload
 import play.api.i18n.{Lang, Messages, MessagesApi}
 import uk.gov.hmrc.securitiestransferchargefrontend.forms.stf.shared.{AmountPaidForSecuritiesFormProvider, NameOfBuyerFormProvider, NameOfSellerFormProvider, SecuritiesTargetFormProvider}
 import uk.gov.hmrc.securitiestransferchargefrontend.models.stf.fileupload.{ParsedStcRow, ParsedValue, StcRowValidationError}
+import scala.util.{Try, Success, Failure}
 
 import javax.inject.Inject
 
@@ -184,8 +185,8 @@ class StcBasicRowValidator @Inject()(
                                         )(implicit cols: ColumnIndexBuilder): Seq[StcRowValidationError] = {
 
     row.securitiesQuantity match {
-
-      case None =>
+      
+      case None | Some("") =>
         Seq(
           support.error(
             row.rowNumber,
@@ -194,35 +195,48 @@ class StcBasicRowValidator @Inject()(
           )
         )
 
-      case Some(value) if !value.isWhole =>
-        Seq(
-          support.error(
-            row.rowNumber,
-            "securitiesQuantity",
-            messages(s"detailsOfThisTransfer.error.numberOfShares.wholeNumber")
-          )
-        )
+      case Some(stringValue) =>
+        Try(BigDecimal(stringValue)) match {
+          
+          case Failure(_) =>
+            Seq(
+              support.error(
+                row.rowNumber,
+                "securitiesQuantity",
+                messages(s"$affinityKey.detailsOfThisTransfer.error.numberOfShares.nonNumeric")
+              )
+            )
+            
+          case Success(value) if !value.isWhole =>
+            Seq(
+              support.error(
+                row.rowNumber,
+                "securitiesQuantity",
+                messages(s"detailsOfThisTransfer.error.numberOfShares.wholeNumber")
+              )
+            )
 
-      case Some(value) if value < support.securitiesQuantityMin =>
-        Seq(
-          support.error(
-            row.rowNumber,
-            "securitiesQuantity",
-            messages(s"$affinityKey.fileUpload.error.securitiesQuantity.minimum")
-          )
-        )
+          case Success(value) if value < support.securitiesQuantityMin =>
+            Seq(
+              support.error(
+                row.rowNumber,
+                "securitiesQuantity",
+                messages(s"$affinityKey.fileUpload.error.securitiesQuantity.minimum")
+              )
+            )
 
-      case Some(value) if value >= support.securitiesQuantityMax =>
-        Seq(
-          support.error(
-            row.rowNumber,
-            "securitiesQuantity",
-            messages(s"$affinityKey.fileUpload.error.securitiesQuantity.maximum")
-          )
-        )
+          case Success(value) if value >= support.securitiesQuantityMax =>
+            Seq(
+              support.error(
+                row.rowNumber,
+                "securitiesQuantity",
+                messages(s"$affinityKey.fileUpload.error.securitiesQuantity.maximum")
+              )
+            )
 
-      case _ =>
-        Seq.empty
+          case Success(_) =>
+            Seq.empty
+        }
     }
   }
 

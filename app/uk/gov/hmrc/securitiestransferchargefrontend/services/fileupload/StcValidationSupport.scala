@@ -26,16 +26,16 @@ import scala.util.matching.Regex
 @Singleton
 class StcValidationSupport {
 
-  val addressLineMaxLength = 100
+  val addressLineMaxLength = 50
   val optAddressLineMaxLength = 40
   val postcodeMaxLength    = 10
   val countryMaxLength     = 50
 
   val addressPattern: Regex =
-    """^[A-Za-z0-9,\.\-\' ]+$""".r
+    """^[A-Za-z0-9\s\.,\-’'…]+$""".r
 
   val countryPattern: Regex =
-    """^[A-Za-z0-9,\.\-\' ]+$""".r
+    """^[A-Za-z0-9\s\.,\-’'…]+$""".r
 
   val securitiesQuantityMin: BigDecimal = BigDecimal(1)
   val securitiesQuantityMax: BigDecimal = BigDecimal(999999999)

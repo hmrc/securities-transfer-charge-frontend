@@ -61,8 +61,9 @@ class StcRowValidationService @Inject()(
           val parsedRow = mapper.map(rowStream.next())
 
           val errors =
-            stcBasicRowValidator.validate(parsedRow, template, affinityKey) ++
-              stcConditionalRowValidator.validate(parsedRow, template, affinityKey)
+            (stcBasicRowValidator.validate(parsedRow, template, affinityKey) ++
+              stcConditionalRowValidator.validate(parsedRow, template, affinityKey))
+                .sortBy(_.columnIndex)
 
           val updatedErrorCount = blockingErrorCount + errors.count(_.blocking)
 

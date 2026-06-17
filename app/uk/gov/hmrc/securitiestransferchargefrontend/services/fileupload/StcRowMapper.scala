@@ -103,7 +103,7 @@ class StcRowMapper(columnIndex: ColumnIndexBuilder) {
         readString(row, columnIndex.find(StcColumns.typeOfShares)),
 
       securitiesQuantity =
-        readBigDecimal(row, columnIndex.find(StcColumns.securitiesQuantity)),
+        readString(row, columnIndex.find(StcColumns.securitiesQuantity)),
 
       amountPaidForSecurities =
         readString(row, columnIndex.find(StcColumns.amountPaidForSecurities)),

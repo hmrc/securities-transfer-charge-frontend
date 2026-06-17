@@ -212,5 +212,34 @@ class StcRowValidationServiceSpec extends SpecBase {
 
       result mustBe Left(FileParseError.InvalidTemplate)
     }
+
+    "sort combined validation errors by their column index left-to-right" in {
+      val row = ParsedRow(
+        rowNumber = 4,
+        cells = Seq(
+          ParsedCell(columnIndex.find(StcColumns.sellerName).getOrElse(-1), ""),
+          ParsedCell(columnIndex.find(StcColumns.securitiesTarget).getOrElse(-1), ""),
+          ParsedCell(columnIndex.find(StcColumns.sellerAddressInUK).getOrElse(-1), "yes"),
+          ParsedCell(columnIndex.find(StcColumns.sellerAddressLine1).getOrElse(-1), ""),
+          ParsedCell(columnIndex.find(StcColumns.connectedPersons).getOrElse(-1), "yes"),
+          ParsedCell(columnIndex.find(StcColumns.applyingForRelief).getOrElse(-1), "yes"),
+          ParsedCell(columnIndex.find(StcColumns.whatRelief).getOrElse(-1), ""),
+          ParsedCell(columnIndex.find(StcColumns.whatTypeOfSecurities).getOrElse(-1), "shares"),
+          ParsedCell(columnIndex.find(StcColumns.typeOfShares).getOrElse(-1), "")
+        )
+      )
+
+      val result = service.validateStream(Seq(row).iterator, headers, affinityGroupKeyInd, "stf", 25, 10000)
+
+      result.isRight mustBe true
+      val errors = result.toOption.get.head.validationErrors
+
+      errors.size must be > 1
+
+      val actualIndexes = errors.map(_.columnIndex)
+      val expectedSortedIndexes = actualIndexes.sorted
+
+      actualIndexes mustBe expectedSortedIndexes
+    }
   }
 }

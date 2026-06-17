@@ -47,7 +47,7 @@ case class ParsedStcRow(
                          taxRate: Option[BigDecimal],
                          whatTypeOfSecurities: Option[String],
                          typeOfShares: Option[String],
-                         securitiesQuantity: Option[BigDecimal],
+                         securitiesQuantity: Option[String],
                          amountPaidForSecurities: Option[String],
                          totalMarketValue: Option[String],
                          minSharePrice: Option[BigDecimal],

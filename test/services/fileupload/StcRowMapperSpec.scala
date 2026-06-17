@@ -133,7 +133,7 @@ class StcRowMapperSpec extends AnyWordSpec with Matchers {
       result.taxRate mustBe Some(BigDecimal("0.5"))
       result.whatTypeOfSecurities mustBe Some("Shares")
       result.typeOfShares mustBe Some("Ordinary")
-      result.securitiesQuantity mustBe Some(BigDecimal("1000"))
+      result.securitiesQuantity mustBe Some("1000")
       result.amountPaidForSecurities mustBe Some("5000.25")
       result.totalMarketValue mustBe Some("6000")
       result.sharePurchaseReason mustBe Some("treasury")
