@@ -36,3 +36,4 @@ target
 test-result
 tmp
 .vscode/
+/.clinerules
