@@ -39,10 +39,14 @@ class StcRowValidationService @Inject()(
     implicit val columnIndex: ColumnIndexBuilder = new ColumnIndexBuilder(headers)
     val mapper = new StcRowMapper(columnIndex)
 
-    val resolvedTemplate = templateType.toLowerCase match {
-      case "stf"  => Right(StcTemplate.STF)
-      case "sh03" => Right(StcTemplate.SH03)
-      case _      => Left(FileParseError.InvalidTemplate)
+    val resolvedTemplate = (templateType.toLowerCase, affinityKey.toLowerCase) match {
+      case ("stf", "agent") => Right(StcTemplate.STFAgent)
+
+      case ("stf", _) => Right(StcTemplate.STF)
+
+      case ("sh03", _) => Right(StcTemplate.SH03)
+
+      case _ => Left(FileParseError.InvalidTemplate)
     }
 
     resolvedTemplate.flatMap { template =>
