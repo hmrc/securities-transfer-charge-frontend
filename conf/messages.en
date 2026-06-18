@@ -718,3 +718,12 @@ agent.sh03.beforeYouStart.p1 = Use this service to submit details about a purcha
 agent.sh03.beforeYouStart.p2 = You can use this online service to tell us about the purchase, instead of the Companies House SH03 form.
 agent.sh03.beforeYouStart.p3 = Once you have submitted details about the purchase you will get a printable confirmation including the transfer reference number, which can be sent to Companies House.
 agent.sh03.beforeYouStart.p4 = You do not need to tell us about transfers where the company is a Qualifying Asset Holding Company, and the conditions for exemption are met.
+
+reasonForPurchase.cancellation = For cancellation
+reasonForPurchase.treasury = To place into treasure
+reasonForPurchase.error.required = Select why these shares are being purchased
+
+agent.sh03.reasonForPurchase.title = Why are these shares being purchased?
+agent.sh03.reasonForPurchase.heading = Why are these shares being purchased?
+agent.sh03.reasonForPurchase.checkYourAnswersLabel = Why are these shares being purchased?
+agent.sh03.reasonForPurchase.change.hidden = Change why these shares are being purchased
