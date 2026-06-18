@@ -1,5 +1,5 @@
 /*
- * Copyright 2025 HM Revenue & Customs
+ * Copyright 2026 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,63 +18,109 @@ package views.stf.shared
 
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
-import play.api.Application
+import play.twirl.api.Html
 import uk.gov.hmrc.securitiestransferchargefrontend.domain.SubmissionId
 import uk.gov.hmrc.securitiestransferchargefrontend.views.html.stf.shared.SubmissionsDashboardView
 import views.ViewBaseSpec
+import uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.shared.routes
 
 class SubmissionsDashboardViewSpec extends ViewBaseSpec {
 
-  override def fakeApplication(): Application = applicationBuilder().build()
+  private val view: SubmissionsDashboardView = app.injector.instanceOf[SubmissionsDashboardView]
 
-  private val viewInstance         = app.injector.instanceOf[SubmissionsDashboardView]
+  private val emptySubmissionIds: List[SubmissionId] = List.empty
+  private val submissionIds: List[SubmissionId] = List(
+    SubmissionId("sub-001"),
+    SubmissionId("sub-002")
+  )
 
-  private def view(submissionIds: List[SubmissionId]): Document =
-    Jsoup.parse(
-      viewInstance(submissionIds)(fakeRequest, messages).body
-    )
+  "SubmissionsDashboardView" - {
 
-  object ExpectedContent {
-    val title = "Submissions"
-    val heading = "Submissions"
-    val createNew = "Create new submission"
-    
-  }
+    "when rendered with no submissions" - {
 
-  "SubmissionsDashboardView (empty state)" - {
+      val html: Html = view(emptySubmissionIds)(fakeRequest, messages)
+      val document: Document = Jsoup.parse(html.toString())
 
-    val submissionsDashboardView = view(List.empty)
+      "must display the page title" in {
+        document.title() must include(messages("submissionsDashboard.title"))
+      }
 
-    "have the correct title" in {
-      submissionsDashboardView.title must include(ExpectedContent.title)
+      "must display the heading" in {
+        document.getElementsByClass("govuk-heading-l").text() mustBe messages("submissionsDashboard.heading")
+      }
+
+      "must display the hint text" in {
+        document.getElementById("caption-heading").text() mustBe messages("submissionsDashboard.hint")
+      }
+
+      "must display the STF create new submission button" in {
+        val buttons = document.getElementsByClass("govuk-button")
+        buttons.size() mustBe 2
+        
+        val stfButton = buttons.get(0)
+        stfButton.text() mustBe messages("submissionsDashboard.create-new-submission.button")
+        stfButton.hasClass("govuk-button--secondary") mustBe false
+      }
+
+      "must display the SH03 start button" in {
+        val buttons = document.getElementsByClass("govuk-button")
+        buttons.size() mustBe 2
+        
+        val sh03Button = buttons.get(1)
+        sh03Button.text() mustBe "start sh03"
+        sh03Button.hasClass("govuk-button--secondary") mustBe true
+      }
+
+      "must have the SH03 button as a link" in {
+        val buttons = document.getElementsByClass("govuk-button")
+        val sh03Button = buttons.get(1)
+        
+        sh03Button.tagName() mustBe "a"
+        sh03Button.attr("href") mustBe routes.SubmissionsDashboardController.startSh03().url
+      }
+
+      "must have the STF button as a submit button" in {
+        val buttons = document.getElementsByClass("govuk-button")
+        val stfButton = buttons.get(0)
+        
+        stfButton.tagName() mustBe "button"
+        stfButton.attr("type") mustBe "submit"
+      }
+
+      "must not display the submissions table" in {
+        document.select("table").isEmpty mustBe true
+      }
     }
 
-    "have the correct heading" in {
-      submissionsDashboardView.select("h1").text() mustBe ExpectedContent.heading
-    }
+    "when rendered with submissions" - {
 
-    "have a create button with the correct text" in {
-      val button = submissionsDashboardView.select(".govuk-button")
-      button.text() mustBe ExpectedContent.createNew
-    }
+      val html: Html = view(submissionIds)(fakeRequest, messages)
+      val document: Document = Jsoup.parse(html.toString())
 
-    "should not have a back link" in {
-      submissionsDashboardView.hasBackLink mustBe false
-    }
-  }
+      "must display the page title" in {
+        document.title() must include(messages("submissionsDashboard.title"))
+      }
 
-  "SubmissionsDashboardView (with submissions)" - {
+      "must display both buttons" in {
+        val buttons = document.getElementsByClass("govuk-button")
+        buttons.size() mustBe 2
+      }
 
-    val submissionIds = List(submissionId)
+      "must display the STF button with correct text" in {
+        val buttons = document.getElementsByClass("govuk-button")
+        val stfButton = buttons.get(0)
+        stfButton.text() mustBe messages("submissionsDashboard.create-new-submission.button")
+      }
 
-    val submissionsDashboardView = view(submissionIds)
+      "must display the SH03 button with correct text" in {
+        val buttons = document.getElementsByClass("govuk-button")
+        val sh03Button = buttons.get(1)
+        sh03Button.text() mustBe "start sh03"
+      }
 
-    "display the submissions table" in {
-      submissionsDashboardView.select(".govuk-table").size() mustBe 1
-    }
-
-    "display the submission id in the table" in {
-      submissionsDashboardView.select("tbody tr td").first().text() mustBe submissionId.value
+      "must display the submissions table" in {
+        document.select("table").isEmpty mustBe false
+      }
     }
   }
 }

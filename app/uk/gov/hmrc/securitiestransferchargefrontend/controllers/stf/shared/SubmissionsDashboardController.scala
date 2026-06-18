@@ -33,6 +33,7 @@ import uk.gov.hmrc.securitiestransferchargefrontend.navigation.Navigator
 import uk.gov.hmrc.securitiestransferchargefrontend.pages.stf.shared.SubmissionsDashboardPage
 import uk.gov.hmrc.securitiestransferchargefrontend.services.AuditService
 import uk.gov.hmrc.securitiestransferchargefrontend.views.html.stf.shared.SubmissionsDashboardView
+import uk.gov.hmrc.securitiestransferchargefrontend.controllers.sh03.agents.single.routes as sh03Routes
 
 import javax.inject.{Inject, Named}
 import scala.concurrent.{ExecutionContext, Future}
@@ -96,5 +97,9 @@ class SubmissionsDashboardController @Inject()(
         auditService.audit(AuditModel(StartSubmission, userId, innerRequest.affinityGroup, innerRequest.credentialId, submissionId))
         Redirect(call)
       }
+  }
+
+  def startSh03(): Action[AnyContent] = stcAuthEnrolled { implicit request =>
+    Redirect(sh03Routes.BeforeYouStartController.onPageLoad())
   }
 }
