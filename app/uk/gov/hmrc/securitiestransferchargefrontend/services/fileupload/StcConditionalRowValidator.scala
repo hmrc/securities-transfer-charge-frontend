@@ -171,13 +171,12 @@ class StcConditionalRowValidator @Inject()(
   }
 
   private def validateSellerAddress(
-                                    row: ParsedStcRow
-                                  )(implicit cols: ColumnIndexBuilder): Seq[StcRowValidationError] = {
+                                     row: ParsedStcRow
+                                   )(implicit cols: ColumnIndexBuilder): Seq[StcRowValidationError] = {
 
     row.sellerAddressInUK.fold(Seq.empty[StcRowValidationError]) { inUK =>
       sellerAddressLinesValidation(row) ++
-        (if (inUK) validateSellerPostcode(row)
-        else validateSellerCountry(row))
+        (if (inUK) validateSellerPostcode(row) else validateSellerCountry(row))
     }
   }
 
@@ -247,8 +246,7 @@ class StcConditionalRowValidator @Inject()(
 
     row.buyerAddressInUK.fold(Seq.empty[StcRowValidationError]) { inUK =>
       buyerAddressLinesValidation(row) ++
-        (if (inUK) validateBuyerPostcode(row)
-        else validateBuyerCountry(row))
+        (if (inUK) validateBuyerPostcode(row) else validateBuyerCountry(row))
     }
   }
 

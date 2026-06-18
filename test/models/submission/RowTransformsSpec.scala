@@ -69,7 +69,7 @@ class RowTransformsSpec extends AnyWordSpec with Matchers {
       taxRate = Some(BigDecimal("1.5")),
       whatTypeOfSecurities = Some("Shares"),
       typeOfShares = Some("Ordinary Shares"),
-      securitiesQuantity = Some(BigDecimal("1000")),
+      securitiesQuantity = Some("1000"),
       amountPaidForSecurities = Some("5000.25"),
       totalMarketValue = Some("6000"),
       minSharePrice = Some(BigDecimal("100")), 

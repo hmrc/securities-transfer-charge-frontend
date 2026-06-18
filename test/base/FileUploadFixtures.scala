@@ -73,7 +73,7 @@ trait FileUploadFixtures {
       taxRate = None,
       whatTypeOfSecurities = Some(""),
       typeOfShares = Some(""),
-      securitiesQuantity = Some(BigDecimal(1)),
+      securitiesQuantity = Some("1"),
       amountPaidForSecurities = Some("1"),
       totalMarketValue = Some("1"),
       minSharePrice = Some(BigDecimal(1)),

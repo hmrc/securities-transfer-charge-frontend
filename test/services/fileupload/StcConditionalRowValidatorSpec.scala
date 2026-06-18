@@ -56,7 +56,7 @@ class StcConditionalRowValidatorSpec extends SpecBase {
       taxRate = Some(BigDecimal("0.5")),
       whatTypeOfSecurities = Some("shares"),
       typeOfShares = Some("Ordinary Shares"),
-      securitiesQuantity = Some(BigDecimal(100)),
+      securitiesQuantity = Some("100"),
       amountPaidForSecurities = Some("1000"),
       totalMarketValue = None,
       minSharePrice = None,
@@ -249,7 +249,7 @@ class StcConditionalRowValidatorSpec extends SpecBase {
     }
 
     "validate seller country when seller address is not in the UK" in {
-      val longCountry = "a" * 51
+      val longCountry = "a" * 101
 
       val result = validator.validate(
         validParsedRow.copy(
@@ -285,7 +285,7 @@ class StcConditionalRowValidatorSpec extends SpecBase {
   }
 
   "reject country max length for seller address" in {
-    val longCountry = "a" * 51
+    val longCountry = "a" * 101
 
     val result = validator.validate(
       validParsedRow.copy(
@@ -323,7 +323,7 @@ class StcConditionalRowValidatorSpec extends SpecBase {
   }
 
   "reject country max length for buyer address" in {
-    val longCountry = "a" * 51
+    val longCountry = "a" * 101
 
     val result = validator.validate(
       validParsedRow.copy(

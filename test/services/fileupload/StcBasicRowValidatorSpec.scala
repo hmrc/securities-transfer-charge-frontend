@@ -61,7 +61,7 @@ class StcBasicRowValidatorSpec extends SpecBase {
       taxRate = Some(BigDecimal("0.5")),
       whatTypeOfSecurities = Some("Shares"),
       typeOfShares = Some("Ordinary"),
-      securitiesQuantity = Some(BigDecimal(10000)),
+      securitiesQuantity = Some("10000"),
       amountPaidForSecurities = Some("15000"),
       totalMarketValue = Some("20000"),
       minSharePrice = None,
@@ -139,7 +139,7 @@ class StcBasicRowValidatorSpec extends SpecBase {
 
     "return securities quantity whole number error when a decimal is provided" in {
       val result = validator.validate(
-        validRow.copy(securitiesQuantity = Some(BigDecimal("10.5"))),
+        validRow.copy(securitiesQuantity = Some("10.5")),
         StcTemplate.STF, "org"
       )
 
@@ -214,7 +214,7 @@ class StcBasicRowValidatorSpec extends SpecBase {
 
     "return securities quantity minimum error" in {
       val result = validator.validate(
-        validRow.copy(securitiesQuantity = Some(BigDecimal(0))),
+        validRow.copy(securitiesQuantity = Some("0")),
         StcTemplate.STF, affinityGroupKeyInd
       )
 
@@ -223,7 +223,7 @@ class StcBasicRowValidatorSpec extends SpecBase {
 
     "return securities quantity maximum error" in {
       val result = validator.validate(
-        validRow.copy(securitiesQuantity = Some(BigDecimal(999999999))),
+        validRow.copy(securitiesQuantity = Some("999999999")),
         StcTemplate.STF, affinityGroupKeyInd
       )
 
