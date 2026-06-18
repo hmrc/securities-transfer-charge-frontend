@@ -18,6 +18,7 @@
 @import uk.gov.hmrc.securitiestransferchargefrontend.views.html.stf.shared.SubmissionsTable
 @import uk.gov.hmrc.securitiestransferchargefrontend.views.html.templates
 @import uk.gov.hmrc.securitiestransferchargefrontend.domain.SubmissionId
+@import uk.gov.hmrc.securitiestransferchargefrontend.controllers.sh03.agents.single.routes as sh03Routes
 
 
 @this(
@@ -29,19 +30,19 @@
 @(submissionIds: List[SubmissionId])(implicit request: Request[_], messages: Messages)
 
 @layout(pageTitle = titleNoForm(messages("submissionsDashboard.title")), showBackLink = false) {
+
+    <div id="caption-heading" class="govuk-caption-l">
+        @messages("submissionsDashboard.hint")
+    </div>
+
+    <h1 class="govuk-heading-l">@messages("submissionsDashboard.heading")</h1>
+
+    @if(submissionIds.nonEmpty) {
+        @SubmissionsTable(submissionIds)
+    }
+
     @formHelper(action = routes.SubmissionsDashboardController.onSubmit(), Symbol("autoComplete") -> "off") {
-
-        <div id="caption-heading" class="govuk-caption-l">
-            @messages("submissionsDashboard.hint")
-        </div>
-
-        <h1 class="govuk-heading-l">@messages("submissionsDashboard.heading")</h1>
-
-        @if(submissionIds.nonEmpty) {
-            @SubmissionsTable(submissionIds)
-        }
-
-<p>
+        <p>
             @govukButton(
                 ButtonViewModel(
                     messages("submissionsDashboard.create-new-submission.button")
@@ -49,4 +50,11 @@
             )
         </p>
     }
+
+        <p>
+            @govukButton(
+                ButtonViewModel(
+                    messages("submissionsDashboard.sh03.button"))
+                .asSecondaryButton().asLink(routes.SubmissionsDashboardController.startSh03().url) )
+        </p>
 }
