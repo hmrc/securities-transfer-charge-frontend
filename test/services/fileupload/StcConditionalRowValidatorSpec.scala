@@ -181,7 +181,7 @@ class StcConditionalRowValidatorSpec extends SpecBase {
               sellerAddressInUK = Some(true),
               sellerAddressLine1 = Some(over100Chars)
             ),
-          "must be 50 characters or fewer"
+          "must be 100 characters or fewer"
         ),
         (
           "sellerAddressLine2",
@@ -249,7 +249,7 @@ class StcConditionalRowValidatorSpec extends SpecBase {
     }
 
     "validate seller country when seller address is not in the UK" in {
-      val longCountry = "a" * 51
+      val longCountry = "a" * 101
 
       val result = validator.validate(
         validParsedRow.copy(
@@ -285,7 +285,7 @@ class StcConditionalRowValidatorSpec extends SpecBase {
   }
 
   "reject country max length for seller address" in {
-    val longCountry = "a" * 51
+    val longCountry = "a" * 101
 
     val result = validator.validate(
       validParsedRow.copy(
@@ -323,7 +323,7 @@ class StcConditionalRowValidatorSpec extends SpecBase {
   }
 
   "reject country max length for buyer address" in {
-    val longCountry = "a" * 51
+    val longCountry = "a" * 101
 
     val result = validator.validate(
       validParsedRow.copy(
