@@ -24,6 +24,7 @@ import uk.gov.hmrc.securitiestransferchargefrontend.clients.{SaveAndReturnClient
 import uk.gov.hmrc.securitiestransferchargefrontend.connectors.*
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.actions.*
 import uk.gov.hmrc.securitiestransferchargefrontend.handlers.ErrorHandler
+import uk.gov.hmrc.securitiestransferchargefrontend.navigation.sh03.agents.single.Sh03AgentNavigator
 import uk.gov.hmrc.securitiestransferchargefrontend.navigation.stf.agents.StfAgentNavigator
 import uk.gov.hmrc.securitiestransferchargefrontend.navigation.stf.individuals.StfNavigator
 import uk.gov.hmrc.securitiestransferchargefrontend.navigation.stf.organisations.StfOrgNavigator
@@ -86,6 +87,12 @@ class Module extends AbstractModule {
     bind(classOf[PersistentNavigator])
       .annotatedWith(Names.named("agents"))
       .to(classOf[StfAgentNavigator])
+    bind(classOf[Navigator])
+      .annotatedWith(Names.named("agentsSh03"))
+      .to(classOf[Sh03AgentNavigator])
+    bind(classOf[PersistentNavigator])
+      .annotatedWith(Names.named("agentsSh03"))
+      .to(classOf[Sh03AgentNavigator])
     bind(classOf[ValidationErrorRepository])
       .to(classOf[ValidationErrorRepositoryImpl])
   }

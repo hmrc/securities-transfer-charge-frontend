@@ -44,6 +44,187 @@ checkYourAnswers.heading = Check your answers
 journeyRecovery.continue.title = Sorry, there is a problem with the service
 journeyRecovery.continue.heading = Sorry, there is a problem with the service
 journeyRecovery.continue.guidance = [Add content to explain how to proceed
+journeyRecovery.continue.guidance = [Add content to explain how to proceed.]
+journeyRecovery.startAgain.title = Sorry, there is a problem with the service
+journeyRecovery.startAgain.heading = Sorry, there is a problem with the service
+journeyRecovery.startAgain.guidance = [Add content to explain why the user needs to start again.]
+
+signedOut.title = For your security, we signed you out
+signedOut.heading = For your security, we signed you out
+signedOut.guidance = We did not save your answers.
+
+unauthorised.title = You can’t access this service with this account
+unauthorised.heading = You can’t access this service with this account
+
+transfer.details.caption = Transfer details
+seller.details.caption = Seller details
+org.details.caption = Business details
+
+confirmAddress.title = Review and confirm your address
+confirmAddress.heading = Review and confirm your address
+confirmAddress.editLink = Edit address
+confirmAddress.confirm = Confirm address
+
+submissionsDashboard.title = Submissions
+submissionsDashboard.heading = Submissions
+submissionsDashboard.create-new-submission.button = Create new submission
+submissionsDashboard.hint = Submission dashboard
+
+submissionsDashboard.table.submissionId = Submission ID
+submissionsDashboard.table.moneyOwed = Money owed
+submissionsDashboard.table.chargeDueBy = Charge due by
+submissionsDashboard.table.status = Status
+submissionsDashboard.table.action = Action
+
+individual.howToNotifyAboutSecuritiesTransfer.title = How do you want to tell us about your securities transfers?
+individual.howToNotifyAboutSecuritiesTransfer.heading = How do you want to tell us about your securities transfers?
+individual.howToNotifyAboutSecuritiesTransfer.oneAtATime = One at a time
+individual.howToNotifyAboutSecuritiesTransfer.oneAtATime.hint = Each transfer must be between you and one seller, and can include one kind of security or type of shares.
+individual.howToNotifyAboutSecuritiesTransfer.moreThanOneAtATime = More than one at a time
+individual.howToNotifyAboutSecuritiesTransfer.moreThanOneAtATime.hint = Download the template, complete it using one row per transfer, and upload it on the following pages. You can then find the submission on your dashboard and pay the money owed.
+individual.howToNotifyAboutSecuritiesTransfer.checkYourAnswersLabel = How do you want to tell us about your securities transfers?
+individual.howToNotifyAboutSecuritiesTransfer.error.required = Select a way to tell us about your securities transfer
+individual.howToNotifyAboutSecuritiesTransfer.change.hidden = HowToNotifyAboutSecuritiesTransfer
+
+nameOfSeller.title = What’s the seller’s name?
+nameOfSeller.heading = What’s the seller’s name?
+nameOfSeller.checkYourAnswersLabel = What’s the seller’s name?
+nameOfSeller.error.required = Enter the seller’s full name
+nameOfSeller.error.length = Seller’s name must be 35 characters or less
+nameOfSeller.change.hidden = NameOfSeller
+nameOfSeller.hint = This can be a business, person or another entity.
+
+connectedPersons.title = Connected persons
+connectedPersons.heading = Connected persons
+connectedPersons.legend = Are you and the seller of these securities connected?
+connectedPersons.checkYourAnswersLabel = Connected persons
+connectedPersons.error.required = Select yes if you and the seller are ‘connected persons’
+connectedPersons.p = We need to know if you and the seller of these securities are considered ‘connected persons’ for tax purposes. Connected persons include spouses, civil partners and close relatives.
+connectedPersons.details.summary = Read more about connected persons
+connectedPersons.details.content.p1 = You are considered connected with the following people:
+connectedPersons.details.content.l1 = your husband, wife or civil partner
+connectedPersons.details.content.l2 = your relatives and their husbands, wives or civil partners
+connectedPersons.details.content.l3 = your husband’s, wife’s or civil partner’s relatives and their husbands, wives or civil partners
+connectedPersons.details.content.l4 = the trustees of a settlement of which you are a settlor, or of which a person who is still alive and who is connected with you is a settlor
+connectedPersons.details.content.p2 = Relative means a brother, sister, ancestor or descendant. It does not include nephews, nieces, uncles and aunts.
+connectedPersons.details.content.link.text = Read HMRC guidance on connected persons
+connectedPersons.change.hidden = Change connected persons
+
+applyingForRelief.title = Are you applying for a relief?
+applyingForRelief.heading = Are you applying for a relief?
+applyingForRelief.checkYourAnswersLabel = Are you applying for a relief?
+applyingForRelief.error.required = Select yes if you are applying for a relief
+applyingForRelief.change.hidden = Change applying for a relief
+applyingForRelief.p = See a
+applyingForRelief.details.content.link.text = full list of reliefs
+
+whatReliefAreYouApplyingFor.title = What relief are you applying for?
+whatReliefAreYouApplyingFor.heading = What relief are you applying for?
+whatReliefAreYouApplyingFor.checkYourAnswersLabel = What relief are you applying for?
+whatReliefAreYouApplyingFor.error.required = Enter the type of relief you’re applying for
+whatReliefAreYouApplyingFor.change.hidden = Change what relief are you applying for
+whatReliefAreYouApplyingFor.p = Start typing the name of the relief and select from the list.
+whatReliefAreYouApplyingFor.details.content.link.text = See a full list of reliefs
+
+securitiesTarget.title = What business are you buying these securities in?
+securitiesTarget.heading = What business are you buying these securities in?
+securitiesTarget.businessName = Business name
+securitiesTarget.crn = Company registration number (CRN) (optional)
+securitiesTarget.crn.hint = This is also called a company number. For example, SN898989 or 12345678
+securitiesTarget.checkYourAnswersLabel = What business are you buying these securities in?
+securitiesTarget.error.businessName.required = Enter the name of the business you’re buying securities in
+securitiesTarget.error.businessName.length = Business name must be 160 characters or fewer
+securitiesTarget.error.crn.length = Company registration number must be 8 characters
+securitiesTarget.businessName.change.hidden = BusinessName
+securitiesTarget.crn.change.hidden = CRN
+
+chargingPoint.title = When did you buy these securities?
+chargingPoint.heading = When did you buy these securities?
+chargingPoint.hint = This is also called the charging point. For example, 27 3 2024
+chargingPoint.checkYourAnswersLabel = When did you buy the securities?
+chargingPoint.error.required.all = Enter the date you bought the securities
+chargingPoint.error.required.two = The date you bought the securities must include {0} and {1}
+chargingPoint.error.required = The date you bought the securities must include a {0}
+chargingPoint.error.invalid = The date you bought the securities must be a real date
+chargingPoint.error.futureDate = The day you bought the securities must be today’s date or a date in the past
+chargingPoint.change.hidden = ChargingPoint
+
+taxRate.title = Tax rate
+taxRate.heading = Tax rate
+taxRate.p1 = For most securities transfers, you will be charged a tax rate of 0.5% of the consideration.
+taxRate.p2 = If the securities are being transferred into a ‘depository receipt scheme’ or a ‘clearance service’, you will need to pay the 1.5% tax rate in most circumstances. This is usually where the transfer is not integral to capital raising or where the clearance service has elected to remain in the 0.5% regime.
+taxRate.legend = What is the tax rate for this transfer?
+taxRate.half = 0.5%
+taxRate.oneAndHalf = 1.5%
+taxRate.checkYourAnswersLabel = Tax rate
+taxRate.error.required = Select a tax rate
+taxRate.change.hidden = TaxRate
+
+otherSecuritiesType.title = Enter the type of securities you are buying
+otherSecuritiesType.heading = Enter the type of securities you are buying
+otherSecuritiesType.checkYourAnswersLabel = What type of securities are you buying?
+otherSecuritiesType.error.required = Enter the type of securities you’re buying
+otherSecuritiesType.change.hidden = Change what type of securities are you buying
+
+individual.whatTypeOfSecurities.title = What type of securities are you buying?
+individual.whatTypeOfSecurities.heading = What type of securities are you buying?
+individual.whatTypeOfSecurities.shares = Shares
+individual.whatTypeOfSecurities.other = Other
+individual.whatTypeOfSecurities.checkYourAnswersLabel = What type of securities are you buying?
+individual.whatTypeOfSecurities.error.required = Select the type of securities you are buying
+individual.whatTypeOfSecurities.change.hidden = Change what type of securities are you buying
+
+totalMarketValue.title = What is the total market value of these securities?
+totalMarketValue.heading = What is the total market value of these securities?
+totalMarketValue.hint = For example, £600 or £193.54
+totalMarketValue.checkYourAnswersLabel = What is the total market value of these securities?
+totalMarketValue.error.nonNumeric = The market value of the securities must be a number
+totalMarketValue.error.required = Enter the total market value of the securities
+totalMarketValue.error.invalidNumeric = Enter the market value of the securities using up to two decimal places
+totalMarketValue.error.aboveMaximum = The market value of the securities must be {0} or less
+totalMarketValue.error.belowMinimum = The market value of the securities must be greater than zero
+totalMarketValue.change.hidden = Change the market value of the securities
+
+amountPaidForSecurities.title = How much did you pay for these securities?
+amountPaidForSecurities.heading = How much did you pay for these securities?
+amountPaidForSecurities.checkYourAnswersLabel = How much did you pay for these securities?
+amountPaidForSecurities.p1 = Enter the total amount of consideration given in exchange for these securities as a cash amount.
+amountPaidForSecurities.p2 = You do not need to provide details about conversion or exchange rates, or how valuations of non-monetary items were reached.
+amountPaidForSecurities.hint = For example, £600 or £193.54
+amountPaidForSecurities.error.nonNumeric = The amount you paid for the securities must be a number
+amountPaidForSecurities.error.required = Enter the amount you paid for the securities
+amountPaidForSecurities.error.invalidNumeric = Enter your amountPaidForSecurities using up to two decimal places
+amountPaidForSecurities.error.aboveMaximum = amountPaidForSecurities must be {0} or less
+amountPaidForSecurities.error.belowMinimum = amountPaidForSecurities must be {0} or more
+amountPaidForSecurities.change.hidden = amountPaidForSecurities
+
+individual.amountPaidForSecurities.error.nonNumeric = The amount you paid for the securities must be a number
+individual.amountPaidForSecurities.error.required = Enter the amount you paid for the securities
+individual.amountPaidForSecurities.error.invalidNumeric = The amount you paid for these securities must be a positive number like 600 or 193.54
+individual.amountPaidForSecurities.error.aboveMaximum = The amount you paid for the securities must be £999,999,999 or below
+individual.amountPaidForSecurities.error.negative = The amount you paid for these securities must be a positive number like 600 or 193.54
+
+individual.totalMarketValue.error.nonNumeric = The market value of the securities must be a number
+individual.totalMarketValue.error.required = Enter the total market value of the securities
+individual.totalMarketValue.error.invalidNumeric = The market value of the securities must be a number and can include up to two decimal places, like £30 or £28.60
+individual.totalMarketValue.error.aboveMaximum = The market value of the securities must be £999,999,999 or below
+individual.totalMarketValue.error.negative = The market value of the securities must be 0 or more
+
+individual.detailsOfThisTransfer.error.numberOfShares.required = Enter the number of shares you are buying
+individual.detailsOfThisTransfer.error.numberOfShares.nonNumeric = The amount of shares you are buying must be a number
+individual.detailsOfThisTransfer.error.typeOfShares.required = Enter the type or class of shares you are buying
+individual.detailsOfThisTransfer.error.amountPaid.required = Enter the amount you paid for the shares in pounds
+individual.detailsOfThisTransfer.error.amountPaid.invalidNumeric = The amount you paid for the shares must be a number and can include up to two decimal places, like £30 or £28.60
+individual.detailsOfThisTransfer.error.amountPaid.nonNumeric = The amount you paid for the shares must be a number and can include up to two decimal places, like £30 or £28.60
+individual.detailsOfThisTransfer.error.amountPaid.negative = The amount you paid for the shares must be 0 or more
+individual.detailsOfThisTransfer.error.amountPaid.aboveMaximum = The amount you paid for the shares must be £999,999,999 or below
+
+individual.detailsOfThisTransfer.error.marketValue.required = Enter the market value of the shares you are buying in pounds
+individual.detailsOfThisTransfer.error.marketValue.invalidNumeric = The market value of the shares must be a number and can include up to two decimal places, like £30 or £28.60
+individual.detailsOfThisTransfer.error.marketValue.nonNumeric = The market value of the shares must be a number and can include up to two decimal places, like £30 or £28.60
+individual.detailsOfThisTransfer.error.marketValue.negative = The market value of the shares must be 0 or more
+individual.detailsOfThisTransfer.error.marketValue.aboveMaximum = The market value of the shares must be £999,999,999 or below
+individual.detailsOfThisTransfer.error.typeOfShares.length = The type or class of shares you are buying must be 100 characters or fewer
 
 agent.sh03.companyDetails.title = Company details
 agent.sh03.companyDetails.heading = Company details
@@ -59,3 +240,499 @@ agent.sh03.companyDetails.isPlc.label = Is the purchasing company a Public Limit
 agent.sh03.companyDetails.isPlc.error.required = Select yes if the purchasing company is a Public Limited Company (PLC)
 agent.sh03.companyDetails.checkYourAnswersLabel = Company details
 agent.sh03.companyDetails.change.hidden = Change company details
+
+individual.chargingPoint.error.required.all = Enter the date you bought the securities
+individual.chargingPoint.error.futureDate = The day you bought the securities must be today’s date or a date in the past
+individual.chargingPoint.error.invalid = The date you bought the securities must be a real date
+individual.amountPaidForSecurities.error.required = Enter the amount you paid for the securities
+
+detailsOfThisTransfer.title = What are the details of this transfer?
+detailsOfThisTransfer.heading = What are the details of this transfer?
+detailsOfThisTransfer.numberOfShares = Number of shares
+detailsOfThisTransfer.typeOfShares = Type or class of shares
+detailsOfThisTransfer.amountPaid = Amount paid for the shares
+detailsOfThisTransfer.marketValue = Market value of the shares
+detailsOfThisTransfer.checkYourAnswersLabel = What are the details of this transfer?
+detailsOfThisTransfer.change.hidden = Change what are the details of this transfer
+detailsOfThisTransfer.error.numberOfShares.wholeNumber = The number of shares must be a whole number between 1 and 999,999,999
+detailsOfThisTransfer.error.numberOfShares.min = The number of shares must be at least 1
+detailsOfThisTransfer.error.numberOfShares.max = The number of shares must be below 999,999,999
+
+sectionTitle.businessDetails = Business details
+sectionTitle.sellerDetails = Seller details
+
+org.confirmAddress.title = Confirm business address
+org.confirmAddress.heading = Confirm business address
+org.confirmAddress.editLink = Edit address
+org.confirmAddress.confirm = Confirm and continue
+
+org.nameOfSeller.hint = This is the individual, business or trust selling the securities.
+
+org.howToNotifyAboutSecuritiesTransfer.title = How do you want to tell us about your securities transfers?
+org.howToNotifyAboutSecuritiesTransfer.heading = How do you want to tell us about your securities transfers?
+org.howToNotifyAboutSecuritiesTransfer.oneAtATime = One at a time
+org.howToNotifyAboutSecuritiesTransfer.oneAtATime.hint = Each transfer can have one seller, and can include one type of security or type of shares.
+org.howToNotifyAboutSecuritiesTransfer.moreThanOneAtATime = More than one at a time
+org.howToNotifyAboutSecuritiesTransfer.moreThanOneAtATime.hint = Download the template, complete it using one row per transfer, and upload it on the following pages. You can then find the submission on your dashboard and pay the charges due.
+org.howToNotifyAboutSecuritiesTransfer.checkYourAnswersLabel = How do you want to tell us about your securities transfers?
+org.howToNotifyAboutSecuritiesTransfer.error.required = Select a way to tell us about these securities transfers
+org.howToNotifyAboutSecuritiesTransfer.change.hidden = HowToNotifyAboutSecuritiesTransfer
+
+org.connectedPersons.error.required = Select yes if the business and the seller are ‘connected persons’
+org.connectedPersons.p = We need to know if the business buying the securities and the seller are ‘connected persons’, according to
+org.connectedPersons.p.link.content = section 1122 of the Corporation Tax Act 2010
+org.connectedPersons.legend = Is the business and the seller of these securities connected persons?
+
+org.applyingForRelief.error.required = Select yes if the business is applying for a relief
+org.applyingForRelief.title = Is the business applying for a relief?
+org.applyingForRelief.heading = Is the business applying for a relief?
+org.applyingForRelief.checkYourAnswersLabel = Is the business applying for a relief?
+org.applyingForRelief.change.hidden = Change applying for a relief
+
+org.whatReliefAreYouApplyingFor.title = What relief is the business applying for?
+org.whatReliefAreYouApplyingFor.heading = What relief is the business applying for?
+org.whatReliefAreYouApplyingFor.checkYourAnswersLabel = What relief is the business applying for?
+org.whatReliefAreYouApplyingFor.error.required = Enter the type of relief the business is applying for
+org.whatReliefAreYouApplyingFor.change.hidden = Change what relief the business is applying for
+org.whatReliefAreYouApplyingFor.p = Start typing the name of the relief and select from the list.
+org.whatReliefAreYouApplyingFor.details.content.link.text = See a full list of reliefs
+
+org.chargingPoint.title = What is the charging point?
+org.chargingPoint.heading = What is the charging point?
+org.chargingPoint.hint = This is the date the securities were bought by the business. For example, 27 3 2024
+org.chargingPoint.checkYourAnswersLabel = What is the charging point?
+org.chargingPoint.error.required.all = Enter the date the business bought the securities
+org.chargingPoint.error.required.two = The date the business bought the securities must include {0} and {1}
+org.chargingPoint.error.required = The date the business bought the securities must include a {0}
+org.chargingPoint.error.invalid = The date the business bought the securities must be a real date
+org.chargingPoint.error.futureDate = The date the business bought the securities must be today’s date or a date in the past
+org.chargingPoint.change.hidden = ChargingPoint
+
+org.taxRate.p1 = For most securities transfers, the business will be charged a tax rate of 0.5% of the consideration.
+org.taxRate.p2 = If the securities are being transferred into a ‘depository receipt scheme’ or a ‘clearance service’, the business will need to pay the 1.5% tax rate in most circumstances. This is usually where the transfer is not integral to capital raising or where the clearance service has elected to remain in the 0.5% regime.
+
+org.securitiesTarget.title = Which business are the securities being bought in?
+org.securitiesTarget.heading = Which business are the securities being bought in?
+org.securitiesTarget.businessName = Business name
+org.securitiesTarget.crn = Company registration number (CRN) (optional)
+org.securitiesTarget.crn.hint = This is also called a company number.<br>For example, SN898989 or 12345678
+org.securitiesTarget.checkYourAnswersLabel = What business are you buying these securities in?
+org.securitiesTarget.error.businessName.required = Enter the name of the business the securities are in
+org.securitiesTarget.error.businessName.length = Business name must be 160 characters or fewer
+org.securitiesTarget.error.crn.length = Company reference number must be 8 characters or fewer
+org.securitiesTarget.error.crn.invalid = Company registration number can only be numbers or letters
+org.securitiesTarget.businessName.change.hidden = Change which business the securities are being bought in
+org.securitiesTarget.crn.change.hidden = CRN
+
+org.amountPaidForSecurities.title = How much did the business pay for these securities?
+org.amountPaidForSecurities.heading = How much did the business pay for these securities?
+org.amountPaidForSecurities.checkYourAnswersLabel = How much did the business pay for these securities?
+org.amountPaidForSecurities.p1 = Enter the total amount of consideration given in exchange for these securities as a cash amount.
+org.amountPaidForSecurities.p2 = You do not need to provide details about conversion or exchange rates, or how valuations of non-monetary items were reached.
+org.amountPaidForSecurities.hint = For example, £600 or £193.54
+org.amountPaidForSecurities.error.nonNumeric = The amount paid for the securities must be a number
+org.amountPaidForSecurities.error.required = Enter the amount the business paid for the securities
+org.amountPaidForSecurities.error.invalidNumeric = The amount the business paid for these securities must be a positive number like 600 or 193.54
+org.amountPaidForSecurities.error.aboveMaximum = The amount the business paid for the securities must be £999,999,999 or below
+org.amountPaidForSecurities.error.negative = The amount the business paid for these securities must be a positive number like 600 or 193.54
+org.amountPaidForSecurities.change.hidden = Change the amount the business paid for the securities
+
+org.otherSecuritiesType.title = What type of securities is the business buying?
+org.otherSecuritiesType.heading = What type of securities is the business buying?
+org.otherSecuritiesType.checkYourAnswersLabel = What type of securities is the business buying?
+org.otherSecuritiesType.error.required = Enter the type of securities the business is buying
+org.otherSecuritiesType.change.hidden = Change what type of securities is the business buying
+
+org.whatTypeOfSecurities.title = What type of securities is the business buying?
+org.whatTypeOfSecurities.heading = What type of securities is the business buying?
+org.whatTypeOfSecurities.shares = Shares
+org.whatTypeOfSecurities.other = Other
+org.whatTypeOfSecurities.checkYourAnswersLabel = What type of securities is the business buying?
+org.whatTypeOfSecurities.error.required = Enter the type of securities the business is buying
+org.whatTypeOfSecurities.change.hidden = Change what type of securities the business is buying
+
+org.totalMarketValue.title = What is the total market value of these securities?
+org.totalMarketValue.heading = What is the total market value of these securities?
+org.totalMarketValue.checkYourAnswersLabel = What is the total market value of these securities?
+org.totalMarketValue.error.nonNumeric = The market value of the securities must be a number
+org.totalMarketValue.error.required = Enter the total market value of the securities
+org.totalMarketValue.error.invalidNumeric = The market value of the securities must be a number and can include up to two decimal places, like £30 or £28.60
+org.totalMarketValue.error.aboveMaximum = The market value of the securities must be £999,999,999 or below
+org.totalMarketValue.error.negative = The market value of the securities must be 0 or more
+org.totalMarketValue.error.belowMinimum = The market value must be {0} or more
+org.totalMarketValue.change.hidden = Change the market value of the securities
+org.totalMarketValue.hint = For example, £600 or £193.54
+
+templateInstructions.title = How to use the template
+templateInstructions.heading = How to use the template
+templateInstructions.p1 = Use the template to tell us about more than one securities transfer at a time.
+templateInstructions.step1 = Download the template
+templateInstructions.step2 = Complete the template, using one row for each type of securities you are buying
+templateInstructions.step3 = Upload your file on the next page as a .xlsx or .csv
+templateInstructions.p2 = Remember, do not edit the first two rows, or change the order of the columns.
+templateInstructions.p3.span1 = Once you have uploaded and submitted your file it will show on your
+templateInstructions.p3.a = STC dashboard
+templateInstructions.p3.span2 = You can then pay any charges due.
+return-to-dashboard.link = Return to dashboard
+
+formattingError.title = Your file has formatting errors
+formattingError.heading = Your file has formatting errors
+formattingError.p1 = More than 25 formatting errors have been detected in this file.
+formattingError.p2 = The errors may include things like incorrect formatting of numbers or dates, or a letters in a cell that can only contain numbers.
+formattingError.p3 = These will need to be corrected before your file can be uploaded again.
+formattingError.p4 = Check the instructions in the template file for more guidance.
+
+fileUpload.title = Upload your file
+fileUpload.heading = Upload your file
+fileUpload.label = Upload a file
+fileUpload.button = Upload
+fileUpload.inset.text = Accepted file types: .xlsx, .csv
+
+fileUpload.error.emptyFile.title = There are no transfers in your file
+fileUpload.error.emptyFile.heading = There are no transfers in your file
+fileUpload.error.emptyFile.p1 = Add the correct transfer details to the file then you can upload it again, or upload a different file.
+fileUpload.error.emptyFile.download.text = Download the template file.
+fileUpload.upload.another = Upload a different file
+
+fileUpload.redirectError.emptyFile = Select a file to upload
+fileUpload.redirectError.EntityTooLarge = The selected file must be smaller than 100mb
+fileUpload.redirectError.generic = The selected file could not be uploaded – try again
+fileUpload.redirectError.InvalidArgument = The selected file must be a .csv or a .xlsx
+
+org.templateInstructions.title = How to use the template
+org.templateInstructions.heading = How to use the template
+org.templateInstructions.p1 = Use the template to tell us about more than one securities transfer at a time.
+org.templateInstructions.step1 = Download the template
+org.templateInstructions.step2 = Complete the template, using one row for each type of securities the business is buying
+org.templateInstructions.step3 = Upload your file on the next page as a .xlsx or .csv
+org.templateInstructions.p2 = Remember, do not edit the first two rows, or change the order of the columns.
+org.templateInstructions.p3 = Once you have uploaded and submitted your file, it may take a few minutes to process before showing as on your dashboard. You can then pay any charges due.
+org.return-to-dashboard.link = Return to dashboard
+
+uploadedFileError.title = There is a problem with your uploaded file
+uploadedFileError.heading = There is a problem with your uploaded file
+uploadedFileError.p1 = Correct the errors and upload it again, or upload a different file.
+uploadedFileError.table.heading = Problems with your file
+uploadedFileError.table.cell = Cell
+uploadedFileError.table.error = Error
+
+agent.nameOfBuyer.details.caption = Buyer details
+agent.nameOfBuyer.title = What’s the buyer’s name?
+agent.nameOfBuyer.heading = What’s the buyer’s name?
+agent.nameOfBuyer.hint = This is the individual, business or trust buying the securities
+agent.details.caption = Agent details
+agentReference.title = Add a reference
+agentReference.heading = Add a reference (optional)
+agentReference.checkYourAnswersLabel = Add a reference
+agentReference.hint = You can add a reference for your own records and to help you find this submission later. It will not be used by HMRC.
+agentReference.error.length = Your reference must be 255 characters or fewer
+agentReference.change.hidden = AgentReference
+
+nameOfBuyer.error.required = Enter the buyer’s name
+nameOfBuyer.error.length = Buyer’s name must be 35 characters or fewer
+
+agent.howToNotifyAboutSecuritiesTransfer.title = How would you like to tell us about these securities transfers?
+agent.howToNotifyAboutSecuritiesTransfer.heading = How would you like to tell us about these securities transfers?
+agent.howToNotifyAboutSecuritiesTransfer.oneAtATime = One at a time
+agent.howToNotifyAboutSecuritiesTransfer.oneAtATime.hint = Each transfer must be between one buyer and one seller, and can include one kind of security or type of shares.
+agent.howToNotifyAboutSecuritiesTransfer.moreThanOneAtATime = More than one at a time
+agent.howToNotifyAboutSecuritiesTransfer.moreThanOneAtATime.hint = Download the template, complete it using one row per transfer, and upload it on the following pages. Once submitted it will take up to an hour to process. You can then find the submission on your dashboard and pay the charges due.
+agent.howToNotifyAboutSecuritiesTransfer.checkYourAnswersLabel = How would you like to tell us about these securities transfers?
+agent.howToNotifyAboutSecuritiesTransfer.error.required = Select a way to tell us about your securities transfers
+agent.howToNotifyAboutSecuritiesTransfer.change.hidden = HowToNotifyAboutSecuritiesTransfer
+
+agent.nameOfSeller.title = What’s the seller’s name?
+agent.nameOfSeller.heading = What’s the seller’s name?
+agent.nameOfSeller.checkYourAnswersLabel = What’s the seller’s name?
+agent.nameOfSeller.change.hidden = NameOfSeller
+agent.nameOfSeller.hint = This is the individual, business or trust selling the securities
+
+agent.connectedPersons.title = Connected persons
+agent.connectedPersons.heading = Connected persons
+agent.connectedPersons.legend = Are the buyer and seller connected persons?
+agent.connectedPersons.checkYourAnswersLabel = Are the buyer and seller connected persons?
+agent.connectedPersons.error.required = Select yes if the buyer and seller are connected persons
+agent.connectedPersons.p = We need to know if the buyer and seller of these shares are considered ‘connected persons’ according to
+agent.connectedPersons.content.link.text = section 1122 of the Corporation Tax Act 2010
+agent.connectedPersons.change.hidden = Change connected persons
+
+agent.securitiesTarget.title = What business are the securities bought in?
+agent.securitiesTarget.heading = What business are the securities bought in?
+agent.securitiesTarget.businessName = Business name
+agent.securitiesTarget.crn = Company registration number (CRN) (optional)
+agent.securitiesTarget.crn.hint = This is also called a company number. For example, SN898989 or 12345678
+agent.securitiesTarget.checkYourAnswersLabel = What business are the securities bought in?
+agent.securitiesTarget.error.businessName.required = Enter the name of the business the securities are in
+agent.securitiesTarget.error.businessName.length = Business name must be 160 characters or fewer
+agent.securitiesTarget.error.crn.length = Company registration number must be 8 characters
+agent.securitiesTarget.error.crn.invalid = Company registration number can only be numbers or letters
+agent.securitiesTarget.businessName.change.hidden = BusinessName
+agent.securitiesTarget.crn.change.hidden = CRN
+
+org.uploadedFileError.title = There is a problem with your uploaded file
+org.uploadedFileError.heading = There is a problem with your uploaded file
+org.uploadedFileError.p1 = Correct the errors and upload it again, or upload a different file.
+org.uploadedFileError.table.heading = Problems with your file
+org.uploadedFileError.table.cell = Cell
+org.uploadedFileError.table.error = Error
+
+org.detailsOfThisTransfer.error.numberOfShares.required = Enter the number of shares the business is buying
+org.detailsOfThisTransfer.error.numberOfShares.nonNumeric = The amount of shares the business is buying must be a number
+org.detailsOfThisTransfer.error.typeOfShares.required = Enter the type or class of shares the business is buying
+org.detailsOfThisTransfer.error.typeOfShares.length = The type or class of shares the business is purchasing must be 100 characters or fewer
+org.detailsOfThisTransfer.error.amountPaid.required = Enter the amount the business paid for the shares in pounds
+org.detailsOfThisTransfer.error.amountPaid.invalidNumeric = The amount the business paid for the shares must be a number and can include up to two decimal places, like £30 or £28.60
+org.detailsOfThisTransfer.error.amountPaid.nonNumeric = The amount the business paid for the shares must be a number and can include up to two decimal places, like £30 or £28.60
+org.detailsOfThisTransfer.error.amountPaid.negative = The amount the business paid for the shares must be 0 or more
+org.detailsOfThisTransfer.error.amountPaid.aboveMaximum = The amount the business paid for the shares must be £999,999,999 or below
+
+org.detailsOfThisTransfer.error.marketValue.required = Enter the market value of the shares the business is buying in pounds
+org.detailsOfThisTransfer.error.marketValue.invalidNumeric = The market value of the shares must be a number and can include up to two decimal places, like £30 or £28.60
+org.detailsOfThisTransfer.error.marketValue.nonNumeric = The market value of the shares must be a number and can include up to two decimal places, like £30 or £28.60
+org.detailsOfThisTransfer.error.marketValue.negative = The market value of the shares must be 0 or more
+org.detailsOfThisTransfer.error.marketValue.aboveMaximum = The market value of the shares must be £999,999,999 or below
+
+fileUpload.error.sellerAddressInUK.invalid = Enter ‘yes’ if the seller lives in the UK, or ‘no’ if the seller does not live in the UK
+fileUpload.error.sellerAddressLine1.required = Enter the first line of the seller’s address
+fileUpload.error.sellerAddressLine1.length = Address line 1 must be 100 characters or fewer
+fileUpload.error.sellerAddressLine1.invalidCharacters = Address line 1 can only include letters, numbers and the following characters: , . - ’
+fileUpload.error.sellerAddressLine2.length = Address line 2 must be 40 characters or fewer
+fileUpload.error.sellerAddressLine2.invalidCharacters = Address line 2 can only include letters, numbers and the following characters: , . - ’
+fileUpload.error.sellerAddressLine3.length = Address line 3 must be 40 characters or fewer
+fileUpload.error.sellerAddressLine3.invalidCharacters = Address line 3 can only include letters, numbers and the following characters: , . - ’
+fileUpload.error.sellerAddressLine4.length = Address line 4 must be 40 characters or fewer
+fileUpload.error.sellerAddressLine4.invalidCharacters = Address line 4 can only include letters, numbers and the following characters: , . - ’
+fileUpload.error.sellerPostcode.required = Enter a postcode
+fileUpload.error.sellerPostcode.notFound = Your postcode cannot be found, check it is correct
+fileUpload.error.sellerPostcode.invalid = Enter a real postcode, like AA1 1AA
+fileUpload.error.sellerCountry.length = Country must be 100 characters or fewer
+fileUpload.error.sellerCountry.required = Enter a country
+fileUpload.error.sellerCountry.invalidCharacters = Country can only include letters, numbers and the following characters: , . - ’
+
+fileUpload.error.buyerAddressInUK.invalid = Enter ‘yes’ if the buyer lives in the UK, or ‘no’ if the buyer does not live in the UK
+fileUpload.error.buyerAddressLine1.required = Enter the first line of the buyer’s address
+fileUpload.error.buyerAddressLine1.length = Address line 1 must be 100 characters or fewer
+fileUpload.error.buyerAddressLine1.invalidCharacters = Address line 1 can only include letters, numbers and the following characters: , . - ’
+fileUpload.error.buyerAddressLine2.length = Address line 2 must be 40 characters or fewer
+fileUpload.error.buyerAddressLine2.invalidCharacters = Address line 2 can only include letters, numbers and the following characters: , . - ’
+fileUpload.error.buyerAddressLine3.length = Address line 3 must be 40 characters or fewer
+fileUpload.error.buyerAddressLine3.invalidCharacters = Address line 3 can only include letters, numbers and the following characters: , . - ’
+fileUpload.error.buyerAddressLine4.length = Address line 4 must be 40 characters or fewer
+fileUpload.error.buyerAddressLine4.invalidCharacters = Address line 4 can only include letters, numbers and the following characters: , . - ’
+fileUpload.error.buyerPostcode.required = Enter a postcode
+fileUpload.error.buyerPostcode.invalid = Enter a real postcode, like AA1 1AA
+fileUpload.error.buyerCountry.length = Country must be 100 characters or fewer
+fileUpload.error.buyerCountry.required = Enter a country
+fileUpload.error.buyerCountry.invalidCharacters = Country can only include letters, numbers and the following characters: , . - ’
+
+individual.fileUpload.error.connectedPersons.invalid = Enter ‘yes’ if you and the buyer are connected persons
+org.fileUpload.error.connectedPersons.invalid = Enter ‘yes’ if the business and the buyer are connected persons
+agent.fileUpload.error.connectedPersons.invalid = Enter ‘yes’ if the buyer and seller are connected persons, or ‘no’ if they are not connected
+individual.fileUpload.error.applyingForRelief.invalid = Enter ‘yes’ if you are applying for a relief, or ‘no’ if you are not applying for a relief
+org.fileUpload.error.applyingForRelief.invalid = Enter ‘yes’ if the business is applying for a relief, or ‘no’ if the business is not applying for a relief
+agent.fileUpload.error.applyingForRelief.invalid = Enter ‘yes’ if the buyer is applying for a relief, or ‘no’ if the buyer is not applying for a relief
+individual.fileUpload.error.whatReliefAreYouApplyingFor.invalid = Enter the name of the relief you are applying for. See a <a target="_blank" href="#" class="govuk-link">full list of reliefs (opens in new tab)</a>.
+org.fileUpload.error.whatReliefAreYouApplyingFor.invalid = Enter the name of the relief the business is applying for. See a <a target="_blank" href="#" class="govuk-link">full list of reliefs (opens in new tab)</a>.
+agent.fileUpload.error.whatReliefAreYouApplyingFor.invalid = Enter the name of the relief the buyer is applying for. See a <a target="_blank" href="#" class="govuk-link">full list of reliefs (opens in new tab)</a>.
+
+fileUpload.error.chargingPoint.invalidCharacters = The date you bought the securities can only contain numbers and letters
+fileUpload.error.taxRate.invalid = Enter a tax rate of ‘0.5%’ or ‘1.5%’
+
+individual.fileUpload.error.whatTypeOfSecurities.required = Enter the type of securities you are buying
+org.fileUpload.error.whatTypeOfSecurities.required = Enter the type of securities the business is buying
+agent.fileUpload.error.whatTypeOfSecurities.required = Enter the type of securities the buyer is purchasing
+individual.fileUpload.error.typeOfShares.required = If you are buying shares, enter the type of shares
+org.fileUpload.error.typeOfShares.required = If the business is buying shares, enter the type of shares
+agent.fileUpload.error.typeOfShares.required = If the buyer is purchasing shares, enter the type of shares
+
+individual.fileUpload.error.typeOfShares.maxLength = The type of shares you are buying must be 255 characters or fewer
+org.fileUpload.error.typeOfShares.maxLength = The type of shares the business is purchasing must be 255 characters or fewer
+agent.fileUpload.error.typeOfShares.maxLength = The type of shares the buyer is purchasing must be 255 characters or fewer
+
+individual.fileUpload.error.securitiesQuantity.required = Enter the number of shares you are buying
+individual.fileUpload.error.securitiesQuantity.nonNumeric = The amount of shares you are buying must be a number
+individual.fileUpload.error.securitiesQuantity.minimum = The number of shares must be at least 1
+individual.fileUpload.error.securitiesQuantity.maximum = The number of shares you are buying must be below 999,999,999
+individual.fileUpload.error.securitiesQuantity.wholeNumber = The number of shares you are buying must be a whole number
+
+org.fileUpload.error.securitiesQuantity.required = Enter the number of shares the business is buying
+org.fileUpload.error.securitiesQuantity.nonNumeric = The amount of shares must be a number
+org.fileUpload.error.securitiesQuantity.minimum = The number of shares must be at least 1
+org.fileUpload.error.securitiesQuantity.maximum = The number of shares must be below 999,999,999
+
+agent.fileUpload.error.securitiesQuantity.required = Enter the number of shares the buyer is purchasing
+agent.fileUpload.error.securitiesQuantity.nonNumeric = The amount of shares must be a number
+agent.fileUpload.error.securitiesQuantity.minimum = The number of shares must be at least 1
+agent.fileUpload.error.securitiesQuantity.maximum = The number of shares must be below 999,999,999
+
+individual.fileUpload.chargingPoint.error.required = Enter the date you bought the securities
+org.fileUpload.chargingPoint.error.required = Enter the date the business bought the securities
+agent.fileUpload.chargingPoint.error.required = Enter the date the buyer purchased the securities
+
+individual.fileUpload.chargingPoint.error.futureDate = The day you bought the securities must be today’s date or a date in the past
+org.fileUpload.chargingPoint.error.futureDate = The day the business bought the securities must be today’s date or a date in the past
+agent.fileUpload.chargingPoint.error.futureDate = The day the buyer purchased the securities must be today’s date or a date in the past
+
+minSharePrice.error.required = Enter an amount in £
+minSharePrice.error.maximum = The minimum share price must be below 999,999,999
+
+maxSharePrice.error.required = Enter an amount in £
+maxSharePrice.error.maximum = The maximum share price must be below 999,999,999
+
+sharePurchaseReason.required = Enter reason for share purchase
+sharePurchaseReason.invalid = Enter ‘cancellation’ or ‘treasury’
+
+purchasedForCancellation.invalid = Enter ‘yes’ if the shares also qualify as treasury shares
+
+agent.applyingForRelief.title = Is the buyer applying for a relief?
+agent.applyingForRelief.heading = Is the buyer applying for a relief?
+agent.applyingForRelief.checkYourAnswersLabel = Is the buyer applying for a relief?
+agent.applyingForRelief.error.required = Select yes if the buyer is  applying for a relief
+agent.applyingForRelief.change.hidden = ApplyingForRelief
+agent.applyingForRelief.p = See a
+agent.applyingForRelief.details.content.link.text = full list of reliefs
+
+agent.whatReliefAreYouApplyingFor.title = Enter the relief the buyer is applying for
+agent.whatReliefAreYouApplyingFor.heading = Enter the relief the buyer is applying for
+agent.whatReliefAreYouApplyingFor.p = Start typing the name of the relief and select from the list. See a
+agent.whatReliefAreYouApplyingFor.details.content.link.text = full list of reliefs
+agent.whatReliefAreYouApplyingFor.error.required = Start typing the name of the relief and select from the list
+
+agent.taxRate.p1 = For most securities transfers, the buyer will be charged a tax rate of 0.5% of the consideration.
+agent.taxRate.p2 = If the securities are being transferred into a ‘depository receipt scheme’ or a ‘clearance service’, the buyer will need to pay the 1.5% tax rate in most circumstances. This is usually where the transfer is not integral to capital raising or where the clearance service has elected to remain in the 0.5% regime.
+agent.taxRate.error.required = Select a tax rate
+
+fileUpload.processing.title = We are checking your file
+fileUpload.processing.paragraph = This may take a few seconds
+
+agent.chargingPoint.title = What’s the charging point?
+agent.chargingPoint.heading = What’s the charging point?
+agent.chargingPoint.hint = This is the date the securities were bought. For example, 27 3 2024
+agent.chargingPoint.checkYourAnswersLabel = What is the charging point?
+agent.chargingPoint.error.required.all = Enter the date the securities were bought
+agent.chargingPoint.error.required.two = The date the securities were bought must include {0} and {1}
+agent.chargingPoint.error.required = The date the securities were bought must include a {0}
+agent.chargingPoint.error.invalid = The date the securities were bought must be a real date
+agent.chargingPoint.error.futureDate = The date the securities were bought must be today’s date or a date in the past
+agent.chargingPoint.change.hidden = ChargingPoint
+
+
+agent.whatTypeOfSecurities.title = What type of securities is the buyer purchasing?
+agent.whatTypeOfSecurities.heading = What type of securities is the buyer purchasing?
+agent.whatTypeOfSecurities.shares = Shares
+agent.whatTypeOfSecurities.other = Other
+agent.whatTypeOfSecurities.error.required = Select the type of securities the buyer is purchasing
+agent.whatTypeOfSecurities.checkYourAnswersLabel = What type of securities is the buyer purchasing?
+agent.whatTypeOfSecurities.change.hidden = Change the type of securities the buyer is purchasing
+
+agent.amountPaidForSecurities.error.required = Enter the amount paid for the securities
+agent.amountPaidForSecurities.error.invalidNumeric = The amount paid for the securities must be a number and can include up to two decimal places, like £30 or £28.60
+agent.amountPaidForSecurities.error.nonNumeric = The amount paid for the securities must be a number and can include up to two decimal places, like £30 or £28.60
+agent.amountPaidForSecurities.error.negative = The amount paid for the securities must be 0 or more
+agent.amountPaidForSecurities.error.aboveMaximum = The amount paid for the securities must be £999,999,999 or below
+agent.amountPaidForSecurities.title = How much did the buyer pay for the securities?
+agent.amountPaidForSecurities.heading = How much did the buyer pay for the securities?
+agent.amountPaidForSecurities.checkYourAnswersLabel = How much did the buyer pay for the securities?
+agent.amountPaidForSecurities.p1 = Enter the total amount of consideration given in exchange for these securities as a cash amount.
+agent.amountPaidForSecurities.p2 = You do not need to provide details about conversion or exchange rates, or how valuations of non-monetary items were reached.
+agent.amountPaidForSecurities.hint = For example, £600 or £193.54
+agent.amountPaidForSecurities.change.hidden = Change the amount the buyer paid for the securities
+
+agent.otherSecuritiesType.title = Enter the type of securities the buyer is purchasing
+agent.otherSecuritiesType.heading = Enter the type of securities the buyer is purchasing
+agent.otherSecuritiesType.checkYourAnswersLabel = What type of securities is the buyer purchasing?
+agent.otherSecuritiesType.error.required = Enter the type of securities the buyer is purchasing
+agent.otherSecuritiesType.change.hidden = Change the type of securities the buyer is purchasing
+agent.otherSecuritiesType.error.length = The type of securities the buyer is purchasing must be 255 characters or fewer
+
+agent.detailsOfThisTransfer.error.numberOfShares.required = Enter the number of shares the buyer is purchasing
+agent.detailsOfThisTransfer.error.numberOfShares.nonNumeric = The amount of shares must be a number
+agent.detailsOfThisTransfer.error.typeOfShares.required = Enter the type or class of shares the buyer is purchasing
+agent.detailsOfThisTransfer.error.typeOfShares.length = The type or class of shares the buyer is purchasing must be 100 characters or fewer
+agent.detailsOfThisTransfer.error.marketValue.required = Enter the market value of the shares in pounds
+agent.detailsOfThisTransfer.error.marketValue.invalidNumeric = The market value of the shares must be a number and can include up to two decimal places, like £30 or £28.60
+agent.detailsOfThisTransfer.error.marketValue.nonNumeric = The market value of the shares must be a number and can include up to two decimal places, like £30 or £28.60
+agent.detailsOfThisTransfer.error.marketValue.negative = The market value of the shares must be 0 or more
+agent.detailsOfThisTransfer.error.marketValue.aboveMaximum = The market value of the shares must be £999,999,999 or below
+
+agent.detailsOfThisTransfer.error.amountPaid.required = Enter the amount paid for the shares in pounds
+agent.detailsOfThisTransfer.error.amountPaid.invalidNumeric = The amount paid for the shares must be a number and can include up to two decimal places, like £30 or £28.60
+agent.detailsOfThisTransfer.error.amountPaid.nonNumeric = The amount paid for the shares must be a number and can include up to two decimal places, like £30 or £28.60
+agent.detailsOfThisTransfer.error.amountPaid.negative = The amount paid for the shares must be 0 or more
+agent.detailsOfThisTransfer.error.amountPaid.aboveMaximum = The amount paid for the shares must be £999,999,999 or below
+
+fileUploaded.error.emptyFile.title = The file you have uploaded is empty
+fileUploaded.error.emptyFile.heading = The file you have uploaded is empty
+fileUploaded.error.emptyFile.p = Check you are uploading the correct file.
+
+fileUpload.error.type.title = Check your file
+fileUpload.error.type.p = Your file was not uploaded. Check you have selected the correct file, and that it’s saved as a .csv or a .xlsx.
+fileUpload.error.type.backlink = Back to file upload
+
+fileUploaded.error.virus.title = Your file contains a virus
+fileUploaded.error.virus.heading = Your file contains a virus
+fileUploaded.error.virus.p = The file you have uploaded contains a virus, you will need to upload a different file.
+
+agent.totalMarketValue.title = What is the total market value of the securities?
+agent.totalMarketValue.heading = What is the total market value of the securities?
+agent.totalMarketValue.checkYourAnswersLabel = What is the total market value of the securities?
+agent.totalMarketValue.error.nonNumeric = The market value of the securities must be a number
+agent.totalMarketValue.error.required = Enter the total market value of the securities
+agent.totalMarketValue.error.invalidNumeric = The market value of the securities must be a number and can include up to two decimal places, like £30 or £28.60
+agent.totalMarketValue.error.aboveMaximum = The market value of the securities must be £999,999,999 or below
+agent.totalMarketValue.change.hidden = Change the market value of the securities
+agent.totalMarketValue.hint = For example, £600 or £193.54
+agent.totalMarketValue.error.negative = The market value of the securities must be 0 or more
+agent.totalMarketValue.checkYourAnswersLabel = What is the total market value of the securities?
+
+fileUploaded.error.encryptedFile.title = There was a problem uploading your file
+fileUploaded.error.encryptedFile.heading = There was a problem uploading your file
+fileUploaded.error.encryptedFile.p = The file you have uploaded is password-protected. Check you have the right file, or remove the password and upload it again.
+
+bulk.fileUpload.error.title = There was a problem uploading your file
+bulk.fileUpload.error.heading = There was a problem uploading your file
+bulk.fileUpload.error.p = The selected file could not be uploaded, try again.
+
+bulk.rows.error.title = There was a problem uploading your file
+bulk.rows.error.heading = There was a problem uploading your file
+bulk.rows.error.p = There are too many rows in your uploaded file. The number of rows must be 10,000 or fewer.
+
+bulk.duplicate.error.title = You have uploaded this file before
+bulk.duplicate.error.heading = You have uploaded this file before
+bulk.duplicate.error.p = This file has been uploaded in the last {0} days, check you have the correct file.
+
+fileUpload.error.invalidTemplate.title = The template file you uploaded has been changed
+fileUpload.error.invalidTemplate.heading = The template file you uploaded has been changed
+fileUpload.error.invalidTemplate.p.start = You must
+fileUpload.error.invalidTemplate.p.link = use the template file
+fileUpload.error.invalidTemplate.p.end = to record details of the transfers, and upload this file.
+fileUpload.error.invalidTemplate.p2 = Remember, do not edit the first two rows, or change the order of the columns in the template.
+
+agent.templateInstructions.title = How to use the template
+agent.templateInstructions.heading = How to use the template
+agent.templateInstructions.p1 = Use the template to tell us about more than one securities transfer at a time.
+agent.templateInstructions.step1 = Download the template
+agent.templateInstructions.step2 = Complete the template, using one row for each transfer between a buyer and seller
+agent.templateInstructions.step3 = Upload the file on the next page as a .xlsx or .csv
+agent.templateInstructions.p2 = Remember, do not edit the first two rows, or change the order of the columns.
+agent.templateInstructions.p3 = Once you have uploaded and submitted the file, it may take a few minutes to process before showing as ‘ready to pay’ on your dashboard. You can then pay the charges due.
+
+bulk.agentReference.hint = You can add a reference for your own records and to help you find this submission later. It will not be used by HMRC
+submission.details.caption = Submission details
+
+submissionsDashboard.sh03.button = start sh03
+agent.sh03.beforeYouStart.title = Before you start
+agent.sh03.beforeYouStart.heading = Before you start
+agent.sh03.beforeYouStart.p1 = Use this service to submit details about a purchase of a limited company’s own shares, and pay the charges due.
+agent.sh03.beforeYouStart.p2 = You can use this online service to tell us about the purchase, instead of the Companies House SH03 form.
+agent.sh03.beforeYouStart.p3 = Once you have submitted details about the purchase you will get a printable confirmation including the transfer reference number, which can be sent to Companies House.
+agent.sh03.beforeYouStart.p4 = You do not need to tell us about transfers where the company is a Qualifying Asset Holding Company, and the conditions for exemption are met.
+
+reasonForPurchase.cancellation = For cancellation
+reasonForPurchase.treasury = To place into treasure
+reasonForPurchase.error.required = Select why these shares are being purchased
+
+agent.sh03.reasonForPurchase.title = Why are these shares being purchased?
+agent.sh03.reasonForPurchase.heading = Why are these shares being purchased?
+agent.sh03.reasonForPurchase.checkYourAnswersLabel = Why are these shares being purchased?
+agent.sh03.reasonForPurchase.change.hidden = Change why these shares are being purchased
