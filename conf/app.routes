@@ -296,3 +296,8 @@ GET       /submissions-dashboard/sh03                      uk.gov.hmrc.securitie
 
 GET        /sh03/agent/before-you-start                 uk.gov.hmrc.securitiestransferchargefrontend.controllers.sh03.agents.single.BeforeYouStartController.onPageLoad()
 POST       /sh03/agent/before-you-start                uk.gov.hmrc.securitiestransferchargefrontend.controllers.sh03.agents.single.BeforeYouStartController.onSubmit()
+# SH03 Agent Company Details
+GET  /sh03/agent/company-details                  uk.gov.hmrc.securitiestransferchargefrontend.controllers.sh03.agents.single.CompanyDetailsController.onPageLoad(mode: Mode = NormalMode)
+POST /sh03/agent/company-details                  uk.gov.hmrc.securitiestransferchargefrontend.controllers.sh03.agents.single.CompanyDetailsController.onSubmit(mode: Mode = NormalMode)
+GET  /sh03/agent/change-company-details           uk.gov.hmrc.securitiestransferchargefrontend.controllers.sh03.agents.single.CompanyDetailsController.onPageLoad(mode: Mode = CheckMode)
+POST /sh03/agent/change-company-details           uk.gov.hmrc.securitiestransferchargefrontend.controllers.sh03.agents.single.CompanyDetailsController.onSubmit(mode: Mode = CheckMode)

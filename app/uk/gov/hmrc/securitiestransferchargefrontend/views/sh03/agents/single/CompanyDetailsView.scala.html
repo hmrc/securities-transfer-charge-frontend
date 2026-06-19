@@ -1,0 +1,97 @@
+@*
+ * Copyright 2026 HM Revenue & Customs
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *@
+
+@import uk.gov.hmrc.securitiestransferchargefrontend.models.sh03.agents.CompanyDetails
+@import uk.gov.hmrc.securitiestransferchargefrontend.views.html.templates.Layout
+@import uk.gov.hmrc.securitiestransferchargefrontend.controllers.sh03.agents.single.routes
+@import uk.gov.hmrc.securitiestransferchargefrontend.views.html.components.SaveAndReturnButton
+
+@this(
+    layout: Layout,
+    formHelper: FormWithCSRF,
+    govukErrorSummary: GovukErrorSummary,
+    govukInput: GovukInput,
+    govukRadios: GovukRadios,
+    govukButton: GovukButton,
+    saveAndReturnButton: SaveAndReturnButton
+)
+
+@(form: Form[CompanyDetails], mode: Mode)(implicit request: Request[_], messages: Messages)
+
+@layout(pageTitle = title(form, messages("agent.sh03.companyDetails.title"))) {
+
+    @formHelper(action = routes.CompanyDetailsController.onSubmit(mode)) {
+
+        @if(form.errors.nonEmpty) {
+            @govukErrorSummary(ErrorSummaryViewModel(form))
+        }
+
+        <h1 class="govuk-heading-l">@messages("agent.sh03.companyDetails.heading")</h1>
+
+        @govukInput(Input(
+            id = "companyName",
+            name = "companyName",
+            label = Label(
+                content = Text(messages("agent.sh03.companyDetails.companyName.label"))
+            ),
+            value = form("companyName").value,
+            errorMessage = form("companyName").error.map(err => ErrorMessage(content = Text(messages(err.message))))
+        ))
+
+        @govukInput(Input(
+            id = "companyRegistrationNumber",
+            name = "companyRegistrationNumber",
+            label = Label(
+                content = Text(messages("agent.sh03.companyDetails.crn.label"))
+            ),
+            hint = Some(Hint(
+                content = Text(messages("agent.sh03.companyDetails.crn.hint"))
+            )),
+            classes = "govuk-input--width-10",
+            value = form("companyRegistrationNumber").value,
+            errorMessage = form("companyRegistrationNumber").error.map(err => ErrorMessage(content = Text(messages(err.message))))
+        ))
+
+        @govukRadios(Radios(
+            fieldset = Some(Fieldset(
+                legend = Some(Legend(
+                    content = Text(messages("agent.sh03.companyDetails.isPlc.label")),
+                    classes = "govuk-fieldset__legend--m"
+                ))
+            )),
+            name = "isPlc",
+            items = Seq(
+                RadioItem(
+                    content = Text(messages("site.yes")),
+                    value = Some("true"),
+                    checked = form("isPlc").value.contains("true")
+                ),
+                RadioItem(
+                    content = Text(messages("site.no")),
+                    value = Some("false"),
+                    checked = form("isPlc").value.contains("false")
+                )
+            ),
+            errorMessage = form("isPlc").error.map(err => ErrorMessage(content = Text(messages(err.message))))
+        ))
+
+        @govukButton(Button(
+            content = Text(messages("site.save-and-continue.button"))
+        ))
+
+        @saveAndReturnButton()
+    }
+}
