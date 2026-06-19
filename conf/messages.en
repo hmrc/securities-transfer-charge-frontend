@@ -141,7 +141,7 @@ chargingPoint.title = When did you buy these securities?
 chargingPoint.heading = When did you buy these securities?
 chargingPoint.hint = This is also called the charging point. For example, 27 3 2024
 chargingPoint.checkYourAnswersLabel = When did you buy the securities?
-chargingPoint.error.required.all = Enter the date you bought these securities
+chargingPoint.error.required.all = Enter the date you bought the securities
 chargingPoint.error.required.two = The date you bought the securities must include {0} and {1}
 chargingPoint.error.required = The date you bought the securities must include a {0}
 chargingPoint.error.invalid = The date you bought the securities must be a real date
@@ -230,7 +230,7 @@ individual.securitiesTarget.error.businessName.length = Business name must be 16
 individual.securitiesTarget.error.crn.length = Company registration number must be 8 characters
 individual.securitiesTarget.error.crn.invalid = Company registration number can only be numbers or letters
 
-individual.chargingPoint.error.required.all = Enter the date you bought these securities
+individual.chargingPoint.error.required.all = Enter the date you bought the securities
 individual.chargingPoint.error.futureDate = The day you bought the securities must be today’s date or a date in the past
 individual.chargingPoint.error.invalid = The date you bought the securities must be a real date
 individual.amountPaidForSecurities.error.required = Enter the amount you paid for the securities
