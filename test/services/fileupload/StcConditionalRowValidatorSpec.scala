@@ -190,7 +190,7 @@ class StcConditionalRowValidatorSpec extends SpecBase {
               sellerAddressInUK = Some(true),
               sellerAddressLine2 = Some(over40Chars)
             ),
-          "must be fewer than 40 characters long"
+          "must be 40 characters or fewer"
         ),
         (
           "sellerAddressLine3",
@@ -199,7 +199,7 @@ class StcConditionalRowValidatorSpec extends SpecBase {
               sellerAddressInUK = Some(true),
               sellerAddressLine3 = Some(over40Chars)
             ),
-          "must be fewer than 40 characters long"
+          "must be 40 characters or fewer"
         ),
         (
           "sellerAddressLine4",
@@ -208,7 +208,7 @@ class StcConditionalRowValidatorSpec extends SpecBase {
               sellerAddressInUK = Some(true),
               sellerAddressLine4 = Some(over40Chars)
             ),
-          "must be fewer than 40 characters long"
+          "must be 40 characters or fewer"
         )
       )
 
