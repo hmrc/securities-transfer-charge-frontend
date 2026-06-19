@@ -19,10 +19,12 @@ package uk.gov.hmrc.securitiestransferchargefrontend.navigation.sh03.agents.sing
 import play.api.mvc.Call
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.routes
-import uk.gov.hmrc.securitiestransferchargefrontend.models.UserAnswers
+import uk.gov.hmrc.securitiestransferchargefrontend.models.{NormalMode, UserAnswers}
+import uk.gov.hmrc.securitiestransferchargefrontend.models.sh03.shared.ReasonForPurchase
+import uk.gov.hmrc.securitiestransferchargefrontend.controllers.sh03.agents.single.routes as sh03AgentSingleRoutes
 import uk.gov.hmrc.securitiestransferchargefrontend.navigation.PersistentNavigationHelper
 import uk.gov.hmrc.securitiestransferchargefrontend.pages.Page
-import uk.gov.hmrc.securitiestransferchargefrontend.pages.sh03.single.ReasonForPurchasePage
+import uk.gov.hmrc.securitiestransferchargefrontend.pages.sh03.single.{ReasonForPurchasePage, TreasurySharesPage}
 import uk.gov.hmrc.securitiestransferchargefrontend.services.AnswerPersistenceService
 
 import scala.concurrent.{ExecutionContext, Future}
@@ -39,7 +41,11 @@ class ForwardRoutes(answerPersistenceService: AnswerPersistenceService,
 
   def forwardRoutes(page: Page)(implicit hc: HeaderCarrier): UserAnswers => Future[Call] = page match {
 
-    case ReasonForPurchasePage => userAnswers => goTo(routes.JourneyRecoveryController.onPageLoad(),Some(userAnswers))
+    case ReasonForPurchasePage => userAnswers => dataDependent(ReasonForPurchasePage, userAnswers) {
+      case ReasonForPurchase.ForCancellation  => sh03AgentSingleRoutes.TreasurySharesController.onPageLoad(NormalMode)
+      case ReasonForPurchase.ToPlaceIntoTreasury => ???
+    }
+    case TreasurySharesPage => userAnswers => goTo(routes.JourneyRecoveryController.onPageLoad(),Some(userAnswers))
 
     case _ => _ => Future.successful(defaultPage)
   }

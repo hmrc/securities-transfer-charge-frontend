@@ -18,16 +18,25 @@ package uk.gov.hmrc.securitiestransferchargefrontend.navigation.sh03.agents.sing
 
 import play.api.mvc.Call
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.routes
-import uk.gov.hmrc.securitiestransferchargefrontend.models.UserAnswers
+import uk.gov.hmrc.securitiestransferchargefrontend.controllers.sh03.agents.single.routes as sh03AgentSingleRoutes
+import uk.gov.hmrc.securitiestransferchargefrontend.models.{NormalMode, UserAnswers}
+import uk.gov.hmrc.securitiestransferchargefrontend.models.sh03.shared.ReasonForPurchase
 import uk.gov.hmrc.securitiestransferchargefrontend.navigation.NavigationHelper
 import uk.gov.hmrc.securitiestransferchargefrontend.pages.*
-import uk.gov.hmrc.securitiestransferchargefrontend.pages.sh03.single.ReasonForPurchasePage
+import uk.gov.hmrc.securitiestransferchargefrontend.pages.sh03.single.{ReasonForPurchasePage, TreasurySharesPage}
 
 class BackwardsRoutes(defaultPage: Call):
 
   val navHelper: NavigationHelper = new NavigationHelper(defaultPage)
 
+  import navHelper.*
+
+
   def predecessorRoutes(page: Page): UserAnswers => Call = page match {
     case ReasonForPurchasePage => _ => routes.JourneyRecoveryController.onPageLoad()
+    case TreasurySharesPage => userAnswers => dataDependent(ReasonForPurchasePage, userAnswers) {
+      case ReasonForPurchase.ForCancellation  => sh03AgentSingleRoutes.ReasonForPurchaseController.onPageLoad(NormalMode)
+      case ReasonForPurchase.ToPlaceIntoTreasury => ???
+    }
     case _ => _ => defaultPage
   }
