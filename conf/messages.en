@@ -1,4 +1,4 @@
-service.name = securities-transfer-charge-frontend
+service.name = Tell us about a security transfer
 
 site.back = Back
 site.remove = Remove
@@ -711,6 +711,8 @@ agent.templateInstructions.p3 = Once you have uploaded and submitted the file, i
 bulk.agentReference.hint = You can add a reference for your own records and to help you find this submission later. It will not be used by HMRC
 submission.details.caption = Submission details
 
+sh03.section.name =  Share buyback (SH03)
+
 submissionsDashboard.sh03.button = start sh03
 agent.sh03.beforeYouStart.title = Before you start
 agent.sh03.beforeYouStart.heading = Before you start
@@ -743,3 +745,12 @@ agent.sh03.howToNotifyAboutShareBuyback.moreThanOneAtATime.hint = Tell us about 
 agent.sh03.howToNotifyAboutShareBuyback.checkYourAnswersLabel = How would you like to tell us about this share buyback?
 agent.sh03.howToNotifyAboutShareBuyback.error.required = Select a way to tell us about this share buyback
 agent.sh03.howToNotifyAboutShareBuyback.change.hidden = HowToNotifyAboutShareBuyback
+
+agent.sh03.connectedPersons.title = Connected persons
+agent.sh03.connectedPersons.heading = Connected persons
+agent.sh03.connectedPersons.legend = Are the buyer and seller connected persons?
+agent.sh03.connectedPersons.checkYourAnswersLabel = Are the buyer and seller connected persons?
+agent.sh03.connectedPersons.error.required = Select yes if the buyer and seller are connected persons
+agent.sh03.connectedPersons.p = We need to know if the buyer and seller of these shares are considered ‘connected persons’ according to
+agent.sh03.connectedPersons.content.link.text = section 1122 of the Corporation Tax Act 2010
+agent.sh03.connectedPersons.change.hidden = Change connected persons

@@ -25,6 +25,7 @@ import uk.gov.hmrc.securitiestransferchargefrontend.controllers.sh03.agents.sing
 import uk.gov.hmrc.securitiestransferchargefrontend.models.sh03.HowToNotifyAboutShareBuyback.{MoreThanOneAtATime, OneAtATime}
 import uk.gov.hmrc.securitiestransferchargefrontend.navigation.PersistentNavigationHelper
 import uk.gov.hmrc.securitiestransferchargefrontend.pages.Page
+import uk.gov.hmrc.securitiestransferchargefrontend.pages.sh03.shared.ConnectedPersonsPage
 import uk.gov.hmrc.securitiestransferchargefrontend.pages.sh03.shared.HowToNotifyAboutShareBuybackPage
 import uk.gov.hmrc.securitiestransferchargefrontend.pages.sh03.single.{ReasonForPurchasePage, TreasurySharesPage}
 import uk.gov.hmrc.securitiestransferchargefrontend.services.AnswerPersistenceService
@@ -51,9 +52,10 @@ class ForwardRoutes(answerPersistenceService: AnswerPersistenceService,
     }
     case ReasonForPurchasePage => userAnswers => dataDependent(ReasonForPurchasePage, userAnswers) {
       case ReasonForPurchase.ForCancellation  => sh03AgentSingleRoutes.TreasurySharesController.onPageLoad(NormalMode)
-      case ReasonForPurchase.ToPlaceIntoTreasury => ???
+      case ReasonForPurchase.ToPlaceIntoTreasury => sh03AgentSingleRoutes.ConnectedPersonsController.onPageLoad(NormalMode)
     }
-    case TreasurySharesPage => userAnswers => goTo(routes.JourneyRecoveryController.onPageLoad(),Some(userAnswers))
+    case TreasurySharesPage => userAnswers => dataRequired(TreasurySharesPage, userAnswers,sh03AgentSingleRoutes.ConnectedPersonsController.onPageLoad(NormalMode))
+    case ConnectedPersonsPage  => userAnswers => goTo(routes.JourneyRecoveryController.onPageLoad(),Some(userAnswers))
 
     case _ => _ => Future.successful(defaultPage)
   }

@@ -23,6 +23,7 @@ import uk.gov.hmrc.securitiestransferchargefrontend.models.{NormalMode, UserAnsw
 import uk.gov.hmrc.securitiestransferchargefrontend.models.sh03.shared.ReasonForPurchase
 import uk.gov.hmrc.securitiestransferchargefrontend.navigation.NavigationHelper
 import uk.gov.hmrc.securitiestransferchargefrontend.pages.*
+import uk.gov.hmrc.securitiestransferchargefrontend.pages.sh03.shared.ConnectedPersonsPage
 import uk.gov.hmrc.securitiestransferchargefrontend.pages.sh03.single.{ReasonForPurchasePage, TreasurySharesPage}
 
 class BackwardsRoutes(defaultPage: Call):
@@ -34,9 +35,10 @@ class BackwardsRoutes(defaultPage: Call):
 
   def predecessorRoutes(page: Page): UserAnswers => Call = page match {
     case ReasonForPurchasePage => _ => routes.JourneyRecoveryController.onPageLoad()
-    case TreasurySharesPage => userAnswers => dataDependent(ReasonForPurchasePage, userAnswers) {
-      case ReasonForPurchase.ForCancellation  => sh03AgentSingleRoutes.ReasonForPurchaseController.onPageLoad(NormalMode)
-      case ReasonForPurchase.ToPlaceIntoTreasury => ???
+    case TreasurySharesPage => _ => sh03AgentSingleRoutes.ReasonForPurchaseController.onPageLoad(NormalMode)
+    case ConnectedPersonsPage => userAnswers => dataDependent(ReasonForPurchasePage, userAnswers) {
+      case ReasonForPurchase.ForCancellation  => sh03AgentSingleRoutes.TreasurySharesController.onPageLoad(NormalMode)
+      case ReasonForPurchase.ToPlaceIntoTreasury => sh03AgentSingleRoutes.ReasonForPurchaseController.onPageLoad(NormalMode)
     }
     case _ => _ => defaultPage
   }

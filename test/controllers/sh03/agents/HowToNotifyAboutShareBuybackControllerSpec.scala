@@ -22,12 +22,9 @@ import org.mockito.Mockito.when
 import org.scalatestplus.mockito.MockitoSugar
 import play.api.data.Form
 import play.api.inject.bind
-import play.api.mvc.Call
 import play.api.test.FakeRequest
 import play.api.test.Helpers.*
-import uk.gov.hmrc.http.HeaderCarrier
-import uk.gov.hmrc.securitiestransferchargefrontend.clients.SaveAndReturnClient
-import uk.gov.hmrc.securitiestransferchargefrontend.controllers.routes
+import uk.gov.hmrc.securitiestransferchargefrontend.clients.SubmissionIdClient
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.sh03.agents.routes as agentRoutes
 import uk.gov.hmrc.securitiestransferchargefrontend.forms.sh03.agents.HowToNotifyAboutShareBuybackFormProvider
 import uk.gov.hmrc.securitiestransferchargefrontend.models.sh03.HowToNotifyAboutShareBuyback
@@ -40,8 +37,6 @@ import scala.concurrent.Future
 import scala.language.postfixOps
 
 class HowToNotifyAboutShareBuybackControllerSpec extends SpecBase with MockitoSugar {
-
-  def onwardRoute = Call("GET", "/foo")
 
   lazy val howToNotifyAboutShareBuybackRoute: String = agentRoutes.HowToNotifyAboutShareBuybackController.onPageLoad(NormalMode).url
 
@@ -88,16 +83,21 @@ class HowToNotifyAboutShareBuybackControllerSpec extends SpecBase with MockitoSu
     }
 
     "must redirect to the appropriate next page when one at a time is submitted" in {
-      val saveAndReturnClient = mock[SaveAndReturnClient]
 
-      val userAnswers = UserAnswers(testUserId, testGroupIdentifier, submissionId).set(HowToNotifyAboutShareBuybackPage, HowToNotifyAboutShareBuyback.values.head).success.value
+      val mockIdClient = mock[SubmissionIdClient]
 
+      when(mockIdClient.nextSubmissionId()(any()))
+        .thenReturn(Future.successful(submissionId))
 
-      val application = applicationBuilder(userAnswers = Some(userAnswers), affinityGroup = agentAffinity, saveAndReturnClient = saveAndReturnClient)
+      val userAnswers = UserAnswers(testUserId, testGroupIdentifier, submissionId)
+        .set(HowToNotifyAboutShareBuybackPage, HowToNotifyAboutShareBuyback.values.head).success.value
+
+      val application = applicationBuilder(userAnswers = Some(userAnswers), affinityGroup = agentAffinity)
+        .overrides(
+          bind[Navigator].qualifiedWith("agentsSh03").toInstance(getNavigator),
+          bind[SubmissionIdClient].toInstance(mockIdClient)
+        )
         .build()
-
-      when(saveAndReturnClient.save(any[UserAnswers]())(any[HeaderCarrier]()))
-        .thenReturn(Future.successful(()))
 
       running(application) {
         val request =
@@ -107,20 +107,27 @@ class HowToNotifyAboutShareBuybackControllerSpec extends SpecBase with MockitoSu
         val result = route(application, request).value
 
         status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual routes.JourneyRecoveryController.onPageLoad().url
+
+        redirectLocation(result).value mustEqual testNextPage.url
       }
     }
 
     "must redirect to the appropriate next page when more than one at a time is selected" in {
-      val saveAndReturnClient = mock[SaveAndReturnClient]
-      val userAnswers = UserAnswers(testUserId, testGroupIdentifier, submissionId).set(HowToNotifyAboutShareBuybackPage, HowToNotifyAboutShareBuyback.values.last).success.value
 
+      val mockIdClient = mock[SubmissionIdClient]
 
-      val application = applicationBuilder(userAnswers = Some(userAnswers), affinityGroup = agentAffinity, saveAndReturnClient = saveAndReturnClient)
+      when(mockIdClient.nextSubmissionId()(any()))
+        .thenReturn(Future.successful(submissionId))
+
+      val userAnswers = UserAnswers(testUserId, testGroupIdentifier, submissionId)
+        .set(HowToNotifyAboutShareBuybackPage, HowToNotifyAboutShareBuyback.values.last).success.value
+
+      val application = applicationBuilder(userAnswers = Some(userAnswers), affinityGroup = agentAffinity)
+        .overrides(
+          bind[Navigator].qualifiedWith("agentsSh03").toInstance(getNavigator),
+          bind[SubmissionIdClient].toInstance(mockIdClient)
+        )
         .build()
-
-      when(saveAndReturnClient.save(any[UserAnswers]())(any[HeaderCarrier]()))
-        .thenReturn(Future.successful(()))
 
       running(application) {
         val request =
@@ -130,7 +137,8 @@ class HowToNotifyAboutShareBuybackControllerSpec extends SpecBase with MockitoSu
         val result = route(application, request).value
 
         status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual routes.JourneyRecoveryController.onPageLoad().url
+
+        redirectLocation(result).value mustEqual testNextPage.url
       }
     }
 
