@@ -40,7 +40,7 @@ class CompanyDetailsController @Inject()(
   formProvider: CompanyDetailsFormProvider,
   val controllerComponents: MessagesControllerComponents,
   view: CompanyDetailsView,
-  @Named("agents") navigator: Navigator
+  @Named("agentsSh03") navigator: Navigator,
 )(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport {
 
   val form: Form[CompanyDetails] = formProvider()

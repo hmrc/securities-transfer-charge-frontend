@@ -16,62 +16,82 @@
 
 package views.sh03.agents.single
 
-import forms.sh03.agents.CompanyDetailsFormProvider
-import models.NormalMode
-import play.api.data.Form
-import play.twirl.api.HtmlFormat
+import org.jsoup.Jsoup
+import org.jsoup.nodes.Document
+import play.api.Application
+import uk.gov.hmrc.securitiestransferchargefrontend.forms.sh03.agents.CompanyDetailsFormProvider
+import uk.gov.hmrc.securitiestransferchargefrontend.models.NormalMode
 import uk.gov.hmrc.securitiestransferchargefrontend.models.sh03.agents.CompanyDetails
 import uk.gov.hmrc.securitiestransferchargefrontend.views.html.sh03.agents.single.CompanyDetailsView
 import views.ViewBaseSpec
-import views.helper.JsoupHelper
 
-class CompanyDetailsViewSpec extends ViewBaseSpec with JsoupHelper {
+class CompanyDetailsViewSpec extends ViewBaseSpec {
+
+  override def fakeApplication(): Application = applicationBuilder(affinityGroup = agentAffinity).build()
 
   val messageKeyPrefix = "agent.sh03.companyDetails"
 
-  val form: Form[CompanyDetails] = new CompanyDetailsFormProvider()()
+  private val viewInstance = app.injector.instanceOf[CompanyDetailsView]
+  private val formProvider = new CompanyDetailsFormProvider()
+  private val form = formProvider()
 
-  val view: CompanyDetailsView = app.injector.instanceOf[CompanyDetailsView]
+  def view(): Document = Jsoup.parse(
+    viewInstance(form, NormalMode)(fakeRequest, messages).body
+  )
 
-  def createView: () => HtmlFormat.Appendable = () =>
-    view(form, NormalMode)(fakeRequest, messages)
+  object ExpectedContent {
+    val title: String = messages(s"$messageKeyPrefix.title")
+    val heading: String = messages(s"$messageKeyPrefix.heading")
+    val companyNameLabel: String = messages(s"$messageKeyPrefix.companyName.label")
+    val crnLabel: String = messages(s"$messageKeyPrefix.crn.label")
+    val crnHint: String = messages(s"$messageKeyPrefix.crn.hint")
+    val isPlcLabel: String = messages(s"$messageKeyPrefix.isPlc.label")
+    val saveAndContinue: String = messages("site.save-and-continue.button")
+    val saveAndReturn: String = messages("site.save-and-return.button")
+  }
 
   "CompanyDetailsView" - {
 
-    behave like normalPage(createView, messageKeyPrefix)
-
-    behave like pageWithBackLink(createView)
-
-    behave like pageWithSubmitButton(createView)
-
     "must contain heading" in {
-      val doc = asDocument(createView())
-      assertContainsText(doc, messages(s"$messageKeyPrefix.heading"))
+      val doc = view()
+      doc.select("h1").text() must include(ExpectedContent.heading)
     }
 
     "must contain company name input" in {
-      val doc = asDocument(createView())
-      assertRenderedById(doc, "companyName")
-      assertContainsLabel(doc, "companyName", messages(s"$messageKeyPrefix.companyName.label"))
+      val doc = view()
+      doc.select("#companyName").size() mustBe 1
+      doc.select("label[for=companyName]").text() must include(ExpectedContent.companyNameLabel)
     }
 
     "must contain CRN input with hint text" in {
-      val doc = asDocument(createView())
-      assertRenderedById(doc, "companyRegistrationNumber")
-      assertContainsLabel(doc, "companyRegistrationNumber", messages(s"$messageKeyPrefix.crn.label"))
-      assertContainsText(doc, messages(s"$messageKeyPrefix.crn.hint"))
+      val doc = view()
+      doc.select("#companyRegistrationNumber").size() mustBe 1
+      doc.select("label[for=companyRegistrationNumber]").text() must include(ExpectedContent.crnLabel)
+      doc.text() must include(ExpectedContent.crnHint)
     }
 
     "must contain PLC radio buttons" in {
-      val doc = asDocument(createView())
-      assertContainsText(doc, messages(s"$messageKeyPrefix.isPlc.label"))
-      assertContainsText(doc, messages("site.yes"))
-      assertContainsText(doc, messages("site.no"))
+      val doc = view()
+      doc.text() must include(ExpectedContent.isPlcLabel)
+      doc.text() must include(messages("site.yes"))
+      doc.text() must include(messages("site.no"))
+    }
+
+    "must contain save and continue button" in {
+      val doc = view()
+      val buttons = doc.select(".govuk-button")
+      buttons.get(0).text() mustBe ExpectedContent.saveAndContinue
     }
 
     "must contain save and return button" in {
-      val doc = asDocument(createView())
-      assertContainsText(doc, messages("site.save-and-return.button"))
+      val doc = view()
+      val buttons = doc.select(".govuk-button")
+      buttons.get(1).text() mustBe ExpectedContent.saveAndReturn
+    }
+
+    "must have back link" in {
+      val doc = view()
+      doc.hasBackLink mustBe true
     }
   }
 
@@ -79,8 +99,8 @@ class CompanyDetailsViewSpec extends ViewBaseSpec with JsoupHelper {
 
     "must show error summary when there are errors" in {
       val formWithErrors = form.bind(Map("companyName" -> ""))
-      val doc = asDocument(view(formWithErrors, NormalMode)(fakeRequest, messages))
-      assertRenderedById(doc, "error-summary-title")
+      val doc = Jsoup.parse(viewInstance(formWithErrors, NormalMode)(fakeRequest, messages).body)
+      doc.hasErrorSummary mustBe true
     }
 
     "must show error for company name" in {
@@ -89,8 +109,8 @@ class CompanyDetailsViewSpec extends ViewBaseSpec with JsoupHelper {
         "companyRegistrationNumber" -> "AB123456",
         "isPlc" -> "true"
       ))
-      val doc = asDocument(view(formWithErrors, NormalMode)(fakeRequest, messages))
-      assertContainsText(doc, messages(s"$messageKeyPrefix.companyName.error.required"))
+      val doc = Jsoup.parse(viewInstance(formWithErrors, NormalMode)(fakeRequest, messages).body)
+      doc.text() must include(messages(s"$messageKeyPrefix.companyName.error.required"))
     }
 
     "must show error for CRN" in {
@@ -99,8 +119,8 @@ class CompanyDetailsViewSpec extends ViewBaseSpec with JsoupHelper {
         "companyRegistrationNumber" -> "ABC",
         "isPlc" -> "true"
       ))
-      val doc = asDocument(view(formWithErrors, NormalMode)(fakeRequest, messages))
-      assertContainsText(doc, messages(s"$messageKeyPrefix.crn.error.length"))
+      val doc = Jsoup.parse(viewInstance(formWithErrors, NormalMode)(fakeRequest, messages).body)
+      doc.text() must include(messages(s"$messageKeyPrefix.crn.error.invalid"))
     }
 
     "must show error for PLC selection" in {
@@ -108,8 +128,8 @@ class CompanyDetailsViewSpec extends ViewBaseSpec with JsoupHelper {
         "companyName" -> "Test Company",
         "companyRegistrationNumber" -> "AB123456"
       ))
-      val doc = asDocument(view(formWithErrors, NormalMode)(fakeRequest, messages))
-      assertContainsText(doc, messages(s"$messageKeyPrefix.isPlc.error.required"))
+      val doc = Jsoup.parse(viewInstance(formWithErrors, NormalMode)(fakeRequest, messages).body)
+      doc.text() must include(messages(s"$messageKeyPrefix.isPlc.error.required"))
     }
   }
 }

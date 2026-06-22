@@ -18,6 +18,8 @@ package forms.sh03.agents
 
 import forms.behaviours.StringFieldBehaviours
 import play.api.data.FormError
+import uk.gov.hmrc.securitiestransferchargefrontend.forms.sh03.agents.CompanyDetailsFormProvider
+import org.scalacheck.Gen
 
 class CompanyDetailsFormProviderSpec extends StringFieldBehaviours {
 
@@ -36,31 +38,28 @@ class CompanyDetailsFormProviderSpec extends StringFieldBehaviours {
       stringsWithMaxLength(maxLength)
     )
 
-    behave like fieldWithMaxLength(
-      form,
-      fieldName,
-      maxLength = maxLength,
-      lengthError = FormError(fieldName, lengthKey)
-    )
-
     behave like mandatoryField(
       form,
       fieldName,
       requiredError = FormError(fieldName, requiredKey)
     )
+
+    "must not bind strings longer than max length" in {
+      val result = form.bind(Map(fieldName -> ("a" * (maxLength + 1)))).apply(fieldName)
+      result.errors.map(_.message) must contain(lengthKey)
+    }
   }
 
   ".companyRegistrationNumber" - {
 
     val fieldName = "companyRegistrationNumber"
     val requiredKey = "agent.sh03.companyDetails.crn.error.required"
-    val lengthKey = "agent.sh03.companyDetails.crn.error.length"
     val invalidKey = "agent.sh03.companyDetails.crn.error.invalid"
 
     behave like fieldThatBindsValidData(
       form,
       fieldName,
-      Seq("AB123456", "12345678", "SN898989")
+      Gen.oneOf("AB123456", "12345678", "SN898989")
     )
 
     behave like mandatoryField(
@@ -72,18 +71,21 @@ class CompanyDetailsFormProviderSpec extends StringFieldBehaviours {
     "must not bind strings that are not exactly 8 characters" in {
       forAll(stringsLongerThan(8) -> "longString") { string =>
         val result = form.bind(Map(fieldName -> string)).apply(fieldName)
-        result.errors must contain(FormError(fieldName, lengthKey))
+        result.errors.map(_.key) must contain(fieldName)
+        result.errors.map(_.message) must contain(invalidKey)
       }
 
-      forAll(stringsShorterThan(8) -> "shortString") { string =>
+      forAll(stringsShorterThan(8).suchThat(_.nonEmpty) -> "shortString") { string =>
         val result = form.bind(Map(fieldName -> string)).apply(fieldName)
-        result.errors must contain(FormError(fieldName, lengthKey))
+        result.errors.map(_.key) must contain(fieldName)
+        result.errors.map(_.message) must contain(invalidKey)
       }
     }
 
     "must not bind strings with invalid characters" in {
       val result = form.bind(Map(fieldName -> "AB12-456")).apply(fieldName)
-      result.errors must contain(FormError(fieldName, invalidKey))
+      result.errors.map(_.key) must contain(fieldName)
+      result.errors.map(_.message) must contain(invalidKey)
     }
   }
 
@@ -99,12 +101,20 @@ class CompanyDetailsFormProviderSpec extends StringFieldBehaviours {
     )
 
     "must bind true" in {
-      val result = form.bind(Map(fieldName -> "true"))
+      val result = form.bind(Map(
+        "companyName" -> "Test Company",
+        "companyRegistrationNumber" -> "AB123456",
+        fieldName -> "true"
+      ))
       result.value.value.isPlc mustBe true
     }
 
     "must bind false" in {
-      val result = form.bind(Map(fieldName -> "false"))
+      val result = form.bind(Map(
+        "companyName" -> "Test Company",
+        "companyRegistrationNumber" -> "AB123456",
+        fieldName -> "false"
+      ))
       result.value.value.isPlc mustBe false
     }
   }

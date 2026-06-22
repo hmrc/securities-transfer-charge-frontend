@@ -62,10 +62,10 @@ class BeforeYouStartViewSpec extends ViewBaseSpec {
       }
 
       "display the correct content" in {
-        beforeYouStartView.para(1).value mustBe ExpectedContent.p1
-        beforeYouStartView.para(2).value mustBe ExpectedContent.p2
-        beforeYouStartView.para(3).value mustBe ExpectedContent.p3
-        beforeYouStartView.para(4).value mustBe ExpectedContent.p4
+        beforeYouStartView.para(1) mustBe Some(ExpectedContent.p1)
+        beforeYouStartView.para(2) mustBe Some(ExpectedContent.p2)
+        beforeYouStartView.para(3) mustBe Some(ExpectedContent.p3)
+        beforeYouStartView.para(4) mustBe Some(ExpectedContent.p4)
       }
 
       "have a continue button" in {
@@ -87,6 +87,3 @@ class BeforeYouStartViewSpec extends ViewBaseSpec {
     }
   }
 }
-
-
-

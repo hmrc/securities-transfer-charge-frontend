@@ -68,8 +68,8 @@ class AmountPaidForSecuritiesViewSpec extends ViewBaseSpec {
       }
 
       "display the correct content" in {
-        amountPaidForSecuritiesView.para(1).value mustBe ExpectedContent.p1
-        amountPaidForSecuritiesView.para(2).value mustBe ExpectedContent.p2
+        amountPaidForSecuritiesView.para(1) mustBe Some(ExpectedContent.p1)
+        amountPaidForSecuritiesView.para(2) mustBe Some(ExpectedContent.p2)
       }
 
       "have a button with the text save and continue " in {

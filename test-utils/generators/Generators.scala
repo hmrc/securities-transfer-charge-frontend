@@ -96,6 +96,11 @@ trait Generators extends ModelGenerators {
     chars     <- listOfN(length, arbitrary[Char])
   } yield chars.mkString
 
+  def stringsShorterThan(maxLength: Int): Gen[String] = for {
+    length <- Gen.chooseNum(0, (maxLength - 1).max(0))
+    chars  <- listOfN(length, arbitrary[Char])
+  } yield chars.mkString
+
   def stringsExceptSpecificValues(excluded: Seq[String]): Gen[String] =
     nonEmptyString suchThat (!excluded.contains(_))
 
