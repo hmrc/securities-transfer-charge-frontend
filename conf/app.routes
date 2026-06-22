@@ -294,8 +294,8 @@ POST       /stf/agent/bulk/change/add-reference            uk.gov.hmrc.securitie
 
 GET         /submissions-dashboard/sh03                      uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.shared.SubmissionsDashboardController.startSh03()
 
-GET        /sh03/agent/before-you-start                 uk.gov.hmrc.securitiestransferchargefrontend.controllers.sh03.agents.single.BeforeYouStartController.onPageLoad()
-POST       /sh03/agent/before-you-start                uk.gov.hmrc.securitiestransferchargefrontend.controllers.sh03.agents.single.BeforeYouStartController.onSubmit()
+GET        /sh03/agent/before-you-start                 uk.gov.hmrc.securitiestransferchargefrontend.controllers.sh03.agents.BeforeYouStartController.onPageLoad()
+POST       /sh03/agent/before-you-start                uk.gov.hmrc.securitiestransferchargefrontend.controllers.sh03.agents.BeforeYouStartController.onSubmit()
 
 GET        /sh03/agent/share-purchase                        uk.gov.hmrc.securitiestransferchargefrontend.controllers.sh03.agents.single.ReasonForPurchaseController.onPageLoad(mode: Mode = NormalMode)
 POST       /sh03/agent/share-purchase                       uk.gov.hmrc.securitiestransferchargefrontend.controllers.sh03.agents.single.ReasonForPurchaseController.onSubmit(mode: Mode = NormalMode)

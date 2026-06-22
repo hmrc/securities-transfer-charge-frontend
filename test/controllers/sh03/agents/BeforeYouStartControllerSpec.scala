@@ -14,14 +14,13 @@
  * limitations under the License.
  */
 
-package controllers.sh03.agents.single
-
+package controllers.sh03.agents
 
 import base.SpecBase
 import play.api.test.FakeRequest
 import play.api.test.Helpers.*
-import uk.gov.hmrc.securitiestransferchargefrontend.controllers.sh03.agents.single.routes
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.sh03.agents.routes as agentSH03Route
+import uk.gov.hmrc.securitiestransferchargefrontend.controllers.sh03.agents.single.routes
 import uk.gov.hmrc.securitiestransferchargefrontend.models.NormalMode
 import uk.gov.hmrc.securitiestransferchargefrontend.views.html.sh03.agents.single.BeforeYouStartView
 
