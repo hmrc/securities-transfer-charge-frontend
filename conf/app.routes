@@ -110,8 +110,8 @@ GET        /stf/org/seller/address/return                 uk.gov.hmrc.securities
 
 GET        /stf/org/how-many-transfers                    uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.organisations.HowToNotifyAboutSecuritiesTransferController.onPageLoad(mode: Mode = NormalMode)
 POST       /stf/org/how-many-transfers                    uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.organisations.HowToNotifyAboutSecuritiesTransferController.onSubmit(mode: Mode = NormalMode)
-GET        /stf/org/how-many-transfers                    uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.organisations.HowToNotifyAboutSecuritiesTransferController.onPageLoad(mode: Mode = CheckMode)
-POST       /stf/org/how-many-transfers                    uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.organisations.HowToNotifyAboutSecuritiesTransferController.onSubmit(mode: Mode = CheckMode)
+GET        /stf/org/change/how-many-transfers                    uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.organisations.HowToNotifyAboutSecuritiesTransferController.onPageLoad(mode: Mode = CheckMode)
+POST       /stf/org/change/how-many-transfers                    uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.organisations.HowToNotifyAboutSecuritiesTransferController.onSubmit(mode: Mode = CheckMode)
 
 GET        /stf/org/connected-persons                     uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.organisations.single.ConnectedPersonsController.onPageLoad(mode: Mode = NormalMode)
 POST       /stf/org/connected-persons                     uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.organisations.single.ConnectedPersonsController.onSubmit(mode: Mode = NormalMode)
@@ -198,8 +198,8 @@ POST       /stf/agent/change/add-reference                uk.gov.hmrc.securities
 
 GET        /stf/agent/how-many-transfers                  uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.agents.HowToNotifyAboutSecuritiesTransferController.onPageLoad(mode: Mode = NormalMode)
 POST       /stf/agent/how-many-transfers                  uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.agents.HowToNotifyAboutSecuritiesTransferController.onSubmit(mode: Mode = NormalMode)
-GET        /stf/agent/how-many-transfers                  uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.agents.HowToNotifyAboutSecuritiesTransferController.onPageLoad(mode: Mode = CheckMode)
-POST       /stf/agent/how-many-transfers                  uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.agents.HowToNotifyAboutSecuritiesTransferController.onSubmit(mode: Mode = CheckMode)
+GET        /stf/agent/change/how-many-transfers                  uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.agents.HowToNotifyAboutSecuritiesTransferController.onPageLoad(mode: Mode = CheckMode)
+POST       /stf/agent/change/how-many-transfers                  uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.agents.HowToNotifyAboutSecuritiesTransferController.onSubmit(mode: Mode = CheckMode)
 
 GET        /stf/agent/address                             uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.agents.single.AddressController.onPageLoad()
 GET        /stf/agent/address/return                      uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.agents.single.AddressController.onReturn(id: String)
@@ -292,18 +292,22 @@ POST       /stf/agent/bulk/add-reference                   uk.gov.hmrc.securitie
 GET        /stf/agent/bulk/change/add-reference            uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.agents.bulk.AgentReferenceController.onPageLoad(mode: Mode = CheckMode)
 POST       /stf/agent/bulk/change/add-reference            uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.agents.bulk.AgentReferenceController.onSubmit(mode: Mode = CheckMode)
 
-GET       /submissions-dashboard/sh03                      uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.shared.SubmissionsDashboardController.startSh03()
+GET         /submissions-dashboard/sh03                      uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.shared.SubmissionsDashboardController.startSh03()
 
 GET        /sh03/agent/before-you-start                 uk.gov.hmrc.securitiestransferchargefrontend.controllers.sh03.agents.single.BeforeYouStartController.onPageLoad()
 POST       /sh03/agent/before-you-start                uk.gov.hmrc.securitiestransferchargefrontend.controllers.sh03.agents.single.BeforeYouStartController.onSubmit()
 
 GET        /sh03/agent/share-purchase                        uk.gov.hmrc.securitiestransferchargefrontend.controllers.sh03.agents.single.ReasonForPurchaseController.onPageLoad(mode: Mode = NormalMode)
 POST       /sh03/agent/share-purchase                       uk.gov.hmrc.securitiestransferchargefrontend.controllers.sh03.agents.single.ReasonForPurchaseController.onSubmit(mode: Mode = NormalMode)
-GET        /sh03/agent/share-purchase                 uk.gov.hmrc.securitiestransferchargefrontend.controllers.sh03.agents.single.ReasonForPurchaseController.onPageLoad(mode: Mode = CheckMode)
-POST       /sh03/agent/share-purchase                 uk.gov.hmrc.securitiestransferchargefrontend.controllers.sh03.agents.single.ReasonForPurchaseController.onSubmit(mode: Mode = CheckMode)
+GET        /sh03/agent/change/share-purchase                 uk.gov.hmrc.securitiestransferchargefrontend.controllers.sh03.agents.single.ReasonForPurchaseController.onPageLoad(mode: Mode = CheckMode)
+POST       /sh03/agent/change/share-purchase                 uk.gov.hmrc.securitiestransferchargefrontend.controllers.sh03.agents.single.ReasonForPurchaseController.onSubmit(mode: Mode = CheckMode)
 
 GET        /sh03/agent/treasury-shares                       uk.gov.hmrc.securitiestransferchargefrontend.controllers.sh03.agents.single.TreasurySharesController.onPageLoad(mode: Mode = NormalMode)
 POST       /sh03/agent/treasury-shares                       uk.gov.hmrc.securitiestransferchargefrontend.controllers.sh03.agents.single.TreasurySharesController.onSubmit(mode: Mode = NormalMode)
-GET        /sh03/agent/treasury-shares                 uk.gov.hmrc.securitiestransferchargefrontend.controllers.sh03.agents.single.TreasurySharesController.onPageLoad(mode: Mode = CheckMode)
-POST       /sh03/agent/treasury-shares                 uk.gov.hmrc.securitiestransferchargefrontend.controllers.sh03.agents.single.TreasurySharesController.onSubmit(mode: Mode = CheckMode)
+GET        /sh03/agent/change/treasury-shares                 uk.gov.hmrc.securitiestransferchargefrontend.controllers.sh03.agents.single.TreasurySharesController.onPageLoad(mode: Mode = CheckMode)
+POST       /sh03/agent/change/treasury-shares                 uk.gov.hmrc.securitiestransferchargefrontend.controllers.sh03.agents.single.TreasurySharesController.onSubmit(mode: Mode = CheckMode)
 
+GET        /sh03/agent/how-many-transfers                   uk.gov.hmrc.securitiestransferchargefrontend.controllers.sh03.agents.HowToNotifyAboutShareBuybackController.onPageLoad(mode: Mode = NormalMode)
+POST       /sh03/agent/how-many-transfers                   uk.gov.hmrc.securitiestransferchargefrontend.controllers.sh03.agents.HowToNotifyAboutShareBuybackController.onSubmit(mode: Mode = NormalMode)
+GET        /sh03/agent/change/how-many-transfers            uk.gov.hmrc.securitiestransferchargefrontend.controllers.sh03.agents.HowToNotifyAboutShareBuybackController.onPageLoad(mode: Mode = CheckMode)
+POST       /sh03/agent/change/how-many-transfers            uk.gov.hmrc.securitiestransferchargefrontend.controllers.sh03.agents.HowToNotifyAboutShareBuybackController.onSubmit(mode: Mode = CheckMode)

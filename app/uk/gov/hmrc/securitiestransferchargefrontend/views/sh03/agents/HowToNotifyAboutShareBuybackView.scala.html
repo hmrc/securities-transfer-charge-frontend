@@ -1,0 +1,60 @@
+@*
+ * Copyright 2026 HM Revenue & Customs
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *@
+
+@import uk.gov.hmrc.securitiestransferchargefrontend.models.sh03.HowToNotifyAboutShareBuyback
+@import uk.gov.hmrc.securitiestransferchargefrontend.viewmodels.LegendSize.Large
+@import uk.gov.hmrc.securitiestransferchargefrontend.views.html.templates
+@import uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.shared.routes
+@import uk.gov.hmrc.securitiestransferchargefrontend.controllers.sh03.agents.routes as agentsRoutes
+
+@this(
+    layout: templates.Layout,
+    formHelper: FormWithCSRF,
+    govukErrorSummary: GovukErrorSummary,
+    govukRadios: GovukRadios,
+    govukButton: GovukButton
+)
+
+@(form: Form[_], mode: Mode, affinityGroupKey: String, backLinkCall: Call)(implicit request: Request[_], messages: Messages)
+
+@layout(pageTitle = title(form, messages("agent.sh03.howToNotifyAboutShareBuyback.title")), backLinkUrl = Some(backLinkCall.url)) {
+
+    @formHelper(action = agentsRoutes.HowToNotifyAboutShareBuybackController.onSubmit(mode), Symbol("autoComplete") -> "off") {
+
+        @if(form.errors.nonEmpty) {
+            @govukErrorSummary(ErrorSummaryViewModel(form,  errorLinkOverrides = Map("value" -> "value_0")))
+        }
+
+        @govukRadios(
+            RadiosViewModel(
+                field  = form("value"),
+                legend = LegendViewModel(messages("agent.sh03.howToNotifyAboutShareBuyback.heading")).asPageHeading(Large),
+                items  = HowToNotifyAboutShareBuyback.options(affinityGroupKey)
+            )
+        )
+        <div class="govuk-button-group">
+
+            @govukButton(
+                ButtonViewModel(messages("site.continue"))
+            )
+
+            <a class="govuk-link" href="@routes.SubmissionsDashboardController.onPageLoad().url">
+            @messages("return-to-dashboard.link")
+            </a>
+
+        </div>
+    }
+}

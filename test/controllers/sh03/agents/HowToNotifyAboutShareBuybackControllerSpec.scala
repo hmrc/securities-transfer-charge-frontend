@@ -1,0 +1,157 @@
+/*
+ * Copyright 2026 HM Revenue & Customs
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+package controllers.sh03.agents
+
+import base.SpecBase
+import org.mockito.ArgumentMatchers.any
+import org.mockito.Mockito.when
+import org.scalatestplus.mockito.MockitoSugar
+import play.api.data.Form
+import play.api.inject.bind
+import play.api.mvc.Call
+import play.api.test.FakeRequest
+import play.api.test.Helpers.*
+import uk.gov.hmrc.http.HeaderCarrier
+import uk.gov.hmrc.securitiestransferchargefrontend.clients.SaveAndReturnClient
+import uk.gov.hmrc.securitiestransferchargefrontend.controllers.routes
+import uk.gov.hmrc.securitiestransferchargefrontend.controllers.sh03.agents.routes as agentRoutes
+import uk.gov.hmrc.securitiestransferchargefrontend.forms.sh03.agents.HowToNotifyAboutShareBuybackFormProvider
+import uk.gov.hmrc.securitiestransferchargefrontend.models.sh03.HowToNotifyAboutShareBuyback
+import uk.gov.hmrc.securitiestransferchargefrontend.models.{NormalMode, UserAnswers}
+import uk.gov.hmrc.securitiestransferchargefrontend.navigation.Navigator
+import uk.gov.hmrc.securitiestransferchargefrontend.pages.sh03.shared.HowToNotifyAboutShareBuybackPage
+import uk.gov.hmrc.securitiestransferchargefrontend.views.html.sh03.agents.HowToNotifyAboutShareBuybackView
+
+import scala.concurrent.Future
+import scala.language.postfixOps
+
+class HowToNotifyAboutShareBuybackControllerSpec extends SpecBase with MockitoSugar {
+
+  def onwardRoute = Call("GET", "/foo")
+
+  lazy val howToNotifyAboutShareBuybackRoute: String = agentRoutes.HowToNotifyAboutShareBuybackController.onPageLoad(NormalMode).url
+
+  val formProvider = new HowToNotifyAboutShareBuybackFormProvider()
+  val form: Form[HowToNotifyAboutShareBuyback] = formProvider()
+
+  "HowToNotifyAboutShareBuyback Controller" - {
+
+    "must return OK and the correct view for a GET" in {
+
+      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers), affinityGroup = agentAffinity)
+        .overrides(bind[Navigator].qualifiedWith("agentsSh03").toInstance(getNavigator))
+        .build()
+
+      running(application) {
+        val request = FakeRequest(GET, howToNotifyAboutShareBuybackRoute)
+
+        val result = route(application, request).value
+
+        val view = application.injector.instanceOf[HowToNotifyAboutShareBuybackView]
+
+        status(result) mustEqual OK
+        contentAsString(result) mustEqual view(form, NormalMode, affinityGroupKeyAgent, testBackLinkRoute)(request, messages(application)).toString
+      }
+    }
+
+    "must populate the view correctly on a GET when the question has previously been answered" in {
+
+      val userAnswers = UserAnswers(testUserId, testGroupIdentifier, submissionId).set(HowToNotifyAboutShareBuybackPage, HowToNotifyAboutShareBuyback.values.head).success.value
+      val application = applicationBuilder(userAnswers = Some(userAnswers))
+        .overrides(bind[Navigator].qualifiedWith("agentsSh03").toInstance(getNavigator))
+        .build()
+
+      running(application) {
+        val request = FakeRequest(GET, howToNotifyAboutShareBuybackRoute)
+
+        val view = application.injector.instanceOf[HowToNotifyAboutShareBuybackView]
+
+        val result = route(application, request).value
+
+        status(result) mustEqual OK
+        contentAsString(result) mustEqual view(form.fill(HowToNotifyAboutShareBuyback.values.head), NormalMode, affinityGroupKeyInd, testBackLinkRoute)(request, messages(application)).toString
+      }
+    }
+
+    "must redirect to the appropriate next page when one at a time is submitted" in {
+      val saveAndReturnClient = mock[SaveAndReturnClient]
+
+      val userAnswers = UserAnswers(testUserId, testGroupIdentifier, submissionId).set(HowToNotifyAboutShareBuybackPage, HowToNotifyAboutShareBuyback.values.head).success.value
+
+
+      val application = applicationBuilder(userAnswers = Some(userAnswers), affinityGroup = agentAffinity, saveAndReturnClient = saveAndReturnClient)
+        .build()
+
+      when(saveAndReturnClient.save(any[UserAnswers]())(any[HeaderCarrier]()))
+        .thenReturn(Future.successful(()))
+
+      running(application) {
+        val request =
+          FakeRequest(POST, howToNotifyAboutShareBuybackRoute)
+            .withFormUrlEncodedBody("value" -> HowToNotifyAboutShareBuyback.values.head.toString)
+
+        val result = route(application, request).value
+
+        status(result) mustEqual SEE_OTHER
+        redirectLocation(result).value mustEqual routes.JourneyRecoveryController.onPageLoad().url
+      }
+    }
+
+    "must redirect to the appropriate next page when more than one at a time is selected" in {
+      val saveAndReturnClient = mock[SaveAndReturnClient]
+      val userAnswers = UserAnswers(testUserId, testGroupIdentifier, submissionId).set(HowToNotifyAboutShareBuybackPage, HowToNotifyAboutShareBuyback.values.last).success.value
+
+
+      val application = applicationBuilder(userAnswers = Some(userAnswers), affinityGroup = agentAffinity, saveAndReturnClient = saveAndReturnClient)
+        .build()
+
+      when(saveAndReturnClient.save(any[UserAnswers]())(any[HeaderCarrier]()))
+        .thenReturn(Future.successful(()))
+
+      running(application) {
+        val request =
+          FakeRequest(POST, howToNotifyAboutShareBuybackRoute)
+            .withFormUrlEncodedBody("value" -> HowToNotifyAboutShareBuyback.values.last.toString)
+
+        val result = route(application, request).value
+
+        status(result) mustEqual SEE_OTHER
+        redirectLocation(result).value mustEqual routes.JourneyRecoveryController.onPageLoad().url
+      }
+    }
+
+    "must return a Bad Request and errors when invalid data is submitted" in {
+      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers), affinityGroup = agentAffinity)
+        .overrides(bind[Navigator].qualifiedWith("agentsSh03").toInstance(getNavigator))
+        .build()
+
+      running(application) {
+        val request =
+          FakeRequest(POST, howToNotifyAboutShareBuybackRoute).withFormUrlEncodedBody(("value", ""))
+
+        val boundForm = form.bind(Map("value" -> ""))
+
+        val view = application.injector.instanceOf[HowToNotifyAboutShareBuybackView]
+
+        val result = route(application, request).value
+
+        status(result) mustEqual BAD_REQUEST
+        contentAsString(result) mustEqual view(boundForm, NormalMode, affinityGroupKeyAgent, testBackLinkRoute)(request, messages(application)).toString
+      }
+    }
+  }
+}
