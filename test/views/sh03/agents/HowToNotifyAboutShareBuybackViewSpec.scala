@@ -42,8 +42,8 @@ class HowToNotifyAboutShareBuybackViewSpec extends ViewBaseSpec {
   )
 
   object ExpectedContent {
-    val title: String = messages("agent.sh03.howToNotifyAboutShareBuyback.title")
-    val heading: String = messages("agent.sh03.howToNotifyAboutShareBuyback.heading")
+    val title: String = messages("agent.sh03.shareBuyback.title")
+    val heading: String = messages("agent.sh03.shareBuyback.heading")
     val continue: String = messages("site.continue")
     val returnLink: String = messages("return-to-dashboard.link")
   }

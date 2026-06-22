@@ -26,6 +26,6 @@ class HowToNotifyAboutShareBuybackFormProvider @Inject() extends Mappings {
 
   def apply(): Form[HowToNotifyAboutShareBuyback] =
     Form(
-      "value" -> enumerable[HowToNotifyAboutShareBuyback]("agent.sh03.howToNotifyAboutShareBuyback.error.required")
+      "value" -> enumerable[HowToNotifyAboutShareBuyback]("agent.sh03.shareBuyback.error.required")
     )
 }

@@ -736,15 +736,15 @@ agent.sh03.treasuryShares.checkYourAnswersLabel = Do these shares also qualify a
 agent.sh03.treasuryShares.change.hidden = Change do these shares also qualify as treasury shares?
 agent.sh03.treasuryShares.error.required = Select yes if these shares also qualify as treasury shares
 
-agent.sh03.howToNotifyAboutShareBuyback.title = How would you like to tell us about this share buyback?
-agent.sh03.howToNotifyAboutShareBuyback.heading = How would you like to tell us about this share buyback?
-agent.sh03.howToNotifyAboutShareBuyback.oneAtATime = One transfer at a time
-agent.sh03.howToNotifyAboutShareBuyback.oneAtATime.hint = Tell us about a purchase of one type of shares, between the business and one seller
-agent.sh03.howToNotifyAboutShareBuyback.moreThanOneAtATime = More than one transfer at a time
-agent.sh03.howToNotifyAboutShareBuyback.moreThanOneAtATime.hint = Tell us about several share purchases at once using our template. You can download the template, complete a row for each purchase, and upload it on the following pages. You can include purchases from different sellers and of different types of shares
-agent.sh03.howToNotifyAboutShareBuyback.checkYourAnswersLabel = How would you like to tell us about this share buyback?
-agent.sh03.howToNotifyAboutShareBuyback.error.required = Select a way to tell us about this share buyback
-agent.sh03.howToNotifyAboutShareBuyback.change.hidden = HowToNotifyAboutShareBuyback
+agent.sh03.shareBuyback.title = How would you like to tell us about this share buyback?
+agent.sh03.shareBuyback.heading = How would you like to tell us about this share buyback?
+agent.sh03.shareBuyback.oneAtATime = One transfer at a time
+agent.sh03.shareBuyback.oneAtATime.hint = Tell us about a purchase of one type of shares, between the business and one seller
+agent.sh03.shareBuyback.moreThanOneAtATime = More than one transfer at a time
+agent.sh03.shareBuyback.moreThanOneAtATime.hint = Tell us about several share purchases at once using our template. You can download the template, complete a row for each purchase, and upload it on the following pages. You can include purchases from different sellers and of different types of shares
+agent.sh03.shareBuyback.checkYourAnswersLabel = How would you like to tell us about this share buyback?
+agent.sh03.shareBuyback.error.required = Select a way to tell us about this share buyback
+agent.sh03.shareBuyback.change.hidden = HowToNotifyAboutShareBuyback
 
 agent.sh03.connectedPersons.title = Connected persons
 agent.sh03.connectedPersons.heading = Connected persons

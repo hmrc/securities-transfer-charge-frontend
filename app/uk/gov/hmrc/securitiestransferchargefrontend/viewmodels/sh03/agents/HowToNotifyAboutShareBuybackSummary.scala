@@ -34,16 +34,16 @@ object HowToNotifyAboutShareBuybackSummary  {
 
         val value = ValueViewModel(
           HtmlContent(
-            HtmlFormat.escape(messages(s"howToNotifyAboutShareBuyback.$answer"))
+            HtmlFormat.escape(messages(s"shareBuyback.$answer"))
           )
         )
 
         SummaryListRowViewModel(
-          key     = "howToNotifyAboutShareBuyback.checkYourAnswersLabel",
+          key     = "agent.sh03.shareBuyback.checkYourAnswersLabel",
           value   = value,
           actions = Seq(
             ActionItemViewModel("site.change", routes.HowToNotifyAboutShareBuybackController.onPageLoad(CheckMode).url)
-              .withVisuallyHiddenText(messages("howToNotifyAboutShareBuyback.change.hidden"))
+              .withVisuallyHiddenText(messages("agent.sh03.shareBuyback.change.hidden"))
           )
         )
     }
