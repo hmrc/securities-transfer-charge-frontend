@@ -1,4 +1,4 @@
-service.name = securities-transfer-charge-frontend
+service.name = Tell us about a security transfer
 
 site.back = Back
 site.remove = Remove
@@ -710,6 +710,8 @@ agent.templateInstructions.p3 = Once you have uploaded and submitted the file, i
 
 bulk.agentReference.hint = You can add a reference for your own records and to help you find this submission later. It will not be used by HMRC
 submission.details.caption = Submission details
+
+sh03.section.name =  Share buyback (SH03)
 
 submissionsDashboard.sh03.button = start sh03
 agent.sh03.beforeYouStart.title = Before you start

@@ -26,7 +26,7 @@
 
 @()(implicit request: Request[_], messages: Messages)
 
-@layout(pageTitle = titleNoForm(messages("agent.sh03.beforeYouStart.title")),backLinkUrl = Some(routes.SubmissionsDashboardController.onPageLoad().url)) {
+@layout(pageTitle = titleNoForm(messages("agent.sh03.beforeYouStart.title"),Some(messages("sh03.section.name"))),backLinkUrl = Some(routes.SubmissionsDashboardController.onPageLoad().url)) {
 
     <h1 class="govuk-heading-l">
         @messages("agent.sh03.beforeYouStart.heading")
