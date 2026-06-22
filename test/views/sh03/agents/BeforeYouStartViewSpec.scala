@@ -14,15 +14,15 @@
  * limitations under the License.
  */
 
-package views.sh03.agents.single
+package views.sh03.agents
 
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
 import play.api.Application
-import uk.gov.hmrc.securitiestransferchargefrontend.views.html.sh03.agents.single.BeforeYouStartView
-import views.ViewBaseSpec
+import uk.gov.hmrc.securitiestransferchargefrontend.controllers.sh03.agents.routes as sh03Routes
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.shared.routes
-import uk.gov.hmrc.securitiestransferchargefrontend.controllers.sh03.agents.single.routes as sh03Routes
+import uk.gov.hmrc.securitiestransferchargefrontend.views.html.sh03.agents.BeforeYouStartView
+import views.ViewBaseSpec
 
 class BeforeYouStartViewSpec extends ViewBaseSpec {
 
