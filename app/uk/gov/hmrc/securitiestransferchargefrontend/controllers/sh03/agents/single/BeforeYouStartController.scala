@@ -16,29 +16,43 @@
 
 package uk.gov.hmrc.securitiestransferchargefrontend.controllers.sh03.agents.single
 
+import play.api.Logging
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
+import uk.gov.hmrc.securitiestransferchargefrontend.clients.SubmissionIdClient
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.actions.*
-import uk.gov.hmrc.securitiestransferchargefrontend.controllers.routes
+import uk.gov.hmrc.securitiestransferchargefrontend.domain.{GroupIdentifier, UserId}
+import uk.gov.hmrc.securitiestransferchargefrontend.models.{NormalMode, UserAnswers}
+import uk.gov.hmrc.securitiestransferchargefrontend.navigation.Navigator
+import uk.gov.hmrc.securitiestransferchargefrontend.pages.sh03.agents.BeforeYouStartPage
 import uk.gov.hmrc.securitiestransferchargefrontend.views.html.sh03.agents.single.BeforeYouStartView
 
-import javax.inject.Inject
+import javax.inject.{Inject, Named}
+import scala.concurrent.ExecutionContext
 
 class BeforeYouStartController @Inject()(
                                           override val messagesApi: MessagesApi,
                                           stcAuthEnrolled: StcAuthEnrolledAction,
                                           val controllerComponents: MessagesControllerComponents,
-                                          view: BeforeYouStartView
-                                        ) extends FrontendBaseController with I18nSupport {
+                                          view: BeforeYouStartView,
+                                          @Named("agentsSh03") navigator: Navigator,
+                                          submissionIdClient: SubmissionIdClient
+                                        ) (implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport with Logging {
 
   def onPageLoad(): Action[AnyContent] = stcAuthEnrolled {
     implicit request =>
       Ok(view())
   }
 
-  def onSubmit(): Action[AnyContent] = stcAuthEnrolled { implicit request =>
-    //Todo -> update to go to the How would you like to tell us about this share buyback page
-    Redirect(routes.JourneyRecoveryController.onPageLoad())
+  def onSubmit(): Action[AnyContent] = stcAuthEnrolled.async { implicit request =>
+    val user = UserId(request.internalId)
+    val group = GroupIdentifier(request.groupIdentifier)
+    for {
+      submission <- submissionIdClient.nextSubmissionId()
+      emptyAnswers = UserAnswers.empty(user)(group)(submission)
+      nextPage <- navigator.nextPage(BeforeYouStartPage, NormalMode, emptyAnswers)
+      _ = logger.info(s"Next page is ${nextPage.url}")
+    } yield Redirect(nextPage)
   }
 }

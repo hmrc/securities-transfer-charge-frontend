@@ -65,28 +65,32 @@
             errorMessage = form("companyRegistrationNumber").error.map(err => ErrorMessage(content = Text(messages(err.message))))
         ))
 
-        @govukRadios(Radios(
-            fieldset = Some(Fieldset(
-                legend = Some(Legend(
-                    content = Text(messages("agent.sh03.companyDetails.isPlc.label")),
-                    classes = "govuk-fieldset__legend--m"
-                ))
-            )),
-            name = "isPlc",
-            items = Seq(
-                RadioItem(
-                    content = Text(messages("site.yes")),
-                    value = Some("true"),
-                    checked = form("isPlc").value.contains("true")
-                ),
-                RadioItem(
-                    content = Text(messages("site.no")),
-                    value = Some("false"),
-                    checked = form("isPlc").value.contains("false")
+        <div class="govuk-form-group @if(form("isPlc").hasErrors){govuk-form-group--error}">
+            <label class="govuk-label" for="isPlc">
+                @messages("agent.sh03.companyDetails.isPlc.label")
+            </label>
+            @if(form("isPlc").hasErrors) {
+                <p class="govuk-error-message">
+                    <span class="govuk-visually-hidden">@messages("error.browser.title.prefix")</span>
+                    @messages(form("isPlc").error.get.message)
+                </p>
+            }
+            @govukRadios(Radios(
+                name = "isPlc",
+                items = Seq(
+                    RadioItem(
+                        content = Text(messages("site.yes")),
+                        value = Some("true"),
+                        checked = form("isPlc").value.contains("true")
+                    ),
+                    RadioItem(
+                        content = Text(messages("site.no")),
+                        value = Some("false"),
+                        checked = form("isPlc").value.contains("false")
+                    )
                 )
-            ),
-            errorMessage = form("isPlc").error.map(err => ErrorMessage(content = Text(messages(err.message))))
-        ))
+            ))
+        </div>
 
         @govukButton(Button(
             content = Text(messages("site.save-and-continue.button"))

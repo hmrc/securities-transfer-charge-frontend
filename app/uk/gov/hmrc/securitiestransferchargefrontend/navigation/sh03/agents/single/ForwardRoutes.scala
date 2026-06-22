@@ -24,6 +24,7 @@ import uk.gov.hmrc.securitiestransferchargefrontend.models.sh03.shared.ReasonFor
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.sh03.agents.single.routes as sh03AgentSingleRoutes
 import uk.gov.hmrc.securitiestransferchargefrontend.navigation.PersistentNavigationHelper
 import uk.gov.hmrc.securitiestransferchargefrontend.pages.Page
+import uk.gov.hmrc.securitiestransferchargefrontend.pages.sh03.agents.BeforeYouStartPage
 import uk.gov.hmrc.securitiestransferchargefrontend.pages.sh03.single.{ReasonForPurchasePage, TreasurySharesPage}
 import uk.gov.hmrc.securitiestransferchargefrontend.services.AnswerPersistenceService
 
@@ -40,6 +41,8 @@ class ForwardRoutes(answerPersistenceService: AnswerPersistenceService,
 
 
   def forwardRoutes(page: Page)(implicit hc: HeaderCarrier): UserAnswers => Future[Call] = page match {
+
+    case BeforeYouStartPage => as => goTo(sh03AgentSingleRoutes.CompanyDetailsController.onPageLoad(NormalMode), Some(as))
 
     case ReasonForPurchasePage => userAnswers => dataDependent(ReasonForPurchasePage, userAnswers) {
       case ReasonForPurchase.ForCancellation  => sh03AgentSingleRoutes.TreasurySharesController.onPageLoad(NormalMode)
