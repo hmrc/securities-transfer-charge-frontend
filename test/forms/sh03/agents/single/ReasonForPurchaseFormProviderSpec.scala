@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package forms
+package forms.sh03.agents.single
 
 import forms.behaviours.OptionFieldBehaviours
 import play.api.data.FormError

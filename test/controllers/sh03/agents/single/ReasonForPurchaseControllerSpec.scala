@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package controllers
+package controllers.sh03.agents.single
 
 import base.SpecBase
 import org.scalatestplus.mockito.MockitoSugar
