@@ -65,9 +65,9 @@ class ApplyingForReliefController @Inject()(
         formWithErrors =>
           Future.successful(BadRequest(view(formWithErrors, mode, backLinkCall(mode)(request.userAnswers)))),
 
-        value =>
+        applyingForRelief =>
           for {
-            updatedAnswers <- Future.fromTry(request.userAnswers.set(ApplyingForReliefPage, value))
+            updatedAnswers <- Future.fromTry(request.userAnswers.set(ApplyingForReliefPage, applyingForRelief))
             nextPage <- navigator.nextPage(ApplyingForReliefPage, mode, updatedAnswers, isReturn(request))
           } yield Redirect(nextPage)
       )

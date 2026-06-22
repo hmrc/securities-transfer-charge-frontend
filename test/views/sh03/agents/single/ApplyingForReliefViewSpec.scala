@@ -68,13 +68,14 @@ class ApplyingForReliefViewSpec extends ViewBaseSpec {
       "have the first paragraph" in {
         doc.select(".govuk-body").first().text() must include(ExpectedContent.paragraph)
       }
+      
       "have the correct radio buttons" in {
         val radios = doc.select(".govuk-radios").text()
 
         radios must include(ExpectedContent.yes)
         radios must include(ExpectedContent.no)
       }
-
+      
       "have a save and continue button" in {
         doc.select(".govuk-button").first().text() mustBe ExpectedContent.saveAndContinue
       }
