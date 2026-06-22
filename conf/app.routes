@@ -314,3 +314,8 @@ POST       /sh03/agent/treasury-shares                       uk.gov.hmrc.securit
 GET        /sh03/agent/treasury-shares                 uk.gov.hmrc.securitiestransferchargefrontend.controllers.sh03.agents.single.TreasurySharesController.onPageLoad(mode: Mode = CheckMode)
 POST       /sh03/agent/treasury-shares                 uk.gov.hmrc.securitiestransferchargefrontend.controllers.sh03.agents.single.TreasurySharesController.onSubmit(mode: Mode = CheckMode)
 
+GET        /sh03/agent/connected-persons                    uk.gov.hmrc.securitiestransferchargefrontend.controllers.sh03.agents.single.ConnectedPersonsController.onPageLoad(mode: Mode = NormalMode)
+POST       /sh03/agent/connected-persons                    uk.gov.hmrc.securitiestransferchargefrontend.controllers.sh03.agents.single.ConnectedPersonsController.onSubmit(mode: Mode = NormalMode)
+GET        /sh03/agent/change/connected-persons             uk.gov.hmrc.securitiestransferchargefrontend.controllers.sh03.agents.single.ConnectedPersonsController.onPageLoad(mode: Mode = CheckMode)
+POST       /sh03/agent/change/connected-persons             uk.gov.hmrc.securitiestransferchargefrontend.controllers.sh03.agents.single.ConnectedPersonsController.onSubmit(mode: Mode = CheckMode)
+
