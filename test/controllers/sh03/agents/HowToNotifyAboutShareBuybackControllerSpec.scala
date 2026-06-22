@@ -25,8 +25,7 @@ import play.api.inject.bind
 import play.api.mvc.Call
 import play.api.test.FakeRequest
 import play.api.test.Helpers.*
-import uk.gov.hmrc.http.HeaderCarrier
-import uk.gov.hmrc.securitiestransferchargefrontend.clients.SaveAndReturnClient
+import uk.gov.hmrc.securitiestransferchargefrontend.clients.SubmissionIdClient
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.routes
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.sh03.agents.routes as agentRoutes
 import uk.gov.hmrc.securitiestransferchargefrontend.forms.sh03.agents.HowToNotifyAboutShareBuybackFormProvider
@@ -88,16 +87,19 @@ class HowToNotifyAboutShareBuybackControllerSpec extends SpecBase with MockitoSu
     }
 
     "must redirect to the appropriate next page when one at a time is submitted" in {
-      val saveAndReturnClient = mock[SaveAndReturnClient]
+      val mockIdClient = mock[SubmissionIdClient]
 
-      val userAnswers = UserAnswers(testUserId, testGroupIdentifier, submissionId).set(HowToNotifyAboutShareBuybackPage, HowToNotifyAboutShareBuyback.values.head).success.value
+      when(mockIdClient.nextSubmissionId()(any()))
+        .thenReturn(Future.successful(submissionId))
 
+      val userAnswers = UserAnswers(testUserId, testGroupIdentifier, submissionId)
+        .set(HowToNotifyAboutShareBuybackPage, HowToNotifyAboutShareBuyback.values.head).success.value
 
-      val application = applicationBuilder(userAnswers = Some(userAnswers), affinityGroup = agentAffinity, saveAndReturnClient = saveAndReturnClient)
+      val application = applicationBuilder(userAnswers = Some(userAnswers), affinityGroup = agentAffinity)
+        .overrides(
+          bind[SubmissionIdClient].toInstance(mockIdClient)
+        )
         .build()
-
-      when(saveAndReturnClient.save(any[UserAnswers]())(any[HeaderCarrier]()))
-        .thenReturn(Future.successful(()))
 
       running(application) {
         val request =
@@ -112,15 +114,19 @@ class HowToNotifyAboutShareBuybackControllerSpec extends SpecBase with MockitoSu
     }
 
     "must redirect to the appropriate next page when more than one at a time is selected" in {
-      val saveAndReturnClient = mock[SaveAndReturnClient]
-      val userAnswers = UserAnswers(testUserId, testGroupIdentifier, submissionId).set(HowToNotifyAboutShareBuybackPage, HowToNotifyAboutShareBuyback.values.last).success.value
+      val mockIdClient = mock[SubmissionIdClient]
 
+      when(mockIdClient.nextSubmissionId()(any()))
+        .thenReturn(Future.successful(submissionId))
 
-      val application = applicationBuilder(userAnswers = Some(userAnswers), affinityGroup = agentAffinity, saveAndReturnClient = saveAndReturnClient)
+      val userAnswers = UserAnswers(testUserId, testGroupIdentifier, submissionId)
+        .set(HowToNotifyAboutShareBuybackPage, HowToNotifyAboutShareBuyback.values.last).success.value
+
+      val application = applicationBuilder(userAnswers = Some(userAnswers), affinityGroup = agentAffinity)
+        .overrides(
+          bind[SubmissionIdClient].toInstance(mockIdClient)
+        )
         .build()
-
-      when(saveAndReturnClient.save(any[UserAnswers]())(any[HeaderCarrier]()))
-        .thenReturn(Future.successful(()))
 
       running(application) {
         val request =
