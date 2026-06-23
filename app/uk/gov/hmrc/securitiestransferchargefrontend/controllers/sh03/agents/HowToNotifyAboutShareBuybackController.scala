@@ -48,23 +48,18 @@ class HowToNotifyAboutShareBuybackController @Inject()(
 
   val form: Form[HowToNotifyAboutShareBuyback] = formProvider()
 
-  lazy val backLinkCall: Mode => UserAnswers => Call =
-    mode => userAnswers => navigator.previousPage(HowToNotifyAboutShareBuybackPage, mode, userAnswers)
+//  lazy val backLinkCall: Mode => UserAnswers => Call =
+//    mode => userAnswers => navigator.previousPage(HowToNotifyAboutShareBuybackPage, mode, userAnswers)
 
-  def onPageLoad(mode: Mode): Action[AnyContent] = (stcAuthEnrolled andThen getData andThen requireData) {
-    implicit request =>
+  def onPageLoad(mode: Mode): Action[AnyContent] = (stcAuthEnrolled andThen getData) {implicit request =>
 
-      val innerRequest = request.request
+    val innerRequest = request.request
 
-      val preparedForm = request.userAnswers.get(HowToNotifyAboutShareBuybackPage) match {
-        case None => form
-        case Some(value) => form.fill(value)
-      }
-
-      Ok(view(preparedForm, mode, innerRequest.affinityGroupKey, backLinkCall(mode)(request.userAnswers)))
+    Ok(view(form, mode, innerRequest.affinityGroupKey))
   }
 
-  def onSubmit(mode: Mode): Action[AnyContent] = (stcAuthEnrolled andThen getData andThen requireData).async {
+
+  def onSubmit(mode: Mode): Action[AnyContent] = (stcAuthEnrolled andThen getData).async {
     implicit request =>
 
       val innerRequest = request.request
@@ -72,16 +67,16 @@ class HowToNotifyAboutShareBuybackController @Inject()(
       val group = GroupIdentifier(innerRequest.groupIdentifier)
 
       form.bindFromRequest().fold(
-        formWithErrors => 
-          Future.successful(BadRequest(view(formWithErrors, mode, innerRequest.affinityGroupKey, backLinkCall(mode)(request.userAnswers)))),
+        formWithErrors =>
+          Future.successful(BadRequest(view(formWithErrors, mode, innerRequest.affinityGroupKey))),
 
         howToNotify =>
           for {
             submissionId <- idClient.nextSubmissionId()
             emptyAnswers = UserAnswers.empty(userId)(group)(submissionId)
             updatedAnswers <- Future.fromTry(emptyAnswers.set(HowToNotifyAboutShareBuybackPage, howToNotify))
-            nextPage    <- navigator.nextPage(HowToNotifyAboutShareBuybackPage, NormalMode, updatedAnswers)
+            nextPage <- navigator.nextPage(HowToNotifyAboutShareBuybackPage, NormalMode, updatedAnswers)
           } yield Redirect(nextPage)
-        )
+      )
   }
 }

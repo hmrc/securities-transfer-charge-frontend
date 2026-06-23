@@ -39,6 +39,6 @@ class BeforeYouStartController @Inject()(
   }
 
   def onSubmit(): Action[AnyContent] = stcAuthEnrolled { implicit request =>
-    Redirect(routes.HowToNotifyAboutShareBuybackController.onPageLoad(NormalMode))
+    Redirect(routes.HowToNotifyAboutShareBuybackController.onPageLoad())
   }
 }
