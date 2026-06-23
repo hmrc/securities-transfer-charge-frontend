@@ -76,7 +76,6 @@ class Sh03AgentNavigatorSpec extends SpecBase with ScalaFutures {
 
       "must go from CompanyDetails to ReasonForPurchasePage" in {
         //TODO
-
       }
 
       "must go from ReasonForPurchase to TreasuryShares when 'For Cancellation' is selected" in {
