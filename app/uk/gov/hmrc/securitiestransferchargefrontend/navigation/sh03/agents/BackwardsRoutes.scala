@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.securitiestransferchargefrontend.navigation.sh03.agents.single
+package uk.gov.hmrc.securitiestransferchargefrontend.navigation.sh03.agents
 
 import play.api.mvc.Call
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.routes
@@ -31,8 +31,7 @@ class BackwardsRoutes(defaultPage: Call):
   val navHelper: NavigationHelper = new NavigationHelper(defaultPage)
 
   import navHelper.*
-
-
+  
   def predecessorRoutes(page: Page): UserAnswers => Call = page match {
     case ReasonForPurchasePage => _ => routes.JourneyRecoveryController.onPageLoad()
     case TreasurySharesPage => _ => sh03AgentSingleRoutes.ReasonForPurchaseController.onPageLoad(NormalMode)

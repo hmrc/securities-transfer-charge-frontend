@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.securitiestransferchargefrontend.navigation.sh03.agents.single
+package uk.gov.hmrc.securitiestransferchargefrontend.navigation.sh03.agents
 
 import play.api.mvc.Call
 import uk.gov.hmrc.http.HeaderCarrier
@@ -49,12 +49,14 @@ class ForwardRoutes(answerPersistenceService: AnswerPersistenceService,
         case MoreThanOneAtATime => defaultPage
       }
     }
+    //TODO
+    //TODO
     case ReasonForPurchasePage => userAnswers => dataDependent(ReasonForPurchasePage, userAnswers) {
       case ReasonForPurchase.ForCancellation  => sh03AgentSingleRoutes.TreasurySharesController.onPageLoad(NormalMode)
       case ReasonForPurchase.ToPlaceIntoTreasury => sh03AgentSingleRoutes.ConnectedPersonsController.onPageLoad(NormalMode)
     }
-    case TreasurySharesPage => userAnswers => dataRequired(TreasurySharesPage, userAnswers,sh03AgentSingleRoutes.ConnectedPersonsController.onPageLoad(NormalMode))
-    case ConnectedPersonsPage  => userAnswers => dataRequired(ConnectedPersonsPage, userAnswers,sh03AgentSingleRoutes.ApplyingForReliefController.onPageLoad(NormalMode))
+    case TreasurySharesPage => userAnswers => dataRequired(TreasurySharesPage, userAnswers, sh03AgentSingleRoutes.ConnectedPersonsController.onPageLoad(NormalMode))
+    case ConnectedPersonsPage  => userAnswers => dataRequired(ConnectedPersonsPage, userAnswers, sh03AgentSingleRoutes.ApplyingForReliefController.onPageLoad(NormalMode))
     case ApplyingForReliefPage  => userAnswers =>  goTo(routes.JourneyRecoveryController.onPageLoad(),Some(userAnswers))
 
     case _ => _ => Future.successful(defaultPage)
