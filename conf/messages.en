@@ -81,9 +81,7 @@ individual.howToNotifyAboutSecuritiesTransfer.oneAtATime = One at a time
 individual.howToNotifyAboutSecuritiesTransfer.oneAtATime.hint = Each transfer must be between you and one seller, and can include one kind of security or type of shares.
 individual.howToNotifyAboutSecuritiesTransfer.moreThanOneAtATime = More than one at a time
 individual.howToNotifyAboutSecuritiesTransfer.moreThanOneAtATime.hint = Download the template, complete it using one row per transfer, and upload it on the following pages. You can then find the submission on your dashboard and pay the money owed.
-individual.howToNotifyAboutSecuritiesTransfer.checkYourAnswersLabel = How do you want to tell us about your securities transfers?
 individual.howToNotifyAboutSecuritiesTransfer.error.required = Select a way to tell us about your securities transfer
-individual.howToNotifyAboutSecuritiesTransfer.change.hidden = HowToNotifyAboutSecuritiesTransfer
 
 nameOfSeller.title = What’s the seller’s name?
 nameOfSeller.heading = What’s the seller’s name?
@@ -265,9 +263,7 @@ org.howToNotifyAboutSecuritiesTransfer.oneAtATime = One at a time
 org.howToNotifyAboutSecuritiesTransfer.oneAtATime.hint = Each transfer can have one seller, and can include one type of security or type of shares.
 org.howToNotifyAboutSecuritiesTransfer.moreThanOneAtATime = More than one at a time
 org.howToNotifyAboutSecuritiesTransfer.moreThanOneAtATime.hint = Download the template, complete it using one row per transfer, and upload it on the following pages. You can then find the submission on your dashboard and pay the charges due.
-org.howToNotifyAboutSecuritiesTransfer.checkYourAnswersLabel = How do you want to tell us about your securities transfers?
 org.howToNotifyAboutSecuritiesTransfer.error.required = Select a way to tell us about these securities transfers
-org.howToNotifyAboutSecuritiesTransfer.change.hidden = HowToNotifyAboutSecuritiesTransfer
 
 org.connectedPersons.error.required = Select yes if the business and the seller are ‘connected persons’
 org.connectedPersons.p = We need to know if the business buying the securities and the seller are ‘connected persons’, according to
@@ -428,9 +424,7 @@ agent.howToNotifyAboutSecuritiesTransfer.oneAtATime = One at a time
 agent.howToNotifyAboutSecuritiesTransfer.oneAtATime.hint = Each transfer must be between one buyer and one seller, and can include one kind of security or type of shares.
 agent.howToNotifyAboutSecuritiesTransfer.moreThanOneAtATime = More than one at a time
 agent.howToNotifyAboutSecuritiesTransfer.moreThanOneAtATime.hint = Download the template, complete it using one row per transfer, and upload it on the following pages. Once submitted it will take up to an hour to process. You can then find the submission on your dashboard and pay the charges due.
-agent.howToNotifyAboutSecuritiesTransfer.checkYourAnswersLabel = How would you like to tell us about these securities transfers?
 agent.howToNotifyAboutSecuritiesTransfer.error.required = Select a way to tell us about your securities transfers
-agent.howToNotifyAboutSecuritiesTransfer.change.hidden = HowToNotifyAboutSecuritiesTransfer
 
 agent.nameOfSeller.title = What’s the seller’s name?
 agent.nameOfSeller.heading = What’s the seller’s name?
