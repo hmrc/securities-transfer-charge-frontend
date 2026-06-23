@@ -48,6 +48,8 @@ class ConnectedPersonsViewSpec extends ViewBaseSpec {
     val paraLinkText: String = messages("agent.sh03.connectedPersons.content.link.text")
     val saveAndContinue: String = messages("site.save-and-continue.button")
     val saveAndReturn: String = messages("site.save-and-return.button")
+    val yes: String = messages("site.yes")
+    val no: String = messages("site.no")
   }
 
   "The ConnectedPersonsView" - {
@@ -71,6 +73,13 @@ class ConnectedPersonsViewSpec extends ViewBaseSpec {
 
       "have the correct legend" in {
         connectedPersonsView.select(".govuk-fieldset").text() must include(ExpectedContent.legend)
+      }
+
+      "have the correct radio buttons" in {
+        val radios = connectedPersonsView.select(".govuk-radios").text()
+
+        radios must include(ExpectedContent.yes)
+        radios must include(ExpectedContent.no)
       }
 
       "have a save and continue button" in {

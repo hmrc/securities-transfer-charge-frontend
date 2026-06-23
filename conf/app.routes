@@ -312,3 +312,8 @@ POST       /sh03/agent/connected-persons                    uk.gov.hmrc.securiti
 GET        /sh03/agent/change/connected-persons             uk.gov.hmrc.securitiestransferchargefrontend.controllers.sh03.agents.single.ConnectedPersonsController.onPageLoad(mode: Mode = CheckMode)
 POST       /sh03/agent/change/connected-persons             uk.gov.hmrc.securitiestransferchargefrontend.controllers.sh03.agents.single.ConnectedPersonsController.onSubmit(mode: Mode = CheckMode)
 
+GET        /sh03/agent/apply-relief                               uk.gov.hmrc.securitiestransferchargefrontend.controllers.sh03.agents.single.ApplyingForReliefController.onPageLoad(mode: Mode = NormalMode)
+POST       /sh03/agent/apply-relief                               uk.gov.hmrc.securitiestransferchargefrontend.controllers.sh03.agents.single.ApplyingForReliefController.onSubmit(mode: Mode = NormalMode)
+GET        /sh03/agent/change/apply-relief                        uk.gov.hmrc.securitiestransferchargefrontend.controllers.sh03.agents.single.ApplyingForReliefController.onPageLoad(mode: Mode = CheckMode)
+POST       /sh03/agent/change/apply-relief                        uk.gov.hmrc.securitiestransferchargefrontend.controllers.sh03.agents.single.ApplyingForReliefController.onSubmit(mode: Mode = CheckMode)
+
