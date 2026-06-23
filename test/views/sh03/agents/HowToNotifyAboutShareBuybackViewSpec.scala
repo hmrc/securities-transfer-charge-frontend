@@ -38,12 +38,14 @@ class HowToNotifyAboutShareBuybackViewSpec extends ViewBaseSpec {
   private val testBackLinkRoute: Call = Call("GET", "/back-link")
 
   def view(): Document = Jsoup.parse(
-    viewInstance(form, NormalMode, affinityGroupKeyInd, testBackLinkRoute)(fakeRequest, messages).body
+    viewInstance(form, NormalMode, affinityGroupKeyAgent, testBackLinkRoute)(fakeRequest, messages).body
   )
 
   object ExpectedContent {
     val title: String = messages("agent.sh03.shareBuyback.title")
     val heading: String = messages("agent.sh03.shareBuyback.heading")
+    val oneAtATime: String = messages("agent.sh03.shareBuyback.oneAtATime")
+    val moreThanOneAtATime: String = messages("agent.sh03.shareBuyback.moreThanOneAtATime")
     val continue: String = messages("site.continue")
     val returnLink: String = messages("return-to-dashboard.link")
   }
@@ -58,6 +60,13 @@ class HowToNotifyAboutShareBuybackViewSpec extends ViewBaseSpec {
 
       "have the correct heading" in {
         howToNotifyAboutShareBuybackView.select("h1").text() mustBe ExpectedContent.heading
+      }
+
+      "have the correct radio buttons" in {
+        val radios = howToNotifyAboutShareBuybackView.select(".govuk-radios").text()
+
+        radios must include(ExpectedContent.oneAtATime)
+        radios must include(ExpectedContent.moreThanOneAtATime)
       }
 
       "have a continue button" in {

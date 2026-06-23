@@ -28,7 +28,7 @@ class HowToNotifyAboutShareBuybackFormProviderSpec extends OptionFieldBehaviours
   ".value" - {
 
     val fieldName = "value"
-    val requiredKey = "agent.sh03.howToNotifyAboutShareBuyback.error.required"
+    val requiredKey = "agent.sh03.shareBuyback.error.required"
 
     behave like optionsField[HowToNotifyAboutShareBuyback](
       form,

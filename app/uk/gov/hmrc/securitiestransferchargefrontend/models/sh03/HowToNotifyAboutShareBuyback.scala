@@ -37,11 +37,11 @@ object HowToNotifyAboutShareBuyback extends Enumerable.Implicits {
     values.zipWithIndex.map {
       case (value, index) =>
         RadioItem(
-          content = Text(messages(s"$affinityGroupKey.sh03.howToNotifyAboutShareBuyback.${value.toString}")),
+          content = Text(messages(s"$affinityGroupKey.sh03.shareBuyback.${value.toString}")),
           value   = Some(value.toString),
           id      = Some(s"value_$index"),
           hint = Some(
-            Hint(content = Text(messages(s"$affinityGroupKey.sh03.howToNotifyAboutShareBuyback.${value.toString}.hint")))
+            Hint(content = Text(messages(s"$affinityGroupKey.sh03.shareBuyback.${value.toString}.hint")))
           )
         )
     }
