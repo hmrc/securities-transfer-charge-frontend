@@ -18,6 +18,7 @@
 @import uk.gov.hmrc.securitiestransferchargefrontend.views.html.templates.Layout
 @import uk.gov.hmrc.securitiestransferchargefrontend.controllers.sh03.agents.single.routes
 @import uk.gov.hmrc.securitiestransferchargefrontend.views.html.components.SaveAndReturnButton
+@import uk.gov.hmrc.securitiestransferchargefrontend.viewmodels.InputWidth._
 
 @this(
     layout: Layout,
@@ -41,60 +42,32 @@
 
         <h1 class="govuk-heading-l">@messages("agent.sh03.companyDetails.heading")</h1>
 
-        @govukInput(Input(
-            id = "companyName",
-            name = "companyName",
-            label = Label(
-                content = Text(messages("agent.sh03.companyDetails.companyName.label"))
-            ),
-            value = form("companyName").value,
-            errorMessage = form("companyName").error.map(err => ErrorMessage(content = Text(messages(err.message))))
-        ))
+        @govukInput(
+            InputViewModel(
+                field = form("companyName"),
+                label = LabelViewModel(messages("agent.sh03.companyDetails.companyName.label"))
+            )
+        )
 
-        @govukInput(Input(
-            id = "companyRegistrationNumber",
-            name = "companyRegistrationNumber",
-            label = Label(
-                content = Text(messages("agent.sh03.companyDetails.crn.label"))
-            ),
-            hint = Some(Hint(
-                content = Text(messages("agent.sh03.companyDetails.crn.hint"))
-            )),
-            classes = "govuk-input--width-10",
-            value = form("companyRegistrationNumber").value,
-            errorMessage = form("companyRegistrationNumber").error.map(err => ErrorMessage(content = Text(messages(err.message))))
-        ))
+        @govukInput(
+            InputViewModel(
+                field = form("companyRegistrationNumber"),
+                label = LabelViewModel(messages("agent.sh03.companyDetails.crn.label"))
+            )
+            .withHint(HintViewModel(messages("agent.sh03.companyDetails.crn.hint")))
+            .withWidth(Fixed10)
+        )
 
-        <div class="govuk-form-group @if(form("isPlc").hasErrors){ govuk-form-group--error}">
-            <label class="govuk-label" for="isPlc">
-                @messages("agent.sh03.companyDetails.isPlc.label")
-            </label>
-            @if(form("isPlc").hasErrors) {
-                <p class="govuk-error-message">
-                    <span class="govuk-visually-hidden">@messages("error.browser.title.prefix")</span>
-                    @messages(form("isPlc").error.get.message)
-                </p>
-            }
-            @govukRadios(Radios(
-                name = "isPlc",
-                items = Seq(
-                    RadioItem(
-                        content = Text(messages("site.yes")),
-                        value = Some("true"),
-                        checked = form("isPlc").value.contains("true")
-                    ),
-                    RadioItem(
-                        content = Text(messages("site.no")),
-                        value = Some("false"),
-                        checked = form("isPlc").value.contains("false")
-                    )
-                )
-            ))
-        </div>
+        @govukRadios(
+            RadiosViewModel.yesNo(
+                field = form("isPlc"),
+                legend = LegendViewModel(messages("agent.sh03.companyDetails.isPlc.label"))
+            )
+        )
 
-        @govukButton(Button(
-            content = Text(messages("site.save-and-continue.button"))
-        ))
+        @govukButton(
+            ButtonViewModel(messages("site.save-and-continue.button"))
+        )
 
         @saveAndReturnButton()
     }
