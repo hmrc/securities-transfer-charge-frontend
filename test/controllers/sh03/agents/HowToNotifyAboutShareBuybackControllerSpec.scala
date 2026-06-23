@@ -38,7 +38,7 @@ import scala.language.postfixOps
 
 class HowToNotifyAboutShareBuybackControllerSpec extends SpecBase with MockitoSugar {
 
-  lazy val howToNotifyAboutShareBuybackRoute: String = agentRoutes.HowToNotifyAboutShareBuybackController.onPageLoad(NormalMode).url
+  lazy val howToNotifyAboutShareBuybackRoute: String = agentRoutes.HowToNotifyAboutShareBuybackController.onPageLoad().url
 
   val formProvider = new HowToNotifyAboutShareBuybackFormProvider()
   val form: Form[HowToNotifyAboutShareBuyback] = formProvider()
@@ -59,7 +59,7 @@ class HowToNotifyAboutShareBuybackControllerSpec extends SpecBase with MockitoSu
         val view = application.injector.instanceOf[HowToNotifyAboutShareBuybackView]
 
         status(result) mustEqual OK
-        contentAsString(result) mustEqual view(form, NormalMode, affinityGroupKeyAgent, testBackLinkRoute)(request, messages(application)).toString
+        contentAsString(result) mustEqual view(form, NormalMode, affinityGroupKeyAgent)(request, messages(application)).toString
       }
     }
 
@@ -78,7 +78,7 @@ class HowToNotifyAboutShareBuybackControllerSpec extends SpecBase with MockitoSu
         val result = route(application, request).value
 
         status(result) mustEqual OK
-        contentAsString(result) mustEqual view(form.fill(HowToNotifyAboutShareBuyback.values.head), NormalMode, affinityGroupKeyInd, testBackLinkRoute)(request, messages(application)).toString
+        contentAsString(result) mustEqual view(form.fill(HowToNotifyAboutShareBuyback.values.head), NormalMode, affinityGroupKeyInd)(request, messages(application)).toString
       }
     }
 
@@ -158,7 +158,7 @@ class HowToNotifyAboutShareBuybackControllerSpec extends SpecBase with MockitoSu
         val result = route(application, request).value
 
         status(result) mustEqual BAD_REQUEST
-        contentAsString(result) mustEqual view(boundForm, NormalMode, affinityGroupKeyAgent, testBackLinkRoute)(request, messages(application)).toString
+        contentAsString(result) mustEqual view(boundForm, NormalMode, affinityGroupKeyAgent)(request, messages(application)).toString
       }
     }
   }

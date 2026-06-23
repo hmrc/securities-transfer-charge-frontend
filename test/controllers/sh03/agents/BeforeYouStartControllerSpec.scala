@@ -20,7 +20,6 @@ import base.SpecBase
 import play.api.test.FakeRequest
 import play.api.test.Helpers.*
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.sh03.agents.routes as agentSH03Route
-import uk.gov.hmrc.securitiestransferchargefrontend.models.NormalMode
 import uk.gov.hmrc.securitiestransferchargefrontend.views.html.sh03.agents.BeforeYouStartView
 
 class BeforeYouStartControllerSpec extends SpecBase {
@@ -52,7 +51,6 @@ class BeforeYouStartControllerSpec extends SpecBase {
       }
     }
 
-    //Todo test once next page is in
     "must redirect to the journey recovery page on submit" in {
 
       val application =
@@ -68,7 +66,7 @@ class BeforeYouStartControllerSpec extends SpecBase {
         val result = route(application, request).value
 
         status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual agentSH03Route.HowToNotifyAboutShareBuybackController.onPageLoad(NormalMode).url
+        redirectLocation(result).value mustEqual agentSH03Route.HowToNotifyAboutShareBuybackController.onPageLoad().url
       }
     }
   }

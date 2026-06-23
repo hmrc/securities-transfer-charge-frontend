@@ -41,7 +41,7 @@ import scala.concurrent.Future
 
 class HowToNotifyAboutSecuritiesTransferControllerSpec extends SpecBase {
 
-  lazy val howToNotifyAboutSecuritiesTransferRoute: String = orgRoutes.HowToNotifyAboutSecuritiesTransferController.onPageLoad(NormalMode).url
+  lazy val howToNotifyAboutSecuritiesTransferRoute: String = orgRoutes.HowToNotifyAboutSecuritiesTransferController.onPageLoad().url
 
   val formProvider = new HowToNotifyAboutSecuritiesTransferFormProvider()
   val form: Form[HowToNotifyAboutSecuritiesTransfer] = formProvider()

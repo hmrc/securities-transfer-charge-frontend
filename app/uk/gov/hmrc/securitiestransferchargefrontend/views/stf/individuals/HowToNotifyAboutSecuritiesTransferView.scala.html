@@ -36,7 +36,7 @@
         @messages("transfer.details.caption")
     </div>
 
-    @formHelper(action = individualsRoutes.HowToNotifyAboutSecuritiesTransferController.onSubmit(mode), Symbol("autoComplete") -> "off") {
+    @formHelper(action = individualsRoutes.HowToNotifyAboutSecuritiesTransferController.onSubmit(), Symbol("autoComplete") -> "off") {
 
         @if(form.errors.nonEmpty) {
             @govukErrorSummary(ErrorSummaryViewModel(form,  errorLinkOverrides = Map("value" -> "value_0")))

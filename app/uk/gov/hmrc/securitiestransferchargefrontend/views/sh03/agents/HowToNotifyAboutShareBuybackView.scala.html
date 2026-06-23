@@ -30,9 +30,9 @@
 
 @(form: Form[_], mode: Mode, affinityGroupKey: String)(implicit request: Request[_], messages: Messages)
 
-@layout(pageTitle = title(form, messages("agent.sh03.howToNotifyAboutShareBuyback.title")), backLinkUrl = Some(agentsRoutes.BeforeYouStartController.onPageLoad().url)) {
+@layout(pageTitle = title(form, messages("agent.sh03.shareBuyback.title"), Some(messages("sh03.section.name"))), backLinkUrl = Some(agentsRoutes.BeforeYouStartController.onPageLoad().url)) {
 
-    @formHelper(action = agentsRoutes.HowToNotifyAboutShareBuybackController.onSubmit(mode), Symbol("autoComplete") -> "off") {
+    @formHelper(action = agentsRoutes.HowToNotifyAboutShareBuybackController.onSubmit(), Symbol("autoComplete") -> "off") {
 
         @if(form.errors.nonEmpty) {
             @govukErrorSummary(ErrorSummaryViewModel(form,  errorLinkOverrides = Map("value" -> "value_0")))

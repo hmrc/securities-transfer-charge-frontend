@@ -74,7 +74,7 @@ class StfAgentNavigatorSpec extends SpecBase with ScalaFutures {
       "must go from SubmissionsDashboardPage to HowToNotifyAboutSecuritiesTransferController" in {
         val result = navigator.nextPage(SubmissionsDashboardPage, NormalMode, emptyUserAnswers)(fakeRequest)
         whenReady(result) { res =>
-          res mustBe agentRoutes.HowToNotifyAboutSecuritiesTransferController.onPageLoad(NormalMode)
+          res mustBe agentRoutes.HowToNotifyAboutSecuritiesTransferController.onPageLoad()
         }
       }
 
@@ -297,7 +297,7 @@ class StfAgentNavigatorSpec extends SpecBase with ScalaFutures {
       "must go from the AgentReferencePage to HowToNotifyAboutSecuritiesTransferPage if it is in single journey" in {
         val answers = emptyUserAnswers.set(HowToNotifyAboutSecuritiesTransferPage, HowToNotifyAboutSecuritiesTransfer.OneAtATime).get
         val result = navigator.previousPage(AgentReferencePage, NormalMode, answers)
-        result mustBe agentRoutes.HowToNotifyAboutSecuritiesTransferController.onPageLoad(NormalMode)
+        result mustBe agentRoutes.HowToNotifyAboutSecuritiesTransferController.onPageLoad()
       }
       "must go from the AgentReferencePage to HowToNotifyAboutSecuritiesTransferPage if it is in bulk journey" in {
         val answers = emptyUserAnswers.set(HowToNotifyAboutSecuritiesTransferPage, HowToNotifyAboutSecuritiesTransfer.MoreThanOneAtATime).get

@@ -19,7 +19,6 @@ package views.sh03.agents
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
 import play.api.Application
-import play.api.mvc.Call
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.shared.routes
 import uk.gov.hmrc.securitiestransferchargefrontend.forms.sh03.agents.HowToNotifyAboutShareBuybackFormProvider
 import uk.gov.hmrc.securitiestransferchargefrontend.models.NormalMode
@@ -35,10 +34,9 @@ class HowToNotifyAboutShareBuybackViewSpec extends ViewBaseSpec {
   private val viewInstance = app.injector.instanceOf[HowToNotifyAboutShareBuybackView]
   private val formProvider = new HowToNotifyAboutShareBuybackFormProvider()
   private val form = formProvider()
-  private val testBackLinkRoute: Call = Call("GET", "/back-link")
 
   def view(): Document = Jsoup.parse(
-    viewInstance(form, NormalMode, affinityGroupKeyAgent, testBackLinkRoute)(fakeRequest, messages).body
+    viewInstance(form, NormalMode, affinityGroupKeyAgent)(fakeRequest, messages).body
   )
 
   object ExpectedContent {

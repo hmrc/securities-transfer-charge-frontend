@@ -37,7 +37,7 @@ class BackwardsRoutes(defaultPage: Call):
 
     case HowToNotifyAboutSecuritiesTransferPage => _ => sharedRoutes.SubmissionsDashboardController.onPageLoad()
     case AgentReferencePage => userAnswers => dataDependent(HowToNotifyAboutSecuritiesTransferPage, userAnswers) {
-        case OneAtATime => agentRoutes.HowToNotifyAboutSecuritiesTransferController.onPageLoad(NormalMode)
+        case OneAtATime => agentRoutes.HowToNotifyAboutSecuritiesTransferController.onPageLoad()
         case MoreThanOneAtATime => bulkSharedRoutes.FileUploadController.onPageLoad()
     }
     case NameOfBuyerPage => _ => agentSingleRoutes.AgentReferenceController.onPageLoad(NormalMode)
