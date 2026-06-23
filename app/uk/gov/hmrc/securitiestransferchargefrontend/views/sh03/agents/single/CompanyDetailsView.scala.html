@@ -31,7 +31,7 @@
 
 @(form: Form[CompanyDetails], mode: Mode)(implicit request: Request[_], messages: Messages)
 
-@layout(pageTitle = title(form, messages("agent.sh03.companyDetails.title"))) {
+@layout(pageTitle = title(form, messages("agent.sh03.companyDetails.title"), Some(messages("sh03.section.name")))) {
 
     @formHelper(action = routes.CompanyDetailsController.onSubmit(mode)) {
 
@@ -65,7 +65,7 @@
             errorMessage = form("companyRegistrationNumber").error.map(err => ErrorMessage(content = Text(messages(err.message))))
         ))
 
-        <div class="govuk-form-group @if(form("isPlc").hasErrors){govuk-form-group--error}">
+        <div class="govuk-form-group @if(form("isPlc").hasErrors){ govuk-form-group--error}">
             <label class="govuk-label" for="isPlc">
                 @messages("agent.sh03.companyDetails.isPlc.label")
             </label>
