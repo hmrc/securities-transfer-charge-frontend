@@ -14,14 +14,12 @@
  * limitations under the License.
  *@
 
-@import play.twirl.api.StringInterpolation
-@import uk.gov.hmrc.securitiestransferchargefrontend.views.html.components.SaveAndReturnButton
+@import uk.gov.hmrc.securitiestransferchargefrontend.viewmodels.LegendSize.Large
 @import uk.gov.hmrc.securitiestransferchargefrontend.controllers.sh03.agents.single.routes
-@import uk.gov.hmrc.securitiestransferchargefrontend.views.html.templates
-@import uk.gov.hmrc.securitiestransferchargefrontend.viewmodels.LegendSize.Medium
 @import uk.gov.hmrc.hmrcfrontend.views.html.helpers.HmrcNewTabLinkHelper
 @import uk.gov.hmrc.hmrcfrontend.views.viewmodels.newtablinkhelper.NewTabLinkHelper
-@import uk.gov.hmrc.securitiestransferchargefrontend.config.FrontendAppConfig
+@import uk.gov.hmrc.securitiestransferchargefrontend.views.html.components.SaveAndReturnButton
+@import uk.gov.hmrc.securitiestransferchargefrontend.views.html.templates
 
 @this(
     layout: templates.Layout,
@@ -30,47 +28,33 @@
     govukRadios: GovukRadios,
     govukButton: GovukButton,
     hmrcNewTabLinkHelper: HmrcNewTabLinkHelper,
-    config: FrontendAppConfig,
-    govukDetails: GovukDetails,
     saveAndReturnButton:SaveAndReturnButton
 )
 
 @(form: Form[_], mode: Mode, backLinkCall: Call)(implicit request: Request[_], messages: Messages)
 
 @link = @{hmrcNewTabLinkHelper(NewTabLinkHelper(
-        text = messages("agent.sh03.connectedPersons.content.link.text"),
-        href = Some(config.connectedPersonsInformationUrl)
-    ))
-}
+    text = messages("agent.sh03.applyingForRelief.details.content.link.text")
+)) }
 
-@layout(pageTitle = title(form, messages("agent.sh03.connectedPersons.title"),Some(messages("sh03.section.name"))), backLinkUrl = Some(backLinkCall.url)) {
+@layout(pageTitle = title(form, messages("agent.sh03.applyingForRelief.title"),Some(messages("sh03.section.name"))), backLinkUrl = Some(backLinkCall.url)) {
 
-    @formHelper(action = routes.ConnectedPersonsController.onSubmit(mode), Symbol("autoComplete") -> "off") {
+    @formHelper(action = routes.ApplyingForReliefController.onSubmit(mode), Symbol("autoComplete") -> "off") {
 
         @if(form.errors.nonEmpty) {
             @govukErrorSummary(ErrorSummaryViewModel(form))
         }
 
-        <h1 class="govuk-heading-l">
-            @messages("agent.sh03.connectedPersons.heading")
-        </h1>
-
-        <p class="govuk-body">@messages("agent.sh03.connectedPersons.p") @link.</p>
-
-        <br><br>
-
         @govukRadios(
             RadiosViewModel.yesNo(
                 field = form("value"),
-                legend = LegendViewModel(messages("agent.sh03.connectedPersons.legend")).asPageHeading(Medium)
-            )
+                legend = LegendViewModel(messages("agent.sh03.applyingForRelief.heading")).asPageHeading(Large)
+            ).withHint(Hint(content = HtmlContent(
+        HtmlFormat.raw(s"""
+        <p class="govuk-body">${messages("agent.sh03.applyingForRelief.p")} $link</p>
+        """))))
         )
-
-        @govukButton(
-            ButtonViewModel(
-                messages("site.save-and-continue.button")
-            )
-        )
+        @govukButton(ButtonViewModel(messages("site.save-and-continue.button")))
 
         @saveAndReturnButton()
     }
