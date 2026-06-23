@@ -59,8 +59,12 @@
         )
 
         @govukRadios(
-            RadiosViewModel.yesNo(
+            RadiosViewModel(
                 field = form("isPlc"),
+                items = Seq(
+                    RadioItem(content = Text(messages("site.yes")), value = Some("true")),
+                    RadioItem(content = Text(messages("site.no")), value = Some("false"))
+                ),
                 legend = LegendViewModel(messages("agent.sh03.companyDetails.isPlc.label"))
             )
         )
