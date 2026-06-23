@@ -43,8 +43,6 @@ class ForwardRoutes(answerPersistenceService: AnswerPersistenceService,
 
   def forwardRoutes(page: Page)(implicit hc: HeaderCarrier): UserAnswers => Future[Call] = page match {
 
-    case BeforeYouStartPage => as => goTo(sh03AgentSingleRoutes.CompanyDetailsController.onPageLoad(NormalMode), Some(as))
-
     case ReasonForPurchasePage => userAnswers => dataDependent(ReasonForPurchasePage, userAnswers) {
       case ReasonForPurchase.ForCancellation  => sh03AgentSingleRoutes.TreasurySharesController.onPageLoad(NormalMode)
       case ReasonForPurchase.ToPlaceIntoTreasury => sh03AgentSingleRoutes.ConnectedPersonsController.onPageLoad(NormalMode)
