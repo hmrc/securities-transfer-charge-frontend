@@ -26,7 +26,7 @@ import play.api.mvc.Call
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.routes
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.individuals.routes as individualsRoutes
-import uk.gov.hmrc.securitiestransferchargefrontend.models.{NormalMode, UserAnswers}
+import uk.gov.hmrc.securitiestransferchargefrontend.models.UserAnswers
 import uk.gov.hmrc.securitiestransferchargefrontend.pages.*
 import uk.gov.hmrc.securitiestransferchargefrontend.queries.*
 import uk.gov.hmrc.securitiestransferchargefrontend.services.AnswerPersistenceService
@@ -40,7 +40,7 @@ class PersistentNavigationHelperSpec extends SpecBase with MockitoSugar with Sca
   private val emptyUserAnswers = UserAnswers.empty(testUserId)(testGroupIdentifier)(submissionId)
   private val userAnswers = emptyUserAnswers.set(testPage, true).get
   private val errorCall = routes.JourneyRecoveryController.onPageLoad()
-  private val testCall = individualsRoutes.HowToNotifyAboutSecuritiesTransferController.onPageLoad(NormalMode)
+  private val testCall = individualsRoutes.HowToNotifyAboutSecuritiesTransferController.onPageLoad()
   
   private val mockAnswerPersistenceService = mock[AnswerPersistenceService]
   when(mockAnswerPersistenceService.save(any[UserAnswers])(any[HeaderCarrier]))

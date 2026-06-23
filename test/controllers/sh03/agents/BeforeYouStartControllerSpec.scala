@@ -14,22 +14,18 @@
  * limitations under the License.
  */
 
-package controllers.sh03.agents.single
-
+package controllers.sh03.agents
 
 import base.SpecBase
 import play.api.test.FakeRequest
 import play.api.test.Helpers.*
-import uk.gov.hmrc.securitiestransferchargefrontend.controllers.sh03.agents.single.routes
-import uk.gov.hmrc.securitiestransferchargefrontend.controllers.routes.JourneyRecoveryController
-
-import uk.gov.hmrc.securitiestransferchargefrontend.views.html.sh03.agents.single.BeforeYouStartView
+import uk.gov.hmrc.securitiestransferchargefrontend.controllers.sh03.agents.routes as agentSH03Route
+import uk.gov.hmrc.securitiestransferchargefrontend.views.html.sh03.agents.BeforeYouStartView
 
 class BeforeYouStartControllerSpec extends SpecBase {
 
-  private lazy val onPageLoadRoute = routes.BeforeYouStartController.onPageLoad().url
-
-  private lazy val onSubmitRoute = routes.BeforeYouStartController.onSubmit().url
+  private lazy val onPageLoadRoute = agentSH03Route.BeforeYouStartController.onPageLoad().url
+  private lazy val onSubmitRoute = agentSH03Route.BeforeYouStartController.onSubmit().url
 
   "BeforeYouStartController" - {
 
@@ -55,7 +51,6 @@ class BeforeYouStartControllerSpec extends SpecBase {
       }
     }
 
-    //Todo test once next page is in
     "must redirect to the journey recovery page on submit" in {
 
       val application =
@@ -71,7 +66,7 @@ class BeforeYouStartControllerSpec extends SpecBase {
         val result = route(application, request).value
 
         status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual JourneyRecoveryController.onPageLoad().url
+        redirectLocation(result).value mustEqual agentSH03Route.HowToNotifyAboutShareBuybackController.onPageLoad().url
       }
     }
   }

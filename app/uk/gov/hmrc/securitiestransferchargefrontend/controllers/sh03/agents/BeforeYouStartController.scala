@@ -14,14 +14,14 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.securitiestransferchargefrontend.controllers.sh03.agents.single
+package uk.gov.hmrc.securitiestransferchargefrontend.controllers.sh03.agents
 
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.actions.*
-import uk.gov.hmrc.securitiestransferchargefrontend.controllers.routes
-import uk.gov.hmrc.securitiestransferchargefrontend.views.html.sh03.agents.single.BeforeYouStartView
+import uk.gov.hmrc.securitiestransferchargefrontend.controllers.sh03.agents.routes
+import uk.gov.hmrc.securitiestransferchargefrontend.views.html.sh03.agents.BeforeYouStartView
 
 import javax.inject.Inject
 
@@ -38,7 +38,6 @@ class BeforeYouStartController @Inject()(
   }
 
   def onSubmit(): Action[AnyContent] = stcAuthEnrolled { implicit request =>
-    //Todo -> update to go to the How would you like to tell us about this share buyback page
-    Redirect(routes.JourneyRecoveryController.onPageLoad())
+    Redirect(routes.HowToNotifyAboutShareBuybackController.onPageLoad())
   }
 }

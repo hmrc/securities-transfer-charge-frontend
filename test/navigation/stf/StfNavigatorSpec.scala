@@ -68,7 +68,7 @@ class StfNavigatorSpec extends SpecBase with ScalaFutures {
       "must go from SubmissionsDashboardPage to HowToNotifyAboutSecuritiesTransferController" in {
         val result = navigator.nextPage(SubmissionsDashboardPage, NormalMode, emptyUserAnswers)(fakeRequest)
         whenReady(result) { res =>
-          res mustBe individualRoutes.HowToNotifyAboutSecuritiesTransferController.onPageLoad(NormalMode)
+          res mustBe individualRoutes.HowToNotifyAboutSecuritiesTransferController.onPageLoad()
         }
       }
 
@@ -338,12 +338,12 @@ class StfNavigatorSpec extends SpecBase with ScalaFutures {
 
       "must go from the StfBuyersAddressPage to HowToNotifyAboutSecuritiesTransfer" in {
         val result = navigator.previousPage(StfBuyersAddressPage, NormalMode, emptyUserAnswers)
-        result mustBe individualRoutes.HowToNotifyAboutSecuritiesTransferController.onPageLoad(NormalMode)
+        result mustBe individualRoutes.HowToNotifyAboutSecuritiesTransferController.onPageLoad()
       }
 
       "must go from the ConfirmAddressPage to HowToNotifyAboutSecuritiesTransfer" in {
         val result = navigator.previousPage(ConfirmAddressPage, NormalMode, emptyUserAnswers)
-        result mustBe individualRoutes.HowToNotifyAboutSecuritiesTransferController.onPageLoad(NormalMode)
+        result mustBe individualRoutes.HowToNotifyAboutSecuritiesTransferController.onPageLoad()
       }
 
       "must go from the HowToNotifyAboutSecuritiesTransferPage to SubmissionsDashboard" in {

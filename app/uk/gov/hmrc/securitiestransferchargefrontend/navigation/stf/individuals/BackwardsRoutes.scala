@@ -33,8 +33,8 @@ class BackwardsRoutes(defaultPage: Call):
   
   def predecessorRoutes(page: Page): UserAnswers => Call = page match {
     case HowToNotifyAboutSecuritiesTransferPage => _ => sharedRoutes.SubmissionsDashboardController.onPageLoad()
-    case ConfirmAddressPage => _ => individualRoutes.HowToNotifyAboutSecuritiesTransferController.onPageLoad(NormalMode)
-    case StfBuyersAddressPage => _ => individualRoutes.HowToNotifyAboutSecuritiesTransferController.onPageLoad(NormalMode)
+    case ConfirmAddressPage => _ => individualRoutes.HowToNotifyAboutSecuritiesTransferController.onPageLoad()
+    case StfBuyersAddressPage => _ => individualRoutes.HowToNotifyAboutSecuritiesTransferController.onPageLoad()
     case NameOfSellerPage => _ => individualSingleRoutes.ConfirmAddressController.onPageLoad()
     case StfSellerAddressPage => _ => individualSingleRoutes.NameOfSellerController.onPageLoad(NormalMode)
     case ConnectedPersonsPage => _ => individualSingleRoutes.StfSellerAddressController.onPageLoad()
