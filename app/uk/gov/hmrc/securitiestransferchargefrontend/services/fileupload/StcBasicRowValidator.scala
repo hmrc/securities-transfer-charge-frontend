@@ -17,10 +17,11 @@
 package uk.gov.hmrc.securitiestransferchargefrontend.services.fileupload
 
 import play.api.i18n.{Lang, Messages, MessagesApi}
-import uk.gov.hmrc.securitiestransferchargefrontend.forms.stf.shared.{AmountPaidForSecuritiesFormProvider, NameOfBuyerFormProvider, NameOfSellerFormProvider, SecuritiesTargetFormProvider}
+import uk.gov.hmrc.securitiestransferchargefrontend.forms.stf.fileUpload.SecuritiesTargetFormProvider
+import uk.gov.hmrc.securitiestransferchargefrontend.forms.stf.shared.{AmountPaidForSecuritiesFormProvider, NameOfBuyerFormProvider, NameOfSellerFormProvider}
 import uk.gov.hmrc.securitiestransferchargefrontend.models.stf.fileupload.{ParsedStcRow, ParsedValue, StcRowValidationError}
-import scala.util.{Try, Success, Failure}
 
+import scala.util.{Failure, Success, Try}
 import javax.inject.Inject
 
 
@@ -88,7 +89,7 @@ class StcBasicRowValidator @Inject()(
       validateSecuritiesTarget(row, affinityKey) ++
       validateChargingPoint(row, affinityKey) ++
       validateTaxRate(row) ++
-      validateWhatTypeOfSecurities(row, affinityKey) ++
+      validateTypeOfShares(row, affinityKey) ++
       validateSecuritiesQuantity(row, affinityKey) ++
       validateAmountPaidForSecurities(row, affinityKey)
 
@@ -137,7 +138,7 @@ class StcBasicRowValidator @Inject()(
           support.error(
             row.rowNumber,
             "chargingPoint",
-            messages(s"$affinityKey.chargingPoint.error.required.all")
+            messages(s"fileUpload.$affinityKey.chargingPoint.error.required.all")
           )
         )
 
@@ -146,7 +147,7 @@ class StcBasicRowValidator @Inject()(
           support.error(
             row.rowNumber,
             "chargingPoint",
-            messages(s"$affinityKey.chargingPoint.error.invalid")
+            messages(s"fileUpload.$affinityKey.chargingPoint.error.invalid")
           )
         )
 
@@ -155,7 +156,7 @@ class StcBasicRowValidator @Inject()(
           support.error(
             row.rowNumber,
             "chargingPoint",
-            messages(s"$affinityKey.chargingPoint.error.futureDate")
+            messages(s"fileUpload.$affinityKey.chargingPoint.error.futureDate")
           )
         )
 
@@ -474,4 +475,19 @@ class StcBasicRowValidator @Inject()(
         )
     }
   }
+
+  private def validateTypeOfShares(row: ParsedStcRow, affinityKey: String)(implicit cols: ColumnIndexBuilder): Seq[StcRowValidationError] =
+    row.typeOfShares.map(_.trim) match {
+
+      case None  =>
+        Seq(
+          support.error(
+            row.rowNumber,
+            "typeOfShares",
+            messages(s"$affinityKey.fileUpload.error.typeOfSecurities.required")
+          )
+        )
+
+      case _ => Seq.empty
+    }
 }

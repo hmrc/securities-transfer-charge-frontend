@@ -284,80 +284,235 @@ class StcConditionalRowValidatorSpec extends SpecBase {
     }
   }
 
-  "reject country max length for seller address" in {
-    val longCountry = "a" * 101
+  "Agent STF"- {
+    "reject country max length for seller address" in {
+      val longCountry = "a" * 101
 
-    val result = validator.validate(
-      validParsedRow.copy(
-        sellerAddressInUK = Some(false),
-        sellerCountry = Some(longCountry)
-      ), StcTemplate.STFAgent, affinityGroupKeyAgent
-    )
+      val result = validator.validate(
+        validParsedRow.copy(
+          sellerAddressInUK = Some(false),
+          sellerCountry = Some(longCountry)
+        ), StcTemplate.STFAgent, affinityGroupKeyAgent
+      )
 
-    result.exists(_.fieldName == "sellerCountry") mustBe true
-  }
+      result.exists(_.fieldName == "sellerCountry") mustBe true
+    }
 
-  "reject an invalid country for seller address" in {
-    val invalidCountry = "%%%%%%"
+    "reject an invalid country for seller address" in {
+      val invalidCountry = "%%%%%%"
 
-    val result = validator.validate(
-      validParsedRow.copy(
-        sellerAddressInUK = Some(false),
-        sellerCountry = Some(invalidCountry)
-      ), StcTemplate.STFAgent, affinityGroupKeyAgent
-    )
+      val result = validator.validate(
+        validParsedRow.copy(
+          sellerAddressInUK = Some(false),
+          sellerCountry = Some(invalidCountry)
+        ), StcTemplate.STFAgent, affinityGroupKeyAgent
+      )
 
-    result.exists(_.fieldName == "sellerCountry") mustBe true
-  }
+      result.exists(_.fieldName == "sellerCountry") mustBe true
+    }
 
-  "reject missing country for seller address" in {
+    "reject missing country for seller address" in {
 
-    val result = validator.validate(
-      validParsedRow.copy(
-        sellerAddressInUK = Some(false),
-        sellerCountry = None
-      ), StcTemplate.STFAgent, affinityGroupKeyAgent
-    )
+      val result = validator.validate(
+        validParsedRow.copy(
+          sellerAddressInUK = Some(false),
+          sellerCountry = None
+        ), StcTemplate.STFAgent, affinityGroupKeyAgent
+      )
 
-    result.exists(_.fieldName == "sellerCountry") mustBe true
-  }
+      result.exists(_.fieldName == "sellerCountry") mustBe true
+    }
 
-  "reject country max length for buyer address" in {
-    val longCountry = "a" * 101
+    "reject country max length for buyer address" in {
+      val longCountry = "a" * 101
 
-    val result = validator.validate(
-      validParsedRow.copy(
-        buyerAddressInUK = Some(false),
-        buyerCountry = Some(longCountry)
-      ), StcTemplate.STFAgent, affinityGroupKeyAgent
-    )
+      val result = validator.validate(
+        validParsedRow.copy(
+          buyerAddressInUK = Some(false),
+          buyerCountry = Some(longCountry)
+        ), StcTemplate.STFAgent, affinityGroupKeyAgent
+      )
 
-    result.exists(_.fieldName == "buyerCountry") mustBe true
-  }
+      result.exists(_.fieldName == "buyerCountry") mustBe true
+    }
 
-  "reject an invalid country for buyer address" in {
-    val invalidCountry = "%%%%%%"
+    "reject an invalid country for buyer address" in {
+      val invalidCountry = "%%%%%%"
 
-    val result = validator.validate(
-      validParsedRow.copy(
-        buyerAddressInUK = Some(false),
-        buyerCountry = Some(invalidCountry)
-      ), StcTemplate.STFAgent, affinityGroupKeyAgent
-    )
+      val result = validator.validate(
+        validParsedRow.copy(
+          buyerAddressInUK = Some(false),
+          buyerCountry = Some(invalidCountry)
+        ), StcTemplate.STFAgent, affinityGroupKeyAgent
+      )
 
-    result.exists(_.fieldName == "buyerCountry") mustBe true
-  }
+      result.exists(_.fieldName == "buyerCountry") mustBe true
+    }
 
-  "reject missing country for buyer address" in {
+    "reject missing country for buyer address" in {
 
-    val result = validator.validate(
-      validParsedRow.copy(
-        buyerAddressInUK = Some(false),
-        buyerCountry = None
-      ), StcTemplate.STFAgent, affinityGroupKeyAgent
-    )
+      val result = validator.validate(
+        validParsedRow.copy(
+          buyerAddressInUK = Some(false),
+          buyerCountry = None
+        ), StcTemplate.STFAgent, affinityGroupKeyAgent
+      )
 
-    result.exists(_.fieldName == "buyerCountry") mustBe true
+      result.exists(_.fieldName == "buyerCountry") mustBe true
+    }
+
+    "reject missing postcode for buyer address when address in the UK is false" in {
+
+      val result = validator.validate(
+        validParsedRow.copy(
+          buyerAddressInUK = Some(false),
+          buyerPostcode = None
+        ), StcTemplate.STFAgent, affinityGroupKeyAgent
+      )
+
+      result.exists(_.fieldName == "buyerPostcode") mustBe true
+    }
+
+    "reject missing postcode for buyer address when address in the UK is true" in {
+
+      val result = validator.validate(
+        validParsedRow.copy(
+          buyerAddressInUK = Some(true),
+          buyerPostcode = None
+        ), StcTemplate.STFAgent, affinityGroupKeyAgent
+      )
+
+      result.exists(_.fieldName == "buyerPostcode") mustBe true
+    }
+
+    "reject missing postcode for seller address when address in the UK is false" in {
+
+      val result = validator.validate(
+        validParsedRow.copy(
+          sellerAddressInUK = Some(false),
+          sellerPostcode = None
+        ), StcTemplate.STFAgent, affinityGroupKeyAgent
+      )
+
+      result.exists(_.fieldName == "sellerPostcode") mustBe true
+    }
+
+    "reject missing postcode for seller address when address in the UK is true" in {
+
+      val result = validator.validate(
+        validParsedRow.copy(
+          sellerAddressInUK = Some(true),
+          sellerPostcode = None
+        ), StcTemplate.STFAgent, affinityGroupKeyAgent
+      )
+
+      result.exists(_.fieldName == "sellerPostcode") mustBe true
+    }
+
+    "reject invalid postcode when seller address in the UK is true" in {
+
+      val result = validator.validate(
+        validParsedRow.copy(
+          sellerAddressInUK = Some(true),
+          sellerPostcode = Some("%%%%")
+        ), StcTemplate.STFAgent, affinityGroupKeyAgent
+      )
+
+      result.exists(_.fieldName == "sellerPostcode") mustBe true
+    }
+
+    "reject invalid postcode when seller address in the UK is false" in {
+
+      val result = validator.validate(
+        validParsedRow.copy(
+          sellerAddressInUK = Some(false),
+          sellerPostcode = Some("%%%%")
+        ), StcTemplate.STFAgent, affinityGroupKeyAgent
+      )
+
+      result.exists(_.fieldName == "sellerPostcode") mustBe true
+    }
+
+    "reject invalid postcode when buyer address in the UK is true" in {
+
+      val result = validator.validate(
+        validParsedRow.copy(
+          buyerAddressInUK = Some(true),
+          buyerPostcode = Some("%%%%")
+        ), StcTemplate.STFAgent, affinityGroupKeyAgent
+      )
+
+      result.exists(_.fieldName == "buyerPostcode") mustBe true
+    }
+
+    "reject invalid postcode when buyer address in the UK is false" in {
+
+      val result = validator.validate(
+        validParsedRow.copy(
+          buyerAddressInUK = Some(false),
+          buyerPostcode = Some("%%%%")
+        ), StcTemplate.STFAgent, affinityGroupKeyAgent
+      )
+
+      result.exists(_.fieldName == "buyerPostcode") mustBe true
+    }
+
+    "reject invalid relief type" in {
+
+      val result = validator.validate(
+        validParsedRow.copy(applyingForRelief = Some(true),
+          whatReliefAreYouApplyingFor = Some("invalid relief")
+        ), StcTemplate.STFAgent, affinityGroupKeyAgent
+      )
+
+      result.exists(_.fieldName == "whatReliefAreYouApplyingFor") mustBe true
+    }
+
+    "reject tye of securities for invalid length" in {
+
+      val invalidSecurityTypeLength = "a" * 270
+
+      val result = validator.validate(
+        validParsedRow.copy(typeOfShares = Some("shares"),
+          whatTypeOfSecurities = Some(invalidSecurityTypeLength)
+
+        ), StcTemplate.STFAgent, affinityGroupKeyAgent
+      )
+
+      result.exists(_.fieldName == "whatTypeOfSecurities") mustBe true
+    }
+
+    "require type of securities when share type is shares" in {
+
+      val result = validator.validate(
+        validParsedRow.copy(
+          typeOfShares = Some("shares"),
+          whatTypeOfSecurities = None
+        ), StcTemplate.STFAgent, affinityGroupKeyAgent
+      )
+      result.exists(_.fieldName == "whatTypeOfSecurities") mustBe true
+    }
+
+    "require total market value when connected person is true" in {
+
+      val result = validator.validate(
+        validParsedRow.copy( connectedPersons = Some(true),
+          totalMarketValue = None
+        ), StcTemplate.STFAgent, affinityGroupKeyAgent
+      )
+      result.exists(_.fieldName == "totalMarketValue") mustBe true
+    }
+
+    "require relief type when applying for relief is yes" in {
+      val result = validator.validate(
+        validParsedRow.copy(
+          applyingForRelief = Some(true),
+          whatReliefAreYouApplyingFor = None
+        ), StcTemplate.STFAgent, affinityGroupKeyAgent
+      )
+
+      result.exists(_.fieldName == "whatReliefAreYouApplyingFor") mustBe true
+    }
   }
 
   "StcConditionalRowValidator.validate SH03" - {
