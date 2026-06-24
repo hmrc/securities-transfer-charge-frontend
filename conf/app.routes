@@ -291,6 +291,12 @@ GET         /submissions-dashboard/sh03                      uk.gov.hmrc.securit
 GET        /sh03/agent/before-you-start                 uk.gov.hmrc.securitiestransferchargefrontend.controllers.sh03.agents.BeforeYouStartController.onPageLoad()
 POST       /sh03/agent/before-you-start                uk.gov.hmrc.securitiestransferchargefrontend.controllers.sh03.agents.BeforeYouStartController.onSubmit()
 
+GET         /sh03/agent/company-details                  uk.gov.hmrc.securitiestransferchargefrontend.controllers.sh03.agents.single.CompanyDetailsController.onPageLoad(mode: Mode = NormalMode)
+POST        /sh03/agent/company-details                  uk.gov.hmrc.securitiestransferchargefrontend.controllers.sh03.agents.single.CompanyDetailsController.onSubmit(mode: Mode = NormalMode)
+GET         /sh03/agent/change/company-details           uk.gov.hmrc.securitiestransferchargefrontend.controllers.sh03.agents.single.CompanyDetailsController.onPageLoad(mode: Mode = CheckMode)
+POST        /sh03/agent/change/company-details           uk.gov.hmrc.securitiestransferchargefrontend.controllers.sh03.agents.single.CompanyDetailsController.onSubmit(mode: Mode = CheckMode)
+
+
 GET        /sh03/agent/share-purchase                        uk.gov.hmrc.securitiestransferchargefrontend.controllers.sh03.agents.single.ReasonForPurchaseController.onPageLoad(mode: Mode = NormalMode)
 POST       /sh03/agent/share-purchase                       uk.gov.hmrc.securitiestransferchargefrontend.controllers.sh03.agents.single.ReasonForPurchaseController.onSubmit(mode: Mode = NormalMode)
 GET        /sh03/agent/change/share-purchase                 uk.gov.hmrc.securitiestransferchargefrontend.controllers.sh03.agents.single.ReasonForPurchaseController.onPageLoad(mode: Mode = CheckMode)
@@ -313,4 +319,3 @@ GET        /sh03/agent/apply-relief                               uk.gov.hmrc.se
 POST       /sh03/agent/apply-relief                               uk.gov.hmrc.securitiestransferchargefrontend.controllers.sh03.agents.single.ApplyingForReliefController.onSubmit(mode: Mode = NormalMode)
 GET        /sh03/agent/change/apply-relief                        uk.gov.hmrc.securitiestransferchargefrontend.controllers.sh03.agents.single.ApplyingForReliefController.onPageLoad(mode: Mode = CheckMode)
 POST       /sh03/agent/change/apply-relief                        uk.gov.hmrc.securitiestransferchargefrontend.controllers.sh03.agents.single.ApplyingForReliefController.onSubmit(mode: Mode = CheckMode)
-

@@ -44,9 +44,8 @@ class SecuritiesTargetController @Inject()(
                                       view: SecuritiesTargetView
                                      )(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport {
 
-  private def form(implicit request: StcDataRequest[_]) =
-    formProvider(request.request.affinityGroupKey)
-
+  private def form(implicit request: StcDataRequest[_]) = formProvider(request.request.affinityGroupKey)
+  
   lazy val backLinkCall: Mode => UserAnswers => Call =
     mode => userAnswers => navigator.previousPage(SecuritiesTargetPage, mode, userAnswers)
 
