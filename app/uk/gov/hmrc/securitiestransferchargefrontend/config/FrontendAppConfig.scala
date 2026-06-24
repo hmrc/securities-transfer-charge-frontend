@@ -135,4 +135,6 @@ class FrontendAppConfig @Inject() (configuration: Configuration, servicesConfig:
   // Refresh
   val spinnerPageRefreshInterval: Int = configuration.get[Int]("page-refresh.spinner.interval")
   val spinnerPageRefreshTimeout: Int = configuration.get[Int]("page-refresh.spinner.timeout")
+  
+  val govUKUrl: String = configuration.get[String]("urls.external.govUK")
 }
