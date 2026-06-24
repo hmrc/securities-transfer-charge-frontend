@@ -468,7 +468,7 @@ class StcConditionalRowValidatorSpec extends SpecBase {
       result.exists(_.fieldName == "whatReliefAreYouApplyingFor") mustBe true
     }
 
-    "reject tye of securities for invalid length" in {
+    "reject type of securities for invalid length" in {
 
       val invalidSecurityTypeLength = "a" * 270
 
