@@ -228,12 +228,25 @@ individual.securitiesTarget.error.businessName.length = Business name must be 16
 individual.securitiesTarget.error.crn.length = Company registration number must be 8 characters
 individual.securitiesTarget.error.crn.invalid = Company registration number can only be numbers or letters
 
+agent.sh03.companyDetails.title = Company details
+agent.sh03.companyDetails.heading = Company details
+agent.sh03.companyDetails.companyName.label = Company name
+agent.sh03.companyDetails.companyName.error.required = Enter the company name
+agent.sh03.companyDetails.companyName.error.length = Company name must be 160 characters or fewer
+agent.sh03.companyDetails.crn.label = Company registration number (CRN)
+agent.sh03.companyDetails.crn.hint = This is also called a company number. For example, SN898989 or 12345678
+agent.sh03.companyDetails.crn.error.required = Enter the company registration number
+agent.sh03.companyDetails.crn.error.length = Company registration number must be 8 characters long
+agent.sh03.companyDetails.crn.error.invalid = Company registration number can only be numbers or letters
+agent.sh03.companyDetails.isPlc.label = Is the purchasing company a Public Limited Company (PLC)?
+agent.sh03.companyDetails.isPlc.error.required = Select yes if the purchasing company is a Public Limited Company (PLC)
+agent.sh03.companyDetails.checkYourAnswersLabel = Company details
+agent.sh03.companyDetails.change.hidden = Change company details
+
 individual.chargingPoint.error.required.all = Enter the date you bought the securities
 individual.chargingPoint.error.futureDate = The day you bought the securities must be today’s date or a date in the past
 individual.chargingPoint.error.invalid = The date you bought the securities must be a real date
 individual.amountPaidForSecurities.error.required = Enter the amount you paid for the securities
-
-
 
 detailsOfThisTransfer.title = What are the details of this transfer?
 detailsOfThisTransfer.heading = What are the details of this transfer?
