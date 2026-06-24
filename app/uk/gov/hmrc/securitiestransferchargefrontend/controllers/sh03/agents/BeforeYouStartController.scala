@@ -14,15 +14,14 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.securitiestransferchargefrontend.controllers.sh03.agents.single
+package uk.gov.hmrc.securitiestransferchargefrontend.controllers.sh03.agents
 
-import play.api.Logging
 import play.api.i18n.{I18nSupport, MessagesApi}
-import play.api.mvc.{Action, AnyContent, Call, MessagesControllerComponents}
+import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.actions.*
-import uk.gov.hmrc.securitiestransferchargefrontend.models.NormalMode
-import uk.gov.hmrc.securitiestransferchargefrontend.views.html.sh03.agents.single.BeforeYouStartView
+import uk.gov.hmrc.securitiestransferchargefrontend.controllers.sh03.agents.routes
+import uk.gov.hmrc.securitiestransferchargefrontend.views.html.sh03.agents.BeforeYouStartView
 
 import javax.inject.Inject
 
@@ -31,7 +30,7 @@ class BeforeYouStartController @Inject()(
                                           stcAuthEnrolled: StcAuthEnrolledAction,
                                           val controllerComponents: MessagesControllerComponents,
                                           view: BeforeYouStartView
-                                        ) extends FrontendBaseController with I18nSupport with Logging {
+                                        ) extends FrontendBaseController with I18nSupport {
 
   def onPageLoad(): Action[AnyContent] = stcAuthEnrolled {
     implicit request =>
@@ -39,8 +38,6 @@ class BeforeYouStartController @Inject()(
   }
 
   def onSubmit(): Action[AnyContent] = stcAuthEnrolled { implicit request =>
-    // ToDo: This should go to the how to notify page
-    val nextPage: Call = routes.CompanyDetailsController.onPageLoad(NormalMode)
-    Redirect(nextPage)
+    Redirect(routes.HowToNotifyAboutShareBuybackController.onPageLoad())
   }
 }

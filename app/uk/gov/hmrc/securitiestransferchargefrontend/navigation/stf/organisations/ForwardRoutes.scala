@@ -48,7 +48,7 @@ class ForwardRoutes(answerPersistenceService: AnswerPersistenceService,
 
   def forwardRoutes(page: Page)(implicit hc: HeaderCarrier): UserAnswers => Future[Call] = page match {
 
-    case SubmissionsDashboardPage => userAnswers => goTo(orgRoutes.HowToNotifyAboutSecuritiesTransferController.onPageLoad(NormalMode), Some(userAnswers))
+    case SubmissionsDashboardPage => userAnswers => goTo(orgRoutes.HowToNotifyAboutSecuritiesTransferController.onPageLoad(), Some(userAnswers))
     case HowToNotifyAboutSecuritiesTransferPage => userAnswers => {
       dataDependent(HowToNotifyAboutSecuritiesTransferPage, userAnswers) {
         case OneAtATime => orgSingleRoutes.ConfirmAddressController.onPageLoad()
