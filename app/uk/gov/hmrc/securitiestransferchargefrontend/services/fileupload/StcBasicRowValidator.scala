@@ -477,7 +477,7 @@ class StcBasicRowValidator @Inject()(
   }
 
   private def validateTypeOfShares(row: ParsedStcRow, affinityKey: String)(implicit cols: ColumnIndexBuilder): Seq[StcRowValidationError] =
-    row.typeOfShares.map(_.trim) match {
+    row.typeOfShares match {
 
       case None  =>
         Seq(
