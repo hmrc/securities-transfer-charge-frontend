@@ -18,7 +18,8 @@ package services.fileupload
 
 import base.SpecBase
 import play.api.i18n.{Lang, Messages, MessagesApi}
-import uk.gov.hmrc.securitiestransferchargefrontend.forms.stf.shared.{AmountPaidForSecuritiesFormProvider, NameOfBuyerFormProvider, NameOfSellerFormProvider, SecuritiesTargetFormProvider}
+import uk.gov.hmrc.securitiestransferchargefrontend.forms.stf.fileUpload.SecuritiesTargetFormProvider
+import uk.gov.hmrc.securitiestransferchargefrontend.forms.stf.shared.{AmountPaidForSecuritiesFormProvider, NameOfBuyerFormProvider, NameOfSellerFormProvider}
 import uk.gov.hmrc.securitiestransferchargefrontend.models.stf.fileupload.*
 import uk.gov.hmrc.securitiestransferchargefrontend.models.stf.fileupload.ParsedValue.{Invalid, Missing, Valid}
 import uk.gov.hmrc.securitiestransferchargefrontend.services.fileupload.*
@@ -37,13 +38,13 @@ class StcBasicRowValidatorSpec extends SpecBase {
     ParsedStcRow(
       rowNumber = 3,
       buyerName = Some("Bob buyer"),
-      buyerAddressInUK= Some(true),
-      buyerAddressLine1= Some("1 Seller Street"),
-      buyerAddressLine2= Some("Seller District"),
-      buyerAddressLine3= Some("Seller City"),
-      buyerAddressLine4= None,
-      buyerPostcode= Some("AA1 1AA"),
-      buyerCountry= Some("United Kingdom"),
+      buyerAddressInUK = Some(true),
+      buyerAddressLine1 = Some("1 Seller Street"),
+      buyerAddressLine2 = Some("Seller District"),
+      buyerAddressLine3 = Some("Seller City"),
+      buyerAddressLine4 = None,
+      buyerPostcode = Some("AA1 1AA"),
+      buyerCountry = Some("United Kingdom"),
       sellerName = Some("Seller Ltd"),
       sellerAddressInUK = Some(true),
       sellerAddressLine1 = Some("1 Test"),
@@ -125,7 +126,7 @@ class StcBasicRowValidatorSpec extends SpecBase {
         StcTemplate.STF, "org"
       )
 
-      result.exists(e => e.fieldName == "chargingPoint" && e.message == messages("org.chargingPoint.error.futureDate")) mustBe true
+      result.exists(e => e.fieldName == "chargingPoint" && e.message == messages("fileUpload.org.chargingPoint.error.futureDate")) mustBe true
     }
 
     "drop the prefix for charging point invalid error when affinityKey is 'individual'" in {
@@ -247,6 +248,117 @@ class StcBasicRowValidatorSpec extends SpecBase {
 
       result.exists(_.fieldName == "amountPaidForSecurities") mustBe true
     }
-  }
 
+    "Agent STF" - {
+
+      "return type of shares required error" in {
+        val result = validator.validate(
+          validRow.copy(typeOfShares = None),
+          StcTemplate.STFAgent, affinityGroupKeyAgent
+        )
+
+        result.exists(_.fieldName == "typeOfShares") mustBe true
+      }
+
+      "return seller name required error" in {
+        val result = validator.validate(
+          validRow.copy(sellerName = None),
+          StcTemplate.STFAgent, affinityGroupKeyAgent
+        )
+
+        result.exists(_.fieldName == "sellerName") mustBe true
+      }
+
+      "return buyer name required error" in {
+        val result = validator.validate(
+          validRow.copy(buyerName = None),
+          StcTemplate.STFAgent, affinityGroupKeyAgent
+        )
+
+        result.exists(_.fieldName == "buyerName") mustBe true
+      }
+
+      "return seller address in uk missing error" in {
+        val result = validator.validate(
+          validRow.copy(sellerAddressInUK = None),
+          StcTemplate.STFAgent, affinityGroupKeyAgent
+        )
+
+        result.exists(_.fieldName == "sellerAddressInUK") mustBe true
+      }
+
+      "return buyer address in uk missing error" in {
+        val result = validator.validate(
+          validRow.copy(buyerAddressInUK = None),
+          StcTemplate.STFAgent, affinityGroupKeyAgent
+        )
+
+        result.exists(_.fieldName == "buyerAddressInUK") mustBe true
+      }
+
+      "return connected persons missing error" in {
+        val result = validator.validate(
+          validRow.copy(connectedPersons = None),
+          StcTemplate.STFAgent, affinityGroupKeyAgent
+        )
+
+        result.exists(_.fieldName == "connectedPersons") mustBe true
+      }
+
+      "return applying for relief missing error" in {
+        val result = validator.validate(
+          validRow.copy(applyingForRelief = None),
+          StcTemplate.STFAgent, affinityGroupKeyAgent
+        )
+
+        result.exists(_.fieldName == "applyingForRelief") mustBe true
+      }
+
+      "return tax rate required error" in {
+        val result = validator.validate(
+          validRow.copy(taxRate = None),
+          StcTemplate.STFAgent, affinityGroupKeyAgent
+        )
+
+        result.exists(_.fieldName == "taxRate") mustBe true
+      }
+
+
+      "return securities quantity required error" in {
+        val result = validator.validate(
+          validRow.copy(securitiesQuantity = None),
+          StcTemplate.STFAgent, affinityGroupKeyAgent
+        )
+
+        result.exists(_.fieldName == "securitiesQuantity") mustBe true
+      }
+
+      "return charging point required error" in {
+        val result = validator.validate(
+          validRow.copy(chargingPoint = ParsedValue.Missing),
+          StcTemplate.STFAgent, affinityGroupKeyAgent
+        )
+
+        result.exists(_.fieldName == "chargingPoint") mustBe true
+      }
+
+      "return amount paid for securities required error" in {
+        val result = validator.validate(
+          validRow.copy(amountPaidForSecurities = None),
+          StcTemplate.STFAgent, affinityGroupKeyAgent
+        )
+
+        result.exists(_.fieldName == "amountPaidForSecurities") mustBe true
+      }
+
+      "return securities target required error" in {
+        val result = validator.validate(
+          validRow.copy(securitiesTarget = None),
+          StcTemplate.STFAgent, affinityGroupKeyAgent
+        )
+
+        result.exists(_.fieldName == "securitiesTarget") mustBe true
+      }
+    }
+  }
 }
