@@ -22,12 +22,14 @@ import org.scalatest.concurrent.ScalaFutures
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.routes
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.sh03.agents.single.routes as sh03AgentSingleRoutes
 import uk.gov.hmrc.securitiestransferchargefrontend.models.sh03.HowToNotifyAboutShareBuyback
+import uk.gov.hmrc.securitiestransferchargefrontend.models.sh03.agents.CompanyDetails
 import uk.gov.hmrc.securitiestransferchargefrontend.models.sh03.shared.ReasonForPurchase
 import uk.gov.hmrc.securitiestransferchargefrontend.models.{CheckMode, NormalMode, UserAnswers}
 import uk.gov.hmrc.securitiestransferchargefrontend.navigation.sh03.agents.Sh03AgentNavigator
 import uk.gov.hmrc.securitiestransferchargefrontend.pages.Page
+import uk.gov.hmrc.securitiestransferchargefrontend.pages.sh03.agents.CompanyDetailsPage
 import uk.gov.hmrc.securitiestransferchargefrontend.pages.sh03.shared.HowToNotifyAboutShareBuybackPage
-import uk.gov.hmrc.securitiestransferchargefrontend.pages.sh03.single.ReasonForPurchasePage
+import uk.gov.hmrc.securitiestransferchargefrontend.pages.sh03.single.{ReasonForPurchasePage, TreasurySharesPage}
 import uk.gov.hmrc.securitiestransferchargefrontend.pages.sh03.shared.ConnectedPersonsPage
 
 class Sh03AgentNavigatorSpec extends SpecBase with ScalaFutures {
@@ -75,7 +77,11 @@ class Sh03AgentNavigatorSpec extends SpecBase with ScalaFutures {
       }
 
       "must go from CompanyDetails to ReasonForPurchasePage" in {
-        //TODO
+        val answers = emptyUserAnswers.set(CompanyDetailsPage, CompanyDetails("Business 1", "12345678", true)).get
+        val result = navigator.nextPage(CompanyDetailsPage, NormalMode, answers)(fakeRequest)
+        whenReady(result) { res =>
+          res mustBe sh03AgentSingleRoutes.ReasonForPurchaseController.onPageLoad(NormalMode)
+        }
       }
 
       "must go from ReasonForPurchase to TreasuryShares when 'For Cancellation' is selected" in {
@@ -88,6 +94,14 @@ class Sh03AgentNavigatorSpec extends SpecBase with ScalaFutures {
 
       "must go from ReasonForPurchase to ConnectedPersonsPage when 'To Place Into Treasury' is selected" in {
         val answers = emptyUserAnswers.set(ReasonForPurchasePage, ReasonForPurchase.ToPlaceIntoTreasury).get
+        val result = navigator.nextPage(ReasonForPurchasePage, NormalMode, answers)(fakeRequest)
+        whenReady(result) { res =>
+          res mustBe sh03AgentSingleRoutes.ConnectedPersonsController.onPageLoad(NormalMode)
+        }
+      }
+
+      "must go from TreasuryShares to ConnectedPersonsPage" in {
+        val answers = emptyUserAnswers.set(TreasurySharesPage, true).get
         val result = navigator.nextPage(ReasonForPurchasePage, NormalMode, answers)(fakeRequest)
         whenReady(result) { res =>
           res mustBe sh03AgentSingleRoutes.ConnectedPersonsController.onPageLoad(NormalMode)
