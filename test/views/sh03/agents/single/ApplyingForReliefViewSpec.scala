@@ -75,6 +75,10 @@ class ApplyingForReliefViewSpec extends ViewBaseSpec {
         radios must include(ExpectedContent.yes)
         radios must include(ExpectedContent.no)
       }
+
+      "have the correct link" in {
+        doc.select("p.govuk-body").select("a.govuk-link").attr("href") mustBe "https://www.gov.uk"
+      }
       
       "have a save and continue button" in {
         doc.select(".govuk-button").first().text() mustBe ExpectedContent.saveAndContinue

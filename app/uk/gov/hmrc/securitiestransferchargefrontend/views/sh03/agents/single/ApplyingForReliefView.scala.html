@@ -20,6 +20,8 @@
 @import uk.gov.hmrc.hmrcfrontend.views.viewmodels.newtablinkhelper.NewTabLinkHelper
 @import uk.gov.hmrc.securitiestransferchargefrontend.views.html.components.SaveAndReturnButton
 @import uk.gov.hmrc.securitiestransferchargefrontend.views.html.templates
+@import uk.gov.hmrc.securitiestransferchargefrontend.config.FrontendAppConfig
+
 
 @this(
     layout: templates.Layout,
@@ -28,13 +30,15 @@
     govukRadios: GovukRadios,
     govukButton: GovukButton,
     hmrcNewTabLinkHelper: HmrcNewTabLinkHelper,
-    saveAndReturnButton:SaveAndReturnButton
+    saveAndReturnButton:SaveAndReturnButton,
+    config: FrontendAppConfig,
 )
 
 @(form: Form[_], mode: Mode, backLinkCall: Call)(implicit request: Request[_], messages: Messages)
 
 @link = @{hmrcNewTabLinkHelper(NewTabLinkHelper(
-    text = messages("agent.sh03.applyingForRelief.details.content.link.text")
+    text = messages("agent.sh03.applyingForRelief.details.content.link.text"),
+    href = Some(config.govUKUrl)
 )) }
 
 @layout(pageTitle = title(form, messages("agent.sh03.applyingForRelief.title"),Some(messages("sh03.section.name"))), backLinkUrl = Some(backLinkCall.url)) {
