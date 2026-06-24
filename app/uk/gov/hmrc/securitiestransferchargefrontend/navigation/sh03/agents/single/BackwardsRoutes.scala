@@ -18,11 +18,13 @@ package uk.gov.hmrc.securitiestransferchargefrontend.navigation.sh03.agents.sing
 
 import play.api.mvc.Call
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.routes
+import uk.gov.hmrc.securitiestransferchargefrontend.controllers.sh03.agents.routes as sh03AgentRoutes
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.sh03.agents.single.routes as sh03AgentSingleRoutes
-import uk.gov.hmrc.securitiestransferchargefrontend.models.{NormalMode, UserAnswers}
 import uk.gov.hmrc.securitiestransferchargefrontend.models.sh03.shared.ReasonForPurchase
+import uk.gov.hmrc.securitiestransferchargefrontend.models.{NormalMode, UserAnswers}
 import uk.gov.hmrc.securitiestransferchargefrontend.navigation.NavigationHelper
 import uk.gov.hmrc.securitiestransferchargefrontend.pages.*
+import uk.gov.hmrc.securitiestransferchargefrontend.pages.sh03.agents.AgentReferencePage
 import uk.gov.hmrc.securitiestransferchargefrontend.pages.sh03.shared.ConnectedPersonsPage
 import uk.gov.hmrc.securitiestransferchargefrontend.pages.sh03.single.{ApplyingForReliefPage, ReasonForPurchasePage, TreasurySharesPage}
 
@@ -34,6 +36,7 @@ class BackwardsRoutes(defaultPage: Call):
 
 
   def predecessorRoutes(page: Page): UserAnswers => Call = page match {
+    case AgentReferencePage => _ => sh03AgentRoutes.HowToNotifyAboutShareBuybackController.onPageLoad()
     case ReasonForPurchasePage => _ => routes.JourneyRecoveryController.onPageLoad()
     case TreasurySharesPage => _ => sh03AgentSingleRoutes.ReasonForPurchaseController.onPageLoad(NormalMode)
     case ConnectedPersonsPage => userAnswers => dataDependent(ReasonForPurchasePage, userAnswers) {
