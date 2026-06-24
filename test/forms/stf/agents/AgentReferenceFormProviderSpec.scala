@@ -18,7 +18,7 @@ package forms.stf.agents
 
 import play.api.data.FormError
 import forms.behaviours.StringFieldBehaviours
-import uk.gov.hmrc.securitiestransferchargefrontend.forms.stf.agents.AgentReferenceFormProvider
+import uk.gov.hmrc.securitiestransferchargefrontend.forms.shared.AgentReferenceFormProvider
 
 class AgentReferenceFormProviderSpec extends StringFieldBehaviours {
 

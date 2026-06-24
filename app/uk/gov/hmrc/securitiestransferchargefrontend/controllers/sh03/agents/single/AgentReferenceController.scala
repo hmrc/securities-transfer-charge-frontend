@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.agents.bulk
+package uk.gov.hmrc.securitiestransferchargefrontend.controllers.sh03.agents.single
 
 import play.api.data.Form
 import play.api.i18n.{I18nSupport, MessagesApi}
@@ -27,15 +27,15 @@ import uk.gov.hmrc.securitiestransferchargefrontend.forms.shared.AgentReferenceF
 import uk.gov.hmrc.securitiestransferchargefrontend.models.shared.AgentReference
 import uk.gov.hmrc.securitiestransferchargefrontend.models.{Mode, UserAnswers}
 import uk.gov.hmrc.securitiestransferchargefrontend.navigation.Navigator
-import uk.gov.hmrc.securitiestransferchargefrontend.pages.stf.shared.AgentReferencePage
-import uk.gov.hmrc.securitiestransferchargefrontend.views.html.stf.agents.bulk.AgentReferenceView
+import uk.gov.hmrc.securitiestransferchargefrontend.pages.sh03.agents.AgentReferencePage
+import uk.gov.hmrc.securitiestransferchargefrontend.views.html.sh03.agents.single.AgentReferenceView
 
 import javax.inject.{Inject, Named}
 import scala.concurrent.{ExecutionContext, Future}
 
 class AgentReferenceController @Inject()(
                                           override val messagesApi: MessagesApi,
-                                          @Named("agents") navigator: Navigator,
+                                          @Named("agentsSh03") navigator: Navigator,
                                           stcAuthEnrolled: StcAuthEnrolledAction,
                                           getData: StcDataRetrievalAction,
                                           requireData: StcDataRequiredAction,

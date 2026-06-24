@@ -20,7 +20,7 @@ import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
 import play.api.Application
 import play.api.mvc.Call
-import uk.gov.hmrc.securitiestransferchargefrontend.forms.stf.agents.AgentReferenceFormProvider
+import uk.gov.hmrc.securitiestransferchargefrontend.forms.shared.AgentReferenceFormProvider
 import uk.gov.hmrc.securitiestransferchargefrontend.models.NormalMode
 import uk.gov.hmrc.securitiestransferchargefrontend.views.html.stf.agents.single.AgentReferenceView
 import views.ViewBaseSpec
@@ -50,7 +50,7 @@ class AgentReferenceViewSpec extends ViewBaseSpec {
     val saveAndReturn: String = messages("site.save-and-return.button")
   }
 
-  "The SecuritiesTargetView" - {
+  "The AgentReferenceView" - {
     
       val agentReferenceView = view()
 
