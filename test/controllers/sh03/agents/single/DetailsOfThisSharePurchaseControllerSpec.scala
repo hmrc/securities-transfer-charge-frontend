@@ -32,7 +32,6 @@ import uk.gov.hmrc.securitiestransferchargefrontend.navigation.Navigator
 import uk.gov.hmrc.securitiestransferchargefrontend.pages.sh03.shared.ConnectedPersonsPage
 import uk.gov.hmrc.securitiestransferchargefrontend.pages.sh03.single.DetailsOfThisSharePurchasePage
 import uk.gov.hmrc.securitiestransferchargefrontend.views.html.sh03.agents.single.DetailsOfThisSharePurchaseView
-import uk.gov.hmrc.securitiestransferchargefrontend.views.html.stf.agents.single.DetailsOfThisTransferView
 
 class DetailsOfThisSharePurchaseControllerSpec extends SpecBase with MockitoSugar {
 
@@ -133,10 +132,10 @@ class DetailsOfThisSharePurchaseControllerSpec extends SpecBase with MockitoSuga
 
         val boundForm = form.bind(Map("numberOfShares" -> "invalid value"))
 
-        val view = application.injector.instanceOf[DetailsOfThisTransferView]
+        val view = application.injector.instanceOf[DetailsOfThisSharePurchaseView]
 
         val result = route(application, request).value
-        
+
         status(result) mustEqual BAD_REQUEST
         contentAsString(result) mustEqual view(boundForm, NormalMode, testBackLinkRoute)(request, messages(application)).toString
       }
