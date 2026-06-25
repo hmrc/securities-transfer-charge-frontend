@@ -120,7 +120,7 @@ class CompanyDetailsViewSpec extends ViewBaseSpec {
         "isPlc" -> "true"
       ))
       val doc = Jsoup.parse(viewInstance(formWithErrors, NormalMode)(fakeRequest, messages).body)
-      doc.text() must include(messages(s"$messageKeyPrefix.crn.error.invalid"))
+      doc.text() must include(messages(s"$messageKeyPrefix.crn.error.length"))
     }
 
     "must show error for PLC selection" in {
