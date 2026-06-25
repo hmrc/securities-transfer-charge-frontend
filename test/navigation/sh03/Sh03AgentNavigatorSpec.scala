@@ -107,7 +107,7 @@ class Sh03AgentNavigatorSpec extends SpecBase with ScalaFutures {
 
       "must go from TreasuryShares to ConnectedPersonsPage" in {
         val answers = emptyUserAnswers.set(TreasurySharesPage, true).get
-        val result = navigator.nextPage(ReasonForPurchasePage, NormalMode, answers)(fakeRequest)
+        val result = navigator.nextPage(TreasurySharesPage, NormalMode, answers)(fakeRequest)
         whenReady(result) { res =>
           res mustBe sh03AgentSingleRoutes.ConnectedPersonsController.onPageLoad(NormalMode)
         }
@@ -121,7 +121,7 @@ class Sh03AgentNavigatorSpec extends SpecBase with ScalaFutures {
         }
       }
 
-      "must go from ApplyingForRelief to ..." in {
+      "must go from ApplyingForRelief to ..." ignore{
         //TODO
       }
     }
