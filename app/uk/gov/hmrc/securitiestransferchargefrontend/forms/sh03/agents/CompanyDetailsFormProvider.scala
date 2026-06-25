@@ -31,9 +31,8 @@ class CompanyDetailsFormProvider @Inject() extends Mappings {
         .verifying(maxLength(160, "agent.sh03.companyDetails.companyName.error.length")),
       
       "companyRegistrationNumber" -> text("agent.sh03.companyDetails.crn.error.required")
-        .verifying(
-            regexp("""^[a-zA-Z0-9]{8}$""", "agent.sh03.companyDetails.crn.error.invalid")
-        ),
+        .verifying(regexp("""^[a-zA-Z0-9]+$""", "agent.sh03.companyDetails.crn.error.invalid"))
+        .verifying(regexp("""^.{8}$""", "agent.sh03.companyDetails.crn.error.length")),
       
       "isPlc" -> boolean("agent.sh03.companyDetails.isPlc.error.required")
     )(CompanyDetails.apply)(x => Some((x.companyName, x.companyRegistrationNumber, x.isPlc))))

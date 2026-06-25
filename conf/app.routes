@@ -187,6 +187,7 @@ GET        /stf/agent/buyer-name                          uk.gov.hmrc.securities
 POST       /stf/agent/buyer-name                          uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.agents.single.NameOfBuyerController.onSubmit(mode: Mode = NormalMode)
 GET        /stf/agent/change/buyer-name                   uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.agents.single.NameOfBuyerController.onPageLoad(mode: Mode = CheckMode)
 POST       /stf/agent/change/buyer-name                   uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.agents.single.NameOfBuyerController.onSubmit(mode: Mode = CheckMode)
+
 GET        /stf/agent/add-reference                       uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.agents.single.AgentReferenceController.onPageLoad(mode: Mode = NormalMode)
 POST       /stf/agent/add-reference                       uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.agents.single.AgentReferenceController.onSubmit(mode: Mode = NormalMode)
 GET        /stf/agent/change/add-reference                uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.agents.single.AgentReferenceController.onPageLoad(mode: Mode = CheckMode)
@@ -290,6 +291,11 @@ GET         /submissions-dashboard/sh03                      uk.gov.hmrc.securit
 
 GET        /sh03/agent/before-you-start                 uk.gov.hmrc.securitiestransferchargefrontend.controllers.sh03.agents.BeforeYouStartController.onPageLoad()
 POST       /sh03/agent/before-you-start                uk.gov.hmrc.securitiestransferchargefrontend.controllers.sh03.agents.BeforeYouStartController.onSubmit()
+
+GET        /sh03/agent/add-reference                       uk.gov.hmrc.securitiestransferchargefrontend.controllers.sh03.agents.single.AgentReferenceController.onPageLoad(mode: Mode = NormalMode)
+POST       /sh03/agent/add-reference                       uk.gov.hmrc.securitiestransferchargefrontend.controllers.sh03.agents.single.AgentReferenceController.onSubmit(mode: Mode = NormalMode)
+GET        /sh03/agent/change/add-reference                uk.gov.hmrc.securitiestransferchargefrontend.controllers.sh03.agents.single.AgentReferenceController.onPageLoad(mode: Mode = CheckMode)
+POST       /sh03/agent/change/add-reference                uk.gov.hmrc.securitiestransferchargefrontend.controllers.sh03.agents.single.AgentReferenceController.onSubmit(mode: Mode = CheckMode)
 
 GET         /sh03/agent/company-details                  uk.gov.hmrc.securitiestransferchargefrontend.controllers.sh03.agents.single.CompanyDetailsController.onPageLoad(mode: Mode = NormalMode)
 POST        /sh03/agent/company-details                  uk.gov.hmrc.securitiestransferchargefrontend.controllers.sh03.agents.single.CompanyDetailsController.onSubmit(mode: Mode = NormalMode)
