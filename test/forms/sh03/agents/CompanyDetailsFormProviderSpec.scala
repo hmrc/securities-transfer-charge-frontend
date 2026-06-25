@@ -55,6 +55,7 @@ class CompanyDetailsFormProviderSpec extends StringFieldBehaviours {
     val fieldName = "companyRegistrationNumber"
     val requiredKey = "agent.sh03.companyDetails.crn.error.required"
     val invalidKey = "agent.sh03.companyDetails.crn.error.invalid"
+    val lengthKey = "agent.sh03.companyDetails.crn.error.length"
 
     behave like fieldThatBindsValidData(
       form,
@@ -68,24 +69,62 @@ class CompanyDetailsFormProviderSpec extends StringFieldBehaviours {
       requiredError = FormError(fieldName, requiredKey)
     )
 
-    "must not bind strings that are not exactly 8 characters" in {
-      forAll(stringsLongerThan(8) -> "longString") { string =>
-        val result = form.bind(Map(fieldName -> string)).apply(fieldName)
-        result.errors.map(_.key) must contain(fieldName)
-        result.errors.map(_.message) must contain(invalidKey)
-      }
-
-      forAll(stringsShorterThan(8).suchThat(_.nonEmpty) -> "shortString") { string =>
-        val result = form.bind(Map(fieldName -> string)).apply(fieldName)
-        result.errors.map(_.key) must contain(fieldName)
-        result.errors.map(_.message) must contain(invalidKey)
+    "must bind valid 8-character alphanumeric CRNs" in {
+      val validCRNs = Seq("AB123456", "12345678", "ABCDEFGH", "SN898989")
+      validCRNs.foreach { crn =>
+        val result = form.bind(Map(
+          "companyName" -> "Test Company",
+          fieldName -> crn,
+          "isPlc" -> "true"
+        ))
+        result.errors mustBe empty
+        result.value.value.companyRegistrationNumber mustBe crn
       }
     }
 
     "must not bind strings with invalid characters" in {
-      val result = form.bind(Map(fieldName -> "AB12-456")).apply(fieldName)
-      result.errors.map(_.key) must contain(fieldName)
-      result.errors.map(_.message) must contain(invalidKey)
+      val invalidCRNs = Seq("AB12-456", "AB12 456", "AB12@456", "AB12.456")
+      invalidCRNs.foreach { crn =>
+        val result = form.bind(Map(
+          "companyName" -> "Test Company",
+          fieldName -> crn,
+          "isPlc" -> "true"
+        )).apply(fieldName)
+        result.errors.map(_.message) must contain(invalidKey)
+      }
+    }
+
+    "must not bind strings shorter than 8 characters" in {
+      val shortCRNs = Seq("A", "AB", "ABC1234", "1234567")
+      shortCRNs.foreach { crn =>
+        val result = form.bind(Map(
+          "companyName" -> "Test Company",
+          fieldName -> crn,
+          "isPlc" -> "true"
+        )).apply(fieldName)
+        result.errors.map(_.message) must contain(lengthKey)
+      }
+    }
+
+    "must not bind strings longer than 8 characters" in {
+      val longCRNs = Seq("AB1234567", "123456789", "ABCDEFGHIJ")
+      longCRNs.foreach { crn =>
+        val result = form.bind(Map(
+          "companyName" -> "Test Company",
+          fieldName -> crn,
+          "isPlc" -> "true"
+        )).apply(fieldName)
+        result.errors.map(_.message) must contain(lengthKey)
+      }
+    }
+
+    "must show invalid error before length error when both validations fail" in {
+      val result = form.bind(Map(
+        "companyName" -> "Test Company",
+        fieldName -> "AB-123",  // Invalid character AND wrong length (6 chars)
+        "isPlc" -> "true"
+      )).apply(fieldName)
+      result.errors.head.message mustBe invalidKey
     }
   }
 
