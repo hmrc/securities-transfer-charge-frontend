@@ -682,13 +682,12 @@ agent.detailsOfThisTransfer.error.typeOfShares.length = The type or class of sha
 agent.detailsOfThisTransfer.error.marketValue.required = Enter the market value of the shares in pounds
 agent.detailsOfThisTransfer.error.marketValue.invalidNumeric = The market value of the shares must be a number and can include up to two decimal places, like £30 or £28.60
 agent.detailsOfThisTransfer.error.marketValue.nonNumeric = The market value of the shares must be a number and can include up to two decimal places, like £30 or £28.60
-agent.detailsOfThisTransfer.error.marketValue.negative = The market value of the shares must be 0 or more
+agent.detailsOfThisTransfer.error.marketValue.negative = The market value of the shares must be £0.01 or more
 agent.detailsOfThisTransfer.error.marketValue.aboveMaximum = The market value of the shares must be £999,999,999 or below
-
 agent.detailsOfThisTransfer.error.amountPaid.required = Enter the amount paid for the shares in pounds
 agent.detailsOfThisTransfer.error.amountPaid.invalidNumeric = The amount paid for the shares must be a number and can include up to two decimal places, like £30 or £28.60
 agent.detailsOfThisTransfer.error.amountPaid.nonNumeric = The amount paid for the shares must be a number and can include up to two decimal places, like £30 or £28.60
-agent.detailsOfThisTransfer.error.amountPaid.negative = The amount paid for the shares must be 0 or more
+agent.detailsOfThisTransfer.error.amountPaid.negative = The amount paid for the shares must be £0.01 or more
 agent.detailsOfThisTransfer.error.amountPaid.aboveMaximum = The amount paid for the shares must be £999,999,999 or below
 
 fileUploaded.error.emptyFile.title = The file you have uploaded is empty
@@ -801,3 +800,6 @@ agent.sh03.applyingForRelief.error.required = Select yes if the buyer is  applyi
 agent.sh03.applyingForRelief.change.hidden = Change applying for a relief
 agent.sh03.applyingForRelief.p = See a
 agent.sh03.applyingForRelief.details.content.link.text = full list of reliefs
+
+agent.sh03.detailsOfSharePurchase.title = What are the details of this share purchase?
+agent.sh03.detailsOfSharePurchase.heading = What are the details of this share purchase?

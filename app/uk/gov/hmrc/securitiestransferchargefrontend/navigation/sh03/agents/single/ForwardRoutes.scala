@@ -18,15 +18,14 @@ package uk.gov.hmrc.securitiestransferchargefrontend.navigation.sh03.agents.sing
 
 import play.api.mvc.Call
 import uk.gov.hmrc.http.HeaderCarrier
-import uk.gov.hmrc.securitiestransferchargefrontend.controllers.routes
 import uk.gov.hmrc.securitiestransferchargefrontend.models.{NormalMode, UserAnswers}
 import uk.gov.hmrc.securitiestransferchargefrontend.models.sh03.shared.ReasonForPurchase
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.sh03.agents.single.routes as sh03AgentSingleRoutes
 import uk.gov.hmrc.securitiestransferchargefrontend.models.sh03.HowToNotifyAboutShareBuyback.{MoreThanOneAtATime, OneAtATime}
 import uk.gov.hmrc.securitiestransferchargefrontend.navigation.PersistentNavigationHelper
 import uk.gov.hmrc.securitiestransferchargefrontend.pages.Page
-import uk.gov.hmrc.securitiestransferchargefrontend.pages.sh03.shared.{HowToNotifyAboutShareBuybackPage, ConnectedPersonsPage}
-import uk.gov.hmrc.securitiestransferchargefrontend.pages.sh03.single.{ApplyingForReliefPage, ReasonForPurchasePage, TreasurySharesPage}
+import uk.gov.hmrc.securitiestransferchargefrontend.pages.sh03.shared.{ConnectedPersonsPage, HowToNotifyAboutShareBuybackPage}
+import uk.gov.hmrc.securitiestransferchargefrontend.pages.sh03.single.{ApplyingForReliefPage, DetailsOfThisSharePurchasePage, ReasonForPurchasePage, TreasurySharesPage}
 import uk.gov.hmrc.securitiestransferchargefrontend.services.AnswerPersistenceService
 
 import scala.concurrent.{ExecutionContext, Future}
@@ -55,7 +54,11 @@ class ForwardRoutes(answerPersistenceService: AnswerPersistenceService,
     }
     case TreasurySharesPage => userAnswers => dataRequired(TreasurySharesPage, userAnswers,sh03AgentSingleRoutes.ConnectedPersonsController.onPageLoad(NormalMode))
     case ConnectedPersonsPage  => userAnswers => dataRequired(ConnectedPersonsPage, userAnswers,sh03AgentSingleRoutes.ApplyingForReliefController.onPageLoad(NormalMode))
-    case ApplyingForReliefPage  => userAnswers =>  goTo(routes.JourneyRecoveryController.onPageLoad(),Some(userAnswers))
+    case ApplyingForReliefPage  => userAnswers =>  dataDependent(ApplyingForReliefPage, userAnswers){
+      case true => sh03AgentSingleRoutes.DetailsOfThisSharePurchaseController.onPageLoad(NormalMode)
+      case false => defaultPage
+    }
+    case DetailsOfThisSharePurchasePage => userAnswers => dataRequired(DetailsOfThisSharePurchasePage, userAnswers, defaultPage)
 
     case _ => _ => Future.successful(defaultPage)
   }
