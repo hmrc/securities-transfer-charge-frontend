@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package views.stf.agents.bulk
+package views.sh03.agents.single
 
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
@@ -22,7 +22,7 @@ import play.api.Application
 import play.api.mvc.Call
 import uk.gov.hmrc.securitiestransferchargefrontend.forms.shared.AgentReferenceFormProvider
 import uk.gov.hmrc.securitiestransferchargefrontend.models.NormalMode
-import uk.gov.hmrc.securitiestransferchargefrontend.views.html.stf.agents.bulk.AgentReferenceView
+import uk.gov.hmrc.securitiestransferchargefrontend.views.html.sh03.agents.single.AgentReferenceView
 import views.ViewBaseSpec
 
 import scala.language.postfixOps
@@ -44,14 +44,14 @@ class AgentReferenceViewSpec extends ViewBaseSpec {
   object ExpectedContent {
     val title: String = messages("agentReference.title")
     val heading: String = messages("agentReference.heading")
-    val caption: String = messages("submission.details.caption")
-    val hint: String = messages("bulk.agentReference.hint")
-    val continue: String = messages("site.continue")
-    val returnLink: String = messages("return-to-dashboard.link")
+    val caption: String = messages("agent.details.caption")
+    val hint: String = messages("agentReference.hint")
+    val saveAndContinue: String = messages("site.save-and-continue.button")
+    val saveAndReturn: String = messages("site.save-and-return.button")
   }
 
-  "The SecuritiesTargetView" - {
-
+  "The AgentReferenceView" - {
+    
       val agentReferenceView = view()
 
       "have the correct title" in {
@@ -62,22 +62,19 @@ class AgentReferenceViewSpec extends ViewBaseSpec {
         agentReferenceView.select("h1").text() mustBe ExpectedContent.heading
       }
 
-      "display the correct caption text" in {
-        agentReferenceView.getElementsByClass("govuk-caption-l").text() mustBe ExpectedContent.caption
-      }
-
       "display the correct hint text" in {
         agentReferenceView.hintText mustBe Some(ExpectedContent.hint)
       }
 
       "have a save and continue button" in {
         val buttons = agentReferenceView.select(".govuk-button")
-        buttons.get(0).text() mustBe ExpectedContent.continue
+        buttons.get(0).text() mustBe ExpectedContent.saveAndContinue
       }
 
-      "have a link to return back to the submission dashboard page" in {
-        val returnLink = agentReferenceView.select(".govuk-button-group a.govuk-link").first()
-        returnLink.text() mustBe ExpectedContent.returnLink
+      "have a save and return button" in {
+        val buttons = agentReferenceView.select(".govuk-button")
+        buttons.get(1).text() mustBe ExpectedContent.saveAndReturn
       }
   }
+
 }

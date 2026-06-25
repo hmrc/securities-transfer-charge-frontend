@@ -25,7 +25,8 @@ import uk.gov.hmrc.securitiestransferchargefrontend.controllers.sh03.agents.sing
 import uk.gov.hmrc.securitiestransferchargefrontend.models.sh03.HowToNotifyAboutShareBuyback.{MoreThanOneAtATime, OneAtATime}
 import uk.gov.hmrc.securitiestransferchargefrontend.navigation.PersistentNavigationHelper
 import uk.gov.hmrc.securitiestransferchargefrontend.pages.Page
-import uk.gov.hmrc.securitiestransferchargefrontend.pages.sh03.shared.{HowToNotifyAboutShareBuybackPage, ConnectedPersonsPage}
+import uk.gov.hmrc.securitiestransferchargefrontend.pages.sh03.agents.AgentReferencePage
+import uk.gov.hmrc.securitiestransferchargefrontend.pages.sh03.shared.{ConnectedPersonsPage, HowToNotifyAboutShareBuybackPage}
 import uk.gov.hmrc.securitiestransferchargefrontend.pages.sh03.single.{ApplyingForReliefPage, ReasonForPurchasePage, TreasurySharesPage}
 import uk.gov.hmrc.securitiestransferchargefrontend.services.AnswerPersistenceService
 
@@ -45,10 +46,11 @@ class ForwardRoutes(answerPersistenceService: AnswerPersistenceService,
 
     case HowToNotifyAboutShareBuybackPage => userAnswers => {
       dataDependent(HowToNotifyAboutShareBuybackPage, userAnswers) {
-        case OneAtATime => defaultPage
+        case OneAtATime => sh03AgentSingleRoutes.AgentReferenceController.onPageLoad(NormalMode)
         case MoreThanOneAtATime => defaultPage
       }
     }
+    case AgentReferencePage => userAnswers => dataRequired(AgentReferencePage, userAnswers, sh03AgentSingleRoutes.CompanyDetailsController.onPageLoad(NormalMode))
     case ReasonForPurchasePage => userAnswers => dataDependent(ReasonForPurchasePage, userAnswers) {
       case ReasonForPurchase.ForCancellation  => sh03AgentSingleRoutes.TreasurySharesController.onPageLoad(NormalMode)
       case ReasonForPurchase.ToPlaceIntoTreasury => sh03AgentSingleRoutes.ConnectedPersonsController.onPageLoad(NormalMode)

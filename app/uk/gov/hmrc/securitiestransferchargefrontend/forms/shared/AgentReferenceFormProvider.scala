@@ -14,12 +14,12 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.securitiestransferchargefrontend.forms.stf.agents
+package uk.gov.hmrc.securitiestransferchargefrontend.forms.shared
 
 import play.api.data.Form
 import play.api.data.Forms.{mapping, optional}
 import uk.gov.hmrc.securitiestransferchargefrontend.forms.mappings.Mappings
-import uk.gov.hmrc.securitiestransferchargefrontend.models.stf.AgentReference
+import uk.gov.hmrc.securitiestransferchargefrontend.models.shared.AgentReference
 
 import javax.inject.Inject
 
