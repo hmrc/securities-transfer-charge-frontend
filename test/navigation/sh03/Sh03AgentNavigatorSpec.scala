@@ -26,8 +26,9 @@ import uk.gov.hmrc.securitiestransferchargefrontend.models.sh03.agents.CompanyDe
 import uk.gov.hmrc.securitiestransferchargefrontend.models.sh03.shared.ReasonForPurchase
 import uk.gov.hmrc.securitiestransferchargefrontend.models.{CheckMode, NormalMode, UserAnswers}
 import uk.gov.hmrc.securitiestransferchargefrontend.navigation.sh03.agents.Sh03AgentNavigator
+import uk.gov.hmrc.securitiestransferchargefrontend.models.shared.AgentReference
 import uk.gov.hmrc.securitiestransferchargefrontend.pages.Page
-import uk.gov.hmrc.securitiestransferchargefrontend.pages.sh03.agents.CompanyDetailsPage
+import uk.gov.hmrc.securitiestransferchargefrontend.pages.sh03.agents.{AgentReferencePage, CompanyDetailsPage}
 import uk.gov.hmrc.securitiestransferchargefrontend.pages.sh03.shared.HowToNotifyAboutShareBuybackPage
 import uk.gov.hmrc.securitiestransferchargefrontend.pages.sh03.single.{ReasonForPurchasePage, TreasurySharesPage}
 import uk.gov.hmrc.securitiestransferchargefrontend.pages.sh03.shared.ConnectedPersonsPage
@@ -60,7 +61,7 @@ class Sh03AgentNavigatorSpec extends SpecBase with ScalaFutures {
         val answers = emptyUserAnswers.set(HowToNotifyAboutShareBuybackPage, HowToNotifyAboutShareBuyback.OneAtATime).get
         val result = navigator.nextPage(HowToNotifyAboutShareBuybackPage, NormalMode, answers)(fakeRequest)
         whenReady(result) { res =>
-          res mustBe navigator.defaultPage
+          res mustBe sh03AgentSingleRoutes.AgentReferenceController.onPageLoad(NormalMode)
         }
       }
 
@@ -73,7 +74,11 @@ class Sh03AgentNavigatorSpec extends SpecBase with ScalaFutures {
       }
 
       "must go from AgentReference to CompanyDetailsControllerPage" in {
-        //TODO
+        val answers = emptyUserAnswers.set(HowToNotifyAboutShareBuybackPage, HowToNotifyAboutShareBuyback.OneAtATime).get.set(AgentReferencePage, AgentReference(Some("HMRC"))).get
+        val result = navigator.nextPage(AgentReferencePage, NormalMode, answers)(fakeRequest)
+        whenReady(result) { res =>
+          res mustBe sh03AgentSingleRoutes.CompanyDetailsController.onPageLoad(NormalMode)
+        }
       }
 
       "must go from CompanyDetails to ReasonForPurchasePage" in {

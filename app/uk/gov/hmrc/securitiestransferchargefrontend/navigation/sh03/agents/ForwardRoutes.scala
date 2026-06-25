@@ -25,7 +25,8 @@ import uk.gov.hmrc.securitiestransferchargefrontend.controllers.sh03.agents.sing
 import uk.gov.hmrc.securitiestransferchargefrontend.models.sh03.HowToNotifyAboutShareBuyback.{MoreThanOneAtATime, OneAtATime}
 import uk.gov.hmrc.securitiestransferchargefrontend.navigation.PersistentNavigationHelper
 import uk.gov.hmrc.securitiestransferchargefrontend.pages.Page
-import uk.gov.hmrc.securitiestransferchargefrontend.pages.sh03.shared.{HowToNotifyAboutShareBuybackPage, ConnectedPersonsPage}
+import uk.gov.hmrc.securitiestransferchargefrontend.pages.sh03.agents.{AgentReferencePage, CompanyDetailsPage}
+import uk.gov.hmrc.securitiestransferchargefrontend.pages.sh03.shared.{ConnectedPersonsPage, HowToNotifyAboutShareBuybackPage}
 import uk.gov.hmrc.securitiestransferchargefrontend.pages.sh03.single.{ApplyingForReliefPage, ReasonForPurchasePage, TreasurySharesPage}
 import uk.gov.hmrc.securitiestransferchargefrontend.services.AnswerPersistenceService
 
