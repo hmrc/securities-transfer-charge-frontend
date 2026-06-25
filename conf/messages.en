@@ -761,7 +761,7 @@ agent.sh03.beforeYouStart.p3 = Once you have submitted details about the purchas
 agent.sh03.beforeYouStart.p4 = You do not need to tell us about transfers where the company is a Qualifying Asset Holding Company, and the conditions for exemption are met.
 
 reasonForPurchase.cancellation = For cancellation
-reasonForPurchase.treasury = To place into treasure
+reasonForPurchase.treasury = To place into treasury
 reasonForPurchase.error.required = Select why these shares are being purchased
 
 agent.sh03.reasonForPurchase.title = Why are these shares being purchased?
