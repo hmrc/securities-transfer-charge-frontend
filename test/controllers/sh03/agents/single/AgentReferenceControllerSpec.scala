@@ -17,12 +17,8 @@
 package controllers.sh03.agents.single
 
 import base.SpecBase
-import org.mockito.ArgumentMatchers.any
-import org.mockito.Mockito.when
-import org.scalatestplus.mockito.MockitoSugar
 import play.api.data.Form
 import play.api.inject.bind
-import play.api.mvc.Call
 import play.api.test.FakeRequest
 import play.api.test.Helpers.*
 import uk.gov.hmrc.auth.core.AffinityGroup
@@ -36,22 +32,18 @@ import uk.gov.hmrc.securitiestransferchargefrontend.models.{NormalMode, UserAnsw
 import uk.gov.hmrc.securitiestransferchargefrontend.navigation.Navigator
 import uk.gov.hmrc.securitiestransferchargefrontend.pages.sh03.agents.AgentReferencePage
 import uk.gov.hmrc.securitiestransferchargefrontend.pages.sh03.shared.HowToNotifyAboutShareBuybackPage
-import uk.gov.hmrc.securitiestransferchargefrontend.repositories.SessionRepository
 import uk.gov.hmrc.securitiestransferchargefrontend.views.html.sh03.agents.single.AgentReferenceView
 
-import scala.concurrent.Future
 import scala.util.Random
 
-class AgentReferenceControllerSpec extends SpecBase with MockitoSugar {
-
-  def onwardRoute = Call("GET", "/foo")
+class AgentReferenceControllerSpec extends SpecBase {
 
   val formProvider = new AgentReferenceFormProvider()
   val form: Form[AgentReference] = formProvider()
 
   lazy val agentReferenceRoute: String = agentsSh03SingleRoutes.AgentReferenceController.onPageLoad(NormalMode).url
 
-  "AgentReference Controller" - {
+  "AgentReferenceController" - {
 
     "must return OK and the correct view for a GET" in {
       val application = applicationBuilder(userAnswers = Some(emptyUserAnswers), affinityGroup = agentAffinity)
@@ -94,12 +86,8 @@ class AgentReferenceControllerSpec extends SpecBase with MockitoSugar {
     "must redirect to the next page when valid data is submitted" in {
       val updatedAnswers = emptyUserAnswers.set(HowToNotifyAboutShareBuybackPage, OneAtATime).success.value
 
-      val mockSessionRepository = mock[SessionRepository]
-
-      when(mockSessionRepository.set(any())) thenReturn Future.successful(())
-
       val application =
-        applicationBuilder(userAnswers = Some(updatedAnswers), AffinityGroup.Agent, sessionRepository = mockSessionRepository)
+        applicationBuilder(userAnswers = Some(updatedAnswers), AffinityGroup.Agent)
           .build()
 
       running(application) {
@@ -170,4 +158,3 @@ class AgentReferenceControllerSpec extends SpecBase with MockitoSugar {
     }
   }
 }
-
