@@ -56,7 +56,7 @@ class StcConditionalRowValidator @Inject()(
                         affinityKey: String
                       )(implicit cols: ColumnIndexBuilder): Seq[StcRowValidationError] =
     validateReliefType(row, affinityKey) ++
-      validateTypeOfShares(row, affinityKey) ++
+      validateTypeOfSecurities(row, affinityKey) ++
       validateBuyerAddress(row) ++
       validateSellerAddress(row) ++
       validateTotalMarketValue(row, affinityKey)
@@ -174,10 +174,11 @@ class StcConditionalRowValidator @Inject()(
                                      row: ParsedStcRow
                                    )(implicit cols: ColumnIndexBuilder): Seq[StcRowValidationError] = {
 
-    row.sellerAddressInUK.fold(Seq.empty[StcRowValidationError]) { inUK =>
-      sellerAddressLinesValidation(row) ++
-        (if (inUK) validateSellerPostcode(row) else validateSellerCountry(row))
-    }
+    sellerAddressLinesValidation(row) ++
+      validateSellerPostcode(row) ++
+      row.sellerAddressInUK.fold(Seq.empty[StcRowValidationError]) { inUK =>
+        if (!inUK) validateSellerCountry(row) else Seq.empty
+      }
   }
 
   private def validateSellerPostcode(
@@ -244,10 +245,11 @@ class StcConditionalRowValidator @Inject()(
                                     row: ParsedStcRow
                                   )(implicit cols: ColumnIndexBuilder): Seq[StcRowValidationError] = {
 
-    row.buyerAddressInUK.fold(Seq.empty[StcRowValidationError]) { inUK =>
-      buyerAddressLinesValidation(row) ++
-        (if (inUK) validateBuyerPostcode(row) else validateBuyerCountry(row))
-    }
+    buyerAddressLinesValidation(row) ++
+      validateBuyerPostcode(row) ++
+      row.buyerAddressInUK.fold(Seq.empty[StcRowValidationError]) { inUK =>
+        if (!inUK) validateBuyerCountry(row) else Seq.empty
+      }
   }
 
   private def validateBuyerPostcode(
@@ -418,5 +420,28 @@ class StcConditionalRowValidator @Inject()(
         Some(messages(s"fileUpload.error.$fieldName.invalidCharacters"))
       )
     }
+  }
+
+  private def validateTypeOfSecurities(
+                                        row: ParsedStcRow,
+                                        affinityKey: String
+                                      )(implicit cols: ColumnIndexBuilder): Seq[StcRowValidationError] = {
+
+    Seq(
+      Option.when(row.whatTypeOfSecurities.isEmpty && row.typeOfShares.exists(_.equalsIgnoreCase("shares"))) {
+        support.error(
+          row.rowNumber,
+          "whatTypeOfSecurities",
+          messages(s"$affinityKey.fileUpload.error.typeOfShares.required")
+        )
+      },
+      Option.when(row.whatTypeOfSecurities.exists(_.length > support.typeOfShareMaxLength)) {
+        support.error(
+          row.rowNumber,
+          "whatTypeOfSecurities",
+          messages(s"$affinityKey.fileUpload.error.typeOfShares.maxLength")
+        )
+      }
+    ).flatten
   }
 }

@@ -14,13 +14,15 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.securitiestransferchargefrontend.models.stf
+package uk.gov.hmrc.securitiestransferchargefrontend.pages.sh03.agents
 
-import play.api.libs.json.*
+import play.api.libs.json.JsPath
+import uk.gov.hmrc.securitiestransferchargefrontend.models.shared.AgentReference
+import uk.gov.hmrc.securitiestransferchargefrontend.pages.QuestionPage
 
-case class AgentReference (agentReference: Option[String])
+case object AgentReferencePage extends QuestionPage[AgentReference] {
 
-object AgentReference {
+  override def path: JsPath = JsPath \ toString
 
-  implicit val format: OFormat[AgentReference] = Json.format
+  override def toString: String = "agentReference"
 }
