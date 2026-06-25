@@ -20,6 +20,7 @@ import base.SpecBase
 import base.stubs.StubAnswerPersistenceService
 import org.scalatest.concurrent.ScalaFutures
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.routes
+import uk.gov.hmrc.securitiestransferchargefrontend.controllers.sh03.agents.routes as sh03AgentRoutes
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.sh03.agents.single.routes as sh03AgentSingleRoutes
 import uk.gov.hmrc.securitiestransferchargefrontend.models.sh03.HowToNotifyAboutShareBuyback
 import uk.gov.hmrc.securitiestransferchargefrontend.models.sh03.agents.CompanyDetails
@@ -30,7 +31,7 @@ import uk.gov.hmrc.securitiestransferchargefrontend.models.shared.AgentReference
 import uk.gov.hmrc.securitiestransferchargefrontend.pages.Page
 import uk.gov.hmrc.securitiestransferchargefrontend.pages.sh03.agents.{AgentReferencePage, CompanyDetailsPage}
 import uk.gov.hmrc.securitiestransferchargefrontend.pages.sh03.shared.HowToNotifyAboutShareBuybackPage
-import uk.gov.hmrc.securitiestransferchargefrontend.pages.sh03.single.{ReasonForPurchasePage, TreasurySharesPage}
+import uk.gov.hmrc.securitiestransferchargefrontend.pages.sh03.single.{ApplyingForReliefPage, ReasonForPurchasePage, TreasurySharesPage}
 import uk.gov.hmrc.securitiestransferchargefrontend.pages.sh03.shared.ConnectedPersonsPage
 
 class Sh03AgentNavigatorSpec extends SpecBase with ScalaFutures {
@@ -121,7 +122,7 @@ class Sh03AgentNavigatorSpec extends SpecBase with ScalaFutures {
         }
       }
 
-      "must go from ApplyingForRelief to ..." ignore{
+      "must go from ApplyingForRelief to DetailsOfThisSharePurchasePage" ignore{
         //TODO
       }
     }
@@ -147,6 +148,46 @@ class Sh03AgentNavigatorSpec extends SpecBase with ScalaFutures {
       result mustBe navigator.defaultPage
     }
 
-    //TODO THE TEST PAGES AFTER WILL'S AND JON'S PR HAVE BEEN MERGED
+    "must go from the AgentReferencePage to HowToNotifyAboutShareBuybackPage if it is in single journey" in {
+      val answers = emptyUserAnswers.set(HowToNotifyAboutShareBuybackPage, HowToNotifyAboutShareBuyback.OneAtATime).get
+      val result = navigator.previousPage(AgentReferencePage, NormalMode, answers)
+      result mustBe sh03AgentRoutes.HowToNotifyAboutShareBuybackController.onPageLoad()
+    }
+
+    "must go from the CompanyDetailsPage to AgentReferencePage if it is in single journey" in {
+      val answers = emptyUserAnswers.set(AgentReferencePage, AgentReference(Some("HMRC"))).get
+      val result = navigator.previousPage(CompanyDetailsPage, NormalMode, answers)
+      result mustBe sh03AgentSingleRoutes.AgentReferenceController.onPageLoad(NormalMode)
+    }
+
+    "must go from the ReasonForPurchasePage to CompanyDetailsPage if it is in single journey" in {
+      val answers = emptyUserAnswers.set(CompanyDetailsPage, CompanyDetails("Business 1", "12345678", true)).get
+      val result = navigator.previousPage(ReasonForPurchasePage, NormalMode, answers)
+      result mustBe sh03AgentSingleRoutes.CompanyDetailsController.onPageLoad(NormalMode)
+    }
+
+    "must go from the TreasurySharesPage to ReasonForPurchasePage if it is in single journey" in {
+      val answers = emptyUserAnswers.set(ReasonForPurchasePage, ReasonForPurchase.ForCancellation).get
+      val result = navigator.previousPage(TreasurySharesPage, NormalMode, answers)
+      result mustBe sh03AgentSingleRoutes.ReasonForPurchaseController.onPageLoad(NormalMode)
+    }
+
+    "must go from the ConnectedPersonsPage to TreasurySharesPage when reason for purchase is FOR CANCELLATION" in {
+      val answers = emptyUserAnswers.set(ReasonForPurchasePage, ReasonForPurchase.ForCancellation).get
+      val result = navigator.previousPage(ConnectedPersonsPage, NormalMode, answers)
+      result mustBe sh03AgentSingleRoutes.TreasurySharesController.onPageLoad(NormalMode)
+    }
+
+    "must go from the ConnectedPersonsPage to ReasonForPurchasePage when reason for purchase is FOR CANCELLATION" in {
+      val answers = emptyUserAnswers.set(ReasonForPurchasePage, ReasonForPurchase.ToPlaceIntoTreasury).get
+      val result = navigator.previousPage(ConnectedPersonsPage, NormalMode, answers)
+      result mustBe sh03AgentSingleRoutes.ReasonForPurchaseController.onPageLoad(NormalMode)
+    }
+
+    "must go from the ApplyingForReliefPage to ConnectedPersonsPage if it is in single journey" in {
+      val answers = emptyUserAnswers.set(ConnectedPersonsPage, true).get
+      val result = navigator.previousPage(ApplyingForReliefPage, NormalMode, answers)
+      result mustBe sh03AgentSingleRoutes.ConnectedPersonsController.onPageLoad(NormalMode)
+    }
   }
 }
