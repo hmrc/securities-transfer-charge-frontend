@@ -24,7 +24,7 @@ import uk.gov.hmrc.securitiestransferchargefrontend.clients.{SaveAndReturnClient
 import uk.gov.hmrc.securitiestransferchargefrontend.connectors.*
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.actions.*
 import uk.gov.hmrc.securitiestransferchargefrontend.handlers.ErrorHandler
-import uk.gov.hmrc.securitiestransferchargefrontend.navigation.sh03.agents.single.Sh03AgentNavigator
+import uk.gov.hmrc.securitiestransferchargefrontend.navigation.sh03.agents.Sh03AgentNavigator
 import uk.gov.hmrc.securitiestransferchargefrontend.navigation.stf.agents.StfAgentNavigator
 import uk.gov.hmrc.securitiestransferchargefrontend.navigation.stf.individuals.StfNavigator
 import uk.gov.hmrc.securitiestransferchargefrontend.navigation.stf.organisations.StfOrgNavigator
