@@ -26,7 +26,7 @@ import uk.gov.hmrc.securitiestransferchargefrontend.navigation.PersistentNavigat
 import uk.gov.hmrc.securitiestransferchargefrontend.pages.Page
 import uk.gov.hmrc.securitiestransferchargefrontend.pages.sh03.agents.{AgentReferencePage, CompanyDetailsPage}
 import uk.gov.hmrc.securitiestransferchargefrontend.pages.sh03.shared.{ConnectedPersonsPage, HowToNotifyAboutShareBuybackPage}
-import uk.gov.hmrc.securitiestransferchargefrontend.pages.sh03.single.{ApplyingForReliefPage, ReasonForPurchasePage, TreasurySharesPage}
+import uk.gov.hmrc.securitiestransferchargefrontend.pages.sh03.single.{ApplyingForReliefPage, DetailsOfThisSharePurchasePage, ReasonForPurchasePage, TreasurySharesPage}
 import uk.gov.hmrc.securitiestransferchargefrontend.services.AnswerPersistenceService
 
 import scala.concurrent.{ExecutionContext, Future}
@@ -50,14 +50,18 @@ class ForwardRoutes(answerPersistenceService: AnswerPersistenceService,
       }
     }
     case AgentReferencePage => userAnswers => dataRequired(AgentReferencePage, userAnswers, sh03AgentSingleRoutes.CompanyDetailsController.onPageLoad(NormalMode))
-    case CompanyDetailsPage => userAnswers => dataRequired(CompanyDetailsPage,userAnswers, sh03AgentSingleRoutes.ReasonForPurchaseController.onPageLoad(NormalMode))
+    case CompanyDetailsPage => userAnswers => dataRequired(CompanyDetailsPage, userAnswers, sh03AgentSingleRoutes.ReasonForPurchaseController.onPageLoad(NormalMode))
     case ReasonForPurchasePage => userAnswers => dataDependent(ReasonForPurchasePage, userAnswers) {
       case ReasonForPurchase.ForCancellation  => sh03AgentSingleRoutes.TreasurySharesController.onPageLoad(NormalMode)
       case ReasonForPurchase.ToPlaceIntoTreasury => sh03AgentSingleRoutes.ConnectedPersonsController.onPageLoad(NormalMode)
     }
-    case TreasurySharesPage => userAnswers => dataRequired(TreasurySharesPage, userAnswers, sh03AgentSingleRoutes.ConnectedPersonsController.onPageLoad(NormalMode))
-    case ConnectedPersonsPage  => userAnswers => dataRequired(ConnectedPersonsPage, userAnswers, sh03AgentSingleRoutes.ApplyingForReliefController.onPageLoad(NormalMode))
-    case ApplyingForReliefPage  => userAnswers =>  goTo(defaultPage,Some(userAnswers))
+    case TreasurySharesPage => userAnswers => dataRequired(TreasurySharesPage, userAnswers,sh03AgentSingleRoutes.ConnectedPersonsController.onPageLoad(NormalMode))
+    case ConnectedPersonsPage  => userAnswers => dataRequired(ConnectedPersonsPage, userAnswers,sh03AgentSingleRoutes.ApplyingForReliefController.onPageLoad(NormalMode))
+    case ApplyingForReliefPage  => userAnswers =>  dataDependent(ApplyingForReliefPage, userAnswers){
+      case false => sh03AgentSingleRoutes.DetailsOfThisSharePurchaseController.onPageLoad(NormalMode)
+      case true => defaultPage
+    }
+    case DetailsOfThisSharePurchasePage => userAnswers => dataRequired(DetailsOfThisSharePurchasePage, userAnswers, defaultPage)
 
     case _ => _ => Future.successful(defaultPage)
   }
