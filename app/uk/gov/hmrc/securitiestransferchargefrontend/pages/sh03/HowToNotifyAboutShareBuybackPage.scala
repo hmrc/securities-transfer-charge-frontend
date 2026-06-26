@@ -14,13 +14,15 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.securitiestransferchargefrontend.pages.sh03.agents
+package uk.gov.hmrc.securitiestransferchargefrontend.pages.sh03
 
 import play.api.libs.json.JsPath
-import uk.gov.hmrc.securitiestransferchargefrontend.models.sh03.agents.CompanyDetails
+import uk.gov.hmrc.securitiestransferchargefrontend.models.sh03.HowToNotifyAboutShareBuyback
 import uk.gov.hmrc.securitiestransferchargefrontend.pages.QuestionPage
 
-case object CompanyDetailsPage extends QuestionPage[CompanyDetails] {
+case object HowToNotifyAboutShareBuybackPage extends QuestionPage[HowToNotifyAboutShareBuyback] {
+
   override def path: JsPath = JsPath \ toString
-  override def toString: String = "CompanyDetailsPage"
+
+  override def toString: String = "howToNotifyAboutShareBuyback"
 }

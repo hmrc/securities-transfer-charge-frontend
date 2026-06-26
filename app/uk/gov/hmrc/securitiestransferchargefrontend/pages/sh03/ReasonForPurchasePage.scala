@@ -14,10 +14,15 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.securitiestransferchargefrontend.pages.sh03.agents
+package uk.gov.hmrc.securitiestransferchargefrontend.pages.sh03
 
-import uk.gov.hmrc.securitiestransferchargefrontend.pages.Page
+import play.api.libs.json.JsPath
+import uk.gov.hmrc.securitiestransferchargefrontend.models.sh03.shared.ReasonForPurchase
+import uk.gov.hmrc.securitiestransferchargefrontend.pages.QuestionPage
 
-case object BeforeYouStartPage extends Page {
-  override def toString: String = "beforeYouStart"
+case object ReasonForPurchasePage extends QuestionPage[ReasonForPurchase] {
+
+  override def path: JsPath = JsPath \ toString
+
+  override def toString: String = "reasonForPurchase"
 }

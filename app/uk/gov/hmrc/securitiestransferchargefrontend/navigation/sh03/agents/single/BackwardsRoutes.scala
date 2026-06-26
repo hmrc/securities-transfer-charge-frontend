@@ -24,9 +24,7 @@ import uk.gov.hmrc.securitiestransferchargefrontend.models.sh03.shared.ReasonFor
 import uk.gov.hmrc.securitiestransferchargefrontend.models.{NormalMode, UserAnswers}
 import uk.gov.hmrc.securitiestransferchargefrontend.navigation.NavigationHelper
 import uk.gov.hmrc.securitiestransferchargefrontend.pages.*
-import uk.gov.hmrc.securitiestransferchargefrontend.pages.sh03.agents.AgentReferencePage
-import uk.gov.hmrc.securitiestransferchargefrontend.pages.sh03.shared.ConnectedPersonsPage
-import uk.gov.hmrc.securitiestransferchargefrontend.pages.sh03.single.{ApplyingForReliefPage, ReasonForPurchasePage, TreasurySharesPage}
+import uk.gov.hmrc.securitiestransferchargefrontend.pages.sh03.{AgentReferencePage, ApplyingForReliefPage, ConnectedPersonsPage, MinimumAmountPaidPage, ReasonForPurchasePage, TreasurySharesPage}
 
 class BackwardsRoutes(defaultPage: Call):
 
@@ -44,5 +42,6 @@ class BackwardsRoutes(defaultPage: Call):
       case ReasonForPurchase.ToPlaceIntoTreasury => sh03AgentSingleRoutes.ReasonForPurchaseController.onPageLoad(NormalMode)
     }
     case ApplyingForReliefPage => _ => sh03AgentSingleRoutes.ConnectedPersonsController.onPageLoad(NormalMode)
+    case MinimumAmountPaidPage => _ => routes.JourneyRecoveryController.onPageLoad()
     case _ => _ => defaultPage
   }
