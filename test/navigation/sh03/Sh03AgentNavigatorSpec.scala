@@ -176,10 +176,10 @@ class Sh03AgentNavigatorSpec extends SpecBase with ScalaFutures {
       result mustBe sh03AgentSingleRoutes.ReasonForPurchaseController.onPageLoad(NormalMode)
     }
 
-    "must go from the ConnectedPersonsPage to TreasurySharesPage when reason for purchase is FOR CANCELLATION" in {
-      val answers = emptyUserAnswers.set(ReasonForPurchasePage, ReasonForPurchase.ForCancellation).get
+    "must go from the ConnectedPersonsPage to TreasurySharesPage when reason for purchase is To Place Into Treasury" in {
+      val answers = emptyUserAnswers.set(ReasonForPurchasePage, ReasonForPurchase.ToPlaceIntoTreasury).get
       val result = navigator.previousPage(ConnectedPersonsPage, NormalMode, answers)
-      result mustBe sh03AgentSingleRoutes.TreasurySharesController.onPageLoad(NormalMode)
+      result mustBe sh03AgentSingleRoutes.ReasonForPurchaseController.onPageLoad(NormalMode)
     }
 
     "must go from the ConnectedPersonsPage to ReasonForPurchasePage when reason for purchase is TO PLACE INTO TREASURY" in {
