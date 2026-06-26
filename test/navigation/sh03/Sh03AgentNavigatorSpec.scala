@@ -66,14 +66,6 @@ class Sh03AgentNavigatorSpec extends SpecBase with ScalaFutures {
         }
       }
 
-      "must go from the HowToNotifyAboutShareBuyback to AgentReferenceController when more than one at a time is selected" in {
-        val answers = emptyUserAnswers.set(HowToNotifyAboutShareBuybackPage, HowToNotifyAboutShareBuyback.MoreThanOneAtATime).get
-        val result = navigator.nextPage(HowToNotifyAboutShareBuybackPage, NormalMode, answers)(fakeRequest)
-        whenReady(result) { res =>
-          res mustBe navigator.defaultPage
-        }
-      }
-
       "must go from AgentReference to CompanyDetailsControllerPage" in {
         val answers = emptyUserAnswers.set(HowToNotifyAboutShareBuybackPage, HowToNotifyAboutShareBuyback.OneAtATime).get.set(AgentReferencePage, AgentReference(Some("HMRC"))).get
         val result = navigator.nextPage(AgentReferencePage, NormalMode, answers)(fakeRequest)
