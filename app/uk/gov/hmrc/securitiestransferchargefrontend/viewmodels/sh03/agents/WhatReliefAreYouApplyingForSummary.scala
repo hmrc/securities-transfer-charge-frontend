@@ -32,11 +32,11 @@ object WhatReliefAreYouApplyingForSummary  {
       answer =>
 
         SummaryListRowViewModel(
-          key     = "whatReliefAreYouApplyingFor.checkYourAnswersLabel",
+          key     = "agent.sh03.whatReliefAreYouApplyingFor.checkYourAnswersLabel",
           value   = ValueViewModel(HtmlFormat.escape(answer).toString),
           actions = Seq(
             ActionItemViewModel("site.change", routes.WhatReliefAreYouApplyingForController.onPageLoad(CheckMode).url)
-              .withVisuallyHiddenText(messages("whatReliefAreYouApplyingFor.change.hidden"))
+              .withVisuallyHiddenText(messages("agent.sh03.whatReliefAreYouApplyingFor.change.hidden"))
           )
         )
     }

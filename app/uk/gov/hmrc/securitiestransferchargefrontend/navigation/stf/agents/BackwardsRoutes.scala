@@ -47,7 +47,7 @@ class BackwardsRoutes(defaultPage: Call):
     case StfSellerAddressPage => _ => agentSingleRoutes.NameOfSellerController.onPageLoad(NormalMode)
     case ConnectedPersonsPage => _ => agentSingleRoutes.StfSellerAddressController.onPageLoad()
     case ApplyingForReliefPage => _ => agentSingleRoutes.ConnectedPersonsController.onPageLoad(NormalMode)
-    case single.WhatReliefAreYouApplyingForPage => _ => agentSingleRoutes.ApplyingForReliefController.onPageLoad(NormalMode)
+    case WhatReliefAreYouApplyingForPage => _ => agentSingleRoutes.ApplyingForReliefController.onPageLoad(NormalMode)
     case SecuritiesTargetPage => userAnswers => dataDependent(ApplyingForReliefPage, userAnswers) {
       case true  => agentSingleRoutes.WhatReliefAreYouApplyingForController.onPageLoad(NormalMode)
       case false => agentSingleRoutes.ApplyingForReliefController.onPageLoad(NormalMode)
