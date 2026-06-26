@@ -24,6 +24,7 @@ import javax.inject.Inject
 class MinimumAmountPaidFormProvider @Inject() extends Mappings {
 
   private val max = BigDecimal("999999999")
+  private val min = BigDecimal("0.01")
 
   def apply(affinityKey: String): Form[BigDecimal] =
     Form(
@@ -33,5 +34,6 @@ class MinimumAmountPaidFormProvider @Inject() extends Mappings {
         s"$affinityKey.sh03.minimumAmountPaid.error.nonNumeric",
         s"$affinityKey.sh03.minimumAmountPaid.error.negative"
       ).verifying(maximumCurrency(max, s"$affinityKey.sh03.minimumAmountPaid.error.aboveMaximum"))
+        .verifying(minimumCurrency(min, s"$affinityKey.sh03.minimumAmountPaid.error.belowMinimum"))
     )
 }

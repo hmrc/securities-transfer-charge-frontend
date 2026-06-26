@@ -812,6 +812,7 @@ agent.sh03.minimumAmountPaid.error.required = Enter the minimum amount paid for 
 agent.sh03.minimumAmountPaid.error.invalidNumeric = The minimum amount paid for the shares must be a number and can include up to two decimal places, like £30 or £28.60
 agent.sh03.minimumAmountPaid.error.nonNumeric = The minimum amount paid for the shares must be a number and can include up to two decimal places, like £30 or £28.60
 agent.sh03.minimumAmountPaid.error.negative = The minimum amount paid for the shares must be £0.01 or more
+agent.sh03.minimumAmountPaid.error.belowMinimum = The minimum amount paid for the shares must be £0.01 or more
 agent.sh03.minimumAmountPaid.error.aboveMaximum = The minimum amount paid for the shares must be £999,999,999 or less
 
 agent.sh03.detailsOfSharePurchase.title = What are the details of this share purchase?

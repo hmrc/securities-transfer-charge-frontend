@@ -37,7 +37,7 @@ class MinimumAmountPaidFormProviderSpec extends CurrencyFieldBehaviours {
         val form = new MinimumAmountPaidFormProvider()(affinityKey = key)
         val fieldName = "value"
 
-        val minimum = BigDecimal("0")
+        val minimum = BigDecimal("0.01")
         val maximum = BigDecimal("999999999")
 
         val validDataGenerator =
@@ -84,7 +84,7 @@ class MinimumAmountPaidFormProviderSpec extends CurrencyFieldBehaviours {
           fieldName,
           minimum = minimum,
           expectedError =
-            FormError(fieldName, s"$key.sh03.minimumAmountPaid.error.negative")
+            FormError(fieldName, s"$key.sh03.minimumAmountPaid.error.belowMinimum",Seq(currencyFormat(minimum)))
         )
       }
     }
