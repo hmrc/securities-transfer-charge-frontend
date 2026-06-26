@@ -760,6 +760,8 @@ agent.sh03.beforeYouStart.p2 = You can use this online service to tell us about 
 agent.sh03.beforeYouStart.p3 = Once you have submitted details about the purchase you will get a printable confirmation including the transfer reference number, which can be sent to Companies House.
 agent.sh03.beforeYouStart.p4 = You do not need to tell us about transfers where the company is a Qualifying Asset Holding Company, and the conditions for exemption are met.
 
+agent.sh03.agentReference.hint = You can add a reference for your own records and to help you find this transfer later. It will not be used by HMRC
+
 reasonForPurchase.cancellation = For cancellation
 reasonForPurchase.treasury = To place into treasury
 reasonForPurchase.error.required = Select why these shares are being purchased
