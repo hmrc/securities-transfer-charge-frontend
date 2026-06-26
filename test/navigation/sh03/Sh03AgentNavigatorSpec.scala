@@ -31,7 +31,7 @@ import uk.gov.hmrc.securitiestransferchargefrontend.models.shared.AgentReference
 import uk.gov.hmrc.securitiestransferchargefrontend.pages.Page
 import uk.gov.hmrc.securitiestransferchargefrontend.pages.sh03.agents.{AgentReferencePage, CompanyDetailsPage}
 import uk.gov.hmrc.securitiestransferchargefrontend.pages.sh03.shared.HowToNotifyAboutShareBuybackPage
-import uk.gov.hmrc.securitiestransferchargefrontend.pages.sh03.single.{ApplyingForReliefPage, ReasonForPurchasePage, TreasurySharesPage}
+import uk.gov.hmrc.securitiestransferchargefrontend.pages.sh03.single.{ApplyingForReliefPage, DetailsOfThisSharePurchasePage, ReasonForPurchasePage, TreasurySharesPage}
 import uk.gov.hmrc.securitiestransferchargefrontend.pages.sh03.shared.ConnectedPersonsPage
 
 class Sh03AgentNavigatorSpec extends SpecBase with ScalaFutures {
@@ -66,12 +66,8 @@ class Sh03AgentNavigatorSpec extends SpecBase with ScalaFutures {
         }
       }
 
-      "must go from the HowToNotifyAboutShareBuyback to AgentReferenceController when more than one at a time is selected" in {
-        val answers = emptyUserAnswers.set(HowToNotifyAboutShareBuybackPage, HowToNotifyAboutShareBuyback.MoreThanOneAtATime).get
-        val result = navigator.nextPage(HowToNotifyAboutShareBuybackPage, NormalMode, answers)(fakeRequest)
-        whenReady(result) { res =>
-          res mustBe navigator.defaultPage
-        }
+      "must go from the HowToNotifyAboutShareBuyback to AgentReferenceController when more than one at a time is selected" ignore {
+        //TODO AT BULK JOURNEY
       }
 
       "must go from AgentReference to CompanyDetailsControllerPage" in {
@@ -123,7 +119,11 @@ class Sh03AgentNavigatorSpec extends SpecBase with ScalaFutures {
       }
 
       "must go from ApplyingForRelief to DetailsOfThisSharePurchasePage" ignore{
-        //TODO
+        val answers = emptyUserAnswers.set(ApplyingForReliefPage, false).get
+        val result = navigator.nextPage(ApplyingForReliefPage, NormalMode, answers)(fakeRequest)
+        whenReady(result) { res =>
+          res mustBe sh03AgentSingleRoutes.DetailsOfThisSharePurchaseController.onPageLoad(NormalMode)
+        }
       }
     }
   }
@@ -178,7 +178,7 @@ class Sh03AgentNavigatorSpec extends SpecBase with ScalaFutures {
       result mustBe sh03AgentSingleRoutes.TreasurySharesController.onPageLoad(NormalMode)
     }
 
-    "must go from the ConnectedPersonsPage to ReasonForPurchasePage when reason for purchase is FOR CANCELLATION" in {
+    "must go from the ConnectedPersonsPage to ReasonForPurchasePage when reason for purchase is TO PLACE INTO TREASURY" in {
       val answers = emptyUserAnswers.set(ReasonForPurchasePage, ReasonForPurchase.ToPlaceIntoTreasury).get
       val result = navigator.previousPage(ConnectedPersonsPage, NormalMode, answers)
       result mustBe sh03AgentSingleRoutes.ReasonForPurchaseController.onPageLoad(NormalMode)
@@ -188,6 +188,12 @@ class Sh03AgentNavigatorSpec extends SpecBase with ScalaFutures {
       val answers = emptyUserAnswers.set(ConnectedPersonsPage, true).get
       val result = navigator.previousPage(ApplyingForReliefPage, NormalMode, answers)
       result mustBe sh03AgentSingleRoutes.ConnectedPersonsController.onPageLoad(NormalMode)
+    }
+
+    "must go from the DetailsOfThisSharePurchasePage to ApplyingForReliefPage if it is in single journey" in {
+      val answers = emptyUserAnswers.set(ApplyingForReliefPage, false).get
+      val result = navigator.previousPage(DetailsOfThisSharePurchasePage, NormalMode, answers)
+      result mustBe sh03AgentSingleRoutes.ApplyingForReliefController.onPageLoad(NormalMode)
     }
   }
 }

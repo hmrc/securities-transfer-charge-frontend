@@ -25,7 +25,7 @@ import uk.gov.hmrc.securitiestransferchargefrontend.navigation.NavigationHelper
 import uk.gov.hmrc.securitiestransferchargefrontend.pages.*
 import uk.gov.hmrc.securitiestransferchargefrontend.pages.sh03.agents.{AgentReferencePage, CompanyDetailsPage}
 import uk.gov.hmrc.securitiestransferchargefrontend.pages.sh03.shared.ConnectedPersonsPage
-import uk.gov.hmrc.securitiestransferchargefrontend.pages.sh03.single.{ApplyingForReliefPage, ReasonForPurchasePage, TreasurySharesPage}
+import uk.gov.hmrc.securitiestransferchargefrontend.pages.sh03.single.{ApplyingForReliefPage, DetailsOfThisSharePurchasePage, ReasonForPurchasePage, TreasurySharesPage}
 
 class BackwardsRoutes(defaultPage: Call):
 
@@ -43,5 +43,6 @@ class BackwardsRoutes(defaultPage: Call):
       case ReasonForPurchase.ToPlaceIntoTreasury => sh03AgentSingleRoutes.ReasonForPurchaseController.onPageLoad(NormalMode)
     }
     case ApplyingForReliefPage => _ => sh03AgentSingleRoutes.ConnectedPersonsController.onPageLoad(NormalMode)
+    case DetailsOfThisSharePurchasePage => _ => sh03AgentSingleRoutes.ApplyingForReliefController.onPageLoad(NormalMode)
     case _ => _ => defaultPage
   }
