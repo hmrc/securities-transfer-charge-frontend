@@ -18,10 +18,11 @@ package controllers.sh03.agents.single
 
 import base.SpecBase
 import org.scalatestplus.mockito.MockitoSugar
+import play.api.data.Form
 import play.api.test.FakeRequest
-import play.api.test.Helpers._
+import play.api.test.Helpers.*
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.routes
-import uk.gov.hmrc.securitiestransferchargefrontend.controllers.sh03.agents.single.{routes => sh03Routes}
+import uk.gov.hmrc.securitiestransferchargefrontend.controllers.sh03.agents.single.routes as sh03Routes
 import uk.gov.hmrc.securitiestransferchargefrontend.forms.sh03.agents.CompanyDetailsFormProvider
 import uk.gov.hmrc.securitiestransferchargefrontend.models.{NormalMode, UserAnswers}
 import uk.gov.hmrc.securitiestransferchargefrontend.models.sh03.agents.CompanyDetails
@@ -31,7 +32,7 @@ import uk.gov.hmrc.securitiestransferchargefrontend.views.html.sh03.agents.singl
 class CompanyDetailsControllerSpec extends SpecBase with MockitoSugar {
 
   val formProvider = new CompanyDetailsFormProvider()
-  val form = formProvider()
+  val form: Form[CompanyDetails] = formProvider()
 
   lazy val companyDetailsRoute: String = sh03Routes.CompanyDetailsController.onPageLoad(NormalMode).url
 
