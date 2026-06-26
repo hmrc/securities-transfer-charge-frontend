@@ -21,7 +21,7 @@ import uk.gov.hmrc.securitiestransferchargefrontend.models.sh03.shared.ReasonFor
 import uk.gov.hmrc.securitiestransferchargefrontend.models.stf.{DetailsOfThisTransfer, HowToNotifyAboutSecuritiesTransfer, WhatTypeOfSecurities}
 
 trait ModelGenerators {
-
+  
   implicit lazy val arbitraryReasonForPurchase: Arbitrary[ReasonForPurchase] =
     Arbitrary {
       Gen.oneOf(ReasonForPurchase.values)

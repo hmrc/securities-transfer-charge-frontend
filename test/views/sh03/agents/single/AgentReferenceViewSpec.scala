@@ -45,7 +45,7 @@ class AgentReferenceViewSpec extends ViewBaseSpec {
     val title: String = messages("agentReference.title")
     val heading: String = messages("agentReference.heading")
     val caption: String = messages("agent.details.caption")
-    val hint: String = messages("agentReference.hint")
+    val hint: String = messages("agent.sh03.agentReference.hint")
     val saveAndContinue: String = messages("site.save-and-continue.button")
     val saveAndReturn: String = messages("site.save-and-return.button")
   }
