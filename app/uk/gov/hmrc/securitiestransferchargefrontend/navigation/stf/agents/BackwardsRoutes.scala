@@ -25,6 +25,7 @@ import uk.gov.hmrc.securitiestransferchargefrontend.models.stf.HowToNotifyAboutS
 import uk.gov.hmrc.securitiestransferchargefrontend.models.{NormalMode, UserAnswers}
 import uk.gov.hmrc.securitiestransferchargefrontend.navigation.NavigationHelper
 import uk.gov.hmrc.securitiestransferchargefrontend.pages.*
+import uk.gov.hmrc.securitiestransferchargefrontend.pages.sh03.single
 import uk.gov.hmrc.securitiestransferchargefrontend.pages.stf.shared.{AgentReferencePage, HowToNotifyAboutSecuritiesTransferPage}
 import uk.gov.hmrc.securitiestransferchargefrontend.pages.stf.single.*
 
@@ -46,7 +47,7 @@ class BackwardsRoutes(defaultPage: Call):
     case StfSellerAddressPage => _ => agentSingleRoutes.NameOfSellerController.onPageLoad(NormalMode)
     case ConnectedPersonsPage => _ => agentSingleRoutes.StfSellerAddressController.onPageLoad()
     case ApplyingForReliefPage => _ => agentSingleRoutes.ConnectedPersonsController.onPageLoad(NormalMode)
-    case WhatReliefAreYouApplyingForPage => _ => agentSingleRoutes.ApplyingForReliefController.onPageLoad(NormalMode)
+    case single.WhatReliefAreYouApplyingForPage => _ => agentSingleRoutes.ApplyingForReliefController.onPageLoad(NormalMode)
     case SecuritiesTargetPage => userAnswers => dataDependent(ApplyingForReliefPage, userAnswers) {
       case true  => agentSingleRoutes.WhatReliefAreYouApplyingForController.onPageLoad(NormalMode)
       case false => agentSingleRoutes.ApplyingForReliefController.onPageLoad(NormalMode)

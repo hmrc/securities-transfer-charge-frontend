@@ -801,3 +801,10 @@ agent.sh03.applyingForRelief.error.required = Select yes if the buyer is  applyi
 agent.sh03.applyingForRelief.change.hidden = Change applying for a relief
 agent.sh03.applyingForRelief.p = See a
 agent.sh03.applyingForRelief.details.content.link.text = full list of reliefs
+
+whatReliefAreYouApplyingFor.title = whatReliefAreYouApplyingFor
+whatReliefAreYouApplyingFor.heading = whatReliefAreYouApplyingFor
+whatReliefAreYouApplyingFor.checkYourAnswersLabel = whatReliefAreYouApplyingFor
+whatReliefAreYouApplyingFor.error.required = Enter whatReliefAreYouApplyingFor
+whatReliefAreYouApplyingFor.error.length = WhatReliefAreYouApplyingFor must be 100 characters or less
+whatReliefAreYouApplyingFor.change.hidden = WhatReliefAreYouApplyingFor
