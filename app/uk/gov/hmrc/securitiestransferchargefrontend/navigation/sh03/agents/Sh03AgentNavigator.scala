@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.securitiestransferchargefrontend.navigation.sh03.agents.single
+package uk.gov.hmrc.securitiestransferchargefrontend.navigation.sh03.agents
 
 import com.google.inject.Singleton
 import play.api.mvc.{Call, Request}
@@ -24,7 +24,7 @@ import uk.gov.hmrc.securitiestransferchargefrontend.controllers.routes
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.shared.routes as sharedRoutes
 import uk.gov.hmrc.securitiestransferchargefrontend.domain.{SubmissionId, UserId}
 import uk.gov.hmrc.securitiestransferchargefrontend.models.UserAnswers
-import uk.gov.hmrc.securitiestransferchargefrontend.navigation.sh03.agents.single
+import uk.gov.hmrc.securitiestransferchargefrontend.navigation.sh03.agents
 import uk.gov.hmrc.securitiestransferchargefrontend.navigation.{AbstractModeNavigator, PersistentNavigator}
 import uk.gov.hmrc.securitiestransferchargefrontend.pages.*
 import uk.gov.hmrc.securitiestransferchargefrontend.services.AnswerPersistenceService
@@ -33,16 +33,15 @@ import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
-class Sh03AgentNavigator @Inject()(
-                                   answerPersistenceService: AnswerPersistenceService)
+class Sh03AgentNavigator @Inject()(answerPersistenceService: AnswerPersistenceService)
                                   (implicit ec: ExecutionContext) extends AbstractModeNavigator with PersistentNavigator:
 
   override lazy val dashboardPage: Call = sharedRoutes.SubmissionsDashboardController.onPageLoad()
   val defaultPage: Call = routes.JourneyRecoveryController.onPageLoad()
   val errorPages: List[Call] = List(defaultPage)
 
-  val forwardRoutes: single.ForwardRoutes = new single.ForwardRoutes(answerPersistenceService, defaultPage, errorPages)
-  val backwardsRoutes: single.BackwardsRoutes = new single.BackwardsRoutes(defaultPage)
+  val forwardRoutes: ForwardRoutes = new ForwardRoutes(answerPersistenceService, defaultPage, errorPages)
+  val backwardsRoutes: BackwardsRoutes = new BackwardsRoutes(defaultPage)
 
   override def forwardRoutes(page: Page)(implicit hc: HeaderCarrier): UserAnswers => Future[Call] =
     forwardRoutes.forwardRoutes(page)(hc)
