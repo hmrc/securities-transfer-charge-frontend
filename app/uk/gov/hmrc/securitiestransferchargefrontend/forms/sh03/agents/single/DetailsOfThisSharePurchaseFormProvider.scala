@@ -47,12 +47,12 @@ class DetailsOfThisSharePurchaseFormProvider @Inject() extends Mappings {
           currency(s"${affinityKey}.detailsOfThisTransfer.error.amountPaid.required",
             s"${affinityKey}.detailsOfThisTransfer.error.amountPaid.invalidNumeric",
             s"${affinityKey}.detailsOfThisTransfer.error.amountPaid.nonNumeric",
-            s"${affinityKey}.detailsOfThisTransfer.error.amountPaid.negative")
+            s"${affinityKey}.sh03.detailsOfThisTransfer.error.amountPaid.negative")
             .verifying(maximumCurrency(maxCurrency, s"${affinityKey}.detailsOfThisTransfer.error.amountPaid.aboveMaximum")),
         "marketValue" -> optional(currency(s"${affinityKey}.detailsOfThisTransfer.error.marketValue.required",
           s"${affinityKey}.detailsOfThisTransfer.error.marketValue.invalidNumeric",
           s"${affinityKey}.detailsOfThisTransfer.error.marketValue.nonNumeric",
-          s"${affinityKey}.detailsOfThisTransfer.error.marketValue.negative")
+          s"${affinityKey}.sh03.detailsOfThisTransfer.error.marketValue.negative")
           .verifying(maximumCurrency(maxCurrency, s"${affinityKey}.detailsOfThisTransfer.error.marketValue.aboveMaximum")))
           .verifying(requiredIf(requireMarketValue, affinityKey))
       )(DetailsOfThisSharePurchase.apply)(x => Some((x.numberOfShares, x.typeOfShares, x.amountPaid, x.marketValue)))
