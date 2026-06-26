@@ -18,24 +18,18 @@ package controllers.sh03.agents.single
 
 import base.Fixtures.testUserAnswers
 import base.SpecBase
-import org.mockito.ArgumentMatchers.any
-import org.mockito.Mockito.when
 import org.scalatestplus.mockito.MockitoSugar
 import play.api.data.Form
 import play.api.inject.bind
 import play.api.test.FakeRequest
 import play.api.test.Helpers.*
-import uk.gov.hmrc.http.HeaderCarrier
-import uk.gov.hmrc.securitiestransferchargefrontend.clients.SaveAndReturnClient
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.routes
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.sh03.agents.single.routes as agentSingle
 import uk.gov.hmrc.securitiestransferchargefrontend.forms.sh03.agents.WhatReliefAreYouApplyingForFormProvider
-import uk.gov.hmrc.securitiestransferchargefrontend.models.{NormalMode, ReliefsDataSource, UserAnswers}
+import uk.gov.hmrc.securitiestransferchargefrontend.models.{NormalMode, ReliefsDataSource}
 import uk.gov.hmrc.securitiestransferchargefrontend.navigation.Navigator
 import uk.gov.hmrc.securitiestransferchargefrontend.pages.sh03.single.WhatReliefAreYouApplyingForPage
 import uk.gov.hmrc.securitiestransferchargefrontend.views.html.sh03.agents.single.WhatReliefAreYouApplyingForView
-
-import scala.concurrent.Future
 
 class WhatReliefAreYouApplyingForControllerSpec extends SpecBase with MockitoSugar {
 
@@ -89,12 +83,6 @@ class WhatReliefAreYouApplyingForControllerSpec extends SpecBase with MockitoSug
     }
 
     "must redirect to the next page when valid data is submitted" in {
-
-      val saveAndReturnClient = mock[SaveAndReturnClient]
-
-      when(saveAndReturnClient.save(any[UserAnswers]())(any[HeaderCarrier]()))
-        .thenReturn(Future.successful(()))
-
       val application =
         applicationBuilder(userAnswers = Some(emptyUserAnswers), affinityGroup = agentAffinity)
           .build()
