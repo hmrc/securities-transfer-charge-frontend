@@ -66,8 +66,12 @@ class Sh03AgentNavigatorSpec extends SpecBase with ScalaFutures {
         }
       }
 
-      "must go from the HowToNotifyAboutShareBuyback to AgentReferenceController when more than one at a time is selected" ignore {
-        //TODO AT BULK JOURNEY
+      "must go from the HowToNotifyAboutShareBuyback to AgentReferenceController when more than one at a time is selected" in {
+        val answers = emptyUserAnswers.set(HowToNotifyAboutShareBuybackPage, HowToNotifyAboutShareBuyback.MoreThanOneAtATime).get
+        val result = navigator.nextPage(HowToNotifyAboutShareBuybackPage, NormalMode, answers)(fakeRequest)
+        whenReady(result) { res =>
+          res mustBe navigator.defaultPage
+        }
       }
 
       "must go from AgentReference to CompanyDetailsControllerPage" in {
@@ -118,7 +122,7 @@ class Sh03AgentNavigatorSpec extends SpecBase with ScalaFutures {
         }
       }
 
-      "must go from ApplyingForRelief to DetailsOfThisSharePurchasePage" ignore{
+      "must go from ApplyingForRelief to DetailsOfThisSharePurchasePage" in {
         val answers = emptyUserAnswers.set(ApplyingForReliefPage, false).get
         val result = navigator.nextPage(ApplyingForReliefPage, NormalMode, answers)(fakeRequest)
         whenReady(result) { res =>
