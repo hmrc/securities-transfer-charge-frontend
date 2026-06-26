@@ -58,8 +58,8 @@ class ForwardRoutes(answerPersistenceService: AnswerPersistenceService,
     case TreasurySharesPage => userAnswers => dataRequired(TreasurySharesPage, userAnswers,sh03AgentSingleRoutes.ConnectedPersonsController.onPageLoad(NormalMode))
     case ConnectedPersonsPage  => userAnswers => dataRequired(ConnectedPersonsPage, userAnswers,sh03AgentSingleRoutes.ApplyingForReliefController.onPageLoad(NormalMode))
     case ApplyingForReliefPage  => userAnswers =>  dataDependent(ApplyingForReliefPage, userAnswers){
-      case true => sh03AgentSingleRoutes.DetailsOfThisSharePurchaseController.onPageLoad(NormalMode)
-      case false => defaultPage
+      case false => sh03AgentSingleRoutes.DetailsOfThisSharePurchaseController.onPageLoad(NormalMode)
+      case true => defaultPage
     }
     case DetailsOfThisSharePurchasePage => userAnswers => dataRequired(DetailsOfThisSharePurchasePage, userAnswers, defaultPage)
 

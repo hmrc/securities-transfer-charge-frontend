@@ -34,9 +34,7 @@ import uk.gov.hmrc.securitiestransferchargefrontend.pages.sh03.single.DetailsOfT
 import uk.gov.hmrc.securitiestransferchargefrontend.views.html.sh03.agents.single.DetailsOfThisSharePurchaseView
 
 class DetailsOfThisSharePurchaseControllerSpec extends SpecBase with MockitoSugar {
-
-  def onwardRoute = Call("GET", "/foo")
-
+  
   val formProvider = new DetailsOfThisSharePurchaseFormProvider()
   val form: Form[DetailsOfThisSharePurchase] = formProvider(affinityKey = affinityGroupKeyAgent)
 
