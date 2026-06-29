@@ -25,7 +25,7 @@ import uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.shared.SaveA
 import uk.gov.hmrc.securitiestransferchargefrontend.forms.sh03.agents.single.DetailsOfThisSharePurchaseFormProvider
 import uk.gov.hmrc.securitiestransferchargefrontend.models.{Mode, UserAnswers}
 import uk.gov.hmrc.securitiestransferchargefrontend.navigation.Navigator
-import uk.gov.hmrc.securitiestransferchargefrontend.pages.sh03.single.DetailsOfThisSharePurchasePage
+import uk.gov.hmrc.securitiestransferchargefrontend.pages.sh03.DetailsOfThisSharePurchasePage
 import uk.gov.hmrc.securitiestransferchargefrontend.utils.CommonHelpers.requireMarketValue
 import uk.gov.hmrc.securitiestransferchargefrontend.views.html.sh03.agents.single.DetailsOfThisSharePurchaseView
 

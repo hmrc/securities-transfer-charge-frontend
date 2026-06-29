@@ -14,9 +14,14 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.securitiestransferchargefrontend.pages.stf.bulk
+package uk.gov.hmrc.securitiestransferchargefrontend.pages.sh03
 
-import uk.gov.hmrc.securitiestransferchargefrontend.pages.Page
+import play.api.libs.json.JsPath
+import uk.gov.hmrc.securitiestransferchargefrontend.pages.QuestionPage
 
-case object FileUploadPage extends Page {
+case object MinimumAmountPaidPage extends QuestionPage[BigDecimal] {
+
+  override def path: JsPath = JsPath \ toString
+
+  override def toString: String = "minimumAmountPaid"
 }
