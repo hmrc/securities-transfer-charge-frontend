@@ -29,10 +29,7 @@ import uk.gov.hmrc.securitiestransferchargefrontend.models.{CheckMode, NormalMod
 import uk.gov.hmrc.securitiestransferchargefrontend.navigation.sh03.agents.Sh03AgentNavigator
 import uk.gov.hmrc.securitiestransferchargefrontend.models.shared.AgentReference
 import uk.gov.hmrc.securitiestransferchargefrontend.pages.Page
-import uk.gov.hmrc.securitiestransferchargefrontend.pages.sh03.agents.{AgentReferencePage, CompanyDetailsPage}
-import uk.gov.hmrc.securitiestransferchargefrontend.pages.sh03.shared.HowToNotifyAboutShareBuybackPage
-import uk.gov.hmrc.securitiestransferchargefrontend.pages.sh03.single.{ApplyingForReliefPage, DetailsOfThisSharePurchasePage, ReasonForPurchasePage, TreasurySharesPage}
-import uk.gov.hmrc.securitiestransferchargefrontend.pages.sh03.shared.ConnectedPersonsPage
+import uk.gov.hmrc.securitiestransferchargefrontend.pages.sh03._
 
 class Sh03AgentNavigatorSpec extends SpecBase with ScalaFutures {
 
