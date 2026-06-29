@@ -19,6 +19,8 @@ package navigation.sh03
 import base.SpecBase
 import base.stubs.StubAnswerPersistenceService
 import org.scalatest.concurrent.ScalaFutures
+import org.scalatestplus.mockito.MockitoSugar.mock
+import uk.gov.hmrc.securitiestransferchargefrontend.config.FrontendAppConfig
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.routes
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.sh03.agents.routes as sh03AgentRoutes
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.sh03.agents.single.routes as sh03AgentSingleRoutes
@@ -29,11 +31,13 @@ import uk.gov.hmrc.securitiestransferchargefrontend.models.{CheckMode, NormalMod
 import uk.gov.hmrc.securitiestransferchargefrontend.navigation.sh03.agents.Sh03AgentNavigator
 import uk.gov.hmrc.securitiestransferchargefrontend.models.shared.AgentReference
 import uk.gov.hmrc.securitiestransferchargefrontend.pages.Page
-import uk.gov.hmrc.securitiestransferchargefrontend.pages.sh03._
+import uk.gov.hmrc.securitiestransferchargefrontend.pages.sh03.*
 
 class Sh03AgentNavigatorSpec extends SpecBase with ScalaFutures {
 
-  val navigator = new Sh03AgentNavigator(StubAnswerPersistenceService())
+  private val mockConfig: FrontendAppConfig = mock[FrontendAppConfig]
+
+  val navigator = new Sh03AgentNavigator(StubAnswerPersistenceService(),mockConfig)
 
   "Sh03AgentNavigator" - {
 
