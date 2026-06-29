@@ -16,41 +16,42 @@
 
 package uk.gov.hmrc.securitiestransferchargefrontend.controllers.sh03.agents.single
 
-import play.api.data.Form
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, Call, MessagesControllerComponents}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.actions.*
+import uk.gov.hmrc.securitiestransferchargefrontend.controllers.actions.requests.StcDataRequest
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.shared.SaveAndReturnButton.isReturn
-import uk.gov.hmrc.securitiestransferchargefrontend.forms.sh03.agents.single.ConnectedPersonsFormProvider
+import uk.gov.hmrc.securitiestransferchargefrontend.forms.sh03.shared.MinimumAmountPaidFormProvider
 import uk.gov.hmrc.securitiestransferchargefrontend.models.{Mode, UserAnswers}
 import uk.gov.hmrc.securitiestransferchargefrontend.navigation.Navigator
-import uk.gov.hmrc.securitiestransferchargefrontend.pages.sh03.ConnectedPersonsPage
-import uk.gov.hmrc.securitiestransferchargefrontend.views.html.sh03.agents.single.ConnectedPersonsView
+import uk.gov.hmrc.securitiestransferchargefrontend.pages.sh03.MinimumAmountPaidPage
+import uk.gov.hmrc.securitiestransferchargefrontend.views.html.sh03.agents.single.MinimumAmountPaidView
 
 import javax.inject.{Inject, Named}
 import scala.concurrent.{ExecutionContext, Future}
 
-class ConnectedPersonsController @Inject()(
-                                         override val messagesApi: MessagesApi,
-                                         @Named("agentsSh03") navigator: Navigator,
-                                         stcAuthEnrolled: StcAuthEnrolledAction,
-                                         getData: StcDataRetrievalAction,
-                                         requireData: StcDataRequiredAction,
-                                         formProvider: ConnectedPersonsFormProvider,
-                                         val controllerComponents: MessagesControllerComponents,
-                                         view: ConnectedPersonsView
-                                 )(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport {
+class MinimumAmountPaidController @Inject()(
+                                                   override val messagesApi: MessagesApi,
+                                                   @Named("agentsSh03") navigator: Navigator,
+                                                   stcAuthEnrolled: StcAuthEnrolledAction,
+                                                   getData: StcDataRetrievalAction,
+                                                   requireData: StcDataRequiredAction,
+                                                   formProvider: MinimumAmountPaidFormProvider,
+                                                   val controllerComponents: MessagesControllerComponents,
+                                                   view: MinimumAmountPaidView
+                                      )(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport {
 
-  val form: Form[Boolean] = formProvider()
+  private def form(implicit request: StcDataRequest[_]) =
+    formProvider(request.request.affinityGroupKey)
 
   lazy val backLinkCall: Mode => UserAnswers => Call =
-    mode => userAnswers => navigator.previousPage(ConnectedPersonsPage, mode, userAnswers)
+    mode => userAnswers => navigator.previousPage(MinimumAmountPaidPage, mode, userAnswers)
 
   def onPageLoad(mode: Mode): Action[AnyContent] = (stcAuthEnrolled andThen getData andThen requireData) {
     implicit request =>
 
-      val preparedForm = request.userAnswers.get(ConnectedPersonsPage) match {
+      val preparedForm = request.userAnswers.get(MinimumAmountPaidPage) match {
         case None => form
         case Some(value) => form.fill(value)
       }
@@ -65,10 +66,10 @@ class ConnectedPersonsController @Inject()(
         formWithErrors =>
           Future.successful(BadRequest(view(formWithErrors, mode, backLinkCall(mode)(request.userAnswers)))),
 
-        areConnected =>
+        amount =>
           for {
-            updatedAnswers <- Future.fromTry(request.userAnswers.set(ConnectedPersonsPage, areConnected))
-            nextPage <- navigator.nextPage(ConnectedPersonsPage, mode, updatedAnswers, isReturn(request))
+            updatedAnswers <- Future.fromTry(request.userAnswers.set(MinimumAmountPaidPage, amount))
+            nextPage       <- navigator.nextPage(MinimumAmountPaidPage, mode, updatedAnswers, isReturn(request))
           } yield Redirect(nextPage)
       )
   }

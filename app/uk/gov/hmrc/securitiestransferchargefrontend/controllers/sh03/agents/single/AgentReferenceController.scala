@@ -27,7 +27,7 @@ import uk.gov.hmrc.securitiestransferchargefrontend.forms.shared.AgentReferenceF
 import uk.gov.hmrc.securitiestransferchargefrontend.models.shared.AgentReference
 import uk.gov.hmrc.securitiestransferchargefrontend.models.{Mode, UserAnswers}
 import uk.gov.hmrc.securitiestransferchargefrontend.navigation.Navigator
-import uk.gov.hmrc.securitiestransferchargefrontend.pages.sh03.agents.AgentReferencePage
+import uk.gov.hmrc.securitiestransferchargefrontend.pages.sh03.AgentReferencePage
 import uk.gov.hmrc.securitiestransferchargefrontend.views.html.sh03.agents.single.AgentReferenceView
 
 import javax.inject.{Inject, Named}

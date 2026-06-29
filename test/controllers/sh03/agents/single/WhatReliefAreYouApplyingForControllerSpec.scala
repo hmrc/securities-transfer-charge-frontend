@@ -16,88 +16,85 @@
 
 package controllers.sh03.agents.single
 
+import base.Fixtures.testUserAnswers
 import base.SpecBase
+import org.scalatestplus.mockito.MockitoSugar
 import play.api.data.Form
 import play.api.inject.bind
 import play.api.test.FakeRequest
 import play.api.test.Helpers.*
-import uk.gov.hmrc.auth.core.AffinityGroup
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.routes
-import uk.gov.hmrc.securitiestransferchargefrontend.controllers.sh03.agents.single.routes as agentsSh03SingleRoutes
-import uk.gov.hmrc.securitiestransferchargefrontend.forms.shared.AgentReferenceFormProvider
-import uk.gov.hmrc.securitiestransferchargefrontend.models.sh03.HowToNotifyAboutShareBuyback
-import uk.gov.hmrc.securitiestransferchargefrontend.models.sh03.HowToNotifyAboutShareBuyback.OneAtATime
-import uk.gov.hmrc.securitiestransferchargefrontend.models.shared.AgentReference
-import uk.gov.hmrc.securitiestransferchargefrontend.models.{NormalMode, UserAnswers}
+import uk.gov.hmrc.securitiestransferchargefrontend.controllers.sh03.agents.single.routes as agentSingle
+import uk.gov.hmrc.securitiestransferchargefrontend.forms.sh03.agents.WhatReliefAreYouApplyingForFormProvider
+import uk.gov.hmrc.securitiestransferchargefrontend.models.{NormalMode, ReliefsDataSource}
 import uk.gov.hmrc.securitiestransferchargefrontend.navigation.Navigator
-import uk.gov.hmrc.securitiestransferchargefrontend.pages.sh03.{AgentReferencePage, HowToNotifyAboutShareBuybackPage}
-import uk.gov.hmrc.securitiestransferchargefrontend.views.html.sh03.agents.single.AgentReferenceView
+import uk.gov.hmrc.securitiestransferchargefrontend.pages.sh03.WhatReliefAreYouApplyingForPage
+import uk.gov.hmrc.securitiestransferchargefrontend.views.html.sh03.agents.single.WhatReliefAreYouApplyingForView
 
-import scala.util.Random
+class WhatReliefAreYouApplyingForControllerSpec extends SpecBase with MockitoSugar {
 
-class AgentReferenceControllerSpec extends SpecBase {
+  val formProvider = new WhatReliefAreYouApplyingForFormProvider()
+  val form: Form[String] = formProvider()
 
-  val formProvider = new AgentReferenceFormProvider()
-  val form: Form[AgentReference] = formProvider()
+  lazy val whatReliefAreYouApplyingForRoute: String = agentSingle.WhatReliefAreYouApplyingForController.onPageLoad(NormalMode).url
 
-  lazy val agentReferenceRoute: String = agentsSh03SingleRoutes.AgentReferenceController.onPageLoad(NormalMode).url
-
-  "AgentReferenceController" - {
+  "WhatReliefAreYouApplyingFor Controller" - {
 
     "must return OK and the correct view for a GET" in {
+
       val application = applicationBuilder(userAnswers = Some(emptyUserAnswers), affinityGroup = agentAffinity)
-        .overrides(
-          bind[Navigator].qualifiedWith("agentsSh03").toInstance(getNavigator))
+        .overrides(bind[Navigator].qualifiedWith("agentsSh03").toInstance(getNavigator))
         .build()
 
       running(application) {
-        val request = FakeRequest(GET, agentReferenceRoute)
+        val request = FakeRequest(GET, whatReliefAreYouApplyingForRoute)
 
         val result = route(application, request).value
 
-        val view = application.injector.instanceOf[AgentReferenceView]
+        val view = application.injector.instanceOf[WhatReliefAreYouApplyingForView]
+
+        val reliefsDataSource = application.injector.instanceOf[ReliefsDataSource]
 
         status(result) mustEqual OK
-        contentAsString(result) mustEqual view(form, NormalMode, testBackLinkRoute)(request, messages(application)).toString
+        contentAsString(result) mustEqual view(form, NormalMode,reliefsDataSource.reliefs, testBackLinkRoute)(request, messages(application)).toString
       }
     }
 
     "must populate the view correctly on a GET when the question has previously been answered" in {
 
-      val userAnswers = UserAnswers(testUserId, testGroupIdentifier, submissionId).set(AgentReferencePage,AgentReference(Some("answer"))).success.value
+      val userAnswers = testUserAnswers.set(WhatReliefAreYouApplyingForPage, "answer").success.value
 
       val application = applicationBuilder(userAnswers = Some(userAnswers), affinityGroup = agentAffinity)
         .overrides(bind[Navigator].qualifiedWith("agentsSh03").toInstance(getNavigator))
         .build()
 
       running(application) {
-        val request = FakeRequest(GET, agentReferenceRoute)
+        val request = FakeRequest(GET, whatReliefAreYouApplyingForRoute)
 
-        val view = application.injector.instanceOf[AgentReferenceView]
+        val view = application.injector.instanceOf[WhatReliefAreYouApplyingForView]
+
+        val reliefsDataSource = application.injector.instanceOf[ReliefsDataSource]
 
         val result = route(application, request).value
 
         status(result) mustEqual OK
-        contentAsString(result) mustEqual view(form.fill(AgentReference(Some("answer"))), NormalMode, testBackLinkRoute)(request, messages(application)).toString
+        contentAsString(result) mustEqual view(form.fill("answer"), NormalMode,reliefsDataSource.reliefs, testBackLinkRoute)(request, messages(application)).toString
       }
     }
 
     "must redirect to the next page when valid data is submitted" in {
-      val updatedAnswers = emptyUserAnswers.set(HowToNotifyAboutShareBuybackPage, OneAtATime).success.value
-
       val application =
-        applicationBuilder(userAnswers = Some(updatedAnswers), AffinityGroup.Agent)
+        applicationBuilder(userAnswers = Some(emptyUserAnswers), affinityGroup = agentAffinity)
           .build()
 
       running(application) {
         val request =
-          FakeRequest(POST, agentReferenceRoute)
-            .withFormUrlEncodedBody(("value", "answer"))
+          FakeRequest(POST, whatReliefAreYouApplyingForRoute)
+            .withFormUrlEncodedBody(("reliefs", "test-relief"))
 
         val result = route(application, request).value
 
         status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual agentsSh03SingleRoutes.CompanyDetailsController.onPageLoad(NormalMode).url
       }
     }
 
@@ -108,21 +105,20 @@ class AgentReferenceControllerSpec extends SpecBase {
         .build()
 
       running(application) {
-
-        val invalidValue = Random.alphanumeric.take(260).mkString
-
         val request =
-          FakeRequest(POST, agentReferenceRoute)
-            .withFormUrlEncodedBody(("value", invalidValue))
+          FakeRequest(POST, whatReliefAreYouApplyingForRoute)
+            .withFormUrlEncodedBody(("reliefs", ""))
 
-        val boundForm = form.bind(Map("value" -> invalidValue))
+        val boundForm = form.bind(Map("reliefs" -> ""))
 
-        val view = application.injector.instanceOf[AgentReferenceView]
+        val view = application.injector.instanceOf[WhatReliefAreYouApplyingForView]
+        val reliefsDataSource = application.injector.instanceOf[ReliefsDataSource]
+
 
         val result = route(application, request).value
 
         status(result) mustEqual BAD_REQUEST
-        contentAsString(result) mustEqual view(boundForm, NormalMode, testBackLinkRoute)(request, messages(application)).toString
+        contentAsString(result) mustEqual view(boundForm, NormalMode,reliefsDataSource.reliefs, testBackLinkRoute)(request, messages(application)).toString
       }
     }
 
@@ -131,7 +127,7 @@ class AgentReferenceControllerSpec extends SpecBase {
       val application = applicationBuilder(userAnswers = None, affinityGroup = agentAffinity).build()
 
       running(application) {
-        val request = FakeRequest(GET, agentReferenceRoute)
+        val request = FakeRequest(GET, whatReliefAreYouApplyingForRoute)
 
         val result = route(application, request).value
 
@@ -142,12 +138,12 @@ class AgentReferenceControllerSpec extends SpecBase {
 
     "must redirect to Journey Recovery for a POST if no existing data is found" in {
 
-      val application = applicationBuilder(userAnswers = None, affinityGroup = agentAffinity).build()
+      val application = applicationBuilder(userAnswers = None).build()
 
       running(application) {
         val request =
-          FakeRequest(POST, agentReferenceRoute)
-            .withFormUrlEncodedBody(("value", "answer"))
+          FakeRequest(POST, whatReliefAreYouApplyingForRoute)
+            .withFormUrlEncodedBody(("reliefs", "answer"))
 
         val result = route(application, request).value
 

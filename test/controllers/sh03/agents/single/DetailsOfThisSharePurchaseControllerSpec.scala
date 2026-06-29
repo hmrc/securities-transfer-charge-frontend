@@ -28,8 +28,7 @@ import uk.gov.hmrc.securitiestransferchargefrontend.forms.sh03.agents.single.Det
 import uk.gov.hmrc.securitiestransferchargefrontend.models.sh03.agents.DetailsOfThisSharePurchase
 import uk.gov.hmrc.securitiestransferchargefrontend.models.{NormalMode, UserAnswers}
 import uk.gov.hmrc.securitiestransferchargefrontend.navigation.Navigator
-import uk.gov.hmrc.securitiestransferchargefrontend.pages.sh03.shared.ConnectedPersonsPage
-import uk.gov.hmrc.securitiestransferchargefrontend.pages.sh03.single.DetailsOfThisSharePurchasePage
+import uk.gov.hmrc.securitiestransferchargefrontend.pages.sh03.{ConnectedPersonsPage, DetailsOfThisSharePurchasePage}
 import uk.gov.hmrc.securitiestransferchargefrontend.views.html.sh03.agents.single.DetailsOfThisSharePurchaseView
 
 class DetailsOfThisSharePurchaseControllerSpec extends SpecBase with MockitoSugar {
