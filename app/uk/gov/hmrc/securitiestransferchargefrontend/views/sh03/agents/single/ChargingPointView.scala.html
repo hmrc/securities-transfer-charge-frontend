@@ -39,7 +39,7 @@ text = messages("agent.sh03.chargingPoint.link.text"),
 href = Some(routes.JourneyRecoveryController.onPageLoad().url)
 )) }
 
-@layout(pageTitle = title(form, messages("agent.sh03.chargingPoint.title")), backLinkUrl = Some(backLinkCall.url)) {
+@layout(pageTitle = title(form, messages("agent.sh03.chargingPoint.title"),Some(messages("sh03.section.name"))), backLinkUrl = Some(backLinkCall.url)) {
 
     @formHelper(action = sh03Routes.ChargingPointController.onSubmit(mode), Symbol("autoComplete") -> "off") {
 
