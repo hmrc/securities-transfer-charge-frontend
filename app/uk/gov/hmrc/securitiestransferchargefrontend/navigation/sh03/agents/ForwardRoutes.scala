@@ -18,26 +18,29 @@ package uk.gov.hmrc.securitiestransferchargefrontend.navigation.sh03.agents
 
 import play.api.mvc.Call
 import uk.gov.hmrc.http.HeaderCarrier
+import uk.gov.hmrc.securitiestransferchargefrontend.config.FrontendAppConfig
 import uk.gov.hmrc.securitiestransferchargefrontend.models.{NormalMode, UserAnswers}
 import uk.gov.hmrc.securitiestransferchargefrontend.models.sh03.shared.ReasonForPurchase
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.sh03.agents.single.routes as sh03AgentSingleRoutes
 import uk.gov.hmrc.securitiestransferchargefrontend.models.sh03.HowToNotifyAboutShareBuyback.{MoreThanOneAtATime, OneAtATime}
 import uk.gov.hmrc.securitiestransferchargefrontend.navigation.PersistentNavigationHelper
 import uk.gov.hmrc.securitiestransferchargefrontend.pages.Page
-import uk.gov.hmrc.securitiestransferchargefrontend.pages.sh03._
-
+import uk.gov.hmrc.securitiestransferchargefrontend.pages.sh03.*
 import uk.gov.hmrc.securitiestransferchargefrontend.services.AnswerPersistenceService
 
 import scala.concurrent.{ExecutionContext, Future}
 
 class ForwardRoutes(answerPersistenceService: AnswerPersistenceService,
                     defaultPage: Call,
-                    errorPages: Seq[Call])
+                    errorPages: Seq[Call],
+                    appConfig: FrontendAppConfig)
                    (implicit ec: ExecutionContext):
 
   val helper = new PersistentNavigationHelper(answerPersistenceService, defaultPage, errorPages)
 
   import helper.*
+
+  private val firstDate = appConfig.firstChargingPoint
 
 
   def forwardRoutes(page: Page)(implicit hc: HeaderCarrier): UserAnswers => Future[Call] = page match {
@@ -61,7 +64,11 @@ class ForwardRoutes(answerPersistenceService: AnswerPersistenceService,
       case true => defaultPage
     }
     case DetailsOfThisSharePurchasePage => userAnswers => dataRequired(DetailsOfThisSharePurchasePage, userAnswers, defaultPage)
-    case MinimumAmountPaidPage  => userAnswers =>  goTo(defaultPage,Some(userAnswers))
+    case MinimumAmountPaidPage  => userAnswers =>   dataRequired(MinimumAmountPaidPage, userAnswers,sh03AgentSingleRoutes.ChargingPointController.onPageLoad(NormalMode))
+    case ChargingPointPage => userAnswers => dataDependent(ChargingPointPage, userAnswers) {enterDate =>
+      if (enterDate.isBefore(firstDate)) defaultPage
+      else ??? //Go to role in purchasing company page
+    }
 
     case _ => _ => Future.successful(defaultPage)
   }

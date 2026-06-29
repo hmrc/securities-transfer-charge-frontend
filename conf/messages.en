@@ -822,3 +822,21 @@ agent.sh03.detailsOfSharePurchase.error.marketValue.negative = The market value 
 
 agent.sh03.whatReliefAreYouApplyingFor.checkYourAnswersLabel = Enter the relief the buyer is applying for
 agent.sh03.whatReliefAreYouApplyingFor.change.hidden = Change what relief the buyer is applying for
+
+agent.sh03.chargingPoint.title = Charging point
+agent.sh03.chargingPoint.heading = Charging point
+agent.sh03.chargingPoint.p1 = Any tax due on this share buyback must be paid 30 days from the charging point.
+agent.sh03.chargingPoint.p2 = The charging point is the date the share buyback is substantially completed. For example, the date when:
+agent.sh03.chargingPoint.bullet1 = all or the majority of the consideration is paid
+agent.sh03.chargingPoint.bullet2 = the buyer can exercise rights or receive benefits associated with owning the shares
+agent.sh03.chargingPoint.p3 = Find out
+agent.sh03.chargingPoint.link.text = more about charging points
+agent.sh03.chargingPoint.heading2 = What is the charging point for this share buyback?
+agent.sh03.chargingPoint.hint = For example, 27 3 2024
+agent.sh03.chargingPoint.checkYourAnswersLabel = Charging point
+agent.sh03.chargingPoint.error.required.all = Enter the charging point for this share buyback
+agent.sh03.chargingPoint.error.required.two = The charging point for this share buyback must include a {0} and a {1}
+agent.sh03.chargingPoint.error.required = The charging point for this share buyback must include a {0}
+agent.sh03.chargingPoint.error.invalid = The charging point for this share buyback must be a real date
+agent.sh03.chargingPoint.error.futureDate = The charging point for this share buyback must be today’s date, or a date in the past
+agent.sh03.chargingPoint.change.hidden = Change the charging point

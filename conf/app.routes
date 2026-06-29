@@ -341,3 +341,8 @@ GET        /sh03/agent/share-details                        uk.gov.hmrc.securiti
 POST       /sh03/agent/share-details                        uk.gov.hmrc.securitiestransferchargefrontend.controllers.sh03.agents.single.DetailsOfThisSharePurchaseController.onSubmit(mode: Mode = NormalMode)
 GET        /sh03/agent/change/share-details                 uk.gov.hmrc.securitiestransferchargefrontend.controllers.sh03.agents.single.DetailsOfThisSharePurchaseController.onPageLoad(mode: Mode = CheckMode)
 POST       /sh03/agent/change/share-details                 uk.gov.hmrc.securitiestransferchargefrontend.controllers.sh03.agents.single.DetailsOfThisSharePurchaseController.onSubmit(mode: Mode = CheckMode)
+
+GET        /sh03/agent/charging-point                        uk.gov.hmrc.securitiestransferchargefrontend.controllers.sh03.agents.single.ChargingPointController.onPageLoad(mode: Mode = NormalMode)
+POST       /sh03/agent/charging-point                        uk.gov.hmrc.securitiestransferchargefrontend.controllers.sh03.agents.single.ChargingPointController.onSubmit(mode: Mode = NormalMode)
+GET        /sh03/agent/change/charging-point                uk.gov.hmrc.securitiestransferchargefrontend.controllers.sh03.agents.single.ChargingPointController.onPageLoad(mode: Mode = CheckMode)
+POST       /sh03/agent/change/charging-point                 uk.gov.hmrc.securitiestransferchargefrontend.controllers.sh03.agents.single.ChargingPointController.onSubmit(mode: Mode = CheckMode)
