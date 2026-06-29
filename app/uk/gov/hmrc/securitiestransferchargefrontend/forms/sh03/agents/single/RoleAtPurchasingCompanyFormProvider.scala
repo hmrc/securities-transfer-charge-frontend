@@ -16,23 +16,40 @@
 
 package uk.gov.hmrc.securitiestransferchargefrontend.forms.sh03.agents.single
 
-import javax.inject.Inject
-import play.api.data.Form
 import play.api.data.Forms.*
+import play.api.data.format.Formatter
+import play.api.data.{Form, FormError}
 import uk.gov.hmrc.securitiestransferchargefrontend.models.sh03.agents.RoleAtPurchasingCompany
 
+import javax.inject.Inject
+
 class RoleAtPurchasingCompanyFormProvider @Inject() {
+
+  private val uksOrganFormatter: Formatter[Option[String]] = new Formatter[Option[String]] {
+
+    override def bind(key: String, data: Map[String, String]): Either[Seq[FormError], Option[String]] = {
+      val role = data.getOrElse("role", "")
+      val uksOrgan = data.get(key).filter(_.trim.nonEmpty)
+
+      if (role == "ukSocietas") {
+        uksOrgan match {
+          case None => Left(Seq(FormError(key, "agent.sh03.roleAtPurchasingCompany.uksOrgan.error.required")))
+          case Some(str) if str.length > 100 => Left(Seq(FormError(key, "agent.sh03.roleAtPurchasingCompany.uksOrgan.error.length")))
+          case Some(str) => Right(Some(str))
+        }
+      } else {
+        Right(uksOrgan)
+      }
+    }
+
+    override def unbind(key: String, value: Option[String]): Map[String, String] =
+      value.map(v => Map(key -> v)).getOrElse(Map.empty)
+  }
 
   def apply(): Form[RoleAtPurchasingCompany] = Form(
     mapping(
       "role" -> default(text, "").verifying("agent.sh03.roleAtPurchasingCompany.error.required", _.trim.nonEmpty),
-      "uksOrgan" -> optional(text)
+      "uksOrgan" -> of(uksOrganFormatter)
     )(RoleAtPurchasingCompany.apply)(o => Some((o.role, o.uksOrgan)))
-      .verifying("agent.sh03.roleAtPurchasingCompany.uksOrgan.error.required", data =>
-        if (data.role == "ukSocietas") data.uksOrgan.exists(_.trim.nonEmpty) else true
-      )
-      .verifying("agent.sh03.roleAtPurchasingCompany.uksOrgan.error.length", data =>
-        if (data.role == "ukSocietas") data.uksOrgan.forall(_.length <= 100) else true
-      )
   )
 }

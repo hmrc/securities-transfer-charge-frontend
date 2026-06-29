@@ -14,7 +14,7 @@ site.startAgain = Start again
 site.signIn = Sign in
 site.govuk = GOV.UK
 site.upload.file = Upload file
-site.or = Or
+site.or = or
 
 date.day = Day
 date.month = Month
