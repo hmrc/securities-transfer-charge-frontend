@@ -819,3 +819,6 @@ agent.sh03.detailsOfSharePurchase.title = What are the details of this share pur
 agent.sh03.detailsOfSharePurchase.heading = What are the details of this share purchase?
 agent.sh03.detailsOfSharePurchase.error.amountPaid.negative = The amount paid for the shares must be £0.01 or more
 agent.sh03.detailsOfSharePurchase.error.marketValue.negative = The market value of the shares must be £0.01 or more
+
+agent.sh03.whatReliefAreYouApplyingFor.checkYourAnswersLabel = Enter the relief the buyer is applying for
+agent.sh03.whatReliefAreYouApplyingFor.change.hidden = Change what relief the buyer is applying for

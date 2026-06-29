@@ -326,6 +326,11 @@ POST       /sh03/agent/apply-relief                               uk.gov.hmrc.se
 GET        /sh03/agent/change/apply-relief                        uk.gov.hmrc.securitiestransferchargefrontend.controllers.sh03.agents.single.ApplyingForReliefController.onPageLoad(mode: Mode = CheckMode)
 POST       /sh03/agent/change/apply-relief                        uk.gov.hmrc.securitiestransferchargefrontend.controllers.sh03.agents.single.ApplyingForReliefController.onSubmit(mode: Mode = CheckMode)
 
+GET        /sh03/agent/reliefs-list                         uk.gov.hmrc.securitiestransferchargefrontend.controllers.sh03.agents.single.WhatReliefAreYouApplyingForController.onPageLoad(mode: Mode = NormalMode)
+POST       /sh03/agent/reliefs-list                         uk.gov.hmrc.securitiestransferchargefrontend.controllers.sh03.agents.single.WhatReliefAreYouApplyingForController.onSubmit(mode: Mode = NormalMode)
+GET        /sh03/agent/change/reliefs-list                  uk.gov.hmrc.securitiestransferchargefrontend.controllers.sh03.agents.single.WhatReliefAreYouApplyingForController.onPageLoad(mode: Mode = CheckMode)
+POST       /sh03/agent/change/reliefs-list                  uk.gov.hmrc.securitiestransferchargefrontend.controllers.sh03.agents.single.WhatReliefAreYouApplyingForController.onSubmit(mode: Mode = CheckMode)
+
 GET        /sh03/agent/minimum-share-price                               uk.gov.hmrc.securitiestransferchargefrontend.controllers.sh03.agents.single.MinimumAmountPaidController.onPageLoad(mode: Mode = NormalMode)
 POST       /sh03/agent/minimum-share-price                               uk.gov.hmrc.securitiestransferchargefrontend.controllers.sh03.agents.single.MinimumAmountPaidController.onSubmit(mode: Mode = NormalMode)
 GET        /sh03/agent/minimum-share-price                        uk.gov.hmrc.securitiestransferchargefrontend.controllers.sh03.agents.single.MinimumAmountPaidController.onPageLoad(mode: Mode = CheckMode)

@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.securitiestransferchargefrontend.navigation.sh03.agents.single
+package uk.gov.hmrc.securitiestransferchargefrontend.navigation.sh03.agents
 
 import play.api.mvc.Call
 import uk.gov.hmrc.http.HeaderCarrier
