@@ -335,3 +335,5 @@ GET        /sh03/agent/share-details                        uk.gov.hmrc.securiti
 POST       /sh03/agent/share-details                        uk.gov.hmrc.securitiestransferchargefrontend.controllers.sh03.agents.single.DetailsOfThisSharePurchaseController.onSubmit(mode: Mode = NormalMode)
 GET        /sh03/agent/change/share-details                 uk.gov.hmrc.securitiestransferchargefrontend.controllers.sh03.agents.single.DetailsOfThisSharePurchaseController.onPageLoad(mode: Mode = CheckMode)
 POST       /sh03/agent/change/share-details                 uk.gov.hmrc.securitiestransferchargefrontend.controllers.sh03.agents.single.DetailsOfThisSharePurchaseController.onSubmit(mode: Mode = CheckMode)
+
+GET        /sh03/agent/cannot-submit-form                    uk.gov.hmrc.securitiestransferchargefrontend.controllers.sh03.agents.single.CannotSubmitFormErrorController.onPageLoad()

@@ -810,3 +810,18 @@ agent.sh03.detailsOfSharePurchase.error.marketValue.negative = The market value 
 
 agent.sh03.whatReliefAreYouApplyingFor.checkYourAnswersLabel = Enter the relief the buyer is applying for
 agent.sh03.whatReliefAreYouApplyingFor.change.hidden = Change what relief the buyer is applying for
+
+agent.sh03.cannotSubmitFormError.title = You cannot submit this form
+agent.sh03.cannotSubmitFormError.heading = You cannot submit this form
+agent.sh03.cannotSubmitFormError.error.p1 = The details of this share buyback must be provided by someone in an approved role at the company.
+agent.sh03.cannotSubmitFormError.error.p2 = Approved roles include:
+agent.sh03.cannotSubmitFormError.item1 = Director
+agent.sh03.cannotSubmitFormError.item2 = Secretary
+agent.sh03.cannotSubmitFormError.item3 = A ‘person authorised’ under section 270 or 274 of the Companies Act 2026
+agent.sh03.cannotSubmitFormError.item4 = Administrator
+agent.sh03.cannotSubmitFormError.item5 = Receiver
+agent.sh03.cannotSubmitFormError.item6 = Receiver manager
+agent.sh03.cannotSubmitFormError.item7 = CIC manager
+agent.sh03.cannotSubmitFormError.item8 = Someone submitting on behalf of a UK Societas
+agent.sh03.cannotSubmitFormError.error.p3 = You can save your submission as a draft, and submit it once you have this information.
+save-and-return-to-dashboard.link = Save and return to dashboard
