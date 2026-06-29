@@ -807,3 +807,25 @@ agent.sh03.detailsOfSharePurchase.title = What are the details of this share pur
 agent.sh03.detailsOfSharePurchase.heading = What are the details of this share purchase?
 agent.sh03.detailsOfSharePurchase.error.amountPaid.negative = The amount paid for the shares must be £0.01 or more
 agent.sh03.detailsOfSharePurchase.error.marketValue.negative = The market value of the shares must be £0.01 or more
+
+site.or = Or
+
+agent.sh03.roleAtPurchasingCompany.title = Who at the purchasing company provided the details of this share buyback?
+agent.sh03.roleAtPurchasingCompany.heading = Who at the purchasing company provided the details of this share buyback?
+agent.sh03.roleAtPurchasingCompany.director = Director
+agent.sh03.roleAtPurchasingCompany.secretary = Secretary
+agent.sh03.roleAtPurchasingCompany.personAuthorised = A ‘person authorised’ under section 270 or 274 of the Companies Act 2026
+agent.sh03.roleAtPurchasingCompany.administrator = Administrator
+agent.sh03.roleAtPurchasingCompany.receiver = Receiver
+agent.sh03.roleAtPurchasingCompany.receiverManager = Receiver manager
+agent.sh03.roleAtPurchasingCompany.cicManager = CIC manager
+agent.sh03.roleAtPurchasingCompany.ukSocietas = Someone acting on behalf of a UK Societas (UKS)
+agent.sh03.roleAtPurchasingCompany.uksOrgan.label = Which UKS organ are they a member of?
+agent.sh03.roleAtPurchasingCompany.notProvided = The information was not provided by someone in one of these roles
+agent.sh03.roleAtPurchasingCompany.checkYourAnswersLabel = Who at the purchasing company provided the details of this share buyback?
+agent.sh03.roleAtPurchasingCompany.change.hidden = Change who at the purchasing company provided the details of this share buyback
+
+agent.sh03.roleAtPurchasingCompany.error.required = Select the person’s role within the company who provided information about the share buyback
+agent.sh03.roleAtPurchasingCompany.uksOrgan.error.required = Enter the UKS organ they are a member of
+agent.sh03.roleAtPurchasingCompany.uksOrgan.error.min = The UKS organ you are a member of must be at least 1 character
+agent.sh03.roleAtPurchasingCompany.uksOrgan.error.length = The UKS organ you are a member of must be 100 characters or fewer

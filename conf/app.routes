@@ -330,3 +330,8 @@ GET        /sh03/agent/share-details                        uk.gov.hmrc.securiti
 POST       /sh03/agent/share-details                        uk.gov.hmrc.securitiestransferchargefrontend.controllers.sh03.agents.single.DetailsOfThisSharePurchaseController.onSubmit(mode: Mode = NormalMode)
 GET        /sh03/agent/change/share-details                 uk.gov.hmrc.securitiestransferchargefrontend.controllers.sh03.agents.single.DetailsOfThisSharePurchaseController.onPageLoad(mode: Mode = CheckMode)
 POST       /sh03/agent/change/share-details                 uk.gov.hmrc.securitiestransferchargefrontend.controllers.sh03.agents.single.DetailsOfThisSharePurchaseController.onSubmit(mode: Mode = CheckMode)
+
+GET        /sh03/agent/role-purchasing-company                 uk.gov.hmrc.securitiestransferchargefrontend.controllers.sh03.agents.single.RoleAtPurchasingCompanyController.onPageLoad(mode: Mode = NormalMode)
+POST       /sh03/agent/role-purchasing-company                 uk.gov.hmrc.securitiestransferchargefrontend.controllers.sh03.agents.single.RoleAtPurchasingCompanyController.onSubmit(mode: Mode = NormalMode)
+GET        /sh03/agent/change/role-purchasing-company          uk.gov.hmrc.securitiestransferchargefrontend.controllers.sh03.agents.single.RoleAtPurchasingCompanyController.onPageLoad(mode: Mode = CheckMode)
+POST       /sh03/agent/change/role-purchasing-company          uk.gov.hmrc.securitiestransferchargefrontend.controllers.sh03.agents.single.RoleAtPurchasingCompanyController.onSubmit(mode: Mode = CheckMode)
