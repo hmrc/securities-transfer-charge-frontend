@@ -14,14 +14,12 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.securitiestransferchargefrontend.pages.sh03.shared
+package uk.gov.hmrc.securitiestransferchargefrontend.models.sh03.agents
 
-import play.api.libs.json.JsPath
-import uk.gov.hmrc.securitiestransferchargefrontend.pages.QuestionPage
+import play.api.libs.json.*
 
-case object ConnectedPersonsPage extends QuestionPage[Boolean] {
+case class RoleAtPurchasingCompany(role: String, uksOrgan: Option[String])
 
-  override def path: JsPath = JsPath \ toString
-
-  override def toString: String = "connectedPersons"
+object RoleAtPurchasingCompany {
+  implicit val format: OFormat[RoleAtPurchasingCompany] = Json.format[RoleAtPurchasingCompany]
 }

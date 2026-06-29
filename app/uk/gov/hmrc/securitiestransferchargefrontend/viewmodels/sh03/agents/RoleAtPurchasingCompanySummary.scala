@@ -22,29 +22,29 @@ import uk.gov.hmrc.govukfrontend.views.viewmodels.content.HtmlContent
 import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.SummaryListRow
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.sh03.agents.single.routes
 import uk.gov.hmrc.securitiestransferchargefrontend.models.{CheckMode, UserAnswers}
-import uk.gov.hmrc.securitiestransferchargefrontend.pages.sh03.ReasonForPurchasePage
+import uk.gov.hmrc.securitiestransferchargefrontend.pages.sh03.agents.RoleAtPurchasingCompanyPage
 import uk.gov.hmrc.securitiestransferchargefrontend.viewmodels.govuk.summarylist.*
 import uk.gov.hmrc.securitiestransferchargefrontend.viewmodels.implicits.*
 
-object ReasonForPurchaseSummary  {
+object RoleAtPurchasingCompanySummary {
 
   def row(answers: UserAnswers)(implicit messages: Messages): Option[SummaryListRow] =
-    answers.get(ReasonForPurchasePage).map {
-      answer =>
+    answers.get(RoleAtPurchasingCompanyPage).map { answer =>
+      
+      val roleText = messages(s"agent.sh03.roleAtPurchasingCompany.${answer.role}")
+      
+      val valueHtml = answer.uksOrgan match {
+        case Some(organ) => s"${HtmlFormat.escape(roleText).toString}<br>${HtmlFormat.escape(organ).toString}"
+        case None        => HtmlFormat.escape(roleText).toString
+      }
 
-        val value = ValueViewModel(
-          HtmlContent(
-            HtmlFormat.escape(messages(s"reasonForPurchase.$answer"))
-          )
+      SummaryListRowViewModel(
+        key = "agent.sh03.roleAtPurchasingCompany.checkYourAnswersLabel",
+        value = ValueViewModel(HtmlContent(valueHtml)),
+        actions = Seq(
+          ActionItemViewModel("site.change", routes.RoleAtPurchasingCompanyController.onPageLoad(CheckMode).url)
+            .withVisuallyHiddenText(messages("agent.sh03.roleAtPurchasingCompany.change.hidden"))
         )
-
-        SummaryListRowViewModel(
-          key     = "reasonForPurchase.checkYourAnswersLabel",
-          value   = value,
-          actions = Seq(
-            ActionItemViewModel("site.change", routes.ReasonForPurchaseController.onPageLoad(CheckMode).url)
-              .withVisuallyHiddenText(messages("reasonForPurchase.change.hidden"))
-          )
-        )
+      )
     }
 }
