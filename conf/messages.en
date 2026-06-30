@@ -801,3 +801,12 @@ agent.sh03.applyingForRelief.error.required = Select yes if the buyer is  applyi
 agent.sh03.applyingForRelief.change.hidden = Change applying for a relief
 agent.sh03.applyingForRelief.p = See a
 agent.sh03.applyingForRelief.details.content.link.text = full list of reliefs
+
+agent.sh03.maximumAmountPaid.title = What is the maximum amount paid for the shares, in pounds?
+agent.sh03.maximumAmountPaid.heading = What is the maximum amount paid for the shares, in pounds?
+agent.sh03.maximumAmountPaid.checkYourAnswersLabel = What is the maximum amount paid for the shares, in pounds?
+agent.sh03.maximumAmountPaid.error.required = Enter the maximum amount paid for the shares
+agent.sh03.maximumAmountPaid.error.invalidNumeric = The maximum amount paid for the shares must be a number and can include up to two decimal places, like £30 or £28.60
+agent.sh03.maximumAmountPaid.error.aboveMaximum = The maximum amount paid for the shares must be £999,999,999 or less
+agent.sh03.maximumAmountPaid.error.negative = The maximum amount paid for the shares must be £0.01 or more
+agent.sh03.maximumAmountPaid.change.hidden = Change the maximum amount paid for the shares
