@@ -32,7 +32,7 @@ import scala.concurrent.{ExecutionContext, Future}
 
 class MaximumAmountPaidController @Inject()(
                                              override val messagesApi: MessagesApi,
-                                             @Named("agents") navigator: Navigator,
+                                             @Named("agentsSh03") navigator: Navigator,
                                              stcAuthEnrolled: StcAuthEnrolledAction,
                                              getData: StcDataRetrievalAction,
                                              requireData: StcDataRequiredAction,
