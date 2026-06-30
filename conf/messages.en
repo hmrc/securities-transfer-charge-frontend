@@ -579,14 +579,14 @@ individual.fileUpload.error.securitiesQuantity.maximum = The number of shares mu
 individual.fileUpload.error.securitiesQuantity.wholeNumber = The number of shares you are buying must be a whole number
 
 org.fileUpload.error.securitiesQuantity.required = Enter the number of shares the business is buying
-org.fileUpload.error.securitiesQuantity.nonNumeric = The amount of shares must be a number
-org.fileUpload.error.securitiesQuantity.minimum = The number of shares must be at least 1
-org.fileUpload.error.securitiesQuantity.maximum = The number of shares must be below 999,999,999
+org.fileUpload.error.securitiesQuantity.nonNumeric = The number of shares must be a whole number between 1 and 999,999,999
+org.fileUpload.error.securitiesQuantity.minimum = The number of shares must be a whole number between 1 and 999,999,999
+org.fileUpload.error.securitiesQuantity.maximum = The number of shares must be a whole number between 1 and 999,999,999
 
 agent.fileUpload.error.securitiesQuantity.required = Enter the number of shares the buyer is purchasing
-agent.fileUpload.error.securitiesQuantity.nonNumeric = The amount of shares must be a number
-agent.fileUpload.error.securitiesQuantity.minimum = The number of shares must be at least 1
-agent.fileUpload.error.securitiesQuantity.maximum = The number of shares must be below 999,999,999
+agent.fileUpload.error.securitiesQuantity.nonNumeric = The number of shares must be a whole number between 1 and 999,999,999
+agent.fileUpload.error.securitiesQuantity.minimum = The number of shares must be a whole number between 1 and 999,999,999
+agent.fileUpload.error.securitiesQuantity.maximum = The number of shares must be a whole number between 1 and 999,999,999
 
 individual.fileUpload.chargingPoint.error.required = Enter the date you bought the securities
 org.fileUpload.chargingPoint.error.required = Enter the date the business bought the securities
@@ -647,6 +647,26 @@ fileUpload.individual.chargingPoint.error.required.all = Enter the date you boug
 fileUpload.individual.chargingPoint.error.futureDate = The day you bought the securities must be today’s date or a date in the past
 fileUpload.individual.chargingPoint.error.invalid = The date you bought the securities must be a real date
 
+fileUpload.agent.amountPaidForSecurities.error.required = Enter the amount paid for the securities
+fileUpload.agent.amountPaidForSecurities.error.invalidNumeric = The amount paid for the securities must be a number and can include up to two decimal places, like £30 or £28.60
+fileUpload.agent.amountPaidForSecurities.error.nonNumeric = The amount paid for the securities must be a number and can include up to two decimal places, like £30 or £28.60
+fileUpload.agent.amountPaidForSecurities.error.negative = The amount paid for the securities must be £0.01 or more
+fileUpload.agent.amountPaidForSecurities.error.belowMinimum = The amount paid for the securities must be £0.01 or more
+fileUpload.agent.amountPaidForSecurities.error.aboveMaximum = The amount paid for the securities must be £999,999,999 or below
+
+fileUpload.org.amountPaidForSecurities.error.required = Enter the amount paid for the securities
+fileUpload.org.amountPaidForSecurities.error.invalidNumeric = The amount paid for the securities must be a number and can include up to two decimal places, like £30 or £28.60
+fileUpload.org.amountPaidForSecurities.error.nonNumeric = The amount paid for the securities must be a number and can include up to two decimal places, like £30 or £28.60
+fileUpload.org.amountPaidForSecurities.error.negative = The amount paid for the securities must be £0.01 or more
+fileUpload.org.amountPaidForSecurities.error.belowMinimum = The amount paid for the securities must be £0.01 or more
+fileUpload.org.amountPaidForSecurities.error.aboveMaximum = The amount paid for the securities must be £999,999,999 or below
+
+fileUpload.individual.amountPaidForSecurities.error.required = Enter the amount you paid for the securities
+fileUpload.individual.amountPaidForSecurities.error.invalidNumeric = The amount paid for the securities must be a number and can include up to two decimal places, like £30 or £28.60
+fileUpload.individual.amountPaidForSecurities.error.nonNumeric = The amount paid for the securities must be a number and can include up to two decimal places, like £30 or £28.60
+fileUpload.individual.amountPaidForSecurities.error.negative = The amount paid for the securities must be £0.01 or more
+fileUpload.individual.amountPaidForSecurities.error.belowMinimum = The amount paid for the securities must be £0.01 or more
+fileUpload.individual.amountPaidForSecurities.error.aboveMaximum = The amount you paid for the securities must be £999,999,999 or below
 
 agent.whatTypeOfSecurities.title = What type of securities is the buyer purchasing?
 agent.whatTypeOfSecurities.heading = What type of securities is the buyer purchasing?
@@ -843,3 +863,30 @@ agent.sh03.roleAtPurchasingCompany.error.required = Select the person’s role w
 agent.sh03.roleAtPurchasingCompany.uksOrgan.error.required = Enter the UKS organ they are a member of
 agent.sh03.roleAtPurchasingCompany.uksOrgan.error.min = The UKS organ you are a member of must be at least 1 character
 agent.sh03.roleAtPurchasingCompany.uksOrgan.error.length = The UKS organ you are a member of must be 100 characters or fewer
+
+agent.sh03.chargingPoint.title = Charging point
+agent.sh03.chargingPoint.heading = Charging point
+agent.sh03.chargingPoint.p1 = Any tax due on this share buyback must be paid 30 days from the charging point.
+agent.sh03.chargingPoint.p2 = The charging point is the date the share buyback is substantially completed. For example, the date when:
+agent.sh03.chargingPoint.bullet1 = all or the majority of the consideration is paid
+agent.sh03.chargingPoint.bullet2 = the buyer can exercise rights or receive benefits associated with owning the shares
+agent.sh03.chargingPoint.p3 = Find out
+agent.sh03.chargingPoint.link.text = more about charging points
+agent.sh03.chargingPoint.heading2 = What is the charging point for this share buyback?
+agent.sh03.chargingPoint.hint = For example, 27 3 2024
+agent.sh03.chargingPoint.checkYourAnswersLabel = Charging point
+agent.sh03.chargingPoint.error.required.all = Enter the charging point for this share buyback
+agent.sh03.chargingPoint.error.required.two = The charging point for this share buyback must include a {0} and a {1}
+agent.sh03.chargingPoint.error.required = The charging point for this share buyback must include a {0}
+agent.sh03.chargingPoint.error.invalid = The charging point for this share buyback must be a real date
+agent.sh03.chargingPoint.error.futureDate = The charging point for this share buyback must be today’s date, or a date in the past
+agent.sh03.chargingPoint.change.hidden = Change the charging point
+
+agent.sh03.maximumAmountPaid.title = What is the maximum amount paid for the shares, in pounds?
+agent.sh03.maximumAmountPaid.heading = What is the maximum amount paid for the shares, in pounds?
+agent.sh03.maximumAmountPaid.checkYourAnswersLabel = What is the maximum amount paid for the shares, in pounds?
+agent.sh03.maximumAmountPaid.error.required = Enter the maximum amount paid for the shares
+agent.sh03.maximumAmountPaid.error.invalidNumeric = The maximum amount paid for the shares must be a number and can include up to two decimal places, like £30 or £28.60
+agent.sh03.maximumAmountPaid.error.aboveMaximum = The maximum amount paid for the shares must be £999,999,999 or less
+agent.sh03.maximumAmountPaid.error.negative = The maximum amount paid for the shares must be £0.01 or more
+agent.sh03.maximumAmountPaid.change.hidden = Change the maximum amount paid for the shares
