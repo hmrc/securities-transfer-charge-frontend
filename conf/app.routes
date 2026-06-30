@@ -351,3 +351,8 @@ GET        /sh03/agent/role-purchasing-company                 uk.gov.hmrc.secur
 POST       /sh03/agent/role-purchasing-company                 uk.gov.hmrc.securitiestransferchargefrontend.controllers.sh03.agents.single.RoleAtPurchasingCompanyController.onSubmit(mode: Mode = NormalMode)
 GET        /sh03/agent/change/role-purchasing-company          uk.gov.hmrc.securitiestransferchargefrontend.controllers.sh03.agents.single.RoleAtPurchasingCompanyController.onPageLoad(mode: Mode = CheckMode)
 POST       /sh03/agent/change/role-purchasing-company          uk.gov.hmrc.securitiestransferchargefrontend.controllers.sh03.agents.single.RoleAtPurchasingCompanyController.onSubmit(mode: Mode = CheckMode)
+
+GET        /sh03/agent/maximum-amount-shares                    uk.gov.hmrc.securitiestransferchargefrontend.controllers.sh03.agents.single.MaximumAmountPaidController.onPageLoad(mode: Mode = NormalMode)
+POST       /sh03/agent/maximum-amount-shares                    uk.gov.hmrc.securitiestransferchargefrontend.controllers.sh03.agents.single.MaximumAmountPaidController.onSubmit(mode: Mode = NormalMode)
+GET        /sh03/agent/change/maximum-amount-shares             uk.gov.hmrc.securitiestransferchargefrontend.controllers.sh03.agents.single.MaximumAmountPaidController.onPageLoad(mode: Mode = CheckMode)
+POST       /sh03/agent/change/maximum-amount-shares             uk.gov.hmrc.securitiestransferchargefrontend.controllers.sh03.agents.single.MaximumAmountPaidController.onSubmit(mode: Mode = CheckMode)

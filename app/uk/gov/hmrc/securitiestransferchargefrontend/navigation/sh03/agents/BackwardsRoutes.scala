@@ -45,5 +45,6 @@ class BackwardsRoutes(defaultPage: Call):
     case DetailsOfThisSharePurchasePage => _ => sh03AgentSingleRoutes.ApplyingForReliefController.onPageLoad(NormalMode)
     case MinimumAmountPaidPage => _ => routes.JourneyRecoveryController.onPageLoad()
     case ChargingPointPage => _ => sh03AgentSingleRoutes.MinimumAmountPaidController.onPageLoad(NormalMode)
+    case MaximumAmountPaidPage => _ => routes.JourneyRecoveryController.onPageLoad()
     case _ => _ => defaultPage
   }
