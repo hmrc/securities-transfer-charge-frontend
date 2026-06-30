@@ -29,7 +29,7 @@ import uk.gov.hmrc.securitiestransferchargefrontend.controllers.sh03.agents.sing
 import uk.gov.hmrc.securitiestransferchargefrontend.forms.sh03.agents.MaximumAmountPaidFormProvider
 import uk.gov.hmrc.securitiestransferchargefrontend.models.NormalMode
 import uk.gov.hmrc.securitiestransferchargefrontend.navigation.Navigator
-import uk.gov.hmrc.securitiestransferchargefrontend.pages.sh03.single.MaximumAmountPaidPage
+import uk.gov.hmrc.securitiestransferchargefrontend.pages.sh03.MaximumAmountPaidPage
 import uk.gov.hmrc.securitiestransferchargefrontend.repositories.SessionRepository
 import uk.gov.hmrc.securitiestransferchargefrontend.views.html.sh03.agents.single.MaximumAmountPaidView
 
