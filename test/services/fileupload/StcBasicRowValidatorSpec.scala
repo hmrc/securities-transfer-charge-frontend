@@ -18,8 +18,8 @@ package services.fileupload
 
 import base.SpecBase
 import play.api.i18n.{Lang, Messages, MessagesApi}
-import uk.gov.hmrc.securitiestransferchargefrontend.forms.stf.fileUpload.SecuritiesTargetFormProvider
-import uk.gov.hmrc.securitiestransferchargefrontend.forms.stf.shared.{AmountPaidForSecuritiesFormProvider, NameOfBuyerFormProvider, NameOfSellerFormProvider}
+import uk.gov.hmrc.securitiestransferchargefrontend.forms.stf.fileUpload.{SecuritiesTargetFormProvider,AmountPaidForSecuritiesFormProvider}
+import uk.gov.hmrc.securitiestransferchargefrontend.forms.stf.shared.{NameOfBuyerFormProvider, NameOfSellerFormProvider}
 import uk.gov.hmrc.securitiestransferchargefrontend.models.stf.fileupload.*
 import uk.gov.hmrc.securitiestransferchargefrontend.models.stf.fileupload.ParsedValue.{Invalid, Missing, Valid}
 import uk.gov.hmrc.securitiestransferchargefrontend.services.fileupload.*
