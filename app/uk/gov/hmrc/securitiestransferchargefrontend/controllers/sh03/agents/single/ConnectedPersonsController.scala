@@ -25,7 +25,7 @@ import uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.shared.SaveA
 import uk.gov.hmrc.securitiestransferchargefrontend.forms.sh03.agents.single.ConnectedPersonsFormProvider
 import uk.gov.hmrc.securitiestransferchargefrontend.models.{Mode, UserAnswers}
 import uk.gov.hmrc.securitiestransferchargefrontend.navigation.Navigator
-import uk.gov.hmrc.securitiestransferchargefrontend.pages.sh03.shared.ConnectedPersonsPage
+import uk.gov.hmrc.securitiestransferchargefrontend.pages.sh03.ConnectedPersonsPage
 import uk.gov.hmrc.securitiestransferchargefrontend.views.html.sh03.agents.single.ConnectedPersonsView
 
 import javax.inject.{Inject, Named}
