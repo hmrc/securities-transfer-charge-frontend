@@ -118,7 +118,7 @@ class CannotSubmitFormErrorViewSpec extends ViewBaseSpec {
       }
 
       "have a save and return link back to the submission dashboard page" in {
-        val saveAndReturnLink = cannotSubmitFormErrorView.select(".govuk-button-group a.govuk-link").first()
+        val saveAndReturnLink = cannotSubmitFormErrorView.select(".govuk-body a.govuk-link").first()
         saveAndReturnLink.text() mustBe ExpectedContent.saveAndReturnLink
         saveAndReturnLink.attr("href") mustBe routes.SubmissionsDashboardController.onPageLoad().url
       }
