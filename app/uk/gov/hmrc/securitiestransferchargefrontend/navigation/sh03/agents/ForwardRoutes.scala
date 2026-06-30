@@ -67,7 +67,7 @@ class ForwardRoutes(answerPersistenceService: AnswerPersistenceService,
     case MinimumAmountPaidPage  => userAnswers =>   dataRequired(MinimumAmountPaidPage, userAnswers,sh03AgentSingleRoutes.ChargingPointController.onPageLoad(NormalMode))
     case ChargingPointPage => userAnswers => dataDependent(ChargingPointPage, userAnswers) {enterDate =>
       if (enterDate.isBefore(firstDate)) defaultPage
-      else ??? //Go to role in purchasing company page
+      else sh03AgentSingleRoutes.RoleAtPurchasingCompanyController.onPageLoad(NormalMode)
     }
 
     case _ => _ => Future.successful(defaultPage)
