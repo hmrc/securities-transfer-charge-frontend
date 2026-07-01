@@ -16,12 +16,15 @@
 
 @import uk.gov.hmrc.securitiestransferchargefrontend.viewmodels.LabelSize.Large
 @import uk.gov.hmrc.securitiestransferchargefrontend.controllers.sh03.agents.single.routes.WhatReliefAreYouApplyingForController
+@import uk.gov.hmrc.hmrcfrontend.views.html.helpers.HmrcNewTabLinkHelper
+@import uk.gov.hmrc.hmrcfrontend.views.viewmodels.newtablinkhelper.NewTabLinkHelper
 @import uk.gov.hmrc.securitiestransferchargefrontend.views.ViewHelper
 @import uk.gov.hmrc.securitiestransferchargefrontend.views.html.templates
 @import uk.gov.hmrc.govukfrontend.views.viewmodels.errormessage._
 @import uk.gov.hmrc.govukfrontend.views.Implicits.RichSelect
 @import uk.gov.hmrc.securitiestransferchargefrontend.models.Relief
 @import uk.gov.hmrc.securitiestransferchargefrontend.views.html.components.SaveAndReturnButton
+@import uk.gov.hmrc.securitiestransferchargefrontend.config.FrontendAppConfig
 
 @this(
     layout: templates.Layout,
@@ -29,10 +32,17 @@
     govukErrorSummary: GovukErrorSummary,
     govukSelect: GovukSelect,
     govukButton: GovukButton,
-    saveAndReturnButton: SaveAndReturnButton
+    hmrcNewTabLinkHelper: HmrcNewTabLinkHelper,
+    saveAndReturnButton: SaveAndReturnButton,
+    appConfig: FrontendAppConfig
 )
 
 @(form: Form[_], mode: Mode, reliefs: Seq[Relief], backLinkCall: Call)(implicit request: Request[_], messages: Messages)
+
+@link = @{ hmrcNewTabLinkHelper(NewTabLinkHelper(
+    text = messages("agent.whatReliefAreYouApplyingFor.details.content.link.text"),
+    href = Some(appConfig.reliefsGuidanceUrl)
+)) }
 
 @layout(
     pageTitle = title(form, messages("agent.whatReliefAreYouApplyingFor.title"), Some(messages("sh03.section.name"))),
@@ -46,20 +56,14 @@
 
         <h1 class="govuk-heading-l">@messages("agent.whatReliefAreYouApplyingFor.heading")</h1>
 
-        <p class="govuk-body">
-            @messages("agent.whatReliefAreYouApplyingFor.p")
-            <a href="https://www.gov.uk/guidance/stamp-duty-reliefs-and-exemptions-on-paper-shares" class="govuk-link" rel="noreferrer noopener" target="_blank">
-                @messages("agent.whatReliefAreYouApplyingFor.details.content.link.text")
-            </a>.
-        </p>
+        <p class="govuk-body">@messages("agent.whatReliefAreYouApplyingFor.p") @link.</p>
 
         @govukSelect(Select(
-            id = form("reliefs").id,
-            name = form("reliefs").name,
             label = Label(
-                content = HtmlContent(messages("agent.whatReliefAreYouApplyingFor.heading")),
+                content = Text(messages("agent.whatReliefAreYouApplyingFor.heading")),
                 classes = "govuk-visually-hidden"
             ),
+            attributes = Map("aria-label" -> messages("agent.whatReliefAreYouApplyingFor.heading")),
             items = ViewHelper.reliefsToSelectItems(reliefs, form)
         ).asAccessibleAutocomplete().withFormField(form("reliefs")))
 
