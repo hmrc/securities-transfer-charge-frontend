@@ -24,7 +24,7 @@
 @import uk.gov.hmrc.govukfrontend.views.Implicits.RichSelect
 @import uk.gov.hmrc.securitiestransferchargefrontend.models.Relief
 @import uk.gov.hmrc.securitiestransferchargefrontend.views.html.components.SaveAndReturnButton
-
+@import uk.gov.hmrc.securitiestransferchargefrontend.config.FrontendAppConfig
 
 @this(
     layout: templates.Layout,
@@ -33,13 +33,15 @@
     govukSelect: GovukSelect,
     govukButton: GovukButton,
     hmrcNewTabLinkHelper: HmrcNewTabLinkHelper,
-    saveAndReturnButton: SaveAndReturnButton
+    saveAndReturnButton: SaveAndReturnButton,
+    appConfig: FrontendAppConfig
 )
 
 @(form: Form[_], mode: Mode, reliefs: Seq[Relief], backLinkCall: Call)(implicit request: Request[_], messages: Messages)
 
 @link = @{ hmrcNewTabLinkHelper(NewTabLinkHelper(
-    text = messages("agent.whatReliefAreYouApplyingFor.details.content.link.text")
+    text = messages("agent.whatReliefAreYouApplyingFor.details.content.link.text"),
+    href = Some(appConfig.reliefsGuidanceUrl)
 )) }
 
 @layout(
@@ -57,12 +59,11 @@
         <p class="govuk-body">@messages("agent.whatReliefAreYouApplyingFor.p") @link.</p>
 
         @govukSelect(Select(
-            id = form("reliefs").id,
-            name = form("reliefs").name,
             label = Label(
-                content = HtmlContent(messages("agent.whatReliefAreYouApplyingFor.heading")),
+                content = Text(messages("agent.whatReliefAreYouApplyingFor.heading")),
                 classes = "govuk-visually-hidden"
             ),
+            attributes = Map("aria-label" -> messages("agent.whatReliefAreYouApplyingFor.heading")),
             items = ViewHelper.reliefsToSelectItems(reliefs, form)
         ).asAccessibleAutocomplete().withFormField(form("reliefs")))
 
