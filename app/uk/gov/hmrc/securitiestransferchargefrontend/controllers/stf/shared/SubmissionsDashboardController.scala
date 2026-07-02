@@ -25,8 +25,6 @@ import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import uk.gov.hmrc.securitiestransferchargefrontend.clients.{SaveAndReturnClient, SubmissionIdClient}
 import uk.gov.hmrc.securitiestransferchargefrontend.config.FrontendAppConfig
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.actions.{StcAuthEnrolledAction, StcDataRetrievalAction}
-import uk.gov.hmrc.securitiestransferchargefrontend.controllers.sh03.agents.routes as sh03AgentRoutes
-import uk.gov.hmrc.securitiestransferchargefrontend.controllers.sh03.organisations.routes as sh03OrgRoutes
 import uk.gov.hmrc.securitiestransferchargefrontend.domain.{GroupIdentifier, SubmissionId, UserId}
 import uk.gov.hmrc.securitiestransferchargefrontend.models.audit.AuditModel
 import uk.gov.hmrc.securitiestransferchargefrontend.models.audit.JourneyStatus.StartSubmission
@@ -35,6 +33,7 @@ import uk.gov.hmrc.securitiestransferchargefrontend.navigation.Navigator
 import uk.gov.hmrc.securitiestransferchargefrontend.pages.stf.shared.SubmissionsDashboardPage
 import uk.gov.hmrc.securitiestransferchargefrontend.services.AuditService
 import uk.gov.hmrc.securitiestransferchargefrontend.views.html.stf.shared.SubmissionsDashboardView
+import uk.gov.hmrc.securitiestransferchargefrontend.controllers.sh03.shared.routes as sh03SharedRoutes
 
 import javax.inject.{Inject, Named}
 import scala.concurrent.{ExecutionContext, Future}
@@ -66,9 +65,9 @@ class SubmissionsDashboardController @Inject()(
 
 
   private def listSubmissionIds(userId: UserId, groupIdentifier: GroupIdentifier)(implicit headerCarrier: HeaderCarrier): Future[List[SubmissionId]] = {
-    import appConfig.SaveAndReturnRetrievalType.*
+    import appConfig.SaveAndReturnRetrievalType._
     appConfig.saveAndReturnRetrieval match {
-      case UserOnly => saveAndReturnClient.listByUser(userId)
+      case UserOnly     => saveAndReturnClient.listByUser(userId)
       case UserAndGroup => saveAndReturnClient.listByGroup(groupIdentifier)
     }
   }
@@ -100,16 +99,7 @@ class SubmissionsDashboardController @Inject()(
       }
   }
 
-  def startSh03(): Action[AnyContent] = (stcAuthEnrolled andThen getData).async { implicit request =>
-    val innerRequest = request.request
-
-    val call = innerRequest.affinityGroup match {
-      case AffinityGroup.Organisation => sh03OrgRoutes.BeforeYouStartController.onPageLoad()
-
-      case AffinityGroup.Agent => sh03AgentRoutes.BeforeYouStartController.onPageLoad()
-
-      case _ => sh03OrgRoutes.BeforeYouStartController.onPageLoad()
-    }
-    Future.successful(Redirect(call))
+  def startSh03(): Action[AnyContent] = stcAuthEnrolled { implicit request =>
+    Redirect(sh03SharedRoutes.BeforeYouStartController.onPageLoad())
   }
 }

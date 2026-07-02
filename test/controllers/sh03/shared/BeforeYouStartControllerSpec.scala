@@ -14,25 +14,29 @@
  * limitations under the License.
  */
 
-package controllers.sh03.organisations
+package controllers.sh03.shared
 
 import base.SpecBase
 import play.api.test.FakeRequest
 import play.api.test.Helpers.*
-import uk.gov.hmrc.securitiestransferchargefrontend.controllers.sh03.organisations.routes as orgSH03Route
-import uk.gov.hmrc.securitiestransferchargefrontend.views.html.sh03.organisations.BeforeYouStartView
-import uk.gov.hmrc.securitiestransferchargefrontend.controllers.routes
+import uk.gov.hmrc.securitiestransferchargefrontend.controllers.sh03.shared.routes as sharedSH03Route
+import uk.gov.hmrc.securitiestransferchargefrontend.controllers.sh03.agents.routes as agentSH03Route
+import uk.gov.hmrc.securitiestransferchargefrontend.views.html.sh03.shared.BeforeYouStartView
 
 class BeforeYouStartControllerSpec extends SpecBase {
 
-  private lazy val onPageLoadRoute = orgSH03Route.BeforeYouStartController.onPageLoad().url
-  private lazy val onSubmitRoute = orgSH03Route.BeforeYouStartController.onSubmit().url
+  private lazy val onPageLoadRoute = sharedSH03Route.BeforeYouStartController.onPageLoad().url
+  private lazy val onSubmitRoute = sharedSH03Route.BeforeYouStartController.onSubmit().url
 
   "BeforeYouStartController" - {
 
     "must return OK and the correct view for a GET" in {
 
-      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers), affinityGroup = orgAffinity).build()
+      val application =
+        applicationBuilder(
+          userAnswers = Some(emptyUserAnswers),
+          affinityGroup = agentAffinity
+        ).build()
 
       running(application) {
 
@@ -50,7 +54,11 @@ class BeforeYouStartControllerSpec extends SpecBase {
 
     "must redirect to the journey recovery page on submit" in {
 
-      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers), affinityGroup = orgAffinity).build()
+      val application =
+        applicationBuilder(
+          userAnswers = Some(emptyUserAnswers),
+          affinityGroup = agentAffinity
+        ).build()
 
       running(application) {
 
@@ -59,7 +67,7 @@ class BeforeYouStartControllerSpec extends SpecBase {
         val result = route(application, request).value
 
         status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual routes.JourneyRecoveryController.onPageLoad().url
+        redirectLocation(result).value mustEqual agentSH03Route.HowToNotifyAboutShareBuybackController.onPageLoad().url
       }
     }
   }

@@ -16,7 +16,7 @@
 
 @import uk.gov.hmrc.securitiestransferchargefrontend.views.html.templates
 @import uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.shared.routes
-@import uk.gov.hmrc.securitiestransferchargefrontend.controllers.sh03.organisations.routes as sh03Routes
+@import uk.gov.hmrc.securitiestransferchargefrontend.controllers.sh03.shared.routes as sh03SharedRoutes
 
 @this(
     layout: templates.Layout,
@@ -26,20 +26,20 @@
 
 @()(implicit request: Request[_], messages: Messages)
 
-@layout(pageTitle = titleNoForm(messages("org.sh03.beforeYouStart.title"),Some(messages("sh03.section.name"))),backLinkUrl = Some(routes.SubmissionsDashboardController.onPageLoad().url)) {
+@layout(pageTitle = titleNoForm(messages("sh03.beforeYouStart.title"),Some(messages("sh03.section.name"))),backLinkUrl = Some(routes.SubmissionsDashboardController.onPageLoad().url)) {
 
     <h1 class="govuk-heading-l">
-        @messages("org.sh03.beforeYouStart.heading")
+        @messages("sh03.beforeYouStart.heading")
     </h1>
 
-    @for(key <- Seq("org.sh03.beforeYouStart.p1","org.sh03.beforeYouStart.p2","org.sh03.beforeYouStart.p3","org.sh03.beforeYouStart.p4"
+    @for(key <- Seq("sh03.beforeYouStart.p1","sh03.beforeYouStart.p2","sh03.beforeYouStart.p3","sh03.beforeYouStart.p4"
     )) {
         <p class="govuk-body">
             @messages(key)
         </p>
     }
 
-    @formHelper(action = sh03Routes.BeforeYouStartController.onSubmit()) {
+    @formHelper(action = sh03SharedRoutes.BeforeYouStartController.onSubmit()) {
 
         <div class="govuk-button-group">
 

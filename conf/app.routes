@@ -289,8 +289,8 @@ POST       /stf/agent/bulk/change/add-reference            uk.gov.hmrc.securitie
 
 GET         /submissions-dashboard/sh03                      uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.shared.SubmissionsDashboardController.startSh03()
 
-GET        /sh03/agent/before-you-start                 uk.gov.hmrc.securitiestransferchargefrontend.controllers.sh03.agents.BeforeYouStartController.onPageLoad()
-POST       /sh03/agent/before-you-start                uk.gov.hmrc.securitiestransferchargefrontend.controllers.sh03.agents.BeforeYouStartController.onSubmit()
+GET        /sh03/before-you-start                          uk.gov.hmrc.securitiestransferchargefrontend.controllers.sh03.shared.BeforeYouStartController.onPageLoad()
+POST       /sh03/before-you-start                          uk.gov.hmrc.securitiestransferchargefrontend.controllers.sh03.shared.BeforeYouStartController.onSubmit()
 
 GET        /sh03/agent/add-reference                       uk.gov.hmrc.securitiestransferchargefrontend.controllers.sh03.agents.single.AgentReferenceController.onPageLoad(mode: Mode = NormalMode)
 POST       /sh03/agent/add-reference                       uk.gov.hmrc.securitiestransferchargefrontend.controllers.sh03.agents.single.AgentReferenceController.onSubmit(mode: Mode = NormalMode)
@@ -358,6 +358,3 @@ GET        /sh03/agent/change/maximum-amount-shares             uk.gov.hmrc.secu
 POST       /sh03/agent/change/maximum-amount-shares             uk.gov.hmrc.securitiestransferchargefrontend.controllers.sh03.agents.single.MaximumAmountPaidController.onSubmit(mode: Mode = CheckMode)
 
 GET        /sh03/agent/cannot-submit-form                    uk.gov.hmrc.securitiestransferchargefrontend.controllers.sh03.agents.single.CannotSubmitFormErrorController.onPageLoad()
-
-GET        /sh03/org/before-you-start                     uk.gov.hmrc.securitiestransferchargefrontend.controllers.sh03.organisations.BeforeYouStartController.onPageLoad()
-POST       /sh03/org/before-you-start                     uk.gov.hmrc.securitiestransferchargefrontend.controllers.sh03.organisations.BeforeYouStartController.onSubmit()
