@@ -20,14 +20,18 @@ import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.actions.*
-import uk.gov.hmrc.securitiestransferchargefrontend.controllers.sh03.agents.routes
+import uk.gov.hmrc.securitiestransferchargefrontend.controllers.sh03.agents.routes as agentRoutes
+import uk.gov.hmrc.securitiestransferchargefrontend.controllers.routes
 import uk.gov.hmrc.securitiestransferchargefrontend.views.html.sh03.shared.BeforeYouStartView
+import uk.gov.hmrc.auth.core.AffinityGroup
+import scala.concurrent.Future
 
 import javax.inject.Inject
 
 class BeforeYouStartController @Inject()(
                                           override val messagesApi: MessagesApi,
                                           stcAuthEnrolled: StcAuthEnrolledAction,
+                                          getData: StcDataRetrievalAction,
                                           val controllerComponents: MessagesControllerComponents,
                                           view: BeforeYouStartView
                                         ) extends FrontendBaseController with I18nSupport {
@@ -37,7 +41,17 @@ class BeforeYouStartController @Inject()(
       Ok(view())
   }
 
-  def onSubmit(): Action[AnyContent] = stcAuthEnrolled { implicit request =>
-    Redirect(routes.HowToNotifyAboutShareBuybackController.onPageLoad())
+  def onSubmit(): Action[AnyContent] = (stcAuthEnrolled andThen getData).async { implicit request =>
+    val innerRequest = request.request
+
+    val call = innerRequest.affinityGroup match {
+      case AffinityGroup.Organisation =>
+        routes.JourneyRecoveryController.onPageLoad()
+      case AffinityGroup.Agent =>
+        agentRoutes.HowToNotifyAboutShareBuybackController.onPageLoad()
+      case _ =>
+        routes.JourneyRecoveryController.onPageLoad()
+    }
+    Future.successful(Redirect(call))
   }
 }
