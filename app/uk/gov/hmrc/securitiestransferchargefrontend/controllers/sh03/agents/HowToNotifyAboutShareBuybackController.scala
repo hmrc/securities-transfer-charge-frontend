@@ -23,7 +23,7 @@ import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import uk.gov.hmrc.securitiestransferchargefrontend.clients.SubmissionIdClient
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.actions.*
 import uk.gov.hmrc.securitiestransferchargefrontend.domain.{GroupIdentifier, UserId}
-import uk.gov.hmrc.securitiestransferchargefrontend.forms.sh03.agents.HowToNotifyAboutShareBuybackFormProvider
+import uk.gov.hmrc.securitiestransferchargefrontend.forms.sh03.shared.HowToNotifyAboutShareBuybackFormProvider
 import uk.gov.hmrc.securitiestransferchargefrontend.models.sh03.HowToNotifyAboutShareBuyback
 import uk.gov.hmrc.securitiestransferchargefrontend.models.{NormalMode, UserAnswers}
 import uk.gov.hmrc.securitiestransferchargefrontend.navigation.Navigator
@@ -45,11 +45,12 @@ class HowToNotifyAboutShareBuybackController @Inject()(
                                        view: HowToNotifyAboutShareBuybackView
                                      )(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport {
 
-  val form: Form[HowToNotifyAboutShareBuyback] = formProvider()
+  
 
   def onPageLoad(): Action[AnyContent] = (stcAuthEnrolled andThen getData) {implicit request =>
 
     val innerRequest = request.request
+    val form: Form[HowToNotifyAboutShareBuyback] = formProvider(innerRequest.affinityGroupKey)
 
     Ok(view(form, NormalMode, innerRequest.affinityGroupKey))
   }
@@ -61,6 +62,7 @@ class HowToNotifyAboutShareBuybackController @Inject()(
       val innerRequest = request.request
       val userId = UserId(innerRequest.internalId)
       val group = GroupIdentifier(innerRequest.groupIdentifier)
+      val form: Form[HowToNotifyAboutShareBuyback] = formProvider(innerRequest.affinityGroupKey)
 
       form.bindFromRequest().fold(
         formWithErrors =>

@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package controllers.sh03.agents
+package controllers.sh03.organisations
 
 import base.SpecBase
 import org.mockito.ArgumentMatchers.any
@@ -25,31 +25,29 @@ import play.api.inject.bind
 import play.api.test.FakeRequest
 import play.api.test.Helpers.*
 import uk.gov.hmrc.securitiestransferchargefrontend.clients.SubmissionIdClient
-import uk.gov.hmrc.securitiestransferchargefrontend.controllers.sh03.agents.routes as agentRoutes
+import uk.gov.hmrc.securitiestransferchargefrontend.controllers.routes
+import uk.gov.hmrc.securitiestransferchargefrontend.controllers.sh03.organisations.routes as orgRoutes
 import uk.gov.hmrc.securitiestransferchargefrontend.forms.sh03.shared.HowToNotifyAboutShareBuybackFormProvider
 import uk.gov.hmrc.securitiestransferchargefrontend.models.sh03.HowToNotifyAboutShareBuyback
 import uk.gov.hmrc.securitiestransferchargefrontend.models.{NormalMode, UserAnswers}
-import uk.gov.hmrc.securitiestransferchargefrontend.navigation.Navigator
 import uk.gov.hmrc.securitiestransferchargefrontend.pages.sh03.HowToNotifyAboutShareBuybackPage
-import uk.gov.hmrc.securitiestransferchargefrontend.views.html.sh03.agents.HowToNotifyAboutShareBuybackView
+import uk.gov.hmrc.securitiestransferchargefrontend.views.html.sh03.organisations.HowToNotifyAboutShareBuybackView
 
 import scala.concurrent.Future
 import scala.language.postfixOps
 
 class HowToNotifyAboutShareBuybackControllerSpec extends SpecBase with MockitoSugar {
 
-  lazy val howToNotifyAboutShareBuybackRoute: String = agentRoutes.HowToNotifyAboutShareBuybackController.onPageLoad().url
+  lazy val howToNotifyAboutShareBuybackRoute: String = orgRoutes.HowToNotifyAboutShareBuybackController.onPageLoad().url
 
   val formProvider = new HowToNotifyAboutShareBuybackFormProvider()
-  val form: Form[HowToNotifyAboutShareBuyback] = formProvider(affinityGroupKeyAgent)
+  val form: Form[HowToNotifyAboutShareBuyback] = formProvider(affinityGroupKeyOrg)
 
-  "HowToNotifyAboutShareBuyback Controller" - {
+  "HowToNotifyAboutShareBuybackController" - {
 
     "must return OK and the correct view for a GET" in {
 
-      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers), affinityGroup = agentAffinity)
-        .overrides(bind[Navigator].qualifiedWith("agentsSh03").toInstance(getNavigator))
-        .build()
+      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers), affinityGroup = orgAffinity).build()
 
       running(application) {
         val request = FakeRequest(GET, howToNotifyAboutShareBuybackRoute)
@@ -59,11 +57,11 @@ class HowToNotifyAboutShareBuybackControllerSpec extends SpecBase with MockitoSu
         val view = application.injector.instanceOf[HowToNotifyAboutShareBuybackView]
 
         status(result) mustEqual OK
-        contentAsString(result) mustEqual view(form, NormalMode, affinityGroupKeyAgent)(request, messages(application)).toString
+        contentAsString(result) mustEqual view(form, NormalMode, affinityGroupKeyOrg)(request, messages(application)).toString
       }
     }
 
-    "must redirect to the appropriate next page when one at a time is submitted" in {
+    "must redirect to JourneyRecovery (placeholder) when One at a time is submitted" in {
 
       val mockIdClient = mock[SubmissionIdClient]
 
@@ -73,9 +71,8 @@ class HowToNotifyAboutShareBuybackControllerSpec extends SpecBase with MockitoSu
       val userAnswers = UserAnswers(testUserId, testGroupIdentifier, submissionId)
         .set(HowToNotifyAboutShareBuybackPage, HowToNotifyAboutShareBuyback.values.head).success.value
 
-      val application = applicationBuilder(userAnswers = Some(userAnswers), affinityGroup = agentAffinity)
+      val application = applicationBuilder(userAnswers = Some(userAnswers), affinityGroup = orgAffinity)
         .overrides(
-          bind[Navigator].qualifiedWith("agentsSh03").toInstance(getNavigator),
           bind[SubmissionIdClient].toInstance(mockIdClient)
         )
         .build()
@@ -89,11 +86,12 @@ class HowToNotifyAboutShareBuybackControllerSpec extends SpecBase with MockitoSu
 
         status(result) mustEqual SEE_OTHER
 
-        redirectLocation(result).value mustEqual testNextPage.url
+        // Currently hardcoded to redirect to Journey Recovery in the Org controller
+        redirectLocation(result).value mustEqual routes.JourneyRecoveryController.onPageLoad().url
       }
     }
 
-    "must redirect to the appropriate next page when more than one at a time is selected" in {
+    "must redirect to JourneyRecovery (placeholder) when More than one at a time is selected" in {
 
       val mockIdClient = mock[SubmissionIdClient]
 
@@ -103,9 +101,8 @@ class HowToNotifyAboutShareBuybackControllerSpec extends SpecBase with MockitoSu
       val userAnswers = UserAnswers(testUserId, testGroupIdentifier, submissionId)
         .set(HowToNotifyAboutShareBuybackPage, HowToNotifyAboutShareBuyback.values.last).success.value
 
-      val application = applicationBuilder(userAnswers = Some(userAnswers), affinityGroup = agentAffinity)
+      val application = applicationBuilder(userAnswers = Some(userAnswers), affinityGroup = orgAffinity)
         .overrides(
-          bind[Navigator].qualifiedWith("agentsSh03").toInstance(getNavigator),
           bind[SubmissionIdClient].toInstance(mockIdClient)
         )
         .build()
@@ -119,14 +116,14 @@ class HowToNotifyAboutShareBuybackControllerSpec extends SpecBase with MockitoSu
 
         status(result) mustEqual SEE_OTHER
 
-        redirectLocation(result).value mustEqual testNextPage.url
+        // Currently hardcoded to redirect to Journey Recovery in the Org controller
+        redirectLocation(result).value mustEqual routes.JourneyRecoveryController.onPageLoad().url
       }
     }
 
     "must return a Bad Request and errors when invalid data is submitted" in {
-      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers), affinityGroup = agentAffinity)
-        .overrides(bind[Navigator].qualifiedWith("agentsSh03").toInstance(getNavigator))
-        .build()
+
+      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers), affinityGroup = orgAffinity).build()
 
       running(application) {
         val request =
@@ -139,7 +136,7 @@ class HowToNotifyAboutShareBuybackControllerSpec extends SpecBase with MockitoSu
         val result = route(application, request).value
 
         status(result) mustEqual BAD_REQUEST
-        contentAsString(result) mustEqual view(boundForm, NormalMode, affinityGroupKeyAgent)(request, messages(application)).toString
+        contentAsString(result) mustEqual view(boundForm, NormalMode, affinityGroupKeyOrg)(request, messages(application)).toString
       }
     }
   }

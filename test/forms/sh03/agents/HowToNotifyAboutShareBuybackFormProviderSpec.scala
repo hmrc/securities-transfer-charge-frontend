@@ -18,17 +18,18 @@ package forms.sh03.agents
 
 import play.api.data.FormError
 import forms.behaviours.OptionFieldBehaviours
-import uk.gov.hmrc.securitiestransferchargefrontend.forms.sh03.agents.HowToNotifyAboutShareBuybackFormProvider
+import uk.gov.hmrc.securitiestransferchargefrontend.forms.sh03.shared.HowToNotifyAboutShareBuybackFormProvider
 import uk.gov.hmrc.securitiestransferchargefrontend.models.sh03.HowToNotifyAboutShareBuyback
 
 class HowToNotifyAboutShareBuybackFormProviderSpec extends OptionFieldBehaviours {
 
-  val form = new HowToNotifyAboutShareBuybackFormProvider()()
+  val affinityKey = "agent"
+  val form = new HowToNotifyAboutShareBuybackFormProvider()(affinityKey)
 
   ".value" - {
 
     val fieldName = "value"
-    val requiredKey = "agent.sh03.shareBuyback.error.required"
+    val requiredKey = s"$affinityKey.sh03.shareBuyback.error.required"
 
     behave like optionsField[HowToNotifyAboutShareBuyback](
       form,
