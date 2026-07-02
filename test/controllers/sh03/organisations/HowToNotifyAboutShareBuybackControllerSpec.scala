@@ -25,11 +25,11 @@ import play.api.inject.bind
 import play.api.test.FakeRequest
 import play.api.test.Helpers.*
 import uk.gov.hmrc.securitiestransferchargefrontend.clients.SubmissionIdClient
-import uk.gov.hmrc.securitiestransferchargefrontend.controllers.routes
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.sh03.organisations.routes as orgRoutes
 import uk.gov.hmrc.securitiestransferchargefrontend.forms.sh03.shared.HowToNotifyAboutShareBuybackFormProvider
 import uk.gov.hmrc.securitiestransferchargefrontend.models.sh03.HowToNotifyAboutShareBuyback
 import uk.gov.hmrc.securitiestransferchargefrontend.models.{NormalMode, UserAnswers}
+import uk.gov.hmrc.securitiestransferchargefrontend.navigation.Navigator
 import uk.gov.hmrc.securitiestransferchargefrontend.pages.sh03.HowToNotifyAboutShareBuybackPage
 import uk.gov.hmrc.securitiestransferchargefrontend.views.html.sh03.organisations.HowToNotifyAboutShareBuybackView
 
@@ -47,7 +47,9 @@ class HowToNotifyAboutShareBuybackControllerSpec extends SpecBase with MockitoSu
 
     "must return OK and the correct view for a GET" in {
 
-      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers), affinityGroup = orgAffinity).build()
+      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers), affinityGroup = orgAffinity)
+        .overrides(bind[Navigator].qualifiedWith("orgSh03").toInstance(getNavigator))
+        .build()
 
       running(application) {
         val request = FakeRequest(GET, howToNotifyAboutShareBuybackRoute)
@@ -61,7 +63,7 @@ class HowToNotifyAboutShareBuybackControllerSpec extends SpecBase with MockitoSu
       }
     }
 
-    "must redirect to JourneyRecovery (placeholder) when One at a time is submitted" in {
+    "must redirect to the appropriate next page when One at a time is submitted" in {
 
       val mockIdClient = mock[SubmissionIdClient]
 
@@ -73,6 +75,7 @@ class HowToNotifyAboutShareBuybackControllerSpec extends SpecBase with MockitoSu
 
       val application = applicationBuilder(userAnswers = Some(userAnswers), affinityGroup = orgAffinity)
         .overrides(
+          bind[Navigator].qualifiedWith("orgSh03").toInstance(getNavigator),
           bind[SubmissionIdClient].toInstance(mockIdClient)
         )
         .build()
@@ -86,12 +89,11 @@ class HowToNotifyAboutShareBuybackControllerSpec extends SpecBase with MockitoSu
 
         status(result) mustEqual SEE_OTHER
 
-        // Currently hardcoded to redirect to Journey Recovery in the Org controller
-        redirectLocation(result).value mustEqual routes.JourneyRecoveryController.onPageLoad().url
+        redirectLocation(result).value mustEqual testNextPage.url
       }
     }
 
-    "must redirect to JourneyRecovery (placeholder) when More than one at a time is selected" in {
+    "must redirect to the appropriate next page when More than one at a time is selected" in {
 
       val mockIdClient = mock[SubmissionIdClient]
 
@@ -103,6 +105,7 @@ class HowToNotifyAboutShareBuybackControllerSpec extends SpecBase with MockitoSu
 
       val application = applicationBuilder(userAnswers = Some(userAnswers), affinityGroup = orgAffinity)
         .overrides(
+          bind[Navigator].qualifiedWith("orgSh03").toInstance(getNavigator),
           bind[SubmissionIdClient].toInstance(mockIdClient)
         )
         .build()
@@ -116,14 +119,15 @@ class HowToNotifyAboutShareBuybackControllerSpec extends SpecBase with MockitoSu
 
         status(result) mustEqual SEE_OTHER
 
-        // Currently hardcoded to redirect to Journey Recovery in the Org controller
-        redirectLocation(result).value mustEqual routes.JourneyRecoveryController.onPageLoad().url
+        redirectLocation(result).value mustEqual testNextPage.url
       }
     }
 
     "must return a Bad Request and errors when invalid data is submitted" in {
 
-      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers), affinityGroup = orgAffinity).build()
+      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers), affinityGroup = orgAffinity)
+        .overrides(bind[Navigator].qualifiedWith("orgSh03").toInstance(getNavigator))
+        .build()
 
       running(application) {
         val request =

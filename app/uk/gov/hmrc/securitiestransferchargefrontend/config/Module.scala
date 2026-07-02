@@ -25,6 +25,7 @@ import uk.gov.hmrc.securitiestransferchargefrontend.connectors.*
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.actions.*
 import uk.gov.hmrc.securitiestransferchargefrontend.handlers.ErrorHandler
 import uk.gov.hmrc.securitiestransferchargefrontend.navigation.sh03.agents.Sh03AgentNavigator
+import uk.gov.hmrc.securitiestransferchargefrontend.navigation.sh03.organisations.Sh03OrgNavigator
 import uk.gov.hmrc.securitiestransferchargefrontend.navigation.stf.agents.StfAgentNavigator
 import uk.gov.hmrc.securitiestransferchargefrontend.navigation.stf.individuals.StfNavigator
 import uk.gov.hmrc.securitiestransferchargefrontend.navigation.stf.organisations.StfOrgNavigator
@@ -93,6 +94,12 @@ class Module extends AbstractModule {
     bind(classOf[PersistentNavigator])
       .annotatedWith(Names.named("agentsSh03"))
       .to(classOf[Sh03AgentNavigator])
+    bind(classOf[Navigator])
+      .annotatedWith(Names.named("orgSh03"))
+      .to(classOf[Sh03OrgNavigator])
+    bind(classOf[PersistentNavigator])
+      .annotatedWith(Names.named("orgSh03"))
+      .to(classOf[Sh03OrgNavigator])
     bind(classOf[ValidationErrorRepository])
       .to(classOf[ValidationErrorRepositoryImpl])
   }
