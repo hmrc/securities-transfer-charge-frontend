@@ -905,3 +905,10 @@ agent.sh03.cannotSubmitFormError.item7 = CIC manager
 agent.sh03.cannotSubmitFormError.item8 = Someone submitting on behalf of a UK Societas
 agent.sh03.cannotSubmitFormError.error.p3 = You can save your submission as a draft, and submit it once you have this information.
 save-and-return-to-dashboard.link = Save and return to dashboard
+
+org.sh03.beforeYouStart.title = Before you start
+org.sh03.beforeYouStart.heading = Before you start
+org.sh03.beforeYouStart.p1 = Use this service to submit details about a purchase of a limited company’s own shares, and pay the charges due.
+org.sh03.beforeYouStart.p2 = You can use this online service to tell us about the purchase, instead of the Companies House SH03 form.
+org.sh03.beforeYouStart.p3 = Once you have submitted details about the purchase you will get a printable confirmation including the transfer reference number, which can be sent to Companies House.
+org.sh03.beforeYouStart.p4 = You do not need to tell us about transfers where the company is a Qualifying Asset Holding Company, and the conditions for exemption are met.
