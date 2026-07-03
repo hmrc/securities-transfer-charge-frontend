@@ -19,6 +19,7 @@
 @import uk.gov.hmrc.securitiestransferchargefrontend.views.html.templates
 @import uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.shared.routes
 @import uk.gov.hmrc.securitiestransferchargefrontend.controllers.sh03.agents.routes as agentsRoutes
+@import uk.gov.hmrc.securitiestransferchargefrontend.controllers.sh03.shared.routes as sharedRoutes
 
 @this(
     layout: templates.Layout,
@@ -30,7 +31,7 @@
 
 @(form: Form[_], mode: Mode, affinityGroupKey: String)(implicit request: Request[_], messages: Messages)
 
-@layout(pageTitle = title(form, messages("agent.sh03.shareBuyback.title"), Some(messages("sh03.section.name"))), backLinkUrl = Some(agentsRoutes.BeforeYouStartController.onPageLoad().url)) {
+@layout(pageTitle = title(form, messages("agent.sh03.shareBuyback.title"), Some(messages("sh03.section.name"))), backLinkUrl = Some(sharedRoutes.BeforeYouStartController.onPageLoad().url)) {
 
     @formHelper(action = agentsRoutes.HowToNotifyAboutShareBuybackController.onSubmit(), Symbol("autoComplete") -> "off") {
 

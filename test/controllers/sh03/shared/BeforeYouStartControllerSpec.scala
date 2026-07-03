@@ -14,18 +14,19 @@
  * limitations under the License.
  */
 
-package controllers.sh03.agents
+package controllers.sh03.shared
 
 import base.SpecBase
 import play.api.test.FakeRequest
 import play.api.test.Helpers.*
+import uk.gov.hmrc.securitiestransferchargefrontend.controllers.sh03.shared.routes as sharedSH03Route
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.sh03.agents.routes as agentSH03Route
-import uk.gov.hmrc.securitiestransferchargefrontend.views.html.sh03.agents.BeforeYouStartView
+import uk.gov.hmrc.securitiestransferchargefrontend.views.html.sh03.shared.BeforeYouStartView
 
 class BeforeYouStartControllerSpec extends SpecBase {
 
-  private lazy val onPageLoadRoute = agentSH03Route.BeforeYouStartController.onPageLoad().url
-  private lazy val onSubmitRoute = agentSH03Route.BeforeYouStartController.onSubmit().url
+  private lazy val onPageLoadRoute = sharedSH03Route.BeforeYouStartController.onPageLoad().url
+  private lazy val onSubmitRoute = sharedSH03Route.BeforeYouStartController.onSubmit().url
 
   "BeforeYouStartController" - {
 

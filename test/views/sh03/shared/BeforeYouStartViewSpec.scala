@@ -14,14 +14,14 @@
  * limitations under the License.
  */
 
-package views.sh03.agents
+package views.sh03.shared
 
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
 import play.api.Application
-import uk.gov.hmrc.securitiestransferchargefrontend.controllers.sh03.agents.routes as sh03Routes
+import uk.gov.hmrc.securitiestransferchargefrontend.controllers.sh03.shared.routes as sh03SharedRoutes
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.shared.routes
-import uk.gov.hmrc.securitiestransferchargefrontend.views.html.sh03.agents.BeforeYouStartView
+import uk.gov.hmrc.securitiestransferchargefrontend.views.html.sh03.shared.BeforeYouStartView
 import views.ViewBaseSpec
 
 class BeforeYouStartViewSpec extends ViewBaseSpec {
@@ -37,12 +37,12 @@ class BeforeYouStartViewSpec extends ViewBaseSpec {
     )
 
   object ExpectedContent {
-    val title: String = messages("agent.sh03.beforeYouStart.title")
-    val heading: String = messages("agent.sh03.beforeYouStart.heading")
-    val p1: String = messages("agent.sh03.beforeYouStart.p1")
-    val p2: String = messages("agent.sh03.beforeYouStart.p2")
-    val p3: String = messages("agent.sh03.beforeYouStart.p3")
-    val p4: String = messages("agent.sh03.beforeYouStart.p4")
+    val title: String = messages("sh03.beforeYouStart.title")
+    val heading: String = messages("sh03.beforeYouStart.heading")
+    val p1: String = messages("sh03.beforeYouStart.p1")
+    val p2: String = messages("sh03.beforeYouStart.p2")
+    val p3: String = messages("sh03.beforeYouStart.p3")
+    val p4: String = messages("sh03.beforeYouStart.p4")
     val continue: String = messages("site.continue")
     val returnToDashboard: String = messages("return-to-dashboard.link")
   }
@@ -75,7 +75,7 @@ class BeforeYouStartViewSpec extends ViewBaseSpec {
 
       "submits to the correct endpoint" in {
         val form = beforeYouStartView.select("form")
-        form.attr("action") mustBe sh03Routes.BeforeYouStartController.onSubmit().url
+        form.attr("action") mustBe sh03SharedRoutes.BeforeYouStartController.onSubmit().url
       }
 
       "have a return to dashboard link" in {
