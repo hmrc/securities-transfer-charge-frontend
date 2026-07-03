@@ -28,6 +28,7 @@ class DetailsOfThisSharePurchaseFormProvider @Inject() extends Mappings {
   private val maxNumOfShares = 999999999
   private val minNumOfShares = 1
   private val maxCurrency: BigDecimal = BigDecimal(999999999)
+  private val minCurrency = 0.01
 
   def apply(requireMarketValue: Boolean = true, affinityKey: String): Form[DetailsOfThisSharePurchase] =
     Form(
@@ -47,13 +48,15 @@ class DetailsOfThisSharePurchaseFormProvider @Inject() extends Mappings {
           currency(s"${affinityKey}.detailsOfThisTransfer.error.amountPaid.required",
             s"${affinityKey}.detailsOfThisTransfer.error.amountPaid.invalidNumeric",
             s"${affinityKey}.detailsOfThisTransfer.error.amountPaid.nonNumeric",
-            s"${affinityKey}.sh03.detailsOfSharePurchase.error.amountPaid.negative")
-            .verifying(maximumCurrency(maxCurrency, s"${affinityKey}.detailsOfThisTransfer.error.amountPaid.aboveMaximum")),
+            s"${affinityKey}.sh03.detailsOfSharePurchase.error.amountPaid.belowMinimum")
+            .verifying(maximumCurrency(maxCurrency, s"${affinityKey}.detailsOfThisTransfer.error.amountPaid.aboveMaximum"))
+            .verifying(minimumCurrency(minCurrency, s"${affinityKey}.sh03.detailsOfSharePurchase.error.amountPaid.belowMinimum")),
         "marketValue" -> optional(currency(s"${affinityKey}.detailsOfThisTransfer.error.marketValue.required",
           s"${affinityKey}.detailsOfThisTransfer.error.marketValue.invalidNumeric",
           s"${affinityKey}.detailsOfThisTransfer.error.marketValue.nonNumeric",
-          s"${affinityKey}.sh03.detailsOfSharePurchase.error.marketValue.negative")
-          .verifying(maximumCurrency(maxCurrency, s"${affinityKey}.detailsOfThisTransfer.error.marketValue.aboveMaximum")))
+          s"${affinityKey}.sh03.detailsOfSharePurchase.error.marketValue.belowMinimum")
+          .verifying(maximumCurrency(maxCurrency, s"${affinityKey}.detailsOfThisTransfer.error.marketValue.aboveMaximum"))
+          .verifying(minimumCurrency(minCurrency, s"${affinityKey}.sh03.detailsOfSharePurchase.error.marketValue.belowMinimum")))
           .verifying(requiredIf(requireMarketValue, affinityKey))
       )(DetailsOfThisSharePurchase.apply)(x => Some((x.numberOfShares, x.typeOfShares, x.amountPaid, x.marketValue)))
     )
