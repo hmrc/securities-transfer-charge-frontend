@@ -773,12 +773,12 @@ submission.details.caption = Submission details
 sh03.section.name =  Share buyback (SH03)
 
 submissionsDashboard.sh03.button = start sh03
-agent.sh03.beforeYouStart.title = Before you start
-agent.sh03.beforeYouStart.heading = Before you start
-agent.sh03.beforeYouStart.p1 = Use this service to submit details about a purchase of a limited company’s own shares, and pay the charges due.
-agent.sh03.beforeYouStart.p2 = You can use this online service to tell us about the purchase, instead of the Companies House SH03 form.
-agent.sh03.beforeYouStart.p3 = Once you have submitted details about the purchase you will get a printable confirmation including the transfer reference number, which can be sent to Companies House.
-agent.sh03.beforeYouStart.p4 = You do not need to tell us about transfers where the company is a Qualifying Asset Holding Company, and the conditions for exemption are met.
+sh03.beforeYouStart.title = Before you start
+sh03.beforeYouStart.heading = Before you start
+sh03.beforeYouStart.p1 = Use this service to submit details about a purchase of a limited company’s own shares, and pay the charges due.
+sh03.beforeYouStart.p2 = You can use this online service to tell us about the purchase, instead of the Companies House SH03 form.
+sh03.beforeYouStart.p3 = Once you have submitted details about the purchase you will get a printable confirmation including the transfer reference number, which can be sent to Companies House.
+sh03.beforeYouStart.p4 = You do not need to tell us about transfers where the company is a Qualifying Asset Holding Company, and the conditions for exemption are met.
 
 agent.sh03.agentReference.hint = You can add a reference for your own records and to help you find this transfer later. It will not be used by HMRC
 

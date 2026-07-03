@@ -33,7 +33,7 @@ import uk.gov.hmrc.securitiestransferchargefrontend.navigation.Navigator
 import uk.gov.hmrc.securitiestransferchargefrontend.pages.stf.shared.SubmissionsDashboardPage
 import uk.gov.hmrc.securitiestransferchargefrontend.services.AuditService
 import uk.gov.hmrc.securitiestransferchargefrontend.views.html.stf.shared.SubmissionsDashboardView
-import uk.gov.hmrc.securitiestransferchargefrontend.controllers.sh03.agents.routes as sh03Routes
+import uk.gov.hmrc.securitiestransferchargefrontend.controllers.sh03.shared.routes as sh03SharedRoutes
 
 import javax.inject.{Inject, Named}
 import scala.concurrent.{ExecutionContext, Future}
@@ -71,7 +71,7 @@ class SubmissionsDashboardController @Inject()(
       case UserAndGroup => saveAndReturnClient.listByGroup(groupIdentifier)
     }
   }
-  
+
   def onSubmit(): Action[AnyContent] = (stcAuthEnrolled andThen getData).async {
     implicit request =>
 
@@ -100,6 +100,6 @@ class SubmissionsDashboardController @Inject()(
   }
 
   def startSh03(): Action[AnyContent] = stcAuthEnrolled { implicit request =>
-    Redirect(sh03Routes.BeforeYouStartController.onPageLoad())
+    Redirect(sh03SharedRoutes.BeforeYouStartController.onPageLoad())
   }
 }
