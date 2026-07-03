@@ -18,7 +18,7 @@ package uk.gov.hmrc.securitiestransferchargefrontend.models.sh03.agents
 
 import play.api.libs.json.*
 
-case class DetailsOfThisSharePurchase (numberOfShares: Int, typeOfShares: String, amountPaid: BigDecimal,marketValue: Option[BigDecimal])
+case class DetailsOfThisSharePurchase (numberOfShares: Int, typeOfShares: String, amountPaid: BigDecimal, marketValue: Option[BigDecimal])
 
 object DetailsOfThisSharePurchase {
 
