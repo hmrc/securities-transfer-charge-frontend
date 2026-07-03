@@ -28,7 +28,7 @@ import uk.gov.hmrc.securitiestransferchargefrontend.controllers.sh03.agents.sing
 import uk.gov.hmrc.securitiestransferchargefrontend.forms.sh03.agents.single.ConnectedPersonsFormProvider
 import uk.gov.hmrc.securitiestransferchargefrontend.models.NormalMode
 import uk.gov.hmrc.securitiestransferchargefrontend.navigation.Navigator
-import uk.gov.hmrc.securitiestransferchargefrontend.pages.sh03.shared.ConnectedPersonsPage
+import uk.gov.hmrc.securitiestransferchargefrontend.pages.sh03.ConnectedPersonsPage
 import uk.gov.hmrc.securitiestransferchargefrontend.views.html.sh03.agents.single.ConnectedPersonsView
 
 class ConnectedPersonsControllerSpec extends SpecBase with MockitoSugar {

@@ -14,6 +14,7 @@ site.startAgain = Start again
 site.signIn = Sign in
 site.govuk = GOV.UK
 site.upload.file = Upload file
+site.or = or
 
 date.day = Day
 date.month = Month
@@ -175,7 +176,7 @@ totalMarketValue.title = What is the total market value of these securities?
 totalMarketValue.heading = What is the total market value of these securities?
 totalMarketValue.hint = For example, £600 or £193.54
 totalMarketValue.checkYourAnswersLabel = What is the total market value of these securities?
-totalMarketValue.error.nonNumeric = The market value of the securities must be a number
+totalMarketValue.error.nonNumeric = The market value of the securities must be a number and can include up to two decimal places, like £30 or £28.60
 totalMarketValue.error.required = Enter the total market value of the securities
 totalMarketValue.error.invalidNumeric = Enter the market value of the securities using up to two decimal places
 totalMarketValue.error.aboveMaximum = The market value of the securities must be {0} or less
@@ -201,14 +202,14 @@ individual.amountPaidForSecurities.error.invalidNumeric = The amount you paid fo
 individual.amountPaidForSecurities.error.aboveMaximum = The amount you paid for the securities must be £999,999,999 or below
 individual.amountPaidForSecurities.error.negative = The amount you paid for these securities must be a positive number like 600 or 193.54
 
-individual.totalMarketValue.error.nonNumeric = The market value of the securities must be a number
+individual.totalMarketValue.error.nonNumeric = The market value of the securities must be a number and can include up to two decimal places, like £30 or £28.60
 individual.totalMarketValue.error.required = Enter the total market value of the securities
 individual.totalMarketValue.error.invalidNumeric = The market value of the securities must be a number and can include up to two decimal places, like £30 or £28.60
 individual.totalMarketValue.error.aboveMaximum = The market value of the securities must be £999,999,999 or below
-individual.totalMarketValue.error.negative = The market value of the securities must be 0 or more
+individual.totalMarketValue.error.negative = The market value of the securities must be £0 or more
 
 individual.detailsOfThisTransfer.error.numberOfShares.required = Enter the number of shares you are buying
-individual.detailsOfThisTransfer.error.numberOfShares.nonNumeric = The amount of shares you are buying must be a number
+individual.detailsOfThisTransfer.error.numberOfShares.nonNumeric = The number of shares must be a whole number between 1 and 999,999,999
 individual.detailsOfThisTransfer.error.typeOfShares.required = Enter the type or class of shares you are buying
 individual.detailsOfThisTransfer.error.amountPaid.required = Enter the amount you paid for the shares in pounds
 individual.detailsOfThisTransfer.error.amountPaid.invalidNumeric = The amount you paid for the shares must be a number and can include up to two decimal places, like £30 or £28.60
@@ -369,11 +370,11 @@ org.whatTypeOfSecurities.change.hidden = Change what type of securities the busi
 org.totalMarketValue.title = What is the total market value of these securities?
 org.totalMarketValue.heading = What is the total market value of these securities?
 org.totalMarketValue.checkYourAnswersLabel = What is the total market value of these securities?
-org.totalMarketValue.error.nonNumeric = The market value of the securities must be a number
+org.totalMarketValue.error.nonNumeric = The market value of the securities must be a number and can include up to two decimal places, like £30 or £28.60
 org.totalMarketValue.error.required = Enter the total market value of the securities
 org.totalMarketValue.error.invalidNumeric = The market value of the securities must be a number and can include up to two decimal places, like £30 or £28.60
 org.totalMarketValue.error.aboveMaximum = The market value of the securities must be £999,999,999 or below
-org.totalMarketValue.error.negative = The market value of the securities must be 0 or more
+org.totalMarketValue.error.negative = The market value of the securities must be £0 or more
 org.totalMarketValue.error.belowMinimum = The market value must be {0} or more
 org.totalMarketValue.change.hidden = Change the market value of the securities
 org.totalMarketValue.hint = For example, £600 or £193.54
@@ -572,20 +573,20 @@ org.fileUpload.error.typeOfShares.maxLength = The type of shares the business is
 agent.fileUpload.error.typeOfShares.maxLength = The type of shares the buyer is purchasing must be 255 characters or fewer
 
 individual.fileUpload.error.securitiesQuantity.required = Enter the number of shares you are buying
-individual.fileUpload.error.securitiesQuantity.nonNumeric = The amount of shares you are buying must be a number
-individual.fileUpload.error.securitiesQuantity.minimum = The number of shares must be at least 1
-individual.fileUpload.error.securitiesQuantity.maximum = The number of shares you are buying must be below 999,999,999
+individual.fileUpload.error.securitiesQuantity.nonNumeric = The number of shares must be a whole number between 1 and 999,999,999
+individual.fileUpload.error.securitiesQuantity.minimum = The number of shares must be a whole number between 1 and 999,999,999
+individual.fileUpload.error.securitiesQuantity.maximum = The number of shares must be a whole number between 1 and 999,999,999
 individual.fileUpload.error.securitiesQuantity.wholeNumber = The number of shares you are buying must be a whole number
 
 org.fileUpload.error.securitiesQuantity.required = Enter the number of shares the business is buying
-org.fileUpload.error.securitiesQuantity.nonNumeric = The amount of shares must be a number
-org.fileUpload.error.securitiesQuantity.minimum = The number of shares must be at least 1
-org.fileUpload.error.securitiesQuantity.maximum = The number of shares must be below 999,999,999
+org.fileUpload.error.securitiesQuantity.nonNumeric = The number of shares must be a whole number between 1 and 999,999,999
+org.fileUpload.error.securitiesQuantity.minimum = The number of shares must be a whole number between 1 and 999,999,999
+org.fileUpload.error.securitiesQuantity.maximum = The number of shares must be a whole number between 1 and 999,999,999
 
 agent.fileUpload.error.securitiesQuantity.required = Enter the number of shares the buyer is purchasing
-agent.fileUpload.error.securitiesQuantity.nonNumeric = The amount of shares must be a number
-agent.fileUpload.error.securitiesQuantity.minimum = The number of shares must be at least 1
-agent.fileUpload.error.securitiesQuantity.maximum = The number of shares must be below 999,999,999
+agent.fileUpload.error.securitiesQuantity.nonNumeric = The number of shares must be a whole number between 1 and 999,999,999
+agent.fileUpload.error.securitiesQuantity.minimum = The number of shares must be a whole number between 1 and 999,999,999
+agent.fileUpload.error.securitiesQuantity.maximum = The number of shares must be a whole number between 1 and 999,999,999
 
 individual.fileUpload.chargingPoint.error.required = Enter the date you bought the securities
 org.fileUpload.chargingPoint.error.required = Enter the date the business bought the securities
@@ -646,6 +647,26 @@ fileUpload.individual.chargingPoint.error.required.all = Enter the date you boug
 fileUpload.individual.chargingPoint.error.futureDate = The day you bought the securities must be today’s date or a date in the past
 fileUpload.individual.chargingPoint.error.invalid = The date you bought the securities must be a real date
 
+fileUpload.agent.amountPaidForSecurities.error.required = Enter the amount paid for the securities
+fileUpload.agent.amountPaidForSecurities.error.invalidNumeric = The amount paid for the securities must be a number and can include up to two decimal places, like £30 or £28.60
+fileUpload.agent.amountPaidForSecurities.error.nonNumeric = The amount paid for the securities must be a number and can include up to two decimal places, like £30 or £28.60
+fileUpload.agent.amountPaidForSecurities.error.negative = The amount paid for the securities must be £0.01 or more
+fileUpload.agent.amountPaidForSecurities.error.belowMinimum = The amount paid for the securities must be £0.01 or more
+fileUpload.agent.amountPaidForSecurities.error.aboveMaximum = The amount paid for the securities must be £999,999,999 or below
+
+fileUpload.org.amountPaidForSecurities.error.required = Enter the amount paid for the securities
+fileUpload.org.amountPaidForSecurities.error.invalidNumeric = The amount paid for the securities must be a number and can include up to two decimal places, like £30 or £28.60
+fileUpload.org.amountPaidForSecurities.error.nonNumeric = The amount paid for the securities must be a number and can include up to two decimal places, like £30 or £28.60
+fileUpload.org.amountPaidForSecurities.error.negative = The amount paid for the securities must be £0.01 or more
+fileUpload.org.amountPaidForSecurities.error.belowMinimum = The amount paid for the securities must be £0.01 or more
+fileUpload.org.amountPaidForSecurities.error.aboveMaximum = The amount paid for the securities must be £999,999,999 or below
+
+fileUpload.individual.amountPaidForSecurities.error.required = Enter the amount you paid for the securities
+fileUpload.individual.amountPaidForSecurities.error.invalidNumeric = The amount paid for the securities must be a number and can include up to two decimal places, like £30 or £28.60
+fileUpload.individual.amountPaidForSecurities.error.nonNumeric = The amount paid for the securities must be a number and can include up to two decimal places, like £30 or £28.60
+fileUpload.individual.amountPaidForSecurities.error.negative = The amount paid for the securities must be £0.01 or more
+fileUpload.individual.amountPaidForSecurities.error.belowMinimum = The amount paid for the securities must be £0.01 or more
+fileUpload.individual.amountPaidForSecurities.error.aboveMaximum = The amount you paid for the securities must be £999,999,999 or below
 
 agent.whatTypeOfSecurities.title = What type of securities is the buyer purchasing?
 agent.whatTypeOfSecurities.heading = What type of securities is the buyer purchasing?
@@ -705,13 +726,13 @@ fileUploaded.error.virus.p = The file you have uploaded contains a virus, you wi
 agent.totalMarketValue.title = What is the total market value of the securities?
 agent.totalMarketValue.heading = What is the total market value of the securities?
 agent.totalMarketValue.checkYourAnswersLabel = What is the total market value of the securities?
-agent.totalMarketValue.error.nonNumeric = The market value of the securities must be a number
+agent.totalMarketValue.error.nonNumeric = The market value of the securities must be a number and can include up to two decimal places, like £30 or £28.60
 agent.totalMarketValue.error.required = Enter the total market value of the securities
 agent.totalMarketValue.error.invalidNumeric = The market value of the securities must be a number and can include up to two decimal places, like £30 or £28.60
 agent.totalMarketValue.error.aboveMaximum = The market value of the securities must be £999,999,999 or below
 agent.totalMarketValue.change.hidden = Change the market value of the securities
 agent.totalMarketValue.hint = For example, £600 or £193.54
-agent.totalMarketValue.error.negative = The market value of the securities must be 0 or more
+agent.totalMarketValue.error.negative = The market value of the securities must be £0 or more
 agent.totalMarketValue.checkYourAnswersLabel = What is the total market value of the securities?
 
 fileUploaded.error.encryptedFile.title = There was a problem uploading your file
@@ -759,6 +780,8 @@ agent.sh03.beforeYouStart.p2 = You can use this online service to tell us about 
 agent.sh03.beforeYouStart.p3 = Once you have submitted details about the purchase you will get a printable confirmation including the transfer reference number, which can be sent to Companies House.
 agent.sh03.beforeYouStart.p4 = You do not need to tell us about transfers where the company is a Qualifying Asset Holding Company, and the conditions for exemption are met.
 
+agent.sh03.agentReference.hint = You can add a reference for your own records and to help you find this transfer later. It will not be used by HMRC
+
 reasonForPurchase.cancellation = For cancellation
 reasonForPurchase.treasury = To place into treasury
 reasonForPurchase.error.required = Select why these shares are being purchased
@@ -801,9 +824,86 @@ agent.sh03.applyingForRelief.change.hidden = Change applying for a relief
 agent.sh03.applyingForRelief.p = See a
 agent.sh03.applyingForRelief.details.content.link.text = full list of reliefs
 
+
+agent.sh03.minimumAmountPaid.title = What is the minimum amount paid for the shares, in pounds?
+agent.sh03.minimumAmountPaid.heading = What is the minimum amount paid for the shares, in pounds?
+agent.sh03.minimumAmountPaid.checkYourAnswersLabel = What is the minimum amount paid for the shares, in pounds?
+agent.sh03.minimumAmountPaid.change.hidden = What is the minimum amount paid for the shares, in pounds?
+agent.sh03.minimumAmountPaid.error.required = Enter the minimum amount paid for the shares
+agent.sh03.minimumAmountPaid.error.invalidNumeric = The minimum amount paid for the shares must be a number and can include up to two decimal places, like £30 or £28.60
+agent.sh03.minimumAmountPaid.error.nonNumeric = The minimum amount paid for the shares must be a number and can include up to two decimal places, like £30 or £28.60
+agent.sh03.minimumAmountPaid.error.negative = The minimum amount paid for the shares must be £0.01 or more
+agent.sh03.minimumAmountPaid.error.belowMinimum = The minimum amount paid for the shares must be £0.01 or more
+agent.sh03.minimumAmountPaid.error.aboveMaximum = The minimum amount paid for the shares must be £999,999,999 or less
+
 agent.sh03.detailsOfSharePurchase.title = What are the details of this share purchase?
 agent.sh03.detailsOfSharePurchase.heading = What are the details of this share purchase?
 agent.sh03.detailsOfSharePurchase.amountPaid = Amount paid for the shares in pounds
 agent.sh03.detailsOfSharePurchase.marketValue = Market value of the shares in pounds
 agent.sh03.detailsOfSharePurchase.error.amountPaid.negative = The amount paid for the shares must be £0.01 or more
 agent.sh03.detailsOfSharePurchase.error.marketValue.negative = The market value of the shares must be £0.01 or more
+
+agent.sh03.whatReliefAreYouApplyingFor.checkYourAnswersLabel = Enter the relief the buyer is applying for
+agent.sh03.whatReliefAreYouApplyingFor.change.hidden = Change what relief the buyer is applying for
+
+agent.sh03.roleAtPurchasingCompany.title = Who at the purchasing company provided the details of this share buyback?
+agent.sh03.roleAtPurchasingCompany.heading = Who at the purchasing company provided the details of this share buyback?
+agent.sh03.roleAtPurchasingCompany.director = Director
+agent.sh03.roleAtPurchasingCompany.secretary = Secretary
+agent.sh03.roleAtPurchasingCompany.personAuthorised = A ‘person authorised’ under section 270 or 274 of the Companies Act 2026
+agent.sh03.roleAtPurchasingCompany.administrator = Administrator
+agent.sh03.roleAtPurchasingCompany.receiver = Receiver
+agent.sh03.roleAtPurchasingCompany.receiverManager = Receiver manager
+agent.sh03.roleAtPurchasingCompany.cicManager = CIC manager
+agent.sh03.roleAtPurchasingCompany.ukSocietas = Someone acting on behalf of a UK Societas (UKS)
+agent.sh03.roleAtPurchasingCompany.uksOrgan.label = Which UKS organ are they a member of?
+agent.sh03.roleAtPurchasingCompany.notProvided = The information was not provided by someone in one of these roles
+agent.sh03.roleAtPurchasingCompany.checkYourAnswersLabel = Who at the purchasing company provided the details of this share buyback?
+agent.sh03.roleAtPurchasingCompany.change.hidden = Change who at the purchasing company provided the details of this share buyback
+
+agent.sh03.roleAtPurchasingCompany.error.required = Select the person’s role within the company who provided information about the share buyback
+agent.sh03.roleAtPurchasingCompany.uksOrgan.error.required = Enter the UKS organ they are a member of
+agent.sh03.roleAtPurchasingCompany.uksOrgan.error.min = The UKS organ you are a member of must be at least 1 character
+agent.sh03.roleAtPurchasingCompany.uksOrgan.error.length = The UKS organ you are a member of must be 100 characters or fewer
+
+agent.sh03.chargingPoint.title = Charging point
+agent.sh03.chargingPoint.heading = Charging point
+agent.sh03.chargingPoint.p1 = Any tax due on this share buyback must be paid 30 days from the charging point.
+agent.sh03.chargingPoint.p2 = The charging point is the date the share buyback is substantially completed. For example, the date when:
+agent.sh03.chargingPoint.bullet1 = all or the majority of the consideration is paid
+agent.sh03.chargingPoint.bullet2 = the buyer can exercise rights or receive benefits associated with owning the shares
+agent.sh03.chargingPoint.p3 = Find out
+agent.sh03.chargingPoint.link.text = more about charging points
+agent.sh03.chargingPoint.heading2 = What is the charging point for this share buyback?
+agent.sh03.chargingPoint.hint = For example, 27 3 2024
+agent.sh03.chargingPoint.checkYourAnswersLabel = Charging point
+agent.sh03.chargingPoint.error.required.all = Enter the charging point for this share buyback
+agent.sh03.chargingPoint.error.required.two = The charging point for this share buyback must include a {0} and a {1}
+agent.sh03.chargingPoint.error.required = The charging point for this share buyback must include a {0}
+agent.sh03.chargingPoint.error.invalid = The charging point for this share buyback must be a real date
+agent.sh03.chargingPoint.error.futureDate = The charging point for this share buyback must be today’s date, or a date in the past
+agent.sh03.chargingPoint.change.hidden = Change the charging point
+
+agent.sh03.maximumAmountPaid.title = What is the maximum amount paid for the shares, in pounds?
+agent.sh03.maximumAmountPaid.heading = What is the maximum amount paid for the shares, in pounds?
+agent.sh03.maximumAmountPaid.checkYourAnswersLabel = What is the maximum amount paid for the shares, in pounds?
+agent.sh03.maximumAmountPaid.error.required = Enter the maximum amount paid for the shares
+agent.sh03.maximumAmountPaid.error.invalidNumeric = The maximum amount paid for the shares must be a number and can include up to two decimal places, like £30 or £28.60
+agent.sh03.maximumAmountPaid.error.aboveMaximum = The maximum amount paid for the shares must be £999,999,999 or less
+agent.sh03.maximumAmountPaid.error.negative = The maximum amount paid for the shares must be £0.01 or more
+agent.sh03.maximumAmountPaid.change.hidden = Change the maximum amount paid for the shares
+
+agent.sh03.cannotSubmitFormError.title = You cannot submit this form
+agent.sh03.cannotSubmitFormError.heading = You cannot submit this form
+agent.sh03.cannotSubmitFormError.error.p1 = The details of this share buyback must be provided by someone in an approved role at the company.
+agent.sh03.cannotSubmitFormError.error.p2 = Approved roles include:
+agent.sh03.cannotSubmitFormError.item1 = Director
+agent.sh03.cannotSubmitFormError.item2 = Secretary
+agent.sh03.cannotSubmitFormError.item3 = A ‘person authorised’ under section 270 or 274 of the Companies Act 2026
+agent.sh03.cannotSubmitFormError.item4 = Administrator
+agent.sh03.cannotSubmitFormError.item5 = Receiver
+agent.sh03.cannotSubmitFormError.item6 = Receiver manager
+agent.sh03.cannotSubmitFormError.item7 = CIC manager
+agent.sh03.cannotSubmitFormError.item8 = Someone submitting on behalf of a UK Societas
+agent.sh03.cannotSubmitFormError.error.p3 = You can save your submission as a draft, and submit it once you have this information.
+save-and-return-to-dashboard.link = Save and return to dashboard

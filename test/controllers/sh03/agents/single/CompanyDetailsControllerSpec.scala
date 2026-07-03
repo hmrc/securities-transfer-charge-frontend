@@ -22,11 +22,11 @@ import play.api.data.Form
 import play.api.test.FakeRequest
 import play.api.test.Helpers.*
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.routes
-import uk.gov.hmrc.securitiestransferchargefrontend.controllers.sh03.agents.single.routes as sh03Routes
+import uk.gov.hmrc.securitiestransferchargefrontend.controllers.sh03.agents.single.routes as sh03AgentSingleRoutes
 import uk.gov.hmrc.securitiestransferchargefrontend.forms.sh03.agents.CompanyDetailsFormProvider
 import uk.gov.hmrc.securitiestransferchargefrontend.models.{NormalMode, UserAnswers}
 import uk.gov.hmrc.securitiestransferchargefrontend.models.sh03.agents.CompanyDetails
-import uk.gov.hmrc.securitiestransferchargefrontend.pages.sh03.agents.CompanyDetailsPage
+import uk.gov.hmrc.securitiestransferchargefrontend.pages.sh03.CompanyDetailsPage
 import uk.gov.hmrc.securitiestransferchargefrontend.views.html.sh03.agents.single.CompanyDetailsView
 
 class CompanyDetailsControllerSpec extends SpecBase with MockitoSugar {
@@ -34,7 +34,7 @@ class CompanyDetailsControllerSpec extends SpecBase with MockitoSugar {
   val formProvider = new CompanyDetailsFormProvider()
   val form: Form[CompanyDetails] = formProvider()
 
-  lazy val companyDetailsRoute: String = sh03Routes.CompanyDetailsController.onPageLoad(NormalMode).url
+  lazy val companyDetailsRoute: String = sh03AgentSingleRoutes.CompanyDetailsController.onPageLoad(NormalMode).url
 
   val validAnswer = CompanyDetails("Test Company Ltd", "AB123456", true)
 
@@ -75,11 +75,7 @@ class CompanyDetailsControllerSpec extends SpecBase with MockitoSugar {
       }
     }
 
-    "must redirect to next page when valid data is submitted" ignore {
-      // TODO: This test requires a custom Navigator to be injected via applicationBuilder
-      // Currently uses real Navigator which redirects to error page instead of test stub
-      // Needs test infrastructure update to support Navigator injection
-
+    "must redirect to next page when valid data is submitted" in {
       val application =
         applicationBuilder(userAnswers = Some(emptyUserAnswers))
           .build()
@@ -96,7 +92,7 @@ class CompanyDetailsControllerSpec extends SpecBase with MockitoSugar {
         val result = route(application, request).value
 
         status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual testNextPage.url
+        redirectLocation(result).value mustEqual sh03AgentSingleRoutes.ReasonForPurchaseController.onPageLoad(NormalMode).url
       }
     }
 
