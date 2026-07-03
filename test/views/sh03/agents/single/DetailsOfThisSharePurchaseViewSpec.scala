@@ -46,8 +46,8 @@ class DetailsOfThisSharePurchaseViewSpec extends ViewBaseSpec {
     val heading: String = messages("agent.sh03.detailsOfSharePurchase.heading")
     val saveAndContinue: String = messages("site.save-and-continue.button")
     val saveAndReturn: String = messages("site.save-and-return.button")
-    val numberOfShares: String = messages("detailsOfThisTransfer.numberOfShares")
-    val typeOfShares: String = messages("detailsOfThisTransfer.typeOfShares")
+    val numberOfShares: String = messages("agent.sh03.detailsOfSharePurchase.numberOfShares")
+    val typeOfShares: String = messages("agent.sh03.detailsOfSharePurchase.typeOfShares")
     val amountPaid: String = messages("agent.sh03.detailsOfSharePurchase.amountPaid")
     val marketValue: String = messages("agent.sh03.detailsOfSharePurchase.marketValue")
   }
