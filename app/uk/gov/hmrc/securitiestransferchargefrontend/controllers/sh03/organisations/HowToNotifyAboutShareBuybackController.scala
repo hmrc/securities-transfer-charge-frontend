@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.securitiestransferchargefrontend.controllers.sh03.agents
+package uk.gov.hmrc.securitiestransferchargefrontend.controllers.sh03.organisations
 
 import play.api.data.Form
 import play.api.i18n.{I18nSupport, MessagesApi}
@@ -28,37 +28,31 @@ import uk.gov.hmrc.securitiestransferchargefrontend.models.sh03.HowToNotifyAbout
 import uk.gov.hmrc.securitiestransferchargefrontend.models.{NormalMode, UserAnswers}
 import uk.gov.hmrc.securitiestransferchargefrontend.navigation.Navigator
 import uk.gov.hmrc.securitiestransferchargefrontend.pages.sh03.HowToNotifyAboutShareBuybackPage
-import uk.gov.hmrc.securitiestransferchargefrontend.views.html.sh03.agents.HowToNotifyAboutShareBuybackView
+import uk.gov.hmrc.securitiestransferchargefrontend.views.html.sh03.organisations.HowToNotifyAboutShareBuybackView
 
 import javax.inject.{Inject, Named}
 import scala.concurrent.{ExecutionContext, Future}
-import scala.language.postfixOps
 
 class HowToNotifyAboutShareBuybackController @Inject()(
-                                       override val messagesApi: MessagesApi,
-                                       @Named("agentsSh03") navigator: Navigator,
-                                       idClient: SubmissionIdClient,
-                                       stcAuthEnrolled: StcAuthEnrolledAction,
-                                       getData: StcDataRetrievalAction,
-                                       formProvider: HowToNotifyAboutShareBuybackFormProvider,
-                                       val controllerComponents: MessagesControllerComponents,
-                                       view: HowToNotifyAboutShareBuybackView
-                                     )(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport {
+                                                        override val messagesApi: MessagesApi,
+                                                        @Named("orgSh03") navigator: Navigator,
+                                                        idClient: SubmissionIdClient,
+                                                        stcAuthEnrolled: StcAuthEnrolledAction,
+                                                        getData: StcDataRetrievalAction,
+                                                        formProvider: HowToNotifyAboutShareBuybackFormProvider,
+                                                        val controllerComponents: MessagesControllerComponents,
+                                                        view: HowToNotifyAboutShareBuybackView
+                                                      )(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport {
 
-  
-
-  def onPageLoad(): Action[AnyContent] = (stcAuthEnrolled andThen getData) {implicit request =>
-
+  def onPageLoad(): Action[AnyContent] = (stcAuthEnrolled andThen getData) { implicit request =>
     val innerRequest = request.request
     val form: Form[HowToNotifyAboutShareBuyback] = formProvider(innerRequest.affinityGroupKey)
 
     Ok(view(form, NormalMode, innerRequest.affinityGroupKey))
   }
 
-
   def onSubmit(): Action[AnyContent] = (stcAuthEnrolled andThen getData).async {
     implicit request =>
-
       val innerRequest = request.request
       val userId = UserId(innerRequest.internalId)
       val group = GroupIdentifier(innerRequest.groupIdentifier)
