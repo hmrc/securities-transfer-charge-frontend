@@ -48,8 +48,8 @@ class DetailsOfThisSharePurchaseViewSpec extends ViewBaseSpec {
     val saveAndReturn: String = messages("site.save-and-return.button")
     val numberOfShares: String = messages("detailsOfThisTransfer.numberOfShares")
     val typeOfShares: String = messages("detailsOfThisTransfer.typeOfShares")
-    val amountPaid: String = messages("detailsOfThisTransfer.amountPaid")
-    val marketValue: String = messages("detailsOfThisTransfer.marketValue")
+    val amountPaid: String = messages("agent.sh03.detailsOfSharePurchase.amountPaid")
+    val marketValue: String = messages("agent.sh03.detailsOfSharePurchase.marketValue")
   }
 
   "The DetailsOfThisSharePurchase" - {
