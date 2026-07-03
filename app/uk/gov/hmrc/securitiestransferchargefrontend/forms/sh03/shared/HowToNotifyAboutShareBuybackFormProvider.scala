@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.securitiestransferchargefrontend.forms.sh03.agents
+package uk.gov.hmrc.securitiestransferchargefrontend.forms.sh03.shared
 
 import play.api.data.Form
 import uk.gov.hmrc.securitiestransferchargefrontend.forms.mappings.Mappings
@@ -24,8 +24,8 @@ import javax.inject.Inject
 
 class HowToNotifyAboutShareBuybackFormProvider @Inject() extends Mappings {
 
-  def apply(): Form[HowToNotifyAboutShareBuyback] =
+  def apply(affinityKey: String): Form[HowToNotifyAboutShareBuyback] =
     Form(
-      "value" -> enumerable[HowToNotifyAboutShareBuyback]("agent.sh03.shareBuyback.error.required")
+      "value" -> enumerable[HowToNotifyAboutShareBuyback](s"$affinityKey.sh03.shareBuyback.error.required")
     )
 }

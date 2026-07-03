@@ -358,3 +358,6 @@ GET        /sh03/agent/change/maximum-amount-shares             uk.gov.hmrc.secu
 POST       /sh03/agent/change/maximum-amount-shares             uk.gov.hmrc.securitiestransferchargefrontend.controllers.sh03.agents.single.MaximumAmountPaidController.onSubmit(mode: Mode = CheckMode)
 
 GET        /sh03/agent/cannot-submit-form                    uk.gov.hmrc.securitiestransferchargefrontend.controllers.sh03.agents.single.CannotSubmitFormErrorController.onPageLoad()
+
+GET        /sh03/org/how-many-transfers                   uk.gov.hmrc.securitiestransferchargefrontend.controllers.sh03.organisations.HowToNotifyAboutShareBuybackController.onPageLoad()
+POST       /sh03/org/how-many-transfers                   uk.gov.hmrc.securitiestransferchargefrontend.controllers.sh03.organisations.HowToNotifyAboutShareBuybackController.onSubmit()
