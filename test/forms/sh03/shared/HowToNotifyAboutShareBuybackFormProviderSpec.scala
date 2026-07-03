@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package forms.sh03.agents
+package forms.sh03.shared
 
 import play.api.data.FormError
 import forms.behaviours.OptionFieldBehaviours
@@ -23,25 +23,31 @@ import uk.gov.hmrc.securitiestransferchargefrontend.models.sh03.HowToNotifyAbout
 
 class HowToNotifyAboutShareBuybackFormProviderSpec extends OptionFieldBehaviours {
 
-  val affinityKey = "agent"
-  val form = new HowToNotifyAboutShareBuybackFormProvider()(affinityKey)
+  val formProvider = new HowToNotifyAboutShareBuybackFormProvider()
 
   ".value" - {
-
     val fieldName = "value"
-    val requiredKey = s"$affinityKey.sh03.shareBuyback.error.required"
+    
+    Seq("agent", "org").foreach { affinityKey =>
 
-    behave like optionsField[HowToNotifyAboutShareBuyback](
-      form,
-      fieldName,
-      validValues  = HowToNotifyAboutShareBuyback.values,
-      invalidError = FormError(fieldName, "error.invalid")
-    )
+      s"when affinity key is $affinityKey" - {
 
-    behave like mandatoryField(
-      form,
-      fieldName,
-      requiredError = FormError(fieldName, requiredKey)
-    )
+        val form = formProvider(affinityKey)
+        val requiredKey = s"$affinityKey.sh03.shareBuyback.error.required"
+
+        behave like optionsField[HowToNotifyAboutShareBuyback](
+          form,
+          fieldName,
+          validValues  = HowToNotifyAboutShareBuyback.values,
+          invalidError = FormError(fieldName, "error.invalid")
+        )
+
+        behave like mandatoryField(
+          form,
+          fieldName,
+          requiredError = FormError(fieldName, requiredKey)
+        )
+      }
+    }
   }
 }
