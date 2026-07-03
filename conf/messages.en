@@ -773,12 +773,12 @@ submission.details.caption = Submission details
 sh03.section.name =  Share buyback (SH03)
 
 submissionsDashboard.sh03.button = start sh03
-agent.sh03.beforeYouStart.title = Before you start
-agent.sh03.beforeYouStart.heading = Before you start
-agent.sh03.beforeYouStart.p1 = Use this service to submit details about a purchase of a limited company’s own shares, and pay the charges due.
-agent.sh03.beforeYouStart.p2 = You can use this online service to tell us about the purchase, instead of the Companies House SH03 form.
-agent.sh03.beforeYouStart.p3 = Once you have submitted details about the purchase you will get a printable confirmation including the transfer reference number, which can be sent to Companies House.
-agent.sh03.beforeYouStart.p4 = You do not need to tell us about transfers where the company is a Qualifying Asset Holding Company, and the conditions for exemption are met.
+sh03.beforeYouStart.title = Before you start
+sh03.beforeYouStart.heading = Before you start
+sh03.beforeYouStart.p1 = Use this service to submit details about a purchase of a limited company’s own shares, and pay the charges due.
+sh03.beforeYouStart.p2 = You can use this online service to tell us about the purchase, instead of the Companies House SH03 form.
+sh03.beforeYouStart.p3 = Once you have submitted details about the purchase you will get a printable confirmation including the transfer reference number, which can be sent to Companies House.
+sh03.beforeYouStart.p4 = You do not need to tell us about transfers where the company is a Qualifying Asset Holding Company, and the conditions for exemption are met.
 
 agent.sh03.agentReference.hint = You can add a reference for your own records and to help you find this transfer later. It will not be used by HMRC
 
@@ -838,8 +838,10 @@ agent.sh03.minimumAmountPaid.error.aboveMaximum = The minimum amount paid for th
 
 agent.sh03.detailsOfSharePurchase.title = What are the details of this share purchase?
 agent.sh03.detailsOfSharePurchase.heading = What are the details of this share purchase?
-agent.sh03.detailsOfSharePurchase.error.amountPaid.negative = The amount paid for the shares must be £0.01 or more
-agent.sh03.detailsOfSharePurchase.error.marketValue.negative = The market value of the shares must be £0.01 or more
+agent.sh03.detailsOfSharePurchase.amountPaid = Amount paid for the shares in pounds
+agent.sh03.detailsOfSharePurchase.marketValue = Market value of the shares in pounds
+agent.sh03.detailsOfSharePurchase.error.amountPaid.belowMinimum = The amount paid for the shares must be £1 or more
+agent.sh03.detailsOfSharePurchase.error.marketValue.belowMinimum = The market value of the shares must be £0.01 or more
 
 agent.sh03.whatReliefAreYouApplyingFor.checkYourAnswersLabel = Enter the relief the buyer is applying for
 agent.sh03.whatReliefAreYouApplyingFor.change.hidden = Change what relief the buyer is applying for
@@ -904,4 +906,5 @@ agent.sh03.cannotSubmitFormError.item6 = Receiver manager
 agent.sh03.cannotSubmitFormError.item7 = CIC manager
 agent.sh03.cannotSubmitFormError.item8 = Someone submitting on behalf of a UK Societas
 agent.sh03.cannotSubmitFormError.error.p3 = You can save your submission as a draft, and submit it once you have this information.
+
 save-and-return-to-dashboard.link = Save and return to dashboard

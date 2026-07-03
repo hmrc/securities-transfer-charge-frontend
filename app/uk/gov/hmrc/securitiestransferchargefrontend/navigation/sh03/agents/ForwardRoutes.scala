@@ -42,7 +42,6 @@ class ForwardRoutes(answerPersistenceService: AnswerPersistenceService,
 
   private val firstDate = appConfig.firstChargingPoint
 
-
   def forwardRoutes(page: Page)(implicit hc: HeaderCarrier): UserAnswers => Future[Call] = page match {
 
     case HowToNotifyAboutShareBuybackPage => userAnswers => {
@@ -62,7 +61,6 @@ class ForwardRoutes(answerPersistenceService: AnswerPersistenceService,
     case ApplyingForReliefPage  => userAnswers =>  dataDependent(ApplyingForReliefPage, userAnswers){
       case true => sh03AgentSingleRoutes.WhatReliefAreYouApplyingForController.onPageLoad(NormalMode)
       case false => sh03AgentSingleRoutes.DetailsOfThisSharePurchaseController.onPageLoad(NormalMode)
-
     }
     case DetailsOfThisSharePurchasePage => userAnswers => dataRequired(DetailsOfThisSharePurchasePage, userAnswers, defaultPage)
     case MinimumAmountPaidPage  => userAnswers =>   dataRequired(MinimumAmountPaidPage, userAnswers,sh03AgentSingleRoutes.ChargingPointController.onPageLoad(NormalMode))
