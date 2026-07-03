@@ -915,3 +915,12 @@ org.sh03.shareBuyback.oneAtATime = One transfer at a time
 org.sh03.shareBuyback.oneAtATime.hint = Tell us about a purchase of one type of shares, between the business and one seller
 org.sh03.shareBuyback.moreThanOneAtATime = More than one transfer at a time
 org.sh03.shareBuyback.moreThanOneAtATime.hint = Tell us about several share purchases at once using our template. You can download the template, complete a row for each purchase, and upload it on the following pages. You can include purchases from different sellers and of different types of shares
+
+org.sh03.companyDetails.title = What is the company registration number (CRN)?
+org.sh03.companyDetails.heading = What is the company registration number (CRN)?
+org.sh03.companyDetails.crn.hint = This is also called a company number. For example, SN898989 or 12345678
+org.sh03.companyDetails.checkYourAnswersLabel = What is the company registration number (CRN)?
+org.sh03.companyDetails.error.required = Enter the company registration number
+org.sh03.companyDetails.error.invalid = Company registration number can only be numbers or letters
+org.sh03.companyDetails.error.length = Company registration number must be 8 characters long
+org.sh03.companyDetails.change.hidden = Change company registration number (CRN)

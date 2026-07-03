@@ -26,6 +26,7 @@ class CompanyDetailsFormProvider @Inject() extends Mappings {
   def apply(): Form[String] =
     Form(
       "value" -> text("org.sh03.companyDetails.error.required")
-        .verifying(maxLength(8, "org.sh03.companyDetails.error.length"))
+        .verifying(regexp("""^[a-zA-Z0-9]+$""", "org.sh03.companyDetails.error.invalid"))
+        .verifying(regexp("""^.{8}$""", "org.sh03.companyDetails.error.length"))
     )
 }

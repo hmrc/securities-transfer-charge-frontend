@@ -28,12 +28,12 @@ import uk.gov.hmrc.securitiestransferchargefrontend.navigation.Navigator
 import uk.gov.hmrc.securitiestransferchargefrontend.pages.sh03.OrgCompanyDetailsPage
 import uk.gov.hmrc.securitiestransferchargefrontend.views.html.sh03.organisations.single.CompanyDetailsView
 
-import javax.inject.Inject
+import javax.inject.{Inject, Named}
 import scala.concurrent.{ExecutionContext, Future}
 
 class CompanyDetailsController @Inject()(
                                         override val messagesApi: MessagesApi,
-                                        navigator: Navigator,
+                                        @Named("orgSh03") navigator: Navigator,
                                         stcAuthEnrolled: StcAuthEnrolledAction,
                                         getData: StcDataRetrievalAction,
                                         requireData: StcDataRequiredAction,
