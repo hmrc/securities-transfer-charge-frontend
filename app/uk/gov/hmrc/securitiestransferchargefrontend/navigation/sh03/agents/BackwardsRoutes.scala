@@ -17,7 +17,6 @@
 package uk.gov.hmrc.securitiestransferchargefrontend.navigation.sh03.agents
 
 import play.api.mvc.Call
-import uk.gov.hmrc.securitiestransferchargefrontend.controllers.routes
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.sh03.agents.routes as sh03AgentRoutes
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.sh03.agents.single.routes as sh03AgentSingleRoutes
 import uk.gov.hmrc.securitiestransferchargefrontend.models.sh03.shared.ReasonForPurchase
@@ -42,9 +41,24 @@ class BackwardsRoutes(defaultPage: Call):
       case ReasonForPurchase.ToPlaceIntoTreasury => sh03AgentSingleRoutes.ReasonForPurchaseController.onPageLoad(NormalMode)
     }
     case ApplyingForReliefPage => _ => sh03AgentSingleRoutes.ConnectedPersonsController.onPageLoad(NormalMode)
-    case DetailsOfThisSharePurchasePage => _ => sh03AgentSingleRoutes.ApplyingForReliefController.onPageLoad(NormalMode)
-    case MinimumAmountPaidPage => _ => routes.JourneyRecoveryController.onPageLoad()
-    case ChargingPointPage => _ => sh03AgentSingleRoutes.MinimumAmountPaidController.onPageLoad(NormalMode)
-    case MaximumAmountPaidPage => _ => routes.JourneyRecoveryController.onPageLoad()
+    case WhatReliefAreYouApplyingForPage => _ => sh03AgentSingleRoutes.ApplyingForReliefController.onPageLoad(NormalMode)
+    
+    case DetailsOfThisSharePurchasePage => userAnswers => dataDependent(ApplyingForReliefPage, userAnswers) { applyingForRelief =>
+      if(applyingForRelief) 
+        sh03AgentSingleRoutes.WhatReliefAreYouApplyingForController.onPageLoad(NormalMode)
+      else
+        sh03AgentSingleRoutes.ApplyingForReliefController.onPageLoad(NormalMode)
+    }
+    case MaximumAmountPaidPage => _ => sh03AgentSingleRoutes.DetailsOfThisSharePurchaseController.onPageLoad(NormalMode)
+
+    case MinimumAmountPaidPage => _ => sh03AgentSingleRoutes.MaximumAmountPaidController.onPageLoad(NormalMode)
+    case ChargingPointPage => userAnswers => dataDependent(CompanyDetailsPage, userAnswers) { companyDetails =>
+      if(companyDetails.isPlc)
+        sh03AgentSingleRoutes.MinimumAmountPaidController.onPageLoad(NormalMode)
+      else
+        sh03AgentSingleRoutes.DetailsOfThisSharePurchaseController.onPageLoad(NormalMode)  
+      
+    }
+    case RoleAtPurchasingCompanyPage => _ => sh03AgentSingleRoutes.ChargingPointController.onPageLoad(NormalMode)
     case _ => _ => defaultPage
   }

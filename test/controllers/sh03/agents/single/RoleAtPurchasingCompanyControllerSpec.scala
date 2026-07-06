@@ -27,7 +27,7 @@ import uk.gov.hmrc.securitiestransferchargefrontend.forms.sh03.agents.single.Rol
 import uk.gov.hmrc.securitiestransferchargefrontend.models.NormalMode
 import uk.gov.hmrc.securitiestransferchargefrontend.models.sh03.agents.RoleAtPurchasingCompany
 import uk.gov.hmrc.securitiestransferchargefrontend.navigation.Navigator
-import uk.gov.hmrc.securitiestransferchargefrontend.pages.sh03.agents.RoleAtPurchasingCompanyPage
+import uk.gov.hmrc.securitiestransferchargefrontend.pages.sh03.RoleAtPurchasingCompanyPage
 import uk.gov.hmrc.securitiestransferchargefrontend.views.html.sh03.agents.single.RoleAtPurchasingCompanyView
 
 class RoleAtPurchasingCompanyControllerSpec extends SpecBase {

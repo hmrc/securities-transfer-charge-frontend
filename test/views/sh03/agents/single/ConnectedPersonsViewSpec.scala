@@ -22,7 +22,7 @@ import play.api.Application
 import play.api.mvc.Call
 import uk.gov.hmrc.securitiestransferchargefrontend.forms.sh03.agents.single.ConnectedPersonsFormProvider
 import uk.gov.hmrc.securitiestransferchargefrontend.models.NormalMode
-import uk.gov.hmrc.securitiestransferchargefrontend.views.html.stf.agents.single.ConnectedPersonsView
+import uk.gov.hmrc.securitiestransferchargefrontend.views.html.sh03.agents.single.ConnectedPersonsView
 import views.ViewBaseSpec
 
 class ConnectedPersonsViewSpec extends ViewBaseSpec {
@@ -50,6 +50,7 @@ class ConnectedPersonsViewSpec extends ViewBaseSpec {
     val saveAndReturn: String = messages("site.save-and-return.button")
     val yes: String = messages("site.yes")
     val no: String = messages("site.no")
+    val link: String = "https://www.gov.uk/hmrc-internal-manuals/vat-insurance/vatins9000"
   }
 
   "The ConnectedPersonsView" - {
@@ -68,7 +69,7 @@ class ConnectedPersonsViewSpec extends ViewBaseSpec {
 
       "have the correct text with a link" in {
         connectedPersonsView.select(".govuk-body").text() mustBe ExpectedContent.para + " " + ExpectedContent.paraLinkText + " (opens in new tab)."
-        connectedPersonsView.select("p.govuk-body").select("a.govuk-link").attr("href") mustBe "https://www.gov.uk/hmrc-internal-manuals/vat-insurance/vatins9000"
+        connectedPersonsView.select("p.govuk-body").select("a.govuk-link").attr("href") mustBe ExpectedContent.link
       }
 
       "have the correct legend" in {

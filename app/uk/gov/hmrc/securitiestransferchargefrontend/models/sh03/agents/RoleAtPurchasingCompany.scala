@@ -21,5 +21,6 @@ import play.api.libs.json.*
 case class RoleAtPurchasingCompany(role: String, uksOrgan: Option[String])
 
 object RoleAtPurchasingCompany {
+  val unsupportedRole = "unsupportedRole"
   implicit val format: OFormat[RoleAtPurchasingCompany] = Json.format[RoleAtPurchasingCompany]
 }
