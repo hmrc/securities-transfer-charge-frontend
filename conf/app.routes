@@ -362,3 +362,8 @@ GET        /sh03/agent/check-your-answers                       uk.gov.hmrc.secu
 
 GET        /sh03/org/how-many-transfers                   uk.gov.hmrc.securitiestransferchargefrontend.controllers.sh03.organisations.HowToNotifyAboutShareBuybackController.onPageLoad()
 POST       /sh03/org/how-many-transfers                   uk.gov.hmrc.securitiestransferchargefrontend.controllers.sh03.organisations.HowToNotifyAboutShareBuybackController.onSubmit()
+
+GET        /sh03/org/treasury-shares                       uk.gov.hmrc.securitiestransferchargefrontend.controllers.sh03.organisations.single.TreasurySharesController.onPageLoad(mode: Mode = NormalMode)
+POST       /sh03/org/treasury-shares                       uk.gov.hmrc.securitiestransferchargefrontend.controllers.sh03.organisations.single.TreasurySharesController.onSubmit(mode: Mode = NormalMode)
+GET        /sh03/org/change/treasury-shares                 uk.gov.hmrc.securitiestransferchargefrontend.controllers.sh03.organisations.single.TreasurySharesController.onPageLoad(mode: Mode = CheckMode)
+POST       /sh03/org/change/treasury-shares                 uk.gov.hmrc.securitiestransferchargefrontend.controllers.sh03.organisations.single.TreasurySharesController.onSubmit(mode: Mode = CheckMode)

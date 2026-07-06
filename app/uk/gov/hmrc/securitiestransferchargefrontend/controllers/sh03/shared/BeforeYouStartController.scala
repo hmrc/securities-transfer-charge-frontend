@@ -21,6 +21,7 @@ import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.actions.*
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.sh03.agents.routes as agentRoutes
+import uk.gov.hmrc.securitiestransferchargefrontend.controllers.sh03.organisations.routes as orgRoutes
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.routes
 import uk.gov.hmrc.securitiestransferchargefrontend.views.html.sh03.shared.BeforeYouStartView
 import uk.gov.hmrc.auth.core.AffinityGroup
@@ -46,7 +47,7 @@ class BeforeYouStartController @Inject()(
 
     val call = innerRequest.affinityGroup match {
       case AffinityGroup.Organisation =>
-        routes.JourneyRecoveryController.onPageLoad()
+        orgRoutes.HowToNotifyAboutShareBuybackController.onPageLoad()
       case AffinityGroup.Agent =>
         agentRoutes.HowToNotifyAboutShareBuybackController.onPageLoad()
       case _ =>
