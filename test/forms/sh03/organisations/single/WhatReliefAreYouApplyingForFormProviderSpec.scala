@@ -1,15 +1,15 @@
-package forms
+package forms.sh03.organisations.single
 
-import uk.gov.hmrc.securitiestransferchargefrontend.forms.behaviours.StringFieldBehaviours
 import play.api.data.FormError
+import uk.gov.hmrc.securitiestransferchargefrontend.forms.behaviours.StringFieldBehaviours
 
-class WhatReliefAreYouApplyingForViewFormProviderSpec extends StringFieldBehaviours {
+class WhatReliefAreYouApplyingForFormProviderSpec extends StringFieldBehaviours {
 
-  val requiredKey = "whatReliefAreYouApplyingForView.error.required"
-  val lengthKey = "whatReliefAreYouApplyingForView.error.length"
+  val requiredKey = "whatReliefAreYouApplyingFor.error.required"
+  val lengthKey = "whatReliefAreYouApplyingFor.error.length"
   val maxLength = 100
 
-  val form = new WhatReliefAreYouApplyingForViewFormProvider()()
+  val form = new WhatReliefAreYouApplyingForFormProvider()()
 
   ".value" - {
 

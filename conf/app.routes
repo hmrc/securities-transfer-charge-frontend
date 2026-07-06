@@ -361,7 +361,8 @@ GET        /sh03/agent/cannot-submit-form                    uk.gov.hmrc.securit
 
 GET        /sh03/org/how-many-transfers                   uk.gov.hmrc.securitiestransferchargefrontend.controllers.sh03.organisations.HowToNotifyAboutShareBuybackController.onPageLoad()
 POST       /sh03/org/how-many-transfers                   uk.gov.hmrc.securitiestransferchargefrontend.controllers.sh03.organisations.HowToNotifyAboutShareBuybackController.onSubmit()
-GET        /whatReliefAreYouApplyingForView                        uk.gov.hmrc.securitiestransferchargefrontend.controllers.WhatReliefAreYouApplyingForViewController.onPageLoad(mode: Mode = NormalMode)
-POST       /whatReliefAreYouApplyingForView                        uk.gov.hmrc.securitiestransferchargefrontend.controllers.WhatReliefAreYouApplyingForViewController.onSubmit(mode: Mode = NormalMode)
-GET        /changeWhatReliefAreYouApplyingForView                  uk.gov.hmrc.securitiestransferchargefrontend.controllers.WhatReliefAreYouApplyingForViewController.onPageLoad(mode: Mode = CheckMode)
-POST       /changeWhatReliefAreYouApplyingForView                  uk.gov.hmrc.securitiestransferchargefrontend.controllers.WhatReliefAreYouApplyingForViewController.onSubmit(mode: Mode = CheckMode)
+
+GET        /sh03/org/reliefs-list                       uk.gov.hmrc.securitiestransferchargefrontend.controllers.sh03.organisations.single.WhatReliefAreYouApplyingForController.onPageLoad(mode: Mode = NormalMode)
+POST       /sh03/org/reliefs-list                       uk.gov.hmrc.securitiestransferchargefrontend.controllers.sh03.organisations.single.WhatReliefAreYouApplyingForController.onSubmit(mode: Mode = NormalMode)
+GET        /sh03/org/change/reliefs-list                uk.gov.hmrc.securitiestransferchargefrontend.controllers.sh03.organisations.single.WhatReliefAreYouApplyingForController.onPageLoad(mode: Mode = CheckMode)
+POST       /sh03/org/change/reliefs-list                uk.gov.hmrc.securitiestransferchargefrontend.controllers.sh03.organisations.single.WhatReliefAreYouApplyingForController.onSubmit(mode: Mode = CheckMode)

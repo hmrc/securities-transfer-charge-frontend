@@ -11,17 +11,17 @@ import play.api.inject.bind
 import play.api.mvc.Call
 import play.api.test.FakeRequest
 import play.api.test.Helpers._
-import uk.gov.hmrc.securitiestransferchargefrontend.forms.sh03.organisations.single.WhatReliefAreYouApplyingForViewFormProvider
+import uk.gov.hmrc.securitiestransferchargefrontend.forms.sh03.organisations.single.WhatReliefAreYouApplyingForFormProvider
 import uk.gov.hmrc.securitiestransferchargefrontend.repositories.SessionRepository
 import uk.gov.hmrc.securitiestransferchargefrontend.views.html.WhatReliefAreYouApplyingForViewView
 
 import scala.concurrent.Future
 
-class WhatReliefAreYouApplyingForViewControllerSpec extends SpecBase with MockitoSugar {
+class WhatReliefAreYouApplyingForControllerSpec extends SpecBase with MockitoSugar {
 
   def onwardRoute = Call("GET", "/foo")
 
-  val formProvider = new WhatReliefAreYouApplyingForViewFormProvider()
+  val formProvider = new WhatReliefAreYouApplyingForFormProvider()
   val form = formProvider()
 
   lazy val whatReliefAreYouApplyingForViewRoute = routes.WhatReliefAreYouApplyingForViewController.onPageLoad(NormalMode).url
