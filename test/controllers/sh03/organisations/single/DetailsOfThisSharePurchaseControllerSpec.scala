@@ -102,6 +102,7 @@ class DetailsOfThisSharePurchaseControllerSpec extends SpecBase with MockitoSuga
     }
 
     "must return a Bad Request and errors when invalid data is submitted" in {
+
       val updatedAnswers = emptyUserAnswers.set(ConnectedPersonsPage, true).success.value
 
       val application = applicationBuilder(userAnswers = Some(updatedAnswers), affinityGroup = orgAffinity)

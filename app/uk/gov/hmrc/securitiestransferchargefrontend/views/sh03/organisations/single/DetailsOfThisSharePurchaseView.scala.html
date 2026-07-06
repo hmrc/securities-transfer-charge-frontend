@@ -28,7 +28,7 @@
     saveAndReturnButton:SaveAndReturnButton
 )
 
-@(form: Form[_], mode: Mode, backLinkCall: Call,requireMarketValue: Boolean= true)(implicit request: Request[_], messages: Messages)
+@(form: Form[_], mode: Mode, backLinkCall: Call, requireMarketValue: Boolean= true)(implicit request: Request[_], messages: Messages)
 
 @layout(pageTitle = title(form, messages("org.sh03.detailsOfSharePurchase.title"), Some(messages("sh03.section.name"))), backLinkUrl = Some(backLinkCall.url)) {
 
