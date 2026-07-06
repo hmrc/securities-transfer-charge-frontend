@@ -22,7 +22,7 @@ import play.api.mvc.{Action, AnyContent, Call, MessagesControllerComponents}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.actions.*
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.shared.SaveAndReturnButton.isReturn
-import uk.gov.hmrc.securitiestransferchargefrontend.forms.sh03.agents.single.TreasurySharesFormProvider
+import uk.gov.hmrc.securitiestransferchargefrontend.forms.sh03.shared.TreasurySharesFormProvider
 import uk.gov.hmrc.securitiestransferchargefrontend.models.{Mode, UserAnswers}
 import uk.gov.hmrc.securitiestransferchargefrontend.navigation.Navigator
 import uk.gov.hmrc.securitiestransferchargefrontend.pages.sh03.TreasurySharesPage
@@ -42,13 +42,14 @@ class TreasurySharesController @Inject()(
                                          view: TreasurySharesView
                                  )(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport {
 
-  val form: Form[Boolean] = formProvider()
-
   lazy val backLinkCall: Mode => UserAnswers => Call =
     mode => userAnswers => navigator.previousPage(TreasurySharesPage, mode, userAnswers)
 
   def onPageLoad(mode: Mode): Action[AnyContent] = (stcAuthEnrolled andThen getData andThen requireData) {
     implicit request =>
+
+      val innerRequest = request.request
+      val form: Form[Boolean] = formProvider(innerRequest.affinityGroupKey)
 
       val preparedForm = request.userAnswers.get(TreasurySharesPage) match {
         case None => form
@@ -60,6 +61,9 @@ class TreasurySharesController @Inject()(
 
   def onSubmit(mode: Mode): Action[AnyContent] = (stcAuthEnrolled andThen getData andThen requireData).async {
     implicit request =>
+
+      val innerRequest = request.request
+      val form: Form[Boolean] = formProvider(innerRequest.affinityGroupKey)
 
       form.bindFromRequest().fold(
         formWithErrors =>
