@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.securitiestransferchargefrontend.controllers.sh03.agents.single
+package uk.gov.hmrc.securitiestransferchargefrontend.controllers.sh03.organisations.single
 
 import play.api.data.Form
 import play.api.i18n.{I18nSupport, MessagesApi}
@@ -26,14 +26,14 @@ import uk.gov.hmrc.securitiestransferchargefrontend.forms.sh03.shared.TreasurySh
 import uk.gov.hmrc.securitiestransferchargefrontend.models.{Mode, UserAnswers}
 import uk.gov.hmrc.securitiestransferchargefrontend.navigation.Navigator
 import uk.gov.hmrc.securitiestransferchargefrontend.pages.sh03.TreasurySharesPage
-import uk.gov.hmrc.securitiestransferchargefrontend.views.html.sh03.agents.single.TreasurySharesView
+import uk.gov.hmrc.securitiestransferchargefrontend.views.html.sh03.organisations.single.TreasurySharesView
 
 import javax.inject.{Inject, Named}
 import scala.concurrent.{ExecutionContext, Future}
 
 class TreasurySharesController @Inject()(
                                          override val messagesApi: MessagesApi,
-                                         @Named("agentsSh03") navigator: Navigator,
+                                         @Named("orgSh03") navigator: Navigator,
                                          stcAuthEnrolled: StcAuthEnrolledAction,
                                          getData: StcDataRetrievalAction,
                                          requireData: StcDataRequiredAction,
@@ -41,13 +41,14 @@ class TreasurySharesController @Inject()(
                                          val controllerComponents: MessagesControllerComponents,
                                          view: TreasurySharesView
                                  )(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport {
+  
 
   lazy val backLinkCall: Mode => UserAnswers => Call =
     mode => userAnswers => navigator.previousPage(TreasurySharesPage, mode, userAnswers)
 
   def onPageLoad(mode: Mode): Action[AnyContent] = (stcAuthEnrolled andThen getData andThen requireData) {
     implicit request =>
-
+      
       val innerRequest = request.request
       val form: Form[Boolean] = formProvider(innerRequest.affinityGroupKey)
 
