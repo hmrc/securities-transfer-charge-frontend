@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package controllers.sh03.agents.single
+package controllers.sh03.organisations.single
 
 import base.Fixtures.testUserAnswers
 import base.SpecBase
@@ -23,26 +23,26 @@ import play.api.inject.bind
 import play.api.test.FakeRequest
 import play.api.test.Helpers.*
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.routes
-import uk.gov.hmrc.securitiestransferchargefrontend.controllers.sh03.agents.single.routes as sh03AgentsRoutes
+import uk.gov.hmrc.securitiestransferchargefrontend.controllers.sh03.organisations.single.routes as sh03OrgsRoutes
 import uk.gov.hmrc.securitiestransferchargefrontend.forms.sh03.shared.TreasurySharesFormProvider
 import uk.gov.hmrc.securitiestransferchargefrontend.models.NormalMode
 import uk.gov.hmrc.securitiestransferchargefrontend.navigation.Navigator
 import uk.gov.hmrc.securitiestransferchargefrontend.pages.sh03.TreasurySharesPage
-import uk.gov.hmrc.securitiestransferchargefrontend.views.html.sh03.agents.single.TreasurySharesView
+import uk.gov.hmrc.securitiestransferchargefrontend.views.html.sh03.organisations.single.TreasurySharesView
 
 class TreasurySharesControllerSpec extends SpecBase {
 
   val formProvider = new TreasurySharesFormProvider()
-  val form: Form[Boolean] = formProvider(affinityGroupKeyAgent)
+  val form: Form[Boolean] = formProvider(affinityGroupKeyOrg)
 
-  lazy val treasurySharesRoute: String = sh03AgentsRoutes.TreasurySharesController.onPageLoad(NormalMode).url
+  lazy val treasurySharesRoute: String = sh03OrgsRoutes.TreasurySharesController.onPageLoad(NormalMode).url
 
   "TreasurySharesController" - {
 
     "must return OK and the correct view for a GET" in {
 
-      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers), affinityGroup = agentAffinity)
-        .overrides(bind[Navigator].qualifiedWith("agentsSh03").toInstance(getNavigator))
+      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers), affinityGroup = orgAffinity)
+        .overrides(bind[Navigator].qualifiedWith("orgSh03").toInstance(getNavigator))
         .build()
 
       running(application) {
@@ -61,8 +61,8 @@ class TreasurySharesControllerSpec extends SpecBase {
 
       val userAnswers = testUserAnswers.set(TreasurySharesPage, true).success.value
 
-      val application = applicationBuilder(userAnswers = Some(userAnswers), affinityGroup = agentAffinity)
-        .overrides(bind[Navigator].qualifiedWith("agentsSh03").toInstance(getNavigator))
+      val application = applicationBuilder(userAnswers = Some(userAnswers), affinityGroup = orgAffinity)
+        .overrides(bind[Navigator].qualifiedWith("orgSh03").toInstance(getNavigator))
         .build()
 
       running(application) {
@@ -79,8 +79,8 @@ class TreasurySharesControllerSpec extends SpecBase {
 
     "must redirect to the next page when valid data is submitted" in {
 
-      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers), affinityGroup = agentAffinity)
-        .overrides(bind[Navigator].qualifiedWith("agentsSh03").toInstance(getNavigator))
+      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers), affinityGroup = orgAffinity)
+        .overrides(bind[Navigator].qualifiedWith("orgSh03").toInstance(getNavigator))
         .build()
 
       running(application) {
@@ -97,8 +97,8 @@ class TreasurySharesControllerSpec extends SpecBase {
 
     "must return a Bad Request and errors when invalid data is submitted" in {
 
-      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers), affinityGroup = agentAffinity)
-        .overrides(bind[Navigator].qualifiedWith("agentsSh03").toInstance(getNavigator))
+      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers), affinityGroup = orgAffinity)
+        .overrides(bind[Navigator].qualifiedWith("orgSh03").toInstance(getNavigator))
         .build()
 
       running(application) {
@@ -119,7 +119,7 @@ class TreasurySharesControllerSpec extends SpecBase {
 
     "must redirect to Journey Recovery for a POST if no existing data is found" in {
 
-      val application = applicationBuilder(userAnswers = None, affinityGroup = agentAffinity).build()
+      val application = applicationBuilder(userAnswers = None, affinityGroup = orgAffinity).build()
 
       running(application) {
         val request =
