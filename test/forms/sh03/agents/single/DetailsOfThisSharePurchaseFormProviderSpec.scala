@@ -18,11 +18,17 @@ package forms.sh03.agents.single
 
 import base.SpecBase
 import forms.behaviours.{CurrencyFieldBehaviours, IntFieldBehaviours, StringFieldBehaviours}
+import org.scalacheck.Gen
 import play.api.data.FormError
+import uk.gov.hmrc.securitiestransferchargefrontend.config.CurrencyFormatter.currencyFormat
 import uk.gov.hmrc.securitiestransferchargefrontend.forms.sh03.agents.single.DetailsOfThisSharePurchaseFormProvider
 
+
 class DetailsOfThisSharePurchaseFormProviderSpec
-  extends StringFieldBehaviours with CurrencyFieldBehaviours with IntFieldBehaviours with SpecBase{
+  extends StringFieldBehaviours
+    with CurrencyFieldBehaviours
+    with IntFieldBehaviours
+    with SpecBase {
 
   private val affinityKey = affinityGroupKeyAgent
 
@@ -34,11 +40,11 @@ class DetailsOfThisSharePurchaseFormProviderSpec
   ".numberOfShares" - {
 
     val fieldName = "numberOfShares"
-    val requiredKey = s"$affinityKey.detailsOfThisTransfer.error.numberOfShares.required"
-    val nonNumericKey = s"$affinityKey.detailsOfThisTransfer.error.numberOfShares.nonNumeric"
-    val wholeNumberKey = "detailsOfThisTransfer.error.numberOfShares.wholeNumber"
-    val minimumKey = "detailsOfThisTransfer.error.numberOfShares.min"
-    val maximumKey = "detailsOfThisTransfer.error.numberOfShares.max"
+    val requiredKey = s"$affinityKey.sh03.detailsOfSharePurchase.error.numberOfShares.required"
+    val nonNumericKey = s"$affinityKey.sh03.detailsOfSharePurchase.error.numberOfShares.nonNumeric"
+    val wholeNumberKey = s"$affinityKey.sh03.detailsOfSharePurchase.error.numberOfShares.wholeNumber"
+    val minimumKey = s"$affinityKey.sh03.detailsOfSharePurchase.error.numberOfShares.min"
+    val maximumKey = s"$affinityKey.sh03.detailsOfSharePurchase.error.numberOfShares.max"
 
     val min = 1
 
@@ -54,7 +60,7 @@ class DetailsOfThisSharePurchaseFormProviderSpec
       val result = form.bind(Map(fieldName -> "1000000000"))
 
       result.errors must contain(
-        FormError("numberOfShares", maximumKey)
+        FormError(fieldName, maximumKey)
       )
     }
 
@@ -75,11 +81,12 @@ class DetailsOfThisSharePurchaseFormProviderSpec
   ".typeOfShares" - {
 
     val fieldName = "typeOfShares"
+
     val requiredKey =
-      s"$affinityKey.detailsOfThisTransfer.error.typeOfShares.required"
+      s"$affinityKey.sh03.detailsOfSharePurchase.error.typeOfShares.required"
 
     val lengthKey =
-      s"$affinityKey.detailsOfThisTransfer.error.typeOfShares.length"
+      s"$affinityKey.sh03.detailsOfSharePurchase.error.typeOfShares.length"
 
     val maxLength = 100
 
@@ -107,10 +114,13 @@ class DetailsOfThisSharePurchaseFormProviderSpec
 
     val fieldName = "amountPaid"
 
-    val maximum = 999999999
+    val maximum = BigDecimal(999999999)
+    val minimum = BigDecimal(1.00)
 
     val validDataGenerator =
-      intsInRangeWithCommas(0, maximum)
+      Gen
+        .chooseNum(minimum, maximum)
+        .map(_.toString)
 
     behave like fieldThatBindsValidData(
       form,
@@ -124,12 +134,12 @@ class DetailsOfThisSharePurchaseFormProviderSpec
       nonNumericError =
         FormError(
           fieldName,
-          s"$affinityKey.detailsOfThisTransfer.error.amountPaid.nonNumeric"
+          s"$affinityKey.sh03.detailsOfSharePurchase.error.amountPaid.nonNumeric"
         ),
       invalidNumericError =
         FormError(
           fieldName,
-          s"$affinityKey.detailsOfThisTransfer.error.amountPaid.invalidNumeric"
+          s"$affinityKey.sh03.detailsOfSharePurchase.error.amountPaid.invalidNumeric"
         )
     )
 
@@ -140,8 +150,20 @@ class DetailsOfThisSharePurchaseFormProviderSpec
       expectedError =
         FormError(
           fieldName,
-          s"$affinityKey.detailsOfThisTransfer.error.amountPaid.aboveMaximum",
-          Seq("£999,999,999")
+          s"$affinityKey.sh03.detailsOfSharePurchase.error.amountPaid.aboveMaximum",
+          Seq(currencyFormat(maximum))
+        )
+    )
+
+    behave like currencyFieldWithMinimum(
+      form,
+      fieldName,
+      minimum = minimum,
+      expectedError =
+        FormError(
+          fieldName,
+          s"$affinityKey.sh03.detailsOfSharePurchase.error.amountPaid.belowMinimum",
+          Seq(currencyFormat(minimum))
         )
     )
 
@@ -151,7 +173,7 @@ class DetailsOfThisSharePurchaseFormProviderSpec
       requiredError =
         FormError(
           fieldName,
-          s"$affinityKey.detailsOfThisTransfer.error.amountPaid.required"
+          s"$affinityKey.sh03.detailsOfSharePurchase.error.amountPaid.required"
         )
     )
   }
@@ -160,10 +182,13 @@ class DetailsOfThisSharePurchaseFormProviderSpec
 
     val fieldName = "marketValue"
 
-    val maximum = 999999999
+    val maximum = BigDecimal(999999999)
+    val minimum = BigDecimal(0.01)
 
     val validDataGenerator =
-      intsInRangeWithCommas(0, maximum)
+      Gen
+        .chooseNum(minimum, maximum)
+        .map(_.toString)
 
     behave like fieldThatBindsValidData(
       form,
@@ -177,12 +202,12 @@ class DetailsOfThisSharePurchaseFormProviderSpec
       nonNumericError =
         FormError(
           fieldName,
-          s"$affinityKey.detailsOfThisTransfer.error.marketValue.nonNumeric"
+          s"$affinityKey.sh03.detailsOfSharePurchase.error.marketValue.nonNumeric"
         ),
       invalidNumericError =
         FormError(
           fieldName,
-          s"$affinityKey.detailsOfThisTransfer.error.marketValue.invalidNumeric"
+          s"$affinityKey.sh03.detailsOfSharePurchase.error.marketValue.invalidNumeric"
         )
     )
 
@@ -193,8 +218,8 @@ class DetailsOfThisSharePurchaseFormProviderSpec
       expectedError =
         FormError(
           fieldName,
-          s"$affinityKey.detailsOfThisTransfer.error.marketValue.aboveMaximum",
-          Seq("£999,999,999")
+          s"$affinityKey.sh03.detailsOfSharePurchase.error.marketValue.aboveMaximum",
+          Seq(currencyFormat(maximum))
         )
     )
 
@@ -204,7 +229,19 @@ class DetailsOfThisSharePurchaseFormProviderSpec
       requiredError =
         FormError(
           fieldName,
-          s"$affinityKey.detailsOfThisTransfer.error.marketValue.required"
+          s"$affinityKey.sh03.detailsOfSharePurchase.error.marketValue.required"
+        )
+    )
+
+    behave like currencyFieldWithMinimum(
+      form,
+      fieldName,
+      minimum = minimum,
+      expectedError =
+        FormError(
+          fieldName,
+          s"$affinityKey.sh03.detailsOfSharePurchase.error.marketValue.belowMinimum",
+          Seq(currencyFormat(minimum))
         )
     )
   }

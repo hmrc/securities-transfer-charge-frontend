@@ -15,7 +15,9 @@
  *@
 
 @import uk.gov.hmrc.securitiestransferchargefrontend.views.html.templates
+@import uk.gov.hmrc.securitiestransferchargefrontend.controllers.sh03.agents.single.routes as sh03AgentSingleRoutes
 @import uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.shared.routes
+@import uk.gov.hmrc.securitiestransferchargefrontend.models.NormalMode
 
 @this(
     layout: templates.Layout,
@@ -24,7 +26,7 @@
 
 @()(implicit request: Request[_], messages: Messages)
 
-@layout(pageTitle = titleNoForm(messages("agent.sh03.cannotSubmitFormError.title"), Some(messages("sh03.section.name"))), backLinkUrl = Some(routes.SubmissionsDashboardController.onPageLoad().url)) {
+@layout(pageTitle = titleNoForm(messages("agent.sh03.cannotSubmitFormError.title"), Some(messages("sh03.section.name"))), backLinkUrl = Some(sh03AgentSingleRoutes.RoleAtPurchasingCompanyController.onPageLoad(NormalMode).url)) {
 
     <h1 class="govuk-heading-l">@messages("agent.sh03.cannotSubmitFormError.heading")</h1>
 

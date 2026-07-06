@@ -27,6 +27,7 @@ import uk.gov.hmrc.securitiestransferchargefrontend.navigation.PersistentNavigat
 import uk.gov.hmrc.securitiestransferchargefrontend.pages.Page
 import uk.gov.hmrc.securitiestransferchargefrontend.pages.sh03.*
 import uk.gov.hmrc.securitiestransferchargefrontend.services.AnswerPersistenceService
+import uk.gov.hmrc.securitiestransferchargefrontend.models.sh03.agents.RoleAtPurchasingCompany
 
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -50,25 +51,58 @@ class ForwardRoutes(answerPersistenceService: AnswerPersistenceService,
         case MoreThanOneAtATime => defaultPage
       }
     }
-    case AgentReferencePage => userAnswers => dataRequired(AgentReferencePage, userAnswers, sh03AgentSingleRoutes.CompanyDetailsController.onPageLoad(NormalMode))
-    case CompanyDetailsPage => userAnswers => dataRequired(CompanyDetailsPage, userAnswers, sh03AgentSingleRoutes.ReasonForPurchaseController.onPageLoad(NormalMode))
-    case ReasonForPurchasePage => userAnswers => dataDependent(ReasonForPurchasePage, userAnswers) {
-      case ReasonForPurchase.ForCancellation  => sh03AgentSingleRoutes.TreasurySharesController.onPageLoad(NormalMode)
-      case ReasonForPurchase.ToPlaceIntoTreasury => sh03AgentSingleRoutes.ConnectedPersonsController.onPageLoad(NormalMode)
-    }
-    case TreasurySharesPage => userAnswers => dataRequired(TreasurySharesPage, userAnswers,sh03AgentSingleRoutes.ConnectedPersonsController.onPageLoad(NormalMode))
-    case ConnectedPersonsPage  => userAnswers => dataRequired(ConnectedPersonsPage, userAnswers,sh03AgentSingleRoutes.ApplyingForReliefController.onPageLoad(NormalMode))
-    case ApplyingForReliefPage  => userAnswers =>  dataDependent(ApplyingForReliefPage, userAnswers){
-      case true => sh03AgentSingleRoutes.WhatReliefAreYouApplyingForController.onPageLoad(NormalMode)
-      case false => sh03AgentSingleRoutes.DetailsOfThisSharePurchaseController.onPageLoad(NormalMode)
-    }
-    case DetailsOfThisSharePurchasePage => userAnswers => dataRequired(DetailsOfThisSharePurchasePage, userAnswers, defaultPage)
-    case MinimumAmountPaidPage  => userAnswers =>   dataRequired(MinimumAmountPaidPage, userAnswers,sh03AgentSingleRoutes.ChargingPointController.onPageLoad(NormalMode))
-    case ChargingPointPage => userAnswers => dataDependent(ChargingPointPage, userAnswers) {enterDate =>
-      if (enterDate.isBefore(firstDate)) defaultPage
-      else sh03AgentSingleRoutes.RoleAtPurchasingCompanyController.onPageLoad(NormalMode)
-    }
-    case MaximumAmountPaidPage  => userAnswers =>  goTo(defaultPage,Some(userAnswers))
+    case AgentReferencePage => userAnswers =>
+      dataRequired(AgentReferencePage, userAnswers, sh03AgentSingleRoutes.CompanyDetailsController.onPageLoad(NormalMode))
 
+    case CompanyDetailsPage => userAnswers =>
+      dataRequired(CompanyDetailsPage, userAnswers, sh03AgentSingleRoutes.ReasonForPurchaseController.onPageLoad(NormalMode))
+
+    case ReasonForPurchasePage => userAnswers =>
+      dataDependent(ReasonForPurchasePage, userAnswers) {
+        case ReasonForPurchase.ForCancellation => sh03AgentSingleRoutes.TreasurySharesController.onPageLoad(NormalMode)
+        case ReasonForPurchase.ToPlaceIntoTreasury => sh03AgentSingleRoutes.ConnectedPersonsController.onPageLoad(NormalMode)
+      }
+    case TreasurySharesPage => userAnswers =>
+      dataRequired(TreasurySharesPage, userAnswers, sh03AgentSingleRoutes.ConnectedPersonsController.onPageLoad(NormalMode))
+
+    case ConnectedPersonsPage => userAnswers =>
+      dataRequired(ConnectedPersonsPage, userAnswers, sh03AgentSingleRoutes.ApplyingForReliefController.onPageLoad(NormalMode))
+
+    case ApplyingForReliefPage => userAnswers =>
+      dataDependent(ApplyingForReliefPage, userAnswers) {
+        case false => sh03AgentSingleRoutes.DetailsOfThisSharePurchaseController.onPageLoad(NormalMode)
+        case true => sh03AgentSingleRoutes.WhatReliefAreYouApplyingForController.onPageLoad(NormalMode)
+      }
+    case WhatReliefAreYouApplyingForPage => userAnswers =>
+      dataRequired(WhatReliefAreYouApplyingForPage, userAnswers, sh03AgentSingleRoutes.DetailsOfThisSharePurchaseController.onPageLoad(NormalMode))
+
+    case DetailsOfThisSharePurchasePage => userAnswers =>
+      dataDependent(CompanyDetailsPage, userAnswers) { companyDetails =>
+        if (companyDetails.isPlc)
+          sh03AgentSingleRoutes.MaximumAmountPaidController.onPageLoad(NormalMode)
+        else
+          sh03AgentSingleRoutes.ChargingPointController.onPageLoad(NormalMode)
+      }
+
+    case MaximumAmountPaidPage => userAnswers =>
+      dataRequired(MaximumAmountPaidPage, userAnswers, sh03AgentSingleRoutes.MinimumAmountPaidController.onPageLoad(NormalMode))
+
+    case MinimumAmountPaidPage => userAnswers =>
+      dataRequired(MinimumAmountPaidPage, userAnswers, sh03AgentSingleRoutes.ChargingPointController.onPageLoad(NormalMode))
+
+    case ChargingPointPage => userAnswers =>
+      dataDependent(ChargingPointPage, userAnswers) { enterDate =>
+        if (enterDate.isBefore(firstDate)) defaultPage
+        else sh03AgentSingleRoutes.RoleAtPurchasingCompanyController.onPageLoad(NormalMode)
+      }
+
+    case RoleAtPurchasingCompanyPage => userAnswers =>
+      dataDependent(RoleAtPurchasingCompanyPage, userAnswers) {
+        roleAtPurchasingCompany =>
+          if (roleAtPurchasingCompany.role == RoleAtPurchasingCompany.unsupportedRole)
+            sh03AgentSingleRoutes.CannotSubmitFormErrorController.onPageLoad()
+          else
+            sh03AgentSingleRoutes.CheckYourAnswersController.onPageLoad()
+      }
     case _ => _ => Future.successful(defaultPage)
   }

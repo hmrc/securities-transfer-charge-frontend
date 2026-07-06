@@ -68,6 +68,10 @@ class MinimumAmountPaidViewSpec extends ViewBaseSpec {
         minimumAmountPaidView.select("input.govuk-input").size() mustBe 1
       }
 
+      "have a pound prefix on the input" in {
+        minimumAmountPaidView.select(".govuk-input__prefix").text() mustBe "£"
+      }
+
       "have a button with the text save and continue" in {
         val buttons = minimumAmountPaidView.select(".govuk-button")
         buttons.get(0).text() mustBe ExpectedContent.saveAndContinue

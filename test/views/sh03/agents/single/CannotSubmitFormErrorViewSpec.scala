@@ -54,6 +54,7 @@ class CannotSubmitFormErrorViewSpec extends ViewBaseSpec {
     val para3Value: String = messages("agent.sh03.cannotSubmitFormError.error.p3")
 
     val saveAndReturnLink: String = messages("save-and-return-to-dashboard.link")
+    val backLinkUrl: String = "/securities-transfer-charge/sh03/agent/role-purchasing-company"
   }
 
   "The CannotSubmitFormErrorView" - {
@@ -115,6 +116,10 @@ class CannotSubmitFormErrorViewSpec extends ViewBaseSpec {
 
       "display the correct third paragraph" in {
         cannotSubmitFormErrorView.para(3) mustBe Some(ExpectedContent.para3Value)
+      }
+
+      "back link url to the role purchasing company page" in {
+        cannotSubmitFormErrorView.select(".govuk-back-link").attr("href") mustBe ExpectedContent.backLinkUrl
       }
 
       "have a save and return link back to the submission dashboard page" in {
