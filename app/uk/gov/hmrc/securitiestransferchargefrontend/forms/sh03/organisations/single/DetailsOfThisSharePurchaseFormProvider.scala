@@ -14,11 +14,11 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.securitiestransferchargefrontend.forms.sh03.agents.single
+package uk.gov.hmrc.securitiestransferchargefrontend.forms.sh03.organisations.single
 
 import play.api.data.Form
 import play.api.data.Forms.*
-import play.api.data.validation.{Constraint, Valid,Invalid}
+import play.api.data.validation.{Constraint, Invalid, Valid}
 import uk.gov.hmrc.securitiestransferchargefrontend.forms.mappings.Mappings
 import uk.gov.hmrc.securitiestransferchargefrontend.models.sh03.shared.DetailsOfThisSharePurchase
 

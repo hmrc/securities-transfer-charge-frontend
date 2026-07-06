@@ -17,7 +17,7 @@
 package uk.gov.hmrc.securitiestransferchargefrontend.pages.sh03
 
 import play.api.libs.json.JsPath
-import uk.gov.hmrc.securitiestransferchargefrontend.models.sh03.agents.DetailsOfThisSharePurchase
+import uk.gov.hmrc.securitiestransferchargefrontend.models.sh03.shared.DetailsOfThisSharePurchase
 import uk.gov.hmrc.securitiestransferchargefrontend.pages.QuestionPage
 
 case object DetailsOfThisSharePurchasePage extends QuestionPage[DetailsOfThisSharePurchase] {
