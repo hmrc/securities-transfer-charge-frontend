@@ -1,0 +1,95 @@
+/*
+ * Copyright 2026 HM Revenue & Customs
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+package views.sh03.organisations.single
+
+import org.jsoup.Jsoup
+import org.jsoup.nodes.Document
+import play.api.Application
+import play.api.mvc.Call
+import uk.gov.hmrc.securitiestransferchargefrontend.forms.sh03.organisations.single.ConnectedPersonsFormProvider
+import uk.gov.hmrc.securitiestransferchargefrontend.models.NormalMode
+import uk.gov.hmrc.securitiestransferchargefrontend.views.html.sh03.organisations.single.ConnectedPersonsView
+import views.ViewBaseSpec
+
+class ConnectedPersonsViewSpec extends ViewBaseSpec {
+
+  override def fakeApplication(): Application =
+    applicationBuilder(affinityGroup = orgAffinity).build()
+
+  private val viewInstance = app.injector.instanceOf[ConnectedPersonsView]
+  private val formProvider = new ConnectedPersonsFormProvider()
+  private val testBackLinkRoute: Call = Call("GET", "/back-link")
+
+  private val form = formProvider()
+
+  def view(): Document = Jsoup.parse(
+    viewInstance(form, NormalMode, testBackLinkRoute)(fakeRequest, messages).body
+  )
+
+  object ExpectedContent {
+    val title: String = messages("org.sh03.connectedPersons.title")
+    val heading: String = messages("org.sh03.connectedPersons.heading")
+    val para: String = messages("org.sh03.connectedPersons.p")
+    val legend: String = messages("org.sh03.connectedPersons.legend")
+    val paraLinkText: String = messages("org.sh03.connectedPersons.content.link.text")
+    val saveAndContinue: String = messages("site.save-and-continue.button")
+    val saveAndReturn: String = messages("site.save-and-return.button")
+    val yes: String = messages("site.yes")
+    val no: String = messages("site.no")
+    val link: String = "https://www.gov.uk/hmrc-internal-manuals/vat-insurance/vatins9000"
+  }
+
+  "The ConnectedPersonsView" - {
+
+    "render view" - {
+
+      val connectedPersonsView = view()
+
+      "have the correct title" in {
+        connectedPersonsView.title() must include(ExpectedContent.title)
+      }
+
+      "have the correct heading" in {
+        connectedPersonsView.select("h1").text() must include(ExpectedContent.heading)
+      }
+
+      "have the correct text with a link" in {
+        connectedPersonsView.select(".govuk-body").text() mustBe ExpectedContent.para + " " + ExpectedContent.paraLinkText + " (opens in new tab)."
+        connectedPersonsView.select("p.govuk-body").select("a.govuk-link").attr("href") mustBe ExpectedContent.link
+      }
+
+      "have the correct legend" in {
+        connectedPersonsView.select(".govuk-fieldset").text() must include(ExpectedContent.legend)
+      }
+
+      "have the correct radio buttons" in {
+        val radios = connectedPersonsView.select(".govuk-radios").text()
+
+        radios must include(ExpectedContent.yes)
+        radios must include(ExpectedContent.no)
+      }
+
+      "have a save and continue button" in {
+        connectedPersonsView.select(".govuk-button").first().text() mustBe ExpectedContent.saveAndContinue
+      }
+
+      "have a save and return button" in {
+        connectedPersonsView.select(".govuk-button--secondary").text() mustBe ExpectedContent.saveAndReturn
+      }
+    }
+  }
+}
