@@ -31,9 +31,9 @@
     saveAndReturnButton: SaveAndReturnButton
 )
 
-@(form: Form[_], mode: Mode)(implicit request: Request[_], messages: Messages)
+@(form: Form[_], mode: Mode,backLinkCall: Call)(implicit request: Request[_], messages: Messages)
 
-@layout(pageTitle = title(form, messages("org.sh03.companyDetails.title"), Some(messages("sh03.section.name")))) {
+@layout(pageTitle = title(form, messages("org.sh03.companyDetails.title"), Some(messages("sh03.section.name"))), backLinkUrl = Some(backLinkCall.url)) {
 
     @formHelper(action = routes.CompanyDetailsController.onSubmit(mode)) {
 

@@ -19,6 +19,8 @@ package controllers.sh03.organisations.single
 import base.SpecBase
 import org.scalatestplus.mockito.MockitoSugar
 import play.api.data.Form
+import play.api.inject
+import play.api.inject.bind
 import play.api.mvc.Call
 import play.api.test.FakeRequest
 import play.api.test.Helpers.*
@@ -26,6 +28,7 @@ import uk.gov.hmrc.securitiestransferchargefrontend.controllers.routes
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.sh03.organisations.single.routes as sh03OrgSingleRoutes
 import uk.gov.hmrc.securitiestransferchargefrontend.forms.sh03.organisations.CompanyDetailsFormProvider
 import uk.gov.hmrc.securitiestransferchargefrontend.models.{NormalMode, UserAnswers}
+import uk.gov.hmrc.securitiestransferchargefrontend.navigation.Navigator
 import uk.gov.hmrc.securitiestransferchargefrontend.pages.sh03.OrgCompanyDetailsPage
 import uk.gov.hmrc.securitiestransferchargefrontend.views.html.sh03.organisations.single.CompanyDetailsView
 
@@ -42,7 +45,9 @@ class CompanyDetailsControllerSpec extends SpecBase with MockitoSugar {
 
     "must return OK and the correct view for a GET" in {
 
-      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers)).build()
+      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers),affinityGroup = orgAffinity)
+        .overrides(inject.bind[Navigator].qualifiedWith("orgSh03").toInstance(getNavigator))
+        .build()
 
       running(application) {
         val request = FakeRequest(GET, companyDetailsRoute)
@@ -52,7 +57,7 @@ class CompanyDetailsControllerSpec extends SpecBase with MockitoSugar {
         val view = application.injector.instanceOf[CompanyDetailsView]
 
         status(result) mustEqual OK
-        contentAsString(result) mustEqual view(form, NormalMode)(request, messages(application)).toString
+        contentAsString(result) mustEqual view(form, NormalMode, testBackLinkRoute)(request, messages(application)).toString
       }
     }
 
@@ -60,8 +65,9 @@ class CompanyDetailsControllerSpec extends SpecBase with MockitoSugar {
 
       val userAnswers = UserAnswers(testUserId, testGroupIdentifier, submissionId).set(OrgCompanyDetailsPage, "answer").success.value
 
-      val application = applicationBuilder(userAnswers = Some(userAnswers)).build()
-
+      val application = applicationBuilder(userAnswers = Some(userAnswers),affinityGroup = orgAffinity)
+        .overrides(bind[Navigator].qualifiedWith("orgSh03").toInstance(getNavigator))
+        .build()
 
       running(application) {
         val request = FakeRequest(GET, companyDetailsRoute)
@@ -71,7 +77,7 @@ class CompanyDetailsControllerSpec extends SpecBase with MockitoSugar {
         val result = route(application, request).value
 
         status(result) mustEqual OK
-        contentAsString(result) mustEqual view(form.fill("answer"), NormalMode)(request, messages(application)).toString
+        contentAsString(result) mustEqual view(form.fill("answer"), NormalMode, testBackLinkRoute)(request, messages(application)).toString
       }
     }
 
@@ -95,7 +101,9 @@ class CompanyDetailsControllerSpec extends SpecBase with MockitoSugar {
 
     "must return a Bad Request and errors when invalid data is submitted" in {
 
-      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers)).build()
+      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers),affinityGroup = orgAffinity)
+        .overrides(bind[Navigator].qualifiedWith("orgSh03").toInstance(getNavigator))
+        .build()
 
       running(application) {
         val request =
@@ -109,7 +117,7 @@ class CompanyDetailsControllerSpec extends SpecBase with MockitoSugar {
         val result = route(application, request).value
 
         status(result) mustEqual BAD_REQUEST
-        contentAsString(result) mustEqual view(boundForm, NormalMode)(request, messages(application)).toString
+        contentAsString(result) mustEqual view(boundForm, NormalMode, testBackLinkRoute)(request, messages(application)).toString
       }
     }
 

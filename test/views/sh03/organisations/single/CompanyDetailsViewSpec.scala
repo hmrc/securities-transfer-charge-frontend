@@ -35,7 +35,7 @@ class CompanyDetailsViewSpec extends ViewBaseSpec {
   private val form = formProvider()
 
   def view(): Document = Jsoup.parse(
-    viewInstance(form, NormalMode)(fakeRequest, messages).body
+    viewInstance(form, NormalMode, testBackLinkRoute)(fakeRequest, messages).body
   )
 
   object ExpectedContent {

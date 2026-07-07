@@ -32,7 +32,7 @@
 
 @(form: Form[CompanyDetails], mode: Mode,backLinkCall: Call)(implicit request: Request[_], messages: Messages)
 
-@layout(pageTitle = title(form, messages("agent.sh03.companyDetails.title"), Some(messages("sh03.section.name"))),backLinkUrl = Some(backLinkCall.url)) {
+@layout(pageTitle = title(form, messages("agent.sh03.companyDetails.title"), Some(messages("sh03.section.name"))), backLinkUrl = Some(backLinkCall.url)) {
 
     @formHelper(action = routes.CompanyDetailsController.onSubmit(mode)) {
 
