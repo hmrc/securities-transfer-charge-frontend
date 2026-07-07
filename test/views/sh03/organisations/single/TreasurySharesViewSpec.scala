@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package views.sh03.agents.single
+package views.sh03.organisations.single
 
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
@@ -27,12 +27,12 @@ import views.ViewBaseSpec
 class TreasurySharesViewSpec extends ViewBaseSpec {
 
   override def fakeApplication(): Application =
-    applicationBuilder(affinityGroup = agentAffinity).build()
+    applicationBuilder(affinityGroup = orgAffinity).build()
 
   private val viewInstance = app.injector.instanceOf[TreasurySharesView]
   private val formProvider = new TreasurySharesFormProvider()
 
-  private val form = formProvider(affinityGroupKeyAgent)
+  private val form = formProvider(affinityGroupKeyOrg)
   
 
   def view(): Document = Jsoup.parse(
@@ -40,8 +40,8 @@ class TreasurySharesViewSpec extends ViewBaseSpec {
   )
 
   object ExpectedContent {
-    val title: String = messages("agent.sh03.treasuryShares.title")
-    val heading: String = messages("agent.sh03.treasuryShares.heading")
+    val title: String = messages("org.sh03.treasuryShares.title")
+    val heading: String = messages("org.sh03.treasuryShares.heading")
     val yes: String = messages("site.yes")
     val no: String = messages("site.no")
     val saveAndContinue: String = messages("site.save-and-continue.button")
