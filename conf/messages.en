@@ -927,6 +927,11 @@ agent.sh03.cannotSubmitFormError.error.p3 = You can save your submission as a dr
 
 save-and-return-to-dashboard.link = Save and return to dashboard
 
+org.sh03.reasonForPurchase.title = Why are these shares being purchased?
+org.sh03.reasonForPurchase.heading = Why are these shares being purchased?
+org.sh03.reasonForPurchase.checkYourAnswersLabel = Why are these shares being purchased?
+org.sh03.reasonForPurchase.change.hidden = Change why these shares are being purchased
+
 org.sh03.shareBuyback.title = How would you like to tell us about this share buyback?
 org.sh03.shareBuyback.heading = How would you like to tell us about this share buyback?
 org.sh03.shareBuyback.oneAtATime = One transfer at a time
