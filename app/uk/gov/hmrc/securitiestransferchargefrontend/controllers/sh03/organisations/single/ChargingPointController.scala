@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.securitiestransferchargefrontend.controllers.sh03.agents.single
+package uk.gov.hmrc.securitiestransferchargefrontend.controllers.sh03.organisations.single
 
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, Call, MessagesControllerComponents}
@@ -25,14 +25,14 @@ import uk.gov.hmrc.securitiestransferchargefrontend.forms.sh03.shared.ChargingPo
 import uk.gov.hmrc.securitiestransferchargefrontend.models.{Mode, UserAnswers}
 import uk.gov.hmrc.securitiestransferchargefrontend.navigation.Navigator
 import uk.gov.hmrc.securitiestransferchargefrontend.pages.sh03.ChargingPointPage
-import uk.gov.hmrc.securitiestransferchargefrontend.views.html.sh03.agents.single.ChargingPointView
+import uk.gov.hmrc.securitiestransferchargefrontend.views.html.sh03.organisations.single.ChargingPointView
 
 import javax.inject.{Inject, Named}
 import scala.concurrent.{ExecutionContext, Future}
 
 class ChargingPointController @Inject()(
                                         override val messagesApi: MessagesApi,
-                                        @Named("agentsSh03") navigator: Navigator,
+                                        @Named("orgSh03") navigator: Navigator,
                                         stcAuthEnrolled: StcAuthEnrolledAction,
                                         getData: StcDataRetrievalAction,
                                         requireData: StcDataRequiredAction,
@@ -46,7 +46,7 @@ class ChargingPointController @Inject()(
 
   def onPageLoad(mode: Mode): Action[AnyContent] = (stcAuthEnrolled andThen getData andThen requireData).async {
     implicit request =>
-
+      
       val innerRequest = request.request
       val affinityKey = innerRequest.affinityGroupKey
 

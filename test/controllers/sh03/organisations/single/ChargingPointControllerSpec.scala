@@ -14,35 +14,35 @@
  * limitations under the License.
  */
 
-package controllers.sh03.agents.single
+package controllers.sh03.organisations.single
 
+import base.Fixtures.organisationAffinity
 import base.SpecBase
-import org.scalatestplus.mockito.MockitoSugar
 import play.api.i18n.Messages
 import play.api.inject.bind
 import play.api.mvc.{AnyContentAsEmpty, AnyContentAsFormUrlEncoded}
 import play.api.test.FakeRequest
 import play.api.test.Helpers.*
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.routes
-import uk.gov.hmrc.securitiestransferchargefrontend.controllers.sh03.agents.single.routes as agentSh03Routes
+import uk.gov.hmrc.securitiestransferchargefrontend.controllers.sh03.organisations.single.routes as orgSh03Routes
 import uk.gov.hmrc.securitiestransferchargefrontend.forms.sh03.shared.ChargingPointFormProvider
 import uk.gov.hmrc.securitiestransferchargefrontend.models.{NormalMode, UserAnswers}
 import uk.gov.hmrc.securitiestransferchargefrontend.navigation.Navigator
 import uk.gov.hmrc.securitiestransferchargefrontend.pages.sh03.ChargingPointPage
-import uk.gov.hmrc.securitiestransferchargefrontend.views.html.sh03.agents.single.ChargingPointView
+import uk.gov.hmrc.securitiestransferchargefrontend.views.html.sh03.organisations.single.ChargingPointView
 
 import java.time.{LocalDate, ZoneOffset}
 
-class ChargingPointControllerSpec extends SpecBase with MockitoSugar {
+class ChargingPointControllerSpec extends SpecBase {
 
   private implicit val messages: Messages = stubMessages()
 
   private val formProvider = new ChargingPointFormProvider()
-  private def form = formProvider(affinityGroupKeyAgent)
-  
+  private def form = formProvider(affinityGroupKeyOrg)
+
   val validAnswer: LocalDate = LocalDate.now(ZoneOffset.UTC)
 
-  lazy val chargingPointRoute: String = agentSh03Routes.ChargingPointController.onPageLoad(NormalMode).url
+  lazy val chargingPointRoute: String = orgSh03Routes.ChargingPointController.onPageLoad(NormalMode).url
 
   override val emptyUserAnswers: UserAnswers = UserAnswers(testUserId, testGroupIdentifier, submissionId)
 
@@ -61,8 +61,8 @@ class ChargingPointControllerSpec extends SpecBase with MockitoSugar {
 
     "must return OK and the correct view for a GET" in {
 
-      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers), affinityGroup = agentAffinity)
-        .overrides(bind[Navigator].qualifiedWith("agentsSh03").toInstance(getNavigator))
+      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers), affinityGroup = organisationAffinity)
+        .overrides(bind[Navigator].qualifiedWith("orgSh03").toInstance(getNavigator))
         .build()
 
       running(application) {
@@ -79,8 +79,8 @@ class ChargingPointControllerSpec extends SpecBase with MockitoSugar {
 
       val userAnswers = UserAnswers(testUserId, testGroupIdentifier, submissionId).set(ChargingPointPage, validAnswer).success.value
 
-      val application = applicationBuilder(userAnswers = Some(userAnswers), affinityGroup = agentAffinity)
-        .overrides(bind[Navigator].qualifiedWith("agentsSh03").toInstance(getNavigator))
+      val application = applicationBuilder(userAnswers = Some(userAnswers), affinityGroup = organisationAffinity)
+        .overrides(bind[Navigator].qualifiedWith("orgSh03").toInstance(getNavigator))
         .build()
 
       running(application) {
@@ -94,10 +94,9 @@ class ChargingPointControllerSpec extends SpecBase with MockitoSugar {
     }
 
     "must redirect to the next page when valid data is submitted" in {
-      
 
-      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers), affinityGroup = agentAffinity)
-        .overrides(bind[Navigator].qualifiedWith("agentsSh03").toInstance(getNavigator))
+      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers), affinityGroup = organisationAffinity)
+        .overrides(bind[Navigator].qualifiedWith("orgSh03").toInstance(getNavigator))
         .build()
 
       running(application) {
@@ -110,8 +109,8 @@ class ChargingPointControllerSpec extends SpecBase with MockitoSugar {
 
     "must return a Bad Request and errors when invalid data is submitted" in {
 
-      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers), affinityGroup = agentAffinity)
-        .overrides(bind[Navigator].qualifiedWith("agentsSh03").toInstance(getNavigator))
+      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers), affinityGroup = organisationAffinity)
+        .overrides(bind[Navigator].qualifiedWith("orgSh03").toInstance(getNavigator))
         .build()
 
       val request =
@@ -132,7 +131,7 @@ class ChargingPointControllerSpec extends SpecBase with MockitoSugar {
 
     "must redirect to Journey Recovery for a GET if no existing data is found" in {
 
-      val application = applicationBuilder(userAnswers = None, affinityGroup = agentAffinity).build()
+      val application = applicationBuilder(userAnswers = None, affinityGroup = organisationAffinity).build()
 
       running(application) {
         val result = route(application, getRequest()).value
@@ -144,7 +143,7 @@ class ChargingPointControllerSpec extends SpecBase with MockitoSugar {
 
     "must redirect to Journey Recovery for a POST if no existing data is found" in {
 
-      val application = applicationBuilder(userAnswers = None, affinityGroup = agentAffinity).build()
+      val application = applicationBuilder(userAnswers = None, affinityGroup = organisationAffinity).build()
 
       running(application) {
         val result = route(application, postRequest()).value
