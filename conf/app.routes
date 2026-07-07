@@ -383,6 +383,10 @@ POST       /sh03/org/connected-persons                    uk.gov.hmrc.securities
 GET        /sh03/org/change/connected-persons             uk.gov.hmrc.securitiestransferchargefrontend.controllers.sh03.organisations.single.ConnectedPersonsController.onPageLoad(mode: Mode = CheckMode)
 POST       /sh03/org/change/connected-persons             uk.gov.hmrc.securitiestransferchargefrontend.controllers.sh03.organisations.single.ConnectedPersonsController.onSubmit(mode: Mode = CheckMode)
 
+GET        /sh03/org/charging-point                        uk.gov.hmrc.securitiestransferchargefrontend.controllers.sh03.organisations.single.ChargingPointController.onPageLoad(mode: Mode = NormalMode)
+POST       /sh03/org/charging-point                        uk.gov.hmrc.securitiestransferchargefrontend.controllers.sh03.organisations.single.ChargingPointController.onSubmit(mode: Mode = NormalMode)
+GET        /sh03/org/change/charging-point                uk.gov.hmrc.securitiestransferchargefrontend.controllers.sh03.organisations.single.ChargingPointController.onPageLoad(mode: Mode = CheckMode)
+POST       /sh03/org/change/charging-point                 uk.gov.hmrc.securitiestransferchargefrontend.controllers.sh03.organisations.single.ChargingPointController.onSubmit(mode: Mode = CheckMode)
 
 GET        /sh03/org/share-details                        uk.gov.hmrc.securitiestransferchargefrontend.controllers.sh03.organisations.single.DetailsOfThisSharePurchaseController.onPageLoad(mode: Mode = NormalMode)
 POST       /sh03/org/share-details                        uk.gov.hmrc.securitiestransferchargefrontend.controllers.sh03.organisations.single.DetailsOfThisSharePurchaseController.onSubmit(mode: Mode = NormalMode)

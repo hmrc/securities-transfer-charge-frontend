@@ -33,7 +33,7 @@ class MinimumAmountPaidViewSpec extends ViewBaseSpec {
 
   private val viewInstance = app.injector.instanceOf[MinimumAmountPaidView]
   private val formProvider = new MinimumAmountPaidFormProvider()
-  private val form         = formProvider("agent")
+  private val form         = formProvider(affinityGroupKeyAgent)
 
   private val testBackLinkRoute: Call = Call("GET", "/back-link")
 
