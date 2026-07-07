@@ -36,7 +36,7 @@ class CompanyDetailsViewSpec extends ViewBaseSpec {
   private val form = formProvider()
 
   def view(): Document = Jsoup.parse(
-    viewInstance(form, NormalMode)(fakeRequest, messages).body
+    viewInstance(form, NormalMode,testBackLinkRoute)(fakeRequest, messages).body
   )
 
   object ExpectedContent {
@@ -99,7 +99,7 @@ class CompanyDetailsViewSpec extends ViewBaseSpec {
 
     "must show error summary when there are errors" in {
       val formWithErrors = form.bind(Map("companyName" -> ""))
-      val doc = Jsoup.parse(viewInstance(formWithErrors, NormalMode)(fakeRequest, messages).body)
+      val doc = Jsoup.parse(viewInstance(formWithErrors, NormalMode,testBackLinkRoute)(fakeRequest, messages).body)
       doc.hasErrorSummary mustBe true
     }
 
@@ -109,7 +109,7 @@ class CompanyDetailsViewSpec extends ViewBaseSpec {
         "companyRegistrationNumber" -> "AB123456",
         "isPlc" -> "true"
       ))
-      val doc = Jsoup.parse(viewInstance(formWithErrors, NormalMode)(fakeRequest, messages).body)
+      val doc = Jsoup.parse(viewInstance(formWithErrors, NormalMode,testBackLinkRoute)(fakeRequest, messages).body)
       doc.text() must include(messages(s"$messageKeyPrefix.companyName.error.required"))
     }
 
@@ -119,7 +119,7 @@ class CompanyDetailsViewSpec extends ViewBaseSpec {
         "companyRegistrationNumber" -> "ABC",
         "isPlc" -> "true"
       ))
-      val doc = Jsoup.parse(viewInstance(formWithErrors, NormalMode)(fakeRequest, messages).body)
+      val doc = Jsoup.parse(viewInstance(formWithErrors, NormalMode,testBackLinkRoute)(fakeRequest, messages).body)
       doc.text() must include(messages(s"$messageKeyPrefix.crn.error.length"))
     }
 
@@ -128,7 +128,7 @@ class CompanyDetailsViewSpec extends ViewBaseSpec {
         "companyName" -> "Test Company",
         "companyRegistrationNumber" -> "AB123456"
       ))
-      val doc = Jsoup.parse(viewInstance(formWithErrors, NormalMode)(fakeRequest, messages).body)
+      val doc = Jsoup.parse(viewInstance(formWithErrors, NormalMode,testBackLinkRoute)(fakeRequest, messages).body)
       doc.text() must include(messages(s"$messageKeyPrefix.isPlc.error.required"))
     }
   }
