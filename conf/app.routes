@@ -372,3 +372,8 @@ GET        /sh03/org/treasury-shares                       uk.gov.hmrc.securitie
 POST       /sh03/org/treasury-shares                       uk.gov.hmrc.securitiestransferchargefrontend.controllers.sh03.organisations.single.TreasurySharesController.onSubmit(mode: Mode = NormalMode)
 GET        /sh03/org/change/treasury-shares                 uk.gov.hmrc.securitiestransferchargefrontend.controllers.sh03.organisations.single.TreasurySharesController.onPageLoad(mode: Mode = CheckMode)
 POST       /sh03/org/change/treasury-shares                 uk.gov.hmrc.securitiestransferchargefrontend.controllers.sh03.organisations.single.TreasurySharesController.onSubmit(mode: Mode = CheckMode)
+
+GET        /sh03/org/charging-point                        uk.gov.hmrc.securitiestransferchargefrontend.controllers.sh03.organisations.single.ChargingPointController.onPageLoad(mode: Mode = NormalMode)
+POST       /sh03/org/charging-point                        uk.gov.hmrc.securitiestransferchargefrontend.controllers.sh03.organisations.single.ChargingPointController.onSubmit(mode: Mode = NormalMode)
+GET        /sh03/org/change/charging-point                uk.gov.hmrc.securitiestransferchargefrontend.controllers.sh03.organisations.single.ChargingPointController.onPageLoad(mode: Mode = CheckMode)
+POST       /sh03/org/change/charging-point                 uk.gov.hmrc.securitiestransferchargefrontend.controllers.sh03.organisations.single.ChargingPointController.onSubmit(mode: Mode = CheckMode)

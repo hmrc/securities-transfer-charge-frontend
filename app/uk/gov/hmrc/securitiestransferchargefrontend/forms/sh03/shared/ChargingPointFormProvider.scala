@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.securitiestransferchargefrontend.forms.sh03.agents.single
+package uk.gov.hmrc.securitiestransferchargefrontend.forms.sh03.shared
 
 import play.api.data.Form
 import play.api.i18n.Messages
@@ -25,15 +25,15 @@ import javax.inject.Inject
 
 class ChargingPointFormProvider @Inject() extends Mappings {
 
-  def apply()(implicit messages: Messages): Form[LocalDate] =
+  def apply(affinityKey: String)(implicit messages: Messages): Form[LocalDate] =
     Form(
       "value" -> localDate(
-        invalidKey     = "agent.sh03.chargingPoint.error.invalid",
-        allRequiredKey = "agent.sh03.chargingPoint.error.required.all",
-        twoRequiredKey = "agent.sh03.chargingPoint.error.required.two",
-        requiredKey    = "agent.sh03.chargingPoint.error.required",
+        invalidKey     = s"$affinityKey.sh03.chargingPoint.error.invalid",
+        allRequiredKey = s"$affinityKey.sh03.chargingPoint.error.required.all",
+        twoRequiredKey = s"$affinityKey.sh03.chargingPoint.error.required.two",
+        requiredKey    = s"$affinityKey.sh03.chargingPoint.error.required",
       ).verifying(
-        maxDate(LocalDate.now(), "agent.sh03.chargingPoint.error.futureDate")
+        maxDate(LocalDate.now(), s"$affinityKey.sh03.chargingPoint.error.futureDate")
       )
     )
 }

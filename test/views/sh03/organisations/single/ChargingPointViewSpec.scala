@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package views.sh03.agents.single
+package views.sh03.organisations.single
 
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
@@ -23,17 +23,17 @@ import play.api.mvc.Call
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.routes
 import uk.gov.hmrc.securitiestransferchargefrontend.forms.sh03.shared.ChargingPointFormProvider
 import uk.gov.hmrc.securitiestransferchargefrontend.models.NormalMode
-import uk.gov.hmrc.securitiestransferchargefrontend.views.html.sh03.agents.single.ChargingPointView
+import uk.gov.hmrc.securitiestransferchargefrontend.views.html.sh03.organisations.single.ChargingPointView
 import views.ViewBaseSpec
 
 class ChargingPointViewSpec extends ViewBaseSpec {
 
   override def fakeApplication(): Application =
-    applicationBuilder(affinityGroup = agentAffinity).build()
+    applicationBuilder(affinityGroup = orgAffinity).build()
 
   private val viewInstance = app.injector.instanceOf[ChargingPointView]
   private val formProvider = new ChargingPointFormProvider()
-  private val form = formProvider(affinityGroupKeyAgent)
+  private val form = formProvider(affinityGroupKeyOrg)
   private val testBackLinkRoute: Call = Call("GET", "/back-link")
 
   def view(): Document =
@@ -42,16 +42,16 @@ class ChargingPointViewSpec extends ViewBaseSpec {
     )
 
   object ExpectedContent {
-    val title: String = messages("agent.sh03.chargingPoint.title")
-    val heading: String = messages("agent.sh03.chargingPoint.heading")
-    val heading2: String = messages("agent.sh03.chargingPoint.heading2")
-    val p1: String = messages("agent.sh03.chargingPoint.p1")
-    val p2: String = messages("agent.sh03.chargingPoint.p2")
-    val p3: String = messages("agent.sh03.chargingPoint.p3")
-    val bullet1: String = messages("agent.sh03.chargingPoint.bullet1")
-    val bullet2: String = messages("agent.sh03.chargingPoint.bullet2")
-    val linkText: String = messages("agent.sh03.chargingPoint.link.text")
-    val hint: String = messages("agent.sh03.chargingPoint.hint")
+    val title: String = messages("org.sh03.chargingPoint.title")
+    val heading: String = messages("org.sh03.chargingPoint.heading")
+    val heading2: String = messages("org.sh03.chargingPoint.heading2")
+    val p1: String = messages("org.sh03.chargingPoint.p1")
+    val p2: String = messages("org.sh03.chargingPoint.p2")
+    val p3: String = messages("org.sh03.chargingPoint.p3")
+    val bullet1: String = messages("org.sh03.chargingPoint.bullet1")
+    val bullet2: String = messages("org.sh03.chargingPoint.bullet2")
+    val linkText: String = messages("org.sh03.chargingPoint.link.text")
+    val hint: String = messages("org.sh03.chargingPoint.hint")
     val saveAndContinue: String = messages("site.save-and-continue.button")
     val saveAndReturn: String = messages("site.save-and-return.button")
   }
