@@ -23,7 +23,7 @@ import uk.gov.hmrc.securitiestransferchargefrontend.models.sh03.shared.ReasonFor
 import uk.gov.hmrc.securitiestransferchargefrontend.models.UserAnswers
 import uk.gov.hmrc.securitiestransferchargefrontend.navigation.PersistentNavigationHelper
 import uk.gov.hmrc.securitiestransferchargefrontend.pages.Page
-import uk.gov.hmrc.securitiestransferchargefrontend.pages.sh03.{HowToNotifyAboutShareBuybackPage, ReasonForPurchasePage}
+import uk.gov.hmrc.securitiestransferchargefrontend.pages.sh03._
 import uk.gov.hmrc.securitiestransferchargefrontend.services.AnswerPersistenceService
 
 import scala.concurrent.{ExecutionContext, Future}
@@ -49,6 +49,7 @@ class ForwardRoutes(
       case ReasonForPurchase.ForCancellation  => defaultPage
       case ReasonForPurchase.ToPlaceIntoTreasury => defaultPage
     }
+    case ConnectedPersonsPage => userAnswers => goTo(defaultPage,Some(userAnswers))
     case _ => _ => Future.successful(defaultPage)
   }
 }
