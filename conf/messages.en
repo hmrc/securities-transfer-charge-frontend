@@ -442,7 +442,7 @@ agentReference.heading = Add a reference (optional)
 agentReference.checkYourAnswersLabel = Add a reference
 agentReference.hint = You can add a reference for your own records and to help you find this submission later. It will not be used by HMRC.
 agentReference.error.length = Your reference must be 255 characters or fewer
-agentReference.change.hidden = AgentReference
+agentReference.change.hidden = Change add a reference
 
 nameOfBuyer.error.required = Enter the buyer’s name
 nameOfBuyer.error.length = Buyer’s name must be 35 characters or fewer
@@ -838,9 +838,27 @@ agent.sh03.minimumAmountPaid.error.aboveMaximum = The minimum amount paid for th
 
 agent.sh03.detailsOfSharePurchase.title = What are the details of this share purchase?
 agent.sh03.detailsOfSharePurchase.heading = What are the details of this share purchase?
+agent.sh03.detailsOfSharePurchase.numberOfShares = Number of shares
+agent.sh03.detailsOfSharePurchase.typeOfShares = Type or class of shares
 agent.sh03.detailsOfSharePurchase.amountPaid = Amount paid for the shares in pounds
 agent.sh03.detailsOfSharePurchase.marketValue = Market value of the shares in pounds
+agent.sh03.detailsOfSharePurchase.error.numberOfShares.required = Enter the number of shares the buyer is purchasing
+agent.sh03.detailsOfSharePurchase.error.numberOfShares.nonNumeric = The amount of shares must be a number
+agent.sh03.detailsOfSharePurchase.error.numberOfShares.wholeNumber = The number of shares must be a whole number between 1 and 999,999,999
+agent.sh03.detailsOfSharePurchase.error.numberOfShares.min = The number of shares must be at least 1
+agent.sh03.detailsOfSharePurchase.error.numberOfShares.max = The number of shares must be below 999,999,999
+agent.sh03.detailsOfSharePurchase.error.typeOfShares.required = Enter the type or class of shares the buyer is purchasing
+agent.sh03.detailsOfSharePurchase.error.typeOfShares.length = The type or class of shares the buyer is purchasing must be 100 characters or fewer
+agent.sh03.detailsOfSharePurchase.error.amountPaid.required = Enter the amount paid for the shares in pounds
+agent.sh03.detailsOfSharePurchase.error.amountPaid.invalidNumeric = The amount paid for the shares must be a number and can include up to two decimal places, like £30 or £28.60
+agent.sh03.detailsOfSharePurchase.error.amountPaid.nonNumeric = The amount paid for the shares must be a number and can include up to two decimal places, like £30 or £28.60
+agent.sh03.detailsOfSharePurchase.error.amountPaid.nonNumeric = The amount paid for the shares must be a number and can include up to two decimal places, like £30 or £28.60
 agent.sh03.detailsOfSharePurchase.error.amountPaid.belowMinimum = The amount paid for the shares must be £1 or more
+agent.sh03.detailsOfSharePurchase.error.amountPaid.aboveMaximum = The amount paid for the shares must be £999,999,999 or below
+agent.sh03.detailsOfSharePurchase.error.marketValue.required = Enter the market value of the shares in pounds
+agent.sh03.detailsOfSharePurchase.error.marketValue.invalidNumeric = The market value of the shares must be a number and can include up to two decimal places, like £30 or £28.60
+agent.sh03.detailsOfSharePurchase.error.marketValue.nonNumeric = The market value of the shares must be a number and can include up to two decimal places, like £30 or £28.60
+agent.sh03.detailsOfSharePurchase.error.marketValue.aboveMaximum = The market value of the shares must be £999,999,999 or below
 agent.sh03.detailsOfSharePurchase.error.marketValue.belowMinimum = The market value of the shares must be £0.01 or more
 
 agent.sh03.whatReliefAreYouApplyingFor.checkYourAnswersLabel = Enter the relief the buyer is applying for
@@ -920,3 +938,9 @@ org.sh03.shareBuyback.oneAtATime = One transfer at a time
 org.sh03.shareBuyback.oneAtATime.hint = Tell us about a purchase of one type of shares, between the business and one seller
 org.sh03.shareBuyback.moreThanOneAtATime = More than one transfer at a time
 org.sh03.shareBuyback.moreThanOneAtATime.hint = Tell us about several share purchases at once using our template. You can download the template, complete a row for each purchase, and upload it on the following pages. You can include purchases from different sellers and of different types of shares
+
+org.sh03.treasuryShares.title = Do these shares also qualify as treasury shares?
+org.sh03.treasuryShares.heading = Do these shares also qualify as treasury shares?
+org.sh03.treasuryShares.checkYourAnswersLabel = Do these shares also qualify as treasury shares?
+org.sh03.treasuryShares.change.hidden = Change do these shares also qualify as treasury shares?
+org.sh03.treasuryShares.error.required = Select yes if these shares also qualify as treasury shares

@@ -22,7 +22,7 @@ import play.api.Application
 import play.api.mvc.Call
 import uk.gov.hmrc.securitiestransferchargefrontend.forms.sh03.agents.WhatReliefAreYouApplyingForFormProvider
 import uk.gov.hmrc.securitiestransferchargefrontend.models.{NormalMode, ReliefsDataSource}
-import uk.gov.hmrc.securitiestransferchargefrontend.views.html.stf.agents.single.WhatReliefAreYouApplyingForView
+import uk.gov.hmrc.securitiestransferchargefrontend.views.html.sh03.agents.single.WhatReliefAreYouApplyingForView
 import views.ViewBaseSpec
 
 class WhatReliefAreYouApplyingForViewSpec extends ViewBaseSpec {
@@ -47,6 +47,7 @@ class WhatReliefAreYouApplyingForViewSpec extends ViewBaseSpec {
     val paragraph: String = messages("agent.whatReliefAreYouApplyingFor.p")
     val saveAndContinue: String = messages("site.save-and-continue.button")
     val saveAndReturn: String = messages("site.save-and-return.button")
+    val link = "https://www.gov.uk/guidance/stamp-duty-reliefs-and-exemptions-on-paper-shares"
   }
 
   "The WhatReliefAreYouApplyingForView" - {
@@ -65,6 +66,10 @@ class WhatReliefAreYouApplyingForViewSpec extends ViewBaseSpec {
 
       "have the first paragraph" in {
         doc.select(".govuk-body").text() must include(ExpectedContent.paragraph)
+      }
+
+      "have the correct link" in {
+        doc.select(".govuk-body").select("a.govuk-link").attr("href") mustBe ExpectedContent.link
       }
 
       "have a save and continue button" in {
