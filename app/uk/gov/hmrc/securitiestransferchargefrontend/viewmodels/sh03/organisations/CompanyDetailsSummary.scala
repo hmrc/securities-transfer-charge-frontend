@@ -14,36 +14,29 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.securitiestransferchargefrontend.viewmodels.sh03.agents
+package uk.gov.hmrc.securitiestransferchargefrontend.viewmodels.sh03.organisations.single
 
 import play.api.i18n.Messages
 import play.twirl.api.HtmlFormat
-import uk.gov.hmrc.govukfrontend.views.viewmodels.content.HtmlContent
 import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.SummaryListRow
-import uk.gov.hmrc.securitiestransferchargefrontend.controllers.sh03.agents.single.routes
+import uk.gov.hmrc.securitiestransferchargefrontend.controllers.sh03.organisations.single.routes
 import uk.gov.hmrc.securitiestransferchargefrontend.models.{CheckMode, UserAnswers}
-import uk.gov.hmrc.securitiestransferchargefrontend.pages.sh03.ReasonForPurchasePage
+import uk.gov.hmrc.securitiestransferchargefrontend.pages.sh03.OrgCompanyDetailsPage
 import uk.gov.hmrc.securitiestransferchargefrontend.viewmodels.govuk.summarylist.*
 import uk.gov.hmrc.securitiestransferchargefrontend.viewmodels.implicits.*
 
-object ReasonForPurchaseSummary  {
+object CompanyDetailsSummary  {
 
   def row(answers: UserAnswers)(implicit messages: Messages): Option[SummaryListRow] =
-    answers.get(ReasonForPurchasePage).map {
+    answers.get(OrgCompanyDetailsPage).map {
       answer =>
 
-        val value = ValueViewModel(
-          HtmlContent(
-            HtmlFormat.escape(messages(s"reasonForPurchase.$answer"))
-          )
-        )
-
         SummaryListRowViewModel(
-          key     = "reasonForPurchase.checkYourAnswersLabel",
-          value   = value,
+          key     = "org.sh03.companyDetails.checkYourAnswersLabel",
+          value   = ValueViewModel(HtmlFormat.escape(answer).toString),
           actions = Seq(
-            ActionItemViewModel("site.change", routes.ReasonForPurchaseController.onPageLoad(CheckMode).url)
-              .withVisuallyHiddenText(messages("reasonForPurchase.change.hidden"))
+            ActionItemViewModel("site.change", routes.CompanyDetailsController.onPageLoad(CheckMode).url)
+              .withVisuallyHiddenText(messages("org.sh03.companyDetails.change.hidden"))
           )
         )
     }

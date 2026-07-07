@@ -14,20 +14,20 @@
  * limitations under the License.
  */
 
-package views.sh03.agents.single
+package views.sh03.organisations.single
 
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
 import play.api.Application
 import uk.gov.hmrc.securitiestransferchargefrontend.forms.sh03.shared.ReasonForPurchaseFormProvider
 import uk.gov.hmrc.securitiestransferchargefrontend.models.NormalMode
-import uk.gov.hmrc.securitiestransferchargefrontend.views.html.sh03.agents.single.ReasonForPurchaseView
+import uk.gov.hmrc.securitiestransferchargefrontend.views.html.sh03.organisations.single.ReasonForPurchaseView
 import views.ViewBaseSpec
 
 class ReasonForPurchaseViewSpec extends ViewBaseSpec {
 
   override def fakeApplication(): Application =
-    applicationBuilder(affinityGroup = agentAffinity).build()
+    applicationBuilder(affinityGroup = orgAffinity).build()
 
   private val viewInstance = app.injector.instanceOf[ReasonForPurchaseView]
   private val formProvider = new ReasonForPurchaseFormProvider()
@@ -39,8 +39,8 @@ class ReasonForPurchaseViewSpec extends ViewBaseSpec {
   )
 
   object ExpectedContent {
-    val title: String = messages("agent.sh03.reasonForPurchase.title")
-    val heading: String = messages("agent.sh03.reasonForPurchase.heading")
+    val title: String = messages("org.sh03.reasonForPurchase.title")
+    val heading: String = messages("org.sh03.reasonForPurchase.heading")
     val saveAndContinue: String = messages("site.save-and-continue.button")
     val saveAndReturn: String = messages("site.save-and-return.button")
 

@@ -23,6 +23,8 @@ import play.api.mvc.Call
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.routes
 import uk.gov.hmrc.securitiestransferchargefrontend.models.sh03.HowToNotifyAboutShareBuyback
 import uk.gov.hmrc.securitiestransferchargefrontend.models.{CheckMode, NormalMode}
+import uk.gov.hmrc.securitiestransferchargefrontend.controllers.sh03.organisations.single.routes as sh03OrgSingleRoutes
+
 import uk.gov.hmrc.securitiestransferchargefrontend.navigation.sh03.organisations.Sh03OrgNavigator
 import uk.gov.hmrc.securitiestransferchargefrontend.pages.Page
 import uk.gov.hmrc.securitiestransferchargefrontend.pages.sh03.*
@@ -51,11 +53,11 @@ class Sh03OrgNavigatorSpec extends SpecBase with ScalaFutures {
         }
       }
 
-      "must go from HowToNotifyAboutShareBuyback to default page (placeholder) when 'One at a time' is selected" in {
-        val answers = emptyUserAnswers.set(HowToNotifyAboutShareBuybackPage, HowToNotifyAboutShareBuyback.OneAtATime).success.value
+      "must go from HowToNotifyAboutShareBuyback to CompanyDetailsController when 'One at a time' is selected" in {
+        val answers = emptyUserAnswers.set(HowToNotifyAboutShareBuybackPage, HowToNotifyAboutShareBuyback.OneAtATime).get
         val result = navigator.nextPage(HowToNotifyAboutShareBuybackPage, NormalMode, answers)(fakeRequest)
-        whenReady(result) { (res: Call) =>
-          res mustEqual navigator.defaultPage
+        whenReady(result) { res =>
+          res mustBe sh03OrgSingleRoutes.CompanyDetailsController.onPageLoad(NormalMode)
         }
       }
 

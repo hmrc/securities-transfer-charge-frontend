@@ -14,40 +14,30 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.securitiestransferchargefrontend.viewmodels.sh03.organisations.single
+package uk.gov.hmrc.securitiestransferchargefrontend.viewmodels.sh03.organisations
 
 import play.api.i18n.Messages
-import play.twirl.api.{Html, HtmlFormat}
-import uk.gov.hmrc.govukfrontend.views.viewmodels.content.HtmlContent
 import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.SummaryListRow
-import uk.gov.hmrc.securitiestransferchargefrontend.config.CurrencyFormatter.currencyFormat
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.sh03.organisations.single.routes
 import uk.gov.hmrc.securitiestransferchargefrontend.models.{CheckMode, UserAnswers}
-import uk.gov.hmrc.securitiestransferchargefrontend.pages.sh03.DetailsOfThisSharePurchasePage
+import uk.gov.hmrc.securitiestransferchargefrontend.pages.sh03.TreasurySharesPage
 import uk.gov.hmrc.securitiestransferchargefrontend.viewmodels.govuk.summarylist.*
 import uk.gov.hmrc.securitiestransferchargefrontend.viewmodels.implicits.*
 
-object DetailsOfThisSharePurchaseSummary  {
+object TreasurySharesSummary  {
 
   def row(answers: UserAnswers)(implicit messages: Messages): Option[SummaryListRow] =
-    answers.get(DetailsOfThisSharePurchasePage).map {
+    answers.get(TreasurySharesPage).map {
       answer =>
 
-        val value = Html(
-          s"""
-             |${HtmlFormat.escape(answer.numberOfShares.toString).body}<br/>
-             |${HtmlFormat.escape(answer.typeOfShares).body}<br/>
-             |${HtmlFormat.escape(currencyFormat(answer.amountPaid)).body}<br/>
-             |${answer.marketValue.map(v => HtmlFormat.escape(currencyFormat(v)).body).getOrElse("")}
-             |""".stripMargin
-        )
-        
+        val value = if (answer) "site.yes" else "site.no"
+
         SummaryListRowViewModel(
-          key     = "detailsOfThisSharePurchase.checkYourAnswersLabel",
-          value   = ValueViewModel(HtmlContent(value)),
+          key     = "org.sh03.treasuryShares.checkYourAnswersLabel",
+          value   = ValueViewModel(value),
           actions = Seq(
-            ActionItemViewModel("site.change", routes.DetailsOfThisSharePurchaseController.onPageLoad(CheckMode).url)
-              .withVisuallyHiddenText(messages("detailsOfThisSharePurchase.change.hidden"))
+            ActionItemViewModel("site.change", routes.TreasurySharesController.onPageLoad(CheckMode).url)
+              .withVisuallyHiddenText(messages("org.sh03.treasuryShares.change.hidden"))
           )
         )
     }

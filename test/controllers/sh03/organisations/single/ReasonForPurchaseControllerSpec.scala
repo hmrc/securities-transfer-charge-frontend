@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package controllers.sh03.agents.single
+package controllers.sh03.organisations.single
 
 import base.SpecBase
 import org.scalatestplus.mockito.MockitoSugar
@@ -23,13 +23,13 @@ import play.api.inject.bind
 import play.api.test.FakeRequest
 import play.api.test.Helpers.*
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.routes.JourneyRecoveryController
-import uk.gov.hmrc.securitiestransferchargefrontend.controllers.sh03.agents.single.routes
+import uk.gov.hmrc.securitiestransferchargefrontend.controllers.sh03.organisations.single.routes
 import uk.gov.hmrc.securitiestransferchargefrontend.forms.sh03.shared.ReasonForPurchaseFormProvider
 import uk.gov.hmrc.securitiestransferchargefrontend.models.sh03.shared.ReasonForPurchase
 import uk.gov.hmrc.securitiestransferchargefrontend.models.{NormalMode, UserAnswers}
 import uk.gov.hmrc.securitiestransferchargefrontend.navigation.Navigator
 import uk.gov.hmrc.securitiestransferchargefrontend.pages.sh03.ReasonForPurchasePage
-import uk.gov.hmrc.securitiestransferchargefrontend.views.html.sh03.agents.single.ReasonForPurchaseView
+import uk.gov.hmrc.securitiestransferchargefrontend.views.html.sh03.organisations.single.ReasonForPurchaseView
 
 class ReasonForPurchaseControllerSpec extends SpecBase with MockitoSugar {
   
@@ -42,8 +42,8 @@ class ReasonForPurchaseControllerSpec extends SpecBase with MockitoSugar {
 
     "must return OK and the correct view for a GET" in {
 
-      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers), affinityGroup = agentAffinity)
-        .overrides(bind[Navigator].qualifiedWith("agentsSh03").toInstance(getNavigator))
+      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers), affinityGroup = orgAffinity)
+        .overrides(bind[Navigator].qualifiedWith("orgSh03").toInstance(getNavigator))
         .build()
 
       running(application) {
@@ -62,8 +62,8 @@ class ReasonForPurchaseControllerSpec extends SpecBase with MockitoSugar {
 
       val userAnswers = UserAnswers(testUserId, testGroupIdentifier, submissionId).set(ReasonForPurchasePage, ReasonForPurchase.values.head).success.value
 
-      val application = applicationBuilder(userAnswers = Some(userAnswers), affinityGroup = agentAffinity)
-        .overrides(bind[Navigator].qualifiedWith("agentsSh03").toInstance(getNavigator))
+      val application = applicationBuilder(userAnswers = Some(userAnswers), affinityGroup = orgAffinity)
+        .overrides(bind[Navigator].qualifiedWith("orgSh03").toInstance(getNavigator))
         .build()
 
       running(application) {
@@ -83,8 +83,8 @@ class ReasonForPurchaseControllerSpec extends SpecBase with MockitoSugar {
 
       val updatedAnswers = emptyUserAnswers.set(ReasonForPurchasePage, ReasonForPurchase.ForCancellation).success.value
       val application =
-        applicationBuilder(userAnswers = Some(updatedAnswers), affinityGroup = agentAffinity)
-          .overrides(bind[Navigator].qualifiedWith("agentsSh03").toInstance(getNavigator))
+        applicationBuilder(userAnswers = Some(updatedAnswers), affinityGroup = orgAffinity)
+          .overrides(bind[Navigator].qualifiedWith("orgSh03").toInstance(getNavigator))
           .build()
 
 
@@ -103,8 +103,8 @@ class ReasonForPurchaseControllerSpec extends SpecBase with MockitoSugar {
     "must return a Bad Request and errors when invalid data is submitted" in {
 
       val application =
-        applicationBuilder(userAnswers = Some(emptyUserAnswers), affinityGroup = agentAffinity)
-          .overrides(bind[Navigator].qualifiedWith("agentsSh03").toInstance(getNavigator))
+        applicationBuilder(userAnswers = Some(emptyUserAnswers), affinityGroup = orgAffinity)
+          .overrides(bind[Navigator].qualifiedWith("orgSh03").toInstance(getNavigator))
           .build()
 
       running(application) {

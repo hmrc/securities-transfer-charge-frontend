@@ -14,30 +14,30 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.securitiestransferchargefrontend.viewmodels.sh03.organisations.single
+package uk.gov.hmrc.securitiestransferchargefrontend.viewmodels.sh03.organisations
 
 import play.api.i18n.Messages
 import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.SummaryListRow
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.sh03.organisations.single.routes
 import uk.gov.hmrc.securitiestransferchargefrontend.models.{CheckMode, UserAnswers}
-import uk.gov.hmrc.securitiestransferchargefrontend.pages.sh03.TreasurySharesPage
+import uk.gov.hmrc.securitiestransferchargefrontend.pages.sh03.ConnectedPersonsPage
 import uk.gov.hmrc.securitiestransferchargefrontend.viewmodels.govuk.summarylist.*
 import uk.gov.hmrc.securitiestransferchargefrontend.viewmodels.implicits.*
 
-object TreasurySharesSummary  {
+object ConnectedPersonsSummary  {
 
   def row(answers: UserAnswers)(implicit messages: Messages): Option[SummaryListRow] =
-    answers.get(TreasurySharesPage).map {
+    answers.get(ConnectedPersonsPage).map {
       answer =>
 
         val value = if (answer) "site.yes" else "site.no"
 
         SummaryListRowViewModel(
-          key     = "org.sh03.treasuryShares.checkYourAnswersLabel",
+          key     = "org.sh03.connectedPersons.checkYourAnswersLabel",
           value   = ValueViewModel(value),
           actions = Seq(
-            ActionItemViewModel("site.change", routes.TreasurySharesController.onPageLoad(CheckMode).url)
-              .withVisuallyHiddenText(messages("org.sh03.treasuryShares.change.hidden"))
+            ActionItemViewModel("site.change", routes.ConnectedPersonsController.onPageLoad(CheckMode).url)
+              .withVisuallyHiddenText(messages("org.sh03.connectedPersons.change.hidden"))
           )
         )
     }
