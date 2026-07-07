@@ -56,7 +56,7 @@ class CompanyDetailsControllerSpec extends SpecBase with MockitoSugar {
         val view = application.injector.instanceOf[CompanyDetailsView]
 
         status(result) mustEqual OK
-        contentAsString(result) mustEqual view(form, NormalMode,testBackLinkRoute)(request, messages(application)).toString
+        contentAsString(result) mustEqual view(form, NormalMode, testBackLinkRoute)(request, messages(application)).toString
       }
     }
 

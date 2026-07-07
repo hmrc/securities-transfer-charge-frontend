@@ -21,7 +21,6 @@ import org.jsoup.nodes.Document
 import play.api.Application
 import uk.gov.hmrc.securitiestransferchargefrontend.forms.sh03.agents.CompanyDetailsFormProvider
 import uk.gov.hmrc.securitiestransferchargefrontend.models.NormalMode
-import uk.gov.hmrc.securitiestransferchargefrontend.models.sh03.agents.CompanyDetails
 import uk.gov.hmrc.securitiestransferchargefrontend.views.html.sh03.agents.single.CompanyDetailsView
 import views.ViewBaseSpec
 
@@ -51,46 +50,44 @@ class CompanyDetailsViewSpec extends ViewBaseSpec {
   }
 
   "CompanyDetailsView" - {
+    val doc = view()
+
+    "have the correct title" in {
+      doc.title must include(ExpectedContent.title)
+    }
 
     "must contain heading" in {
-      val doc = view()
       doc.select("h1").text() must include(ExpectedContent.heading)
     }
 
     "must contain company name input" in {
-      val doc = view()
       doc.select("#companyName").size() mustBe 1
       doc.select("label[for=companyName]").text() must include(ExpectedContent.companyNameLabel)
     }
 
     "must contain CRN input with hint text" in {
-      val doc = view()
       doc.select("#companyRegistrationNumber").size() mustBe 1
       doc.select("label[for=companyRegistrationNumber]").text() must include(ExpectedContent.crnLabel)
       doc.text() must include(ExpectedContent.crnHint)
     }
 
     "must contain PLC radio buttons" in {
-      val doc = view()
       doc.text() must include(ExpectedContent.isPlcLabel)
       doc.text() must include(messages("site.yes"))
       doc.text() must include(messages("site.no"))
     }
 
     "must contain save and continue button" in {
-      val doc = view()
       val buttons = doc.select(".govuk-button")
       buttons.get(0).text() mustBe ExpectedContent.saveAndContinue
     }
 
     "must contain save and return button" in {
-      val doc = view()
       val buttons = doc.select(".govuk-button")
       buttons.get(1).text() mustBe ExpectedContent.saveAndReturn
     }
 
     "must have back link" in {
-      val doc = view()
       doc.hasBackLink mustBe true
     }
   }

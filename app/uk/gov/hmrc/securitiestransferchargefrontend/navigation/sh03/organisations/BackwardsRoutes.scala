@@ -20,7 +20,7 @@ import play.api.mvc.Call
 import uk.gov.hmrc.securitiestransferchargefrontend.models.UserAnswers
 import uk.gov.hmrc.securitiestransferchargefrontend.navigation.NavigationHelper
 import uk.gov.hmrc.securitiestransferchargefrontend.pages.Page
-import uk.gov.hmrc.securitiestransferchargefrontend.pages.sh03.HowToNotifyAboutShareBuybackPage
+import uk.gov.hmrc.securitiestransferchargefrontend.pages.sh03._
 
 class BackwardsRoutes(defaultPage: Call):
 
@@ -28,5 +28,6 @@ class BackwardsRoutes(defaultPage: Call):
 
   def predecessorRoutes(page: Page): UserAnswers => Call = page match {
     case HowToNotifyAboutShareBuybackPage => _ => defaultPage
+    case ConnectedPersonsPage => _ => defaultPage
     case _ => _ => defaultPage
   }
