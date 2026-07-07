@@ -14,11 +14,11 @@
  * limitations under the License.
  */
 
-package forms.sh03.agents.single
+package forms.sh03.shared
 
 import forms.behaviours.OptionFieldBehaviours
 import play.api.data.FormError
-import uk.gov.hmrc.securitiestransferchargefrontend.forms.sh03.agents.single.ReasonForPurchaseFormProvider
+import uk.gov.hmrc.securitiestransferchargefrontend.forms.sh03.shared.ReasonForPurchaseFormProvider
 import uk.gov.hmrc.securitiestransferchargefrontend.models.sh03.shared.ReasonForPurchase
 
 class ReasonForPurchaseFormProviderSpec extends OptionFieldBehaviours {

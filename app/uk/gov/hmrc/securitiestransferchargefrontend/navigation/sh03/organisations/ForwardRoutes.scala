@@ -19,10 +19,11 @@ package uk.gov.hmrc.securitiestransferchargefrontend.navigation.sh03.organisatio
 import play.api.mvc.Call
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.securitiestransferchargefrontend.models.sh03.HowToNotifyAboutShareBuyback.{MoreThanOneAtATime, OneAtATime}
+import uk.gov.hmrc.securitiestransferchargefrontend.models.sh03.shared.ReasonForPurchase
 import uk.gov.hmrc.securitiestransferchargefrontend.models.UserAnswers
 import uk.gov.hmrc.securitiestransferchargefrontend.navigation.PersistentNavigationHelper
 import uk.gov.hmrc.securitiestransferchargefrontend.pages.Page
-import uk.gov.hmrc.securitiestransferchargefrontend.pages.sh03.HowToNotifyAboutShareBuybackPage
+import uk.gov.hmrc.securitiestransferchargefrontend.pages.sh03.{HowToNotifyAboutShareBuybackPage, ReasonForPurchasePage}
 import uk.gov.hmrc.securitiestransferchargefrontend.services.AnswerPersistenceService
 
 import scala.concurrent.{ExecutionContext, Future}
@@ -43,6 +44,10 @@ class ForwardRoutes(
         case OneAtATime => defaultPage
         case MoreThanOneAtATime => defaultPage
       }
+    }
+    case ReasonForPurchasePage => userAnswers => dataDependent(ReasonForPurchasePage, userAnswers) {
+      case ReasonForPurchase.ForCancellation  => defaultPage
+      case ReasonForPurchase.ToPlaceIntoTreasury => defaultPage
     }
     case _ => _ => Future.successful(defaultPage)
   }
