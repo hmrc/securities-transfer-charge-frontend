@@ -19,11 +19,13 @@ package uk.gov.hmrc.securitiestransferchargefrontend.navigation.sh03.organisatio
 import play.api.mvc.Call
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.securitiestransferchargefrontend.models.sh03.HowToNotifyAboutShareBuyback.{MoreThanOneAtATime, OneAtATime}
+import uk.gov.hmrc.securitiestransferchargefrontend.models.{NormalMode, UserAnswers}
+import uk.gov.hmrc.securitiestransferchargefrontend.controllers.sh03.organisations.single.routes as sh03OrgSingleRoutes
+import uk.gov.hmrc.securitiestransferchargefrontend.controllers.routes
 import uk.gov.hmrc.securitiestransferchargefrontend.models.sh03.shared.ReasonForPurchase
-import uk.gov.hmrc.securitiestransferchargefrontend.models.UserAnswers
 import uk.gov.hmrc.securitiestransferchargefrontend.navigation.PersistentNavigationHelper
 import uk.gov.hmrc.securitiestransferchargefrontend.pages.Page
-import uk.gov.hmrc.securitiestransferchargefrontend.pages.sh03.{HowToNotifyAboutShareBuybackPage, ReasonForPurchasePage}
+import uk.gov.hmrc.securitiestransferchargefrontend.pages.sh03.{HowToNotifyAboutShareBuybackPage, OrgCompanyDetailsPage, ReasonForPurchasePage}
 import uk.gov.hmrc.securitiestransferchargefrontend.services.AnswerPersistenceService
 
 import scala.concurrent.{ExecutionContext, Future}
@@ -41,10 +43,11 @@ class ForwardRoutes(
   def forwardRoutes(page: Page)(implicit hc: HeaderCarrier): UserAnswers => Future[Call] = page match {
     case HowToNotifyAboutShareBuybackPage => userAnswers => {
       dataDependent(HowToNotifyAboutShareBuybackPage, userAnswers) {
-        case OneAtATime => defaultPage
+        case OneAtATime => sh03OrgSingleRoutes.CompanyDetailsController.onPageLoad(NormalMode)
         case MoreThanOneAtATime => defaultPage
       }
     }
+    case OrgCompanyDetailsPage => userAnswers => dataRequired(OrgCompanyDetailsPage, userAnswers, routes.JourneyRecoveryController.onPageLoad())
     case ReasonForPurchasePage => userAnswers => dataDependent(ReasonForPurchasePage, userAnswers) {
       case ReasonForPurchase.ForCancellation  => defaultPage
       case ReasonForPurchase.ToPlaceIntoTreasury => defaultPage
