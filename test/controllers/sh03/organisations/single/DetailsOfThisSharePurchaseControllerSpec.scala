@@ -20,7 +20,6 @@ import base.SpecBase
 import org.scalatestplus.mockito.MockitoSugar
 import play.api.data.Form
 import play.api.inject.bind
-import play.api.mvc.Call
 import play.api.test.FakeRequest
 import play.api.test.Helpers.*
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.routes
@@ -34,10 +33,8 @@ import uk.gov.hmrc.securitiestransferchargefrontend.views.html.sh03.organisation
 
 class DetailsOfThisSharePurchaseControllerSpec extends SpecBase with MockitoSugar {
 
-  def onwardRoute = Call("GET", "/foo")
-
   val formProvider = new DetailsOfThisSharePurchaseFormProvider()
-  val form: Form[DetailsOfThisSharePurchase] = formProvider(affinityKey = affinityGroupKeyAgent)
+  val form: Form[DetailsOfThisSharePurchase] = formProvider(affinityKey = affinityGroupKeyOrg)
 
   lazy val detailsOfThisSharePurchaseRoute: String = orgSingleRoutes.DetailsOfThisSharePurchaseController.onPageLoad(NormalMode).url
 
