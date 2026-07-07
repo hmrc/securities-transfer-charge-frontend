@@ -53,7 +53,7 @@ class ForwardRoutes(
       case ReasonForPurchase.ToPlaceIntoTreasury => defaultPage
     }
 
-    case MinimumAmountPaidPage => userAnswers => goTo(defaultPage,Some(userAnswers)
+    case MinimumAmountPaidPage => userAnswers => goTo(defaultPage,Some(userAnswers))
     case _ => _ => Future.successful(defaultPage)
   }
 }
