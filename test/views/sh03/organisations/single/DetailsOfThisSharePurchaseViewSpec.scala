@@ -35,7 +35,7 @@ class DetailsOfThisSharePurchaseViewSpec extends ViewBaseSpec {
   private val formProvider = new  DetailsOfThisSharePurchaseFormProvider()
   private val testBackLinkRoute: Call = Call("GET", "/back-link")
 
-  private val form = formProvider(affinityKey = affinityGroupKeyAgent)
+  private val form = formProvider(affinityKey = affinityGroupKeyOrg)
 
   def view(requireMarketValue:Boolean): Document = Jsoup.parse(
     viewInstance(form, NormalMode, testBackLinkRoute,requireMarketValue)(fakeRequest, messages).body
