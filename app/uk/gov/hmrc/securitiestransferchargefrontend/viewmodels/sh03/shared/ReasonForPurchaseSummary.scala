@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.securitiestransferchargefrontend.viewmodels.sh03.agents
+package uk.gov.hmrc.securitiestransferchargefrontend.viewmodels.sh03.shared
 
 import play.api.i18n.Messages
 import play.twirl.api.HtmlFormat
