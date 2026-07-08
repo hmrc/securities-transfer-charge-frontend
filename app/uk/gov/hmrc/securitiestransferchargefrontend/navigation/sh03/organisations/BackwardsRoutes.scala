@@ -29,5 +29,6 @@ class BackwardsRoutes(defaultPage: Call):
   def predecessorRoutes(page: Page): UserAnswers => Call = page match {
     case HowToNotifyAboutShareBuybackPage => _ => defaultPage
     case ConnectedPersonsPage => _ => defaultPage
+    case MinimumAmountPaidPage => _ => defaultPage
     case _ => _ => defaultPage
   }

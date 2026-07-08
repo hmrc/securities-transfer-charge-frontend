@@ -980,3 +980,14 @@ org.sh03.chargingPoint.error.required = The charging point for this share buybac
 org.sh03.chargingPoint.error.invalid = The charging point for this share buyback must be a real date
 org.sh03.chargingPoint.error.futureDate = The charging point for this share buyback must be today’s date, or a date in the past
 org.sh03.chargingPoint.change.hidden = Change the charging point
+
+org.sh03.minimumAmountPaid.title = What is the minimum amount paid for the shares, in pounds?
+org.sh03.minimumAmountPaid.heading = What is the minimum amount paid for the shares, in pounds?
+org.sh03.minimumAmountPaid.checkYourAnswersLabel = What is the minimum amount paid for the shares, in pounds?
+org.sh03.minimumAmountPaid.change.hidden = What is the minimum amount paid for the shares, in pounds?
+org.sh03.minimumAmountPaid.error.required = Enter the minimum amount paid for the shares
+org.sh03.minimumAmountPaid.error.invalidNumeric = The minimum amount paid for the shares must be a number and can include up to two decimal places, like £30 or £28.60
+org.sh03.minimumAmountPaid.error.nonNumeric = The minimum amount paid for the shares must be a number and can include up to two decimal places, like £30 or £28.60
+org.sh03.minimumAmountPaid.error.negative = The minimum amount paid for the shares must be £0.01 or more
+org.sh03.minimumAmountPaid.error.belowMinimum = The minimum amount paid for the shares must be £0.01 or more
+org.sh03.minimumAmountPaid.error.aboveMaximum = The minimum amount paid for the shares must be £999,999,999 or less

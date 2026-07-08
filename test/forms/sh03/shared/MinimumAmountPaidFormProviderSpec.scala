@@ -26,7 +26,7 @@ import scala.math.BigDecimal.RoundingMode
 
 class MinimumAmountPaidFormProviderSpec extends CurrencyFieldBehaviours {
 
-  private val affinityKeys: Seq[String] = Seq("agent") // TODO add org when ready
+  private val affinityKeys: Seq[String] = Seq("agent","org")
 
   ".value" - {
 
