@@ -1003,3 +1003,14 @@ org.sh03.detailsOfSharePurchase.error.marketValue.invalidNumeric = The market va
 org.sh03.detailsOfSharePurchase.error.marketValue.nonNumeric = The market value of the shares must be a number and can include up to two decimal places, like £30 or £28.60
 org.sh03.detailsOfSharePurchase.error.marketValue.aboveMaximum = The market value of the shares must be £999,999,999 or below
 org.sh03.detailsOfSharePurchase.error.marketValue.belowMinimum = The market value of the shares must be £0.01 or more
+
+org.sh03.minimumAmountPaid.title = What is the minimum amount paid for the shares, in pounds?
+org.sh03.minimumAmountPaid.heading = What is the minimum amount paid for the shares, in pounds?
+org.sh03.minimumAmountPaid.checkYourAnswersLabel = What is the minimum amount paid for the shares, in pounds?
+org.sh03.minimumAmountPaid.change.hidden = What is the minimum amount paid for the shares, in pounds?
+org.sh03.minimumAmountPaid.error.required = Enter the minimum amount paid for the shares
+org.sh03.minimumAmountPaid.error.invalidNumeric = The minimum amount paid for the shares must be a number and can include up to two decimal places, like £30 or £28.60
+org.sh03.minimumAmountPaid.error.nonNumeric = The minimum amount paid for the shares must be a number and can include up to two decimal places, like £30 or £28.60
+org.sh03.minimumAmountPaid.error.negative = The minimum amount paid for the shares must be £0.01 or more
+org.sh03.minimumAmountPaid.error.belowMinimum = The minimum amount paid for the shares must be £0.01 or more
+org.sh03.minimumAmountPaid.error.aboveMaximum = The minimum amount paid for the shares must be £999,999,999 or less

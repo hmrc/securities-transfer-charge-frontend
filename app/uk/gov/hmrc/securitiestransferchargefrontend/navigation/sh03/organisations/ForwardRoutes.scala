@@ -55,6 +55,7 @@ class ForwardRoutes(
       case ReasonForPurchase.ForCancellation  => sh03OrgSingleRoutes.TreasurySharesController.onPageLoad(NormalMode)
       case ReasonForPurchase.ToPlaceIntoTreasury => sh03OrgSingleRoutes.ConnectedPersonsController.onPageLoad(NormalMode)
     }
+
     case TreasurySharesPage => userAnswers => dataRequired(TreasurySharesPage, userAnswers, sh03OrgSingleRoutes.ConnectedPersonsController.onPageLoad(NormalMode))
     case ConnectedPersonsPage => userAnswers => goTo(defaultPage,Some(userAnswers))
     case ChargingPointPage => userAnswers =>
@@ -62,6 +63,8 @@ class ForwardRoutes(
         if (enterDate.isBefore(firstDate)) defaultPage
         else sh03OrgSingleRoutes.DetailsOfThisSharePurchaseController.onPageLoad(NormalMode)
       }
+    case MinimumAmountPaidPage => userAnswers =>
+      dataRequired(MinimumAmountPaidPage, userAnswers, sh03AgentSingleRoutes.ChargingPointController.onPageLoad(NormalMode))
     case _ => _ => Future.successful(defaultPage)
   }
 }
