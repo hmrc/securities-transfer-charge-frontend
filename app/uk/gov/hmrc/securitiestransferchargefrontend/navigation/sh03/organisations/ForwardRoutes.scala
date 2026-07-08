@@ -22,10 +22,11 @@ import uk.gov.hmrc.securitiestransferchargefrontend.models.sh03.HowToNotifyAbout
 import uk.gov.hmrc.securitiestransferchargefrontend.models.{NormalMode, UserAnswers}
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.sh03.organisations.single.routes as sh03OrgSingleRoutes
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.routes
+import uk.gov.hmrc.securitiestransferchargefrontend.controllers.sh03.agents.single.routes as sh03AgentSingleRoutes
 import uk.gov.hmrc.securitiestransferchargefrontend.models.sh03.shared.ReasonForPurchase
 import uk.gov.hmrc.securitiestransferchargefrontend.navigation.PersistentNavigationHelper
 import uk.gov.hmrc.securitiestransferchargefrontend.pages.Page
-import uk.gov.hmrc.securitiestransferchargefrontend.pages.sh03._
+import uk.gov.hmrc.securitiestransferchargefrontend.pages.sh03.*
 import uk.gov.hmrc.securitiestransferchargefrontend.services.AnswerPersistenceService
 
 import scala.concurrent.{ExecutionContext, Future}
@@ -52,6 +53,9 @@ class ForwardRoutes(
       case ReasonForPurchase.ForCancellation  => defaultPage
       case ReasonForPurchase.ToPlaceIntoTreasury => defaultPage
     }
+
+    case MinimumAmountPaidPage => userAnswers =>
+      dataRequired(MinimumAmountPaidPage, userAnswers, sh03AgentSingleRoutes.ChargingPointController.onPageLoad(NormalMode))
     case ConnectedPersonsPage => userAnswers => goTo(defaultPage,Some(userAnswers))
     case MinimumAmountPaidPage => userAnswers => goTo(defaultPage,Some(userAnswers))
     case _ => _ => Future.successful(defaultPage)
