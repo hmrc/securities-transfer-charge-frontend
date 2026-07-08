@@ -14,12 +14,12 @@
  * limitations under the License.
  */
 
-package forms.sh03.agents.single
+package forms.sh03.shared
 
 import forms.behaviours.DateBehaviours
 import play.api.i18n.Messages
 import play.api.test.Helpers.stubMessages
-import uk.gov.hmrc.securitiestransferchargefrontend.forms.sh03.agents.single.ChargingPointFormProvider
+import uk.gov.hmrc.securitiestransferchargefrontend.forms.sh03.shared.ChargingPointFormProvider
 import uk.gov.hmrc.securitiestransferchargefrontend.models.DateHelper.today
 
 import java.time.{LocalDate, ZoneOffset}
@@ -27,7 +27,7 @@ import java.time.{LocalDate, ZoneOffset}
 class ChargingPointFormProviderSpec extends DateBehaviours {
 
   private implicit val messages: Messages = stubMessages()
-  private val form = new ChargingPointFormProvider()()
+  val formProvider = new ChargingPointFormProvider()
 
   ".value" - {
 
@@ -36,21 +36,31 @@ class ChargingPointFormProviderSpec extends DateBehaviours {
       max = LocalDate.now(ZoneOffset.UTC)
     )
 
-    behave like dateField(form, "value", validData)
+    Seq("agent", "org").foreach { affinityKey =>
 
-    behave like mandatoryDateField(form, "value", "agent.sh03.chargingPoint.error.required.all")
+      s"when affinity key is $affinityKey" - {
 
-    "reject dates in the future" in {
-      val futureDate = today.plusDays(1)
+        val form = formProvider(affinityKey)
+        val requiredKey = s"$affinityKey.sh03.chargingPoint.error.required.all"
+        val futureDateKey = s"$affinityKey.sh03.chargingPoint.error.futureDate"
 
-      val result = form.bind(
-        Map(
-          "value.day" -> futureDate.getDayOfMonth.toString,
-          "value.month" -> futureDate.getMonthValue.toString,
-          "value.year" -> futureDate.getYear.toString
-        )
-      )
-      result.errors.map(_.message) must contain("agent.sh03.chargingPoint.error.futureDate")
+        behave like dateField(form, "value", validData)
+
+        behave like mandatoryDateField(form, "value", requiredKey)
+
+        "reject dates in the future" in {
+          val futureDate = today.plusDays(1)
+
+          val result = form.bind(
+            Map(
+              "value.day"   -> futureDate.getDayOfMonth.toString,
+              "value.month" -> futureDate.getMonthValue.toString,
+              "value.year"  -> futureDate.getYear.toString
+            )
+          )
+          result.errors.map(_.message) must contain(futureDateKey)
+        }
+      }
     }
   }
 }

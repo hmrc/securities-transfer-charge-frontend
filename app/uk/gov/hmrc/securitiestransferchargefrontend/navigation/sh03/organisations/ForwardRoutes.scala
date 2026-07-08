@@ -52,7 +52,7 @@ class ForwardRoutes(
       case ReasonForPurchase.ForCancellation  => defaultPage
       case ReasonForPurchase.ToPlaceIntoTreasury => defaultPage
     }
-
+    case ConnectedPersonsPage => userAnswers => goTo(defaultPage,Some(userAnswers))
     case MinimumAmountPaidPage => userAnswers => goTo(defaultPage,Some(userAnswers))
     case _ => _ => Future.successful(defaultPage)
   }

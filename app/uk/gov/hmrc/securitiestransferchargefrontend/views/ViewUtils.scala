@@ -23,7 +23,7 @@ object ViewUtils {
 
   def title(form: Form[_], title: String, section: Option[String] = None)(implicit messages: Messages): String =
     titleNoForm(
-      title   = s"${errorPrefix(form)} ${messages(title)}",
+      title   = if(form.hasErrors || form.hasGlobalErrors) s"${errorPrefix(form)} ${messages(title)}" else s"${messages(title)}",
       section = section
     )
 
