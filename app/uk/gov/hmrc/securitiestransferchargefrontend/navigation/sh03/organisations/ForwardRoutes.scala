@@ -57,7 +57,6 @@ class ForwardRoutes(
     case MinimumAmountPaidPage => userAnswers =>
       dataRequired(MinimumAmountPaidPage, userAnswers, sh03AgentSingleRoutes.ChargingPointController.onPageLoad(NormalMode))
     case ConnectedPersonsPage => userAnswers => goTo(defaultPage,Some(userAnswers))
-    case MinimumAmountPaidPage => userAnswers => goTo(defaultPage,Some(userAnswers))
     case _ => _ => Future.successful(defaultPage)
   }
 }
