@@ -43,11 +43,11 @@ object DetailsOfThisSharePurchaseSummary  {
         )
 
         SummaryListRowViewModel(
-          key     = "detailsOfThisSharePurchase.checkYourAnswersLabel",
+          key     = "org.sh03.detailsOfThisSharePurchase.checkYourAnswersLabel",
           value   = ValueViewModel(HtmlContent(value)),
           actions = Seq(
             ActionItemViewModel("site.change", routes.DetailsOfThisSharePurchaseController.onPageLoad(CheckMode).url)
-              .withVisuallyHiddenText(messages("detailsOfThisSharePurchase.change.hidden"))
+              .withVisuallyHiddenText(messages("org.sh03.detailsOfThisSharePurchase.change.hidden"))
           )
         )
     }
