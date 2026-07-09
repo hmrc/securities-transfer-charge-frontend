@@ -14,11 +14,11 @@
  * limitations under the License.
  */
 
-package forms.sh03.agents
+package forms.sh03.shared
 
 import base.SpecBase
 import play.api.data.FormError
-import uk.gov.hmrc.securitiestransferchargefrontend.forms.sh03.agents.MaximumAmountPaidFormProvider
+import uk.gov.hmrc.securitiestransferchargefrontend.forms.sh03.shared.MaximumAmountPaidFormProvider
 
 class MaximumAmountPaidFormProviderSpec extends SpecBase {
 
