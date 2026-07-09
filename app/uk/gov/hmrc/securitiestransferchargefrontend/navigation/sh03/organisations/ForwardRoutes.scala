@@ -56,19 +56,23 @@ class ForwardRoutes(
       case ReasonForPurchase.ToPlaceIntoTreasury => sh03OrgSingleRoutes.ConnectedPersonsController.onPageLoad(NormalMode)
     }
     case TreasurySharesPage => userAnswers => dataRequired(TreasurySharesPage, userAnswers, sh03OrgSingleRoutes.ConnectedPersonsController.onPageLoad(NormalMode))
-    case ConnectedPersonsPage => userAnswers =>  dataRequired(ConnectedPersonsPage, userAnswers, defaultPage)
+    case ConnectedPersonsPage => userAnswers =>  dataRequired(ConnectedPersonsPage, userAnswers, sh03OrgSingleRoutes.MaximumAmountPaidController.onPageLoad(NormalMode))
+    //TODO THE ApplyingForReliefPage
+    //TODO THE WhatReliefAreYouApplyingForPage
     case DetailsOfThisSharePurchasePage => userAnswers => dataDependent(CompanyDetailsPage, userAnswers) {companyDetails =>
       if (companyDetails.isPlc)
-        defaultPage
+        sh03OrgSingleRoutes.MaximumAmountPaidController.onPageLoad(NormalMode)
       else
         sh03OrgSingleRoutes.ChargingPointController.onPageLoad(NormalMode)
     }
+    case MaximumAmountPaidPage => userAnswers => dataRequired(MaximumAmountPaidPage, userAnswers, sh03OrgSingleRoutes.MinimumAmountPaidController.onPageLoad(NormalMode))
     case MinimumAmountPaidPage => userAnswers => dataRequired(MinimumAmountPaidPage, userAnswers, sh03OrgSingleRoutes.ChargingPointController.onPageLoad(NormalMode))
     case ChargingPointPage => userAnswers =>
       dataDependent(ChargingPointPage, userAnswers) {enterDate =>
         if (enterDate.isBefore(firstDate)) defaultPage
         else defaultPage
       }
+    //TODO THE RoleAtPurchasingCompanyPage
     case _ => _ => Future.successful(defaultPage)
   }
 }
