@@ -55,7 +55,6 @@ class ForwardRoutes(
       case ReasonForPurchase.ForCancellation  => sh03OrgSingleRoutes.TreasurySharesController.onPageLoad(NormalMode)
       case ReasonForPurchase.ToPlaceIntoTreasury => sh03OrgSingleRoutes.ConnectedPersonsController.onPageLoad(NormalMode)
     }
-
     case TreasurySharesPage => userAnswers => dataRequired(TreasurySharesPage, userAnswers, sh03OrgSingleRoutes.ConnectedPersonsController.onPageLoad(NormalMode))
     case ConnectedPersonsPage => userAnswers =>  dataRequired(ConnectedPersonsPage, userAnswers, defaultPage)
     //TODO THE ApplyingForReliefPage
