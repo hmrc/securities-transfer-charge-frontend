@@ -14,42 +14,42 @@
  * limitations under the License.
  */
 
-package views.sh03.agents.single
+package views.sh03.organisations.single
 
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
 import play.api.Application
 import play.api.mvc.Call
-import uk.gov.hmrc.securitiestransferchargefrontend.forms.sh03.shared.DetailsOfThisSharePurchaseFormProvider
 import uk.gov.hmrc.securitiestransferchargefrontend.models.NormalMode
-import uk.gov.hmrc.securitiestransferchargefrontend.views.html.sh03.agents.single.DetailsOfThisSharePurchaseView
+import uk.gov.hmrc.securitiestransferchargefrontend.forms.sh03.shared.DetailsOfThisSharePurchaseFormProvider
+import uk.gov.hmrc.securitiestransferchargefrontend.views.html.sh03.organisations.single.DetailsOfThisSharePurchaseView
 import views.ViewBaseSpec
 
 
 class DetailsOfThisSharePurchaseViewSpec extends ViewBaseSpec {
 
   override def fakeApplication(): Application =
-    applicationBuilder(affinityGroup = agentAffinity).build()
+    applicationBuilder(affinityGroup = orgAffinity).build()
 
   private val viewInstance = app.injector.instanceOf[DetailsOfThisSharePurchaseView]
   private val formProvider = new  DetailsOfThisSharePurchaseFormProvider()
   private val testBackLinkRoute: Call = Call("GET", "/back-link")
 
-  private val form = formProvider(affinityKey = affinityGroupKeyAgent)
+  private val form = formProvider(affinityKey = affinityGroupKeyOrg)
 
   def view(requireMarketValue:Boolean): Document = Jsoup.parse(
     viewInstance(form, NormalMode, testBackLinkRoute,requireMarketValue)(fakeRequest, messages).body
   )
 
   object ExpectedContent {
-    val title: String = messages("agent.sh03.detailsOfSharePurchase.title")
-    val heading: String = messages("agent.sh03.detailsOfSharePurchase.heading")
+    val title: String = messages("org.sh03.detailsOfSharePurchase.title")
+    val heading: String = messages("org.sh03.detailsOfSharePurchase.heading")
     val saveAndContinue: String = messages("site.save-and-continue.button")
     val saveAndReturn: String = messages("site.save-and-return.button")
-    val numberOfShares: String = messages("agent.sh03.detailsOfSharePurchase.numberOfShares")
-    val typeOfShares: String = messages("agent.sh03.detailsOfSharePurchase.typeOfShares")
-    val amountPaid: String = messages("agent.sh03.detailsOfSharePurchase.amountPaid")
-    val marketValue: String = messages("agent.sh03.detailsOfSharePurchase.marketValue")
+    val numberOfShares: String = messages("org.sh03.detailsOfSharePurchase.numberOfShares")
+    val typeOfShares: String = messages("org.sh03.detailsOfSharePurchase.typeOfShares")
+    val amountPaid: String = messages("org.sh03.detailsOfSharePurchase.amountPaid")
+    val marketValue: String = messages("org.sh03.detailsOfSharePurchase.marketValue")
   }
 
   "The DetailsOfThisSharePurchase" - {

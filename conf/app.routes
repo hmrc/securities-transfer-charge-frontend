@@ -388,6 +388,11 @@ POST       /sh03/org/charging-point                        uk.gov.hmrc.securitie
 GET        /sh03/org/change/charging-point                uk.gov.hmrc.securitiestransferchargefrontend.controllers.sh03.organisations.single.ChargingPointController.onPageLoad(mode: Mode = CheckMode)
 POST       /sh03/org/change/charging-point                 uk.gov.hmrc.securitiestransferchargefrontend.controllers.sh03.organisations.single.ChargingPointController.onSubmit(mode: Mode = CheckMode)
 
+GET        /sh03/org/share-details                        uk.gov.hmrc.securitiestransferchargefrontend.controllers.sh03.organisations.single.DetailsOfThisSharePurchaseController.onPageLoad(mode: Mode = NormalMode)
+POST       /sh03/org/share-details                        uk.gov.hmrc.securitiestransferchargefrontend.controllers.sh03.organisations.single.DetailsOfThisSharePurchaseController.onSubmit(mode: Mode = NormalMode)
+GET        /sh03/org/change/share-details                 uk.gov.hmrc.securitiestransferchargefrontend.controllers.sh03.organisations.single.DetailsOfThisSharePurchaseController.onPageLoad(mode: Mode = CheckMode)
+POST       /sh03/org/change/share-details                 uk.gov.hmrc.securitiestransferchargefrontend.controllers.sh03.organisations.single.DetailsOfThisSharePurchaseController.onSubmit(mode: Mode = CheckMode)
+
 GET        /sh03/org/minimum-share-price                               uk.gov.hmrc.securitiestransferchargefrontend.controllers.sh03.organisations.single.MinimumAmountPaidController.onPageLoad(mode: Mode = NormalMode)
 POST       /sh03/org/minimum-share-price                               uk.gov.hmrc.securitiestransferchargefrontend.controllers.sh03.organisations.single.MinimumAmountPaidController.onSubmit(mode: Mode = NormalMode)
 GET        /sh03/org/change/minimum-share-price                        uk.gov.hmrc.securitiestransferchargefrontend.controllers.sh03.organisations.single.MinimumAmountPaidController.onPageLoad(mode: Mode = CheckMode)

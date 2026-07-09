@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package controllers.sh03.agents.single
+package controllers.sh03.organisations.single
 
 import base.SpecBase
 import org.scalatestplus.mockito.MockitoSugar
@@ -23,20 +23,20 @@ import play.api.inject.bind
 import play.api.test.FakeRequest
 import play.api.test.Helpers.*
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.routes
-import uk.gov.hmrc.securitiestransferchargefrontend.controllers.sh03.agents.single.routes as agentSingleRoutes
+import uk.gov.hmrc.securitiestransferchargefrontend.controllers.sh03.organisations.single.routes as orgSingleRoutes
 import uk.gov.hmrc.securitiestransferchargefrontend.forms.sh03.shared.DetailsOfThisSharePurchaseFormProvider
 import uk.gov.hmrc.securitiestransferchargefrontend.models.sh03.shared.DetailsOfThisSharePurchase
 import uk.gov.hmrc.securitiestransferchargefrontend.models.{NormalMode, UserAnswers}
 import uk.gov.hmrc.securitiestransferchargefrontend.navigation.Navigator
 import uk.gov.hmrc.securitiestransferchargefrontend.pages.sh03.{ConnectedPersonsPage, DetailsOfThisSharePurchasePage}
-import uk.gov.hmrc.securitiestransferchargefrontend.views.html.sh03.agents.single.DetailsOfThisSharePurchaseView
+import uk.gov.hmrc.securitiestransferchargefrontend.views.html.sh03.organisations.single.DetailsOfThisSharePurchaseView
 
 class DetailsOfThisSharePurchaseControllerSpec extends SpecBase with MockitoSugar {
-  
-  val formProvider = new DetailsOfThisSharePurchaseFormProvider()
-  val form: Form[DetailsOfThisSharePurchase] = formProvider(affinityKey = affinityGroupKeyAgent)
 
-  lazy val detailsOfThisSharePurchaseRoute: String = agentSingleRoutes.DetailsOfThisSharePurchaseController.onPageLoad(NormalMode).url
+  val formProvider = new DetailsOfThisSharePurchaseFormProvider()
+  val form: Form[DetailsOfThisSharePurchase] = formProvider(affinityKey = affinityGroupKeyOrg)
+
+  lazy val detailsOfThisSharePurchaseRoute: String = orgSingleRoutes.DetailsOfThisSharePurchaseController.onPageLoad(NormalMode).url
 
   val amount: BigDecimal = BigDecimal(500)
 
@@ -52,8 +52,8 @@ class DetailsOfThisSharePurchaseControllerSpec extends SpecBase with MockitoSuga
     "must return OK and the correct view for a GET" in {
       val updatedAnswers = emptyUserAnswers.set(ConnectedPersonsPage,true).success.value
 
-      val application = applicationBuilder(userAnswers = Some(updatedAnswers), affinityGroup = agentAffinity)
-        .overrides(bind[Navigator].qualifiedWith("agentsSh03").toInstance(getNavigator))
+      val application = applicationBuilder(userAnswers = Some(updatedAnswers), affinityGroup = orgAffinity)
+        .overrides(bind[Navigator].qualifiedWith("orgSh03").toInstance(getNavigator))
         .build()
 
       running(application) {
@@ -72,8 +72,8 @@ class DetailsOfThisSharePurchaseControllerSpec extends SpecBase with MockitoSuga
       val answers = userAnswers.set(DetailsOfThisSharePurchasePage, detailsOfThisSharePurchase).success.value
       val updatedAnswers = answers.set(ConnectedPersonsPage,true).success.value
 
-      val application = applicationBuilder(userAnswers = Some(updatedAnswers), affinityGroup = agentAffinity)
-        .overrides(bind[Navigator].qualifiedWith("agentsSh03").toInstance(getNavigator))
+      val application = applicationBuilder(userAnswers = Some(updatedAnswers), affinityGroup = orgAffinity)
+        .overrides(bind[Navigator].qualifiedWith("orgSh03").toInstance(getNavigator))
         .build()
 
       running(application) {
@@ -92,8 +92,8 @@ class DetailsOfThisSharePurchaseControllerSpec extends SpecBase with MockitoSuga
       val updatedAnswers = emptyUserAnswers.set(ConnectedPersonsPage, true).success.value
 
       val application =
-        applicationBuilder(userAnswers = Some(updatedAnswers), affinityGroup = agentAffinity)
-          .overrides(bind[Navigator].qualifiedWith("agentsSh03").toInstance(getNavigator))
+        applicationBuilder(userAnswers = Some(updatedAnswers), affinityGroup = orgAffinity)
+          .overrides(bind[Navigator].qualifiedWith("orgSh03").toInstance(getNavigator))
           .build()
 
       running(application) {
@@ -118,8 +118,8 @@ class DetailsOfThisSharePurchaseControllerSpec extends SpecBase with MockitoSuga
 
       val updatedAnswers = emptyUserAnswers.set(ConnectedPersonsPage, true).success.value
 
-      val application = applicationBuilder(userAnswers = Some(updatedAnswers), affinityGroup = agentAffinity)
-        .overrides(bind[Navigator].qualifiedWith("agentsSh03").toInstance(getNavigator))
+      val application = applicationBuilder(userAnswers = Some(updatedAnswers), affinityGroup = orgAffinity)
+        .overrides(bind[Navigator].qualifiedWith("orgSh03").toInstance(getNavigator))
         .build()
 
       running(application) {
@@ -139,8 +139,7 @@ class DetailsOfThisSharePurchaseControllerSpec extends SpecBase with MockitoSuga
     }
 
     "must redirect to Journey Recovery for a GET if no existing data is found" in {
-
-      val application = applicationBuilder(userAnswers = None, affinityGroup = agentAffinity).build()
+      val application = applicationBuilder(userAnswers = None, affinityGroup = orgAffinity).build()
 
       running(application) {
         val request = FakeRequest(GET, detailsOfThisSharePurchaseRoute)
@@ -151,11 +150,9 @@ class DetailsOfThisSharePurchaseControllerSpec extends SpecBase with MockitoSuga
         redirectLocation(result).value mustEqual routes.JourneyRecoveryController.onPageLoad().url
       }
     }
-    
 
     "must redirect to Journey Recovery for a POST if no existing data is found" in {
-
-      val application = applicationBuilder(userAnswers = None, affinityGroup = agentAffinity).build()
+      val application = applicationBuilder(userAnswers = None, affinityGroup = orgAffinity).build()
 
       running(application) {
         val request =
