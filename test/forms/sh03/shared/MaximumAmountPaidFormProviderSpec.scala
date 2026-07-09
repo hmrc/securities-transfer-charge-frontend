@@ -16,7 +16,7 @@
 
 package forms.sh03.shared
 
-import base.SpecBase
+import forms.behaviours.CurrencyFieldBehaviours
 import org.scalacheck.Gen
 import play.api.data.FormError
 import uk.gov.hmrc.securitiestransferchargefrontend.config.CurrencyFormatter.currencyFormat
@@ -24,7 +24,7 @@ import uk.gov.hmrc.securitiestransferchargefrontend.forms.sh03.shared.MaximumAmo
 
 import scala.math.BigDecimal.RoundingMode
 
-class MaximumAmountPaidFormProviderSpec extends SpecBase {
+class MaximumAmountPaidFormProviderSpec extends CurrencyFieldBehaviours {
 
   private val affinityKeys: Seq[String] = Seq("agent", "org")
 
@@ -57,7 +57,7 @@ class MaximumAmountPaidFormProviderSpec extends SpecBase {
           form,
           fieldName,
           nonNumericError =
-            FormError(fieldName, s"$key.sh03.maximumAmountPaid.error.nonNumeric"),
+            FormError(fieldName, s"$key.sh03.maximumAmountPaid.error.invalidNumeric"),
           invalidNumericError =
             FormError(fieldName, s"$key.sh03.maximumAmountPaid.error.invalidNumeric")
         )
