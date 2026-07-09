@@ -57,22 +57,18 @@ class ForwardRoutes(
     }
     case TreasurySharesPage => userAnswers => dataRequired(TreasurySharesPage, userAnswers, sh03OrgSingleRoutes.ConnectedPersonsController.onPageLoad(NormalMode))
     case ConnectedPersonsPage => userAnswers =>  dataRequired(ConnectedPersonsPage, userAnswers, defaultPage)
-    //TODO THE ApplyingForReliefPage
-    //TODO THE WhatReliefAreYouApplyingForPage
     case DetailsOfThisSharePurchasePage => userAnswers => dataDependent(CompanyDetailsPage, userAnswers) {companyDetails =>
       if (companyDetails.isPlc)
         defaultPage
       else
         sh03OrgSingleRoutes.ChargingPointController.onPageLoad(NormalMode)
     }
-    //TODO THE MaximumAmountPaidPage
     case MinimumAmountPaidPage => userAnswers => dataRequired(MinimumAmountPaidPage, userAnswers, sh03OrgSingleRoutes.ChargingPointController.onPageLoad(NormalMode))
     case ChargingPointPage => userAnswers =>
       dataDependent(ChargingPointPage, userAnswers) {enterDate =>
         if (enterDate.isBefore(firstDate)) defaultPage
         else defaultPage
       }
-    //TODO THE RoleAtPurchasingCompanyPage
     case _ => _ => Future.successful(defaultPage)
   }
 }
