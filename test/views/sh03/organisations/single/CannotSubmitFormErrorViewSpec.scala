@@ -52,7 +52,7 @@ class CannotSubmitFormErrorViewSpec extends ViewBaseSpec {
     val para3Value: String = messages("org.sh03.cannotSubmitFormError.p3")
 
     val saveAndReturnLink: String = messages("save-and-return-to-dashboard.link")
-    // Temporary backlink to satisfy the test until RoleAtPurchasingCompanyController is built
+
     val backLinkUrl: String = "#"
   }
 
