@@ -21,7 +21,6 @@ import org.scalatestplus.mockito.MockitoSugar
 import play.api.data.Form
 import play.api.inject
 import play.api.inject.bind
-import play.api.mvc.Call
 import play.api.test.FakeRequest
 import play.api.test.Helpers.*
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.routes
@@ -33,8 +32,6 @@ import uk.gov.hmrc.securitiestransferchargefrontend.pages.sh03.OrgCompanyDetails
 import uk.gov.hmrc.securitiestransferchargefrontend.views.html.sh03.organisations.single.CompanyDetailsView
 
 class CompanyDetailsControllerSpec extends SpecBase with MockitoSugar {
-
-  def onwardRoute = Call("GET", "/foo")
 
   val formProvider = new CompanyDetailsFormProvider()
   val form: Form[String] = formProvider()
@@ -83,9 +80,9 @@ class CompanyDetailsControllerSpec extends SpecBase with MockitoSugar {
 
     "must redirect to the next page when valid data is submitted" in {
 
-      val application =
-        applicationBuilder(userAnswers = Some(emptyUserAnswers))
-          .build()
+      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers), affinityGroup = orgAffinity)
+        .overrides(bind[Navigator].qualifiedWith("orgSh03").toInstance(getNavigator))
+        .build()
 
       running(application) {
         val request =
@@ -95,7 +92,7 @@ class CompanyDetailsControllerSpec extends SpecBase with MockitoSugar {
         val result = route(application, request).value
 
         status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual routes.JourneyRecoveryController.onPageLoad().url
+        redirectLocation(result).value mustEqual testNextPage.url
       }
     }
 

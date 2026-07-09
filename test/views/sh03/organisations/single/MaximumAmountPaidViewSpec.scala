@@ -33,7 +33,7 @@ class MaximumAmountPaidViewSpec extends ViewBaseSpec {
   private val viewInstance = app.injector.instanceOf[MaximumAmountPaidView]
   private val formProvider = new MaximumAmountPaidFormProvider()
   private val testBackLinkRoute: Call = Call("GET", "/back-link")
-  val messageKeyPrefix = "org.sh03.maximumAmountPaid.companyDetails"
+  val messageKeyPrefix = "org.sh03.maximumAmountPaid"
 
 
   private val form = formProvider(affinityGroupKeyOrg)
