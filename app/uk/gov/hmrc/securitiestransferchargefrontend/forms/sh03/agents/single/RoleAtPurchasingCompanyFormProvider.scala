@@ -19,7 +19,7 @@ package uk.gov.hmrc.securitiestransferchargefrontend.forms.sh03.agents.single
 import play.api.data.Forms.*
 import play.api.data.format.Formatter
 import play.api.data.{Form, FormError}
-import uk.gov.hmrc.securitiestransferchargefrontend.models.sh03.agents.RoleAtPurchasingCompany
+import uk.gov.hmrc.securitiestransferchargefrontend.models.sh03.shared.RoleAtPurchasingCompany
 
 import javax.inject.Inject
 

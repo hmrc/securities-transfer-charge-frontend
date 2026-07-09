@@ -24,7 +24,7 @@ import uk.gov.hmrc.securitiestransferchargefrontend.models.{NormalMode, UserAnsw
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.sh03.organisations.single.routes as sh03OrgSingleRoutes
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.routes
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.sh03.agents.single.routes as sh03AgentSingleRoutes
-import uk.gov.hmrc.securitiestransferchargefrontend.models.sh03.shared.ReasonForPurchase
+import uk.gov.hmrc.securitiestransferchargefrontend.models.sh03.shared.{ReasonForPurchase, RoleAtPurchasingCompany}
 import uk.gov.hmrc.securitiestransferchargefrontend.navigation.PersistentNavigationHelper
 import uk.gov.hmrc.securitiestransferchargefrontend.pages.Page
 import uk.gov.hmrc.securitiestransferchargefrontend.pages.sh03.*
@@ -65,6 +65,15 @@ class ForwardRoutes(
       dataDependent(ChargingPointPage, userAnswers) { enterDate =>
         if (enterDate.isBefore(firstDate)) defaultPage
         else defaultPage
+      }
+
+    case RoleAtPurchasingCompanyPage => userAnswers =>
+      dataDependent(RoleAtPurchasingCompanyPage, userAnswers) {
+        roleAtPurchasingCompany =>
+          if (roleAtPurchasingCompany.role == RoleAtPurchasingCompany.unsupportedRole)
+            sh03OrgSingleRoutes.CannotSubmitFormErrorController.onPageLoad()
+          else
+            defaultPage
       }
     case _ => _ => Future.successful(defaultPage)
   }

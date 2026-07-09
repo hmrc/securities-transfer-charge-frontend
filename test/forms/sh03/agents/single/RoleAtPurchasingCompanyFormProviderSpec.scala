@@ -19,7 +19,7 @@ package forms.sh03.agents.single
 import base.SpecBase
 import play.api.data.{Form, FormError}
 import uk.gov.hmrc.securitiestransferchargefrontend.forms.sh03.agents.single.RoleAtPurchasingCompanyFormProvider
-import uk.gov.hmrc.securitiestransferchargefrontend.models.sh03.agents.RoleAtPurchasingCompany
+import uk.gov.hmrc.securitiestransferchargefrontend.models.sh03.shared.RoleAtPurchasingCompany
 
 class RoleAtPurchasingCompanyFormProviderSpec extends SpecBase {
 
