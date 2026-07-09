@@ -57,8 +57,6 @@ class ForwardRoutes(
     }
     case TreasurySharesPage => userAnswers => dataRequired(TreasurySharesPage, userAnswers, sh03OrgSingleRoutes.ConnectedPersonsController.onPageLoad(NormalMode))
     case ConnectedPersonsPage => userAnswers =>  dataRequired(ConnectedPersonsPage, userAnswers, sh03OrgSingleRoutes.MaximumAmountPaidController.onPageLoad(NormalMode))
-    //TODO THE ApplyingForReliefPage
-    //TODO THE WhatReliefAreYouApplyingForPage
     case DetailsOfThisSharePurchasePage => userAnswers => dataDependent(CompanyDetailsPage, userAnswers) {companyDetails =>
       if (companyDetails.isPlc)
         sh03OrgSingleRoutes.MaximumAmountPaidController.onPageLoad(NormalMode)
@@ -72,7 +70,6 @@ class ForwardRoutes(
         if (enterDate.isBefore(firstDate)) defaultPage
         else defaultPage
       }
-    //TODO THE RoleAtPurchasingCompanyPage
     case _ => _ => Future.successful(defaultPage)
   }
 }
