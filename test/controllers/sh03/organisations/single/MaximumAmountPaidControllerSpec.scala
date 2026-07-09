@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package controllers.sh03.agents.single
+package controllers.sh03.organisations.single
 
 import base.SpecBase
 import org.scalatestplus.mockito.MockitoSugar
@@ -23,29 +23,29 @@ import play.api.inject.bind
 import play.api.test.FakeRequest
 import play.api.test.Helpers.*
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.routes
-import uk.gov.hmrc.securitiestransferchargefrontend.controllers.sh03.agents.single.routes as sh03AgentSingleRoutes
+import uk.gov.hmrc.securitiestransferchargefrontend.controllers.sh03.organisations.single.routes as sh03OrgSingleRoutes
 import uk.gov.hmrc.securitiestransferchargefrontend.forms.sh03.shared.MaximumAmountPaidFormProvider
 import uk.gov.hmrc.securitiestransferchargefrontend.models.NormalMode
 import uk.gov.hmrc.securitiestransferchargefrontend.navigation.Navigator
 import uk.gov.hmrc.securitiestransferchargefrontend.pages.sh03.MaximumAmountPaidPage
-import uk.gov.hmrc.securitiestransferchargefrontend.views.html.sh03.agents.single.MaximumAmountPaidView
+import uk.gov.hmrc.securitiestransferchargefrontend.views.html.sh03.organisations.single.MaximumAmountPaidView
 
 class MaximumAmountPaidControllerSpec extends SpecBase with MockitoSugar {
 
   val formProvider = new MaximumAmountPaidFormProvider()
   val form: Form[BigDecimal] = formProvider(affinityKey=affinityGroupKeyAgent)
 
-  lazy val maximumAmountPaidRoute: String = sh03AgentSingleRoutes.MaximumAmountPaidController.onPageLoad(NormalMode).url
-
   val validAnswer: BigDecimal = BigDecimal("999999")
+
+  lazy val maximumAmountPaidRoute: String = sh03OrgSingleRoutes.MaximumAmountPaidController.onPageLoad(NormalMode).url
 
   "MaximumAmountPaid Controller" - {
 
     "must return OK and the correct view for a GET" in {
 
-      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers), affinityGroup = agentAffinity)
-          .overrides(bind[Navigator].qualifiedWith("agentsSh03").toInstance(getNavigator))
-          .build()
+      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers), affinityGroup = orgAffinity)
+        .overrides(bind[Navigator].qualifiedWith("orgSh03").toInstance(getNavigator))
+        .build()
 
       running(application) {
         val request = FakeRequest(GET, maximumAmountPaidRoute)
@@ -64,9 +64,9 @@ class MaximumAmountPaidControllerSpec extends SpecBase with MockitoSugar {
 
       val userAnswers = emptyUserAnswers.set(MaximumAmountPaidPage, validAnswer).success.value
 
-      val application = applicationBuilder(userAnswers = Some(userAnswers), affinityGroup = agentAffinity)
-          .overrides(bind[Navigator].qualifiedWith("agentsSh03").toInstance(getNavigator))
-          .build()
+      val application = applicationBuilder(userAnswers = Some(userAnswers), affinityGroup = orgAffinity)
+        .overrides(bind[Navigator].qualifiedWith("orgSh03").toInstance(getNavigator))
+        .build()
 
       running(application) {
         val request = FakeRequest(GET, maximumAmountPaidRoute)
@@ -83,9 +83,9 @@ class MaximumAmountPaidControllerSpec extends SpecBase with MockitoSugar {
 
     "must redirect to the next page when valid data is submitted" in {
 
-      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers), affinityGroup = agentAffinity)
-          .overrides(bind[Navigator].qualifiedWith("agentsSh03").toInstance(getNavigator))
-          .build()
+      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers), affinityGroup = orgAffinity)
+        .overrides(bind[Navigator].qualifiedWith("orgSh03").toInstance(getNavigator))
+        .build()
 
       running(application) {
         val request = FakeRequest(POST, maximumAmountPaidRoute).withFormUrlEncodedBody(("value", validAnswer.toString))
@@ -99,9 +99,9 @@ class MaximumAmountPaidControllerSpec extends SpecBase with MockitoSugar {
 
     "must return a Bad Request and errors when invalid data is submitted" in {
 
-      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers), affinityGroup = agentAffinity)
-          .overrides(bind[Navigator].qualifiedWith("agentsSh03").toInstance(getNavigator))
-          .build()
+      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers), affinityGroup = orgAffinity)
+        .overrides(bind[Navigator].qualifiedWith("orgSh03").toInstance(getNavigator))
+        .build()
 
       running(application) {
         val request = FakeRequest(POST, maximumAmountPaidRoute).withFormUrlEncodedBody(("value", "invalid value"))
@@ -120,7 +120,7 @@ class MaximumAmountPaidControllerSpec extends SpecBase with MockitoSugar {
 
     "must redirect to Journey Recovery for a GET if no existing data is found" in {
 
-      val application = applicationBuilder(userAnswers = None, affinityGroup = agentAffinity).build()
+      val application = applicationBuilder(userAnswers = None, affinityGroup = orgAffinity).build()
 
       running(application) {
         val request = FakeRequest(GET, maximumAmountPaidRoute)
@@ -133,8 +133,7 @@ class MaximumAmountPaidControllerSpec extends SpecBase with MockitoSugar {
     }
 
     "must redirect to Journey Recovery for a POST if no existing data is found" in {
-
-      val application = applicationBuilder(userAnswers = None, affinityGroup = agentAffinity).build()
+      val application = applicationBuilder(userAnswers = None, affinityGroup = orgAffinity).build()
 
       running(application) {
         val request = FakeRequest(POST, maximumAmountPaidRoute).withFormUrlEncodedBody(("value", validAnswer.toString))

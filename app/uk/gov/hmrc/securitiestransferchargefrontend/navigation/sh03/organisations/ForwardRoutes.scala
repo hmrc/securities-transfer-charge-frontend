@@ -22,8 +22,6 @@ import uk.gov.hmrc.securitiestransferchargefrontend.config.FrontendAppConfig
 import uk.gov.hmrc.securitiestransferchargefrontend.models.sh03.HowToNotifyAboutShareBuyback.{MoreThanOneAtATime, OneAtATime}
 import uk.gov.hmrc.securitiestransferchargefrontend.models.{NormalMode, UserAnswers}
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.sh03.organisations.single.routes as sh03OrgSingleRoutes
-import uk.gov.hmrc.securitiestransferchargefrontend.controllers.routes
-import uk.gov.hmrc.securitiestransferchargefrontend.controllers.sh03.agents.single.routes as sh03AgentSingleRoutes
 import uk.gov.hmrc.securitiestransferchargefrontend.models.sh03.shared.ReasonForPurchase
 import uk.gov.hmrc.securitiestransferchargefrontend.navigation.PersistentNavigationHelper
 import uk.gov.hmrc.securitiestransferchargefrontend.pages.Page
@@ -52,21 +50,29 @@ class ForwardRoutes(
         case MoreThanOneAtATime => defaultPage
       }
     }
-    case OrgCompanyDetailsPage => userAnswers => dataRequired(OrgCompanyDetailsPage, userAnswers, routes.JourneyRecoveryController.onPageLoad())
+    case OrgCompanyDetailsPage => userAnswers => dataRequired(OrgCompanyDetailsPage, userAnswers, sh03OrgSingleRoutes.ReasonForPurchaseController.onPageLoad(NormalMode))
     case ReasonForPurchasePage => userAnswers => dataDependent(ReasonForPurchasePage, userAnswers) {
-      case ReasonForPurchase.ForCancellation  => defaultPage
-      case ReasonForPurchase.ToPlaceIntoTreasury => defaultPage
+      case ReasonForPurchase.ForCancellation  => sh03OrgSingleRoutes.TreasurySharesController.onPageLoad(NormalMode)
+      case ReasonForPurchase.ToPlaceIntoTreasury => sh03OrgSingleRoutes.ConnectedPersonsController.onPageLoad(NormalMode)
     }
-
-    case MinimumAmountPaidPage => userAnswers =>
-      dataRequired(MinimumAmountPaidPage, userAnswers, sh03AgentSingleRoutes.ChargingPointController.onPageLoad(NormalMode))
-    case ConnectedPersonsPage => userAnswers => goTo(defaultPage,Some(userAnswers))
+    case TreasurySharesPage => userAnswers => dataRequired(TreasurySharesPage, userAnswers, sh03OrgSingleRoutes.ConnectedPersonsController.onPageLoad(NormalMode))
+    case ConnectedPersonsPage => userAnswers =>  dataRequired(ConnectedPersonsPage, userAnswers, sh03OrgSingleRoutes.MaximumAmountPaidController.onPageLoad(NormalMode))
+    //TODO THE ApplyingForReliefPage
+    //TODO THE WhatReliefAreYouApplyingForPage
+    case DetailsOfThisSharePurchasePage => userAnswers => dataDependent(CompanyDetailsPage, userAnswers) {companyDetails =>
+      if (companyDetails.isPlc)
+        sh03OrgSingleRoutes.MaximumAmountPaidController.onPageLoad(NormalMode)
+      else
+        sh03OrgSingleRoutes.ChargingPointController.onPageLoad(NormalMode)
+    }
+    case MaximumAmountPaidPage => userAnswers => dataRequired(MaximumAmountPaidPage, userAnswers, sh03OrgSingleRoutes.MinimumAmountPaidController.onPageLoad(NormalMode))
+    case MinimumAmountPaidPage => userAnswers => dataRequired(MinimumAmountPaidPage, userAnswers, sh03OrgSingleRoutes.ChargingPointController.onPageLoad(NormalMode))
     case ChargingPointPage => userAnswers =>
-      dataDependent(ChargingPointPage, userAnswers) { enterDate =>
+      dataDependent(ChargingPointPage, userAnswers) {enterDate =>
         if (enterDate.isBefore(firstDate)) defaultPage
         else defaultPage
       }
+    //TODO THE RoleAtPurchasingCompanyPage
     case _ => _ => Future.successful(defaultPage)
   }
-  
 }

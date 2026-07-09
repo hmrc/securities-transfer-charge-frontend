@@ -17,153 +17,76 @@
 package forms.sh03.shared
 
 import base.SpecBase
+import org.scalacheck.Gen
 import play.api.data.FormError
+import uk.gov.hmrc.securitiestransferchargefrontend.config.CurrencyFormatter.currencyFormat
 import uk.gov.hmrc.securitiestransferchargefrontend.forms.sh03.shared.MaximumAmountPaidFormProvider
+
+import scala.math.BigDecimal.RoundingMode
 
 class MaximumAmountPaidFormProviderSpec extends SpecBase {
 
-  val form = new MaximumAmountPaidFormProvider()()
+  private val affinityKeys: Seq[String] = Seq("agent", "org")
 
   ".value" - {
 
-    val fieldName = "value"
+    affinityKeys.foreach { key =>
 
-    val requiredKey = "agent.sh03.maximumAmountPaid.error.required"
-    val invalidNumericKey = "agent.sh03.maximumAmountPaid.error.invalidNumeric"
-    val negativeKey = "agent.sh03.maximumAmountPaid.error.negative"
-    val aboveMaximumKey = "agent.sh03.maximumAmountPaid.error.aboveMaximum"
+      s"when affinityKey is $key" - {
 
-    "must bind valid whole number values" in {
-      val validValues = Seq(
-        "1" -> BigDecimal("1"),
-        "30" -> BigDecimal("30"),
-        "999" -> BigDecimal("999"),
-        "999999" -> BigDecimal("999999"),
-        "999999999" -> BigDecimal("999999999")
-      )
+        val form = new MaximumAmountPaidFormProvider()(affinityKey = key)
 
-      validValues.foreach { case (input, expectedValue) =>
-        val result = form.bind(Map(fieldName -> input))
+        val fieldName = "value"
 
-        result.errors mustBe empty
-        result.value.value mustBe expectedValue
-      }
-    }
+        val minimum = BigDecimal("0.01")
+        val maximum = BigDecimal("999999999")
 
-    "must bind valid decimal values up to two decimal places" in {
-      val validValues = Seq(
-        "0.01" -> BigDecimal("0.01"),
-        "28.60" -> BigDecimal("28.60"),
-        "999.99" -> BigDecimal("999.99"),
-        "999999.99" -> BigDecimal("999999.99")
-      )
+        val validDataGenerator =
+          Gen
+            .chooseNum(minimum.toInt, maximum.toInt)
+            .map(BigDecimal(_).setScale(2, RoundingMode.HALF_UP))
+            .map(_.toString)
 
-      validValues.foreach { case (input, expectedValue) =>
-        val result = form.bind(Map(fieldName -> input))
+        behave like fieldThatBindsValidData(
+          form,
+          fieldName,
+          validDataGenerator
+        )
 
-        result.errors mustBe empty
-        result.value.value mustBe expectedValue
-      }
-    }
+        behave like currencyField(
+          form,
+          fieldName,
+          nonNumericError =
+            FormError(fieldName, s"$key.sh03.maximumAmountPaid.error.nonNumeric"),
+          invalidNumericError =
+            FormError(fieldName, s"$key.sh03.maximumAmountPaid.error.invalidNumeric")
+        )
 
-    "must bind valid values containing commas" in {
-      val validValues = Seq(
-        "999,999" -> BigDecimal("999999"),
-        "1,000,000" -> BigDecimal("1000000"),
-        "999,999.99" -> BigDecimal("999999.99"),
-        "9,9" -> BigDecimal("99")
-      )
+        behave like currencyFieldWithMaximum(
+          form,
+          fieldName,
+          maximum,
+          FormError(
+            fieldName,
+            s"$key.sh03.maximumAmountPaid.error.aboveMaximum",
+            Seq(currencyFormat(maximum))
+          )
+        )
 
-      validValues.foreach {
-        case (input, expectedValue) =>
-        val result = form.bind(Map(fieldName -> input))
+        behave like mandatoryField(
+          form,
+          fieldName,
+          requiredError =
+            FormError(fieldName, s"$key.sh03.maximumAmountPaid.error.required")
+        )
 
-        result.errors mustBe empty
-        result.value.value mustBe expectedValue
-      }
-    }
-
-    "must not bind when the field is empty" in {
-      val result = form.bind(Map(fieldName -> "")).apply(fieldName)
-
-      result.errors must contain(FormError(fieldName, requiredKey))
-    }
-
-    "must not bind when the field only contains spaces" in {
-      val result = form.bind(Map(fieldName -> "   ")).apply(fieldName)
-
-      result.errors must contain(FormError(fieldName, requiredKey))
-    }
-
-    "must not bind non-numeric values" in {
-      val invalidValues = Seq(
-        "abc",
-        "invalid value",
-        "30 pounds",
-        "30a",
-        "30-"
-      )
-
-      invalidValues.foreach { input =>
-        val result = form.bind(Map(fieldName -> input)).apply(fieldName)
-
-        result.errors.map(_.message) must contain(invalidNumericKey)
-      }
-    }
-
-    "must not bind values with more than two decimal places" in {
-      val invalidValues = Seq(
-        "1.234",
-        "30.999",
-        "999999.999",
-        "999,999.999"
-      )
-
-      invalidValues.foreach { input =>
-        val result = form.bind(Map(fieldName -> input)).apply(fieldName)
-
-        result.errors.map(_.message) must contain(invalidNumericKey)
-      }
-    }
-
-    "must not bind invalid decimal formats" in {
-      val invalidValues = Seq(
-        "1..00",
-        "1.2.3",
-        "999.",
-        "999.",
-      )
-
-      invalidValues.foreach { input =>
-        val result = form.bind(Map(fieldName -> input))
-
-        result.errors.map(_.message) must contain(invalidNumericKey)
-      }
-    }
-
-    "must not bind negative values" in {
-      val result = form.bind(Map(fieldName -> "-1")).apply(fieldName)
-
-      result.errors.map(_.message) must contain(negativeKey)
-    }
-
-    "must not bind zero if the value must be at least 0.01" in {
-      val result = form.bind(Map(fieldName -> "0")).apply(fieldName)
-
-      result.errors.map(_.message) must contain(negativeKey)
-    }
-
-    "must not bind values above the maximum amount" in {
-      val invalidValues = Seq(
-        "1000000000",
-        "999999999.01",
-        "1,000,000,000"
-      )
-
-      invalidValues.foreach { input =>
-        val result = form.bind(Map(fieldName -> input)).apply(fieldName)
-
-        result.errors.map(_.message) must contain(aboveMaximumKey)
+        behave like currencyFieldWithMinimum(
+          form,
+          fieldName,
+          minimum = minimum,
+          expectedError =
+            FormError(fieldName, s"$key.sh03.maximumAmountPaid.error.belowMinimum", Seq(currencyFormat(minimum)))
+        )
       }
     }
   }
