@@ -17,7 +17,6 @@
 package controllers.sh03.organisations.single
 
 import base.SpecBase
-import org.scalatestplus.mockito.MockitoSugar
 import play.api.data.Form
 import play.api.inject
 import play.api.inject.bind
@@ -31,7 +30,7 @@ import uk.gov.hmrc.securitiestransferchargefrontend.navigation.Navigator
 import uk.gov.hmrc.securitiestransferchargefrontend.pages.sh03.OrgCompanyDetailsPage
 import uk.gov.hmrc.securitiestransferchargefrontend.views.html.sh03.organisations.single.CompanyDetailsView
 
-class CompanyDetailsControllerSpec extends SpecBase with MockitoSugar {
+class CompanyDetailsControllerSpec extends SpecBase{
 
   val formProvider = new CompanyDetailsFormProvider()
   val form: Form[String] = formProvider()
