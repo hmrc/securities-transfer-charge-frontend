@@ -76,7 +76,7 @@ class ForwardRoutes(answerPersistenceService: AnswerPersistenceService,
       dataRequired(WhatReliefAreYouApplyingForPage, userAnswers, sh03AgentSingleRoutes.DetailsOfThisSharePurchaseController.onPageLoad(NormalMode))
 
     case DetailsOfThisSharePurchasePage => userAnswers =>
-      dataDependent(CompanyDetailsPage, userAnswers) { companyDetails =>
+      dataDependent(CompanyDetailsPage, userAnswers) {companyDetails =>
         if (companyDetails.isPlc)
           sh03AgentSingleRoutes.MaximumAmountPaidController.onPageLoad(NormalMode)
         else
