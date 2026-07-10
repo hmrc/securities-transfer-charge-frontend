@@ -21,7 +21,7 @@ import play.api.mvc.{Action, AnyContent, Call, MessagesControllerComponents}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.actions.*
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.shared.SaveAndReturnButton.isReturn
-import uk.gov.hmrc.securitiestransferchargefrontend.forms.sh03.agents.single.ChargingPointFormProvider
+import uk.gov.hmrc.securitiestransferchargefrontend.forms.sh03.shared.ChargingPointFormProvider
 import uk.gov.hmrc.securitiestransferchargefrontend.models.{Mode, UserAnswers}
 import uk.gov.hmrc.securitiestransferchargefrontend.navigation.Navigator
 import uk.gov.hmrc.securitiestransferchargefrontend.pages.sh03.ChargingPointPage
@@ -47,7 +47,10 @@ class ChargingPointController @Inject()(
   def onPageLoad(mode: Mode): Action[AnyContent] = (stcAuthEnrolled andThen getData andThen requireData).async {
     implicit request =>
 
-      val form = formProvider()
+      val innerRequest = request.request
+      val affinityKey = innerRequest.affinityGroupKey
+
+      val form = formProvider(affinityKey)
 
       val preparedForm = request.userAnswers.get(ChargingPointPage) match {
         case None => form
@@ -60,7 +63,10 @@ class ChargingPointController @Inject()(
   def onSubmit(mode: Mode): Action[AnyContent] = (stcAuthEnrolled andThen getData andThen requireData).async {
     implicit request =>
 
-      val form = formProvider()
+      val innerRequest = request.request
+      val affinityKey = innerRequest.affinityGroupKey
+
+      val form = formProvider(affinityKey)
 
       form.bindFromRequest().fold(
         formWithErrors =>

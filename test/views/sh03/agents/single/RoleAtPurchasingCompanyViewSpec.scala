@@ -20,7 +20,7 @@ import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
 import play.api.Application
 import play.api.mvc.Call
-import uk.gov.hmrc.securitiestransferchargefrontend.forms.sh03.agents.single.RoleAtPurchasingCompanyFormProvider
+import uk.gov.hmrc.securitiestransferchargefrontend.forms.sh03.shared.RoleAtPurchasingCompanyFormProvider
 import uk.gov.hmrc.securitiestransferchargefrontend.models.NormalMode
 import uk.gov.hmrc.securitiestransferchargefrontend.views.html.sh03.agents.single.RoleAtPurchasingCompanyView
 import views.ViewBaseSpec
@@ -36,7 +36,7 @@ class RoleAtPurchasingCompanyViewSpec extends ViewBaseSpec {
   private val formProvider = new RoleAtPurchasingCompanyFormProvider()
   private val testBackLinkRoute: Call = Call("GET", "/back-link")
 
-  private val form = formProvider()
+  private val form = formProvider(affinityGroupKeyAgent)
 
   def view(): Document = Jsoup.parse(
     viewInstance(form, NormalMode, testBackLinkRoute)(fakeRequest, messages).body

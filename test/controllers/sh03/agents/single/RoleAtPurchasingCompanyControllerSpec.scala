@@ -23,9 +23,9 @@ import play.api.test.FakeRequest
 import play.api.test.Helpers.*
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.routes.JourneyRecoveryController
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.sh03.agents.single.routes
-import uk.gov.hmrc.securitiestransferchargefrontend.forms.sh03.agents.single.RoleAtPurchasingCompanyFormProvider
+import uk.gov.hmrc.securitiestransferchargefrontend.forms.sh03.shared.RoleAtPurchasingCompanyFormProvider
 import uk.gov.hmrc.securitiestransferchargefrontend.models.NormalMode
-import uk.gov.hmrc.securitiestransferchargefrontend.models.sh03.agents.RoleAtPurchasingCompany
+import uk.gov.hmrc.securitiestransferchargefrontend.models.sh03.shared.RoleAtPurchasingCompany
 import uk.gov.hmrc.securitiestransferchargefrontend.navigation.Navigator
 import uk.gov.hmrc.securitiestransferchargefrontend.pages.sh03.RoleAtPurchasingCompanyPage
 import uk.gov.hmrc.securitiestransferchargefrontend.views.html.sh03.agents.single.RoleAtPurchasingCompanyView
@@ -35,7 +35,7 @@ class RoleAtPurchasingCompanyControllerSpec extends SpecBase {
   lazy val roleAtPurchasingCompanyRoute: String = routes.RoleAtPurchasingCompanyController.onPageLoad(NormalMode).url
 
   val formProvider = new RoleAtPurchasingCompanyFormProvider()
-  val form: Form[RoleAtPurchasingCompany] = formProvider()
+  val form: Form[RoleAtPurchasingCompany] = formProvider(affinityGroupKeyAgent)
 
   val validData: RoleAtPurchasingCompany = RoleAtPurchasingCompany("director", None)
   val validUkSocietasData: RoleAtPurchasingCompany = RoleAtPurchasingCompany("ukSocietas", Some("Management Board"))

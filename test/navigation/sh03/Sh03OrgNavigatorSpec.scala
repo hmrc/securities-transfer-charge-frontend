@@ -18,18 +18,27 @@ package navigation.sh03
 
 import base.SpecBase
 import base.stubs.StubAnswerPersistenceService
+import org.mockito.Mockito.when
 import org.scalatest.concurrent.ScalaFutures
+import org.scalatestplus.mockito.MockitoSugar.mock
 import play.api.mvc.Call
+import uk.gov.hmrc.securitiestransferchargefrontend.config.FrontendAppConfig
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.routes
 import uk.gov.hmrc.securitiestransferchargefrontend.models.sh03.HowToNotifyAboutShareBuyback
 import uk.gov.hmrc.securitiestransferchargefrontend.models.{CheckMode, NormalMode}
+import uk.gov.hmrc.securitiestransferchargefrontend.controllers.sh03.organisations.single.routes as sh03OrgSingleRoutes
 import uk.gov.hmrc.securitiestransferchargefrontend.navigation.sh03.organisations.Sh03OrgNavigator
 import uk.gov.hmrc.securitiestransferchargefrontend.pages.Page
 import uk.gov.hmrc.securitiestransferchargefrontend.pages.sh03.*
 
+import java.time.LocalDate
+
 class Sh03OrgNavigatorSpec extends SpecBase with ScalaFutures {
 
-  val navigator = new Sh03OrgNavigator(StubAnswerPersistenceService())
+  private val mockConfig: FrontendAppConfig = mock[FrontendAppConfig]
+  when(mockConfig.firstChargingPoint).thenReturn(LocalDate.of(2026, 1, 1))
+  
+  val navigator = new Sh03OrgNavigator(StubAnswerPersistenceService(), mockConfig)
 
   "Sh03OrgNavigator" - {
 
@@ -51,11 +60,11 @@ class Sh03OrgNavigatorSpec extends SpecBase with ScalaFutures {
         }
       }
 
-      "must go from HowToNotifyAboutShareBuyback to default page (placeholder) when 'One at a time' is selected" in {
-        val answers = emptyUserAnswers.set(HowToNotifyAboutShareBuybackPage, HowToNotifyAboutShareBuyback.OneAtATime).success.value
+      "must go from HowToNotifyAboutShareBuyback to CompanyDetailsController when 'One at a time' is selected" in {
+        val answers = emptyUserAnswers.set(HowToNotifyAboutShareBuybackPage, HowToNotifyAboutShareBuyback.OneAtATime).get
         val result = navigator.nextPage(HowToNotifyAboutShareBuybackPage, NormalMode, answers)(fakeRequest)
-        whenReady(result) { (res: Call) =>
-          res mustEqual navigator.defaultPage
+        whenReady(result) { res =>
+          res mustBe sh03OrgSingleRoutes.CompanyDetailsController.onPageLoad(NormalMode)
         }
       }
 

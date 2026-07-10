@@ -33,15 +33,15 @@ import javax.inject.{Inject, Named}
 import scala.concurrent.{ExecutionContext, Future}
 
 class CompanyDetailsController @Inject()(
-  override val messagesApi: MessagesApi,
-  stcAuthEnrolled: StcAuthEnrolledAction,
-  getData: StcDataRetrievalAction,
-  requireData: StcDataRequiredAction,
-  formProvider: CompanyDetailsFormProvider,
-  val controllerComponents: MessagesControllerComponents,
-  view: CompanyDetailsView,
-  @Named("agentsSh03") navigator: Navigator,
-)(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport {
+                                override val messagesApi: MessagesApi,
+                                stcAuthEnrolled: StcAuthEnrolledAction,
+                                getData: StcDataRetrievalAction,
+                                requireData: StcDataRequiredAction,
+                                formProvider: CompanyDetailsFormProvider,
+                                val controllerComponents: MessagesControllerComponents,
+                                view: CompanyDetailsView,
+                                @Named("agentsSh03") navigator: Navigator,
+                              )(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport {
 
   lazy val backLinkCall: Mode => UserAnswers => Call =
     mode => userAnswers => navigator.previousPage(CompanyDetailsPage, mode, userAnswers)

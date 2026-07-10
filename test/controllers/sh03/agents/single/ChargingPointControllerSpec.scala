@@ -25,7 +25,7 @@ import play.api.test.FakeRequest
 import play.api.test.Helpers.*
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.routes
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.sh03.agents.single.routes as agentSh03Routes
-import uk.gov.hmrc.securitiestransferchargefrontend.forms.sh03.agents.single.ChargingPointFormProvider
+import uk.gov.hmrc.securitiestransferchargefrontend.forms.sh03.shared.ChargingPointFormProvider
 import uk.gov.hmrc.securitiestransferchargefrontend.models.{NormalMode, UserAnswers}
 import uk.gov.hmrc.securitiestransferchargefrontend.navigation.Navigator
 import uk.gov.hmrc.securitiestransferchargefrontend.pages.sh03.ChargingPointPage
@@ -38,7 +38,7 @@ class ChargingPointControllerSpec extends SpecBase with MockitoSugar {
   private implicit val messages: Messages = stubMessages()
 
   private val formProvider = new ChargingPointFormProvider()
-  private def form = formProvider()
+  private def form = formProvider(affinityGroupKeyAgent)
   
   val validAnswer: LocalDate = LocalDate.now(ZoneOffset.UTC)
 

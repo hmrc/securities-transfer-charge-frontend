@@ -24,8 +24,8 @@ import play.api.test.FakeRequest
 import play.api.test.Helpers.*
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.routes
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.sh03.agents.single.routes as agentSingleRoutes
-import uk.gov.hmrc.securitiestransferchargefrontend.forms.sh03.agents.single.DetailsOfThisSharePurchaseFormProvider
-import uk.gov.hmrc.securitiestransferchargefrontend.models.sh03.agents.DetailsOfThisSharePurchase
+import uk.gov.hmrc.securitiestransferchargefrontend.forms.sh03.shared.DetailsOfThisSharePurchaseFormProvider
+import uk.gov.hmrc.securitiestransferchargefrontend.models.sh03.shared.DetailsOfThisSharePurchase
 import uk.gov.hmrc.securitiestransferchargefrontend.models.{NormalMode, UserAnswers}
 import uk.gov.hmrc.securitiestransferchargefrontend.navigation.Navigator
 import uk.gov.hmrc.securitiestransferchargefrontend.pages.sh03.{ConnectedPersonsPage, DetailsOfThisSharePurchasePage}
@@ -93,6 +93,7 @@ class DetailsOfThisSharePurchaseControllerSpec extends SpecBase with MockitoSuga
 
       val application =
         applicationBuilder(userAnswers = Some(updatedAnswers), affinityGroup = agentAffinity)
+          .overrides(bind[Navigator].qualifiedWith("agentsSh03").toInstance(getNavigator))
           .build()
 
       running(application) {
@@ -109,7 +110,7 @@ class DetailsOfThisSharePurchaseControllerSpec extends SpecBase with MockitoSuga
         val result = route(application, request).value
 
         status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual routes.JourneyRecoveryController.onPageLoad().url
+        redirectLocation(result).value mustEqual testNextPage.url
       }
     }
 

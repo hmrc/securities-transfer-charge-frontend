@@ -19,7 +19,7 @@ package views.sh03.agents.single
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
 import play.api.Application
-import uk.gov.hmrc.securitiestransferchargefrontend.forms.sh03.agents.single.ReasonForPurchaseFormProvider
+import uk.gov.hmrc.securitiestransferchargefrontend.forms.sh03.shared.ReasonForPurchaseFormProvider
 import uk.gov.hmrc.securitiestransferchargefrontend.models.NormalMode
 import uk.gov.hmrc.securitiestransferchargefrontend.views.html.sh03.agents.single.ReasonForPurchaseView
 import views.ViewBaseSpec
