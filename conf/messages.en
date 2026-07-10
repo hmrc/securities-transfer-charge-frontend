@@ -1036,6 +1036,20 @@ org.sh03.minimumAmountPaid.error.negative = The minimum amount paid for the shar
 org.sh03.minimumAmountPaid.error.belowMinimum = The minimum amount paid for the shares must be £0.01 or more
 org.sh03.minimumAmountPaid.error.aboveMaximum = The minimum amount paid for the shares must be £999,999,999 or less
 
+org.sh03.cannotSubmitFormError.title = You cannot submit this form
+org.sh03.cannotSubmitFormError.heading = You cannot submit this form
+org.sh03.cannotSubmitFormError.p1 = The details of this share buyback must be provided by someone in an approved role at the company.
+org.sh03.cannotSubmitFormError.p2 = Approved roles include:
+org.sh03.cannotSubmitFormError.item1 = Director
+org.sh03.cannotSubmitFormError.item2 = Secretary
+org.sh03.cannotSubmitFormError.item3 = Person authorised under section 270 or 274 of the Companies Act 2026
+org.sh03.cannotSubmitFormError.item4 = Administrator
+org.sh03.cannotSubmitFormError.item5 = Receiver
+org.sh03.cannotSubmitFormError.item6 = Receiver manager
+org.sh03.cannotSubmitFormError.item7 = CIC manager
+org.sh03.cannotSubmitFormError.item8 = Someone submitting on behalf of a UK Societas (UKS)
+org.sh03.cannotSubmitFormError.p3 = You can save your submission as a draft, and submit it once you have this information.
+
 org.sh03.applyingForRelief.title = Is the business applying for a relief?
 org.sh03.applyingForRelief.heading = Is the business applying for a relief?
 org.sh03.applyingForRelief.checkYourAnswersLabel = Is the business applying for a relief?

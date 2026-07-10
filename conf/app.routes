@@ -403,6 +403,8 @@ POST       /sh03/org/minimum-share-price                               uk.gov.hm
 GET        /sh03/org/change/minimum-share-price                        uk.gov.hmrc.securitiestransferchargefrontend.controllers.sh03.organisations.single.MinimumAmountPaidController.onPageLoad(mode: Mode = CheckMode)
 POST       /sh03/org/change/minimum-share-price                        uk.gov.hmrc.securitiestransferchargefrontend.controllers.sh03.organisations.single.MinimumAmountPaidController.onSubmit(mode: Mode = CheckMode)
 
+GET        /sh03/org/cannot-submit-form                       uk.gov.hmrc.securitiestransferchargefrontend.controllers.sh03.organisations.single.CannotSubmitFormErrorController.onPageLoad()
+
 GET        /sh03/org/apply-relief                               uk.gov.hmrc.securitiestransferchargefrontend.controllers.sh03.organisations.single.ApplyingForReliefController.onPageLoad(mode: Mode = NormalMode)
 POST       /sh03/org/apply-relief                               uk.gov.hmrc.securitiestransferchargefrontend.controllers.sh03.organisations.single.ApplyingForReliefController.onSubmit(mode: Mode = NormalMode)
 GET        /sh03/org/change/apply-relief                        uk.gov.hmrc.securitiestransferchargefrontend.controllers.sh03.organisations.single.ApplyingForReliefController.onPageLoad(mode: Mode = CheckMode)

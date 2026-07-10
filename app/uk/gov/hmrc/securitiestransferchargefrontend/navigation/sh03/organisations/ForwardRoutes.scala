@@ -22,7 +22,7 @@ import uk.gov.hmrc.securitiestransferchargefrontend.config.FrontendAppConfig
 import uk.gov.hmrc.securitiestransferchargefrontend.models.sh03.HowToNotifyAboutShareBuyback.{MoreThanOneAtATime, OneAtATime}
 import uk.gov.hmrc.securitiestransferchargefrontend.models.{NormalMode, UserAnswers}
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.sh03.organisations.single.routes as sh03OrgSingleRoutes
-import uk.gov.hmrc.securitiestransferchargefrontend.models.sh03.shared.ReasonForPurchase
+import uk.gov.hmrc.securitiestransferchargefrontend.models.sh03.shared.{ReasonForPurchase, RoleAtPurchasingCompany}
 import uk.gov.hmrc.securitiestransferchargefrontend.navigation.PersistentNavigationHelper
 import uk.gov.hmrc.securitiestransferchargefrontend.pages.Page
 import uk.gov.hmrc.securitiestransferchargefrontend.pages.sh03.*
@@ -57,7 +57,7 @@ class ForwardRoutes(
     }
     case TreasurySharesPage => userAnswers => dataRequired(TreasurySharesPage, userAnswers, sh03OrgSingleRoutes.ConnectedPersonsController.onPageLoad(NormalMode))
     case ConnectedPersonsPage => userAnswers =>  dataRequired(ConnectedPersonsPage, userAnswers, defaultPage)
-    case DetailsOfThisSharePurchasePage => userAnswers => dataDependent(CompanyDetailsPage, userAnswers) {companyDetails =>
+    case DetailsOfThisSharePurchasePage => userAnswers => dataDependent(CompanyDetailsPage, userAnswers) { companyDetails =>
       if (companyDetails.isPlc)
         defaultPage
       else
@@ -65,9 +65,18 @@ class ForwardRoutes(
     }
     case MinimumAmountPaidPage => userAnswers => dataRequired(MinimumAmountPaidPage, userAnswers, sh03OrgSingleRoutes.ChargingPointController.onPageLoad(NormalMode))
     case ChargingPointPage => userAnswers =>
-      dataDependent(ChargingPointPage, userAnswers) {enterDate =>
+      dataDependent(ChargingPointPage, userAnswers) { enterDate =>
         if (enterDate.isBefore(firstDate)) defaultPage
         else defaultPage
+      }
+
+    case RoleAtPurchasingCompanyPage => userAnswers =>
+      dataDependent(RoleAtPurchasingCompanyPage, userAnswers) {
+        roleAtPurchasingCompany =>
+          if (roleAtPurchasingCompany.role == RoleAtPurchasingCompany.unsupportedRole)
+            sh03OrgSingleRoutes.CannotSubmitFormErrorController.onPageLoad()
+          else
+            defaultPage
       }
     case ApplyingForReliefPage => userAnswers =>
       dataDependent(ApplyingForReliefPage, userAnswers) {
@@ -76,4 +85,5 @@ class ForwardRoutes(
       }
     case _ => _ => Future.successful(defaultPage)
   }
+
 }
