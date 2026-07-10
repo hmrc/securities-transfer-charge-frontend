@@ -24,6 +24,7 @@
 @import uk.gov.hmrc.govukfrontend.views.Implicits.RichSelect
 @import uk.gov.hmrc.securitiestransferchargefrontend.models.Relief
 @import uk.gov.hmrc.securitiestransferchargefrontend.views.html.components.SaveAndReturnButton
+@import uk.gov.hmrc.securitiestransferchargefrontend.config.FrontendAppConfig
 
 
 
@@ -34,13 +35,15 @@
   govukSelect: GovukSelect,
   govukButton: GovukButton,
   hmrcNewTabLinkHelper: HmrcNewTabLinkHelper,
+  config: FrontendAppConfig,
   saveAndReturnButton:SaveAndReturnButton
 )
 
 @(form: Form[_], mode: Mode, reliefs: Seq[Relief], backLinkCall: Call)(implicit request: Request[_], messages: Messages)
 
 @link = @{ hmrcNewTabLinkHelper(NewTabLinkHelper(
-    text = messages("org.whatReliefAreYouApplyingFor.details.content.link.text")
+    text = messages("org.whatReliefAreYouApplyingFor.details.content.link.text"),
+    href = Some(config.reliefsGuidanceUrl)
 )) }
 
 @layout(
