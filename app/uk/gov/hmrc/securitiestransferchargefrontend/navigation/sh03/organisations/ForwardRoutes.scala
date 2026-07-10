@@ -66,6 +66,11 @@ class ForwardRoutes(
         if (enterDate.isBefore(firstDate)) defaultPage
         else defaultPage
       }
+    case ApplyingForReliefPage => userAnswers =>
+      dataDependent(ApplyingForReliefPage, userAnswers) {
+        case false => defaultPage
+        case true => defaultPage
+      }
     case _ => _ => Future.successful(defaultPage)
   }
   

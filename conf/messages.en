@@ -991,3 +991,11 @@ org.sh03.minimumAmountPaid.error.nonNumeric = The minimum amount paid for the sh
 org.sh03.minimumAmountPaid.error.negative = The minimum amount paid for the shares must be £0.01 or more
 org.sh03.minimumAmountPaid.error.belowMinimum = The minimum amount paid for the shares must be £0.01 or more
 org.sh03.minimumAmountPaid.error.aboveMaximum = The minimum amount paid for the shares must be £999,999,999 or less
+
+org.sh03.applyingForRelief.title = Is the business applying for a relief?
+org.sh03.applyingForRelief.heading = Is the business applying for a relief?
+org.sh03.applyingForRelief.checkYourAnswersLabel = Is the business applying for a relief?
+org.sh03.applyingForRelief.error.required = Select yes if the business is applying for a relief
+org.sh03.applyingForRelief.change.hidden = Change applying for a relief
+org.sh03.applyingForRelief.p = See a
+org.sh03.applyingForRelief.details.content.link.text = full list of reliefs
