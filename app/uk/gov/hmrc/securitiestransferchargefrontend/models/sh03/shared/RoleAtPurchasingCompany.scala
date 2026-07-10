@@ -14,10 +14,9 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.securitiestransferchargefrontend.models.sh03.agents
+package uk.gov.hmrc.securitiestransferchargefrontend.models.sh03.shared
 
 import play.api.libs.json.*
-
 case class RoleAtPurchasingCompany(role: String, uksOrgan: Option[String])
 
 object RoleAtPurchasingCompany {

@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package views.sh03.agents.single
+package views.sh03.organisations.single
 
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
@@ -22,21 +22,21 @@ import play.api.Application
 import play.api.mvc.Call
 import uk.gov.hmrc.securitiestransferchargefrontend.forms.sh03.shared.RoleAtPurchasingCompanyFormProvider
 import uk.gov.hmrc.securitiestransferchargefrontend.models.NormalMode
-import uk.gov.hmrc.securitiestransferchargefrontend.views.html.sh03.agents.single.RoleAtPurchasingCompanyView
+import uk.gov.hmrc.securitiestransferchargefrontend.views.html.sh03.organisations.single.RoleAtPurchasingCompanyView
 import views.ViewBaseSpec
 
 class RoleAtPurchasingCompanyViewSpec extends ViewBaseSpec {
 
   override def fakeApplication(): Application =
-    applicationBuilder(affinityGroup = agentAffinity).build()
+    applicationBuilder(affinityGroup = orgAffinity).build()
 
-  private val messageKeyPrefix = "agent.sh03.roleAtPurchasingCompany"
+  private val messageKeyPrefix = "org.sh03.roleAtPurchasingCompany"
 
   private val viewInstance = app.injector.instanceOf[RoleAtPurchasingCompanyView]
   private val formProvider = new RoleAtPurchasingCompanyFormProvider()
   private val testBackLinkRoute: Call = Call("GET", "/back-link")
 
-  private val form = formProvider(affinityGroupKeyAgent)
+  private val form = formProvider(affinityGroupKeyOrg)
 
   def view(): Document = Jsoup.parse(
     viewInstance(form, NormalMode, testBackLinkRoute)(fakeRequest, messages).body
@@ -118,7 +118,7 @@ class RoleAtPurchasingCompanyViewSpec extends ViewBaseSpec {
         val doc = Jsoup.parse(viewInstance(formWithErrors, NormalMode, testBackLinkRoute)(fakeRequest, messages).body)
 
         doc.hasErrorSummary mustBe true
-        doc.select(".govuk-error-summary").text() must include(messages("agent.sh03.roleAtPurchasingCompany.error.required"))
+        doc.select(".govuk-error-summary").text() must include(messages("org.sh03.roleAtPurchasingCompany.error.required"))
       }
 
       "must show an error when UK Societas is selected but no organ name is provided" in {
