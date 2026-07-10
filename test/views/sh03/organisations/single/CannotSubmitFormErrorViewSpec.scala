@@ -20,6 +20,8 @@ import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
 import play.api.Application
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.shared.routes
+import uk.gov.hmrc.securitiestransferchargefrontend.controllers.sh03.organisations.single.routes as sh03OrgSingleRoutes
+import uk.gov.hmrc.securitiestransferchargefrontend.models.NormalMode
 import uk.gov.hmrc.securitiestransferchargefrontend.views.html.sh03.organisations.single.CannotSubmitFormErrorView
 import views.ViewBaseSpec
 
@@ -53,7 +55,7 @@ class CannotSubmitFormErrorViewSpec extends ViewBaseSpec {
 
     val saveAndReturnLink: String = messages("save-and-return-to-dashboard.link")
 
-    val backLinkUrl: String = "#"
+    val backLinkUrl: String = sh03OrgSingleRoutes.RoleAtPurchasingCompanyController.onPageLoad(NormalMode).url
   }
 
   "The CannotSubmitFormErrorView" - {
@@ -116,7 +118,7 @@ class CannotSubmitFormErrorViewSpec extends ViewBaseSpec {
         cannotSubmitFormErrorView.para(3) mustBe Some(ExpectedContent.para3Value)
       }
 
-      "back link url points to temporary stub #" in {
+      "back link url to the role purchasing company page" in {
         cannotSubmitFormErrorView.select(".govuk-back-link").attr("href") mustBe ExpectedContent.backLinkUrl
       }
 

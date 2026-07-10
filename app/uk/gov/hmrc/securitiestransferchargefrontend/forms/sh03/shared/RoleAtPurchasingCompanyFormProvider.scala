@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.securitiestransferchargefrontend.forms.sh03.agents.single
+package uk.gov.hmrc.securitiestransferchargefrontend.forms.sh03.shared
 
 import play.api.data.Forms.*
 import play.api.data.format.Formatter
@@ -25,7 +25,7 @@ import javax.inject.Inject
 
 class RoleAtPurchasingCompanyFormProvider @Inject() {
 
-  private val uksOrganFormatter: Formatter[Option[String]] = new Formatter[Option[String]] {
+  private def uksOrganFormatter(affinityKey:String): Formatter[Option[String]] = new Formatter[Option[String]] {
 
     override def bind(key: String, data: Map[String, String]): Either[Seq[FormError], Option[String]] = {
       val role = data.getOrElse("role", "")
@@ -33,8 +33,8 @@ class RoleAtPurchasingCompanyFormProvider @Inject() {
 
       if (role == "ukSocietas") {
         uksOrgan match {
-          case None => Left(Seq(FormError(key, "agent.sh03.roleAtPurchasingCompany.uksOrgan.error.required")))
-          case Some(str) if str.length > 100 => Left(Seq(FormError(key, "agent.sh03.roleAtPurchasingCompany.uksOrgan.error.length")))
+          case None => Left(Seq(FormError(key, s"$affinityKey.sh03.roleAtPurchasingCompany.uksOrgan.error.required")))
+          case Some(str) if str.length > 100 => Left(Seq(FormError(key, s"$affinityKey.sh03.roleAtPurchasingCompany.uksOrgan.error.length")))
           case Some(str) => Right(Some(str))
         }
       } else {
@@ -46,10 +46,10 @@ class RoleAtPurchasingCompanyFormProvider @Inject() {
       value.map(v => Map(key -> v)).getOrElse(Map.empty)
   }
 
-  def apply(): Form[RoleAtPurchasingCompany] = Form(
+  def apply(affinityKey:String): Form[RoleAtPurchasingCompany] = Form(
     mapping(
-      "role" -> default(text, "").verifying("agent.sh03.roleAtPurchasingCompany.error.required", _.trim.nonEmpty),
-      "uksOrgan" -> of(uksOrganFormatter)
+      "role" -> default(text, "").verifying(s"$affinityKey.sh03.roleAtPurchasingCompany.error.required", _.trim.nonEmpty),
+      "uksOrgan" -> of(uksOrganFormatter(affinityKey))
     )(RoleAtPurchasingCompany.apply)(o => Some((o.role, o.uksOrgan)))
   )
 }

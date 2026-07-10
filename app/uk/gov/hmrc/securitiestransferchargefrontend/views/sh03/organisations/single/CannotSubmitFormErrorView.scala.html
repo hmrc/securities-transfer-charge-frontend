@@ -26,8 +26,7 @@ govukButton: GovukButton
 
 @()(implicit request: Request[_], messages: Messages)
 
-@* Note: The backlink is pointed to the Role page, aligning with Scenario 3. Update this route if the org controller has a different name. *@
-@layout(pageTitle = titleNoForm(messages("org.sh03.cannotSubmitFormError.title"), Some(messages("sh03.section.name"))), backLinkUrl = Some("#")) {
+@layout(pageTitle = titleNoForm(messages("org.sh03.cannotSubmitFormError.title"), Some(messages("sh03.section.name"))), backLinkUrl = Some(sh03OrgSingleRoutes.RoleAtPurchasingCompanyController.onPageLoad(NormalMode).url)) {
 
 <h1 class="govuk-heading-l">@messages("org.sh03.cannotSubmitFormError.heading")</h1>
 
