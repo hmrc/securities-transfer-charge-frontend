@@ -23,7 +23,6 @@ import uk.gov.hmrc.securitiestransferchargefrontend.forms.sh03.organisations.sin
 class WhatReliefAreYouApplyingForFormProviderSpec extends StringFieldBehaviours {
 
   val requiredKey = "org.sh03.whatReliefAreYouApplyingFor.error.required"
-  val lengthKey = "org.sh03.whatReliefAreYouApplyingFor.error.length"
 
   val form = new WhatReliefAreYouApplyingForFormProvider()()
 
@@ -34,7 +33,7 @@ class WhatReliefAreYouApplyingForFormProviderSpec extends StringFieldBehaviours 
     behave like fieldThatBindsValidData(
       form,
       fieldName,
-      "value"
+      "relief"
     )
 
 

@@ -25,6 +25,6 @@ class WhatReliefAreYouApplyingForFormProvider @Inject() extends Mappings {
 
   def apply(): Form[String] =
     Form(
-      "reliefs" -> text("org.sh03.whatReliefAreYouApplyingForView.error.required")
+      "reliefs" -> text("org.sh03.whatReliefAreYouApplyingFor.error.required")
     )
 }
