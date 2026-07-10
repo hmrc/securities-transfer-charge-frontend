@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.securitiestransferchargefrontend.controllers.sh03.agents.single
+package uk.gov.hmrc.securitiestransferchargefrontend.controllers.sh03.organisations.single
 
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, Call, MessagesControllerComponents}
@@ -23,18 +23,19 @@ import uk.gov.hmrc.securitiestransferchargefrontend.controllers.actions.*
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.actions.requests.StcDataRequest
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.shared.SaveAndReturnButton.isReturn
 import uk.gov.hmrc.securitiestransferchargefrontend.forms.sh03.shared.DetailsOfThisSharePurchaseFormProvider
+import uk.gov.hmrc.securitiestransferchargefrontend.models.sh03.shared.DetailsOfThisSharePurchase
 import uk.gov.hmrc.securitiestransferchargefrontend.models.{Mode, UserAnswers}
 import uk.gov.hmrc.securitiestransferchargefrontend.navigation.Navigator
 import uk.gov.hmrc.securitiestransferchargefrontend.pages.sh03.DetailsOfThisSharePurchasePage
 import uk.gov.hmrc.securitiestransferchargefrontend.utils.CommonHelpers.requireMarketValue
-import uk.gov.hmrc.securitiestransferchargefrontend.views.html.sh03.agents.single.DetailsOfThisSharePurchaseView
+import uk.gov.hmrc.securitiestransferchargefrontend.views.html.sh03.organisations.single.DetailsOfThisSharePurchaseView
 
 import javax.inject.{Inject, Named}
 import scala.concurrent.{ExecutionContext, Future}
 
 class DetailsOfThisSharePurchaseController @Inject()(
                                       override val messagesApi: MessagesApi,
-                                      @Named("agentsSh03") navigator: Navigator,
+                                      @Named("orgSh03") navigator: Navigator,
                                       stcAuthEnrolled: StcAuthEnrolledAction,
                                       getData: StcDataRetrievalAction,
                                       requireData: StcDataRequiredAction,
@@ -45,7 +46,6 @@ class DetailsOfThisSharePurchaseController @Inject()(
 
   private def form(implicit request: StcDataRequest[_]) =
     formProvider(requireMarketValue,request.request.affinityGroupKey)
-
 
   lazy val backLinkCall: Mode => UserAnswers => Call =
     mode => userAnswers => navigator.previousPage(DetailsOfThisSharePurchasePage, mode, userAnswers)
@@ -63,6 +63,7 @@ class DetailsOfThisSharePurchaseController @Inject()(
 
   def onSubmit(mode: Mode): Action[AnyContent] = (stcAuthEnrolled andThen getData andThen requireData).async {
     implicit request =>
+
       form.bindFromRequest().fold(
         formWithErrors =>
           Future.successful(BadRequest(view(formWithErrors, mode, backLinkCall(mode)(request.userAnswers), requireMarketValue))),

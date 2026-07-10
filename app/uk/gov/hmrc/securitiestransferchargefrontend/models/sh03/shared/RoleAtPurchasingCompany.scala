@@ -14,13 +14,12 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.securitiestransferchargefrontend.models.sh03.agents
+package uk.gov.hmrc.securitiestransferchargefrontend.models.sh03.shared
 
 import play.api.libs.json.*
+case class RoleAtPurchasingCompany(role: String, uksOrgan: Option[String])
 
-case class DetailsOfThisSharePurchase (numberOfShares: Int, typeOfShares: String, amountPaid: BigDecimal, marketValue: Option[BigDecimal])
-
-object DetailsOfThisSharePurchase {
-
-  implicit val format: OFormat[DetailsOfThisSharePurchase] = Json.format
+object RoleAtPurchasingCompany {
+  val unsupportedRole = "unsupportedRole"
+  implicit val format: OFormat[RoleAtPurchasingCompany] = Json.format[RoleAtPurchasingCompany]
 }
