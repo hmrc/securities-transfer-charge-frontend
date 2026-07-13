@@ -33,7 +33,7 @@ import uk.gov.hmrc.securitiestransferchargefrontend.views.html.sh03.organisation
 class MaximumAmountPaidControllerSpec extends SpecBase with MockitoSugar {
 
   val formProvider = new MaximumAmountPaidFormProvider()
-  val form: Form[BigDecimal] = formProvider(affinityKey=affinityGroupKeyAgent)
+  val form: Form[BigDecimal] = formProvider(affinityKey=affinityGroupKeyOrg)
 
   val validAnswer: BigDecimal = BigDecimal("999999")
 

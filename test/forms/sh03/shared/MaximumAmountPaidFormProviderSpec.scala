@@ -85,7 +85,7 @@ class MaximumAmountPaidFormProviderSpec extends CurrencyFieldBehaviours {
           fieldName,
           minimum = minimum,
           expectedError =
-            FormError(fieldName, s"$key.sh03.maximumAmountPaid.error.belowMinimum", Seq(currencyFormat(minimum)))
+            FormError(fieldName, s"$key.sh03.maximumAmountPaid.error.belowMaximum", Seq(currencyFormat(minimum)))
         )
       }
     }

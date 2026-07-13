@@ -36,7 +36,7 @@ class MaximumAmountPaidFormProvider @Inject() extends Mappings {
       )
         .verifying(
           firstError(
-            minimumCurrency(minValue, s"$affinityKey.sh03.maximumAmountPaid.error.belowMinimum"),
+            minimumCurrency(minValue, s"$affinityKey.sh03.maximumAmountPaid.error.belowMaximum"),
             maximumCurrency(maxValue, s"$affinityKey.sh03.maximumAmountPaid.error.aboveMaximum")
           )
         )

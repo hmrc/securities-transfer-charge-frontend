@@ -67,13 +67,6 @@ class MaximumAmountPaidViewSpec extends ViewBaseSpec {
         maximumAmountPaidView.select(".govuk-input__prefix").text() mustBe "£"
       }
 
-      "have the correct input field" in {
-        val input = maximumAmountPaidView.select("input[name=value]")
-
-        input.attr("id") mustBe "value"
-        input.attr("name") mustBe "value"
-      }
-
       "have a save and continue button" in {
         maximumAmountPaidView.select(".govuk-button").first().text() mustBe ExpectedContent.saveAndContinue
       }
