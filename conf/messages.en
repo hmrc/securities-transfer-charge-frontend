@@ -908,7 +908,7 @@ agent.sh03.maximumAmountPaid.error.required = Enter the maximum amount paid for 
 agent.sh03.maximumAmountPaid.error.invalidNumeric = The maximum amount paid for the shares must be a number and can include up to two decimal places, like £30 or £28.60
 agent.sh03.maximumAmountPaid.error.negative = The maximum amount paid for the shares must be £0.01 or more
 agent.sh03.maximumAmountPaid.error.aboveMaximum = The maximum amount paid for the shares must be £999,999,999 or less
-agent.sh03.maximumAmountPaid.error.belowMaximum = The maximum amount paid for the shares must be £0.01 or more
+agent.sh03.maximumAmountPaid.error.belowMinimum = The maximum amount paid for the shares must be £0.01 or more
 agent.sh03.maximumAmountPaid.change.hidden = Change the maximum amount paid for the shares
 
 agent.sh03.cannotSubmitFormError.title = You cannot submit this form
@@ -1052,7 +1052,7 @@ org.sh03.maximumAmountPaid.error.required = Enter the maximum amount paid for th
 org.sh03.maximumAmountPaid.error.invalidNumeric = The maximum amount paid for the shares must be a number and can include up to two decimal places, like £30 or £28.60
 org.sh03.maximumAmountPaid.error.negative = The maximum amount paid for the shares must be £0.01 or more
 org.sh03.maximumAmountPaid.error.aboveMaximum = The maximum amount paid for the shares must be £999,999,999 or less
-org.sh03.maximumAmountPaid.error.belowMaximum = The maximum amount paid for the shares must be £0.01 or more
+org.sh03.maximumAmountPaid.error.belowMinimum = The maximum amount paid for the shares must be £0.01 or more
 org.sh03.maximumAmountPaid.change.hidden = Change the maximum amount paid for the shares
 
 org.sh03.cannotSubmitFormError.title = You cannot submit this form
