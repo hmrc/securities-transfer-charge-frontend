@@ -1049,3 +1049,11 @@ org.sh03.cannotSubmitFormError.item6 = Receiver manager
 org.sh03.cannotSubmitFormError.item7 = CIC manager
 org.sh03.cannotSubmitFormError.item8 = Someone submitting on behalf of a UK Societas (UKS)
 org.sh03.cannotSubmitFormError.p3 = You can save your submission as a draft, and submit it once you have this information.
+
+org.sh03.applyingForRelief.title = Is the business applying for a relief?
+org.sh03.applyingForRelief.heading = Is the business applying for a relief?
+org.sh03.applyingForRelief.checkYourAnswersLabel = Is the business applying for a relief?
+org.sh03.applyingForRelief.error.required = Select yes if the business is applying for a relief
+org.sh03.applyingForRelief.change.hidden = Change applying for a relief
+org.sh03.applyingForRelief.p = See a
+org.sh03.applyingForRelief.details.content.link.text = full list of reliefs
