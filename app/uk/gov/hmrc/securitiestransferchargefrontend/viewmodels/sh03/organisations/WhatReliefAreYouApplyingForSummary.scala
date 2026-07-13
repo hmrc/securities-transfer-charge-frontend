@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.securitiestransferchargefrontend.viewmodels.sh03.organisations.single
+package uk.gov.hmrc.securitiestransferchargefrontend.viewmodels.sh03.organisations
 
 import play.api.i18n.Messages
 import play.twirl.api.HtmlFormat
@@ -32,11 +32,11 @@ object WhatReliefAreYouApplyingForSummary  {
       answer =>
 
         SummaryListRowViewModel(
-          key     = "whatReliefAreYouApplyingForView.checkYourAnswersLabel",
+          key     = "org.sh03.whatReliefAreYouApplyingForView.checkYourAnswersLabel",
           value   = ValueViewModel(HtmlFormat.escape(answer).toString),
           actions = Seq(
             ActionItemViewModel("site.change", routes.WhatReliefAreYouApplyingForController.onPageLoad(CheckMode).url)
-              .withVisuallyHiddenText(messages("whatReliefAreYouApplyingForView.change.hidden"))
+              .withVisuallyHiddenText(messages("org.sh03.whatReliefAreYouApplyingForView.change.hidden"))
           )
         )
     }
