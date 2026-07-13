@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.securitiestransferchargefrontend.controllers.sh03.agents.single
+package uk.gov.hmrc.securitiestransferchargefrontend.controllers.sh03.organisations.single
 
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, Call, MessagesControllerComponents}
@@ -26,23 +26,24 @@ import uk.gov.hmrc.securitiestransferchargefrontend.forms.sh03.shared.MaximumAmo
 import uk.gov.hmrc.securitiestransferchargefrontend.models.{Mode, UserAnswers}
 import uk.gov.hmrc.securitiestransferchargefrontend.navigation.Navigator
 import uk.gov.hmrc.securitiestransferchargefrontend.pages.sh03.MaximumAmountPaidPage
-import uk.gov.hmrc.securitiestransferchargefrontend.views.html.sh03.agents.single.MaximumAmountPaidView
+import uk.gov.hmrc.securitiestransferchargefrontend.views.html.sh03.organisations.single.MaximumAmountPaidView
 
 import javax.inject.{Inject, Named}
 import scala.concurrent.{ExecutionContext, Future}
 
 class MaximumAmountPaidController @Inject()(
-                                             override val messagesApi: MessagesApi,
-                                             @Named("agentsSh03") navigator: Navigator,
-                                             stcAuthEnrolled: StcAuthEnrolledAction,
-                                             getData: StcDataRetrievalAction,
-                                             requireData: StcDataRequiredAction,
-                                             formProvider: MaximumAmountPaidFormProvider,
-                                             val controllerComponents: MessagesControllerComponents,
-                                             view: MaximumAmountPaidView
-                                           )(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport {
+                                          override val messagesApi: MessagesApi,
+                                          @Named("orgSh03") navigator: Navigator,
+                                          stcAuthEnrolled: StcAuthEnrolledAction,
+                                          getData: StcDataRetrievalAction,
+                                          requireData: StcDataRequiredAction,
+                                          formProvider: MaximumAmountPaidFormProvider,
+                                          val controllerComponents: MessagesControllerComponents,
+                                          view: MaximumAmountPaidView
+                                         )(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport {
 
-  private def form(implicit request: StcDataRequest[_]) = formProvider(request.request.affinityGroupKey)
+  private def form(implicit request: StcDataRequest[_]) =
+    formProvider(request.request.affinityGroupKey)
     
   lazy val backLinkCall: Mode => UserAnswers => Call =
     mode => userAnswers => navigator.previousPage(MaximumAmountPaidPage, mode, userAnswers)

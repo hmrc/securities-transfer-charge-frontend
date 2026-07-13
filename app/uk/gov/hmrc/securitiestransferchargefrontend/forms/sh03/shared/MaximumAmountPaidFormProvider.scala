@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.securitiestransferchargefrontend.forms.sh03.agents
+package uk.gov.hmrc.securitiestransferchargefrontend.forms.sh03.shared
 
 import play.api.data.Form
 import uk.gov.hmrc.securitiestransferchargefrontend.forms.mappings.Mappings
@@ -26,18 +26,18 @@ class MaximumAmountPaidFormProvider @Inject() extends Mappings {
   private val minValue = BigDecimal(0.01)
   private val maxValue = BigDecimal("999999999")
 
-  def apply(): Form[BigDecimal] =
+  def apply(affinityKey: String): Form[BigDecimal] =
     Form(
       "value" -> currency(
-        "agent.sh03.maximumAmountPaid.error.required",
-        "agent.sh03.maximumAmountPaid.error.invalidNumeric",
-        "agent.sh03.maximumAmountPaid.error.invalidNumeric",
-        "agent.sh03.maximumAmountPaid.error.negative",
+        s"$affinityKey.sh03.maximumAmountPaid.error.required",
+        s"$affinityKey.sh03.maximumAmountPaid.error.invalidNumeric",
+        s"$affinityKey.sh03.maximumAmountPaid.error.invalidNumeric",
+        s"$affinityKey.sh03.maximumAmountPaid.error.negative",
       )
         .verifying(
           firstError(
-            minimumCurrency(minValue, "agent.sh03.maximumAmountPaid.error.negative"),
-            maximumCurrency(maxValue, "agent.sh03.maximumAmountPaid.error.aboveMaximum")
+            minimumCurrency(minValue, s"$affinityKey.sh03.maximumAmountPaid.error.belowMinimum"),
+            maximumCurrency(maxValue, s"$affinityKey.sh03.maximumAmountPaid.error.aboveMaximum")
           )
         )
     )

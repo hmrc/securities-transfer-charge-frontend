@@ -906,8 +906,9 @@ agent.sh03.maximumAmountPaid.heading = What is the maximum amount paid for the s
 agent.sh03.maximumAmountPaid.checkYourAnswersLabel = What is the maximum amount paid for the shares, in pounds?
 agent.sh03.maximumAmountPaid.error.required = Enter the maximum amount paid for the shares
 agent.sh03.maximumAmountPaid.error.invalidNumeric = The maximum amount paid for the shares must be a number and can include up to two decimal places, like £30 or £28.60
-agent.sh03.maximumAmountPaid.error.aboveMaximum = The maximum amount paid for the shares must be £999,999,999 or less
 agent.sh03.maximumAmountPaid.error.negative = The maximum amount paid for the shares must be £0.01 or more
+agent.sh03.maximumAmountPaid.error.aboveMaximum = The maximum amount paid for the shares must be £999,999,999 or less
+agent.sh03.maximumAmountPaid.error.belowMinimum = The maximum amount paid for the shares must be £0.01 or more
 agent.sh03.maximumAmountPaid.change.hidden = Change the maximum amount paid for the shares
 
 agent.sh03.cannotSubmitFormError.title = You cannot submit this form
@@ -1043,6 +1044,16 @@ org.sh03.minimumAmountPaid.error.nonNumeric = The minimum amount paid for the sh
 org.sh03.minimumAmountPaid.error.negative = The minimum amount paid for the shares must be £0.01 or more
 org.sh03.minimumAmountPaid.error.belowMinimum = The minimum amount paid for the shares must be £0.01 or more
 org.sh03.minimumAmountPaid.error.aboveMaximum = The minimum amount paid for the shares must be £999,999,999 or less
+
+org.sh03.maximumAmountPaid.title = What is the maximum amount paid for the shares, in pounds?
+org.sh03.maximumAmountPaid.heading = What is the maximum amount paid for the shares, in pounds?
+org.sh03.maximumAmountPaid.checkYourAnswersLabel = What is the maximum amount paid for the shares, in pounds?
+org.sh03.maximumAmountPaid.error.required = Enter the maximum amount paid for the shares
+org.sh03.maximumAmountPaid.error.invalidNumeric = The maximum amount paid for the shares must be a number and can include up to two decimal places, like £30 or £28.60
+org.sh03.maximumAmountPaid.error.negative = The maximum amount paid for the shares must be £0.01 or more
+org.sh03.maximumAmountPaid.error.aboveMaximum = The maximum amount paid for the shares must be £999,999,999 or less
+org.sh03.maximumAmountPaid.error.belowMinimum = The maximum amount paid for the shares must be £0.01 or more
+org.sh03.maximumAmountPaid.change.hidden = Change the maximum amount paid for the shares
 
 org.sh03.cannotSubmitFormError.title = You cannot submit this form
 org.sh03.cannotSubmitFormError.heading = You cannot submit this form
