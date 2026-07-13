@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package views.sh03.agents.single
+package views.sh03.organisations.single
 
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
@@ -22,28 +22,28 @@ import play.api.Application
 import play.api.mvc.Call
 import uk.gov.hmrc.securitiestransferchargefrontend.forms.sh03.shared.ApplyingForReliefFormProvider
 import uk.gov.hmrc.securitiestransferchargefrontend.models.NormalMode
-import uk.gov.hmrc.securitiestransferchargefrontend.views.html.sh03.agents.single.ApplyingForReliefView
+import uk.gov.hmrc.securitiestransferchargefrontend.views.html.sh03.organisations.single.ApplyingForReliefView
 import views.ViewBaseSpec
 
 class ApplyingForReliefViewSpec extends ViewBaseSpec {
 
   override def fakeApplication(): Application =
-    applicationBuilder(affinityGroup = agentAffinity).build()
+    applicationBuilder(affinityGroup = orgAffinity).build()
 
   private val viewInstance = app.injector.instanceOf[ApplyingForReliefView]
   private val formProvider = new ApplyingForReliefFormProvider()
   private val testBackLinkRoute: Call = Call("GET", "/back-link")
 
-  private val form = formProvider(affinityGroupKeyAgent)
+  private val form = formProvider(affinityGroupKeyOrg)
 
   def view(): Document = Jsoup.parse(
     viewInstance(form, NormalMode, testBackLinkRoute)(fakeRequest, messages).body
   )
 
   object ExpectedContent {
-    val title: String = messages("agent.sh03.applyingForRelief.title")
-    val heading: String = messages("agent.sh03.applyingForRelief.heading")
-    val paragraph: String = messages("agent.sh03.applyingForRelief.p")
+    val title: String = messages("org.sh03.applyingForRelief.title")
+    val heading: String = messages("org.sh03.applyingForRelief.heading")
+    val paragraph: String = messages("org.sh03.applyingForRelief.p")
     val saveAndContinue: String = messages("site.save-and-continue.button")
     val saveAndReturn: String = messages("site.save-and-return.button")
     val yes: String = messages("site.yes")

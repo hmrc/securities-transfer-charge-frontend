@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.securitiestransferchargefrontend.forms.sh03.agents.single
+package uk.gov.hmrc.securitiestransferchargefrontend.forms.sh03.shared
 
 import play.api.data.Form
 import uk.gov.hmrc.securitiestransferchargefrontend.forms.mappings.Mappings
@@ -23,8 +23,8 @@ import javax.inject.Inject
 
 class ApplyingForReliefFormProvider @Inject() extends Mappings {
 
-  def apply(): Form[Boolean] =
+  def apply(affinityKey: String): Form[Boolean] =
     Form(
-      "value" -> boolean("agent.sh03.applyingForRelief.error.required")
+      "value" -> boolean(s"$affinityKey.sh03.applyingForRelief.error.required")
     )
 }

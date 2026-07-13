@@ -14,72 +14,64 @@
  * limitations under the License.
  */
 
-package views.sh03.agents.single
+package views.sh03.organisations.single
 
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
 import play.api.Application
 import play.api.mvc.Call
-import uk.gov.hmrc.securitiestransferchargefrontend.forms.sh03.shared.ApplyingForReliefFormProvider
-import uk.gov.hmrc.securitiestransferchargefrontend.models.NormalMode
-import uk.gov.hmrc.securitiestransferchargefrontend.views.html.sh03.agents.single.ApplyingForReliefView
+import uk.gov.hmrc.securitiestransferchargefrontend.forms.sh03.organisations.single.WhatReliefAreYouApplyingForFormProvider
+import uk.gov.hmrc.securitiestransferchargefrontend.models.{NormalMode, ReliefsDataSource}
+import uk.gov.hmrc.securitiestransferchargefrontend.views.html.sh03.organisations.single.WhatReliefAreYouApplyingForView
 import views.ViewBaseSpec
 
-class ApplyingForReliefViewSpec extends ViewBaseSpec {
+class WhatReliefAreYouApplyingForViewSpec extends ViewBaseSpec {
 
   override def fakeApplication(): Application =
     applicationBuilder(affinityGroup = agentAffinity).build()
 
-  private val viewInstance = app.injector.instanceOf[ApplyingForReliefView]
-  private val formProvider = new ApplyingForReliefFormProvider()
+  private val viewInstance = app.injector.instanceOf[WhatReliefAreYouApplyingForView]
+  private val source = app.injector.instanceOf[ReliefsDataSource]
+  private val formProvider = new WhatReliefAreYouApplyingForFormProvider()
   private val testBackLinkRoute: Call = Call("GET", "/back-link")
 
-  private val form = formProvider(affinityGroupKeyAgent)
+  private val form = formProvider()
 
   def view(): Document = Jsoup.parse(
-    viewInstance(form, NormalMode, testBackLinkRoute)(fakeRequest, messages).body
+    viewInstance(form, NormalMode, source.reliefs, testBackLinkRoute)(fakeRequest, messages).body
   )
 
   object ExpectedContent {
-    val title: String = messages("agent.sh03.applyingForRelief.title")
-    val heading: String = messages("agent.sh03.applyingForRelief.heading")
-    val paragraph: String = messages("agent.sh03.applyingForRelief.p")
+    val title: String = messages("org.sh03.whatReliefAreYouApplyingFor.title")
+    val heading: String = messages("org.sh03.whatReliefAreYouApplyingFor.heading")
+    val paragraph: String = messages("org.sh03.whatReliefAreYouApplyingFor.p")
     val saveAndContinue: String = messages("site.save-and-continue.button")
     val saveAndReturn: String = messages("site.save-and-return.button")
-    val yes: String = messages("site.yes")
-    val no: String = messages("site.no")
+    val link = "https://www.gov.uk/guidance/stamp-duty-reliefs-and-exemptions-on-paper-shares"
   }
 
-  "The ApplyingForReliefView" - {
+  "The WhatReliefAreYouApplyingForView" - {
 
-    "render view" - {
+    "when rendered without errors" - {
 
       val doc = view()
 
       "have the correct title" in {
         doc.title() must include(ExpectedContent.title)
       }
-
-
+      
       "have the correct heading" in {
         doc.select("h1").text() must include(ExpectedContent.heading)
       }
 
       "have the first paragraph" in {
-        doc.select(".govuk-body").first().text() must include(ExpectedContent.paragraph)
-      }
-      
-      "have the correct radio buttons" in {
-        val radios = doc.select(".govuk-radios").text()
-
-        radios must include(ExpectedContent.yes)
-        radios must include(ExpectedContent.no)
+        doc.select(".govuk-body").text() must include(ExpectedContent.paragraph)
       }
 
       "have the correct link" in {
-        doc.select("p.govuk-body").select("a.govuk-link").attr("href") mustBe "https://www.gov.uk"
+        doc.select(".govuk-body").select("a.govuk-link").attr("href") mustBe ExpectedContent.link
       }
-      
+
       "have a save and continue button" in {
         doc.select(".govuk-button").first().text() mustBe ExpectedContent.saveAndContinue
       }

@@ -378,6 +378,12 @@ POST       /sh03/org/treasury-shares                       uk.gov.hmrc.securitie
 GET        /sh03/org/change/treasury-shares                 uk.gov.hmrc.securitiestransferchargefrontend.controllers.sh03.organisations.single.TreasurySharesController.onPageLoad(mode: Mode = CheckMode)
 POST       /sh03/org/change/treasury-shares                 uk.gov.hmrc.securitiestransferchargefrontend.controllers.sh03.organisations.single.TreasurySharesController.onSubmit(mode: Mode = CheckMode)
 
+
+GET        /sh03/org/reliefs-list                       uk.gov.hmrc.securitiestransferchargefrontend.controllers.sh03.organisations.single.WhatReliefAreYouApplyingForController.onPageLoad(mode: Mode = NormalMode)
+POST       /sh03/org/reliefs-list                       uk.gov.hmrc.securitiestransferchargefrontend.controllers.sh03.organisations.single.WhatReliefAreYouApplyingForController.onSubmit(mode: Mode = NormalMode)
+GET        /sh03/org/change/reliefs-list                uk.gov.hmrc.securitiestransferchargefrontend.controllers.sh03.organisations.single.WhatReliefAreYouApplyingForController.onPageLoad(mode: Mode = CheckMode)
+POST       /sh03/org/change/reliefs-list                uk.gov.hmrc.securitiestransferchargefrontend.controllers.sh03.organisations.single.WhatReliefAreYouApplyingForController.onSubmit(mode: Mode = CheckMode)
+
 GET        /sh03/org/connected-persons                    uk.gov.hmrc.securitiestransferchargefrontend.controllers.sh03.organisations.single.ConnectedPersonsController.onPageLoad(mode: Mode = NormalMode)
 POST       /sh03/org/connected-persons                    uk.gov.hmrc.securitiestransferchargefrontend.controllers.sh03.organisations.single.ConnectedPersonsController.onSubmit(mode: Mode = NormalMode)
 GET        /sh03/org/change/connected-persons             uk.gov.hmrc.securitiestransferchargefrontend.controllers.sh03.organisations.single.ConnectedPersonsController.onPageLoad(mode: Mode = CheckMode)
@@ -404,3 +410,8 @@ GET        /sh03/org/change/minimum-share-price                        uk.gov.hm
 POST       /sh03/org/change/minimum-share-price                        uk.gov.hmrc.securitiestransferchargefrontend.controllers.sh03.organisations.single.MinimumAmountPaidController.onSubmit(mode: Mode = CheckMode)
 
 GET        /sh03/org/cannot-submit-form                       uk.gov.hmrc.securitiestransferchargefrontend.controllers.sh03.organisations.single.CannotSubmitFormErrorController.onPageLoad()
+
+GET        /sh03/org/apply-relief                               uk.gov.hmrc.securitiestransferchargefrontend.controllers.sh03.organisations.single.ApplyingForReliefController.onPageLoad(mode: Mode = NormalMode)
+POST       /sh03/org/apply-relief                               uk.gov.hmrc.securitiestransferchargefrontend.controllers.sh03.organisations.single.ApplyingForReliefController.onSubmit(mode: Mode = NormalMode)
+GET        /sh03/org/change/apply-relief                        uk.gov.hmrc.securitiestransferchargefrontend.controllers.sh03.organisations.single.ApplyingForReliefController.onPageLoad(mode: Mode = CheckMode)
+POST       /sh03/org/change/apply-relief                        uk.gov.hmrc.securitiestransferchargefrontend.controllers.sh03.organisations.single.ApplyingForReliefController.onSubmit(mode: Mode = CheckMode)

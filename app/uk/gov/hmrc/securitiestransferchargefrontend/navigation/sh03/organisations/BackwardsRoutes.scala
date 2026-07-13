@@ -30,5 +30,6 @@ class BackwardsRoutes(defaultPage: Call):
     case HowToNotifyAboutShareBuybackPage => _ => defaultPage
     case ConnectedPersonsPage => _ => defaultPage
     case MinimumAmountPaidPage => _ => defaultPage
+    case ApplyingForReliefPage => _ => defaultPage
     case _ => _ => defaultPage
   }

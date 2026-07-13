@@ -56,7 +56,7 @@ class ForwardRoutes(
       case ReasonForPurchase.ToPlaceIntoTreasury => sh03OrgSingleRoutes.ConnectedPersonsController.onPageLoad(NormalMode)
     }
     case TreasurySharesPage => userAnswers => dataRequired(TreasurySharesPage, userAnswers, sh03OrgSingleRoutes.ConnectedPersonsController.onPageLoad(NormalMode))
-    case ConnectedPersonsPage => userAnswers =>  dataRequired(ConnectedPersonsPage, userAnswers, defaultPage)
+    case ConnectedPersonsPage => userAnswers =>  dataRequired(ConnectedPersonsPage, userAnswers, sh03OrgSingleRoutes.WhatReliefAreYouApplyingForController.onPageLoad(NormalMode))
     case DetailsOfThisSharePurchasePage => userAnswers => dataDependent(CompanyDetailsPage, userAnswers) { companyDetails =>
       if (companyDetails.isPlc)
         defaultPage
@@ -78,7 +78,12 @@ class ForwardRoutes(
           else
             defaultPage
       }
+    case ApplyingForReliefPage => userAnswers =>
+      dataDependent(ApplyingForReliefPage, userAnswers) {
+        case false => defaultPage
+        case true => defaultPage
+      }
     case _ => _ => Future.successful(defaultPage)
   }
-  
+
 }

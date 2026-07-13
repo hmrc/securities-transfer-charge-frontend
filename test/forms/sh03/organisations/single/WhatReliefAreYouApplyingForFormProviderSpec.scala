@@ -14,28 +14,28 @@
  * limitations under the License.
  */
 
-package forms.sh03.agents.single
+package forms.sh03.organisations.single
 
-import forms.behaviours.BooleanFieldBehaviours
 import play.api.data.FormError
-import uk.gov.hmrc.securitiestransferchargefrontend.forms.sh03.agents.single.ApplyingForReliefFormProvider
+import forms.behaviours.StringFieldBehaviours
+import uk.gov.hmrc.securitiestransferchargefrontend.forms.sh03.organisations.single.WhatReliefAreYouApplyingForFormProvider
 
-class ApplyingForReliefFormProviderSpec extends BooleanFieldBehaviours {
+class WhatReliefAreYouApplyingForFormProviderSpec extends StringFieldBehaviours {
 
-  val requiredKey = "agent.sh03.applyingForRelief.error.required"
-  val invalidKey = "error.boolean"
+  val requiredKey = "org.sh03.whatReliefAreYouApplyingFor.error.required"
 
-  val form = new ApplyingForReliefFormProvider()()
+  val form = new WhatReliefAreYouApplyingForFormProvider()()
 
-  ".value" - {
+  ".reliefs" - {
 
-    val fieldName = "value"
+    val fieldName = "reliefs"
 
-    behave like booleanField(
+    behave like fieldThatBindsValidData(
       form,
       fieldName,
-      invalidError = FormError(fieldName, invalidKey)
+      "relief"
     )
+
 
     behave like mandatoryField(
       form,
