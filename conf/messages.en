@@ -938,6 +938,14 @@ org.sh03.shareBuyback.oneAtATime.hint = Tell us about a purchase of one type of 
 org.sh03.shareBuyback.moreThanOneAtATime = More than one transfer at a time
 org.sh03.shareBuyback.moreThanOneAtATime.hint = Tell us about several share purchases at once using our template. You can download the template, complete a row for each purchase, and upload it on the following pages. You can include purchases from different sellers and of different types of shares
 
+org.sh03.whatReliefAreYouApplyingFor.title = Enter the relief the business is applying for
+org.sh03.whatReliefAreYouApplyingFor.heading = Enter the relief the business is applying for
+org.sh03.whatReliefAreYouApplyingFor.checkYourAnswersLabel = Enter the relief the business is applying for
+org.sh03.whatReliefAreYouApplyingFor.error.required = Start typing the name of the relief and select from the list
+org.sh03.whatReliefAreYouApplyingFor.change.hidden = WhatReliefAreYouApplyingForView
+org.sh03.whatReliefAreYouApplyingFor.p = Start typing the name of the relief and select from the list. See a
+org.sh03.whatReliefAreYouApplyingFor.details.content.link.text = full list of relief
+
 org.sh03.companyDetails.title = What is the company registration number (CRN)?
 org.sh03.companyDetails.heading = What is the company registration number (CRN)?
 org.sh03.companyDetails.crn.hint = This is also called a company number. For example, SN898989 or 12345678
@@ -1004,6 +1012,27 @@ org.sh03.detailsOfSharePurchase.error.marketValue.nonNumeric = The market value 
 org.sh03.detailsOfSharePurchase.error.marketValue.aboveMaximum = The market value of the shares must be £999,999,999 or below
 org.sh03.detailsOfSharePurchase.error.marketValue.belowMinimum = The market value of the shares must be £0.01 or more
 
+
+org.sh03.roleAtPurchasingCompany.title = What is your role within the purchasing company?
+org.sh03.roleAtPurchasingCompany.heading =What is your role within the purchasing company?
+org.sh03.roleAtPurchasingCompany.director = Director
+org.sh03.roleAtPurchasingCompany.secretary = Secretary
+org.sh03.roleAtPurchasingCompany.personAuthorised = A ‘person authorised’ under section 270 or 274 of the Companies Act 2026
+org.sh03.roleAtPurchasingCompany.administrator = Administrator
+org.sh03.roleAtPurchasingCompany.receiver = Receiver
+org.sh03.roleAtPurchasingCompany.receiverManager = Receiver manager
+org.sh03.roleAtPurchasingCompany.cicManager = CIC manager
+org.sh03.roleAtPurchasingCompany.ukSocietas = I’m acting on behalf of a UK Societas (UKS)
+org.sh03.roleAtPurchasingCompany.uksOrgan.label = Which UKS organ are they a member of?
+org.sh03.roleAtPurchasingCompany.notProvided = None of these
+org.sh03.roleAtPurchasingCompany.checkYourAnswersLabel = What is your role within the purchasing company?
+org.sh03.roleAtPurchasingCompany.change.hidden = Change what is your role within the purchasing company?
+
+org.sh03.roleAtPurchasingCompany.error.required = Select your role within the purchasing company, or none of these
+org.sh03.roleAtPurchasingCompany.uksOrgan.error.required = Enter the UKS organ you are a member of
+org.sh03.roleAtPurchasingCompany.uksOrgan.error.min = The UKS organ you are a member of must be at least 1 character
+org.sh03.roleAtPurchasingCompany.uksOrgan.error.length = The UKS organ you are a member of must be 100 characters or fewer
+
 org.sh03.minimumAmountPaid.title = What is the minimum amount paid for the shares, in pounds?
 org.sh03.minimumAmountPaid.heading = What is the minimum amount paid for the shares, in pounds?
 org.sh03.minimumAmountPaid.checkYourAnswersLabel = What is the minimum amount paid for the shares, in pounds?
@@ -1023,3 +1052,25 @@ org.sh03.maximumAmountPaid.error.invalidNumeric = The maximum amount paid for th
 org.sh03.maximumAmountPaid.error.aboveMaximum = The maximum amount paid for the shares must be £999,999,999 or less
 org.sh03.maximumAmountPaid.error.negative = The maximum amount paid for the shares must be £0.01 or more
 org.sh03.maximumAmountPaid.change.hidden = Change the maximum amount paid for the shares
+
+org.sh03.cannotSubmitFormError.title = You cannot submit this form
+org.sh03.cannotSubmitFormError.heading = You cannot submit this form
+org.sh03.cannotSubmitFormError.p1 = The details of this share buyback must be provided by someone in an approved role at the company.
+org.sh03.cannotSubmitFormError.p2 = Approved roles include:
+org.sh03.cannotSubmitFormError.item1 = Director
+org.sh03.cannotSubmitFormError.item2 = Secretary
+org.sh03.cannotSubmitFormError.item3 = Person authorised under section 270 or 274 of the Companies Act 2026
+org.sh03.cannotSubmitFormError.item4 = Administrator
+org.sh03.cannotSubmitFormError.item5 = Receiver
+org.sh03.cannotSubmitFormError.item6 = Receiver manager
+org.sh03.cannotSubmitFormError.item7 = CIC manager
+org.sh03.cannotSubmitFormError.item8 = Someone submitting on behalf of a UK Societas (UKS)
+org.sh03.cannotSubmitFormError.p3 = You can save your submission as a draft, and submit it once you have this information.
+
+org.sh03.applyingForRelief.title = Is the business applying for a relief?
+org.sh03.applyingForRelief.heading = Is the business applying for a relief?
+org.sh03.applyingForRelief.checkYourAnswersLabel = Is the business applying for a relief?
+org.sh03.applyingForRelief.error.required = Select yes if the business is applying for a relief
+org.sh03.applyingForRelief.change.hidden = Change applying for a relief
+org.sh03.applyingForRelief.p = See a
+org.sh03.applyingForRelief.details.content.link.text = full list of reliefs

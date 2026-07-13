@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package controllers.sh03.agents.single
+package controllers.sh03.organisations.single
 
 import base.SpecBase
 import org.scalatestplus.mockito.MockitoSugar
@@ -23,26 +23,26 @@ import play.api.inject.bind
 import play.api.test.FakeRequest
 import play.api.test.Helpers.*
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.routes
-import uk.gov.hmrc.securitiestransferchargefrontend.controllers.sh03.agents.single.routes as agentSh03SingleRoutes
+import uk.gov.hmrc.securitiestransferchargefrontend.controllers.sh03.organisations.single.routes as orgSh03SingleRoutes
 import uk.gov.hmrc.securitiestransferchargefrontend.forms.sh03.shared.ApplyingForReliefFormProvider
 import uk.gov.hmrc.securitiestransferchargefrontend.models.{NormalMode, UserAnswers}
 import uk.gov.hmrc.securitiestransferchargefrontend.navigation.Navigator
 import uk.gov.hmrc.securitiestransferchargefrontend.pages.sh03.ApplyingForReliefPage
-import uk.gov.hmrc.securitiestransferchargefrontend.views.html.sh03.agents.single.ApplyingForReliefView
+import uk.gov.hmrc.securitiestransferchargefrontend.views.html.sh03.organisations.single.ApplyingForReliefView
 
 class ApplyingForReliefControllerSpec extends SpecBase with MockitoSugar {
   
   val formProvider = new ApplyingForReliefFormProvider()
-  val form: Form[Boolean] = formProvider(affinityGroupKeyAgent)
+  val form: Form[Boolean] = formProvider(affinityGroupKeyOrg)
 
-  lazy val applyingForReliefRoute: String = agentSh03SingleRoutes.ApplyingForReliefController.onPageLoad(NormalMode).url
+  lazy val applyingForReliefRoute: String = orgSh03SingleRoutes.ApplyingForReliefController.onPageLoad(NormalMode).url
 
   "ApplyingForRelief Controller" - {
 
     "must return OK and the correct view for a GET" in {
 
-      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers), affinityGroup = agentAffinity)
-        .overrides(bind[Navigator].qualifiedWith("agentsSh03").toInstance(getNavigator))
+      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers), affinityGroup = orgAffinity)
+        .overrides(bind[Navigator].qualifiedWith("orgSh03").toInstance(getNavigator))
         .build()
 
       running(application) {
@@ -61,8 +61,8 @@ class ApplyingForReliefControllerSpec extends SpecBase with MockitoSugar {
 
       val userAnswers = UserAnswers(testUserId, testGroupIdentifier, submissionId).set(ApplyingForReliefPage, true).success.value
 
-      val application = applicationBuilder(userAnswers = Some(userAnswers), affinityGroup = agentAffinity)
-        .overrides(bind[Navigator].qualifiedWith("agentsSh03").toInstance(getNavigator))
+      val application = applicationBuilder(userAnswers = Some(userAnswers), affinityGroup = orgAffinity)
+        .overrides(bind[Navigator].qualifiedWith("orgSh03").toInstance(getNavigator))
         .build()
 
       running(application) {
@@ -81,8 +81,8 @@ class ApplyingForReliefControllerSpec extends SpecBase with MockitoSugar {
       
 
       val application =
-        applicationBuilder(userAnswers = Some(emptyUserAnswers), affinityGroup = agentAffinity)
-          .overrides(bind[Navigator].qualifiedWith("agentsSh03").toInstance(getNavigator))
+        applicationBuilder(userAnswers = Some(emptyUserAnswers), affinityGroup = orgAffinity)
+          .overrides(bind[Navigator].qualifiedWith("orgSh03").toInstance(getNavigator))
           .build()
 
       running(application) {
@@ -100,8 +100,8 @@ class ApplyingForReliefControllerSpec extends SpecBase with MockitoSugar {
 
     "must return a Bad Request and errors when invalid data is submitted" in {
 
-      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers), affinityGroup = agentAffinity)
-        .overrides(bind[Navigator].qualifiedWith("agentsSh03").toInstance(getNavigator))
+      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers), affinityGroup = orgAffinity)
+        .overrides(bind[Navigator].qualifiedWith("orgSh03").toInstance(getNavigator))
         .build()
 
       running(application) {
@@ -122,7 +122,7 @@ class ApplyingForReliefControllerSpec extends SpecBase with MockitoSugar {
 
     "must redirect to Journey Recovery for a GET if no existing data is found" in {
 
-      val application = applicationBuilder(userAnswers = None, affinityGroup = agentAffinity).build()
+      val application = applicationBuilder(userAnswers = None, affinityGroup = orgAffinity).build()
 
       running(application) {
         val request = FakeRequest(GET, applyingForReliefRoute)
@@ -136,7 +136,7 @@ class ApplyingForReliefControllerSpec extends SpecBase with MockitoSugar {
 
     "must redirect to Journey Recovery for a POST if no existing data is found" in {
 
-      val application = applicationBuilder(userAnswers = None, affinityGroup = agentAffinity).build()
+      val application = applicationBuilder(userAnswers = None, affinityGroup = orgAffinity).build()
 
       running(application) {
         val request =
