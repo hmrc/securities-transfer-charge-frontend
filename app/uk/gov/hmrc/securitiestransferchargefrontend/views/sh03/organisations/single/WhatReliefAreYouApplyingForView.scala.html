@@ -53,7 +53,6 @@
     @if(form.errors.nonEmpty) {
         @govukErrorSummary(ErrorSummaryViewModel(form))
     }
-    <span class="govuk-caption-l">@messages("transfer.details.caption")</span>
 
     @govukSelect(Select(
         id = form("reliefs").id,
