@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.securitiestransferchargefrontend.controllers.sh03.agents.single
+package uk.gov.hmrc.securitiestransferchargefrontend.controllers.sh03.organisations.single
 
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, Call, MessagesControllerComponents}
@@ -26,14 +26,14 @@ import uk.gov.hmrc.securitiestransferchargefrontend.forms.sh03.shared.RoleAtPurc
 import uk.gov.hmrc.securitiestransferchargefrontend.models.{Mode, UserAnswers}
 import uk.gov.hmrc.securitiestransferchargefrontend.navigation.Navigator
 import uk.gov.hmrc.securitiestransferchargefrontend.pages.sh03.RoleAtPurchasingCompanyPage
-import uk.gov.hmrc.securitiestransferchargefrontend.views.html.sh03.agents.single.RoleAtPurchasingCompanyView
+import uk.gov.hmrc.securitiestransferchargefrontend.views.html.sh03.organisations.single.RoleAtPurchasingCompanyView
 
 import javax.inject.{Inject, Named}
 import scala.concurrent.{ExecutionContext, Future}
 
 class RoleAtPurchasingCompanyController @Inject()(
                                                    override val messagesApi: MessagesApi,
-                                                   @Named("agentsSh03") navigator: Navigator,
+                                                   @Named("orgSh03") navigator: Navigator,
                                                    stcAuthEnrolled: StcAuthEnrolledAction,
                                                    getData: StcDataRetrievalAction,
                                                    requireData: StcDataRequiredAction,

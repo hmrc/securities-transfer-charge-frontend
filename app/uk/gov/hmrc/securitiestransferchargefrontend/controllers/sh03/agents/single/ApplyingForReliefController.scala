@@ -16,13 +16,12 @@
 
 package uk.gov.hmrc.securitiestransferchargefrontend.controllers.sh03.agents.single
 
-import play.api.data.Form
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, Call, MessagesControllerComponents}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.actions.*
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.shared.SaveAndReturnButton.isReturn
-import uk.gov.hmrc.securitiestransferchargefrontend.forms.sh03.agents.single.ApplyingForReliefFormProvider
+import uk.gov.hmrc.securitiestransferchargefrontend.forms.sh03.shared.ApplyingForReliefFormProvider
 import uk.gov.hmrc.securitiestransferchargefrontend.models.{Mode, UserAnswers}
 import uk.gov.hmrc.securitiestransferchargefrontend.navigation.Navigator
 import uk.gov.hmrc.securitiestransferchargefrontend.pages.sh03.ApplyingForReliefPage
@@ -41,14 +40,17 @@ class ApplyingForReliefController @Inject()(
                                          val controllerComponents: MessagesControllerComponents,
                                          view: ApplyingForReliefView
                                  )(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport {
-
-  val form: Form[Boolean] = formProvider()
-
+  
   lazy val backLinkCall: Mode => UserAnswers => Call =
     mode => userAnswers => navigator.previousPage(ApplyingForReliefPage, mode, userAnswers)
 
   def onPageLoad(mode: Mode): Action[AnyContent] = (stcAuthEnrolled andThen getData andThen requireData) {
     implicit request =>
+
+      val innerRequest = request.request
+      val affinityKey = innerRequest.affinityGroupKey
+
+      val form = formProvider(affinityKey)
 
       val preparedForm = request.userAnswers.get(ApplyingForReliefPage) match {
         case None => form
@@ -60,6 +62,11 @@ class ApplyingForReliefController @Inject()(
 
   def onSubmit(mode: Mode): Action[AnyContent] = (stcAuthEnrolled andThen getData andThen requireData).async {
     implicit request =>
+
+      val innerRequest = request.request
+      val affinityKey = innerRequest.affinityGroupKey
+
+      val form = formProvider(affinityKey)
 
       form.bindFromRequest().fold(
         formWithErrors =>

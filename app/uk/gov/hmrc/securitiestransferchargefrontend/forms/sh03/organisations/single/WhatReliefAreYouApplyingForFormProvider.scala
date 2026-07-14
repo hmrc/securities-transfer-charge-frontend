@@ -14,15 +14,17 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.securitiestransferchargefrontend.pages.sh03
+package uk.gov.hmrc.securitiestransferchargefrontend.forms.sh03.organisations.single
 
-import play.api.libs.json.JsPath
-import uk.gov.hmrc.securitiestransferchargefrontend.models.sh03.shared.RoleAtPurchasingCompany
-import uk.gov.hmrc.securitiestransferchargefrontend.pages.QuestionPage
+import play.api.data.Form
+import uk.gov.hmrc.securitiestransferchargefrontend.forms.mappings.Mappings
 
-case object RoleAtPurchasingCompanyPage extends QuestionPage[RoleAtPurchasingCompany] {
+import javax.inject.Inject
 
-  override def path: JsPath = JsPath \ toString
+class WhatReliefAreYouApplyingForFormProvider @Inject() extends Mappings {
 
-  override def toString: String = "roleAtPurchasingCompany"
+  def apply(): Form[String] =
+    Form(
+      "reliefs" -> text("org.sh03.whatReliefAreYouApplyingFor.error.required")
+    )
 }

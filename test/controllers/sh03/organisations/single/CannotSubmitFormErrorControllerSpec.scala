@@ -14,33 +14,31 @@
  * limitations under the License.
  */
 
-package controllers
+package controllers.sh03.organisations.single
 
 import base.SpecBase
 import play.api.test.FakeRequest
 import play.api.test.Helpers.*
-import uk.gov.hmrc.securitiestransferchargefrontend.viewmodels.govuk.SummaryListFluency
-import uk.gov.hmrc.securitiestransferchargefrontend.views.html.CheckYourAnswersView
-import uk.gov.hmrc.securitiestransferchargefrontend.controllers.routes
+import uk.gov.hmrc.securitiestransferchargefrontend.controllers.sh03.organisations.single.routes
+import uk.gov.hmrc.securitiestransferchargefrontend.views.html.sh03.organisations.single.CannotSubmitFormErrorView
 
-class CheckYourAnswersControllerSpec extends SpecBase with SummaryListFluency {
+class CannotSubmitFormErrorControllerSpec extends SpecBase {
 
-  "Check Your Answers Controller" - {
+  "CannotSubmitFormError Controller" - {
 
     "must return OK and the correct view for a GET" in {
 
       val application = applicationBuilder(userAnswers = Some(emptyUserAnswers)).build()
 
       running(application) {
-        val request = FakeRequest(GET, routes.CheckYourAnswersController.onPageLoad().url)
+        val request = FakeRequest(GET, routes.CannotSubmitFormErrorController.onPageLoad().url)
 
         val result = route(application, request).value
 
-        val view = application.injector.instanceOf[CheckYourAnswersView]
-        val list = SummaryListViewModel(Seq.empty)
+        val view = application.injector.instanceOf[CannotSubmitFormErrorView]
 
         status(result) mustEqual OK
-        contentAsString(result) mustEqual view(list)(request, messages(application)).toString
+        contentAsString(result) mustEqual view()(request, messages(application)).toString
       }
     }
   }

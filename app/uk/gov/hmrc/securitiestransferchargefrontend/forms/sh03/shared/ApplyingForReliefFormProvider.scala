@@ -14,13 +14,17 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.securitiestransferchargefrontend.models.sh03.agents
+package uk.gov.hmrc.securitiestransferchargefrontend.forms.sh03.shared
 
-import play.api.libs.json.*
+import play.api.data.Form
+import uk.gov.hmrc.securitiestransferchargefrontend.forms.mappings.Mappings
 
-case class RoleAtPurchasingCompany(role: String, uksOrgan: Option[String])
+import javax.inject.Inject
 
-object RoleAtPurchasingCompany {
-  val unsupportedRole = "unsupportedRole"
-  implicit val format: OFormat[RoleAtPurchasingCompany] = Json.format[RoleAtPurchasingCompany]
+class ApplyingForReliefFormProvider @Inject() extends Mappings {
+
+  def apply(affinityKey: String): Form[Boolean] =
+    Form(
+      "value" -> boolean(s"$affinityKey.sh03.applyingForRelief.error.required")
+    )
 }

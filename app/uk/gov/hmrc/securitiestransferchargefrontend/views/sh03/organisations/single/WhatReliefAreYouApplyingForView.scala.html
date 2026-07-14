@@ -15,7 +15,7 @@
  *@
 
 @import uk.gov.hmrc.securitiestransferchargefrontend.viewmodels.LabelSize.Large
-@import uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.organisations.single.routes.WhatReliefAreYouApplyingForController
+@import uk.gov.hmrc.securitiestransferchargefrontend.controllers.sh03.organisations.single.routes.WhatReliefAreYouApplyingForController
 @import uk.gov.hmrc.hmrcfrontend.views.html.helpers.HmrcNewTabLinkHelper
 @import uk.gov.hmrc.hmrcfrontend.views.viewmodels.newtablinkhelper.NewTabLinkHelper
 @import uk.gov.hmrc.securitiestransferchargefrontend.views.ViewHelper
@@ -26,48 +26,44 @@
 @import uk.gov.hmrc.securitiestransferchargefrontend.views.html.components.SaveAndReturnButton
 @import uk.gov.hmrc.securitiestransferchargefrontend.config.FrontendAppConfig
 
-
-
 @this(
-  layout: templates.Layout,
-  formHelper: FormWithCSRF,
-  govukErrorSummary: GovukErrorSummary,
-  govukSelect: GovukSelect,
-  govukButton: GovukButton,
-  hmrcNewTabLinkHelper: HmrcNewTabLinkHelper,
-  config: FrontendAppConfig,
-  saveAndReturnButton:SaveAndReturnButton
+    layout: templates.Layout,
+    formHelper: FormWithCSRF,
+    govukErrorSummary: GovukErrorSummary,
+    govukSelect: GovukSelect,
+    govukButton: GovukButton,
+    hmrcNewTabLinkHelper: HmrcNewTabLinkHelper,
+    config: FrontendAppConfig,
+    saveAndReturnButton:SaveAndReturnButton
 )
 
 @(form: Form[_], mode: Mode, reliefs: Seq[Relief], backLinkCall: Call)(implicit request: Request[_], messages: Messages)
 
 @link = @{ hmrcNewTabLinkHelper(NewTabLinkHelper(
-    text = messages("org.whatReliefAreYouApplyingFor.details.content.link.text"),
+    text = messages("org.sh03.whatReliefAreYouApplyingFor.details.content.link.text"),
     href = Some(config.reliefsGuidanceUrl)
 )) }
 
 @layout(
-    pageTitle = title(form, messages("org.whatReliefAreYouApplyingFor.title"), Some(messages("transfer.details.caption"))),
+    pageTitle = title(form, messages("org.sh03.whatReliefAreYouApplyingFor.title"), Some(messages("transfer.details.caption"))),
     backLinkUrl = Some(backLinkCall.url)
 ) {
-
-  @formHelper(action = WhatReliefAreYouApplyingForController.onSubmit(mode)) {
+    @formHelper(action = WhatReliefAreYouApplyingForController.onSubmit(mode)) {
 
     @if(form.errors.nonEmpty) {
-      @govukErrorSummary(ErrorSummaryViewModel(form))
+        @govukErrorSummary(ErrorSummaryViewModel(form))
     }
-    <span  class="govuk-caption-l">@messages("transfer.details.caption")</span>
+
     @govukSelect(Select(
-          id = form("reliefs").id,
-          name = form("reliefs").name,
-          label = Label(content = HtmlContent(messages("org.whatReliefAreYouApplyingFor.heading"))).asPageHeading(Large),
-          items = ViewHelper.reliefsToSelectItems(reliefs, form),
-    hint = Some(Hint(content = HtmlContent(s"<p class='govuk-hint'>${messages("org.whatReliefAreYouApplyingFor.p")} $link</p>")))
-      ).asAccessibleAutocomplete().withFormField(form("reliefs")))
+        id = form("reliefs").id,
+        name = form("reliefs").name,
+        label = Label(content = HtmlContent(messages("org.sh03.whatReliefAreYouApplyingFor.heading"))).asPageHeading(Large),
+        items = ViewHelper.reliefsToSelectItems(reliefs, form),
+        hint = Some(Hint(content = HtmlContent(s"<p class='govuk-body'>${messages("org.sh03.whatReliefAreYouApplyingFor.p")} $link.</p>")))
+    ).asAccessibleAutocomplete().withFormField(form("reliefs")))
 
     @govukButton(ButtonViewModel(messages("site.save-and-continue.button")))
 
     @saveAndReturnButton()
-
   }
 }

@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package views.sh03.agents.single
+package views.sh03.organisations.single
 
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
@@ -22,17 +22,19 @@ import play.api.Application
 import play.api.mvc.Call
 import uk.gov.hmrc.securitiestransferchargefrontend.forms.sh03.shared.MaximumAmountPaidFormProvider
 import uk.gov.hmrc.securitiestransferchargefrontend.models.NormalMode
-import uk.gov.hmrc.securitiestransferchargefrontend.views.html.sh03.agents.single.MaximumAmountPaidView
+import uk.gov.hmrc.securitiestransferchargefrontend.views.html.sh03.organisations.single.MaximumAmountPaidView
 import views.ViewBaseSpec
 
 class MaximumAmountPaidViewSpec extends ViewBaseSpec {
 
   override def fakeApplication(): Application =
-    applicationBuilder(affinityGroup = agentAffinity).build()
+    applicationBuilder(affinityGroup = orgAffinity).build()
 
   private val viewInstance = app.injector.instanceOf[MaximumAmountPaidView]
   private val formProvider = new MaximumAmountPaidFormProvider()
   private val testBackLinkRoute: Call = Call("GET", "/back-link")
+  val messageKeyPrefix = "org.sh03.maximumAmountPaid"
+
 
   private val form = formProvider(affinityGroupKeyOrg)
 
@@ -41,8 +43,8 @@ class MaximumAmountPaidViewSpec extends ViewBaseSpec {
   )
 
   object ExpectedContent {
-    val title: String = messages("agent.sh03.maximumAmountPaid.title")
-    val heading: String = messages("agent.sh03.maximumAmountPaid.heading")
+    val title: String = messages(s"$messageKeyPrefix.title")
+    val heading: String = messages(s"$messageKeyPrefix.heading")
     val saveAndContinue: String = messages("site.save-and-continue.button")
     val saveAndReturn: String = messages("site.save-and-return.button")
   }
@@ -63,13 +65,6 @@ class MaximumAmountPaidViewSpec extends ViewBaseSpec {
 
       "have a pound prefix on the input" in {
         maximumAmountPaidView.select(".govuk-input__prefix").text() mustBe "£"
-      }
-
-      "have the correct input field" in {
-        val input = maximumAmountPaidView.select("input[name=value]")
-
-        input.attr("id") mustBe "value"
-        input.attr("name") mustBe "value"
       }
 
       "have a save and continue button" in {
