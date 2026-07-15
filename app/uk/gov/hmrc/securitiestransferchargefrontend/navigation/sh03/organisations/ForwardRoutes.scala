@@ -56,37 +56,35 @@ class ForwardRoutes(
       case ReasonForPurchase.ToPlaceIntoTreasury => sh03OrgSingleRoutes.ConnectedPersonsController.onPageLoad(NormalMode)
     }
     case TreasurySharesPage => userAnswers => dataRequired(TreasurySharesPage, userAnswers, sh03OrgSingleRoutes.ConnectedPersonsController.onPageLoad(NormalMode))
-    case ConnectedPersonsPage => userAnswers =>  dataRequired(ConnectedPersonsPage, userAnswers, sh03OrgSingleRoutes.WhatReliefAreYouApplyingForController.onPageLoad(NormalMode))
-    case DetailsOfThisSharePurchasePage => userAnswers => dataDependent(CompanyDetailsPage, userAnswers) { companyDetails =>
-    case ConnectedPersonsPage => userAnswers =>  dataRequired(ConnectedPersonsPage, userAnswers, sh03OrgSingleRoutes.MaximumAmountPaidController.onPageLoad(NormalMode))
-    //TODO THE ApplyingForReliefPage
-    //TODO THE WhatReliefAreYouApplyingForPage
-    case DetailsOfThisSharePurchasePage => userAnswers => dataDependent(CompanyDetailsPage, userAnswers) {companyDetails =>
-      if (companyDetails.isPlc)
-        sh03OrgSingleRoutes.MaximumAmountPaidController.onPageLoad(NormalMode)
-      else
-        sh03OrgSingleRoutes.ChargingPointController.onPageLoad(NormalMode)
-    }
+    case ConnectedPersonsPage => userAnswers =>  dataRequired(ConnectedPersonsPage, userAnswers, sh03OrgSingleRoutes.ApplyingForReliefController.onPageLoad(NormalMode))
+    case ApplyingForReliefPage => userAnswers => dataDependent(ApplyingForReliefPage, userAnswers) {
+        case false => sh03OrgSingleRoutes.DetailsOfThisSharePurchaseController.onPageLoad(NormalMode)
+        case true => sh03OrgSingleRoutes.WhatReliefAreYouApplyingForController.onPageLoad(NormalMode)
+      }
+    case WhatReliefAreYouApplyingForPage => userAnswers => dataRequired(WhatReliefAreYouApplyingForPage, userAnswers, sh03OrgSingleRoutes.DetailsOfThisSharePurchaseController.onPageLoad(NormalMode))
+    case DetailsOfThisSharePurchasePage => userAnswers => dataRequired(DetailsOfThisSharePurchasePage, userAnswers, sh03OrgSingleRoutes.MaximumAmountPaidController.onPageLoad(NormalMode))
+    //TODO AFTER THE IMPLEMENTATION OF CR TICKET
+    //    case DetailsOfThisSharePurchasePage => userAnswers => dataDependent(CompanyDetailsPage, userAnswers) {companyDetails =>
+    //      if (companyDetails.isPlc)
+    //        sh03OrgSingleRoutes.MaximumAmountPaidController.onPageLoad(NormalMode)
+    //      else
+    //        sh03OrgSingleRoutes.ChargingPointController.onPageLoad(NormalMode)
+    //    }
     case MaximumAmountPaidPage => userAnswers => dataRequired(MaximumAmountPaidPage, userAnswers, sh03OrgSingleRoutes.MinimumAmountPaidController.onPageLoad(NormalMode))
     case MinimumAmountPaidPage => userAnswers => dataRequired(MinimumAmountPaidPage, userAnswers, sh03OrgSingleRoutes.ChargingPointController.onPageLoad(NormalMode))
     case ChargingPointPage => userAnswers =>
       dataDependent(ChargingPointPage, userAnswers) { enterDate =>
         if (enterDate.isBefore(firstDate)) defaultPage
-        else defaultPage
+        else sh03OrgSingleRoutes.RoleAtPurchasingCompanyController.onPageLoad(NormalMode)
       }
-
     case RoleAtPurchasingCompanyPage => userAnswers =>
       dataDependent(RoleAtPurchasingCompanyPage, userAnswers) {
         roleAtPurchasingCompany =>
           if (roleAtPurchasingCompany.role == RoleAtPurchasingCompany.unsupportedRole)
             sh03OrgSingleRoutes.CannotSubmitFormErrorController.onPageLoad()
           else
-            defaultPage
-      }
-    case ApplyingForReliefPage => userAnswers =>
-      dataDependent(ApplyingForReliefPage, userAnswers) {
-        case false => defaultPage
-        case true => defaultPage
+            sh03OrgSingleRoutes.CheckYourAnswersController.onPageLoad()
+
       }
     case _ => _ => Future.successful(defaultPage)
   }

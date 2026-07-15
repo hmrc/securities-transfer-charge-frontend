@@ -420,3 +420,5 @@ GET        /sh03/org/change/apply-relief                        uk.gov.hmrc.secu
 POST       /sh03/org/change/apply-relief                        uk.gov.hmrc.securitiestransferchargefrontend.controllers.sh03.organisations.single.ApplyingForReliefController.onSubmit(mode: Mode = CheckMode)
 
 GET        /sh03/org/cannot-submit-form                       uk.gov.hmrc.securitiestransferchargefrontend.controllers.sh03.organisations.single.CannotSubmitFormErrorController.onPageLoad()
+
+GET        /sh03/agent/check-your-answers                       uk.gov.hmrc.securitiestransferchargefrontend.controllers.sh03.organisations.single.CheckYourAnswersController.onPageLoad()
