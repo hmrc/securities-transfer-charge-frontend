@@ -942,9 +942,9 @@ org.sh03.whatReliefAreYouApplyingFor.title = Enter the relief the business is ap
 org.sh03.whatReliefAreYouApplyingFor.heading = Enter the relief the business is applying for
 org.sh03.whatReliefAreYouApplyingFor.checkYourAnswersLabel = Enter the relief the business is applying for
 org.sh03.whatReliefAreYouApplyingFor.error.required = Start typing the name of the relief and select from the list
-org.sh03.whatReliefAreYouApplyingFor.change.hidden = WhatReliefAreYouApplyingForView
+org.sh03.whatReliefAreYouApplyingFor.change.hidden = Change the relief are you applying for
 org.sh03.whatReliefAreYouApplyingFor.p = Start typing the name of the relief and select from the list. See a
-org.sh03.whatReliefAreYouApplyingFor.details.content.link.text = full list of relief
+org.sh03.whatReliefAreYouApplyingFor.details.content.link.text = full list of reliefs
 
 org.sh03.companyDetails.title = What is the company registration number (CRN)?
 org.sh03.companyDetails.heading = What is the company registration number (CRN)?
