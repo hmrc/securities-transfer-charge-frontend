@@ -17,23 +17,32 @@
 package uk.gov.hmrc.securitiestransferchargefrontend.viewmodels.sh03.organisations
 
 import play.api.i18n.Messages
-import play.twirl.api.HtmlFormat
+import play.twirl.api.{Html, HtmlFormat}
+import uk.gov.hmrc.govukfrontend.views.viewmodels.content.HtmlContent
 import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.SummaryListRow
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.sh03.organisations.single.routes
 import uk.gov.hmrc.securitiestransferchargefrontend.models.{CheckMode, UserAnswers}
-import uk.gov.hmrc.securitiestransferchargefrontend.pages.sh03.OrgCompanyDetailsPage
+import uk.gov.hmrc.securitiestransferchargefrontend.pages.sh03.CompanyDetailsPage
 import uk.gov.hmrc.securitiestransferchargefrontend.viewmodels.govuk.summarylist.*
 import uk.gov.hmrc.securitiestransferchargefrontend.viewmodels.implicits.*
 
-object CompanyDetailsSummary  {
+object CompanyDetailsSummary {
 
   def row(answers: UserAnswers)(implicit messages: Messages): Option[SummaryListRow] =
-    answers.get(OrgCompanyDetailsPage).map {
-      answer =>
+    answers.get(CompanyDetailsPage).map {
+      companyDetails =>
+
+        val value = Html(
+          s"""
+             |${HtmlFormat.escape(companyDetails.companyName).body}<br/>
+             |${HtmlFormat.escape(companyDetails.companyRegistrationNumber).body}<br/>
+             |${HtmlFormat.escape(messages(if (companyDetails.isPlc) "site.yes" else "site.no")).body}
+             |""".stripMargin
+        )
 
         SummaryListRowViewModel(
-          key     = "org.sh03.companyDetails.checkYourAnswersLabel",
-          value   = ValueViewModel(HtmlFormat.escape(answer).toString),
+          key = "org.sh03.companyDetails.checkYourAnswersLabel",
+          value = ValueViewModel(HtmlContent(value)),
           actions = Seq(
             ActionItemViewModel("site.change", routes.CompanyDetailsController.onPageLoad(CheckMode).url)
               .withVisuallyHiddenText(messages("org.sh03.companyDetails.change.hidden"))

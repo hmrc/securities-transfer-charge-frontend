@@ -17,32 +17,35 @@
 package controllers.sh03.organisations.single
 
 import base.SpecBase
+import org.scalatestplus.mockito.MockitoSugar
 import play.api.data.Form
-import play.api.inject
 import play.api.inject.bind
 import play.api.test.FakeRequest
 import play.api.test.Helpers.*
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.routes
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.sh03.organisations.single.routes as sh03OrgSingleRoutes
-import uk.gov.hmrc.securitiestransferchargefrontend.forms.sh03.organisations.CompanyDetailsFormProvider
+import uk.gov.hmrc.securitiestransferchargefrontend.forms.sh03.shared.CompanyDetailsFormProvider
+import uk.gov.hmrc.securitiestransferchargefrontend.models.sh03.shared.CompanyDetails
 import uk.gov.hmrc.securitiestransferchargefrontend.models.{NormalMode, UserAnswers}
 import uk.gov.hmrc.securitiestransferchargefrontend.navigation.Navigator
-import uk.gov.hmrc.securitiestransferchargefrontend.pages.sh03.OrgCompanyDetailsPage
+import uk.gov.hmrc.securitiestransferchargefrontend.pages.sh03.CompanyDetailsPage
 import uk.gov.hmrc.securitiestransferchargefrontend.views.html.sh03.organisations.single.CompanyDetailsView
 
-class CompanyDetailsControllerSpec extends SpecBase{
+class CompanyDetailsControllerSpec extends SpecBase with MockitoSugar {
 
   val formProvider = new CompanyDetailsFormProvider()
-  val form: Form[String] = formProvider()
+  val form: Form[CompanyDetails] = formProvider(affinityGroupKeyOrg)
 
   lazy val companyDetailsRoute: String = sh03OrgSingleRoutes.CompanyDetailsController.onPageLoad(NormalMode).url
 
-  "CompanyDetails Controller" - {
+  val validAnswer = CompanyDetails("Test Company Ltd", "AB123456", true)
+
+  "CompanyDetailsController" - {
 
     "must return OK and the correct view for a GET" in {
 
-      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers),affinityGroup = orgAffinity)
-        .overrides(inject.bind[Navigator].qualifiedWith("orgSh03").toInstance(getNavigator))
+      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers), affinityGroup = orgAffinity)
+        .overrides(bind[Navigator].qualifiedWith("orgSh03").toInstance(getNavigator))
         .build()
 
       running(application) {
@@ -59,9 +62,10 @@ class CompanyDetailsControllerSpec extends SpecBase{
 
     "must populate the view correctly on a GET when the question has previously been answered" in {
 
-      val userAnswers = UserAnswers(testUserId, testGroupIdentifier, submissionId).set(OrgCompanyDetailsPage, "answer").success.value
+      val userAnswers = UserAnswers(testUserId, testGroupIdentifier, submissionId)
+        .set(CompanyDetailsPage, validAnswer).success.value
 
-      val application = applicationBuilder(userAnswers = Some(userAnswers),affinityGroup = orgAffinity)
+      val application = applicationBuilder(userAnswers = Some(userAnswers), affinityGroup = orgAffinity)
         .overrides(bind[Navigator].qualifiedWith("orgSh03").toInstance(getNavigator))
         .build()
 
@@ -73,12 +77,11 @@ class CompanyDetailsControllerSpec extends SpecBase{
         val result = route(application, request).value
 
         status(result) mustEqual OK
-        contentAsString(result) mustEqual view(form.fill("answer"), NormalMode, testBackLinkRoute)(request, messages(application)).toString
+        contentAsString(result) mustEqual view(form.fill(validAnswer), NormalMode, testBackLinkRoute)(request, messages(application)).toString
       }
     }
 
-    "must redirect to the next page when valid data is submitted" in {
-
+    "must redirect to next page when valid data is submitted" in {
       val application = applicationBuilder(userAnswers = Some(emptyUserAnswers), affinityGroup = orgAffinity)
         .overrides(bind[Navigator].qualifiedWith("orgSh03").toInstance(getNavigator))
         .build()
@@ -86,7 +89,11 @@ class CompanyDetailsControllerSpec extends SpecBase{
       running(application) {
         val request =
           FakeRequest(POST, companyDetailsRoute)
-            .withFormUrlEncodedBody(("value", "AB123456"))
+            .withFormUrlEncodedBody(
+              ("companyName", "Test Company Ltd"),
+              ("companyRegistrationNumber", "AB123456"),
+              ("isPlc", "true")
+            )
 
         val result = route(application, request).value
 
@@ -97,16 +104,16 @@ class CompanyDetailsControllerSpec extends SpecBase{
 
     "must return a Bad Request and errors when invalid data is submitted" in {
 
-      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers),affinityGroup = orgAffinity)
+      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers), affinityGroup = orgAffinity)
         .overrides(bind[Navigator].qualifiedWith("orgSh03").toInstance(getNavigator))
         .build()
 
       running(application) {
         val request =
           FakeRequest(POST, companyDetailsRoute)
-            .withFormUrlEncodedBody(("value", ""))
+            .withFormUrlEncodedBody(("value", "invalid value"))
 
-        val boundForm = form.bind(Map("value" -> ""))
+        val boundForm = form.bind(Map("value" -> "invalid value"))
 
         val view = application.injector.instanceOf[CompanyDetailsView]
 
@@ -117,14 +124,20 @@ class CompanyDetailsControllerSpec extends SpecBase{
       }
     }
 
-    "must return a Bad Request when the answer is empty" in {
+    "must return a Bad Request when company name is empty" in {
 
-      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers)).build()
+      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers), affinityGroup = orgAffinity)
+        .overrides(bind[Navigator].qualifiedWith("orgSh03").toInstance(getNavigator))
+        .build()
 
       running(application) {
         val request =
           FakeRequest(POST, companyDetailsRoute)
-            .withFormUrlEncodedBody(("value", ""))
+            .withFormUrlEncodedBody(
+              ("companyName", ""),
+              ("companyRegistrationNumber", "AB123456"),
+              ("isPlc", "true")
+            )
 
         val result = route(application, request).value
 
@@ -132,14 +145,41 @@ class CompanyDetailsControllerSpec extends SpecBase{
       }
     }
 
-    "must return a Bad Request when the answer is not 8 characters" in {
+    "must return a Bad Request when CRN is not 8 characters" in {
 
-      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers)).build()
+      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers), affinityGroup = orgAffinity)
+        .overrides(bind[Navigator].qualifiedWith("orgSh03").toInstance(getNavigator))
+        .build()
 
       running(application) {
         val request =
           FakeRequest(POST, companyDetailsRoute)
-            .withFormUrlEncodedBody(("value", "ABC123"))
+            .withFormUrlEncodedBody(
+              ("companyName", "Test Company"),
+              ("companyRegistrationNumber", "ABC123"),
+              ("isPlc", "true")
+            )
+
+        val result = route(application, request).value
+
+        status(result) mustEqual BAD_REQUEST
+      }
+    }
+
+    "must return a Bad Request when CRN contains invalid characters" in {
+
+      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers), affinityGroup = orgAffinity)
+        .overrides(bind[Navigator].qualifiedWith("orgSh03").toInstance(getNavigator))
+        .build()
+
+      running(application) {
+        val request =
+          FakeRequest(POST, companyDetailsRoute)
+            .withFormUrlEncodedBody(
+              ("companyName", "Test Company"),
+              ("companyRegistrationNumber", "AB12-456"),
+              ("isPlc", "true")
+            )
 
         val result = route(application, request).value
 
@@ -149,7 +189,7 @@ class CompanyDetailsControllerSpec extends SpecBase{
 
     "must redirect to Journey Recovery for a GET if no existing data is found" in {
 
-      val application = applicationBuilder(userAnswers = None).build()
+      val application = applicationBuilder(userAnswers = None, affinityGroup = orgAffinity).build()
 
       running(application) {
         val request = FakeRequest(GET, companyDetailsRoute)
@@ -168,7 +208,11 @@ class CompanyDetailsControllerSpec extends SpecBase{
       running(application) {
         val request =
           FakeRequest(POST, companyDetailsRoute)
-            .withFormUrlEncodedBody(("value", "answer"))
+            .withFormUrlEncodedBody(
+              ("companyName", "Test Company Ltd"),
+              ("companyRegistrationNumber", "AB123456"),
+              ("isPlc", "true")
+            )
 
         val result = route(application, request).value
 

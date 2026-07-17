@@ -43,12 +43,15 @@
 
         @govukInput(
             InputViewModel(
-                field = form("value"),
+                field = form("companyRegistrationNumber"),
                 label = LabelViewModel(messages("org.sh03.companyDetails.heading")).asPageHeading(Large)
             )
             .withHint(HintViewModel(messages("org.sh03.companyDetails.crn.hint")))
             .withWidth(Fixed10)
         )
+
+        <input type="hidden" name="isPlc" value="true"/>
+        <input type="hidden" name="companyName" value="HMRC"/>
 
         @govukButton(
             ButtonViewModel(messages("site.save-and-continue.button"))
