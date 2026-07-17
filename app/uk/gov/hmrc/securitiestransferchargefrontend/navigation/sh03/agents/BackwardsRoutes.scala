@@ -19,11 +19,13 @@ package uk.gov.hmrc.securitiestransferchargefrontend.navigation.sh03.agents
 import play.api.mvc.Call
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.sh03.agents.routes as sh03AgentRoutes
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.sh03.agents.single.routes as sh03AgentSingleRoutes
+import uk.gov.hmrc.securitiestransferchargefrontend.controllers.sh03.agents.bulk.routes as sh03AgentBulkRoutes
 import uk.gov.hmrc.securitiestransferchargefrontend.models.sh03.shared.ReasonForPurchase
 import uk.gov.hmrc.securitiestransferchargefrontend.models.{NormalMode, UserAnswers}
 import uk.gov.hmrc.securitiestransferchargefrontend.navigation.NavigationHelper
 import uk.gov.hmrc.securitiestransferchargefrontend.pages.*
-import uk.gov.hmrc.securitiestransferchargefrontend.pages.sh03._
+import uk.gov.hmrc.securitiestransferchargefrontend.pages.sh03.*
+import uk.gov.hmrc.securitiestransferchargefrontend.pages.sh03.bulk.BulkCompanyDetailsPage
 
 class BackwardsRoutes(defaultPage: Call):
 
@@ -60,5 +62,6 @@ class BackwardsRoutes(defaultPage: Call):
       
     }
     case RoleAtPurchasingCompanyPage => _ => sh03AgentSingleRoutes.ChargingPointController.onPageLoad(NormalMode)
+    case BulkCompanyDetailsPage => _ => sh03AgentBulkRoutes.AgentReferenceController.onPageLoad(NormalMode)
     case _ => _ => defaultPage
   }
