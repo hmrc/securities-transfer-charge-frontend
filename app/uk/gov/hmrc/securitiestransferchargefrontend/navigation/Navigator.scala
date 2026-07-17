@@ -27,12 +27,13 @@ import scala.concurrent.{ExecutionContext, Future}
 trait Navigator:
   def nextPage(page: Page, mode: Mode, userAnswers: UserAnswers, isReturn: Boolean = false)(implicit request: Request[?]): Future[Call]
   def previousPage(page: Page, mode: Mode, userAnswers: UserAnswers): Call
+  def previousPage(page: Page, mode: Mode, userAnswers: Option[UserAnswers]): Call
   def errorPage(forPage: Page): Call
 
 abstract class AbstractModeNavigator(implicit ex: ExecutionContext) extends Navigator:
 
   def forwardRoutes(page: Page)(implicit hc: HeaderCarrier): UserAnswers => Future[Call]
-  def predecessorRoutes(page: Page): UserAnswers => Call
+  def predecessorRoutes(page: Page): Option[UserAnswers] => Call
   lazy val dashboardPage: Call
   val checkRouteMap: Page => UserAnswers => Call
 
@@ -45,8 +46,11 @@ abstract class AbstractModeNavigator(implicit ex: ExecutionContext) extends Navi
     }).map(maybeRedirectToDashboard)
   }
 
-  def previousPage(page: Page, mode: Mode, userAnswers: UserAnswers): Call =
+  override def previousPage(page: Page, mode: Mode, userAnswers: UserAnswers): Call =
+    previousPage(page, mode, Some(userAnswers))
+
+  override def previousPage(page: Page, mode: Mode, userAnswers: Option[UserAnswers]): Call =
     mode match {
       case NormalMode => predecessorRoutes(page)(userAnswers)
-      case CheckMode  => checkRouteMap(page)(userAnswers)
+      case CheckMode => userAnswers.map(checkRouteMap(page)).getOrElse(errorPage(page))
     }

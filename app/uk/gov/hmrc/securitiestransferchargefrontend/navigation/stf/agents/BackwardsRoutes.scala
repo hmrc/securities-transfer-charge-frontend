@@ -19,8 +19,8 @@ package uk.gov.hmrc.securitiestransferchargefrontend.navigation.stf.agents
 import play.api.mvc.Call
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.agents.routes as agentRoutes
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.agents.single.routes as agentSingleRoutes
-import uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.shared.routes as sharedRoutes
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.shared.bulk.routes as bulkSharedRoutes
+import uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.shared.routes as sharedRoutes
 import uk.gov.hmrc.securitiestransferchargefrontend.models.stf.HowToNotifyAboutSecuritiesTransfer.{MoreThanOneAtATime, OneAtATime}
 import uk.gov.hmrc.securitiestransferchargefrontend.models.{NormalMode, UserAnswers}
 import uk.gov.hmrc.securitiestransferchargefrontend.navigation.NavigationHelper
@@ -31,14 +31,17 @@ import uk.gov.hmrc.securitiestransferchargefrontend.pages.stf.single.*
 class BackwardsRoutes(defaultPage: Call):
 
   val navHelper: NavigationHelper = new NavigationHelper(defaultPage)
+
   import navHelper.*
 
-  def predecessorRoutes(page: Page): UserAnswers => Call = page match {
+  def predecessorRoutes(page: Page): Option[UserAnswers] => Call = page match {
 
     case HowToNotifyAboutSecuritiesTransferPage => _ => sharedRoutes.SubmissionsDashboardController.onPageLoad()
-    case AgentReferencePage => userAnswers => dataDependent(HowToNotifyAboutSecuritiesTransferPage, userAnswers) {
+    case AgentReferencePage => _.fold(defaultPage) { userAnswers =>
+      dataDependent(HowToNotifyAboutSecuritiesTransferPage, userAnswers) {
         case OneAtATime => agentRoutes.HowToNotifyAboutSecuritiesTransferController.onPageLoad()
         case MoreThanOneAtATime => bulkSharedRoutes.FileUploadController.onPageLoad()
+      }
     }
     case NameOfBuyerPage => _ => agentSingleRoutes.AgentReferenceController.onPageLoad(NormalMode)
     case StfBuyersAddressPage => _ => agentSingleRoutes.NameOfBuyerController.onPageLoad(NormalMode)
@@ -47,14 +50,16 @@ class BackwardsRoutes(defaultPage: Call):
     case ConnectedPersonsPage => _ => agentSingleRoutes.StfSellerAddressController.onPageLoad()
     case ApplyingForReliefPage => _ => agentSingleRoutes.ConnectedPersonsController.onPageLoad(NormalMode)
     case WhatReliefAreYouApplyingForPage => _ => agentSingleRoutes.ApplyingForReliefController.onPageLoad(NormalMode)
-    case SecuritiesTargetPage => userAnswers => dataDependent(ApplyingForReliefPage, userAnswers) {
-      case true  => agentSingleRoutes.WhatReliefAreYouApplyingForController.onPageLoad(NormalMode)
-      case false => agentSingleRoutes.ApplyingForReliefController.onPageLoad(NormalMode)
+    case SecuritiesTargetPage => _.fold(defaultPage) { userAnswers =>
+      dataDependent(ApplyingForReliefPage, userAnswers) {
+        case true => agentSingleRoutes.WhatReliefAreYouApplyingForController.onPageLoad(NormalMode)
+        case false => agentSingleRoutes.ApplyingForReliefController.onPageLoad(NormalMode)
+      }
     }
     case ChargingPointPage => _ => agentSingleRoutes.SecuritiesTargetController.onPageLoad(NormalMode)
-    case TaxRatePage       => _ => agentSingleRoutes.ChargingPointController.onPageLoad(NormalMode)
+    case TaxRatePage => _ => agentSingleRoutes.ChargingPointController.onPageLoad(NormalMode)
     case WhatTypeOfSecuritiesPage => _ => agentSingleRoutes.TaxRateController.onPageLoad(NormalMode)
-    case OtherSecuritiesTypePage  => _ => agentSingleRoutes.WhatTypeOfSecuritiesController.onPageLoad(NormalMode)
+    case OtherSecuritiesTypePage => _ => agentSingleRoutes.WhatTypeOfSecuritiesController.onPageLoad(NormalMode)
     case AmountPaidForSecuritiesPage => _ => agentSingleRoutes.OtherSecuritiesTypeController.onPageLoad(NormalMode)
     case DetailsOfThisTransferPage => _ => agentSingleRoutes.WhatTypeOfSecuritiesController.onPageLoad(NormalMode)
     case TotalMarketValuePage => _ => agentSingleRoutes.AmountPaidForSecuritiesController.onPageLoad(NormalMode)

@@ -24,6 +24,7 @@ import org.scalatestplus.mockito.MockitoSugar.mock
 import uk.gov.hmrc.securitiestransferchargefrontend.config.FrontendAppConfig
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.routes
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.sh03.agents.routes as sh03AgentRoutes
+import uk.gov.hmrc.securitiestransferchargefrontend.controllers.sh03.shared.routes as sharedRoutes
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.sh03.agents.single.routes as sh03AgentSingleRoutes
 import uk.gov.hmrc.securitiestransferchargefrontend.models.sh03.HowToNotifyAboutShareBuyback
 import uk.gov.hmrc.securitiestransferchargefrontend.models.sh03.shared.*
@@ -236,6 +237,11 @@ class Sh03AgentNavigatorSpec extends SpecBase with ScalaFutures {
       case object UnknownPage extends Page
       val result = navigator.previousPage(UnknownPage, NormalMode, emptyUserAnswers)
       result mustBe navigator.defaultPage
+    }
+
+    "must go from the HowToNotifyAboutShareBuybackPage to BeforeYouStartPage" in {
+      val result = navigator.previousPage(HowToNotifyAboutShareBuybackPage, NormalMode, emptyUserAnswers)
+      result mustBe sharedRoutes.BeforeYouStartController.onPageLoad()
     }
 
     "must go from the AgentReferencePage to HowToNotifyAboutShareBuybackPage" in {
