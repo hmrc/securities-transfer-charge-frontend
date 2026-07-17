@@ -14,12 +14,12 @@
  * limitations under the License.
  */
 
-package views.stf.shared.bulk
+package views.fileUpload
 
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
 import uk.gov.hmrc.securitiestransferchargefrontend.config.FrontendAppConfig
-import uk.gov.hmrc.securitiestransferchargefrontend.views.html.stf.shared.bulk.FileProcessingView
+import uk.gov.hmrc.securitiestransferchargefrontend.views.html.fileUpload.FileProcessingView
 import views.ViewBaseSpec
 
 class FileProcessingViewSpec extends ViewBaseSpec {

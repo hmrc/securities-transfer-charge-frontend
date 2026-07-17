@@ -14,30 +14,33 @@
  * limitations under the License.
  */
 
-package views.stf.shared.bulk
+package views.fileUpload
 
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
 import play.api.Application
-import uk.gov.hmrc.securitiestransferchargefrontend.views.html.stf.shared.bulk.BulkUploadInvalidTemplateView
+import uk.gov.hmrc.securitiestransferchargefrontend.config.FrontendAppConfig
+import uk.gov.hmrc.securitiestransferchargefrontend.models.JourneyType.STF
+import uk.gov.hmrc.securitiestransferchargefrontend.views.html.fileUpload.BulkDuplicateErrorView
 import views.ViewBaseSpec
-import views.helper.JsoupHelper
 
-class BulkUploadInvalidTemplateViewSpec extends ViewBaseSpec with JsoupHelper {
+class BulkDuplicateErrorViewSpec extends ViewBaseSpec {
 
   override def fakeApplication(): Application = applicationBuilder().build()
 
-  private val viewInstance = app.injector.instanceOf[BulkUploadInvalidTemplateView]
+  private val viewInstance = app.injector.instanceOf[BulkDuplicateErrorView]
 
-  def view(): Document = Jsoup.parse(viewInstance("https://example.com/template")(fakeRequest, messages).body)
+  private val config = app.injector.instanceOf[FrontendAppConfig]
+
+  def view(): Document = Jsoup.parse(viewInstance(STF)(fakeRequest, messages).body)
 
   object ExpectedContent {
-    val title: String = messages("fileUpload.error.invalidTemplate.title")
-    val heading: String = messages("fileUpload.error.invalidTemplate.heading")
-    val paragraph: String = s"${messages("fileUpload.error.invalidTemplate.p.start")} ${messages("fileUpload.error.invalidTemplate.p.link")} ${messages("fileUpload.error.invalidTemplate.p.end")}"
+    val title: String = messages("bulk.duplicate.error.title")
+    val heading: String = messages("bulk.duplicate.error.heading")
+    val paragraph: String = messages("bulk.duplicate.error.p",config.checksumTtl)
   }
 
-  "BulkUploadInvalidTemplateView" - {
+  "BulkDuplicateErrorView" - {
 
     "when rendered" - {
 
@@ -48,15 +51,16 @@ class BulkUploadInvalidTemplateViewSpec extends ViewBaseSpec with JsoupHelper {
       }
 
       "have the correct heading" in {
-        doc.heading mustBe Some(ExpectedContent.heading)
+        val heading = doc.select("h1")
+        heading.html() must include(ExpectedContent.heading)
       }
 
       "have the correct paragraph text" in {
-        doc.para(1) mustBe Some(ExpectedContent.paragraph)
+        doc.select(".govuk-body").first().text() mustBe ExpectedContent.paragraph
       }
 
       "display a back link" in {
-        doc.hasBackLink mustBe true
+        doc.select(".govuk-back-link").size() mustBe 1
       }
     }
   }

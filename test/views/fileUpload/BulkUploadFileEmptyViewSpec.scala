@@ -14,29 +14,30 @@
  * limitations under the License.
  */
 
-package views.stf.shared.bulk
+package views.fileUpload
 
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
 import play.api.Application
-import uk.gov.hmrc.securitiestransferchargefrontend.views.html.stf.shared.bulk.EncryptedFileErrorView
+import uk.gov.hmrc.securitiestransferchargefrontend.models.JourneyType.SH03
+import uk.gov.hmrc.securitiestransferchargefrontend.views.html.fileUpload.BulkUploadFileEmptyView
 import views.ViewBaseSpec
 
-class EncryptedFileErrorViewSpec extends ViewBaseSpec {
+class BulkUploadFileEmptyViewSpec extends ViewBaseSpec {
 
   override def fakeApplication(): Application = applicationBuilder().build()
 
-  private val viewInstance = app.injector.instanceOf[EncryptedFileErrorView]
+  private val viewInstance = app.injector.instanceOf[BulkUploadFileEmptyView]
 
-  def view(): Document = Jsoup.parse(viewInstance()(fakeRequest, messages).body)
+  def view(): Document = Jsoup.parse(viewInstance(SH03)(fakeRequest, messages).body)
 
   object ExpectedContent {
-    val title: String = messages("fileUploaded.error.encryptedFile.title")
-    val heading: String = messages("fileUploaded.error.encryptedFile.heading")
-    val paragraph: String = messages("fileUploaded.error.encryptedFile.p")
+    val title: String = messages("fileUploaded.error.emptyFile.title")
+    val heading: String = messages("fileUploaded.error.emptyFile.heading")
+    val paragraph: String = messages("fileUploaded.error.emptyFile.p")
   }
 
-  "EncryptedFileErrorView" - {
+  "BulkUploadFileEmptyView" - {
 
     "when rendered" - {
 

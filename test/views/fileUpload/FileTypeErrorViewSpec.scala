@@ -14,13 +14,14 @@
  * limitations under the License.
  */
 
-package views.stf.shared.bulk
+package views.fileUpload
 
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
 import play.api.Application
-import uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.shared.bulk.routes
-import uk.gov.hmrc.securitiestransferchargefrontend.views.html.stf.shared.bulk.FileTypeErrorView
+import uk.gov.hmrc.securitiestransferchargefrontend.controllers.fileUpload.routes
+import uk.gov.hmrc.securitiestransferchargefrontend.models.JourneyType.STF
+import uk.gov.hmrc.securitiestransferchargefrontend.views.html.fileUpload.FileTypeErrorView
 import views.ViewBaseSpec
 
 class FileTypeErrorViewSpec extends ViewBaseSpec {
@@ -29,7 +30,7 @@ class FileTypeErrorViewSpec extends ViewBaseSpec {
 
   private val viewInstance = app.injector.instanceOf[FileTypeErrorView]
 
-  def view(): Document = Jsoup.parse(viewInstance()(fakeRequest, messages).body)
+  def view(): Document = Jsoup.parse(viewInstance(STF)(fakeRequest, messages).body)
 
   object ExpectedContent {
     val title: String = messages("fileUpload.error.type.title")
@@ -38,7 +39,7 @@ class FileTypeErrorViewSpec extends ViewBaseSpec {
 
     val backLinkText: String = messages("fileUpload.error.type.backlink")
 
-    val backLinkUrl: String = routes.FileUploadController.onPageLoad().url
+    val backLinkUrl: String = routes.FileUploadController.onPageLoad(STF).url
   }
 
   "FileTypeErrorView" - {

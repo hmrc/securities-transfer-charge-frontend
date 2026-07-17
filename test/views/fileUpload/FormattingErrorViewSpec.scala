@@ -14,13 +14,14 @@
  * limitations under the License.
  */
 
-package views.stf.shared.bulk
+package views.fileUpload
 
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
 import play.api.Application
-import uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.shared.bulk.routes
-import uk.gov.hmrc.securitiestransferchargefrontend.views.html.stf.shared.bulk.FormattingErrorView
+import uk.gov.hmrc.securitiestransferchargefrontend.controllers.fileUpload.routes
+import uk.gov.hmrc.securitiestransferchargefrontend.models.JourneyType.{SH03, STF}
+import uk.gov.hmrc.securitiestransferchargefrontend.views.html.fileUpload.FormattingErrorView
 import views.ViewBaseSpec
 
 class FormattingErrorViewSpec extends ViewBaseSpec {
@@ -30,7 +31,7 @@ class FormattingErrorViewSpec extends ViewBaseSpec {
   private val viewInstance         = app.injector.instanceOf[FormattingErrorView]
 
   def view(): Document = Jsoup.parse(
-    viewInstance()(fakeRequest, messages).body
+    viewInstance(STF)(fakeRequest, messages).body
   )
 
   object ExpectedContent {
@@ -75,7 +76,7 @@ class FormattingErrorViewSpec extends ViewBaseSpec {
 
       "have a button that redirects to the file upload page" in {
         val form = formattingErrorView.select("form")
-        form.attr("action") mustBe routes.FileUploadController.onPageLoad().url
+        form.attr("action") mustBe routes.FileUploadController.onPageLoad(STF).url
         form.attr("method") mustBe "GET"
         formattingErrorView.select(".govuk-button").first().text() mustBe ExpectedContent.backToFIle
       }

@@ -30,6 +30,7 @@ import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.securitiestransferchargefrontend.connectors.{SubscriptionConnector, UpscanDownloadException}
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.actions.StcAuthorisedRequest
 import uk.gov.hmrc.securitiestransferchargefrontend.domain.{CredentialId, SubscriptionId}
+import uk.gov.hmrc.securitiestransferchargefrontend.models.JourneyType.STF
 import uk.gov.hmrc.securitiestransferchargefrontend.models.stf.fileupload.FileParseError
 import uk.gov.hmrc.securitiestransferchargefrontend.models.stf.upscan.UpscanJourneyStatus.*
 import uk.gov.hmrc.securitiestransferchargefrontend.models.stf.upscan.{FileUpload, UpscanJourneyStatus}
@@ -60,7 +61,7 @@ class ProcessingServiceSpec extends SpecBase with MockitoSugar with BeforeAndAft
   private val reference = "reference"
   private val affinityKey = "affinity-key"
 
-  private val fileUpload = FileUpload(reference = reference, status = UpscanJourneyStatus.Ready)
+  private val fileUpload = FileUpload(reference = reference, status = UpscanJourneyStatus.Ready, journeyType = STF)
 
   def fakeApplication(): Application = applicationBuilder(userAnswers = Some(emptyUserAnswers)).build()
 

@@ -20,6 +20,7 @@ import base.SpecBase
 import org.scalatest.BeforeAndAfterEach
 import play.api.Application
 import play.api.test.Helpers.{await, defaultAwaitTimeout}
+import uk.gov.hmrc.securitiestransferchargefrontend.models.JourneyType.STF
 import uk.gov.hmrc.securitiestransferchargefrontend.models.stf.upscan.UpscanCallbackRequest.UploadDetails
 import uk.gov.hmrc.securitiestransferchargefrontend.models.stf.upscan.{FileUpload, UpscanDocument, UpscanJourneyStatus}
 import uk.gov.hmrc.securitiestransferchargefrontend.repositories.UpscanJourneyRepositoryImpl
@@ -56,7 +57,8 @@ class UpscanJourneyRepositorySpec extends SpecBase with BeforeAndAfterEach {
       _id = reference,
       fileUpload = FileUpload(
         reference = reference,
-        status = status
+        status = status,
+        journeyType = STF
       )
     )
 

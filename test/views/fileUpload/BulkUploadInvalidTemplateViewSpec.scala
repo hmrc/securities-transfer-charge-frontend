@@ -14,29 +14,31 @@
  * limitations under the License.
  */
 
-package views.stf.shared.bulk
+package views.fileUpload
 
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
 import play.api.Application
-import uk.gov.hmrc.securitiestransferchargefrontend.views.html.stf.shared.bulk.BulkUploadErrorView
+import uk.gov.hmrc.securitiestransferchargefrontend.models.JourneyType.SH03
+import uk.gov.hmrc.securitiestransferchargefrontend.views.html.fileUpload.BulkUploadInvalidTemplateView
 import views.ViewBaseSpec
+import views.helper.JsoupHelper
 
-class BulkUploadErrorViewSpec extends ViewBaseSpec {
+class BulkUploadInvalidTemplateViewSpec extends ViewBaseSpec with JsoupHelper {
 
   override def fakeApplication(): Application = applicationBuilder().build()
 
-  private val viewInstance = app.injector.instanceOf[BulkUploadErrorView]
+  private val viewInstance = app.injector.instanceOf[BulkUploadInvalidTemplateView]
 
-  def view(): Document = Jsoup.parse(viewInstance()(fakeRequest, messages).body)
+  def view(): Document = Jsoup.parse(viewInstance("https://example.com/template",SH03)(fakeRequest, messages).body)
 
   object ExpectedContent {
-    val title: String = messages("bulk.fileUpload.error.title")
-    val heading: String = messages("bulk.fileUpload.error.heading")
-    val paragraph: String = messages("bulk.fileUpload.error.p")
+    val title: String = messages("fileUpload.error.invalidTemplate.title")
+    val heading: String = messages("fileUpload.error.invalidTemplate.heading")
+    val paragraph: String = s"${messages("fileUpload.error.invalidTemplate.p.start")} ${messages("fileUpload.error.invalidTemplate.p.link")} ${messages("fileUpload.error.invalidTemplate.p.end")}"
   }
 
-  "BulkUploadErrorView" - {
+  "BulkUploadInvalidTemplateView" - {
 
     "when rendered" - {
 
@@ -47,16 +49,15 @@ class BulkUploadErrorViewSpec extends ViewBaseSpec {
       }
 
       "have the correct heading" in {
-        val heading = doc.select("h1")
-        heading.html() must include(ExpectedContent.heading)
+        doc.heading mustBe Some(ExpectedContent.heading)
       }
 
       "have the correct paragraph text" in {
-        doc.select(".govuk-body").first().text() mustBe ExpectedContent.paragraph
+        doc.para(1) mustBe Some(ExpectedContent.paragraph)
       }
 
       "display a back link" in {
-        doc.select(".govuk-back-link").size() mustBe 1
+        doc.hasBackLink mustBe true
       }
     }
   }

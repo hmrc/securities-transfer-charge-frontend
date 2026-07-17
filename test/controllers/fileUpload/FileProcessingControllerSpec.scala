@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package controllers.stf.shared.bulk
+package controllers.fileUpload
 
 import base.SpecBase
 import org.mockito.ArgumentMatchers.{any, eq as eqTo}
@@ -26,15 +26,15 @@ import play.api.test.FakeRequest
 import play.api.test.Helpers.{redirectLocation, *}
 import uk.gov.hmrc.auth.core.AffinityGroup
 import uk.gov.hmrc.securitiestransferchargefrontend.config.FrontendAppConfig
-import uk.gov.hmrc.securitiestransferchargefrontend.controllers.routes.JourneyRecoveryController
-import uk.gov.hmrc.securitiestransferchargefrontend.controllers.routes.CheckYourAnswersController
+import uk.gov.hmrc.securitiestransferchargefrontend.controllers.routes.{CheckYourAnswersController, JourneyRecoveryController}
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.agents.bulk.routes as bulkRoutes
-import uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.shared.bulk.routes
+import uk.gov.hmrc.securitiestransferchargefrontend.controllers.fileUpload.routes
+import uk.gov.hmrc.securitiestransferchargefrontend.models.JourneyType.STF
 import uk.gov.hmrc.securitiestransferchargefrontend.models.NormalMode
 import uk.gov.hmrc.securitiestransferchargefrontend.models.stf.upscan.{FileUpload, UpscanJourneyStatus}
 import uk.gov.hmrc.securitiestransferchargefrontend.repositories.UpscanJourneyRepository
 import uk.gov.hmrc.securitiestransferchargefrontend.services.fileupload.processing.{FileProcessingRefreshCounter, FileProcessingRefreshCounterFactory, ProcessingService}
-import uk.gov.hmrc.securitiestransferchargefrontend.views.html.stf.shared.bulk.FileProcessingView
+import uk.gov.hmrc.securitiestransferchargefrontend.views.html.fileUpload.FileProcessingView
 
 import scala.concurrent.Future
 
@@ -47,8 +47,10 @@ class MockFileProcessingRefreshCounterFactory(counter: FileProcessingRefreshCoun
 class FileProcessingControllerSpec extends SpecBase with MockitoSugar {
 
   private val reference = "ref"
+  
+  private val journeyType = STF
 
-  private val fileUpload = FileUpload(reference = reference, status = UpscanJourneyStatus.Initiated)
+  private val fileUpload = FileUpload(reference = reference, status = UpscanJourneyStatus.Initiated, journeyType = journeyType)
 
   private def buildApp(
                         counter: FileProcessingRefreshCounter,
@@ -128,7 +130,7 @@ class FileProcessingControllerSpec extends SpecBase with MockitoSugar {
 
         status(result) mustEqual SEE_OTHER
         redirectLocation(result).value mustEqual
-          routes.FileProcessingController.onTimeout().url
+          routes.FileProcessingController.onTimeout(reference).url
 
         session(result).get("retryCount") mustBe None
       }
@@ -203,7 +205,7 @@ class FileProcessingControllerSpec extends SpecBase with MockitoSugar {
 
         status(result) mustEqual SEE_OTHER
         redirectLocation(result).value mustEqual
-          routes.BulkRowsErrorController.onPageLoad().url
+          routes.BulkRowsErrorController.onPageLoad(journeyType).url
       }
     }
 
@@ -224,7 +226,7 @@ class FileProcessingControllerSpec extends SpecBase with MockitoSugar {
 
         status(result) mustEqual SEE_OTHER
         redirectLocation(result).value mustEqual
-          routes.BulkUploadFileEmptyController.onPageLoad().url
+          routes.BulkUploadFileEmptyController.onPageLoad(journeyType).url
       }
     }
 
@@ -245,7 +247,7 @@ class FileProcessingControllerSpec extends SpecBase with MockitoSugar {
 
         status(result) mustEqual SEE_OTHER
         redirectLocation(result).value mustEqual
-          routes.FormattingErrorController.onPageLoad().url
+          routes.FormattingErrorController.onPageLoad(journeyType).url
       }
     }
 
@@ -266,7 +268,7 @@ class FileProcessingControllerSpec extends SpecBase with MockitoSugar {
 
         status(result) mustEqual SEE_OTHER
         redirectLocation(result).value mustEqual
-          routes.UploadedFileErrorController.onPageLoad(reference).url
+          routes.UploadedFileErrorController.onPageLoad(reference,journeyType).url
       }
     }
 
@@ -287,7 +289,7 @@ class FileProcessingControllerSpec extends SpecBase with MockitoSugar {
 
         status(result) mustEqual SEE_OTHER
         redirectLocation(result).value mustEqual
-          routes.BulkUploadErrorController.onPageLoad().url
+          routes.BulkUploadErrorController.onPageLoad(journeyType).url
       }
     }
 
@@ -308,7 +310,7 @@ class FileProcessingControllerSpec extends SpecBase with MockitoSugar {
 
         status(result) mustEqual SEE_OTHER
         redirectLocation(result).value mustEqual
-          routes.BulkUploadInvalidTemplateController.onPageLoad().url
+          routes.BulkUploadInvalidTemplateController.onPageLoad(journeyType).url
       }
     }
 
@@ -350,7 +352,7 @@ class FileProcessingControllerSpec extends SpecBase with MockitoSugar {
         val result = route(app, FakeRequest(GET, routes.FileProcessingController.onPageLoad(reference).url)).value
 
         status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual routes.BulkUploadErrorController.onPageLoad().url
+        redirectLocation(result).value mustEqual routes.BulkUploadErrorController.onPageLoad(journeyType).url
       }
     }
 
@@ -374,7 +376,7 @@ class FileProcessingControllerSpec extends SpecBase with MockitoSugar {
 
         status(result) mustEqual SEE_OTHER
         redirectLocation(result).value mustEqual
-          routes.EncryptedFileErrorController.onPageLoad().url
+          routes.EncryptedFileErrorController.onPageLoad(journeyType).url
       }
     }
 
@@ -398,7 +400,7 @@ class FileProcessingControllerSpec extends SpecBase with MockitoSugar {
 
         status(result) mustEqual SEE_OTHER
         redirectLocation(result).value mustEqual
-          routes.BulkUploadVirusErrorController.onPageLoad().url
+          routes.BulkUploadVirusErrorController.onPageLoad(journeyType).url
       }
     }
 
@@ -471,7 +473,7 @@ class FileProcessingControllerSpec extends SpecBase with MockitoSugar {
         val result = route(app, FakeRequest(GET, routes.FileProcessingController.onPageLoad(reference).url)).value
 
         status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual routes.FileTypeErrorController.onPageLoad().url
+        redirectLocation(result).value mustEqual routes.FileTypeErrorController.onPageLoad(journeyType).url
       }
     }
   }

@@ -23,6 +23,7 @@ import org.scalatest.{EitherValues, OneInstancePerTest}
 import org.scalatestplus.mockito.MockitoSugar
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.securitiestransferchargefrontend.connectors.UpscanFileDownloadConnector
+import uk.gov.hmrc.securitiestransferchargefrontend.models.JourneyType.STF
 import uk.gov.hmrc.securitiestransferchargefrontend.models.stf.fileupload.*
 import uk.gov.hmrc.securitiestransferchargefrontend.models.stf.upscan.{FileUpload, UpscanCallbackRequest, UpscanJourneyStatus}
 import uk.gov.hmrc.securitiestransferchargefrontend.services.fileupload.*
@@ -57,7 +58,8 @@ class StcUpscanProcessingServiceSpec extends SpecBase with EitherValues with Moc
     reference = "ref-123",
     status = UpscanJourneyStatus.Ready,
     downloadUrl = Some("https://example.com/download/ref-123"),
-    uploadDetails = Some(uploadDetails)
+    uploadDetails = Some(uploadDetails),
+    journeyType = STF
   )
 
   private val validationResponse = StcFileValidationResponse(

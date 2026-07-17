@@ -41,7 +41,6 @@ class UploadedFileErrorController @Inject()(
 
   def onPageLoad(reference: String, journeyType:JourneyType): Action[AnyContent] =
     stcAuthEnrolled.async { implicit request =>
-      println(Console.RED + journeyType + Console.RESET)
       for {
         validationErrors <- validationErrorRepository.findByReference(reference)
       } yield {

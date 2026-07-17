@@ -14,29 +14,30 @@
  * limitations under the License.
  */
 
-package views.stf.shared.bulk
+package views.fileUpload
 
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
 import play.api.Application
-import uk.gov.hmrc.securitiestransferchargefrontend.views.html.stf.shared.bulk.BulkUploadFileEmptyView
+import uk.gov.hmrc.securitiestransferchargefrontend.models.JourneyType.SH03
+import uk.gov.hmrc.securitiestransferchargefrontend.views.html.fileUpload.BulkUploadErrorView
 import views.ViewBaseSpec
 
-class BulkUploadFileEmptyViewSpec extends ViewBaseSpec {
+class BulkUploadErrorViewSpec extends ViewBaseSpec {
 
   override def fakeApplication(): Application = applicationBuilder().build()
 
-  private val viewInstance = app.injector.instanceOf[BulkUploadFileEmptyView]
+  private val viewInstance = app.injector.instanceOf[BulkUploadErrorView]
 
-  def view(): Document = Jsoup.parse(viewInstance()(fakeRequest, messages).body)
+  def view(): Document = Jsoup.parse(viewInstance(SH03)(fakeRequest, messages).body)
 
   object ExpectedContent {
-    val title: String = messages("fileUploaded.error.emptyFile.title")
-    val heading: String = messages("fileUploaded.error.emptyFile.heading")
-    val paragraph: String = messages("fileUploaded.error.emptyFile.p")
+    val title: String = messages("bulk.fileUpload.error.title")
+    val heading: String = messages("bulk.fileUpload.error.heading")
+    val paragraph: String = messages("bulk.fileUpload.error.p")
   }
 
-  "BulkUploadFileEmptyView" - {
+  "BulkUploadErrorView" - {
 
     "when rendered" - {
 

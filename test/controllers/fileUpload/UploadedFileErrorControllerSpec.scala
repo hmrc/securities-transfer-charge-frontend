@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package controllers.stf.shared.bulk
+package controllers.fileUpload
 
 import base.{FileUploadFixtures, SpecBase}
 import org.mockito.Mockito.{reset, when}
@@ -23,10 +23,11 @@ import org.scalatestplus.mockito.MockitoSugar.mock
 import play.api.inject
 import play.api.test.FakeRequest
 import play.api.test.Helpers.*
-import uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.shared.bulk.routes
+import uk.gov.hmrc.securitiestransferchargefrontend.controllers.fileUpload.routes
+import uk.gov.hmrc.securitiestransferchargefrontend.models.JourneyType
 import uk.gov.hmrc.securitiestransferchargefrontend.repositories.ValidationErrorRepository
 import uk.gov.hmrc.securitiestransferchargefrontend.viewmodels.stf.fileupload.UploadedFileErrorMapper
-import uk.gov.hmrc.securitiestransferchargefrontend.views.html.stf.shared.bulk.UploadedFileErrorView
+import uk.gov.hmrc.securitiestransferchargefrontend.views.html.fileUpload.UploadedFileErrorView
 
 import scala.concurrent.Future
 
@@ -42,32 +43,32 @@ class UploadedFileErrorControllerSpec extends SpecBase with BeforeAndAfterEach w
 
   "UploadedFileErrorController" - {
 
-    "must return OK and the correct view for a GET" in {
+    Seq(JourneyType.STF, JourneyType.SH03).foreach { journeyType =>
 
-      val application =
-        applicationBuilder(userAnswers = Some(emptyUserAnswers))
-          .overrides(
-            inject.bind[ValidationErrorRepository].toInstance(mockValidationErrorRepository)
-          ).build()
+      s"$journeyType must return OK and the correct view for a GET" in {
 
-      when(mockValidationErrorRepository.findByReference(reference))
-        .thenReturn(Future.successful(blockingValidationErrors))
+        val application =
+          applicationBuilder(userAnswers = Some(emptyUserAnswers))
+            .overrides(
+              inject.bind[ValidationErrorRepository].toInstance(mockValidationErrorRepository)
+            ).build()
 
-      running(application) {
+        when(mockValidationErrorRepository.findByReference(reference))
+          .thenReturn(Future.successful(blockingValidationErrors))
 
-        val request =
-          FakeRequest(GET, routes.UploadedFileErrorController.onPageLoad(reference).url)
+        running(application) {
 
-        val result = route(application, request).value
+          val request =
+            FakeRequest(GET, routes.UploadedFileErrorController.onPageLoad(reference, journeyType).url)
 
-        val view = application.injector.instanceOf[UploadedFileErrorView]
+          val result = route(application, request).value
 
-        status(result) mustEqual OK
+          val view = application.injector.instanceOf[UploadedFileErrorView]
 
-        contentAsString(result) mustEqual
-          view(
-            UploadedFileErrorMapper.from(blockingValidationErrors)
-          )(request, messages(application)).toString
+          status(result) mustEqual OK
+
+          contentAsString(result) mustEqual view(UploadedFileErrorMapper.from(blockingValidationErrors), journeyType)(request, messages(application)).toString
+        }
       }
     }
   }

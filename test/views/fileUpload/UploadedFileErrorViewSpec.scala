@@ -14,14 +14,15 @@
  * limitations under the License.
  */
 
-package views.stf.shared.bulk
+package views.fileUpload
 
 import base.Fixtures
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
 import play.api.Application
-import uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.shared.bulk.routes
-import uk.gov.hmrc.securitiestransferchargefrontend.views.html.stf.shared.bulk.UploadedFileErrorView
+import uk.gov.hmrc.securitiestransferchargefrontend.controllers.fileUpload.routes
+import uk.gov.hmrc.securitiestransferchargefrontend.models.JourneyType.STF
+import uk.gov.hmrc.securitiestransferchargefrontend.views.html.fileUpload.UploadedFileErrorView
 import views.ViewBaseSpec
 
 class UploadedFileErrorViewSpec extends ViewBaseSpec {
@@ -33,7 +34,7 @@ class UploadedFileErrorViewSpec extends ViewBaseSpec {
 
   def view(): Document =
     Jsoup.parse(
-      viewInstance(Fixtures.uploadedFileErrors)(fakeRequest, messages).body
+      viewInstance(Fixtures.uploadedFileErrors,STF)(fakeRequest, messages).body
     )
 
   object ExpectedContent {
@@ -89,13 +90,10 @@ class UploadedFileErrorViewSpec extends ViewBaseSpec {
         rows.get(2).text() must include("Buyer's country can only contain letters, numbers and hyphens")
       }
 
-      "have a back to file upload button" in {
-        doc.select(".govuk-button").text() mustBe messages("site.back-to-upload.button")
-      }
-
-      "file upload button must redirect to the correct page" in {
-        val form = doc.select("form")
-        form.attr("action") mustBe routes.FileUploadController.onPageLoad().url
+      "display a back link that redirects to the correct page" in {
+        val link = doc.select(".govuk-link").get(3)
+        link.text() mustBe messages("site.back-to-upload.button")
+        link.attr("href") mustBe routes.FileUploadController.onPageLoad(STF).url
       }
     }
   }

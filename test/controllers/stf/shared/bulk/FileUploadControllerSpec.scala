@@ -26,17 +26,22 @@ import play.api.test.FakeRequest
 import play.api.test.Helpers.*
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.securitiestransferchargefrontend.connectors.UpscanInitiateConnector
-import uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.shared.bulk.routes
-import uk.gov.hmrc.securitiestransferchargefrontend.models.stf.upscan.{UploadRequest, UpscanInitiateResponse}
+import uk.gov.hmrc.securitiestransferchargefrontend.controllers.fileUpload.routes
+import uk.gov.hmrc.securitiestransferchargefrontend.controllers.routes.JourneyRecoveryController
+import uk.gov.hmrc.securitiestransferchargefrontend.models.JourneyType
+import uk.gov.hmrc.securitiestransferchargefrontend.models.stf.upscan.UpscanJourneyStatus.Failed
+import uk.gov.hmrc.securitiestransferchargefrontend.models.stf.upscan.{FileUpload, UploadRequest, UpscanInitiateResponse}
 import uk.gov.hmrc.securitiestransferchargefrontend.repositories.UpscanJourneyRepository
 import uk.gov.hmrc.securitiestransferchargefrontend.services.fileupload.processing.{FileProcessingRefreshCounter, FileProcessingRefreshCounterFactory}
-import uk.gov.hmrc.securitiestransferchargefrontend.views.html.stf.shared.bulk.FileUploadView
+import uk.gov.hmrc.securitiestransferchargefrontend.views.html.fileUpload.FileUploadView
 
 import scala.concurrent.Future
 
 class FileUploadControllerSpec extends SpecBase with MockitoSugar {
 
-  lazy val fileUploadRoute: String = routes.FileUploadController.onPageLoad().url
+  val journeyType: JourneyType = JourneyType.STF
+
+  lazy val fileUploadRoute: String = routes.FileUploadController.onPageLoad(journeyType).url
   lazy val onUploadErrorRoute: String = routes.FileUploadController.onUploadError().url
   val reference = "file1"
   val uploadRequest: UploadRequest = UploadRequest(href = "http://someUrl.com", fields = Map("key" -> "1234"))
@@ -86,6 +91,8 @@ class FileUploadControllerSpec extends SpecBase with MockitoSugar {
 
         val mockRepository = mock[UpscanJourneyRepository]
 
+        when(mockRepository.find("1234"))
+          .thenReturn(Future.successful(Some(FileUpload(reference = "1234",status = Failed,journeyType = journeyType))))
         when(mockRepository.delete("1234"))
           .thenReturn(Future.successful(()))
 
@@ -105,13 +112,13 @@ class FileUploadControllerSpec extends SpecBase with MockitoSugar {
           status(result) mustEqual SEE_OTHER
 
           redirectLocation(result).value mustEqual
-            routes.BulkUploadErrorController.onPageLoad().url
+            routes.BulkUploadErrorController.onPageLoad(journeyType).url
 
           verify(mockRepository).delete("1234")
         }
       }
 
-      "must redirect to the BulkUploadErrorController when no key is supplied" in {
+      "must redirect to the JourneyRecovery when no key is supplied" in {
 
         val mockRepository = mock[UpscanJourneyRepository]
 
@@ -130,8 +137,7 @@ class FileUploadControllerSpec extends SpecBase with MockitoSugar {
 
           status(result) mustEqual SEE_OTHER
 
-          redirectLocation(result).value mustEqual
-            routes.BulkUploadErrorController.onPageLoad().url
+          redirectLocation(result).value mustEqual JourneyRecoveryController.onPageLoad().url
 
           verify(mockRepository, never()).delete(any[String])
         }
