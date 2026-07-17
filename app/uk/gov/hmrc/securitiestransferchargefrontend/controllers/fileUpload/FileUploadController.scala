@@ -44,7 +44,6 @@ class FileUploadController @Inject()(
                                     )(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport {
 
   def onPageLoad(journeyType: JourneyType): Action[AnyContent] = stcAuthEnrolled.async { implicit request =>
-    println(Console.GREEN + "hereeeeee" + Console.RESET)
     prepareUpload(journeyType).map { response =>
       val uploadView = view(response.uploadRequest)
       val counter = fileProcessingRefreshCounterFactory(request)
