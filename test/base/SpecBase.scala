@@ -118,7 +118,7 @@ trait SpecBase
       .overrides(
         bind[IdentifierAction].to[FakeIdentifierAction],
         bind[StcAuthEnrolledAction].to(stcAuthEnrolledActionClass(affinityGroup)),
-        bind[StcDataRetrievalAction].to[StubStcDataRetrievalAction],
+        bind[StcDataRetrievalAction].toInstance(StubStcDataRetrievalAction(userAnswers)),
         bind[DataRequiredAction].to[DataRequiredActionImpl],
         bind[StcDataRequiredAction].toInstance(StubStcDataRequiredAction(userAnswers)),
         bind[DataRetrievalAction].toInstance(new FakeDataRetrievalAction(userAnswers)),

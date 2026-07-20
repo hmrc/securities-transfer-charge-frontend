@@ -143,4 +143,23 @@ class HowToNotifyAboutShareBuybackControllerSpec extends SpecBase with MockitoSu
       }
     }
   }
+
+  "must populate the view correctly on a GET when the question has previously been answered" in {
+
+    val userAnswers = UserAnswers(testUserId, testGroupIdentifier, submissionId).set(HowToNotifyAboutShareBuybackPage, HowToNotifyAboutShareBuyback.values.head).success.value
+    val application = applicationBuilder(userAnswers = Some(userAnswers), affinityGroup = agentAffinity)
+        .overrides(bind[Navigator].qualifiedWith("agentsSh03").toInstance(getNavigator))
+        .build()
+
+    running(application) {
+      val request = FakeRequest(GET, howToNotifyAboutShareBuybackRoute)
+
+      val view = application.injector.instanceOf[HowToNotifyAboutShareBuybackView]
+
+      val result = route(application, request).value
+
+      status(result) mustEqual OK
+      contentAsString(result) mustEqual view(form.fill(HowToNotifyAboutShareBuyback.values.head), NormalMode, affinityGroupKeyAgent, testBackLinkRoute)(request, messages(application)).toString
+    }
+  }
 }

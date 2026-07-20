@@ -49,9 +49,18 @@ class HowToNotifyAboutShareBuybackController @Inject()(
 
   def onPageLoad(): Action[AnyContent] = (stcAuthEnrolled andThen getData) { implicit request =>
     val innerRequest = request.request
-    val form: Form[HowToNotifyAboutShareBuyback] = formProvider(innerRequest.affinityGroupKey)
+    val form = formProvider(innerRequest.affinityGroupKey)
 
-    Ok(view(form, NormalMode, innerRequest.affinityGroupKey, backLinkCall(NormalMode)(request.userAnswers)))
+    val preparedForm = request.userAnswers match {
+      case Some(userAnswers) => userAnswers.get(HowToNotifyAboutShareBuybackPage) match {
+        case Some(answer) => form.fill(answer)
+        case None => form
+      }
+
+      case None => form
+    }
+
+    Ok(view(preparedForm, NormalMode, innerRequest.affinityGroupKey, backLinkCall(NormalMode)(request.userAnswers)))
   }
 
   def onSubmit(): Action[AnyContent] = (stcAuthEnrolled andThen getData).async {
