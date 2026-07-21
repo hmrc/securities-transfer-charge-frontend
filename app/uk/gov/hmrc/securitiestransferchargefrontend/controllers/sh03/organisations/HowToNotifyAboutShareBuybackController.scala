@@ -18,14 +18,14 @@ package uk.gov.hmrc.securitiestransferchargefrontend.controllers.sh03.organisati
 
 import play.api.data.Form
 import play.api.i18n.{I18nSupport, MessagesApi}
-import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
+import play.api.mvc.{Action, AnyContent, Call, MessagesControllerComponents}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import uk.gov.hmrc.securitiestransferchargefrontend.clients.SubmissionIdClient
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.actions.*
 import uk.gov.hmrc.securitiestransferchargefrontend.domain.{GroupIdentifier, UserId}
 import uk.gov.hmrc.securitiestransferchargefrontend.forms.sh03.shared.HowToNotifyAboutShareBuybackFormProvider
 import uk.gov.hmrc.securitiestransferchargefrontend.models.sh03.HowToNotifyAboutShareBuyback
-import uk.gov.hmrc.securitiestransferchargefrontend.models.{NormalMode, UserAnswers}
+import uk.gov.hmrc.securitiestransferchargefrontend.models.{Mode, NormalMode, UserAnswers}
 import uk.gov.hmrc.securitiestransferchargefrontend.navigation.Navigator
 import uk.gov.hmrc.securitiestransferchargefrontend.pages.sh03.HowToNotifyAboutShareBuybackPage
 import uk.gov.hmrc.securitiestransferchargefrontend.views.html.sh03.organisations.HowToNotifyAboutShareBuybackView
@@ -44,11 +44,23 @@ class HowToNotifyAboutShareBuybackController @Inject()(
                                                         view: HowToNotifyAboutShareBuybackView
                                                       )(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport {
 
+  lazy val backLinkCall: Mode => Option[UserAnswers] => Call =
+    mode => userAnswers => navigator.previousPage(HowToNotifyAboutShareBuybackPage, mode, userAnswers)
+
   def onPageLoad(): Action[AnyContent] = (stcAuthEnrolled andThen getData) { implicit request =>
     val innerRequest = request.request
-    val form: Form[HowToNotifyAboutShareBuyback] = formProvider(innerRequest.affinityGroupKey)
+    val form = formProvider(innerRequest.affinityGroupKey)
 
-    Ok(view(form, NormalMode, innerRequest.affinityGroupKey))
+    val preparedForm = request.userAnswers match {
+      case Some(userAnswers) => userAnswers.get(HowToNotifyAboutShareBuybackPage) match {
+        case Some(answer) => form.fill(answer)
+        case None => form
+      }
+
+      case None => form
+    }
+
+    Ok(view(preparedForm, NormalMode, innerRequest.affinityGroupKey, backLinkCall(NormalMode)(request.userAnswers)))
   }
 
   def onSubmit(): Action[AnyContent] = (stcAuthEnrolled andThen getData).async {
@@ -60,7 +72,7 @@ class HowToNotifyAboutShareBuybackController @Inject()(
 
       form.bindFromRequest().fold(
         formWithErrors =>
-          Future.successful(BadRequest(view(formWithErrors, NormalMode, innerRequest.affinityGroupKey))),
+          Future.successful(BadRequest(view(formWithErrors, NormalMode, innerRequest.affinityGroupKey, backLinkCall(NormalMode)(request.userAnswers)))),
 
         howToNotify =>
           for {

@@ -59,7 +59,7 @@ class HowToNotifyAboutShareBuybackControllerSpec extends SpecBase with MockitoSu
         val view = application.injector.instanceOf[HowToNotifyAboutShareBuybackView]
 
         status(result) mustEqual OK
-        contentAsString(result) mustEqual view(form, NormalMode, affinityGroupKeyOrg)(request, messages(application)).toString
+        contentAsString(result) mustEqual view(form, NormalMode, affinityGroupKeyOrg, testBackLinkRoute)(request, messages(application)).toString
       }
     }
 
@@ -140,7 +140,26 @@ class HowToNotifyAboutShareBuybackControllerSpec extends SpecBase with MockitoSu
         val result = route(application, request).value
 
         status(result) mustEqual BAD_REQUEST
-        contentAsString(result) mustEqual view(boundForm, NormalMode, affinityGroupKeyOrg)(request, messages(application)).toString
+        contentAsString(result) mustEqual view(boundForm, NormalMode, affinityGroupKeyOrg, testBackLinkRoute)(request, messages(application)).toString
+      }
+    }
+
+    "must populate the view correctly on a GET when the question has previously been answered" in {
+
+      val userAnswers = UserAnswers(testUserId, testGroupIdentifier, submissionId).set(HowToNotifyAboutShareBuybackPage, HowToNotifyAboutShareBuyback.values.head).success.value
+      val application = applicationBuilder(userAnswers = Some(userAnswers), affinityGroup = orgAffinity)
+        .overrides(bind[Navigator].qualifiedWith("orgSh03").toInstance(getNavigator))
+        .build()
+
+      running(application) {
+        val request = FakeRequest(GET, howToNotifyAboutShareBuybackRoute)
+
+        val view = application.injector.instanceOf[HowToNotifyAboutShareBuybackView]
+
+        val result = route(application, request).value
+
+        status(result) mustEqual OK
+        contentAsString(result) mustEqual view(form.fill(HowToNotifyAboutShareBuyback.values.head), NormalMode, affinityGroupKeyOrg, testBackLinkRoute)(request, messages(application)).toString
       }
     }
   }

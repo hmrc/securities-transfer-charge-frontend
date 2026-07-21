@@ -14,26 +14,26 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.securitiestransferchargefrontend.forms.sh03.agents
+package uk.gov.hmrc.securitiestransferchargefrontend.forms.sh03.shared
 
 import play.api.data.Form
-import play.api.data.Forms._
+import play.api.data.Forms.*
 import uk.gov.hmrc.securitiestransferchargefrontend.forms.mappings.Mappings
-import uk.gov.hmrc.securitiestransferchargefrontend.models.sh03.agents.CompanyDetails
+import uk.gov.hmrc.securitiestransferchargefrontend.models.sh03.shared.CompanyDetails
 
 import javax.inject.Inject
 
 class CompanyDetailsFormProvider @Inject() extends Mappings {
 
-  def apply(): Form[CompanyDetails] = Form(
+  def apply(affinityKey: String): Form[CompanyDetails] = Form(
     mapping(
-      "companyName" -> text("agent.sh03.companyDetails.companyName.error.required")
-        .verifying(maxLength(160, "agent.sh03.companyDetails.companyName.error.length")),
-      
-      "companyRegistrationNumber" -> text("agent.sh03.companyDetails.crn.error.required")
-        .verifying(regexp("""^[a-zA-Z0-9]+$""", "agent.sh03.companyDetails.crn.error.invalid"))
-        .verifying(regexp("""^.{8}$""", "agent.sh03.companyDetails.crn.error.length")),
-      
-      "isPlc" -> boolean("agent.sh03.companyDetails.isPlc.error.required")
+      "companyName" -> text(s"$affinityKey.sh03.companyDetails.companyName.error.required")
+        .verifying(maxLength(160, s"$affinityKey.sh03.companyDetails.companyName.error.length")),
+
+      "companyRegistrationNumber" -> text(s"$affinityKey.sh03.companyDetails.crn.error.required")
+        .verifying(regexp("""^[a-zA-Z0-9]+$""", s"$affinityKey.sh03.companyDetails.crn.error.invalid"))
+        .verifying(regexp("""^.{8}$""", s"$affinityKey.sh03.companyDetails.crn.error.length")),
+
+      "isPlc" -> boolean(s"$affinityKey.sh03.companyDetails.isPlc.error.required")
     )(CompanyDetails.apply)(x => Some((x.companyName, x.companyRegistrationNumber, x.isPlc))))
 }

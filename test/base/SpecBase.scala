@@ -89,6 +89,7 @@ trait SpecBase
   def getNavigator: Navigator = new Navigator {
     override def nextPage(page: Page, mode: Mode, userAnswers: UserAnswers, isReturn: Boolean = false)(implicit request: Request[_]): Future[Call] = Future.successful(testNextPage)
     override def previousPage(page: Page, mode: Mode, userAnswers: UserAnswers): Call = testBackLinkRoute
+    override def previousPage(page: Page, mode: Mode, userAnswers: Option[UserAnswers]): Call = testBackLinkRoute
     override def errorPage(forPage: Page): Call = testErrorPage
   }
   
@@ -117,7 +118,7 @@ trait SpecBase
       .overrides(
         bind[IdentifierAction].to[FakeIdentifierAction],
         bind[StcAuthEnrolledAction].to(stcAuthEnrolledActionClass(affinityGroup)),
-        bind[StcDataRetrievalAction].to[StubStcDataRetrievalAction],
+        bind[StcDataRetrievalAction].toInstance(StubStcDataRetrievalAction(userAnswers)),
         bind[DataRequiredAction].to[DataRequiredActionImpl],
         bind[StcDataRequiredAction].toInstance(StubStcDataRequiredAction(userAnswers)),
         bind[DataRetrievalAction].toInstance(new FakeDataRetrievalAction(userAnswers)),
