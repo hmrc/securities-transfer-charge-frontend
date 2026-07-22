@@ -17,22 +17,23 @@
 package controllers.sh03.agents.single
 
 import base.SpecBase
+import org.mockito.ArgumentMatchers.any
+import org.mockito.Mockito.when
+import org.scalatestplus.mockito.MockitoSugar.mock
 import play.api.data.Form
 import play.api.inject.bind
 import play.api.test.FakeRequest
 import play.api.test.Helpers.*
-import uk.gov.hmrc.auth.core.AffinityGroup
-import uk.gov.hmrc.securitiestransferchargefrontend.controllers.routes
+import uk.gov.hmrc.securitiestransferchargefrontend.clients.SubmissionIdClient
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.sh03.agents.single.routes as agentsSh03SingleRoutes
 import uk.gov.hmrc.securitiestransferchargefrontend.forms.shared.AgentReferenceFormProvider
-import uk.gov.hmrc.securitiestransferchargefrontend.models.sh03.HowToNotifyAboutShareBuyback
-import uk.gov.hmrc.securitiestransferchargefrontend.models.sh03.HowToNotifyAboutShareBuyback.OneAtATime
+import uk.gov.hmrc.securitiestransferchargefrontend.models.NormalMode
 import uk.gov.hmrc.securitiestransferchargefrontend.models.shared.AgentReference
-import uk.gov.hmrc.securitiestransferchargefrontend.models.{NormalMode, UserAnswers}
 import uk.gov.hmrc.securitiestransferchargefrontend.navigation.Navigator
-import uk.gov.hmrc.securitiestransferchargefrontend.pages.sh03.{AgentReferencePage, HowToNotifyAboutShareBuybackPage}
+import uk.gov.hmrc.securitiestransferchargefrontend.pages.sh03.AgentReferencePage
 import uk.gov.hmrc.securitiestransferchargefrontend.views.html.sh03.agents.single.AgentReferenceView
 
+import scala.concurrent.Future
 import scala.util.Random
 
 class AgentReferenceControllerSpec extends SpecBase {
@@ -58,35 +59,45 @@ class AgentReferenceControllerSpec extends SpecBase {
         val view = application.injector.instanceOf[AgentReferenceView]
 
         status(result) mustEqual OK
-        contentAsString(result) mustEqual view(form, NormalMode, testBackLinkRoute)(request, messages(application)).toString
+        contentAsString(result) mustEqual view(form, NormalMode)(request, messages(application)).toString
       }
     }
 
-    "must populate the view correctly on a GET when the question has previously been answered" in {
+    "must return OK and a pre-populated form when an answer already exists" in {
 
-      val userAnswers = UserAnswers(testUserId, testGroupIdentifier, submissionId).set(AgentReferencePage,AgentReference(Some("answer"))).success.value
+      val userAnswers = emptyUserAnswers
+        .set(AgentReferencePage, AgentReference(Some("answer")))
+        .success
+        .value
 
       val application = applicationBuilder(userAnswers = Some(userAnswers), affinityGroup = agentAffinity)
-        .overrides(bind[Navigator].qualifiedWith("agentsSh03").toInstance(getNavigator))
-        .build()
+          .overrides(
+            bind[Navigator].qualifiedWith("agentsSh03").toInstance(getNavigator)
+          )
+          .build()
 
       running(application) {
         val request = FakeRequest(GET, agentReferenceRoute)
 
-        val view = application.injector.instanceOf[AgentReferenceView]
-
         val result = route(application, request).value
 
+        val view = application.injector.instanceOf[AgentReferenceView]
+
         status(result) mustEqual OK
-        contentAsString(result) mustEqual view(form.fill(AgentReference(Some("answer"))), NormalMode, testBackLinkRoute)(request, messages(application)).toString
+        contentAsString(result) mustEqual view(form.fill(AgentReference(Some("answer"))), NormalMode)(request, messages(application)).toString
       }
     }
 
+
     "must redirect to the next page when valid data is submitted" in {
-      val updatedAnswers = emptyUserAnswers.set(HowToNotifyAboutShareBuybackPage, OneAtATime).success.value
+      val mockIdClient = mock[SubmissionIdClient]
+
+      when(mockIdClient.nextSubmissionId()(any()))
+        .thenReturn(Future.successful(submissionId))
 
       val application =
-        applicationBuilder(userAnswers = Some(updatedAnswers), AffinityGroup.Agent)
+        applicationBuilder(userAnswers = Some(emptyUserAnswers), agentAffinity)
+          .overrides(bind[Navigator].qualifiedWith("agentsSh03").toInstance(getNavigator), bind[SubmissionIdClient].toInstance(mockIdClient))
           .build()
 
       running(application) {
@@ -97,7 +108,7 @@ class AgentReferenceControllerSpec extends SpecBase {
         val result = route(application, request).value
 
         status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual agentsSh03SingleRoutes.CompanyDetailsController.onPageLoad(NormalMode).url
+        redirectLocation(result).value mustEqual testNextPage.url
       }
     }
 
@@ -122,22 +133,9 @@ class AgentReferenceControllerSpec extends SpecBase {
         val result = route(application, request).value
 
         status(result) mustEqual BAD_REQUEST
-        contentAsString(result) mustEqual view(boundForm, NormalMode, testBackLinkRoute)(request, messages(application)).toString
+        contentAsString(result) mustEqual view(boundForm, NormalMode)(request, messages(application)).toString
       }
     }
 
-    "must redirect to Journey Recovery for a GET if no existing data is found" in {
-
-      val application = applicationBuilder(userAnswers = None, affinityGroup = agentAffinity).build()
-
-      running(application) {
-        val request = FakeRequest(GET, agentReferenceRoute)
-
-        val result = route(application, request).value
-
-        status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual routes.JourneyRecoveryController.onPageLoad().url
-      }
-    }
   }
 }

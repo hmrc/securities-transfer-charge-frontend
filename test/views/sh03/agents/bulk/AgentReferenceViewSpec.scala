@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package views.sh03.agents.single
+package views.sh03.agents.bulk
 
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
@@ -22,7 +22,7 @@ import play.api.Application
 import play.api.mvc.Call
 import uk.gov.hmrc.securitiestransferchargefrontend.forms.shared.AgentReferenceFormProvider
 import uk.gov.hmrc.securitiestransferchargefrontend.models.NormalMode
-import uk.gov.hmrc.securitiestransferchargefrontend.views.html.sh03.agents.single.AgentReferenceView
+import uk.gov.hmrc.securitiestransferchargefrontend.views.html.sh03.agents.bulk.AgentReferenceView
 import views.ViewBaseSpec
 
 import scala.language.postfixOps

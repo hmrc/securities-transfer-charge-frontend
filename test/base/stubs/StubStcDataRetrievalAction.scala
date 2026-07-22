@@ -16,18 +16,24 @@
 
 package base.stubs
 
-import base.Fixtures.emptyUserAnswers
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.actions.requests.StcOptionalDataRequest
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.actions.{StcAuthorisedRequest, StcDataRetrievalAction}
+import uk.gov.hmrc.securitiestransferchargefrontend.models.UserAnswers
 
 import scala.concurrent.{ExecutionContext, Future}
 
-class StubStcDataRetrievalAction extends StcDataRetrievalAction {
-  override def transform[A](request: StcAuthorisedRequest[A]): Future[StcOptionalDataRequest[A]] =
-    Future.successful(StcOptionalDataRequest(request, Some(emptyUserAnswers)))
+class StubStcDataRetrievalAction(userAnswers: Option[UserAnswers]) extends StcDataRetrievalAction {
 
-  override protected def executionContext: ExecutionContext = ExecutionContext.global
+  override def transform[A](request: StcAuthorisedRequest[A]): Future[StcOptionalDataRequest[A]] =
+    Future.successful(
+      StcOptionalDataRequest(request, userAnswers)
+    )
+
+  override protected def executionContext: ExecutionContext =
+    ExecutionContext.global
 }
+
 object StubStcDataRetrievalAction {
-  def apply(): StubStcDataRetrievalAction = new StubStcDataRetrievalAction
+  def apply(userAnswers: Option[UserAnswers] = None): StubStcDataRetrievalAction =
+    new StubStcDataRetrievalAction(userAnswers)
 }

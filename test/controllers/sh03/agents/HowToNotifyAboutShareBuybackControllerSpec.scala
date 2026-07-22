@@ -26,6 +26,8 @@ import play.api.test.FakeRequest
 import play.api.test.Helpers.*
 import uk.gov.hmrc.securitiestransferchargefrontend.clients.SubmissionIdClient
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.sh03.agents.routes as agentRoutes
+import uk.gov.hmrc.securitiestransferchargefrontend.controllers.sh03.agents.single.routes as singleRoute
+import uk.gov.hmrc.securitiestransferchargefrontend.controllers.sh03.agents.bulk.routes as bulkRoute
 import uk.gov.hmrc.securitiestransferchargefrontend.forms.sh03.shared.HowToNotifyAboutShareBuybackFormProvider
 import uk.gov.hmrc.securitiestransferchargefrontend.models.sh03.HowToNotifyAboutShareBuyback
 import uk.gov.hmrc.securitiestransferchargefrontend.models.{NormalMode, UserAnswers}
@@ -89,7 +91,7 @@ class HowToNotifyAboutShareBuybackControllerSpec extends SpecBase with MockitoSu
 
         status(result) mustEqual SEE_OTHER
 
-        redirectLocation(result).value mustEqual testNextPage.url
+        redirectLocation(result).value mustEqual singleRoute.AgentReferenceController.onPageLoad(NormalMode).url
       }
     }
 
@@ -119,7 +121,7 @@ class HowToNotifyAboutShareBuybackControllerSpec extends SpecBase with MockitoSu
 
         status(result) mustEqual SEE_OTHER
 
-        redirectLocation(result).value mustEqual testNextPage.url
+        redirectLocation(result).value mustEqual bulkRoute.AgentReferenceController.onPageLoad(NormalMode).url
       }
     }
 

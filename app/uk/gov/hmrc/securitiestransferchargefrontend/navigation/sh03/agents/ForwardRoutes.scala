@@ -27,7 +27,7 @@ import uk.gov.hmrc.securitiestransferchargefrontend.models.{NormalMode, UserAnsw
 import uk.gov.hmrc.securitiestransferchargefrontend.navigation.PersistentNavigationHelper
 import uk.gov.hmrc.securitiestransferchargefrontend.pages.Page
 import uk.gov.hmrc.securitiestransferchargefrontend.pages.sh03.*
-import uk.gov.hmrc.securitiestransferchargefrontend.pages.sh03.bulk.{BulkAgentReferencePage, BulkCompanyDetailsPage}
+import uk.gov.hmrc.securitiestransferchargefrontend.pages.sh03.bulk.*
 import uk.gov.hmrc.securitiestransferchargefrontend.services.AnswerPersistenceService
 
 import scala.concurrent.{ExecutionContext, Future}
@@ -111,6 +111,14 @@ class ForwardRoutes(answerPersistenceService: AnswerPersistenceService,
 
     case BulkCompanyDetailsPage => userAnswers =>
       dataRequired(BulkCompanyDetailsPage, userAnswers, sh03AgentBulkRoutes.TemplateInstructionsController.onPageLoad())
+
+    case BulkRoleAtPurchasingCompanyPage => userAnswers =>
+      dataDependent(BulkRoleAtPurchasingCompanyPage, userAnswers) {
+        roleAtPurchasingCompany =>
+          if (roleAtPurchasingCompany.role == RoleAtPurchasingCompany.unsupportedRole)
+            sh03AgentBulkRoutes.CannotSubmitFormErrorController.onPageLoad()
+          else ???
+      }
 
     case _ => _ => Future.successful(defaultPage)
   }

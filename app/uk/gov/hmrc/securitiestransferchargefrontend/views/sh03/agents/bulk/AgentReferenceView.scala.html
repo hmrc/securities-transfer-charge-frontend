@@ -18,7 +18,8 @@
 @import uk.gov.hmrc.securitiestransferchargefrontend.viewmodels.LabelSize.Large
 @import uk.gov.hmrc.securitiestransferchargefrontend.views.html.components.SaveAndReturnButton
 @import uk.gov.hmrc.securitiestransferchargefrontend.views.html.templates
-@import uk.gov.hmrc.securitiestransferchargefrontend.controllers.sh03.agents.bulk.routes
+@import uk.gov.hmrc.securitiestransferchargefrontend.controllers.sh03.agents.bulk.routes as bulkRoutes
+@import uk.gov.hmrc.securitiestransferchargefrontend.controllers.sh03.agents.routes
 
 @this(
     layout: templates.Layout,
@@ -30,9 +31,9 @@
 )
 @(form: Form[_], mode: Mode)(implicit request: Request[_], messages: Messages)
 
-@layout(pageTitle = title(form, messages("agentReference.title"), Some(messages("sh03.section.name"))), backLinkUrl = Some("")) {
+@layout(pageTitle = title(form, messages("agentReference.title"), Some(messages("sh03.section.name"))),backLinkUrl = Some(routes.HowToNotifyAboutShareBuybackController.onPageLoad().url)) {
 
-    @formHelper(action = routes.AgentReferenceController.onSubmit(mode)) {
+    @formHelper(action = bulkRoutes.AgentReferenceController.onSubmit(mode)) {
 
         @if(form.errors.nonEmpty) {
             @govukErrorSummary(ErrorSummaryViewModel(form))

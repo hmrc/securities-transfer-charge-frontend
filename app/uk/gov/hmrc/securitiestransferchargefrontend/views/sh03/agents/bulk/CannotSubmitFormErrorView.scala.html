@@ -1,0 +1,53 @@
+@*
+ * Copyright 2026 HM Revenue & Customs
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *@
+
+@import uk.gov.hmrc.securitiestransferchargefrontend.views.html.templates
+@import uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.shared.routes
+@import uk.gov.hmrc.securitiestransferchargefrontend.models.NormalMode
+
+@this(
+    layout: templates.Layout,
+    govukButton: GovukButton
+)
+
+@(backLinkCall: Call)(implicit request: Request[_], messages: Messages)
+
+@layout(pageTitle = titleNoForm(messages("agent.sh03.cannotSubmitFormError.title"), Some(messages("sh03.section.name"))), backLinkUrl = Some(backLinkCall.url)) {
+
+    <h1 class="govuk-heading-l">@messages("agent.sh03.cannotSubmitFormError.heading")</h1>
+
+    <p class="govuk-body">@messages("agent.sh03.cannotSubmitFormError.error.p1")</p>
+    <p class="govuk-body">@messages("agent.sh03.cannotSubmitFormError.error.p2")</p>
+
+    <ul class="govuk-list govuk-list--bullet govuk-!-padding-left-7">
+        <li>@messages("agent.sh03.cannotSubmitFormError.item1")</li>
+        <li>@messages("agent.sh03.cannotSubmitFormError.item2")</li>
+        <li>@messages("agent.sh03.cannotSubmitFormError.item3")</li>
+        <li>@messages("agent.sh03.cannotSubmitFormError.item4")</li>
+        <li>@messages("agent.sh03.cannotSubmitFormError.item5")</li>
+        <li>@messages("agent.sh03.cannotSubmitFormError.item6")</li>
+        <li>@messages("agent.sh03.cannotSubmitFormError.item7")</li>
+        <li>@messages("agent.sh03.cannotSubmitFormError.item8")</li>
+    </ul>
+
+    <p class="govuk-body">@messages("agent.sh03.cannotSubmitFormError.error.p3")</p>
+
+    <p class="govuk-body">
+        <a class="govuk-link" href="@routes.SubmissionsDashboardController.onPageLoad().url">
+        @messages("save-and-return-to-dashboard.link")
+        </a>
+    </p>
+}

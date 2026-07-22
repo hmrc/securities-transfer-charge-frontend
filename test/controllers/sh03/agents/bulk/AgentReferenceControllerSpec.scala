@@ -30,6 +30,7 @@ import uk.gov.hmrc.securitiestransferchargefrontend.forms.shared.AgentReferenceF
 import uk.gov.hmrc.securitiestransferchargefrontend.models.NormalMode
 import uk.gov.hmrc.securitiestransferchargefrontend.models.shared.AgentReference
 import uk.gov.hmrc.securitiestransferchargefrontend.navigation.Navigator
+import uk.gov.hmrc.securitiestransferchargefrontend.pages.sh03.bulk.BulkAgentReferencePage
 import uk.gov.hmrc.securitiestransferchargefrontend.views.html.sh03.agents.bulk.AgentReferenceView
 
 import scala.concurrent.Future
@@ -61,7 +62,32 @@ class AgentReferenceControllerSpec extends SpecBase {
         contentAsString(result) mustEqual view(form, NormalMode)(request, messages(application)).toString
       }
     }
-    
+
+    "must return OK and a pre-populated form when an answer already exists" in {
+
+      val userAnswers = emptyUserAnswers
+        .set(BulkAgentReferencePage, AgentReference(Some("answer")))
+        .success
+        .value
+
+      val application = applicationBuilder(userAnswers = Some(userAnswers), affinityGroup = agentAffinity)
+        .overrides(
+          bind[Navigator].qualifiedWith("agentsSh03").toInstance(getNavigator)
+        )
+        .build()
+
+      running(application) {
+        val request = FakeRequest(GET, agentReferenceRoute)
+
+        val result = route(application, request).value
+
+        val view = application.injector.instanceOf[AgentReferenceView]
+
+        status(result) mustEqual OK
+        contentAsString(result) mustEqual view(form.fill(AgentReference(Some("answer"))), NormalMode)(request, messages(application)).toString
+      }
+    }
+
     "must redirect to the next page when valid data is submitted" in {
       val mockIdClient = mock[SubmissionIdClient]
 

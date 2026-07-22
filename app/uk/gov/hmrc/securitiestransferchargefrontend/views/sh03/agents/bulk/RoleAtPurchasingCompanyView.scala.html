@@ -1,0 +1,103 @@
+@*
+ * Copyright 2026 HM Revenue & Customs
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *@
+
+@import uk.gov.hmrc.securitiestransferchargefrontend.viewmodels.InputWidth._
+@import uk.gov.hmrc.securitiestransferchargefrontend.controllers.sh03.agents.bulk.routes
+@import uk.gov.hmrc.securitiestransferchargefrontend.views.html.components.SaveAndReturnButton
+@import uk.gov.hmrc.securitiestransferchargefrontend.views.html.templates
+@import uk.gov.hmrc.securitiestransferchargefrontend.viewmodels.LegendSize.Large
+
+@this(
+    layout: templates.Layout,
+    formHelper: FormWithCSRF,
+    govukErrorSummary: GovukErrorSummary,
+    govukRadios: GovukRadios,
+    govukInput: GovukInput,
+    govukButton: GovukButton,
+    saveAndReturnButton: SaveAndReturnButton
+)
+
+@(form: Form[_], mode: Mode, backLinkCall: Call)(implicit request: Request[_], messages: Messages)
+
+@layout(pageTitle = title(form, messages("agent.sh03.roleAtPurchasingCompany.title"), Some(messages("sh03.section.name"))), backLinkUrl = Some(backLinkCall.url)) {
+
+    @formHelper(action = routes.RoleAtPurchasingCompanyController.onSubmit(mode), Symbol("autoComplete") -> "off") {
+
+        @if(form.errors.nonEmpty) {
+            @govukErrorSummary(ErrorSummaryViewModel(form))
+        }
+
+        @govukRadios(
+            RadiosViewModel(
+                field = form("role"),
+                legend = LegendViewModel(messages("agent.sh03.roleAtPurchasingCompany.heading")).asPageHeading(Large),
+                items = Seq(
+                    RadioItem(
+                        content = Text(messages("agent.sh03.roleAtPurchasingCompany.director")),
+                        value = Some("director")
+                    ),
+                    RadioItem(
+                        content = Text(messages("agent.sh03.roleAtPurchasingCompany.secretary")),
+                        value = Some("secretary")
+                    ),
+                    RadioItem(
+                        content = Text(messages("agent.sh03.roleAtPurchasingCompany.personAuthorised")),
+                        value = Some("personAuthorised")
+                    ),
+                    RadioItem(
+                        content = Text(messages("agent.sh03.roleAtPurchasingCompany.administrator")),
+                        value = Some("administrator")
+                    ),
+                    RadioItem(
+                        content = Text(messages("agent.sh03.roleAtPurchasingCompany.receiver")),
+                        value = Some("receiver")
+                    ),
+                    RadioItem(
+                        content = Text(messages("agent.sh03.roleAtPurchasingCompany.receiverManager")),
+                        value = Some("receiverManager")
+                    ),
+                    RadioItem(
+                        content = Text(messages("agent.sh03.roleAtPurchasingCompany.cicManager")),
+                        value = Some("cicManager")
+                    ),
+                    RadioItem(
+                        content = Text(messages("agent.sh03.roleAtPurchasingCompany.ukSocietas")),
+                        value = Some("ukSocietas"),
+                        conditionalHtml = Some(govukInput(
+                            InputViewModel(
+                                field = form("uksOrgan"),
+                                label = LabelViewModel(messages("agent.sh03.roleAtPurchasingCompany.uksOrgan.label"))
+                            )
+                            .withWidth(Fixed20)
+                        ))
+                    ),
+                    RadioItem(
+                        divider = Some(messages("site.or"))
+                    ),
+                    RadioItem(
+                        content = Text(messages("agent.sh03.roleAtPurchasingCompany.notProvided")),
+                        value = Some("unsupportedRole")
+                    )
+                )
+            )
+        )
+
+        @govukButton(
+            ButtonViewModel(messages("site.save-and-continue.button"))
+        )
+        @saveAndReturnButton()
+    }
+}

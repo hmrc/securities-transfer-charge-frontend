@@ -25,7 +25,9 @@ import uk.gov.hmrc.securitiestransferchargefrontend.models.{NormalMode, UserAnsw
 import uk.gov.hmrc.securitiestransferchargefrontend.navigation.NavigationHelper
 import uk.gov.hmrc.securitiestransferchargefrontend.pages.*
 import uk.gov.hmrc.securitiestransferchargefrontend.pages.sh03.*
-import uk.gov.hmrc.securitiestransferchargefrontend.pages.sh03.bulk.BulkCompanyDetailsPage
+import uk.gov.hmrc.securitiestransferchargefrontend.pages.sh03.bulk.*
+import uk.gov.hmrc.securitiestransferchargefrontend.controllers.fileUpload.routes
+import uk.gov.hmrc.securitiestransferchargefrontend.models.JourneyType.SH03
 
 class BackwardsRoutes(defaultPage: Call):
 
@@ -63,5 +65,7 @@ class BackwardsRoutes(defaultPage: Call):
     }
     case RoleAtPurchasingCompanyPage => _ => sh03AgentSingleRoutes.ChargingPointController.onPageLoad(NormalMode)
     case BulkCompanyDetailsPage => _ => sh03AgentBulkRoutes.AgentReferenceController.onPageLoad(NormalMode)
+    case BulkRoleAtPurchasingCompanyPage => _ => routes.FileUploadController.onPageLoad(SH03)
+    case CannotSubmitFormErrorPage => _ => sh03AgentBulkRoutes.RoleAtPurchasingCompanyController.onPageLoad(NormalMode)
     case _ => _ => defaultPage
   }
