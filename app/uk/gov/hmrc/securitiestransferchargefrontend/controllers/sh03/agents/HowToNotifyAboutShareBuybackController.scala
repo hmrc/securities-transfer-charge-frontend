@@ -18,11 +18,12 @@ package uk.gov.hmrc.securitiestransferchargefrontend.controllers.sh03.agents
 
 import play.api.data.Form
 import play.api.i18n.{I18nSupport, MessagesApi}
-import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
+import play.api.mvc.{Action, AnyContent, Call, MessagesControllerComponents}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.actions.*
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.sh03.agents.bulk.routes as bulkRoutes
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.sh03.agents.single.routes as singleRoutes
+import uk.gov.hmrc.securitiestransferchargefrontend.controllers.sh03.shared.routes as sharedRoutes
 import uk.gov.hmrc.securitiestransferchargefrontend.forms.sh03.shared.HowToNotifyAboutShareBuybackFormProvider
 import uk.gov.hmrc.securitiestransferchargefrontend.models.NormalMode
 import uk.gov.hmrc.securitiestransferchargefrontend.models.sh03.HowToNotifyAboutShareBuyback
@@ -41,14 +42,14 @@ class HowToNotifyAboutShareBuybackController @Inject()(
                                        view: HowToNotifyAboutShareBuybackView
                                      ) extends FrontendBaseController with I18nSupport {
 
-  
+  val backLinkRoute: Call = sharedRoutes.BeforeYouStartController.onPageLoad()
 
   def onPageLoad(): Action[AnyContent] = (stcAuthEnrolled andThen getData) {implicit request =>
 
     val innerRequest = request.request
     val form: Form[HowToNotifyAboutShareBuyback] = formProvider(innerRequest.affinityGroupKey)
 
-    Ok(view(form, NormalMode, innerRequest.affinityGroupKey))
+    Ok(view(form, NormalMode, innerRequest.affinityGroupKey,backLinkRoute))
   }
 
 
@@ -61,7 +62,7 @@ class HowToNotifyAboutShareBuybackController @Inject()(
       form.bindFromRequest().fold(
         formWithErrors =>
           Future.successful(
-            BadRequest(view(formWithErrors, NormalMode, innerRequest.affinityGroupKey))
+            BadRequest(view(formWithErrors, NormalMode, innerRequest.affinityGroupKey,backLinkRoute))
           ),
 
         {

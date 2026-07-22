@@ -41,6 +41,7 @@ class BackwardsRoutes(defaultPage: Call):
       dataDependent(HowToNotifyAboutSecuritiesTransferPage, userAnswers) {
         case OneAtATime => agentRoutes.HowToNotifyAboutSecuritiesTransferController.onPageLoad()
         case MoreThanOneAtATime => bulkSharedRoutes.FileUploadController.onPageLoad(JourneyType.STF)
+      }
     }
     case NameOfBuyerPage => _ => agentSingleRoutes.AgentReferenceController.onPageLoad(NormalMode)
     case StfBuyersAddressPage => _ => agentSingleRoutes.NameOfBuyerController.onPageLoad(NormalMode)
