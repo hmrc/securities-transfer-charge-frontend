@@ -79,8 +79,8 @@ trait FileUploadFixtures {
       securitiesQuantity = Some("1"),
       amountPaidForSecurities = Some("1"),
       totalMarketValue = Some("1"),
-      minSharePrice = Some(BigDecimal(1)),
-      maxSharePrice = Some(BigDecimal(1)),
+      minSharePrice = Some("1"),
+      maxSharePrice = Some("1"),
       sharePurchaseReason = Some(""),
       purchaseForCancellation = Some(false)
     )

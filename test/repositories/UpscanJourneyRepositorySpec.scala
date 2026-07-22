@@ -20,6 +20,7 @@ import base.SpecBase
 import org.scalatest.BeforeAndAfterEach
 import play.api.Application
 import play.api.test.Helpers.{await, defaultAwaitTimeout}
+import uk.gov.hmrc.securitiestransferchargefrontend.models.JourneyType
 import uk.gov.hmrc.securitiestransferchargefrontend.models.JourneyType.STF
 import uk.gov.hmrc.securitiestransferchargefrontend.models.stf.upscan.UpscanCallbackRequest.UploadDetails
 import uk.gov.hmrc.securitiestransferchargefrontend.models.stf.upscan.{FileUpload, UpscanDocument, UpscanJourneyStatus}
@@ -71,6 +72,24 @@ class UpscanJourneyRepositorySpec extends SpecBase with BeforeAndAfterEach {
       await(repository.insert(document))
 
       await(repository.find(document.fileUpload.reference)) mustBe Some(document.fileUpload)
+    }
+
+    "store and retrieve an upscan journey document with an SH03 JourneyType" in {
+      val reference = "sh03-ref"
+      val document = UpscanDocument(
+        _id = reference,
+        fileUpload = FileUpload(
+          reference = reference,
+          status = UpscanJourneyStatus.Initiated,
+          journeyType = JourneyType.SH03
+        )
+      )
+
+      await(repository.insert(document))
+
+      val retrieved = await(repository.find(reference))
+      retrieved mustBe Some(document.fileUpload)
+      retrieved.get.journeyType mustBe JourneyType.SH03
     }
   }
 

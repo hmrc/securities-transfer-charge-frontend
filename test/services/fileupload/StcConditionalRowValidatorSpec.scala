@@ -105,6 +105,17 @@ class StcConditionalRowValidatorSpec extends SpecBase {
       result.exists(_.fieldName == "whatReliefAreYouApplyingFor") mustBe true
     }
 
+    "ignore relief type errors when applying for relief is no" in {
+      val result = validator.validate(
+        validParsedRow.copy(
+          applyingForRelief = Some(false),
+          whatReliefAreYouApplyingFor = Some("Made Up Relief")
+        ), StcTemplate.STF,affinityGroupKeyInd
+      )
+
+      result.exists(_.fieldName == "whatReliefAreYouApplyingFor") mustBe false
+    }
+
     "require type of shares when what type of securities is shares" in {
       val result = validator.validate(
         validParsedRow.copy(
@@ -281,6 +292,39 @@ class StcConditionalRowValidatorSpec extends SpecBase {
       )
 
       result.exists(_.fieldName == "totalMarketValue") mustBe true
+    }
+
+    "reject total market value below minimum when connected persons is yes" in {
+      val result = validator.validate(
+        validParsedRow.copy(
+          connectedPersons = Some(true),
+          totalMarketValue = Some("0")
+        ), StcTemplate.STF,affinityGroupKeyInd
+      )
+
+      result.exists(_.fieldName == "totalMarketValue") mustBe true
+    }
+
+    "reject invalid numeric total market value when connected persons is yes" in {
+      val result = validator.validate(
+        validParsedRow.copy(
+          connectedPersons = Some(true),
+          totalMarketValue = Some("100.123")
+        ), StcTemplate.STF,affinityGroupKeyInd
+      )
+
+      result.exists(_.fieldName == "totalMarketValue") mustBe true
+    }
+
+    "ignore total market value errors when connected persons is no" in {
+      val result = validator.validate(
+        validParsedRow.copy(
+          connectedPersons = Some(false),
+          totalMarketValue = Some("NOT A NUMBER")
+        ), StcTemplate.STF,affinityGroupKeyInd
+      )
+
+      result.exists(_.fieldName == "totalMarketValue") mustBe false
     }
   }
 
@@ -531,6 +575,17 @@ class StcConditionalRowValidatorSpec extends SpecBase {
       )
 
       result.exists(_.fieldName == "whatReliefAreYouApplyingFor") mustBe true
+    }
+
+    "require total market value when connected persons is yes" in {
+      val result = validator.validate(
+        validParsedRow.copy(
+          connectedPersons = Some(true),
+          totalMarketValue = None
+        ), StcTemplate.SH03, affinityGroupKeyInd
+      )
+
+      result.exists(_.fieldName == "totalMarketValue") mustBe true
     }
   }
 }

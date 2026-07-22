@@ -39,10 +39,6 @@ import scala.concurrent.Future
 
 class FileUploadControllerSpec extends SpecBase with MockitoSugar {
 
-  val journeyType: JourneyType = JourneyType.STF
-
-  lazy val fileUploadRoute: String = routes.FileUploadController.onPageLoad(journeyType).url
-  lazy val onUploadErrorRoute: String = routes.FileUploadController.onUploadError().url
   val reference = "file1"
   val uploadRequest: UploadRequest = UploadRequest(href = "http://someUrl.com", fields = Map("key" -> "1234"))
 
@@ -50,96 +46,105 @@ class FileUploadControllerSpec extends SpecBase with MockitoSugar {
 
   "FileUploadController Controller" - {
 
-    "onPageLoad" - {
+    Seq(JourneyType.STF, JourneyType.SH03).foreach { journeyType =>
 
-      "must return OK and the correct view for a GET" in {
+      s"For JourneyType $journeyType" - {
 
-        val mockUpscanInitiateConnector = mock[UpscanInitiateConnector]
-        val mockCounter = mock[FileProcessingRefreshCounter]
-        val mockCounterFactory = mock[FileProcessingRefreshCounterFactory]
+        lazy val fileUploadRoute: String = routes.FileUploadController.onPageLoad(journeyType).url
+        lazy val onUploadErrorRoute: String = routes.FileUploadController.onUploadError().url
 
+        "onPageLoad" - {
 
-        when(mockUpscanInitiateConnector.initiate()(any[HeaderCarrier]())).thenReturn(Future.successful(upscanInitiateResponse))
-        when(mockCounterFactory.apply(any())).thenReturn(mockCounter)
-        when(mockCounter.reset(any[Result])).thenAnswer(inv => inv.getArgument[Result](0))
+          "must return OK and the correct view for a GET" in {
 
-        val application = applicationBuilder(userAnswers = Some(emptyUserAnswers))
-          .overrides(
-            inject.bind[UpscanInitiateConnector].to(mockUpscanInitiateConnector),
-            inject.bind[FileProcessingRefreshCounterFactory].to(mockCounterFactory))
-          .build()
+            val mockUpscanInitiateConnector = mock[UpscanInitiateConnector]
+            val mockCounter = mock[FileProcessingRefreshCounter]
+            val mockCounterFactory = mock[FileProcessingRefreshCounterFactory]
 
 
-        running(application) {
-          val request = FakeRequest(GET, fileUploadRoute)
+            when(mockUpscanInitiateConnector.initiate()(any[HeaderCarrier]())).thenReturn(Future.successful(upscanInitiateResponse))
+            when(mockCounterFactory.apply(any())).thenReturn(mockCounter)
+            when(mockCounter.reset(any[Result])).thenAnswer(inv => inv.getArgument[Result](0))
 
-          val result = route(application, request).value
+            val application = applicationBuilder(userAnswers = Some(emptyUserAnswers))
+              .overrides(
+                inject.bind[UpscanInitiateConnector].to(mockUpscanInitiateConnector),
+                inject.bind[FileProcessingRefreshCounterFactory].to(mockCounterFactory))
+              .build()
 
-          val view = application.injector.instanceOf[FileUploadView]
 
-          status(result) mustEqual OK
-          contentAsString(result) mustEqual view(uploadRequest)(request, messages(application)).toString
-          verify(mockCounter).reset(any[Result])
+            running(application) {
+              val request = FakeRequest(GET, fileUploadRoute)
+
+              val result = route(application, request).value
+
+              val view = application.injector.instanceOf[FileUploadView]
+
+              status(result) mustEqual OK
+              contentAsString(result) mustEqual view(uploadRequest)(request, messages(application)).toString
+              verify(mockCounter).reset(any[Result])
+            }
+          }
         }
-      }
-    }
 
 
-    "onUploadError" - {
+        "onUploadError" - {
 
-      "must delete the mongo document and redirect to the BulkUploadErrorController" in {
+          "must delete the mongo document and redirect to the BulkUploadErrorController" in {
 
-        val mockRepository = mock[UpscanJourneyRepository]
+            val mockRepository = mock[UpscanJourneyRepository]
 
-        when(mockRepository.find("1234"))
-          .thenReturn(Future.successful(Some(FileUpload(reference = "1234",status = Failed,journeyType = journeyType))))
-        when(mockRepository.delete("1234"))
-          .thenReturn(Future.successful(()))
+            when(mockRepository.find("1234"))
+              .thenReturn(Future.successful(Some(FileUpload(reference = "1234",status = Failed,journeyType = journeyType))))
+            when(mockRepository.delete("1234"))
+              .thenReturn(Future.successful(()))
 
-        val application = applicationBuilder(userAnswers = Some(emptyUserAnswers))
-          .overrides(
-            inject.bind[UpscanJourneyRepository].toInstance(mockRepository)
-          )
-          .build()
+            val application = applicationBuilder(userAnswers = Some(emptyUserAnswers))
+              .overrides(
+                inject.bind[UpscanJourneyRepository].toInstance(mockRepository)
+              )
+              .build()
 
-        running(application) {
+            running(application) {
 
-          val request =
-            FakeRequest(GET, s"$onUploadErrorRoute?key=1234")
+              val request =
+                FakeRequest(GET, s"$onUploadErrorRoute?key=1234")
 
-          val result = route(application, request).value
+              val result = route(application, request).value
 
-          status(result) mustEqual SEE_OTHER
+              status(result) mustEqual SEE_OTHER
 
-          redirectLocation(result).value mustEqual
-            routes.BulkUploadErrorController.onPageLoad(journeyType).url
+              redirectLocation(result).value mustEqual
+                routes.BulkUploadErrorController.onPageLoad(journeyType).url
 
-          verify(mockRepository).delete("1234")
-        }
-      }
+              verify(mockRepository).delete("1234")
+            }
+          }
 
-      "must redirect to the JourneyRecovery when no key is supplied" in {
+          "must redirect to the JourneyRecovery when no key is supplied" in {
 
-        val mockRepository = mock[UpscanJourneyRepository]
+            val mockRepository = mock[UpscanJourneyRepository]
 
-        val application = applicationBuilder(userAnswers = Some(emptyUserAnswers))
-          .overrides(
-            inject.bind[UpscanJourneyRepository].toInstance(mockRepository)
-          )
-          .build()
+            val application = applicationBuilder(userAnswers = Some(emptyUserAnswers))
+              .overrides(
+                inject.bind[UpscanJourneyRepository].toInstance(mockRepository)
+              )
+              .build()
 
-        running(application) {
+            running(application) {
 
-          val request =
-            FakeRequest(GET, onUploadErrorRoute)
+              val request =
+                FakeRequest(GET, onUploadErrorRoute)
 
-          val result = route(application, request).value
+              val result = route(application, request).value
 
-          status(result) mustEqual SEE_OTHER
+              status(result) mustEqual SEE_OTHER
 
-          redirectLocation(result).value mustEqual JourneyRecoveryController.onPageLoad().url
+              redirectLocation(result).value mustEqual JourneyRecoveryController.onPageLoad().url
 
-          verify(mockRepository, never()).delete(any[String])
+              verify(mockRepository, never()).delete(any[String])
+            }
+          }
         }
       }
     }

@@ -77,7 +77,9 @@ class StcBasicRowValidator @Inject()(
       validateMaxSharePrice(row) ++
       validateMinSharePrice(row) ++
       validateSharePurchaseReason(row) ++
-      validatePurchasedForCancellation(row)
+      validatePurchasedForCancellation(row) ++
+      validateConnectedPersons(row, affinityKey) ++
+      validateApplyingForRelief(row, affinityKey)
 
   def validateAgentSTF(row: ParsedStcRow, affinityKey: String)(implicit cols: ColumnIndexBuilder): Seq[StcRowValidationError] =
     validateNameOfBuyer(row) ++
@@ -186,7 +188,7 @@ class StcBasicRowValidator @Inject()(
                                         )(implicit cols: ColumnIndexBuilder): Seq[StcRowValidationError] = {
 
     row.securitiesQuantity match {
-      
+
       case None | Some("") =>
         Seq(
           support.error(
@@ -197,8 +199,8 @@ class StcBasicRowValidator @Inject()(
         )
 
       case Some(stringValue) =>
-        Try(BigDecimal(stringValue)) match {
-          
+        Try(BigDecimal(stringValue.replace(",", ""))) match {
+
           case Failure(_) =>
             Seq(
               support.error(
@@ -207,13 +209,22 @@ class StcBasicRowValidator @Inject()(
                 messages(s"$affinityKey.detailsOfThisTransfer.error.numberOfShares.nonNumeric")
               )
             )
-            
+
           case Success(value) if !value.isWhole =>
             Seq(
               support.error(
                 row.rowNumber,
                 "securitiesQuantity",
-                messages(s"detailsOfThisTransfer.error.numberOfShares.wholeNumber")
+                messages("detailsOfThisTransfer.error.numberOfShares.wholeNumber")
+              )
+            )
+
+          case Success(value) if value > support.securitiesQuantityMax =>
+            Seq(
+              support.error(
+                row.rowNumber,
+                "securitiesQuantity",
+                messages(s"$affinityKey.fileUpload.error.securitiesQuantity.maximum")
               )
             )
 
@@ -223,15 +234,6 @@ class StcBasicRowValidator @Inject()(
                 row.rowNumber,
                 "securitiesQuantity",
                 messages(s"$affinityKey.fileUpload.error.securitiesQuantity.minimum")
-              )
-            )
-
-          case Success(value) if value >= support.securitiesQuantityMax =>
-            Seq(
-              support.error(
-                row.rowNumber,
-                "securitiesQuantity",
-                messages(s"$affinityKey.fileUpload.error.securitiesQuantity.maximum")
               )
             )
 
@@ -346,26 +348,51 @@ class StcBasicRowValidator @Inject()(
 
     row.maxSharePrice match {
 
-      case None =>
-        Seq(
-          support.error(
-            row.rowNumber,
-            "maxSharePrice",
-            messages("maxSharePrice.error.required")
-          )
-        )
-
-      case Some(v) if v > support.maxCurrency =>
-        Seq(
-          support.error(
-            row.rowNumber,
-            "maxSharePrice",
-            messages("maxSharePrice.error.maximum")
-          )
-        )
-
-      case _ =>
+      case None | Some("") =>
         Seq.empty
+
+      case Some(stringValue) =>
+        Try(BigDecimal(stringValue.replace(",", ""))) match {
+
+          case Failure(_) =>
+            Seq(
+              support.error(
+                row.rowNumber,
+                "maxSharePrice",
+                messages("maxSharePrice.error.invalid")
+              )
+            )
+
+          case Success(v) if v.scale > 2 =>
+            Seq(
+              support.error(
+                row.rowNumber,
+                "maxSharePrice",
+                messages("maxSharePrice.error.invalid")
+              )
+            )
+
+          case Success(v) if v > support.maxCurrency =>
+            Seq(
+              support.error(
+                row.rowNumber,
+                "maxSharePrice",
+                messages("maxSharePrice.error.maximum")
+              )
+            )
+
+          case Success(v) if v < support.minCurrency =>
+            Seq(
+              support.error(
+                row.rowNumber,
+                "maxSharePrice",
+                messages("maxSharePrice.error.minimum")
+              )
+            )
+
+          case Success(_) =>
+            Seq.empty
+        }
     }
   }
 
@@ -373,28 +400,53 @@ class StcBasicRowValidator @Inject()(
                                      row: ParsedStcRow
                                    )(implicit cols: ColumnIndexBuilder): Seq[StcRowValidationError] = {
 
-    row.maxSharePrice match {
+    row.minSharePrice match {
 
-      case None =>
-        Seq(
-          support.error(
-            row.rowNumber,
-            "minSharePrice",
-            messages("minSharePrice.error.required")
-          )
-        )
-
-      case Some(v) if v > support.maxCurrency =>
-        Seq(
-          support.error(
-            row.rowNumber,
-            "minSharePrice",
-            messages("minSharePrice.error.maximum")
-          )
-        )
-
-      case _ =>
+      case None | Some("") =>
         Seq.empty
+
+      case Some(stringValue) =>
+        Try(BigDecimal(stringValue.replace(",", ""))) match {
+
+          case Failure(_) =>
+            Seq(
+              support.error(
+                row.rowNumber,
+                "minSharePrice",
+                messages("minSharePrice.error.invalid")
+              )
+            )
+
+          case Success(v) if v.scale > 2 =>
+            Seq(
+              support.error(
+                row.rowNumber,
+                "minSharePrice",
+                messages("minSharePrice.error.invalid")
+              )
+            )
+
+          case Success(v) if v > support.maxCurrency =>
+            Seq(
+              support.error(
+                row.rowNumber,
+                "minSharePrice",
+                messages("minSharePrice.error.maximum")
+              )
+            )
+
+          case Success(v) if v < support.minCurrency =>
+            Seq(
+              support.error(
+                row.rowNumber,
+                "minSharePrice",
+                messages("minSharePrice.error.minimum")
+              )
+            )
+
+          case Success(_) =>
+            Seq.empty
+        }
     }
   }
 

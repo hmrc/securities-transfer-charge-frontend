@@ -29,7 +29,7 @@ import uk.gov.hmrc.securitiestransferchargefrontend.config.FrontendAppConfig
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.routes.{CheckYourAnswersController, JourneyRecoveryController}
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.agents.bulk.routes as bulkRoutes
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.fileUpload.routes
-import uk.gov.hmrc.securitiestransferchargefrontend.models.JourneyType.STF
+import uk.gov.hmrc.securitiestransferchargefrontend.models.JourneyType
 import uk.gov.hmrc.securitiestransferchargefrontend.models.NormalMode
 import uk.gov.hmrc.securitiestransferchargefrontend.models.stf.upscan.{FileUpload, UpscanJourneyStatus}
 import uk.gov.hmrc.securitiestransferchargefrontend.repositories.UpscanJourneyRepository
@@ -47,10 +47,6 @@ class MockFileProcessingRefreshCounterFactory(counter: FileProcessingRefreshCoun
 class FileProcessingControllerSpec extends SpecBase with MockitoSugar {
 
   private val reference = "ref"
-  
-  private val journeyType = STF
-
-  private val fileUpload = FileUpload(reference = reference, status = UpscanJourneyStatus.Initiated, journeyType = journeyType)
 
   private def buildApp(
                         counter: FileProcessingRefreshCounter,
@@ -77,403 +73,409 @@ class FileProcessingControllerSpec extends SpecBase with MockitoSugar {
     counter
   }
 
-  private def fakeUpload(status: UpscanJourneyStatus) =
-    fileUpload.copy(status = status)
-
   "FileProcessingController" - {
 
-    "must return OK and the file processing view for a GET" in {
+    Seq(JourneyType.STF, JourneyType.SH03).foreach { journeyType =>
 
-      val counter = mockCounter()
-      val repository = mock[UpscanJourneyRepository]
-      val service = mock[ProcessingService]
+      s"For JourneyType $journeyType" - {
 
-      when(repository.find(reference))
-        .thenReturn(Future.successful(Some(fakeUpload(UpscanJourneyStatus.Initiated))))
+        def fakeUpload(status: UpscanJourneyStatus) =
+          FileUpload(reference = reference, status = status, journeyType = journeyType)
 
-
-      val app = buildApp(counter, repository, service)
-
-      running(app) {
-
-        val request = FakeRequest(GET, routes.FileProcessingController.onPageLoad(reference).url)
-        val result = route(app, request).value
-        val view = app.injector.instanceOf[FileProcessingView]
-        val appConfig = app.injector.instanceOf[FrontendAppConfig]
-        val refreshInterval = appConfig.spinnerPageRefreshInterval
-
-        status(result) mustEqual OK
-        contentAsString(result) mustEqual view(refreshInterval)(request, messages(app)).toString
-
-        verify(counter).withIncrementedCounter(any[Result])
-      }
-    }
-
-    "must redirect to timeout page when the counter timed out and clear the session var" in {
-
-      val counter = mock[FileProcessingRefreshCounter]
-      when(counter.isTimedOut).thenReturn(true)
-      when(counter.reset(any[Result]))
-        .thenAnswer(inv => inv.getArgument[Result](0))
-
-      val repository = mock[UpscanJourneyRepository]
-      val service = mock[ProcessingService]
-
-      val app = buildApp(counter, repository, service)
-
-      running(app) {
-
-        val request =
-          FakeRequest(GET, routes.FileProcessingController.onPageLoad(reference).url)
-            .withSession("retryCount" -> "50")
-        val result = route(app, request).value
-
-        status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual
-          routes.FileProcessingController.onTimeout(reference).url
-
-        session(result).get("retryCount") mustBe None
-      }
-    }
-
-    "must call processingService.processReadyUpload and return to the file processing page when status is Ready" in {
-
-      val counter = mockCounter()
-      val repository = mock[UpscanJourneyRepository]
-      val service = mock[ProcessingService]
-
-      val upload = fakeUpload(UpscanJourneyStatus.Ready)
-
-      when(repository.find(reference))
-        .thenReturn(Future.successful(Some(upload)))
-
-      when(service.processReadyUpload(any(), any(), any(), any())(any(), any(), any()))
-        .thenReturn(Future.successful(()))
-
-      val app = buildApp(counter, repository, service)
-
-      running(app) {
-
-        val result =
-          route(app, FakeRequest(GET, routes.FileProcessingController.onPageLoad(reference).url)).value
-
-        status(result) mustEqual OK
-
-        verify(service)
-          .processReadyUpload(eqTo(reference), eqTo(upload), any[String], eqTo("stf"))(any(), any(), any())
-
-        verify(counter).withIncrementedCounter(any[Result])
-      }
-    }
-
-    "must return to the file processing page when the status is Processing" in {
-
-      val counter = mockCounter()
-      val repository = mock[UpscanJourneyRepository]
-      val service = mock[ProcessingService]
-
-      when(repository.find(reference))
-        .thenReturn(Future.successful(Some(fakeUpload(UpscanJourneyStatus.Processing))))
-
-      val app = buildApp(counter, repository, service)
-
-      running(app) {
-
-        val result =
-          route(app, FakeRequest(GET, routes.FileProcessingController.onPageLoad(reference).url)).value
-
-        status(result) mustEqual OK
-
-        verify(counter).withIncrementedCounter(any[Result])
-      }
-    }
-
-    "must redirect for RowLimitExceeded" in {
-
-      val counter = mockCounter()
-      val repository = mock[UpscanJourneyRepository]
-      val service = mock[ProcessingService]
-
-      when(repository.find(reference))
-        .thenReturn(Future.successful(Some(fakeUpload(UpscanJourneyStatus.RowLimitExceeded))))
-
-      val app = buildApp(counter, repository, service)
-
-      running(app) {
-
-        val result = route(app, FakeRequest(GET, routes.FileProcessingController.onPageLoad(reference).url)).value
-
-        status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual
-          routes.BulkRowsErrorController.onPageLoad(journeyType).url
-      }
-    }
-
-    "must redirect for an EmptyFile" in {
-
-      val counter = mockCounter()
-      val repository = mock[UpscanJourneyRepository]
-      val service = mock[ProcessingService]
-
-      when(repository.find(reference))
-        .thenReturn(Future.successful(Some(fakeUpload(UpscanJourneyStatus.EmptyFile))))
-
-      val app = buildApp(counter, repository, service)
-
-      running(app) {
-
-        val result = route(app, FakeRequest(GET, routes.FileProcessingController.onPageLoad(reference).url)).value
-
-        status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual
-          routes.BulkUploadFileEmptyController.onPageLoad(journeyType).url
-      }
-    }
-
-    "must redirect for FormatingErrors greater than 25" in {
-
-      val counter = mockCounter()
-      val repository = mock[UpscanJourneyRepository]
-      val service = mock[ProcessingService]
-
-      when(repository.find(reference))
-        .thenReturn(Future.successful(Some(fakeUpload(UpscanJourneyStatus.TooManyErrors))))
-
-      val app = buildApp(counter, repository, service)
-
-      running(app) {
-
-        val result = route(app, FakeRequest(GET, routes.FileProcessingController.onPageLoad(reference).url)).value
-
-        status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual
-          routes.FormattingErrorController.onPageLoad(journeyType).url
-      }
-    }
-
-    "must redirect for FormatingErrors less than 25" in {
-
-      val counter = mockCounter()
-      val repository = mock[UpscanJourneyRepository]
-      val service = mock[ProcessingService]
-
-      when(repository.find(reference))
-        .thenReturn(Future.successful(Some(fakeUpload(UpscanJourneyStatus.FormatingErrors))))
-
-      val app = buildApp(counter, repository, service)
-
-      running(app) {
-
-        val result = route(app, FakeRequest(GET, routes.FileProcessingController.onPageLoad(reference).url)).value
-
-        status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual
-          routes.UploadedFileErrorController.onPageLoad(reference,journeyType).url
-      }
-    }
-
-    "must redirect for an UpscanDownloadError" in {
-
-      val counter = mockCounter()
-      val repository = mock[UpscanJourneyRepository]
-      val service = mock[ProcessingService]
-
-      when(repository.find(reference))
-        .thenReturn(Future.successful(Some(fakeUpload(UpscanJourneyStatus.UpscanDownloadError))))
-
-      val app = buildApp(counter, repository, service)
-
-      running(app) {
-
-        val result = route(app, FakeRequest(GET, routes.FileProcessingController.onPageLoad(reference).url)).value
-
-        status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual
-          routes.BulkUploadErrorController.onPageLoad(journeyType).url
-      }
-    }
-
-    "must redirect for an InvalidTemplate" in {
-
-      val counter = mockCounter()
-      val repository = mock[UpscanJourneyRepository]
-      val service = mock[ProcessingService]
-
-      when(repository.find(reference))
-        .thenReturn(Future.successful(Some(fakeUpload(UpscanJourneyStatus.InvalidTemplate))))
-
-      val app = buildApp(counter, repository, service)
-
-      running(app) {
-
-        val result = route(app, FakeRequest(GET, routes.FileProcessingController.onPageLoad(reference).url)).value
-
-        status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual
-          routes.BulkUploadInvalidTemplateController.onPageLoad(journeyType).url
-      }
-    }
-
-    "must redirect for a FileParseError" in {
-
-      val counter = mockCounter()
-      val repository = mock[UpscanJourneyRepository]
-      val service = mock[ProcessingService]
-
-      when(repository.find(reference))
-        .thenReturn(Future.successful(Some(fakeUpload(UpscanJourneyStatus.FileParseError))))
-
-      val app = buildApp(counter, repository, service)
-
-      running(app) {
-
-        val result = route(app, FakeRequest(GET, routes.FileProcessingController.onPageLoad(reference).url)).value
-
-        status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual JourneyRecoveryController.onPageLoad().url
-      }
-    }
-
-    "must redirect for a failed upload" in {
-
-      val counter = mockCounter()
-      val repository = mock[UpscanJourneyRepository]
-      val service = mock[ProcessingService]
-
-      val upload = fakeUpload(UpscanJourneyStatus.Failed)
-
-      when(repository.find(reference))
-        .thenReturn(Future.successful(Some(upload)))
-
-      val app = buildApp(counter, repository, service)
-
-      running(app) {
-
-        val result = route(app, FakeRequest(GET, routes.FileProcessingController.onPageLoad(reference).url)).value
-
-        status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual routes.BulkUploadErrorController.onPageLoad(journeyType).url
-      }
-    }
-
-    "must redirect for a failed upload (encrypted)" in {
-
-      val counter = mockCounter()
-      val repository = mock[UpscanJourneyRepository]
-      val service = mock[ProcessingService]
-
-      val upload = fakeUpload(UpscanJourneyStatus.Failed)
-        .copy(failureReason = Some("QUARANTINE"),message = Some("EncryptedDoc"))
-
-      when(repository.find(reference))
-        .thenReturn(Future.successful(Some(upload)))
-
-      val app = buildApp(counter, repository, service)
-
-      running(app) {
-
-        val result = route(app, FakeRequest(GET, routes.FileProcessingController.onPageLoad(reference).url)).value
-
-        status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual
-          routes.EncryptedFileErrorController.onPageLoad(journeyType).url
-      }
-    }
-
-    "must redirect for a failed upload (virus)" in {
-
-      val counter = mockCounter()
-      val repository = mock[UpscanJourneyRepository]
-      val service = mock[ProcessingService]
-
-      val upload = fakeUpload(UpscanJourneyStatus.Failed)
-        .copy(failureReason = Some("QUARANTINE"),message = Some("virus"))
-
-      when(repository.find(reference))
-        .thenReturn(Future.successful(Some(upload)))
-
-      val app = buildApp(counter, repository, service)
-
-      running(app) {
-
-        val result = route(app, FakeRequest(GET, routes.FileProcessingController.onPageLoad(reference).url)).value
-
-        status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual
-          routes.BulkUploadVirusErrorController.onPageLoad(journeyType).url
-      }
-    }
-
-      Seq(
-        AffinityGroup.Individual,
-        AffinityGroup.Organisation,
-        AffinityGroup.Agent
-      ).foreach {affinityGroup =>
-        s"must redirect for a successful upload and validation for $affinityGroup" in {
+        "must return OK and the file processing view for a GET" in {
 
           val counter = mockCounter()
           val repository = mock[UpscanJourneyRepository]
           val service = mock[ProcessingService]
 
           when(repository.find(reference))
-            .thenReturn(Future.successful(Some(fakeUpload(UpscanJourneyStatus.Completed))))
+            .thenReturn(Future.successful(Some(fakeUpload(UpscanJourneyStatus.Initiated))))
 
-          val app = buildApp(counter, repository, service, affinityGroup)
+
+          val app = buildApp(counter, repository, service)
+
+          running(app) {
+
+            val request = FakeRequest(GET, routes.FileProcessingController.onPageLoad(reference).url)
+            val result = route(app, request).value
+            val view = app.injector.instanceOf[FileProcessingView]
+            val appConfig = app.injector.instanceOf[FrontendAppConfig]
+            val refreshInterval = appConfig.spinnerPageRefreshInterval
+
+            status(result) mustEqual OK
+            contentAsString(result) mustEqual view(refreshInterval)(request, messages(app)).toString
+
+            verify(counter).withIncrementedCounter(any[Result])
+          }
+        }
+
+        "must redirect to timeout page when the counter timed out and clear the session var" in {
+
+          val counter = mock[FileProcessingRefreshCounter]
+          when(counter.isTimedOut).thenReturn(true)
+          when(counter.reset(any[Result]))
+            .thenAnswer(inv => inv.getArgument[Result](0))
+
+          val repository = mock[UpscanJourneyRepository]
+          val service = mock[ProcessingService]
+
+          val app = buildApp(counter, repository, service)
+
+          running(app) {
+
+            val request =
+              FakeRequest(GET, routes.FileProcessingController.onPageLoad(reference).url)
+                .withSession("retryCount" -> "50")
+            val result = route(app, request).value
+
+            status(result) mustEqual SEE_OTHER
+            redirectLocation(result).value mustEqual
+              routes.FileProcessingController.onTimeout(reference).url
+
+            session(result).get("retryCount") mustBe None
+          }
+        }
+
+        "must call processingService.processReadyUpload and return to the file processing page when status is Ready" in {
+
+          val counter = mockCounter()
+          val repository = mock[UpscanJourneyRepository]
+          val service = mock[ProcessingService]
+
+          val upload = fakeUpload(UpscanJourneyStatus.Ready)
+
+          when(repository.find(reference))
+            .thenReturn(Future.successful(Some(upload)))
+
+          when(service.processReadyUpload(any(), any(), any(), any())(any(), any(), any()))
+            .thenReturn(Future.successful(()))
+
+          val app = buildApp(counter, repository, service)
+
+          running(app) {
+
+            val result =
+              route(app, FakeRequest(GET, routes.FileProcessingController.onPageLoad(reference).url)).value
+
+            status(result) mustEqual OK
+
+            verify(service)
+              .processReadyUpload(eqTo(reference), eqTo(upload), any[String], eqTo(journeyType.value))(any(), any(), any())
+
+            verify(counter).withIncrementedCounter(any[Result])
+          }
+        }
+
+        "must return to the file processing page when the status is Processing" in {
+
+          val counter = mockCounter()
+          val repository = mock[UpscanJourneyRepository]
+          val service = mock[ProcessingService]
+
+          when(repository.find(reference))
+            .thenReturn(Future.successful(Some(fakeUpload(UpscanJourneyStatus.Processing))))
+
+          val app = buildApp(counter, repository, service)
+
+          running(app) {
+
+            val result =
+              route(app, FakeRequest(GET, routes.FileProcessingController.onPageLoad(reference).url)).value
+
+            status(result) mustEqual OK
+
+            verify(counter).withIncrementedCounter(any[Result])
+          }
+        }
+
+        "must redirect for RowLimitExceeded" in {
+
+          val counter = mockCounter()
+          val repository = mock[UpscanJourneyRepository]
+          val service = mock[ProcessingService]
+
+          when(repository.find(reference))
+            .thenReturn(Future.successful(Some(fakeUpload(UpscanJourneyStatus.RowLimitExceeded))))
+
+          val app = buildApp(counter, repository, service)
 
           running(app) {
 
             val result = route(app, FakeRequest(GET, routes.FileProcessingController.onPageLoad(reference).url)).value
 
             status(result) mustEqual SEE_OTHER
+            redirectLocation(result).value mustEqual
+              routes.BulkRowsErrorController.onPageLoad(journeyType).url
+          }
+        }
 
-            affinityGroup match {
-              case AffinityGroup.Agent =>
-                redirectLocation(result).value mustEqual bulkRoutes.AgentReferenceController.onPageLoad(NormalMode).url
-              case _ =>
-                redirectLocation(result).value mustEqual CheckYourAnswersController.onPageLoad().url
+        "must redirect for an EmptyFile" in {
+
+          val counter = mockCounter()
+          val repository = mock[UpscanJourneyRepository]
+          val service = mock[ProcessingService]
+
+          when(repository.find(reference))
+            .thenReturn(Future.successful(Some(fakeUpload(UpscanJourneyStatus.EmptyFile))))
+
+          val app = buildApp(counter, repository, service)
+
+          running(app) {
+
+            val result = route(app, FakeRequest(GET, routes.FileProcessingController.onPageLoad(reference).url)).value
+
+            status(result) mustEqual SEE_OTHER
+            redirectLocation(result).value mustEqual
+              routes.BulkUploadFileEmptyController.onPageLoad(journeyType).url
+          }
+        }
+
+        "must redirect for FormatingErrors greater than 25" in {
+
+          val counter = mockCounter()
+          val repository = mock[UpscanJourneyRepository]
+          val service = mock[ProcessingService]
+
+          when(repository.find(reference))
+            .thenReturn(Future.successful(Some(fakeUpload(UpscanJourneyStatus.TooManyErrors))))
+
+          val app = buildApp(counter, repository, service)
+
+          running(app) {
+
+            val result = route(app, FakeRequest(GET, routes.FileProcessingController.onPageLoad(reference).url)).value
+
+            status(result) mustEqual SEE_OTHER
+            redirectLocation(result).value mustEqual
+              routes.FormattingErrorController.onPageLoad(journeyType).url
+          }
+        }
+
+        "must redirect for FormatingErrors less than 25" in {
+
+          val counter = mockCounter()
+          val repository = mock[UpscanJourneyRepository]
+          val service = mock[ProcessingService]
+
+          when(repository.find(reference))
+            .thenReturn(Future.successful(Some(fakeUpload(UpscanJourneyStatus.FormatingErrors))))
+
+          val app = buildApp(counter, repository, service)
+
+          running(app) {
+
+            val result = route(app, FakeRequest(GET, routes.FileProcessingController.onPageLoad(reference).url)).value
+
+            status(result) mustEqual SEE_OTHER
+            redirectLocation(result).value mustEqual
+              routes.UploadedFileErrorController.onPageLoad(reference,journeyType).url
+          }
+        }
+
+        "must redirect for an UpscanDownloadError" in {
+
+          val counter = mockCounter()
+          val repository = mock[UpscanJourneyRepository]
+          val service = mock[ProcessingService]
+
+          when(repository.find(reference))
+            .thenReturn(Future.successful(Some(fakeUpload(UpscanJourneyStatus.UpscanDownloadError))))
+
+          val app = buildApp(counter, repository, service)
+
+          running(app) {
+
+            val result = route(app, FakeRequest(GET, routes.FileProcessingController.onPageLoad(reference).url)).value
+
+            status(result) mustEqual SEE_OTHER
+            redirectLocation(result).value mustEqual
+              routes.BulkUploadErrorController.onPageLoad(journeyType).url
+          }
+        }
+
+        "must redirect for an InvalidTemplate" in {
+
+          val counter = mockCounter()
+          val repository = mock[UpscanJourneyRepository]
+          val service = mock[ProcessingService]
+
+          when(repository.find(reference))
+            .thenReturn(Future.successful(Some(fakeUpload(UpscanJourneyStatus.InvalidTemplate))))
+
+          val app = buildApp(counter, repository, service)
+
+          running(app) {
+
+            val result = route(app, FakeRequest(GET, routes.FileProcessingController.onPageLoad(reference).url)).value
+
+            status(result) mustEqual SEE_OTHER
+            redirectLocation(result).value mustEqual
+              routes.BulkUploadInvalidTemplateController.onPageLoad(journeyType).url
+          }
+        }
+
+        "must redirect for a FileParseError" in {
+
+          val counter = mockCounter()
+          val repository = mock[UpscanJourneyRepository]
+          val service = mock[ProcessingService]
+
+          when(repository.find(reference))
+            .thenReturn(Future.successful(Some(fakeUpload(UpscanJourneyStatus.FileParseError))))
+
+          val app = buildApp(counter, repository, service)
+
+          running(app) {
+
+            val result = route(app, FakeRequest(GET, routes.FileProcessingController.onPageLoad(reference).url)).value
+
+            status(result) mustEqual SEE_OTHER
+            redirectLocation(result).value mustEqual JourneyRecoveryController.onPageLoad().url
+          }
+        }
+
+        "must redirect for a failed upload" in {
+
+          val counter = mockCounter()
+          val repository = mock[UpscanJourneyRepository]
+          val service = mock[ProcessingService]
+
+          val upload = fakeUpload(UpscanJourneyStatus.Failed)
+
+          when(repository.find(reference))
+            .thenReturn(Future.successful(Some(upload)))
+
+          val app = buildApp(counter, repository, service)
+
+          running(app) {
+
+            val result = route(app, FakeRequest(GET, routes.FileProcessingController.onPageLoad(reference).url)).value
+
+            status(result) mustEqual SEE_OTHER
+            redirectLocation(result).value mustEqual routes.BulkUploadErrorController.onPageLoad(journeyType).url
+          }
+        }
+
+        "must redirect for a failed upload (encrypted)" in {
+
+          val counter = mockCounter()
+          val repository = mock[UpscanJourneyRepository]
+          val service = mock[ProcessingService]
+
+          val upload = fakeUpload(UpscanJourneyStatus.Failed)
+            .copy(failureReason = Some("QUARANTINE"),message = Some("EncryptedDoc"))
+
+          when(repository.find(reference))
+            .thenReturn(Future.successful(Some(upload)))
+
+          val app = buildApp(counter, repository, service)
+
+          running(app) {
+
+            val result = route(app, FakeRequest(GET, routes.FileProcessingController.onPageLoad(reference).url)).value
+
+            status(result) mustEqual SEE_OTHER
+            redirectLocation(result).value mustEqual
+              routes.EncryptedFileErrorController.onPageLoad(journeyType).url
+          }
+        }
+
+        "must redirect for a failed upload (virus)" in {
+
+          val counter = mockCounter()
+          val repository = mock[UpscanJourneyRepository]
+          val service = mock[ProcessingService]
+
+          val upload = fakeUpload(UpscanJourneyStatus.Failed)
+            .copy(failureReason = Some("QUARANTINE"),message = Some("virus"))
+
+          when(repository.find(reference))
+            .thenReturn(Future.successful(Some(upload)))
+
+          val app = buildApp(counter, repository, service)
+
+          running(app) {
+
+            val result = route(app, FakeRequest(GET, routes.FileProcessingController.onPageLoad(reference).url)).value
+
+            status(result) mustEqual SEE_OTHER
+            redirectLocation(result).value mustEqual
+              routes.BulkUploadVirusErrorController.onPageLoad(journeyType).url
+          }
+        }
+
+        Seq(
+          AffinityGroup.Individual,
+          AffinityGroup.Organisation,
+          AffinityGroup.Agent
+        ).foreach {affinityGroup =>
+          s"must redirect for a successful upload and validation for $affinityGroup" in {
+
+            val counter = mockCounter()
+            val repository = mock[UpscanJourneyRepository]
+            val service = mock[ProcessingService]
+
+            when(repository.find(reference))
+              .thenReturn(Future.successful(Some(fakeUpload(UpscanJourneyStatus.Completed))))
+
+            val app = buildApp(counter, repository, service, affinityGroup)
+
+            running(app) {
+
+              val result = route(app, FakeRequest(GET, routes.FileProcessingController.onPageLoad(reference).url)).value
+
+              status(result) mustEqual SEE_OTHER
+
+              affinityGroup match {
+                case AffinityGroup.Agent =>
+                  redirectLocation(result).value mustEqual bulkRoutes.AgentReferenceController.onPageLoad(NormalMode).url
+                case _ =>
+                  redirectLocation(result).value mustEqual CheckYourAnswersController.onPageLoad().url
+              }
             }
           }
-      }
-    }
+        }
 
-    "must redirect when no file upload is found" in {
+        "must redirect when no file upload is found" in {
 
-      val counter = mockCounter()
-      val repository = mock[UpscanJourneyRepository]
-      val service = mock[ProcessingService]
+          val counter = mockCounter()
+          val repository = mock[UpscanJourneyRepository]
+          val service = mock[ProcessingService]
 
-      when(repository.find(reference))
-        .thenReturn(Future.successful(None))
+          when(repository.find(reference))
+            .thenReturn(Future.successful(None))
 
-      val app = buildApp(counter, repository, service)
+          val app = buildApp(counter, repository, service)
 
-      running(app) {
+          running(app) {
 
-        val result = route(app, FakeRequest(GET, routes.FileProcessingController.onPageLoad(reference).url)).value
+            val result = route(app, FakeRequest(GET, routes.FileProcessingController.onPageLoad(reference).url)).value
 
-        status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual JourneyRecoveryController.onPageLoad().url
-      }
-    }
+            status(result) mustEqual SEE_OTHER
+            redirectLocation(result).value mustEqual JourneyRecoveryController.onPageLoad().url
+          }
+        }
 
-    "must redirect for a failed upload (Invalid file type)" in {
+        "must redirect for a failed upload (Invalid file type)" in {
 
-      val counter = mockCounter()
-      val repository = mock[UpscanJourneyRepository]
-      val service = mock[ProcessingService]
+          val counter = mockCounter()
+          val repository = mock[UpscanJourneyRepository]
+          val service = mock[ProcessingService]
 
-      val upload = fakeUpload(UpscanJourneyStatus.Failed).copy(failureReason = Some("REJECTED"), message = Some("mime type"))
+          val upload = fakeUpload(UpscanJourneyStatus.Failed).copy(failureReason = Some("REJECTED"), message = Some("mime type"))
 
-      when(repository.find(reference)).thenReturn(Future.successful(Some(upload)))
+          when(repository.find(reference)).thenReturn(Future.successful(Some(upload)))
 
-      val app = buildApp(counter, repository, service)
+          val app = buildApp(counter, repository, service)
 
-      running(app) {
+          running(app) {
 
-        val result = route(app, FakeRequest(GET, routes.FileProcessingController.onPageLoad(reference).url)).value
+            val result = route(app, FakeRequest(GET, routes.FileProcessingController.onPageLoad(reference).url)).value
 
-        status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual routes.FileTypeErrorController.onPageLoad(journeyType).url
+            status(result) mustEqual SEE_OTHER
+            redirectLocation(result).value mustEqual routes.FileTypeErrorController.onPageLoad(journeyType).url
+          }
+        }
       }
     }
   }

@@ -75,7 +75,8 @@ class StcConditionalRowValidator @Inject()(
                     row: ParsedStcRow,
                     affinityKey: String
                   )(implicit cols: ColumnIndexBuilder): Seq[StcRowValidationError] =
-    validateReliefType(row, affinityKey)
+    validateReliefType(row, affinityKey) ++ 
+      validateTotalMarketValue(row, affinityKey)
 
   private def validateReliefType(
                                   row: ParsedStcRow,

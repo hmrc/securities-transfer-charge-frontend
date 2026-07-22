@@ -580,9 +580,9 @@ org.fileUpload.error.securitiesQuantity.minimum = The number of shares must be a
 org.fileUpload.error.securitiesQuantity.maximum = The number of shares must be a whole number between 1 and 999,999,999
 
 agent.fileUpload.error.securitiesQuantity.required = Enter the number of shares the buyer is purchasing
-agent.fileUpload.error.securitiesQuantity.nonNumeric = The number of shares must be a whole number between 1 and 999,999,999
-agent.fileUpload.error.securitiesQuantity.minimum = The number of shares must be a whole number between 1 and 999,999,999
-agent.fileUpload.error.securitiesQuantity.maximum = The number of shares must be a whole number between 1 and 999,999,999
+agent.fileUpload.error.securitiesQuantity.nonNumeric = The amount of shares must be a number
+agent.fileUpload.error.securitiesQuantity.minimum = The number of shares must be at least 1
+agent.fileUpload.error.securitiesQuantity.maximum = The number of shares must be below 999,999,999
 
 individual.fileUpload.chargingPoint.error.required = Enter the date you bought the securities
 org.fileUpload.chargingPoint.error.required = Enter the date the business bought the securities
@@ -592,16 +592,18 @@ individual.fileUpload.chargingPoint.error.futureDate = The day you bought the se
 org.fileUpload.chargingPoint.error.futureDate = The day the business bought the securities must be today’s date or a date in the past
 agent.fileUpload.chargingPoint.error.futureDate = The day the buyer purchased the securities must be today’s date or a date in the past
 
-minSharePrice.error.required = Enter an amount in £
-minSharePrice.error.maximum = The minimum share price must be below 999,999,999
+minSharePrice.error.invalid = The minimum amount paid for the shares must be a number and can include up to two decimal places, like £30 or £28.60
+minSharePrice.error.minimum = The minimum amount paid for the shares must be £0.01 or more
+minSharePrice.error.maximum = The minimum amount paid for the shares must be £999,999,999 or less
 
-maxSharePrice.error.required = Enter an amount in £
-maxSharePrice.error.maximum = The maximum share price must be below 999,999,999
+maxSharePrice.error.invalid = The maximum amount paid for the shares must be a number and can include up to two decimal places, like £30 or £28.60
+maxSharePrice.error.maximum = The maximum amount paid for the shares must be £999,999,999 or less
+maxSharePrice.error.minimum = The maximum amount paid for the shares must be £0.01 or more
 
 sharePurchaseReason.required = Enter reason for share purchase
-sharePurchaseReason.invalid = Enter ‘cancellation’ or ‘treasury’
+sharePurchaseReason.invalid = Enter ‘cancellation’ if the shares are being purchased for cancellation, or ‘treasury’ if the shares are being purchased to place into treasury
 
-purchasedForCancellation.invalid = Enter ‘yes’ if the shares also qualify as treasury shares
+purchasedForCancellation.invalid = Enter ‘yes’ if the shares purchased for cancellation shares also qualify as treasury shares
 
 agent.applyingForRelief.title = Is the buyer applying for a relief?
 agent.applyingForRelief.heading = Is the buyer applying for a relief?
@@ -635,20 +637,20 @@ agent.chargingPoint.error.invalid = The date the securities were bought must be 
 agent.chargingPoint.error.futureDate = The date the securities were bought must be today’s date or a date in the past
 agent.chargingPoint.change.hidden = ChargingPoint
 
-fileUpload.agent.chargingPoint.error.invalid = The date the buyer purchased the securities must be a real date
-fileUpload.agent.chargingPoint.error.required.all = Enter the date the buyer purchased the securities
-fileUpload.agent.chargingPoint.error.futureDate = The day the buyer purchased the securities must be today’s date or a date in the past
+fileUpload.agent.chargingPoint.error.invalid = The charging point must be a real date
+fileUpload.agent.chargingPoint.error.required.all = Enter the charging point
+fileUpload.agent.chargingPoint.error.futureDate = The charging point must be today’s date or a date in the past
 
 fileUpload.individual.chargingPoint.error.required.all = Enter the date you bought the securities
 fileUpload.individual.chargingPoint.error.futureDate = The day you bought the securities must be today’s date or a date in the past
 fileUpload.individual.chargingPoint.error.invalid = The date you bought the securities must be a real date
 
-fileUpload.agent.amountPaidForSecurities.error.required = Enter the amount paid for the securities
-fileUpload.agent.amountPaidForSecurities.error.invalidNumeric = The amount paid for the securities must be a number and can include up to two decimal places, like £30 or £28.60
-fileUpload.agent.amountPaidForSecurities.error.nonNumeric = The amount paid for the securities must be a number and can include up to two decimal places, like £30 or £28.60
-fileUpload.agent.amountPaidForSecurities.error.negative = The amount paid for the securities must be £0.01 or more
-fileUpload.agent.amountPaidForSecurities.error.belowMinimum = The amount paid for the securities must be £0.01 or more
-fileUpload.agent.amountPaidForSecurities.error.aboveMaximum = The amount paid for the securities must be £999,999,999 or below
+fileUpload.agent.amountPaidForSecurities.error.required = Enter the amount paid for the shares in pounds
+fileUpload.agent.amountPaidForSecurities.error.invalidNumeric = The amount paid for the shares must be a number and can include up to two decimal places, like £30 or £28.60
+fileUpload.agent.amountPaidForSecurities.error.nonNumeric = The amount paid for the shares must be a number and can include up to two decimal places, like £30 or £28.60
+fileUpload.agent.amountPaidForSecurities.error.negative = The amount paid for the shares must be £0.01 or more
+fileUpload.agent.amountPaidForSecurities.error.belowMinimum = The amount paid for the shares must be £0.01 or more
+fileUpload.agent.amountPaidForSecurities.error.aboveMaximum = The amount paid for the shares must be £999,999,999 or below
 
 fileUpload.org.amountPaidForSecurities.error.required = Enter the amount paid for the securities
 fileUpload.org.amountPaidForSecurities.error.invalidNumeric = The amount paid for the securities must be a number and can include up to two decimal places, like £30 or £28.60
@@ -719,17 +721,18 @@ fileUploaded.error.virus.title = Your file contains a virus
 fileUploaded.error.virus.heading = Your file contains a virus
 fileUploaded.error.virus.p = The file you have uploaded contains a virus, you will need to upload a different file.
 
-agent.totalMarketValue.title = What is the total market value of the securities?
-agent.totalMarketValue.heading = What is the total market value of the securities?
-agent.totalMarketValue.checkYourAnswersLabel = What is the total market value of the securities?
-agent.totalMarketValue.error.nonNumeric = The market value of the securities must be a number and can include up to two decimal places, like £30 or £28.60
-agent.totalMarketValue.error.required = Enter the total market value of the securities
-agent.totalMarketValue.error.invalidNumeric = The market value of the securities must be a number and can include up to two decimal places, like £30 or £28.60
-agent.totalMarketValue.error.aboveMaximum = The market value of the securities must be £999,999,999 or below
-agent.totalMarketValue.change.hidden = Change the market value of the securities
+agent.totalMarketValue.title = What is the total market value of the shares?
+agent.totalMarketValue.heading = What is the total market value of the shares?
+agent.totalMarketValue.checkYourAnswersLabel = What is the total market value of the shares?
+agent.totalMarketValue.error.nonNumeric = The market value of the shares must be a number and can include up to two decimal places, like £30 or £28.60
+agent.totalMarketValue.error.required = Enter the market value of the shares in pounds
+agent.totalMarketValue.error.invalidNumeric = The market value of the shares must be a number and can include up to two decimal places, like £30 or £28.60
+agent.totalMarketValue.error.aboveMaximum = The market value of the shares must be £999,999,999 or below
+agent.totalMarketValue.error.belowMinimum = The market value of the shares must be £0.01 or more
+agent.totalMarketValue.change.hidden = Change the market value of the shares
 agent.totalMarketValue.hint = For example, £600 or £193.54
-agent.totalMarketValue.error.negative = The market value of the securities must be £0 or more
-agent.totalMarketValue.checkYourAnswersLabel = What is the total market value of the securities?
+agent.totalMarketValue.error.negative = The market value of the shares must be £0.01 or more
+agent.totalMarketValue.checkYourAnswersLabel = What is the total market value of the shares?
 
 fileUploaded.error.encryptedFile.title = There was a problem uploading your file
 fileUploaded.error.encryptedFile.heading = There was a problem uploading your file
@@ -1082,3 +1085,12 @@ agent.sh03.bulk.companyDetails.heading = Company details
 agent.sh03.bulk.companyDetails.companyName.label = Company name
 agent.sh03.bulk.companyDetails.crn.label = Company registration number (CRN)
 agent.sh03.bulk.companyDetails.crn.hint = This is also called a company number. For example, SN898989 or 12345678
+
+agent.sh03.templateInstructions.title = How to use the template
+agent.sh03.templateInstructions.heading = How to use the template
+agent.sh03.templateInstructions.p1 = Use the template to tell us about more than one share purchase at a time.
+agent.sh03.templateInstructions.step1 = Download the template
+agent.sh03.templateInstructions.step2 = Complete the template, using one row for each class of shares the company is purchasing.
+agent.sh03.templateInstructions.step3 = Upload the file on the next page as a .csv or an .xlsx
+agent.sh03.templateInstructions.p2 = Remember, do not edit the first three rows, or change the order of the columns.
+agent.sh03.templateInstructions.p3 = Once you have uploaded and submitted the file it will show in your recent submissions, you can then pay the tax due.

@@ -420,3 +420,5 @@ GET        /sh03/agent/bulk/company-details                       uk.gov.hmrc.se
 POST       /sh03/agent/bulk/company-details                       uk.gov.hmrc.securitiestransferchargefrontend.controllers.sh03.agents.bulk.CompanyDetailsController.onSubmit(mode: Mode = NormalMode)
 GET        /sh03/agent/bulk/company-details                       uk.gov.hmrc.securitiestransferchargefrontend.controllers.sh03.agents.bulk.CompanyDetailsController.onPageLoad(mode: Mode = CheckMode)
 POST       /sh03/agent/bulk/company-details                       uk.gov.hmrc.securitiestransferchargefrontend.controllers.sh03.agents.bulk.CompanyDetailsController.onSubmit(mode: Mode = CheckMode)
+
+GET        /sh03/agent/bulk/template                       uk.gov.hmrc.securitiestransferchargefrontend.controllers.sh03.agents.bulk.TemplateInstructionsController.onPageLoad()

@@ -33,7 +33,6 @@ class StcBasicRowValidatorSpec extends SpecBase {
   private val messagesApi: MessagesApi = app.injector.instanceOf[MessagesApi]
   private implicit val messages: Messages = messagesApi.preferred(Seq(Lang("en")))
 
-
   private val validRow: ParsedStcRow =
     ParsedStcRow(
       rowNumber = 3,
@@ -91,7 +90,11 @@ class StcBasicRowValidatorSpec extends SpecBase {
       "taxRate",
       "whatTypeOfSecurities",
       "securitiesQuantity",
-      "amountPaidForSecurities"
+      "amountPaidForSecurities",
+      "sharePurchaseReason",
+      "purchasedForCancellation",
+      "minSharePrice",
+      "maxSharePrice"
     ))
 
   "StcBasicRowValidator.validate" - {
@@ -224,7 +227,7 @@ class StcBasicRowValidatorSpec extends SpecBase {
 
     "return securities quantity maximum error" in {
       val result = validator.validate(
-        validRow.copy(securitiesQuantity = Some("999999999")),
+        validRow.copy(securitiesQuantity = Some("1000000000")),
         StcTemplate.STF, affinityGroupKeyInd
       )
 
@@ -323,7 +326,6 @@ class StcBasicRowValidatorSpec extends SpecBase {
         result.exists(_.fieldName == "taxRate") mustBe true
       }
 
-
       "return securities quantity required error" in {
         val result = validator.validate(
           validRow.copy(securitiesQuantity = None),
@@ -358,6 +360,156 @@ class StcBasicRowValidatorSpec extends SpecBase {
         )
 
         result.exists(_.fieldName == "securitiesTarget") mustBe true
+      }
+    }
+
+    "SH03 Validation" - {
+
+      "return no errors for a valid SH03 row" in {
+        val validSh03Row = validRow.copy(
+          whatTypeOfSecurities = Some("shares"),
+          securitiesQuantity = Some("100"),
+          amountPaidForSecurities = Some("1000"),
+          chargingPoint = ParsedValue.Valid(LocalDate.of(2025, 11, 20)),
+          sharePurchaseReason = Some("cancellation"),
+          purchaseForCancellation = Some(true),
+          connectedPersons = Some(true),
+          applyingForRelief = Some(false)
+        )
+        val result = validator.validate(validSh03Row, StcTemplate.SH03, "agent")
+        result mustBe Seq.empty
+      }
+
+      "return share purchase reason missing error" in {
+        val result = validator.validate(
+          validRow.copy(sharePurchaseReason = None),
+          StcTemplate.SH03, "agent"
+        )
+        result.exists(e => e.fieldName == "sharePurchaseReason" && e.message == messages("sharePurchaseReason.required")) mustBe true
+      }
+
+      "return share purchase reason invalid error" in {
+        val result = validator.validate(
+          validRow.copy(sharePurchaseReason = Some("invalid reason")),
+          StcTemplate.SH03, "agent"
+        )
+        result.exists(e => e.fieldName == "sharePurchaseReason" && e.message == messages("sharePurchaseReason.invalid")) mustBe true
+      }
+
+      "return purchase for cancellation missing error" in {
+        val result = validator.validate(
+          validRow.copy(purchaseForCancellation = None),
+          StcTemplate.SH03, "agent"
+        )
+        result.exists(e => e.fieldName == "purchasedForCancellation" && e.message == messages("purchasedForCancellation.invalid")) mustBe true
+      }
+
+      "Min Share Price" - {
+        "allow empty minSharePrice (optional for non-PLCs)" in {
+          val result = validator.validate(
+            validRow.copy(minSharePrice = None),
+            StcTemplate.SH03, "agent"
+          )
+          result.exists(_.fieldName == "minSharePrice") mustBe false
+        }
+
+        "allow valid minSharePrice with commas" in {
+          val result = validator.validate(
+            validRow.copy(minSharePrice = Some("1,000.50")),
+            StcTemplate.SH03, "agent"
+          )
+          result.exists(_.fieldName == "minSharePrice") mustBe false
+        }
+
+        "reject non-numeric minSharePrice" in {
+          val result = validator.validate(
+            validRow.copy(minSharePrice = Some("abc")),
+            StcTemplate.SH03, "agent"
+          )
+          result.exists(e => e.fieldName == "minSharePrice" && e.message == "The minimum amount paid for the shares must be a number and can include up to two decimal places, like £30 or £28.60") mustBe true
+        }
+
+        "reject minSharePrice with more than two decimal places" in {
+          val result = validator.validate(
+            validRow.copy(minSharePrice = Some("10.123")),
+            StcTemplate.SH03, "agent"
+          )
+          result.exists(e => e.fieldName == "minSharePrice" && e.message == "The minimum amount paid for the shares must be a number and can include up to two decimal places, like £30 or £28.60") mustBe true
+        }
+
+        "reject minSharePrice that is too high" in {
+          val result = validator.validate(
+            validRow.copy(minSharePrice = Some("1000000000")),
+            StcTemplate.SH03, "agent"
+          )
+          result.exists(e => e.fieldName == "minSharePrice" && e.message == "The minimum amount paid for the shares must be £999,999,999 or less") mustBe true
+        }
+
+        "reject minSharePrice that is too low" in {
+          val result = validator.validate(
+            validRow.copy(minSharePrice = Some("0")),
+            StcTemplate.SH03, "agent"
+          )
+          result.exists(e => e.fieldName == "minSharePrice" && e.message == "The minimum amount paid for the shares must be £0.01 or more") mustBe true
+        }
+      }
+
+      "Max Share Price" - {
+        "allow empty maxSharePrice (optional for non-PLCs)" in {
+          val result = validator.validate(
+            validRow.copy(maxSharePrice = None),
+            StcTemplate.SH03, "agent"
+          )
+          result.exists(_.fieldName == "maxSharePrice") mustBe false
+        }
+
+        "allow valid maxSharePrice with commas" in {
+          val result = validator.validate(
+            validRow.copy(maxSharePrice = Some("2,500,000")),
+            StcTemplate.SH03, "agent"
+          )
+          result.exists(_.fieldName == "maxSharePrice") mustBe false
+        }
+
+        "reject non-numeric maxSharePrice" in {
+          val result = validator.validate(
+            validRow.copy(maxSharePrice = Some("abc")),
+            StcTemplate.SH03, "agent"
+          )
+          result.exists(e => e.fieldName == "maxSharePrice" && e.message == "The maximum amount paid for the shares must be a number and can include up to two decimal places, like £30 or £28.60") mustBe true
+        }
+
+        "reject maxSharePrice with more than two decimal places" in {
+          val result = validator.validate(
+            validRow.copy(maxSharePrice = Some("10.123")),
+            StcTemplate.SH03, "agent"
+          )
+          result.exists(e => e.fieldName == "maxSharePrice" && e.message == "The maximum amount paid for the shares must be a number and can include up to two decimal places, like £30 or £28.60") mustBe true
+        }
+
+        "reject maxSharePrice that is too high" in {
+          val result = validator.validate(
+            validRow.copy(maxSharePrice = Some("1000000000")),
+            StcTemplate.SH03, "agent"
+          )
+          result.exists(e => e.fieldName == "maxSharePrice" && e.message == "The maximum amount paid for the shares must be £999,999,999 or less") mustBe true
+        }
+
+        "reject maxSharePrice that is too low" in {
+          val result = validator.validate(
+            validRow.copy(maxSharePrice = Some("0")),
+            StcTemplate.SH03, "agent"
+          )
+          result.exists(e => e.fieldName == "maxSharePrice" && e.message == "The maximum amount paid for the shares must be £0.01 or more") mustBe true
+        }
+
+        "allow securitiesQuantity with commas" in {
+          val result = validator.validate(
+            validRow.copy(securitiesQuantity = Some("1,000,000")),
+            StcTemplate.STF, "agent"
+          )
+          result.exists(_.fieldName == "securitiesQuantity") mustBe false
+        }
       }
     }
   }

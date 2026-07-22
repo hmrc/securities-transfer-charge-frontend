@@ -111,9 +111,11 @@ class StcRowMapper(columnIndex: ColumnIndexBuilder) {
       totalMarketValue =
         readString(row, columnIndex.find(StcColumns.totalMarketValue)),
 
-      minSharePrice =
-        readBigDecimal(row, columnIndex.find(StcColumns.minSharePrice)),
-      maxSharePrice = readBigDecimal(row, columnIndex.find(StcColumns.maxSharePrice)),
+      minSharePrice = 
+        readString(row, columnIndex.find(StcColumns.minSharePrice)),
+      
+      maxSharePrice = 
+        readString(row, columnIndex.find(StcColumns.maxSharePrice)),
 
       sharePurchaseReason =
         readString(row, columnIndex.find(StcColumns.purchaseReason)),

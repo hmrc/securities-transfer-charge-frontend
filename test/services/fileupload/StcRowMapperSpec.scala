@@ -136,6 +136,8 @@ class StcRowMapperSpec extends AnyWordSpec with Matchers {
       result.securitiesQuantity mustBe Some("1000")
       result.amountPaidForSecurities mustBe Some("5000.25")
       result.totalMarketValue mustBe Some("6000")
+      result.minSharePrice mustBe Some("7000")
+      result.maxSharePrice mustBe Some("8000")
       result.sharePurchaseReason mustBe Some("treasury")
       result.purchaseForCancellation mustBe Some(false)
     }

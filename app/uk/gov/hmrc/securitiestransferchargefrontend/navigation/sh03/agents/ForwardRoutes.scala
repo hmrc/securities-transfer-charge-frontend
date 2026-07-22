@@ -110,7 +110,7 @@ class ForwardRoutes(answerPersistenceService: AnswerPersistenceService,
       dataRequired(BulkAgentReferencePage, userAnswers, sh03AgentBulkRoutes.CompanyDetailsController.onPageLoad(NormalMode))
 
     case BulkCompanyDetailsPage => userAnswers =>
-      dataRequired(BulkCompanyDetailsPage, userAnswers, defaultPage)  
+      dataRequired(BulkCompanyDetailsPage, userAnswers, sh03AgentBulkRoutes.TemplateInstructionsController.onPageLoad())
 
     case _ => _ => Future.successful(defaultPage)
   }
