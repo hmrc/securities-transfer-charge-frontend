@@ -100,6 +100,9 @@ class FileProcessingController @Inject()(
     val journeyType = fileUpload.journeyType
     fileUpload.status match {
 
+      case UpscanJourneyStatus.Ready if fileUpload.uploadDetails.exists(_.size == 0) =>
+        Future.successful(Redirect(routes.BulkUploadFileEmptyController.onPageLoad(journeyType)))
+
       case UpscanJourneyStatus.Ready =>
         processingService.processReadyUpload(reference, fileUpload, affinityKey, journeyType.value)
         Future.successful(spinnerPage(counter))

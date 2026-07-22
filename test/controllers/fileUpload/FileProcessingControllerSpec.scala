@@ -32,12 +32,14 @@ import uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.agents.bulk.
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.sh03.agents.bulk.routes as sh03BulkRoutes
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.shared.bulk.routes as stfCyaRoutes
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.sh03.shared.bulk.routes as sh03CyaRoutes
+import uk.gov.hmrc.securitiestransferchargefrontend.models.stf.upscan.UpscanCallbackRequest.UploadDetails
 import uk.gov.hmrc.securitiestransferchargefrontend.models.{JourneyType, NormalMode}
 import uk.gov.hmrc.securitiestransferchargefrontend.models.stf.upscan.{FileUpload, UpscanJourneyStatus}
 import uk.gov.hmrc.securitiestransferchargefrontend.repositories.UpscanJourneyRepository
 import uk.gov.hmrc.securitiestransferchargefrontend.services.fileupload.processing.{FileProcessingRefreshCounter, FileProcessingRefreshCounterFactory, ProcessingService}
 import uk.gov.hmrc.securitiestransferchargefrontend.views.html.fileUpload.FileProcessingView
 
+import java.time.Instant
 import scala.concurrent.Future
 
 class MockFileProcessingRefreshCounterFactory(counter: FileProcessingRefreshCounter)
@@ -480,6 +482,35 @@ class FileProcessingControllerSpec extends SpecBase with MockitoSugar {
 
             status(result) mustEqual SEE_OTHER
             redirectLocation(result).value mustEqual routes.FileTypeErrorController.onPageLoad(journeyType).url
+          }
+        }
+
+        "must redirect for an empty file (zero bytes)" in {
+
+          val counter = mockCounter()
+          val repository = mock[UpscanJourneyRepository]
+          val service = mock[ProcessingService]
+
+          val upload = FileUpload(reference = reference,
+            status = UpscanJourneyStatus.Ready,
+            downloadUrl = Some("some-url.com"),
+            uploadDetails = Some(UploadDetails(
+              uploadTimestamp = Instant.now(),
+              checksum = "checksum",
+              fileMimeType = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+              fileName = "zeroBytes.xlxs",
+              size = 0)),journeyType = journeyType)
+
+          when(repository.find(reference)).thenReturn(Future.successful(Some(upload)))
+
+          val app = buildApp(counter, repository, service)
+
+          running(app) {
+
+            val result = route(app, FakeRequest(GET, routes.FileProcessingController.onPageLoad(reference).url)).value
+
+            status(result) mustEqual SEE_OTHER
+            redirectLocation(result).value mustEqual routes.BulkUploadFileEmptyController.onPageLoad(journeyType).url
           }
         }
       }
