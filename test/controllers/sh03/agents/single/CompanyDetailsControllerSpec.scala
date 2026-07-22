@@ -24,9 +24,9 @@ import play.api.test.FakeRequest
 import play.api.test.Helpers.*
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.routes
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.sh03.agents.single.routes as sh03AgentSingleRoutes
-import uk.gov.hmrc.securitiestransferchargefrontend.forms.sh03.agents.CompanyDetailsFormProvider
+import uk.gov.hmrc.securitiestransferchargefrontend.forms.sh03.shared.CompanyDetailsFormProvider
+import uk.gov.hmrc.securitiestransferchargefrontend.models.sh03.shared.CompanyDetails
 import uk.gov.hmrc.securitiestransferchargefrontend.models.{NormalMode, UserAnswers}
-import uk.gov.hmrc.securitiestransferchargefrontend.models.sh03.agents.CompanyDetails
 import uk.gov.hmrc.securitiestransferchargefrontend.navigation.Navigator
 import uk.gov.hmrc.securitiestransferchargefrontend.pages.sh03.CompanyDetailsPage
 import uk.gov.hmrc.securitiestransferchargefrontend.views.html.sh03.agents.single.CompanyDetailsView
@@ -34,7 +34,7 @@ import uk.gov.hmrc.securitiestransferchargefrontend.views.html.sh03.agents.singl
 class CompanyDetailsControllerSpec extends SpecBase with MockitoSugar {
 
   val formProvider = new CompanyDetailsFormProvider()
-  val form: Form[CompanyDetails] = formProvider()
+  val form: Form[CompanyDetails] = formProvider(affinityGroupKeyAgent)
 
   lazy val companyDetailsRoute: String = sh03AgentSingleRoutes.CompanyDetailsController.onPageLoad(NormalMode).url
 
@@ -44,7 +44,7 @@ class CompanyDetailsControllerSpec extends SpecBase with MockitoSugar {
 
     "must return OK and the correct view for a GET" in {
 
-      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers),affinityGroup = agentAffinity)
+      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers), affinityGroup = agentAffinity)
         .overrides(bind[Navigator].qualifiedWith("agentsSh03").toInstance(getNavigator))
         .build()
 
@@ -65,7 +65,7 @@ class CompanyDetailsControllerSpec extends SpecBase with MockitoSugar {
       val userAnswers = UserAnswers(testUserId, testGroupIdentifier, submissionId)
         .set(CompanyDetailsPage, validAnswer).success.value
 
-      val application = applicationBuilder(userAnswers = Some(userAnswers),affinityGroup = agentAffinity)
+      val application = applicationBuilder(userAnswers = Some(userAnswers), affinityGroup = agentAffinity)
         .overrides(bind[Navigator].qualifiedWith("agentsSh03").toInstance(getNavigator))
         .build()
 
@@ -77,12 +77,12 @@ class CompanyDetailsControllerSpec extends SpecBase with MockitoSugar {
         val result = route(application, request).value
 
         status(result) mustEqual OK
-        contentAsString(result) mustEqual view(form.fill(validAnswer), NormalMode,testBackLinkRoute)(request, messages(application)).toString
+        contentAsString(result) mustEqual view(form.fill(validAnswer), NormalMode, testBackLinkRoute)(request, messages(application)).toString
       }
     }
 
     "must redirect to next page when valid data is submitted" in {
-      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers),affinityGroup = agentAffinity)
+      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers), affinityGroup = agentAffinity)
         .overrides(bind[Navigator].qualifiedWith("agentsSh03").toInstance(getNavigator))
         .build()
 
@@ -104,7 +104,7 @@ class CompanyDetailsControllerSpec extends SpecBase with MockitoSugar {
 
     "must return a Bad Request and errors when invalid data is submitted" in {
 
-      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers),affinityGroup = agentAffinity)
+      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers), affinityGroup = agentAffinity)
         .overrides(bind[Navigator].qualifiedWith("agentsSh03").toInstance(getNavigator))
         .build()
 
@@ -120,13 +120,13 @@ class CompanyDetailsControllerSpec extends SpecBase with MockitoSugar {
         val result = route(application, request).value
 
         status(result) mustEqual BAD_REQUEST
-        contentAsString(result) mustEqual view(boundForm, NormalMode,testBackLinkRoute)(request, messages(application)).toString
+        contentAsString(result) mustEqual view(boundForm, NormalMode, testBackLinkRoute)(request, messages(application)).toString
       }
     }
 
     "must return a Bad Request when company name is empty" in {
 
-      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers),affinityGroup = agentAffinity)
+      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers), affinityGroup = agentAffinity)
         .overrides(bind[Navigator].qualifiedWith("agentsSh03").toInstance(getNavigator))
         .build()
 
@@ -147,7 +147,7 @@ class CompanyDetailsControllerSpec extends SpecBase with MockitoSugar {
 
     "must return a Bad Request when CRN is not 8 characters" in {
 
-      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers),affinityGroup = agentAffinity)
+      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers), affinityGroup = agentAffinity)
         .overrides(bind[Navigator].qualifiedWith("agentsSh03").toInstance(getNavigator))
         .build()
 
@@ -168,7 +168,7 @@ class CompanyDetailsControllerSpec extends SpecBase with MockitoSugar {
 
     "must return a Bad Request when CRN contains invalid characters" in {
 
-      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers),affinityGroup = agentAffinity)
+      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers), affinityGroup = agentAffinity)
         .overrides(bind[Navigator].qualifiedWith("agentsSh03").toInstance(getNavigator))
         .build()
 
@@ -189,7 +189,7 @@ class CompanyDetailsControllerSpec extends SpecBase with MockitoSugar {
 
     "must redirect to Journey Recovery for a GET if no existing data is found" in {
 
-      val application = applicationBuilder(userAnswers = None,affinityGroup = agentAffinity).build()
+      val application = applicationBuilder(userAnswers = None, affinityGroup = agentAffinity).build()
 
       running(application) {
         val request = FakeRequest(GET, companyDetailsRoute)
@@ -203,7 +203,7 @@ class CompanyDetailsControllerSpec extends SpecBase with MockitoSugar {
 
     "must redirect to Journey Recovery for a POST if no existing data is found" in {
 
-      val application = applicationBuilder(userAnswers = None,affinityGroup = agentAffinity).build()
+      val application = applicationBuilder(userAnswers = None, affinityGroup = agentAffinity).build()
 
       running(application) {
         val request =

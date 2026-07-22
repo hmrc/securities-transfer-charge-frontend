@@ -33,4 +33,6 @@ class StubNavigator(desiredCall: Call) extends Navigator {
   override def errorPage(forPage: Page): Call = desiredCall
 
   override def previousPage(page: Page, mode: Mode, userAnswers: UserAnswers): Call = desiredCall
+
+  override def previousPage(page: Page, mode: Mode, userAnswers: Option[UserAnswers]): Call = desiredCall
 }

@@ -16,50 +16,54 @@
 
 package uk.gov.hmrc.securitiestransferchargefrontend.controllers.sh03.organisations.single
 
-import play.api.data.Form
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, Call, MessagesControllerComponents}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.actions.*
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.shared.SaveAndReturnButton.isReturn
-import uk.gov.hmrc.securitiestransferchargefrontend.forms.sh03.organisations.CompanyDetailsFormProvider
+import uk.gov.hmrc.securitiestransferchargefrontend.forms.sh03.shared.CompanyDetailsFormProvider
+import uk.gov.hmrc.securitiestransferchargefrontend.models.sh03.shared.CompanyDetails
 import uk.gov.hmrc.securitiestransferchargefrontend.models.{Mode, UserAnswers}
 import uk.gov.hmrc.securitiestransferchargefrontend.navigation.Navigator
-import uk.gov.hmrc.securitiestransferchargefrontend.pages.sh03.OrgCompanyDetailsPage
+import uk.gov.hmrc.securitiestransferchargefrontend.pages.sh03.CompanyDetailsPage
 import uk.gov.hmrc.securitiestransferchargefrontend.views.html.sh03.organisations.single.CompanyDetailsView
 
 import javax.inject.{Inject, Named}
 import scala.concurrent.{ExecutionContext, Future}
 
 class CompanyDetailsController @Inject()(
-                                        override val messagesApi: MessagesApi,
-                                        @Named("orgSh03") navigator: Navigator,
-                                        stcAuthEnrolled: StcAuthEnrolledAction,
-                                        getData: StcDataRetrievalAction,
-                                        requireData: StcDataRequiredAction,
-                                        formProvider: CompanyDetailsFormProvider,
-                                        val controllerComponents: MessagesControllerComponents,
-                                        view: CompanyDetailsView
-                                    )(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport {
-
-  val form: Form[String] = formProvider()
+                                          override val messagesApi: MessagesApi,
+                                          @Named("orgSh03") navigator: Navigator,
+                                          stcAuthEnrolled: StcAuthEnrolledAction,
+                                          getData: StcDataRetrievalAction,
+                                          requireData: StcDataRequiredAction,
+                                          formProvider: CompanyDetailsFormProvider,
+                                          val controllerComponents: MessagesControllerComponents,
+                                          view: CompanyDetailsView
+                                        )(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport {
 
   lazy val backLinkCall: Mode => UserAnswers => Call =
-    mode => userAnswers => navigator.previousPage(OrgCompanyDetailsPage, mode, userAnswers)
+    mode => userAnswers => navigator.previousPage(CompanyDetailsPage, mode, userAnswers)
 
-  def onPageLoad(mode: Mode): Action[AnyContent] = (stcAuthEnrolled andThen getData andThen requireData) {
+  def onPageLoad(mode: Mode): Action[AnyContent] = (stcAuthEnrolled andThen getData andThen requireData).async {
     implicit request =>
+      val innerRequest = request.request
+      val affinityKey = innerRequest.affinityGroupKey
+      val form = formProvider(affinityKey)
 
-      val preparedForm = request.userAnswers.get(OrgCompanyDetailsPage) match {
+      val preparedForm = request.userAnswers.get(CompanyDetailsPage) match {
         case None => form
         case Some(value) => form.fill(value)
       }
 
-      Ok(view(preparedForm, mode, backLinkCall(mode)(request.userAnswers)))
+      Future.successful(Ok(view(preparedForm, mode, backLinkCall(mode)(request.userAnswers))))
   }
 
   def onSubmit(mode: Mode): Action[AnyContent] = (stcAuthEnrolled andThen getData andThen requireData).async {
     implicit request =>
+      val innerRequest = request.request
+      val affinityKey = innerRequest.affinityGroupKey
+      val form = formProvider(affinityKey)
 
       form.bindFromRequest().fold(
         formWithErrors =>
@@ -67,8 +71,8 @@ class CompanyDetailsController @Inject()(
 
         value =>
           for {
-            updatedAnswers <- Future.fromTry(request.userAnswers.set(OrgCompanyDetailsPage, value))
-            nextPage       <- navigator.nextPage(OrgCompanyDetailsPage, mode, updatedAnswers, isReturn(request))
+            updatedAnswers <- Future.fromTry(request.userAnswers.set(CompanyDetailsPage, value))
+            nextPage <- navigator.nextPage(CompanyDetailsPage, mode, updatedAnswers, isReturn(request))
           } yield Redirect(nextPage)
       )
   }

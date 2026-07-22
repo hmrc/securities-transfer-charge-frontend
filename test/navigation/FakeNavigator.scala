@@ -27,8 +27,10 @@ class FakeNavigator(desiredRoute: Call) extends Navigator {
 
   override def nextPage(page: Page, mode: Mode, userAnswers: UserAnswers, isReturn: Boolean = false)(implicit request: Request[?]): Future[Call] =
     Future.successful(desiredRoute)
-    
+
   override def errorPage(forPage: Page): Call = desiredRoute
 
   override def previousPage(page: Page, mode: Mode, userAnswers: UserAnswers): Call = desiredRoute
+
+  override def previousPage(page: Page, mode: Mode, userAnswers: Option[UserAnswers]): Call = desiredRoute
 }

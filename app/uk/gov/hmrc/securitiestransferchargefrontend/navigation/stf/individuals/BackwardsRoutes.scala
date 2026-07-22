@@ -17,21 +17,22 @@
 package uk.gov.hmrc.securitiestransferchargefrontend.navigation.stf.individuals
 
 import play.api.mvc.Call
-import uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.individuals.single.routes as individualSingleRoutes
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.individuals.routes as individualRoutes
+import uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.individuals.single.routes as individualSingleRoutes
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.shared.routes as sharedRoutes
 import uk.gov.hmrc.securitiestransferchargefrontend.models.{NormalMode, UserAnswers}
 import uk.gov.hmrc.securitiestransferchargefrontend.navigation.NavigationHelper
 import uk.gov.hmrc.securitiestransferchargefrontend.pages.*
 import uk.gov.hmrc.securitiestransferchargefrontend.pages.stf.shared.HowToNotifyAboutSecuritiesTransferPage
-import uk.gov.hmrc.securitiestransferchargefrontend.pages.stf.single.{AmountPaidForSecuritiesPage, ApplyingForReliefPage, ChargingPointPage, ConfirmAddressPage, ConnectedPersonsPage, DetailsOfThisTransferPage, NameOfSellerPage, OtherSecuritiesTypePage, SecuritiesTargetPage, StfBuyersAddressPage, StfSellerAddressPage, TaxRatePage, TotalMarketValuePage, WhatReliefAreYouApplyingForPage, WhatTypeOfSecuritiesPage}
+import uk.gov.hmrc.securitiestransferchargefrontend.pages.stf.single.*
 
 class BackwardsRoutes(defaultPage: Call):
 
   val navHelper: NavigationHelper = new NavigationHelper(defaultPage)
+
   import navHelper.*
-  
-  def predecessorRoutes(page: Page): UserAnswers => Call = page match {
+
+  def predecessorRoutes(page: Page): Option[UserAnswers] => Call = page match {
     case HowToNotifyAboutSecuritiesTransferPage => _ => sharedRoutes.SubmissionsDashboardController.onPageLoad()
     case ConfirmAddressPage => _ => individualRoutes.HowToNotifyAboutSecuritiesTransferController.onPageLoad()
     case StfBuyersAddressPage => _ => individualRoutes.HowToNotifyAboutSecuritiesTransferController.onPageLoad()
@@ -40,9 +41,11 @@ class BackwardsRoutes(defaultPage: Call):
     case ConnectedPersonsPage => _ => individualSingleRoutes.StfSellerAddressController.onPageLoad()
     case ApplyingForReliefPage => _ => individualSingleRoutes.ConnectedPersonsController.onPageLoad(NormalMode)
     case WhatReliefAreYouApplyingForPage => _ => individualSingleRoutes.ApplyingForReliefController.onPageLoad(NormalMode)
-    case SecuritiesTargetPage => userAnswers => dataDependent(ApplyingForReliefPage, userAnswers) {
-      case true => individualSingleRoutes.WhatReliefAreYouApplyingForController.onPageLoad(NormalMode)
-      case false => individualSingleRoutes.ApplyingForReliefController.onPageLoad(NormalMode)
+    case SecuritiesTargetPage => _.fold(defaultPage) { userAnswers =>
+      dataDependent(ApplyingForReliefPage, userAnswers) {
+        case true => individualSingleRoutes.WhatReliefAreYouApplyingForController.onPageLoad(NormalMode)
+        case false => individualSingleRoutes.ApplyingForReliefController.onPageLoad(NormalMode)
+      }
     }
     case ChargingPointPage => _ => individualSingleRoutes.SecuritiesTargetController.onPageLoad(NormalMode)
     case TaxRatePage => _ => individualSingleRoutes.ChargingPointController.onPageLoad(NormalMode)

@@ -36,7 +36,7 @@ class HowToNotifyAboutShareBuybackViewSpec extends ViewBaseSpec {
   private val form = formProvider(affinityGroupKeyAgent)
 
   def view(): Document = Jsoup.parse(
-    viewInstance(form, NormalMode, affinityGroupKeyAgent)(fakeRequest, messages).body
+    viewInstance(form, NormalMode, affinityGroupKeyAgent, testBackLinkRoute)(fakeRequest, messages).body
   )
 
   object ExpectedContent {

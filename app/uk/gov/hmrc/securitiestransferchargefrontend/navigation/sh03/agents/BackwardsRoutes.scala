@@ -35,33 +35,39 @@ class BackwardsRoutes(defaultPage: Call):
 
   import navHelper.*
 
-  def predecessorRoutes(page: Page): UserAnswers => Call = page match {
+  def predecessorRoutes(page: Page): Option[UserAnswers] => Call = page match {
+    case HowToNotifyAboutShareBuybackPage => _ => sharedRoutes.BeforeYouStartController.onPageLoad()
     case AgentReferencePage => _ => sh03AgentRoutes.HowToNotifyAboutShareBuybackController.onPageLoad()
     case CompanyDetailsPage => _ => sh03AgentSingleRoutes.AgentReferenceController.onPageLoad(NormalMode)
     case ReasonForPurchasePage => _ => sh03AgentSingleRoutes.CompanyDetailsController.onPageLoad(NormalMode)
     case TreasurySharesPage => _ => sh03AgentSingleRoutes.ReasonForPurchaseController.onPageLoad(NormalMode)
-    case ConnectedPersonsPage => userAnswers => dataDependent(ReasonForPurchasePage, userAnswers) {
-      case ReasonForPurchase.ForCancellation  => sh03AgentSingleRoutes.TreasurySharesController.onPageLoad(NormalMode)
-      case ReasonForPurchase.ToPlaceIntoTreasury => sh03AgentSingleRoutes.ReasonForPurchaseController.onPageLoad(NormalMode)
+    case ConnectedPersonsPage => _.fold(defaultPage) { userAnswers =>
+      dataDependent(ReasonForPurchasePage, userAnswers) {
+        case ReasonForPurchase.ForCancellation => sh03AgentSingleRoutes.TreasurySharesController.onPageLoad(NormalMode)
+        case ReasonForPurchase.ToPlaceIntoTreasury => sh03AgentSingleRoutes.ReasonForPurchaseController.onPageLoad(NormalMode)
+      }
     }
     case ApplyingForReliefPage => _ => sh03AgentSingleRoutes.ConnectedPersonsController.onPageLoad(NormalMode)
     case WhatReliefAreYouApplyingForPage => _ => sh03AgentSingleRoutes.ApplyingForReliefController.onPageLoad(NormalMode)
-    
-    case DetailsOfThisSharePurchasePage => userAnswers => dataDependent(ApplyingForReliefPage, userAnswers) { applyingForRelief =>
-      if(applyingForRelief) 
-        sh03AgentSingleRoutes.WhatReliefAreYouApplyingForController.onPageLoad(NormalMode)
-      else
-        sh03AgentSingleRoutes.ApplyingForReliefController.onPageLoad(NormalMode)
+
+    case DetailsOfThisSharePurchasePage => _.fold(defaultPage) { userAnswers =>
+      dataDependent(ApplyingForReliefPage, userAnswers) { applyingForRelief =>
+        if (applyingForRelief)
+          sh03AgentSingleRoutes.WhatReliefAreYouApplyingForController.onPageLoad(NormalMode)
+        else
+          sh03AgentSingleRoutes.ApplyingForReliefController.onPageLoad(NormalMode)
+      }
     }
     case MaximumAmountPaidPage => _ => sh03AgentSingleRoutes.DetailsOfThisSharePurchaseController.onPageLoad(NormalMode)
 
     case MinimumAmountPaidPage => _ => sh03AgentSingleRoutes.MaximumAmountPaidController.onPageLoad(NormalMode)
-    case ChargingPointPage => userAnswers => dataDependent(CompanyDetailsPage, userAnswers) { companyDetails =>
-      if(companyDetails.isPlc)
-        sh03AgentSingleRoutes.MinimumAmountPaidController.onPageLoad(NormalMode)
-      else
-        sh03AgentSingleRoutes.DetailsOfThisSharePurchaseController.onPageLoad(NormalMode)  
-      
+    case ChargingPointPage => _.fold(defaultPage) { userAnswers =>
+      dataDependent(CompanyDetailsPage, userAnswers) { companyDetails =>
+        if (companyDetails.isPlc)
+          sh03AgentSingleRoutes.MinimumAmountPaidController.onPageLoad(NormalMode)
+        else
+          sh03AgentSingleRoutes.DetailsOfThisSharePurchaseController.onPageLoad(NormalMode)
+      }
     }
     case RoleAtPurchasingCompanyPage => _ => sh03AgentSingleRoutes.ChargingPointController.onPageLoad(NormalMode)
     case BulkCompanyDetailsPage => _ => sh03AgentBulkRoutes.AgentReferenceController.onPageLoad(NormalMode)

@@ -24,17 +24,16 @@ import org.scalatestplus.mockito.MockitoSugar.mock
 import uk.gov.hmrc.securitiestransferchargefrontend.config.FrontendAppConfig
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.routes
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.sh03.agents.routes as sh03AgentRoutes
+import uk.gov.hmrc.securitiestransferchargefrontend.controllers.sh03.shared.routes as sharedRoutes
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.sh03.agents.single.routes as sh03AgentSingleRoutes
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.sh03.shared.single.routes as sh03SingleCyaRoutes
 import uk.gov.hmrc.securitiestransferchargefrontend.models.sh03.HowToNotifyAboutShareBuyback
-import uk.gov.hmrc.securitiestransferchargefrontend.models.sh03.agents._
-import uk.gov.hmrc.securitiestransferchargefrontend.models.sh03.shared._
+import uk.gov.hmrc.securitiestransferchargefrontend.models.sh03.shared.*
+import uk.gov.hmrc.securitiestransferchargefrontend.models.shared.AgentReference
 import uk.gov.hmrc.securitiestransferchargefrontend.models.{CheckMode, NormalMode, UserAnswers}
 import uk.gov.hmrc.securitiestransferchargefrontend.navigation.sh03.agents.Sh03AgentNavigator
-import uk.gov.hmrc.securitiestransferchargefrontend.models.shared.AgentReference
 import uk.gov.hmrc.securitiestransferchargefrontend.pages.Page
 import uk.gov.hmrc.securitiestransferchargefrontend.pages.sh03.*
-
 
 import java.time.LocalDate
 
@@ -50,7 +49,7 @@ class Sh03AgentNavigatorSpec extends SpecBase with ScalaFutures {
     companyName = "Company1",
     companyRegistrationNumber = "12345678",
     isPlc = true)
-  
+
   private val purchaseDetails = DetailsOfThisSharePurchase(
     numberOfShares = 1,
     typeOfShares = "ordinary",
@@ -204,7 +203,7 @@ class Sh03AgentNavigatorSpec extends SpecBase with ScalaFutures {
       }
 
       "must go from RoleAtPurchasingCompanyPage to CheckYourAnswerPage" in {
-        val answers = emptyUserAnswers.set(RoleAtPurchasingCompanyPage, RoleAtPurchasingCompany(role = "Director",uksOrgan = None)).get
+        val answers = emptyUserAnswers.set(RoleAtPurchasingCompanyPage, RoleAtPurchasingCompany(role = "Director", uksOrgan = None)).get
         val result = navigator.nextPage(RoleAtPurchasingCompanyPage, NormalMode, answers)(fakeRequest)
         whenReady(result) { res =>
           res mustBe sh03SingleCyaRoutes.CheckYourAnswersController.onPageLoad()
@@ -239,6 +238,11 @@ class Sh03AgentNavigatorSpec extends SpecBase with ScalaFutures {
       case object UnknownPage extends Page
       val result = navigator.previousPage(UnknownPage, NormalMode, emptyUserAnswers)
       result mustBe navigator.defaultPage
+    }
+
+    "must go from the HowToNotifyAboutShareBuybackPage to BeforeYouStartPage" in {
+      val result = navigator.previousPage(HowToNotifyAboutShareBuybackPage, NormalMode, emptyUserAnswers)
+      result mustBe sharedRoutes.BeforeYouStartController.onPageLoad()
     }
 
     "must go from the AgentReferencePage to HowToNotifyAboutShareBuybackPage" in {

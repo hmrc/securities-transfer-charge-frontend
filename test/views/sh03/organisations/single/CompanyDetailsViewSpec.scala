@@ -19,7 +19,7 @@ package views.sh03.organisations.single
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
 import play.api.Application
-import uk.gov.hmrc.securitiestransferchargefrontend.forms.sh03.organisations.CompanyDetailsFormProvider
+import uk.gov.hmrc.securitiestransferchargefrontend.forms.sh03.shared.CompanyDetailsFormProvider
 import uk.gov.hmrc.securitiestransferchargefrontend.models.NormalMode
 import uk.gov.hmrc.securitiestransferchargefrontend.views.html.sh03.organisations.single.CompanyDetailsView
 import views.ViewBaseSpec
@@ -32,7 +32,7 @@ class CompanyDetailsViewSpec extends ViewBaseSpec {
 
   private val viewInstance = app.injector.instanceOf[CompanyDetailsView]
   private val formProvider = new CompanyDetailsFormProvider()
-  private val form = formProvider()
+  private val form = formProvider(affinityGroupKeyOrg)
 
   def view(): Document = Jsoup.parse(
     viewInstance(form, NormalMode, testBackLinkRoute)(fakeRequest, messages).body

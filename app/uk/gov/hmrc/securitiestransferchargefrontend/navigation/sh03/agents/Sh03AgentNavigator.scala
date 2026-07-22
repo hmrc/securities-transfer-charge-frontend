@@ -47,7 +47,7 @@ class Sh03AgentNavigator @Inject()(answerPersistenceService: AnswerPersistenceSe
   override def forwardRoutes(page: Page)(implicit hc: HeaderCarrier): UserAnswers => Future[Call] =
     forwardRoutes.forwardRoutes(page)(hc)
 
-  override def predecessorRoutes(page: Page): UserAnswers => Call =
+  override def predecessorRoutes(page: Page): Option[UserAnswers] => Call =
     backwardsRoutes.predecessorRoutes(page)
 
   def errorPage(forPage: Page): Call = forPage match {

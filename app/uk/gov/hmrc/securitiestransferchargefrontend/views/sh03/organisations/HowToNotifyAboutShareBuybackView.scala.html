@@ -28,9 +28,9 @@
     govukButton: GovukButton
 )
 
-@(form: Form[_], mode: Mode, affinityGroupKey: String)(implicit request: Request[_], messages: Messages)
+@(form: Form[_], mode: Mode, affinityGroupKey: String, backLinkCall: Call)(implicit request: Request[_], messages: Messages)
 
-@layout(pageTitle = title(form, messages("org.sh03.shareBuyback.title"), Some(messages("sh03.section.name"))), backLinkUrl = Some("")) {
+@layout(pageTitle = title(form, messages("org.sh03.shareBuyback.title"), Some(messages("sh03.section.name"))), backLinkUrl = Some(backLinkCall.url)) {
 
     @formHelper(action = orgRoutes.HowToNotifyAboutShareBuybackController.onSubmit(), Symbol("autoComplete") -> "off") {
 
