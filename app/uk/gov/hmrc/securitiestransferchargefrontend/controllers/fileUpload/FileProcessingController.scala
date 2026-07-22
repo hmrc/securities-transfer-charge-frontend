@@ -23,9 +23,12 @@ import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import uk.gov.hmrc.securitiestransferchargefrontend.config.FrontendAppConfig
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.actions.*
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.fileUpload.routes
-import uk.gov.hmrc.securitiestransferchargefrontend.controllers.routes.{CheckYourAnswersController, JourneyRecoveryController}
-import uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.agents.bulk.routes as bulkRoutes
-import uk.gov.hmrc.securitiestransferchargefrontend.models.NormalMode
+import uk.gov.hmrc.securitiestransferchargefrontend.controllers.routes.JourneyRecoveryController
+import uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.agents.bulk.routes as stfBulkRoutes
+import uk.gov.hmrc.securitiestransferchargefrontend.controllers.sh03.agents.bulk.routes as sh03BulkRoutes
+import uk.gov.hmrc.securitiestransferchargefrontend.controllers.sh03.shared.bulk.routes as sh03CyaRoutes
+import uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.shared.bulk.routes as stfCyaRoutes
+import uk.gov.hmrc.securitiestransferchargefrontend.models.{JourneyType, NormalMode}
 import uk.gov.hmrc.securitiestransferchargefrontend.models.stf.upscan.{FileUpload, UpscanJourneyStatus}
 import uk.gov.hmrc.securitiestransferchargefrontend.repositories.UpscanJourneyRepository
 import uk.gov.hmrc.securitiestransferchargefrontend.services.fileupload.processing.FileProcessingHelper.*
@@ -125,10 +128,15 @@ class FileProcessingController @Inject()(
 
       case UpscanJourneyStatus.Failed => Future.successful(Redirect(routes.BulkUploadErrorController.onPageLoad(journeyType)))
 
-      case UpscanJourneyStatus.Completed => request.affinityGroup match {
-        case AffinityGroup.Agent => Future.successful(Redirect(bulkRoutes.AgentReferenceController.onPageLoad(NormalMode)))
-        case _ => Future.successful(Redirect(CheckYourAnswersController.onPageLoad()))
-      }
+      case UpscanJourneyStatus.Completed =>
+        (request.affinityGroup, journeyType) match {
+          case (AffinityGroup.Agent, JourneyType.STF) => Future.successful(Redirect(stfBulkRoutes.AgentReferenceController.onPageLoad(NormalMode)))
+
+          case (AffinityGroup.Agent, JourneyType.SH03) => Future.successful(Redirect(sh03BulkRoutes.RoleAtPurchasingCompanyController.onPageLoad(NormalMode)))
+
+          case (_, JourneyType.SH03) => Future.successful(Redirect(sh03CyaRoutes.CheckYourAnswersController.onPageLoad()))
+          case (_, JourneyType.STF) => Future.successful(Redirect(stfCyaRoutes.CheckYourAnswersController.onPageLoad()))
+        }
     }
   }
 }

@@ -49,9 +49,6 @@ class AgentReferenceController @Inject()(
 
   def onPageLoad(mode: Mode): Action[AnyContent] = (stcAuthEnrolled andThen getData) { implicit request =>
 
-    println(request.userAnswers)
-    println(request.userAnswers.flatMap(_.get(AgentReferencePage)))
-
       val preparedForm = request.userAnswers.flatMap(_.get(AgentReferencePage))
         .map(form.fill)
         .getOrElse(form)

@@ -11,8 +11,12 @@ GET         /language/:lang                               uk.gov.hmrc.securities
 GET         /refresh-session                              uk.gov.hmrc.securitiestransferchargefrontend.controllers.KeepAliveController.keepAlive()
 
 GET         /there-is-a-problem                           uk.gov.hmrc.securitiestransferchargefrontend.controllers.JourneyRecoveryController.onPageLoad(continueUrl: Option[RedirectUrl] ?= None)
+GET        /check-your-answers                            uk.gov.hmrc.securitiestransferchargefrontend.controllers.CheckYourAnswersController.onPageLoad()
 
-GET        /stf/check-your-answers                        uk.gov.hmrc.securitiestransferchargefrontend.controllers.CheckYourAnswersController.onPageLoad()
+
+GET        /stf/single/check-your-answers                 uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.shared.bulk.CheckYourAnswersController.onPageLoad()
+GET        /stf/bulk/check-your-answers                   uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.shared.single.CheckYourAnswersController.onPageLoad()
+
 
 GET        /stf/account/sign-out-survey                   uk.gov.hmrc.securitiestransferchargefrontend.controllers.auth.AuthController.signOut()
 GET        /stf/account/sign-out                          uk.gov.hmrc.securitiestransferchargefrontend.controllers.auth.AuthController.signOutNoSurvey()
@@ -348,7 +352,7 @@ GET        /sh03/agent/change/maximum-amount-shares             uk.gov.hmrc.secu
 POST       /sh03/agent/change/maximum-amount-shares             uk.gov.hmrc.securitiestransferchargefrontend.controllers.sh03.agents.single.MaximumAmountPaidController.onSubmit(mode: Mode = CheckMode)
 
 GET        /sh03/agent/cannot-submit-form                       uk.gov.hmrc.securitiestransferchargefrontend.controllers.sh03.agents.single.CannotSubmitFormErrorController.onPageLoad()
-GET        /sh03/agent/check-your-answers                       uk.gov.hmrc.securitiestransferchargefrontend.controllers.sh03.agents.single.CheckYourAnswersController.onPageLoad()
+GET        /sh03/single/check-your-answers                       uk.gov.hmrc.securitiestransferchargefrontend.controllers.sh03.shared.single.CheckYourAnswersController.onPageLoad()
 
 GET        /sh03/org/share-purchase                        uk.gov.hmrc.securitiestransferchargefrontend.controllers.sh03.organisations.single.ReasonForPurchaseController.onPageLoad(mode: Mode = NormalMode)
 POST       /sh03/org/share-purchase                        uk.gov.hmrc.securitiestransferchargefrontend.controllers.sh03.organisations.single.ReasonForPurchaseController.onSubmit(mode: Mode = NormalMode)
@@ -429,3 +433,5 @@ GET        /sh03/agent/bulk/change/role-purchasing-company          uk.gov.hmrc.
 POST       /sh03/agent/bulk/change/role-purchasing-company          uk.gov.hmrc.securitiestransferchargefrontend.controllers.sh03.agents.bulk.RoleAtPurchasingCompanyController.onSubmit(mode: Mode = CheckMode)
 
 GET        /sh03/agent/bulk/cannot-submit-form                       uk.gov.hmrc.securitiestransferchargefrontend.controllers.sh03.agents.bulk.CannotSubmitFormErrorController.onPageLoad()
+
+GET        /sh03/bulk/check-your-answers                             uk.gov.hmrc.securitiestransferchargefrontend.controllers.sh03.shared.bulk.CheckYourAnswersController.onPageLoad()

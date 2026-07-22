@@ -26,11 +26,13 @@ import play.api.test.FakeRequest
 import play.api.test.Helpers.{redirectLocation, *}
 import uk.gov.hmrc.auth.core.AffinityGroup
 import uk.gov.hmrc.securitiestransferchargefrontend.config.FrontendAppConfig
-import uk.gov.hmrc.securitiestransferchargefrontend.controllers.routes.{CheckYourAnswersController, JourneyRecoveryController}
-import uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.agents.bulk.routes as bulkRoutes
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.fileUpload.routes
-import uk.gov.hmrc.securitiestransferchargefrontend.models.JourneyType
-import uk.gov.hmrc.securitiestransferchargefrontend.models.NormalMode
+import uk.gov.hmrc.securitiestransferchargefrontend.controllers.routes.JourneyRecoveryController
+import uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.agents.bulk.routes as stfBulkRoutes
+import uk.gov.hmrc.securitiestransferchargefrontend.controllers.sh03.agents.bulk.routes as sh03BulkRoutes
+import uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.shared.bulk.routes as stfCyaRoutes
+import uk.gov.hmrc.securitiestransferchargefrontend.controllers.sh03.shared.bulk.routes as sh03CyaRoutes
+import uk.gov.hmrc.securitiestransferchargefrontend.models.{JourneyType, NormalMode}
 import uk.gov.hmrc.securitiestransferchargefrontend.models.stf.upscan.{FileUpload, UpscanJourneyStatus}
 import uk.gov.hmrc.securitiestransferchargefrontend.repositories.UpscanJourneyRepository
 import uk.gov.hmrc.securitiestransferchargefrontend.services.fileupload.processing.{FileProcessingRefreshCounter, FileProcessingRefreshCounterFactory, ProcessingService}
@@ -426,11 +428,15 @@ class FileProcessingControllerSpec extends SpecBase with MockitoSugar {
 
               status(result) mustEqual SEE_OTHER
 
-              affinityGroup match {
-                case AffinityGroup.Agent =>
-                  redirectLocation(result).value mustEqual bulkRoutes.AgentReferenceController.onPageLoad(NormalMode).url
-                case _ =>
-                  redirectLocation(result).value mustEqual CheckYourAnswersController.onPageLoad().url
+
+              (affinityGroup, journeyType) match {
+                case (AffinityGroup.Agent, JourneyType.STF) => redirectLocation(result).value mustEqual stfBulkRoutes.AgentReferenceController.onPageLoad(NormalMode).url
+
+                case (AffinityGroup.Agent, JourneyType.SH03) => redirectLocation(result).value mustEqual sh03BulkRoutes.RoleAtPurchasingCompanyController.onPageLoad(NormalMode).url
+
+                case (_, JourneyType.STF) => redirectLocation(result).value mustEqual stfCyaRoutes.CheckYourAnswersController.onPageLoad().url
+
+                case (_, JourneyType.SH03) => redirectLocation(result).value mustEqual sh03CyaRoutes.CheckYourAnswersController.onPageLoad().url
               }
             }
           }

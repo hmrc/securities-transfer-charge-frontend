@@ -19,8 +19,10 @@ package uk.gov.hmrc.securitiestransferchargefrontend.navigation.sh03.agents
 import play.api.mvc.Call
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.securitiestransferchargefrontend.config.FrontendAppConfig
-import uk.gov.hmrc.securitiestransferchargefrontend.controllers.sh03.agents.single.routes as sh03AgentSingleRoutes
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.sh03.agents.bulk.routes as sh03AgentBulkRoutes
+import uk.gov.hmrc.securitiestransferchargefrontend.controllers.sh03.agents.single.routes as sh03AgentSingleRoutes
+import uk.gov.hmrc.securitiestransferchargefrontend.controllers.sh03.shared.single.routes as sh03SingleCyaRoutes
+import uk.gov.hmrc.securitiestransferchargefrontend.controllers.sh03.shared.bulk.routes as sh03BulkCyaRoutes
 import uk.gov.hmrc.securitiestransferchargefrontend.models.sh03.HowToNotifyAboutShareBuyback.{MoreThanOneAtATime, OneAtATime}
 import uk.gov.hmrc.securitiestransferchargefrontend.models.sh03.shared.{ReasonForPurchase, RoleAtPurchasingCompany}
 import uk.gov.hmrc.securitiestransferchargefrontend.models.{NormalMode, UserAnswers}
@@ -103,7 +105,7 @@ class ForwardRoutes(answerPersistenceService: AnswerPersistenceService,
           if (roleAtPurchasingCompany.role == RoleAtPurchasingCompany.unsupportedRole)
             sh03AgentSingleRoutes.CannotSubmitFormErrorController.onPageLoad()
           else
-            sh03AgentSingleRoutes.CheckYourAnswersController.onPageLoad()
+            sh03SingleCyaRoutes.CheckYourAnswersController.onPageLoad()
       }
 
     case BulkAgentReferencePage => userAnswers =>
@@ -117,7 +119,7 @@ class ForwardRoutes(answerPersistenceService: AnswerPersistenceService,
         roleAtPurchasingCompany =>
           if (roleAtPurchasingCompany.role == RoleAtPurchasingCompany.unsupportedRole)
             sh03AgentBulkRoutes.CannotSubmitFormErrorController.onPageLoad()
-          else ???
+          else sh03BulkCyaRoutes.CheckYourAnswersController.onPageLoad()
       }
 
     case _ => _ => Future.successful(defaultPage)

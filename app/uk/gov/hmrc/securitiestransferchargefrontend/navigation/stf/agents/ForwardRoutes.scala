@@ -22,6 +22,7 @@ import uk.gov.hmrc.securitiestransferchargefrontend.config.FrontendAppConfig
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.agents.routes as agentRoutes
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.agents.single.routes as agentSingleRoutes
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.agents.bulk.routes as agentBulkRoutes
+import uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.shared.single.routes as stfSingleCyaRoutes
 import uk.gov.hmrc.securitiestransferchargefrontend.models.stf.HowToNotifyAboutSecuritiesTransfer.{MoreThanOneAtATime, OneAtATime}
 import uk.gov.hmrc.securitiestransferchargefrontend.models.{NormalMode, UserAnswers}
 import uk.gov.hmrc.securitiestransferchargefrontend.navigation.PersistentNavigationHelper
@@ -83,15 +84,15 @@ class ForwardRoutes(answerPersistenceService: AnswerPersistenceService,
         if (isConnected)
           agentSingleRoutes.TotalMarketValueController.onPageLoad(NormalMode)
         else
-          routes.CheckYourAnswersController.onPageLoad()
+          stfSingleCyaRoutes.CheckYourAnswersController.onPageLoad()
       }
-    case TotalMarketValuePage => userAnswers => dataRequired(TotalMarketValuePage, userAnswers, routes.CheckYourAnswersController.onPageLoad())
+    case TotalMarketValuePage => userAnswers => dataRequired(TotalMarketValuePage, userAnswers, stfSingleCyaRoutes.CheckYourAnswersController.onPageLoad())
     case WhatTypeOfSecuritiesPage => userAnswers =>
       dataDependent(WhatTypeOfSecuritiesPage, userAnswers) {
         case WhatTypeOfSecurities.Shares => agentSingleRoutes.DetailsOfThisTransferController.onPageLoad(NormalMode)
         case WhatTypeOfSecurities.Other => agentSingleRoutes.OtherSecuritiesTypeController.onPageLoad(NormalMode)
       }
-    case DetailsOfThisTransferPage => userAnswers => dataRequired(DetailsOfThisTransferPage, userAnswers, routes.CheckYourAnswersController.onPageLoad())  
+    case DetailsOfThisTransferPage => userAnswers => dataRequired(DetailsOfThisTransferPage, userAnswers, stfSingleCyaRoutes.CheckYourAnswersController.onPageLoad())  
 
     case _ => _ => Future.successful(defaultPage)
   }

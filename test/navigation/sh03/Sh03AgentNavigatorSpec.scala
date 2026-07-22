@@ -25,6 +25,7 @@ import uk.gov.hmrc.securitiestransferchargefrontend.config.FrontendAppConfig
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.routes
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.sh03.agents.routes as sh03AgentRoutes
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.sh03.agents.single.routes as sh03AgentSingleRoutes
+import uk.gov.hmrc.securitiestransferchargefrontend.controllers.sh03.shared.single.routes as sh03SingleCyaRoutes
 import uk.gov.hmrc.securitiestransferchargefrontend.models.sh03.HowToNotifyAboutShareBuyback
 import uk.gov.hmrc.securitiestransferchargefrontend.models.sh03.agents._
 import uk.gov.hmrc.securitiestransferchargefrontend.models.sh03.shared._
@@ -206,7 +207,7 @@ class Sh03AgentNavigatorSpec extends SpecBase with ScalaFutures {
         val answers = emptyUserAnswers.set(RoleAtPurchasingCompanyPage, RoleAtPurchasingCompany(role = "Director",uksOrgan = None)).get
         val result = navigator.nextPage(RoleAtPurchasingCompanyPage, NormalMode, answers)(fakeRequest)
         whenReady(result) { res =>
-          res mustBe sh03AgentSingleRoutes.CheckYourAnswersController.onPageLoad()
+          res mustBe sh03SingleCyaRoutes.CheckYourAnswersController.onPageLoad()
         }
       }
 

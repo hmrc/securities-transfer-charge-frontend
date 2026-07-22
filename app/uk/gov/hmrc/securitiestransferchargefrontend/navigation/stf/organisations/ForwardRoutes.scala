@@ -23,6 +23,7 @@ import uk.gov.hmrc.securitiestransferchargefrontend.controllers.routes
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.organisations.single.routes as orgSingleRoutes
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.organisations.bulk.routes as orgBulkRoutes
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.organisations.routes as orgRoutes
+import uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.shared.single.routes as stfSingleCyaRoutes
 import uk.gov.hmrc.securitiestransferchargefrontend.models.stf.HowToNotifyAboutSecuritiesTransfer.{MoreThanOneAtATime, OneAtATime}
 import uk.gov.hmrc.securitiestransferchargefrontend.models.stf.WhatTypeOfSecurities
 import uk.gov.hmrc.securitiestransferchargefrontend.models.{NormalMode, UserAnswers}
@@ -78,12 +79,12 @@ class ForwardRoutes(answerPersistenceService: AnswerPersistenceService,
         case WhatTypeOfSecurities.Shares => orgSingleRoutes.DetailsOfThisTransferController.onPageLoad(NormalMode)
         case WhatTypeOfSecurities.Other => orgSingleRoutes.OtherSecuritiesTypeController.onPageLoad(NormalMode)
       }
-    case DetailsOfThisTransferPage => userAnswers => dataRequired(DetailsOfThisTransferPage, userAnswers, routes.CheckYourAnswersController.onPageLoad())
+    case DetailsOfThisTransferPage => userAnswers => dataRequired(DetailsOfThisTransferPage, userAnswers, stfSingleCyaRoutes.CheckYourAnswersController.onPageLoad())
     case AmountPaidForSecuritiesPage => userAnswers =>
       dataDependent(ConnectedPersonsPage, userAnswers) { isConnected =>
         if (isConnected) orgSingleRoutes.TotalMarketValueController.onPageLoad(NormalMode)
-        else routes.CheckYourAnswersController.onPageLoad()
+        else stfSingleCyaRoutes.CheckYourAnswersController.onPageLoad()
       }
-    case TotalMarketValuePage => userAnswers => dataRequired(TotalMarketValuePage, userAnswers, routes.CheckYourAnswersController.onPageLoad())  
+    case TotalMarketValuePage => userAnswers => dataRequired(TotalMarketValuePage, userAnswers, stfSingleCyaRoutes.CheckYourAnswersController.onPageLoad())
     case _ => _ => Future.successful(defaultPage)
   }

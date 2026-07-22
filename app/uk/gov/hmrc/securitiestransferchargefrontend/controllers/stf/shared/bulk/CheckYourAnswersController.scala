@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.securitiestransferchargefrontend.controllers.sh03.agents.single
+package uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.shared.bulk
 
 import com.google.inject.Inject
 import play.api.i18n.{I18nSupport, MessagesApi}
@@ -43,4 +43,4 @@ class CheckYourAnswersController @Inject()(
 
       Ok(view(list))
   }
-}
+}  
