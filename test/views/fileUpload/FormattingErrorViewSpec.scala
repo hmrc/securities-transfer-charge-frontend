@@ -20,7 +20,7 @@ import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
 import play.api.Application
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.fileUpload.routes
-import uk.gov.hmrc.securitiestransferchargefrontend.models.JourneyType.{SH03, STF}
+import uk.gov.hmrc.securitiestransferchargefrontend.models.JourneyType.STF
 import uk.gov.hmrc.securitiestransferchargefrontend.views.html.fileUpload.FormattingErrorView
 import views.ViewBaseSpec
 
@@ -35,19 +35,19 @@ class FormattingErrorViewSpec extends ViewBaseSpec {
   )
 
   object ExpectedContent {
-    val title = "Your file has formatting errors"
-    val heading = "Your file has formatting errors"
+    val title: String = messages("formattingError.title")
+    val heading: String = messages("formattingError.heading")
 
-    val para1Value = "More than 25 formatting errors have been detected in this file."
-    val para2Value = "The errors may include things like incorrect formatting of numbers or dates, or a letters in a cell that can only contain numbers."
-    val para3Value = "These will need to be corrected before your file can be uploaded again."
-    val para4Value = "Check the instructions in the template file for more guidance."
+    val para1Value: String = messages("formattingError.p1")
+    val para2Value: String = messages("formattingError.p2")
+    val para3Value: String = messages("formattingError.p3")
+    val para4Value: String = messages("formattingError.p4")
 
-    val backToFIle = "Back to file upload"
+    val backToFIle: String = messages("site.back-to-upload.button")
   }
 
   "The FormattingErrorView" - {
-    "the user is an Individual" - {
+    "render view" - {
       val formattingErrorView = view()
 
       "have the correct title" in {
@@ -74,11 +74,10 @@ class FormattingErrorViewSpec extends ViewBaseSpec {
         formattingErrorView.para(4) mustBe Some(ExpectedContent.para4Value)
       }
 
-      "have a button that redirects to the file upload page" in {
-        val form = formattingErrorView.select("form")
-        form.attr("action") mustBe routes.FileUploadController.onPageLoad(STF).url
-        form.attr("method") mustBe "GET"
-        formattingErrorView.select(".govuk-button").first().text() mustBe ExpectedContent.backToFIle
+      "display a back link that redirects to the correct page" in {
+        val link = formattingErrorView.select(".govuk-link").get(3)
+        link.text() mustBe messages("site.back-to-upload.button")
+        link.attr("href") mustBe routes.FileUploadController.onPageLoad(STF).url
       }
     }
   }

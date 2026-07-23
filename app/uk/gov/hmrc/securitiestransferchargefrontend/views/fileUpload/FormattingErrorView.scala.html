@@ -36,9 +36,9 @@
     <p class="govuk-body">@messages("formattingError.p3")</p>
     <p class="govuk-body">@Html(messages("formattingError.p4"))</p>
 
-    @formHelper(action = routes.FileUploadController.onPageLoad(journeyType)) {
-        @govukButton(
-            ButtonViewModel(messages("site.back-to-upload.button"))
-        )
-    }
+    <p class="govuk-body">
+        <a class="govuk-link" href="@routes.FileUploadController.onPageLoad(journeyType).url">
+            @messages("site.back-to-upload.button")
+        </a>
+    </p>
 }
