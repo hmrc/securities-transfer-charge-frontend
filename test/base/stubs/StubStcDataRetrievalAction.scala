@@ -22,12 +22,11 @@ import uk.gov.hmrc.securitiestransferchargefrontend.models.UserAnswers
 
 import scala.concurrent.{ExecutionContext, Future}
 
-class StubStcDataRetrievalAction(
-                                  userAnswers: Option[UserAnswers]
-                                ) extends StcDataRetrievalAction {
+class StubStcDataRetrievalAction(userAnswers: Option[UserAnswers]) extends StcDataRetrievalAction {
 
   override def transform[A](request: StcAuthorisedRequest[A]): Future[StcOptionalDataRequest[A]] =
-    Future.successful(StcOptionalDataRequest(request, userAnswers)
+    Future.successful(
+      StcOptionalDataRequest(request, userAnswers)
     )
 
   override protected def executionContext: ExecutionContext =
@@ -35,5 +34,6 @@ class StubStcDataRetrievalAction(
 }
 
 object StubStcDataRetrievalAction {
-  def apply(userAnswers: Option[UserAnswers] = None): StubStcDataRetrievalAction = new StubStcDataRetrievalAction(userAnswers)
+  def apply(userAnswers: Option[UserAnswers] = None): StubStcDataRetrievalAction =
+    new StubStcDataRetrievalAction(userAnswers)
 }

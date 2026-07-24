@@ -34,11 +34,10 @@ class AgentReferenceViewSpec extends ViewBaseSpec {
   private val viewInstance         = app.injector.instanceOf[AgentReferenceView]
   private val formProvider         = new AgentReferenceFormProvider()
   private val form = formProvider()
-  private val testBackLinkRoute: Call = Call("GET", "/back-link")
 
 
   def view(): Document = Jsoup.parse(
-    viewInstance(form, NormalMode, testBackLinkRoute)(fakeRequest, messages).body
+    viewInstance(form, NormalMode)(fakeRequest, messages).body
   )
 
   object ExpectedContent {

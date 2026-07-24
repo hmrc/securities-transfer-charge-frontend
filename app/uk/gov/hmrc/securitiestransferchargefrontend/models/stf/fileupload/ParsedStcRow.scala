@@ -50,8 +50,8 @@ case class ParsedStcRow(
                          securitiesQuantity: Option[String],
                          amountPaidForSecurities: Option[String],
                          totalMarketValue: Option[String],
-                         minSharePrice: Option[BigDecimal],
-                         maxSharePrice: Option[BigDecimal],
+                         minSharePrice: Option[String],
+                         maxSharePrice: Option[String],
                          sharePurchaseReason: Option[String],
                          purchaseForCancellation: Option[Boolean]
                        )

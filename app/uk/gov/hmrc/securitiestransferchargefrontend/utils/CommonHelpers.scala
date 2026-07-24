@@ -19,7 +19,7 @@ package uk.gov.hmrc.securitiestransferchargefrontend.utils
 import play.api.Logger
 import uk.gov.hmrc.auth.core.AffinityGroup
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.actions.requests.StcDataRequest
-import uk.gov.hmrc.securitiestransferchargefrontend.domain.TransferType
+import uk.gov.hmrc.securitiestransferchargefrontend.models.JourneyType
 import uk.gov.hmrc.securitiestransferchargefrontend.pages.stf.single.ConnectedPersonsPage
 
 import scala.concurrent.{ExecutionContext, Future}
@@ -39,23 +39,14 @@ object CommonHelpers {
   def requireMarketValue(implicit request: StcDataRequest[_]): Boolean =
     request.userAnswers.get(ConnectedPersonsPage).contains(true)
 
-  val linkToTemplateFor: TransferType => AffinityGroup => String =
-    case TransferType.STF => {
+  val linkToTemplateFor: JourneyType => AffinityGroup => String =
+    case JourneyType.STF => {
       case AffinityGroup.Individual => "/securities-transfer-charge/assets/Bulk_Securities_Transfer_Charge_template_v1i.xlsx"
       case AffinityGroup.Organisation => "/securities-transfer-charge/assets/Bulk_Securities_Transfer_Charge_template_v1b.xlsx"
       case AffinityGroup.Agent => "/securities-transfer-charge/assets/Bulk_Securities_Transfer_Charge_template_v1a.xlsx"
     }
-    case TransferType.SH03 => {
-      case AffinityGroup.Individual => "TODO"
+    case JourneyType.SH03 => {
       case AffinityGroup.Organisation => "TODO"
-      case AffinityGroup.Agent => "TODO"
+      case AffinityGroup.Agent => "/securities-transfer-charge/assets/Bulk_SH03_template_v1.xlsx"
     }
-    case TransferType.Other => {
-      case AffinityGroup.Individual => "TODO"
-      case AffinityGroup.Organisation => "TODO"
-      case AffinityGroup.Agent => "TODO"
-    }
-
-  val linkToTemplateForStf: AffinityGroup => String = linkToTemplateFor(TransferType.STF)
-
 }

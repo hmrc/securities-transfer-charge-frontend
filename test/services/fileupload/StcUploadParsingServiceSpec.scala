@@ -190,6 +190,10 @@ class StcUploadParsingServiceSpec extends AnyWordSpec with Matchers with EitherV
         Some(TemplateDefinition(expectedColumns = 29, signature = "agent-hash"))
       )
 
+      when(mockConfig.template(eqTo("agent"), eqTo("sh03"))).thenReturn(
+        Some(TemplateDefinition(expectedColumns = 33, signature = "sh03-agent-hash"))
+      )
+
       when(mockParser.withParsedStream[Unit](any(), any())(any())).thenReturn(Right(()))
 
       currentService.withVerifiedTemplateStream(uploadedFile, "individual", "stf") { (_, _) => Right(()) }
@@ -200,6 +204,9 @@ class StcUploadParsingServiceSpec extends AnyWordSpec with Matchers with EitherV
 
       currentService.withVerifiedTemplateStream(uploadedFile, "agent", "stf") { (_, _) => Right(()) }
       verify(mockParser).withParsedStream[Unit](eqTo(uploadedFile), eqTo(29))(any())
+
+      currentService.withVerifiedTemplateStream(uploadedFile, "agent", "sh03") { (_, _) => Right(()) }
+      verify(mockParser).withParsedStream[Unit](eqTo(uploadedFile), eqTo(33))(any())
     }
   }
 }

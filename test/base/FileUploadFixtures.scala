@@ -16,6 +16,7 @@
 
 package base
 
+import uk.gov.hmrc.securitiestransferchargefrontend.models.JourneyType.STF
 import uk.gov.hmrc.securitiestransferchargefrontend.models.stf.fileupload.ParsedValue.Missing
 import uk.gov.hmrc.securitiestransferchargefrontend.models.stf.fileupload.{ParsedStcRow, StcFileValidationResponse, StcRowValidationError, ValidatedStcRow}
 import uk.gov.hmrc.securitiestransferchargefrontend.models.stf.upscan.{FileUpload, UpscanJourneyStatus}
@@ -36,13 +37,15 @@ trait FileUploadFixtures {
       downloadUrl = Some("http://download"),
       uploadDetails = None,
       failureReason = None,
-      message = None
+      message = None,
+      journeyType = STF
     )
 
   val failedFileUpload: FileUpload =
     FileUpload(
       reference = reference,
-      status = UpscanJourneyStatus.Failed
+      status = UpscanJourneyStatus.Failed,
+      journeyType = STF
     )  
 
   def parsedStcRow(rowNumber: Int = 6): ParsedStcRow =
@@ -76,8 +79,8 @@ trait FileUploadFixtures {
       securitiesQuantity = Some("1"),
       amountPaidForSecurities = Some("1"),
       totalMarketValue = Some("1"),
-      minSharePrice = Some(BigDecimal(1)),
-      maxSharePrice = Some(BigDecimal(1)),
+      minSharePrice = Some("1"),
+      maxSharePrice = Some("1"),
       sharePurchaseReason = Some(""),
       purchaseForCancellation = Some(false)
     )

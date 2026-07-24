@@ -18,13 +18,15 @@ package uk.gov.hmrc.securitiestransferchargefrontend.models.stf.upscan
 
 import play.api.libs.json.{Json, OFormat}
 import UpscanCallbackRequest.UploadDetails
+import uk.gov.hmrc.securitiestransferchargefrontend.models.JourneyType
 
 case class FileUpload(reference:String,
                       status:UpscanJourneyStatus,
                       downloadUrl: Option[String] = None,
                       uploadDetails: Option[UploadDetails] = None,
                       failureReason: Option[String] = None,  
-                      message: Option[String] = None )
+                      message: Option[String] = None,
+                      journeyType: JourneyType)
 
 object FileUpload {
   implicit val format: OFormat[FileUpload] = Json.format[FileUpload]

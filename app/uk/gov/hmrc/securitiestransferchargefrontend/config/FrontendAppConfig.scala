@@ -124,9 +124,9 @@ class FrontendAppConfig @Inject() (configuration: Configuration, servicesConfig:
   val basePath = "/securities-transfer-charge"
   
   val upscanBaseUrl: String = servicesConfig.baseUrl("upscan-initiate")
-  val upscanCallbackUrl: String =  s"$stfBaseUrl$basePath/stf/upscan-callback"
-  val upscanUploadSuccessfulUrl: String = s"$host$basePath/stf/bulk-processing"
-  val upscanUploadFailureUrl: String = s"$host$basePath/stf/upload-template/problem"
+  val upscanCallbackUrl: String =  s"$stfBaseUrl$basePath/upscan-callback"
+  val upscanUploadSuccessfulUrl: String = s"$host$basePath/bulk-processing"
+  val upscanUploadFailureUrl: String = s"$host$basePath/upload-template/problem"
 
   // File streamer
   val rowCacheSize: Int = configuration.get[Int]("file-upload.xlsx.row-cache-size")

@@ -98,6 +98,7 @@ class DetailsOfThisTransferControllerSpec extends SpecBase with MockitoSugar {
 
       val application =
         applicationBuilder(userAnswers = Some(updatedAnswers),affinityGroup = orgAffinity)
+          .overrides(bind[Navigator].qualifiedWith("organisations").toInstance(getNavigator))
           .build()
 
       running(application) {
@@ -114,7 +115,7 @@ class DetailsOfThisTransferControllerSpec extends SpecBase with MockitoSugar {
         val result = route(application, request).value
 
         status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual routes.CheckYourAnswersController.onPageLoad().url
+        redirectLocation(result).value mustEqual testNextPage.url
       }
     }
 

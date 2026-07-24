@@ -19,13 +19,17 @@ package uk.gov.hmrc.securitiestransferchargefrontend.navigation.sh03.agents
 import play.api.mvc.Call
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.securitiestransferchargefrontend.config.FrontendAppConfig
+import uk.gov.hmrc.securitiestransferchargefrontend.controllers.sh03.agents.bulk.routes as sh03AgentBulkRoutes
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.sh03.agents.single.routes as sh03AgentSingleRoutes
+import uk.gov.hmrc.securitiestransferchargefrontend.controllers.sh03.shared.single.routes as sh03SingleCyaRoutes
+import uk.gov.hmrc.securitiestransferchargefrontend.controllers.sh03.shared.bulk.routes as sh03BulkCyaRoutes
 import uk.gov.hmrc.securitiestransferchargefrontend.models.sh03.HowToNotifyAboutShareBuyback.{MoreThanOneAtATime, OneAtATime}
 import uk.gov.hmrc.securitiestransferchargefrontend.models.sh03.shared.{ReasonForPurchase, RoleAtPurchasingCompany}
 import uk.gov.hmrc.securitiestransferchargefrontend.models.{NormalMode, UserAnswers}
 import uk.gov.hmrc.securitiestransferchargefrontend.navigation.PersistentNavigationHelper
 import uk.gov.hmrc.securitiestransferchargefrontend.pages.Page
 import uk.gov.hmrc.securitiestransferchargefrontend.pages.sh03.*
+import uk.gov.hmrc.securitiestransferchargefrontend.pages.sh03.bulk.*
 import uk.gov.hmrc.securitiestransferchargefrontend.services.AnswerPersistenceService
 
 import scala.concurrent.{ExecutionContext, Future}
@@ -47,7 +51,7 @@ class ForwardRoutes(answerPersistenceService: AnswerPersistenceService,
     case HowToNotifyAboutShareBuybackPage => userAnswers => {
       dataDependent(HowToNotifyAboutShareBuybackPage, userAnswers) {
         case OneAtATime => sh03AgentSingleRoutes.AgentReferenceController.onPageLoad(NormalMode)
-        case MoreThanOneAtATime => defaultPage
+        case MoreThanOneAtATime => sh03AgentBulkRoutes.AgentReferenceController.onPageLoad(NormalMode)
       }
     }
     case AgentReferencePage => userAnswers =>
@@ -101,7 +105,22 @@ class ForwardRoutes(answerPersistenceService: AnswerPersistenceService,
           if (roleAtPurchasingCompany.role == RoleAtPurchasingCompany.unsupportedRole)
             sh03AgentSingleRoutes.CannotSubmitFormErrorController.onPageLoad()
           else
-            sh03AgentSingleRoutes.CheckYourAnswersController.onPageLoad()
+            sh03SingleCyaRoutes.CheckYourAnswersController.onPageLoad()
       }
+
+    case BulkAgentReferencePage => userAnswers =>
+      dataRequired(BulkAgentReferencePage, userAnswers, sh03AgentBulkRoutes.CompanyDetailsController.onPageLoad(NormalMode))
+
+    case BulkCompanyDetailsPage => userAnswers =>
+      dataRequired(BulkCompanyDetailsPage, userAnswers, sh03AgentBulkRoutes.TemplateInstructionsController.onPageLoad())
+
+    case BulkRoleAtPurchasingCompanyPage => userAnswers =>
+      dataDependent(BulkRoleAtPurchasingCompanyPage, userAnswers) {
+        roleAtPurchasingCompany =>
+          if (roleAtPurchasingCompany.role == RoleAtPurchasingCompany.unsupportedRole)
+            sh03AgentBulkRoutes.CannotSubmitFormErrorController.onPageLoad()
+          else sh03BulkCyaRoutes.CheckYourAnswersController.onPageLoad()
+      }
+
     case _ => _ => Future.successful(defaultPage)
   }

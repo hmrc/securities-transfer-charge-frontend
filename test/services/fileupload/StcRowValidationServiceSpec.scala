@@ -214,6 +214,21 @@ class StcRowValidationServiceSpec extends SpecBase {
       result mustBe Left(FileParseError.InvalidTemplate)
     }
 
+    "successfully resolve the sh03 template type without returning InvalidTemplate" in {
+      val row = ParsedRow(rowNumber = 4, cells = Seq.empty)
+
+      val result = service.validateStream(
+        Seq(row).iterator,
+        headers,
+        affinityGroupKeyAgent,
+        templateType = "sh03",
+        maxErrorsAllowed = 25,
+        maxRows = 10000
+      )
+
+      result.isRight mustBe true
+    }
+
     "sort combined validation errors by their column index left-to-right" in {
       val row = ParsedRow(
         rowNumber = 4,

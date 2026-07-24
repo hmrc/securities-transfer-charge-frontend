@@ -72,8 +72,8 @@ class RowTransformsSpec extends AnyWordSpec with Matchers {
       securitiesQuantity = Some("1000"),
       amountPaidForSecurities = Some("5000.25"),
       totalMarketValue = Some("6000"),
-      minSharePrice = Some(BigDecimal("100")), 
-      maxSharePrice = Some(BigDecimal("1000")), 
+      minSharePrice = Some("100"), 
+      maxSharePrice = Some("1000"), 
       sharePurchaseReason = Some("cancellation"), 
       purchaseForCancellation = Some(true)
     ),

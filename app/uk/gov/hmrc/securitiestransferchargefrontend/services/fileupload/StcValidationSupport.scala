@@ -45,6 +45,7 @@ class StcValidationSupport {
 
   val typeOfShareMaxLength = 255
   val maxCurrency: BigDecimal = BigDecimal(999999999)
+  val minCurrency: BigDecimal = BigDecimal(0.01)
   val dateToday: LocalDate = LocalDate.now()
 
   

@@ -16,7 +16,9 @@
 
 @import uk.gov.hmrc.securitiestransferchargefrontend.views.html.templates
 @import uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.shared.routes
-@import uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.shared.bulk.routes as bulkRoutes
+@import uk.gov.hmrc.securitiestransferchargefrontend.controllers.fileUpload.routes as bulkRoutes
+@import uk.gov.hmrc.securitiestransferchargefrontend.models.JourneyType
+
 
 
 @this(
@@ -26,7 +28,7 @@
     govukButton: GovukButton
 )
 
-@()(implicit request: Request[_], messages: Messages)
+@(templateUrl: String)(implicit request: Request[_], messages: Messages)
 
 @layout(pageTitle = titleNoForm(messages("org.templateInstructions.title"))) {
 
@@ -38,7 +40,7 @@
 
     <ol class="govuk-list govuk-list--number govuk-!-padding-left-9">
         <li>
-            <a class="govuk-link" href="/securities-transfer-charge/assets/Bulk_Securities_Transfer_Charge_template_v1b.xlsx" download="Bulk Securities Transfer Charge template v1b.xlsx">
+            <a class="govuk-link"  href="@templateUrl" download="Bulk Securities Transfer Charge template v1b.xlsx">
                 @messages("org.templateInstructions.step1")
             </a>
         </li><br/>
@@ -55,7 +57,7 @@
         @govukButton(
             ButtonViewModel(
                 messages("site.continue")
-            ).asLink(bulkRoutes.FileUploadController.onPageLoad().url)
+            ).asLink(bulkRoutes.FileUploadController.onPageLoad(JourneyType.STF).url)
         )
 
         <a class="govuk-link" href="@routes.SubmissionsDashboardController.onPageLoad().url">
