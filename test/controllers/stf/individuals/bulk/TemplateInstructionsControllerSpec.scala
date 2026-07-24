@@ -20,6 +20,8 @@ import base.SpecBase
 import play.api.test.FakeRequest
 import play.api.test.Helpers.*
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.individuals.bulk.routes
+import uk.gov.hmrc.securitiestransferchargefrontend.models.JourneyType.STF
+import uk.gov.hmrc.securitiestransferchargefrontend.utils.CommonHelpers
 import uk.gov.hmrc.securitiestransferchargefrontend.views.html.stf.individuals.bulk.TemplateInstructionsView
 
 class TemplateInstructionsControllerSpec extends SpecBase {
@@ -38,7 +40,7 @@ class TemplateInstructionsControllerSpec extends SpecBase {
         val view = application.injector.instanceOf[TemplateInstructionsView]
 
         status(result) mustEqual OK
-        contentAsString(result) mustEqual view()(request, messages(application)).toString
+        contentAsString(result) mustEqual view(CommonHelpers.linkToTemplateFor(STF)(individualAffinity))(request, messages(application)).toString
       }
     }
   }

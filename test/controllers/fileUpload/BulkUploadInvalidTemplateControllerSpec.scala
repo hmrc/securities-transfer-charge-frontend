@@ -21,7 +21,7 @@ import play.api.test.FakeRequest
 import play.api.test.Helpers.*
 import uk.gov.hmrc.auth.core.AffinityGroup
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.fileUpload.routes
-import uk.gov.hmrc.securitiestransferchargefrontend.models.JourneyType
+import uk.gov.hmrc.securitiestransferchargefrontend.models.JourneyType.STF
 import uk.gov.hmrc.securitiestransferchargefrontend.utils.CommonHelpers
 import uk.gov.hmrc.securitiestransferchargefrontend.views.html.fileUpload.BulkUploadInvalidTemplateView
 
@@ -29,23 +29,22 @@ class BulkUploadInvalidTemplateControllerSpec extends SpecBase {
 
   "BulkUploadInvalidTemplateController" - {
 
-    Seq(JourneyType.STF, JourneyType.SH03).foreach { journeyType =>
 
-      s"$journeyType must return OK and the correct view for a GET" in {
+    s"must return OK and the correct view for a GET" in {
 
-        val application = applicationBuilder(userAnswers = Some(emptyUserAnswers), affinityGroup = individualAffinity).build()
+      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers), affinityGroup = individualAffinity).build()
 
-        running(application) {
-          val request = FakeRequest(GET, routes.BulkUploadInvalidTemplateController.onPageLoad(journeyType).url)
+      running(application) {
+        val request = FakeRequest(GET, routes.BulkUploadInvalidTemplateController.onPageLoad(STF).url)
 
-          val result = route(application, request).value
+        val result = route(application, request).value
 
-          val view = application.injector.instanceOf[BulkUploadInvalidTemplateView]
+        val view = application.injector.instanceOf[BulkUploadInvalidTemplateView]
 
-          status(result) mustEqual OK
-          contentAsString(result) mustEqual view(CommonHelpers.linkToTemplateForStf(AffinityGroup.Individual),journeyType)(request, messages(application)).toString
-        }
+        status(result) mustEqual OK
+        contentAsString(result) mustEqual view(CommonHelpers.linkToTemplateFor(STF)(AffinityGroup.Individual), STF)(request, messages(application)).toString
       }
     }
   }
+
 }
