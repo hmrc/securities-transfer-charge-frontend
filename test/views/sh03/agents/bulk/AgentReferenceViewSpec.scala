@@ -19,7 +19,6 @@ package views.sh03.agents.bulk
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
 import play.api.Application
-import play.api.mvc.Call
 import uk.gov.hmrc.securitiestransferchargefrontend.forms.shared.AgentReferenceFormProvider
 import uk.gov.hmrc.securitiestransferchargefrontend.models.NormalMode
 import uk.gov.hmrc.securitiestransferchargefrontend.views.html.sh03.agents.bulk.AgentReferenceView
@@ -37,7 +36,7 @@ class AgentReferenceViewSpec extends ViewBaseSpec {
 
 
   def view(): Document = Jsoup.parse(
-    viewInstance(form, NormalMode)(fakeRequest, messages).body
+    viewInstance(form, NormalMode,testBackLinkRoute)(fakeRequest, messages).body
   )
 
   object ExpectedContent {

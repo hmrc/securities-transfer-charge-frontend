@@ -59,7 +59,7 @@ class AgentReferenceControllerSpec extends SpecBase {
         val view = application.injector.instanceOf[AgentReferenceView]
 
         status(result) mustEqual OK
-        contentAsString(result) mustEqual view(form, NormalMode)(request, messages(application)).toString
+        contentAsString(result) mustEqual view(form, NormalMode,testBackLinkRoute)(request, messages(application)).toString
       }
     }
 
@@ -84,7 +84,7 @@ class AgentReferenceControllerSpec extends SpecBase {
         val view = application.injector.instanceOf[AgentReferenceView]
 
         status(result) mustEqual OK
-        contentAsString(result) mustEqual view(form.fill(AgentReference(Some("answer"))), NormalMode)(request, messages(application)).toString
+        contentAsString(result) mustEqual view(form.fill(AgentReference(Some("answer"))), NormalMode,testBackLinkRoute)(request, messages(application)).toString
       }
     }
 
@@ -132,7 +132,7 @@ class AgentReferenceControllerSpec extends SpecBase {
         val result = route(application, request).value
 
         status(result) mustEqual BAD_REQUEST
-        contentAsString(result) mustEqual view(boundForm, NormalMode)(request, messages(application)).toString
+        contentAsString(result) mustEqual view(boundForm, NormalMode,testBackLinkRoute)(request, messages(application)).toString
       }
     }
   }

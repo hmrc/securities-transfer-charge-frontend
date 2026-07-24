@@ -29,9 +29,9 @@
     govukButton: GovukButton,
     saveAndReturnButton: SaveAndReturnButton
 )
-@(form: Form[_], mode: Mode)(implicit request: Request[_], messages: Messages)
+@(form: Form[_], mode: Mode,backLinkCall: Call)(implicit request: Request[_], messages: Messages)
 
-@layout(pageTitle = title(form, messages("agentReference.title"), Some(messages("sh03.section.name"))),backLinkUrl = Some(routes.HowToNotifyAboutShareBuybackController.onPageLoad().url)) {
+@layout(pageTitle = title(form, messages("agentReference.title"), Some(messages("sh03.section.name"))),backLinkUrl = Some(backLinkCall.url)) {
 
     @formHelper(action = bulkRoutes.AgentReferenceController.onSubmit(mode)) {
 
