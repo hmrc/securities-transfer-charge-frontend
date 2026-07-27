@@ -45,7 +45,7 @@ class FileUploadController @Inject()(
 
   def onPageLoad(journeyType: JourneyType): Action[AnyContent] = stcAuthEnrolled.async { implicit request =>
     prepareUpload(journeyType).map { response =>
-      val uploadView = view(response.uploadRequest)
+      val uploadView = view(response.uploadRequest,journeyType = journeyType)
       val counter = fileProcessingRefreshCounterFactory(request)
       counter.reset(Ok(uploadView))
     }

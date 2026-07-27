@@ -81,7 +81,7 @@ class FileUploadControllerSpec extends SpecBase with MockitoSugar {
               val view = application.injector.instanceOf[FileUploadView]
 
               status(result) mustEqual OK
-              contentAsString(result) mustEqual view(uploadRequest)(request, messages(application)).toString
+              contentAsString(result) mustEqual view(uploadRequest,journeyType = journeyType)(request, messages(application)).toString
               verify(mockCounter).reset(any[Result])
             }
           }
