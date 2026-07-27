@@ -31,10 +31,10 @@ import uk.gov.hmrc.securitiestransferchargefrontend.connectors.{SubscriptionConn
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.actions.StcAuthorisedRequest
 import uk.gov.hmrc.securitiestransferchargefrontend.domain.{CredentialId, SubscriptionId}
 import uk.gov.hmrc.securitiestransferchargefrontend.models.JourneyType.STF
-import uk.gov.hmrc.securitiestransferchargefrontend.models.stf.fileupload.FileParseError
+import uk.gov.hmrc.securitiestransferchargefrontend.models.stf.fileupload.{FileParseError, ParsedStcRow}
 import uk.gov.hmrc.securitiestransferchargefrontend.models.stf.upscan.UpscanJourneyStatus.*
 import uk.gov.hmrc.securitiestransferchargefrontend.models.stf.upscan.{FileUpload, UpscanJourneyStatus}
-import uk.gov.hmrc.securitiestransferchargefrontend.repositories.{UpscanJourneyRepository, ValidationErrorRepository}
+import uk.gov.hmrc.securitiestransferchargefrontend.repositories.{ParsedStcRowsRepository, UpscanJourneyRepository, ValidationErrorRepository}
 import uk.gov.hmrc.securitiestransferchargefrontend.services.fileupload.StcUpscanProcessingService
 import uk.gov.hmrc.securitiestransferchargefrontend.services.fileupload.processing.ProcessingService
 
@@ -56,7 +56,9 @@ class ProcessingServiceSpec extends SpecBase with MockitoSugar with BeforeAndAft
 
   private val mockSubscriptionConnector = mock[SubscriptionConnector]
 
-  private val service = new ProcessingService(mockUpscanProcessingService, mockValidationErrorRepository, mockUpscanJourneyRepository, mockSubscriptionConnector)
+  private val mockParsedStcRowsRepository = mock[ParsedStcRowsRepository]
+
+  private val service = new ProcessingService(mockUpscanProcessingService, mockValidationErrorRepository, mockUpscanJourneyRepository, mockSubscriptionConnector, mockParsedStcRowsRepository)
 
   private val reference = "reference"
   private val affinityKey = "affinity-key"
@@ -310,6 +312,13 @@ class ProcessingServiceSpec extends SpecBase with MockitoSugar with BeforeAndAft
       ).thenReturn(
         Future.successful(subscription)
       )
+
+      when(
+        mockParsedStcRowsRepository.save(
+          any[String],
+          any[Seq[ParsedStcRow]],
+          any[String])
+      ).thenReturn(Future.successful(()))
 
       when(
         mockUpscanProcessingService.process(
