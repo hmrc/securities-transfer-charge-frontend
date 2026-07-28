@@ -19,7 +19,7 @@ package uk.gov.hmrc.securitiestransferchargefrontend.services.fileupload
 import com.github.pjfanning.xlsx.StreamingReader
 import org.apache.poi.ss.usermodel.{Cell, CellType, DateUtil, Row, Workbook}
 import uk.gov.hmrc.securitiestransferchargefrontend.config.FileUploadConfig
-import uk.gov.hmrc.securitiestransferchargefrontend.models.stf.fileupload.FileParseError.{InvalidXlsx, MissingWorksheet}
+import uk.gov.hmrc.securitiestransferchargefrontend.models.stf.fileupload.FileParseError.{EmptyFile, InvalidXlsx, MissingWorksheet}
 import uk.gov.hmrc.securitiestransferchargefrontend.models.stf.fileupload.{FileParseError, ParsedCell, ParsedRow, UploadedFile}
 import uk.gov.hmrc.securitiestransferchargefrontend.config.FrontendAppConfig
 
@@ -56,7 +56,7 @@ class ExcelFileParser @Inject()(config: FileUploadConfig, appConfig: FrontendApp
             val rowIterator = worksheet.iterator().asScala.filterNot(isEmptyRow)
 
             if (!rowIterator.hasNext) {
-              Left(InvalidXlsx("The file is empty or only contains empty rows"))
+              Left(EmptyFile)
             } else {
               val headerRow = rowIterator.next()
               val headers = (0 until expectedColumns).map { i =>
