@@ -53,7 +53,7 @@ class FileUploadViewSpec extends ViewBaseSpec {
     val caption: String = messages("transfer.details.caption")
     val heading: String = messages("fileUpload.heading")
     val label: String = messages("fileUpload.label")
-    val button: String = messages("site.upload.file")
+    val button: String = messages("site.continue")
     val insetText: String = messages("fileUpload.inset.text")
     val returnToDashboard: String = messages("return-to-dashboard.link")
   }
