@@ -19,8 +19,9 @@ package models.submission
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpec
 import uk.gov.hmrc.securitiestransferchargefrontend.domain.TransferType
+import uk.gov.hmrc.securitiestransferchargefrontend.models.sh03.bulk.CompanyDetails
 import uk.gov.hmrc.securitiestransferchargefrontend.models.stf
-import uk.gov.hmrc.securitiestransferchargefrontend.models.stf.fileupload.{ParsedStcRow, ParsedValue, ValidatedStcRow}
+import uk.gov.hmrc.securitiestransferchargefrontend.models.stf.fileupload.{ParsedStcRow, ParsedValue}
 import uk.gov.hmrc.securitiestransferchargefrontend.models.submission.*
 
 import java.time.LocalDate
@@ -41,8 +42,7 @@ class RowTransformsSpec extends AnyWordSpec with Matchers {
     nino = "NY054388A"
   )
 
-  private val validatedRow = ValidatedStcRow(
-    parsedRow = ParsedStcRow(
+  private val parsedStcRow = ParsedStcRow(
       rowNumber = 3,
       buyerName = Some("Bob buyer"),
       buyerAddressInUK= Some(true),
@@ -76,14 +76,12 @@ class RowTransformsSpec extends AnyWordSpec with Matchers {
       maxSharePrice = Some("1000"), 
       sharePurchaseReason = Some("cancellation"), 
       purchaseForCancellation = Some(true)
-    ),
-    validationErrors = Seq.empty
-  )
+    )
 
   "fromValidatedStcRow" should {
 
-    "transform a validated row into a SingleTransferRequest" in {
-      RowTransforms.fromValidatedStcRowToStfRequest(validatedRow, individualData) shouldBe SingleTransferRequest(
+    "transform a validated row into a SingleTransferRequest (STF)" in {
+      RowTransforms.fromValidatedStcRowToStfRequest(parsedStcRow, individualData,None) shouldBe SingleTransferRequest(
         recordId = 3,
         transactionDetails = SingleTransferTransactionDetails(
           transactionType = TransferType.STF,
@@ -132,27 +130,80 @@ class RowTransformsSpec extends AnyWordSpec with Matchers {
       )
     }
 
+    "transform a validated row into a SingleTransferRequest (SH03)" in {
+      val row = parsedStcRow.copy(whatTypeOfSecurities = Some("Ordinary"))
+      val companyDetails = CompanyDetails(companyName = "Company", companyRegistrationNumber = "12345678")
+      val agentReference = "REF-12345"
+      RowTransforms.fromValidatedStcRowToSh03Request(row, individualData, companyDetails,Some(agentReference)) shouldBe SingleTransferRequest(
+        recordId = 3,
+        transactionDetails = SingleTransferTransactionDetails(
+          transactionType = TransferType.SH03,
+          reasonForPurchase = Some(ReasonForPurchase.Both),
+          descriptionOfSecurity = "Ordinary",
+          numberOfShares = 1000,
+          nominalValue = None,
+          marketValue = Some(BigDecimal("6000")),
+          qualifyAsTreasuryShares = Some(true),
+          maxPricePaid = Some(BigDecimal("1000")),
+          minPricePaid = Some(BigDecimal("100")),
+          originalChargingPoint = LocalDate.of(2026, 3, 23),
+          considerationActual = BigDecimal("5000.25"),
+          isConnectedPartiesTransactions = true,
+          companyName = "Company",
+          companyRegistrationNumber = Some("12345678"),
+          reliefClaimedName = Some("Group relief"),
+          reliefPercentage = Some(100)
+        ),
+        contingentDetails = None,
+        mainSellerDetails = SingleTransferSellerDetails(
+          sellerName = "Bob Seller",
+          addr1 = "1 Seller Street",
+          addr2 = Some("Seller District"),
+          addr3 = Some("Seller City"),
+          addr4 = None,
+          postcode = "LS1 1AA",
+          country = "United Kingdom"
+        ),
+        otherSellers = None,
+        mainBuyerDetails = SingleTransferBuyerDetails(
+          buyerName = "John Doe",
+          addr1 = "10 Downing Street",
+          addr2 = Some("Westminster"),
+          addr3 = Some("London"),
+          addr4 = None,
+          postcode = "SW1A 2AA",
+          country = "GBR",
+          email = "foo@bar.com",
+          uniqueId = Some("NY054388A"),
+          taxRate = BuyerTaxRate.HalfPercent,
+          isPLC = None
+        ),
+        otherBuyers = None,
+        agentDetails = None
+      )
+    }
+
     "throw when seller postcode is missing" in {
-      val rowMissingBuyerPostcode = validatedRow.copy(parsedRow = validatedRow.parsedRow.copy(sellerPostcode = None))
+      val rowMissingBuyerPostcode = parsedStcRow.copy(sellerPostcode = None)
 
       an[IllegalArgumentException] shouldBe thrownBy {
-        RowTransforms.fromValidatedStcRowToStfRequest(rowMissingBuyerPostcode, individualData)
+        RowTransforms.fromValidatedStcRowToStfRequest(rowMissingBuyerPostcode, individualData,None)
       }
     }
 
     "throw when seller country is missing" in {
-      val rowMissingSellerCountry = validatedRow.copy(parsedRow = validatedRow.parsedRow.copy(sellerCountry = None, sellerAddressInUK = Some(false)))
+      val rowMissingSellerCountry = parsedStcRow.copy(sellerCountry = None, sellerAddressInUK = Some(false))
 
       an[IllegalArgumentException] shouldBe thrownBy {
-        RowTransforms.fromValidatedStcRowToStfRequest(rowMissingSellerCountry, individualData)
+        RowTransforms.fromValidatedStcRowToStfRequest(rowMissingSellerCountry, individualData,None)
       }
     }
 
     "throw when market value is missing for connected parties transactions" in {
-      val rowMissingMarketValue = validatedRow.copy(parsedRow = validatedRow.parsedRow.copy(totalMarketValue = None))
+      val rowMissingMarketValue = parsedStcRow.copy(totalMarketValue = None)
 
       an[IllegalArgumentException] shouldBe thrownBy {
-        RowTransforms.fromValidatedStcRowToStfRequest(rowMissingMarketValue, individualData)
+        RowTransforms.fromValidatedStcRowToStfRequest(rowMissingMarketValue, individualData,None)
       }
     }
   }
