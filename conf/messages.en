@@ -742,7 +742,7 @@ bulk.fileUpload.error.title = Selected file could not be uploaded
 bulk.fileUpload.error.heading = There was a problem uploading your file
 bulk.fileUpload.error.p = The selected file could not be uploaded, try again.
 
-bulk.rows.error.title = There was a problem uploading your file
+bulk.rows.error.title = Too many rows in your uploaded file
 bulk.rows.error.heading = There was a problem uploading your file
 bulk.rows.error.p = There are too many rows in your uploaded file. The number of rows must be 10,000 or fewer.
 
