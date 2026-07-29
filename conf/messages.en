@@ -317,6 +317,7 @@ org.chargingPoint.change.hidden = ChargingPoint
 fileUpload.org.chargingPoint.error.invalid = The date the business bought the securities must be a real date
 fileUpload.org.chargingPoint.error.required.all = Enter the date the business bought the securities
 fileUpload.org.chargingPoint.error.futureDate = The day the business bought the securities must be today’s date or a date in the past
+fileUpload.org.chargingPoint.error.beforeFirstDate = PLACEHOLDER ERROR MESSAGE
 
 
 org.taxRate.p1 = For most securities transfers, the business will be charged a tax rate of 0.5% of the consideration.
@@ -406,7 +407,7 @@ return-to-dashboard.link = Return to dashboard
 formattingError.title = Your file has formatting errors
 formattingError.heading = Your file has formatting errors
 formattingError.p1 = More than 25 formatting errors have been detected in this file.
-formattingError.p2 = The errors may include things like incorrect formatting of numbers or dates, or a letters in a cell that can only contain numbers.
+formattingError.p2 = The errors may include things like incorrect formatting of numbers or dates, or letters in a cell that can only contain numbers.
 formattingError.p3 = These will need to be corrected before your file can be uploaded again.
 formattingError.p4 = Check the instructions in the template file for more guidance.
 
@@ -571,10 +572,12 @@ fileUpload.error.taxRate.invalid = Enter a tax rate of ‘0.5%’ or ‘1.5%’
 
 individual.fileUpload.error.whatTypeOfSecurities.required = Enter the type of securities you are buying
 org.fileUpload.error.whatTypeOfSecurities.required = Enter the type of securities the business is buying
-agent.fileUpload.error.whatTypeOfSecurities.required = Enter the type of securities the buyer is purchasing
+agent.fileUpload.error.whatTypeOfSecurities.required = Enter the class of shares the buyer is purchasing
 individual.fileUpload.error.typeOfShares.required = If you are buying shares, enter the type of shares
 org.fileUpload.error.typeOfShares.required = If the business is buying shares, enter the type of shares
 agent.fileUpload.error.typeOfShares.required = If the buyer is purchasing shares, enter the type of shares
+agent.fileUpload.error.whatTypeOfSecurities.maxLength = The type or class of shares the buyer is purchasing must be 100 characters or fewer
+
 
 individual.fileUpload.error.typeOfShares.maxLength = The type of shares you are buying must be 255 characters or fewer
 org.fileUpload.error.typeOfShares.maxLength = The type of shares the business is purchasing must be 255 characters or fewer
@@ -652,6 +655,7 @@ agent.chargingPoint.change.hidden = ChargingPoint
 fileUpload.agent.chargingPoint.error.invalid = The charging point must be a real date
 fileUpload.agent.chargingPoint.error.required.all = Enter the charging point
 fileUpload.agent.chargingPoint.error.futureDate = The charging point must be today’s date or a date in the past
+fileUpload.agent.chargingPoint.error.beforeFirstDate = PLACEHOLDER ERROR MESSAGE
 
 fileUpload.individual.chargingPoint.error.required.all = Enter the date you bought the securities
 fileUpload.individual.chargingPoint.error.futureDate = The day you bought the securities must be today’s date or a date in the past
@@ -750,11 +754,11 @@ fileUploaded.error.encryptedFile.title = There was a problem uploading your file
 fileUploaded.error.encryptedFile.heading = There was a problem uploading your file
 fileUploaded.error.encryptedFile.p = The file you have uploaded is password-protected. Check you have the right file, or remove the password and upload it again.
 
-bulk.fileUpload.error.title = There was a problem uploading your file
+bulk.fileUpload.error.title = Selected file could not be uploaded
 bulk.fileUpload.error.heading = There was a problem uploading your file
 bulk.fileUpload.error.p = The selected file could not be uploaded, try again.
 
-bulk.rows.error.title = There was a problem uploading your file
+bulk.rows.error.title = Too many rows in your uploaded file
 bulk.rows.error.heading = There was a problem uploading your file
 bulk.rows.error.p = There are too many rows in your uploaded file. The number of rows must be 10,000 or fewer.
 

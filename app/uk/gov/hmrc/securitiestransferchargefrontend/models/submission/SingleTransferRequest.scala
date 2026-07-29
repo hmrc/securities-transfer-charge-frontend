@@ -103,7 +103,7 @@ final case class SingleTransferAgentDetails(
   country: String,
   phone: String,
   email: String,
-  clientReference: String
+  clientReference: Option[String]
 )
 
 final case class SingleTransferDeclaration(

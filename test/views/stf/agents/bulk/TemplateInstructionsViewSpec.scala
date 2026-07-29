@@ -22,6 +22,7 @@ import play.api.Application
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.fileUpload.routes as bulkRoutes
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.shared.routes
 import uk.gov.hmrc.securitiestransferchargefrontend.models.JourneyType.STF
+import uk.gov.hmrc.securitiestransferchargefrontend.utils.CommonHelpers
 import uk.gov.hmrc.securitiestransferchargefrontend.views.html.stf.agents.bulk.TemplateInstructionsView
 import views.ViewBaseSpec
 
@@ -32,7 +33,7 @@ class TemplateInstructionsViewSpec extends ViewBaseSpec {
   private val viewInstance         = app.injector.instanceOf[TemplateInstructionsView]
 
   def view(): Document = Jsoup.parse(
-    viewInstance()(fakeRequest, messages).body
+    viewInstance(CommonHelpers.linkToTemplateFor(STF)(agentAffinity))(fakeRequest, messages).body
   )
 
   object ExpectedContent {

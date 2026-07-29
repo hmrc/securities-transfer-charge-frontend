@@ -21,6 +21,7 @@ import org.jsoup.nodes.Document
 import play.api.Application
 import play.api.test.FakeRequest
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.shared.routes
+import uk.gov.hmrc.securitiestransferchargefrontend.models.JourneyType
 import uk.gov.hmrc.securitiestransferchargefrontend.models.stf.upscan.UploadRequest
 import uk.gov.hmrc.securitiestransferchargefrontend.views.html.fileUpload.FileUploadView
 import views.ViewBaseSpec
@@ -44,7 +45,7 @@ class FileUploadViewSpec extends ViewBaseSpec {
 
   def view(): Document =
     Jsoup.parse(
-      viewInstance(uploadRequest)(fakeRequest, messages).body
+      viewInstance(uploadRequest,journeyType = JourneyType.STF)(fakeRequest, messages).body
     )
 
   object ExpectedContent {
@@ -52,7 +53,7 @@ class FileUploadViewSpec extends ViewBaseSpec {
     val caption: String = messages("transfer.details.caption")
     val heading: String = messages("fileUpload.heading")
     val label: String = messages("fileUpload.label")
-    val button: String = messages("site.upload.file")
+    val button: String = messages("site.continue")
     val insetText: String = messages("fileUpload.inset.text")
     val returnToDashboard: String = messages("return-to-dashboard.link")
   }
@@ -109,6 +110,11 @@ class FileUploadViewSpec extends ViewBaseSpec {
           doc.select(s"input[name=$key]").attr("value") mustBe value
         }
       }
+    }
+
+    "must not have a caption when journey type is SH03" in {
+      val view = Jsoup.parse(viewInstance(uploadRequest,journeyType = JourneyType.SH03)(fakeRequest, messages).body)
+      view.select(".govuk-caption-l").text() mustBe empty
     }
   }
 }

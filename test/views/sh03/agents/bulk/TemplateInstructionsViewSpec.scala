@@ -14,46 +14,45 @@
  * limitations under the License.
  */
 
-package views.stf.organisations.bulk
+package views.sh03.agents.bulk
 
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
 import play.api.Application
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.fileUpload.routes as bulkRoutes
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.shared.routes
-import uk.gov.hmrc.securitiestransferchargefrontend.models.JourneyType.STF
+import uk.gov.hmrc.securitiestransferchargefrontend.models.JourneyType.SH03
 import uk.gov.hmrc.securitiestransferchargefrontend.utils.CommonHelpers
-import uk.gov.hmrc.securitiestransferchargefrontend.views.html.stf.organisations.bulk.TemplateInstructionsView
+import uk.gov.hmrc.securitiestransferchargefrontend.views.html.sh03.agents.bulk.TemplateInstructionsView
 import views.ViewBaseSpec
 
 class TemplateInstructionsViewSpec extends ViewBaseSpec {
 
-  override def fakeApplication(): Application = applicationBuilder(affinityGroup = orgAffinity).build()
+  override def fakeApplication(): Application = applicationBuilder(affinityGroup = agentAffinity).build()
 
   private val viewInstance         = app.injector.instanceOf[TemplateInstructionsView]
 
   def view(): Document = Jsoup.parse(
-    viewInstance(CommonHelpers.linkToTemplateFor(STF)(orgAffinity))(fakeRequest, messages).body
+    viewInstance(CommonHelpers.linkToTemplateFor(SH03)(agentAffinity))(fakeRequest, messages).body
   )
 
   object ExpectedContent {
-    val title: String = messages("org.templateInstructions.title")
-    val heading: String = messages("org.templateInstructions.heading")
-    val caption: String = messages("transfer.details.caption")
+    val title: String = messages("agent.sh03.templateInstructions.title")
+    val heading: String = messages("agent.sh03.templateInstructions.heading")
 
-    val para1Value: String = messages("org.templateInstructions.p1")
+    val para1Value: String = messages("agent.sh03.templateInstructions.p1")
 
-    val step1: String = messages("org.templateInstructions.step1")
-    val downloadHref = "/securities-transfer-charge/assets/Bulk_Securities_Transfer_Charge_template_v1b.xlsx"
-    val downloadFileName = "Bulk Securities Transfer Charge template v1b.xlsx"
+    val step1: String = messages("agent.sh03.templateInstructions.step1")
+    val downloadHref = "/securities-transfer-charge/assets/Bulk_SH03_template_v1.xlsx"
+    val downloadFileName = "Bulk SH03 template v1.xlsx"
 
-    val step2: String = messages("org.templateInstructions.step2")
-    val step3: String = messages("org.templateInstructions.step3")
-    val para2Value: String = messages("org.templateInstructions.p2")
-    val para3Value: String = messages("org.templateInstructions.p3")
+    val step2: String = messages("agent.sh03.templateInstructions.step2")
+    val step3: String = messages("agent.sh03.templateInstructions.step3")
+    val para2Value: String = messages("agent.sh03.templateInstructions.p2")
+    val para3Value: String = messages("agent.sh03.templateInstructions.p3")
 
     val continue: String = messages("site.continue")
-    val returnLink: String = messages("org.return-to-dashboard.link")
+    val returnLink: String = messages("return-to-dashboard.link")
   }
 
   "The TemplateInstructionsView" - {
@@ -66,10 +65,6 @@ class TemplateInstructionsViewSpec extends ViewBaseSpec {
 
       "have the correct heading" in {
         templateInstructionsView.select("h1").text() mustBe ExpectedContent.heading
-      }
-
-      "display the correct caption text" in {
-        templateInstructionsView.getElementsByClass("govuk-caption-l").text() mustBe ExpectedContent.caption
       }
 
       "display the correct of first paragraph content" in {
@@ -106,11 +101,10 @@ class TemplateInstructionsViewSpec extends ViewBaseSpec {
         spans.get(0).text() mustBe ExpectedContent.para3Value
       }
 
-
       "have a continue button" in {
         val continueButton = templateInstructionsView.select(".govuk-button").first()
         continueButton.text() mustBe ExpectedContent.continue
-        continueButton.attr("href") mustBe bulkRoutes.FileUploadController.onPageLoad(STF).url
+        continueButton.attr("href") mustBe bulkRoutes.FileUploadController.onPageLoad(SH03).url
       }
 
       "have a link to return back to the submission dashboard page" in {
@@ -120,5 +114,4 @@ class TemplateInstructionsViewSpec extends ViewBaseSpec {
       }
     }
   }
-
 }

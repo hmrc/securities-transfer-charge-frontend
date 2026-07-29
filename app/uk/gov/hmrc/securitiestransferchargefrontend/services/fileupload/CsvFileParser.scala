@@ -17,7 +17,7 @@
 package uk.gov.hmrc.securitiestransferchargefrontend.services.fileupload
 
 import org.apache.commons.csv.{CSVFormat, CSVParser, CSVRecord}
-import uk.gov.hmrc.securitiestransferchargefrontend.models.stf.fileupload.FileParseError.InvalidCsv
+import uk.gov.hmrc.securitiestransferchargefrontend.models.stf.fileupload.FileParseError.{EmptyFile, InvalidCsv}
 import uk.gov.hmrc.securitiestransferchargefrontend.models.stf.fileupload.{FileParseError, ParsedCell, ParsedRow, UploadedFile}
 
 import java.io.InputStreamReader
@@ -42,7 +42,7 @@ class CsvFileParser extends FileParser {
         val rowIterator = parser.iterator().asScala.filterNot(isEmptyRecord)
 
         if (!rowIterator.hasNext) {
-          Left(InvalidCsv("The file is empty"))
+          Left(EmptyFile)
         } else {
           val headerRecord = rowIterator.next()
           val headerValues = headerRecord.iterator().asScala.toSeq

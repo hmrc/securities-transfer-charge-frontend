@@ -23,7 +23,7 @@ import uk.gov.hmrc.securitiestransferchargefrontend.models.JourneyType
 import uk.gov.hmrc.securitiestransferchargefrontend.models.stf.fileupload.FileParseError
 import uk.gov.hmrc.securitiestransferchargefrontend.models.stf.upscan.{FileUpload, UpscanJourneyStatus}
 import uk.gov.hmrc.securitiestransferchargefrontend.models.stf.upscan.UpscanJourneyStatus.{Completed, EmptyFile, FormatingErrors, InvalidTemplate, Processing, RowLimitExceeded, TooManyErrors, UpscanDownloadError}
-import uk.gov.hmrc.securitiestransferchargefrontend.repositories.{UpscanJourneyRepository, ValidationErrorRepository}
+import uk.gov.hmrc.securitiestransferchargefrontend.repositories.{UpscanJourneyRepository, ParsedStcRowsRepository, ValidationErrorRepository}
 import uk.gov.hmrc.securitiestransferchargefrontend.services.fileupload.StcUpscanProcessingService
 
 import javax.inject.{Inject, Singleton}
@@ -34,7 +34,8 @@ class ProcessingService @Inject()(
                                    stcUpscanProcessingService: StcUpscanProcessingService,
                                    validationErrorRepository: ValidationErrorRepository,
                                    upscanJourneyRepository: UpscanJourneyRepository,
-                                   subscriptionConnector: SubscriptionConnector
+                                   subscriptionConnector: SubscriptionConnector,
+                                   parsedStcRowsRepository:ParsedStcRowsRepository
                                  ) {
 
   def processReadyUpload(
@@ -43,6 +44,9 @@ class ProcessingService @Inject()(
                           affinityKey: String,
                           journeyType: JourneyType
                         )(implicit request: StcAuthorisedRequest[_], hc: HeaderCarrier, ec: ExecutionContext): Future[Unit] =
+
+    val fileName = fileUpload.uploadDetails.map(_.fileName).getOrElse("")
+
     upscanJourneyRepository.updateStatus(reference, Processing).flatMap { _ =>
 
       stcUpscanProcessingService.process(fileUpload, affinityKey, journeyType).flatMap {
@@ -69,8 +73,9 @@ class ProcessingService @Inject()(
             _ <- upscanJourneyRepository.updateStatus(reference, FormatingErrors)
           } yield ()
 
-        case Right(_) =>
+        case Right(stcFileValidationResponse) =>
           for {
+            _<- parsedStcRowsRepository.save(reference,stcFileValidationResponse.validRows,fileName)
             _ <- subscriptionConnector.getAndStoreSubscription(request.subscriptionId)
             _ <- upscanJourneyRepository.updateStatus(reference, Completed)
           } yield ()
@@ -80,4 +85,5 @@ class ProcessingService @Inject()(
           upscanJourneyRepository.updateStatus(reference, UpscanDownloadError)
       }
     }
+  }
 }

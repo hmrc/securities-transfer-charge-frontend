@@ -22,14 +22,12 @@ import org.mockito.Mockito.when
 import org.scalatestplus.mockito.MockitoSugar
 import play.api.data.Form
 import play.api.inject.bind
-import play.api.mvc.Call
 import play.api.test.FakeRequest
 import play.api.test.Helpers.*
 import uk.gov.hmrc.securitiestransferchargefrontend.clients.SubmissionIdClient
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.sh03.agents.routes as agentRoutes
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.sh03.agents.single.routes as singleRoute
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.sh03.agents.bulk.routes as bulkRoute
-import uk.gov.hmrc.securitiestransferchargefrontend.controllers.sh03.shared.routes as sharedRoutes
 import uk.gov.hmrc.securitiestransferchargefrontend.forms.sh03.shared.HowToNotifyAboutShareBuybackFormProvider
 import uk.gov.hmrc.securitiestransferchargefrontend.models.sh03.HowToNotifyAboutShareBuyback
 import uk.gov.hmrc.securitiestransferchargefrontend.models.{NormalMode, UserAnswers}
@@ -43,7 +41,6 @@ import scala.language.postfixOps
 class HowToNotifyAboutShareBuybackControllerSpec extends SpecBase with MockitoSugar {
 
   lazy val howToNotifyAboutShareBuybackRoute: String = agentRoutes.HowToNotifyAboutShareBuybackController.onPageLoad().url
-  val backLinkRoute: Call = sharedRoutes.BeforeYouStartController.onPageLoad()
 
   val formProvider = new HowToNotifyAboutShareBuybackFormProvider()
   val form: Form[HowToNotifyAboutShareBuyback] = formProvider(affinityGroupKeyAgent)
@@ -64,7 +61,7 @@ class HowToNotifyAboutShareBuybackControllerSpec extends SpecBase with MockitoSu
         val view = application.injector.instanceOf[HowToNotifyAboutShareBuybackView]
 
         status(result) mustEqual OK
-        contentAsString(result) mustEqual view(form, NormalMode, affinityGroupKeyAgent, backLinkRoute)(request, messages(application)).toString
+        contentAsString(result) mustEqual view(form, NormalMode, affinityGroupKeyAgent, testBackLinkRoute)(request, messages(application)).toString
       }
     }
 
@@ -129,7 +126,6 @@ class HowToNotifyAboutShareBuybackControllerSpec extends SpecBase with MockitoSu
     }
 
     "must return a Bad Request and errors when invalid data is submitted" in {
-      val backLinkRoute: Call = sharedRoutes.BeforeYouStartController.onPageLoad()
       val application = applicationBuilder(userAnswers = Some(emptyUserAnswers), affinityGroup = agentAffinity)
         .overrides(bind[Navigator].qualifiedWith("agentsSh03").toInstance(getNavigator))
         .build()
@@ -145,7 +141,7 @@ class HowToNotifyAboutShareBuybackControllerSpec extends SpecBase with MockitoSu
         val result = route(application, request).value
 
         status(result) mustEqual BAD_REQUEST
-        contentAsString(result) mustEqual view(boundForm, NormalMode, affinityGroupKeyAgent, backLinkRoute)(request, messages(application)).toString
+        contentAsString(result) mustEqual view(boundForm, NormalMode, affinityGroupKeyAgent, testBackLinkRoute)(request, messages(application)).toString
       }
     }
   }

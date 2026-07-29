@@ -57,7 +57,7 @@ class CannotSubmitFormErrorViewSpec extends ViewBaseSpec {
   }
 
   "The CannotSubmitFormErrorView" - {
-    "the user is an Individual" - {
+    "render view" - {
       val cannotSubmitFormErrorView = view()
 
       "have the correct title" in {

@@ -18,6 +18,7 @@ package services.fileupload
 
 import base.SpecBase
 import play.api.i18n.MessagesApi
+import uk.gov.hmrc.securitiestransferchargefrontend.config.FrontendAppConfig
 import uk.gov.hmrc.securitiestransferchargefrontend.forms.stf.shared.*
 import uk.gov.hmrc.securitiestransferchargefrontend.models.stf.fileupload.{FileParseError, ParsedCell, ParsedRow}
 import uk.gov.hmrc.securitiestransferchargefrontend.services.fileupload.*
@@ -29,11 +30,14 @@ class StcRowValidationServiceSpec extends SpecBase {
   private val messagesApi: MessagesApi = app.injector.instanceOf[MessagesApi]
   private val support = new StcValidationSupport
 
+  private val appConfig: FrontendAppConfig = app.injector.instanceOf[FrontendAppConfig]
+
   private val service =
     new StcRowValidationService(
       stcBasicRowValidator = new StcBasicRowValidator(
         support = support,
         messagesApi = messagesApi,
+        appConfig = appConfig,
         nameOfSellerFormProvider = new NameOfSellerFormProvider,
         securitiesTargetFormProvider = new SecuritiesTargetFormProvider,
         nameOfBuyerFormProvider = new NameOfBuyerFormProvider,
@@ -45,8 +49,6 @@ class StcRowValidationServiceSpec extends SpecBase {
         totalMarketValueFormProvider = new TotalMarketValueFormProvider
       )
     )
-
-
 
   private val headers: Seq[String] =
     Seq(
@@ -87,7 +89,7 @@ class StcRowValidationServiceSpec extends SpecBase {
           ParsedCell(columnIndex.find(StcColumns.whatRelief).getOrElse(-1), ""),
           ParsedCell(columnIndex.find(StcColumns.securitiesTarget).getOrElse(-1), "Target Ltd"),
           ParsedCell(columnIndex.find(StcColumns.companyRegistrationNumber).getOrElse(-1), "12345678"),
-          ParsedCell(columnIndex.find(StcColumns.chargingPoint).getOrElse(-1), "20/11/2025"),
+          ParsedCell(columnIndex.find(StcColumns.chargingPoint).getOrElse(-1), "20/02/2026"),
           ParsedCell(columnIndex.find(StcColumns.taxRate).getOrElse(-1), "0.5%"),
           ParsedCell(columnIndex.find(StcColumns.whatTypeOfSecurities).getOrElse(-1), "shares"),
           ParsedCell(columnIndex.find(StcColumns.typeOfShares).getOrElse(-1), "ordinary"),
@@ -116,7 +118,7 @@ class StcRowValidationServiceSpec extends SpecBase {
           ParsedCell(columnIndex.find(StcColumns.whatRelief).getOrElse(-1), ""),
           ParsedCell(columnIndex.find(StcColumns.securitiesTarget).getOrElse(-1), "Target Ltd"),
           ParsedCell(columnIndex.find(StcColumns.companyRegistrationNumber).getOrElse(-1), "12345678"),
-          ParsedCell(columnIndex.find(StcColumns.chargingPoint).getOrElse(-1), "20/11/2025"),
+          ParsedCell(columnIndex.find(StcColumns.chargingPoint).getOrElse(-1), "20/02/2026"),
           ParsedCell(columnIndex.find(StcColumns.taxRate).getOrElse(-1), "0.5%"),
           ParsedCell(columnIndex.find(StcColumns.whatTypeOfSecurities).getOrElse(-1), "shares"),
           ParsedCell(columnIndex.find(StcColumns.typeOfShares).getOrElse(-1), ""),
@@ -154,7 +156,7 @@ class StcRowValidationServiceSpec extends SpecBase {
           ParsedCell(columnIndex.find(StcColumns.whatRelief).getOrElse(-1), ""),
           ParsedCell(columnIndex.find(StcColumns.securitiesTarget).getOrElse(-1), "Target Ltd"),
           ParsedCell(columnIndex.find(StcColumns.companyRegistrationNumber).getOrElse(-1), "12345678"),
-          ParsedCell(columnIndex.find(StcColumns.chargingPoint).getOrElse(-1), "20/11/2025"),
+          ParsedCell(columnIndex.find(StcColumns.chargingPoint).getOrElse(-1), "20/02/2026"),
           ParsedCell(columnIndex.find(StcColumns.taxRate).getOrElse(-1), "0.5%"),
           ParsedCell(columnIndex.find(StcColumns.whatTypeOfSecurities).getOrElse(-1), "shares"),
           ParsedCell(columnIndex.find(StcColumns.typeOfShares).getOrElse(-1), ""),

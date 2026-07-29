@@ -18,6 +18,8 @@
 @import uk.gov.hmrc.securitiestransferchargefrontend.views.html.templates
 @import uk.gov.hmrc.govukfrontend.views.html.components.GovukFileUpload
 @import uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.shared.routes
+@import uk.gov.hmrc.securitiestransferchargefrontend.models.JourneyType
+
 
 
 
@@ -28,13 +30,15 @@
     govukErrorSummary: GovukErrorSummary
 )
 
-@(upscanInitiateResponse: UploadRequest, error: Option[String] = None)(implicit request: Request[_],messages: Messages)
+@(upscanInitiateResponse: UploadRequest, error: Option[String] = None,journeyType:JourneyType)(implicit request: Request[_],messages: Messages)
 
 @layout(pageTitle = titleNoForm(messages("fileUpload.title"),Some(messages("transfer.details.caption")))) {
 
+    @if(journeyType == JourneyType.STF) {
     <span class="govuk-caption-l">
         @messages("transfer.details.caption")
     </span>
+    }
 
     <h1 class="govuk-heading-l">
         @messages("fileUpload.heading")
@@ -67,7 +71,7 @@
 
         <div class="govuk-button-group">
             @govukButton(
-             ButtonViewModel(messages("site.upload.file"))
+             ButtonViewModel(messages("site.continue"))
             )
 
             <a class="govuk-link" href="@routes.SubmissionsDashboardController.onPageLoad().url">
