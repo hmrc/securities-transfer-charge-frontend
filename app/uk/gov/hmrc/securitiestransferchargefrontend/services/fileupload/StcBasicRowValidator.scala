@@ -17,7 +17,8 @@
 package uk.gov.hmrc.securitiestransferchargefrontend.services.fileupload
 
 import play.api.i18n.{Lang, Messages, MessagesApi}
-import uk.gov.hmrc.securitiestransferchargefrontend.forms.stf.fileUpload.{SecuritiesTargetFormProvider,AmountPaidForSecuritiesFormProvider}
+import uk.gov.hmrc.securitiestransferchargefrontend.config.FrontendAppConfig
+import uk.gov.hmrc.securitiestransferchargefrontend.forms.stf.fileUpload.{AmountPaidForSecuritiesFormProvider, SecuritiesTargetFormProvider}
 import uk.gov.hmrc.securitiestransferchargefrontend.forms.stf.shared.{NameOfBuyerFormProvider, NameOfSellerFormProvider}
 import uk.gov.hmrc.securitiestransferchargefrontend.models.stf.fileupload.{ParsedStcRow, ParsedValue, StcRowValidationError}
 
@@ -31,7 +32,8 @@ class StcBasicRowValidator @Inject()(
                                       nameOfSellerFormProvider: NameOfSellerFormProvider,
                                       securitiesTargetFormProvider: SecuritiesTargetFormProvider,
                                       nameOfBuyerFormProvider: NameOfBuyerFormProvider,
-                                      amountPaidForSecuritiesFormProvider: AmountPaidForSecuritiesFormProvider
+                                      amountPaidForSecuritiesFormProvider: AmountPaidForSecuritiesFormProvider,
+                                      appConfig: FrontendAppConfig
                                     ) {
 
   private implicit val messages: Messages =
@@ -46,7 +48,7 @@ class StcBasicRowValidator @Inject()(
     template match {
 
       case StcTemplate.STF =>
-        validateSTF(row, affinityKey)
+        validateSTF(row, affinityKey, appConfig)
 
       case StcTemplate.SH03 =>
         validateSH03(row, affinityKey)
@@ -56,24 +58,24 @@ class StcBasicRowValidator @Inject()(
     }
   }
 
-  def validateSTF(row: ParsedStcRow,affinityKey:String)(implicit cols: ColumnIndexBuilder): Seq[StcRowValidationError] =
+  def validateSTF(row: ParsedStcRow, affinityKey:String, appConfig: FrontendAppConfig)(implicit cols: ColumnIndexBuilder): Seq[StcRowValidationError] =
     validateNameOfSeller(row) ++
       validateSellerAddressInUk(row) ++
-      validateConnectedPersons(row,affinityKey) ++
-      validateApplyingForRelief(row,affinityKey) ++
-      validateSecuritiesTarget(row,affinityKey) ++
-      validateChargingPoint(row,affinityKey) ++
+      validateConnectedPersons(row, affinityKey) ++
+      validateApplyingForRelief(row, affinityKey) ++
+      validateSecuritiesTarget(row, affinityKey) ++
+      validateChargingPoint(row, affinityKey, appConfig) ++
       validateTaxRate(row) ++
-      validateWhatTypeOfSecurities(row,affinityKey) ++
-      validateSecuritiesQuantity(row,affinityKey) ++
-      validateAmountPaidForSecurities(row,affinityKey)
+      validateWhatTypeOfSecurities(row, affinityKey) ++
+      validateSecuritiesQuantity(row, affinityKey) ++
+      validateAmountPaidForSecurities(row, affinityKey)
 
 
   def validateSH03(row: ParsedStcRow,affinityKey:String)(implicit cols: ColumnIndexBuilder): Seq[StcRowValidationError] =
     validateWhatTypeOfSecurities(row,affinityKey) ++
       validateSecuritiesQuantity(row,affinityKey) ++
       validateAmountPaidForSecurities(row,affinityKey) ++
-      validateChargingPoint(row,affinityKey) ++
+      validateChargingPoint(row,affinityKey, appConfig) ++
       validateMaxSharePrice(row) ++
       validateMinSharePrice(row) ++
       validateSharePurchaseReason(row) ++
@@ -89,7 +91,7 @@ class StcBasicRowValidator @Inject()(
       validateConnectedPersons(row, affinityKey) ++
       validateApplyingForRelief(row, affinityKey) ++
       validateSecuritiesTarget(row, affinityKey) ++
-      validateChargingPoint(row, affinityKey) ++
+      validateChargingPoint(row, affinityKey, appConfig) ++
       validateTaxRate(row) ++
       validateTypeOfShares(row, affinityKey) ++
       validateSecuritiesQuantity(row, affinityKey) ++
@@ -130,7 +132,8 @@ class StcBasicRowValidator @Inject()(
 
   private def validateChargingPoint(
                                      row: ParsedStcRow,
-                                     affinityKey:String
+                                     affinityKey:String,
+                                     appConfig: FrontendAppConfig
                                    )(implicit cols: ColumnIndexBuilder): Seq[StcRowValidationError] = {
 
     row.chargingPoint match {
@@ -162,6 +165,15 @@ class StcBasicRowValidator @Inject()(
           )
         )
 
+      case ParsedValue.Valid(date) if date.isBefore(appConfig.firstChargingPoint) =>
+        Seq(
+          support.error(
+            row.rowNumber,
+            "chargingPoint",
+            messages(s"fileUpload.$affinityKey.chargingPoint.error.beforeFirstDate")
+          )
+        )
+
       case ParsedValue.Valid(_) =>
         Seq.empty
     }
@@ -176,6 +188,15 @@ class StcBasicRowValidator @Inject()(
             row.rowNumber,
             "whatTypeOfSecurities",
             messages(s"$affinityKey.fileUpload.error.whatTypeOfSecurities.required")
+          )
+        )
+
+      case Some(securities) if securities.length > 100 =>
+        Seq(
+          support.error(
+            row.rowNumber,
+            "whatTypeOfSecurities",
+            messages(s"$affinityKey.fileUpload.error.whatTypeOfSecurities.maxLength")
           )
         )
 

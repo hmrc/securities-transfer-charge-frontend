@@ -82,14 +82,16 @@ object ParsedRowReader {
     }
 
   def readDate(row: ParsedRow, columnIndex: Int): ParsedValue[LocalDate] = {
+    import java.time.format.ResolverStyle
+
     val formatters = Seq(
-      DateTimeFormatter.ISO_LOCAL_DATE,
-      DateTimeFormatter.ofPattern("yyyy/M/d"),
-      DateTimeFormatter.ofPattern("yyyy/MM/dd"),
-      DateTimeFormatter.ofPattern("d/M/uuuu"),
-      DateTimeFormatter.ofPattern("dd/MM/uuuu"),
-      DateTimeFormatter.ofPattern("d M uuuu"),
-      DateTimeFormatter.ofPattern("dd MM uuuu")
+      DateTimeFormatter.ofPattern("uuuu-MM-dd").withResolverStyle(ResolverStyle.STRICT),
+      DateTimeFormatter.ofPattern("uuuu/M/d").withResolverStyle(ResolverStyle.STRICT),
+      DateTimeFormatter.ofPattern("uuuu/MM/dd").withResolverStyle(ResolverStyle.STRICT),
+      DateTimeFormatter.ofPattern("d/M/uuuu").withResolverStyle(ResolverStyle.STRICT),
+      DateTimeFormatter.ofPattern("dd/MM/uuuu").withResolverStyle(ResolverStyle.STRICT),
+      DateTimeFormatter.ofPattern("d M uuuu").withResolverStyle(ResolverStyle.STRICT),
+      DateTimeFormatter.ofPattern("dd MM uuuu").withResolverStyle(ResolverStyle.STRICT)
     )
 
     row.valueAt(columnIndex) match {

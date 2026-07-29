@@ -23,6 +23,7 @@ import uk.gov.hmrc.securitiestransferchargefrontend.forms.stf.shared.{NameOfBuye
 import uk.gov.hmrc.securitiestransferchargefrontend.models.stf.fileupload.*
 import uk.gov.hmrc.securitiestransferchargefrontend.models.stf.fileupload.ParsedValue.{Invalid, Missing, Valid}
 import uk.gov.hmrc.securitiestransferchargefrontend.services.fileupload.*
+import uk.gov.hmrc.securitiestransferchargefrontend.config.FrontendAppConfig
 
 import java.time.LocalDate
 
@@ -32,6 +33,8 @@ class StcBasicRowValidatorSpec extends SpecBase {
 
   private val messagesApi: MessagesApi = app.injector.instanceOf[MessagesApi]
   private implicit val messages: Messages = messagesApi.preferred(Seq(Lang("en")))
+
+  private val appConfig: FrontendAppConfig = app.injector.instanceOf[FrontendAppConfig]
 
   private val validRow: ParsedStcRow =
     ParsedStcRow(
@@ -57,7 +60,7 @@ class StcBasicRowValidatorSpec extends SpecBase {
       whatReliefAreYouApplyingFor = None,
       securitiesTarget = Some("Target Ltd"),
       companyRegistrationNumber = Some("12345678"),
-      chargingPoint = ParsedValue.Valid(LocalDate.of(2025, 11, 20)),
+      chargingPoint = ParsedValue.Valid(LocalDate.of(2026, 2, 20)),
       taxRate = Some(BigDecimal("0.5")),
       whatTypeOfSecurities = Some("Shares"),
       typeOfShares = Some("Ordinary"),
@@ -74,6 +77,7 @@ class StcBasicRowValidatorSpec extends SpecBase {
     new StcBasicRowValidator(
       support = new StcValidationSupport,
       messagesApi = messagesApi,
+      appConfig = appConfig,
       nameOfSellerFormProvider = new NameOfSellerFormProvider,
       securitiesTargetFormProvider = new SecuritiesTargetFormProvider,
       nameOfBuyerFormProvider = new NameOfBuyerFormProvider,
@@ -130,6 +134,15 @@ class StcBasicRowValidatorSpec extends SpecBase {
       )
 
       result.exists(e => e.fieldName == "chargingPoint" && e.message == messages("fileUpload.org.chargingPoint.error.futureDate")) mustBe true
+    }
+
+    "return charging point too early error when date is before the earliest allowed date" in {
+      val result = validator.validate(
+        validRow.copy(chargingPoint = Valid(LocalDate.of(2025, 12, 31))),
+        StcTemplate.STF, "org"
+      )
+
+      result.exists(e => e.fieldName == "chargingPoint" && e.message == messages("fileUpload.org.chargingPoint.error.beforeFirstDate")) mustBe true
     }
 
     "drop the prefix for charging point invalid error when affinityKey is 'individual'" in {
@@ -370,7 +383,7 @@ class StcBasicRowValidatorSpec extends SpecBase {
           whatTypeOfSecurities = Some("shares"),
           securitiesQuantity = Some("100"),
           amountPaidForSecurities = Some("1000"),
-          chargingPoint = ParsedValue.Valid(LocalDate.of(2025, 11, 20)),
+          chargingPoint = ParsedValue.Valid(LocalDate.of(2026, 2, 20)),
           sharePurchaseReason = Some("cancellation"),
           purchaseForCancellation = Some(true),
           connectedPersons = Some(true),
