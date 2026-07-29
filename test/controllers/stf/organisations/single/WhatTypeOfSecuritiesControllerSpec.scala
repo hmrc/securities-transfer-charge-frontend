@@ -54,7 +54,7 @@ class WhatTypeOfSecuritiesControllerSpec extends SpecBase with MockitoSugar {
         userAnswers = Some(emptyUserAnswers),
         affinityGroup = orgAffinity
       )
-        .overrides(bind[Navigator].qualifiedWith("bulk").toInstance(getNavigator))
+        .overrides(bind[Navigator].qualifiedWith("organisations").toInstance(getNavigator))
         .build()
 
       running(application) {
@@ -77,7 +77,7 @@ class WhatTypeOfSecuritiesControllerSpec extends SpecBase with MockitoSugar {
         userAnswers = Some(userAnswers),
         affinityGroup = orgAffinity
       )
-        .overrides(bind[Navigator].qualifiedWith("bulk").toInstance(getNavigator))
+        .overrides(bind[Navigator].qualifiedWith("organisations").toInstance(getNavigator))
         .build()
 
       running(application) {
@@ -124,7 +124,7 @@ class WhatTypeOfSecuritiesControllerSpec extends SpecBase with MockitoSugar {
         userAnswers = Some(emptyUserAnswers),
         affinityGroup = orgAffinity
       )
-        .overrides(bind[Navigator].qualifiedWith("bulk").toInstance(getNavigator))
+        .overrides(bind[Navigator].qualifiedWith("organisations").toInstance(getNavigator))
         .build()
 
       running(application) {

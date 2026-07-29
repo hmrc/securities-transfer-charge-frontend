@@ -34,7 +34,7 @@ import scala.language.postfixOps
 
 class NameOfSellerController @Inject()(
                                         override val messagesApi: MessagesApi,
-                                        @Named("bulk") navigator: Navigator,
+                                        @Named("organisations") navigator: Navigator,
                                         stcAuthEnrolled: StcAuthEnrolledAction,
                                         getData: StcDataRetrievalAction,
                                         requireData: StcDataRequiredAction,

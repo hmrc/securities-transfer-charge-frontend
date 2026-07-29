@@ -44,7 +44,7 @@ class OtherSecuritiesTypeControllerSpec extends SpecBase with MockitoSugar {
     "must return OK and the correct view for a GET" in {
 
       val application = applicationBuilder(userAnswers = Some(emptyUserAnswers), affinityGroup = orgAffinity)
-        .overrides(bind[Navigator].qualifiedWith("bulk").toInstance(getNavigator))
+        .overrides(bind[Navigator].qualifiedWith("organisations").toInstance(getNavigator))
         .build()
 
       running(application) {
@@ -64,7 +64,7 @@ class OtherSecuritiesTypeControllerSpec extends SpecBase with MockitoSugar {
       val userAnswers = testUserAnswers.set(OtherSecuritiesTypePage, "answer").success.value
 
       val application = applicationBuilder(userAnswers = Some(userAnswers), affinityGroup = orgAffinity)
-        .overrides(bind[Navigator].qualifiedWith("bulk").toInstance(getNavigator))
+        .overrides(bind[Navigator].qualifiedWith("organisations").toInstance(getNavigator))
         .build()
 
       running(application) {
@@ -101,7 +101,7 @@ class OtherSecuritiesTypeControllerSpec extends SpecBase with MockitoSugar {
     "must return a Bad Request and errors when invalid data is submitted" in {
 
       val application = applicationBuilder(userAnswers = Some(emptyUserAnswers), affinityGroup = orgAffinity)
-        .overrides(bind[Navigator].qualifiedWith("bulk").toInstance(getNavigator))
+        .overrides(bind[Navigator].qualifiedWith("organisations").toInstance(getNavigator))
         .build()
 
       running(application) {

@@ -34,7 +34,7 @@ import scala.concurrent.{ExecutionContext, Future}
 
 class WhatTypeOfSecuritiesController @Inject()(
                                        override val messagesApi: MessagesApi,
-                                       @Named("bulk") navigator: Navigator,
+                                       @Named("organisations") navigator: Navigator,
                                        stcAuthEnrolled: StcAuthEnrolledAction,
                                        getData: StcDataRetrievalAction,
                                        requireData: StcDataRequiredAction,

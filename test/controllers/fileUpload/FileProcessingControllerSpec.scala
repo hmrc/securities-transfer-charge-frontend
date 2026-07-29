@@ -164,7 +164,7 @@ class FileProcessingControllerSpec extends SpecBase with MockitoSugar {
             status(result) mustEqual OK
 
             verify(service)
-              .processReadyUpload(eqTo(reference), eqTo(upload), any[String], eqTo(journeyType.value))(any(), any(), any())
+              .processReadyUpload(eqTo(reference), eqTo(upload), any[String], eqTo(journeyType))(any(), any(), any())
 
             verify(counter).withIncrementedCounter(any[Result])
           }

@@ -55,7 +55,7 @@ class HowToNotifyAboutSecuritiesTransferControllerSpec extends SpecBase {
           userAnswers = Some(emptyUserAnswers),
           affinityGroup = orgAffinity
         )
-          .overrides(bind[Navigator].qualifiedWith("bulk").toInstance(getNavigator))
+          .overrides(bind[Navigator].qualifiedWith("organisations").toInstance(getNavigator))
           .build()
 
       running(application) {
@@ -78,7 +78,7 @@ class HowToNotifyAboutSecuritiesTransferControllerSpec extends SpecBase {
           userAnswers = Some(userAnswers),
           affinityGroup = orgAffinity
         )
-          .overrides(bind[Navigator].qualifiedWith("bulk").toInstance(getNavigator))
+          .overrides(bind[Navigator].qualifiedWith("organisations").toInstance(getNavigator))
           .build()
 
       running(application) {
@@ -100,7 +100,7 @@ class HowToNotifyAboutSecuritiesTransferControllerSpec extends SpecBase {
           userAnswers = Some(emptyUserAnswers),
           affinityGroup = orgAffinity
         )
-          .overrides(bind[Navigator].qualifiedWith("bulk").toInstance(getNavigator))
+          .overrides(bind[Navigator].qualifiedWith("organisations").toInstance(getNavigator))
           .build()
 
       running(application) {
@@ -124,7 +124,7 @@ class HowToNotifyAboutSecuritiesTransferControllerSpec extends SpecBase {
           userAnswers = None,
           affinityGroup = orgAffinity
         )
-          .overrides(bind[Navigator].qualifiedWith("bulk").toInstance(getNavigator))
+          .overrides(bind[Navigator].qualifiedWith("organisations").toInstance(getNavigator))
           .build()
 
       running(application) {
@@ -143,7 +143,7 @@ class HowToNotifyAboutSecuritiesTransferControllerSpec extends SpecBase {
           userAnswers = Some(emptyUserAnswers),
           affinityGroup = orgAffinity
         )
-          .overrides(bind[Navigator].qualifiedWith("bulk").toInstance(getNavigator))
+          .overrides(bind[Navigator].qualifiedWith("organisations").toInstance(getNavigator))
           .build()
 
       running(application) {

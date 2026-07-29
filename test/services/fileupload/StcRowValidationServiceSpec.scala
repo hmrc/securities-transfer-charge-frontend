@@ -19,10 +19,12 @@ package services.fileupload
 import base.SpecBase
 import play.api.i18n.MessagesApi
 import uk.gov.hmrc.securitiestransferchargefrontend.config.FrontendAppConfig
+import uk.gov.hmrc.securitiestransferchargefrontend.forms.shared.BulkTotalMarketValueFormProvider
 import uk.gov.hmrc.securitiestransferchargefrontend.forms.stf.shared.*
 import uk.gov.hmrc.securitiestransferchargefrontend.models.stf.fileupload.{FileParseError, ParsedCell, ParsedRow}
 import uk.gov.hmrc.securitiestransferchargefrontend.services.fileupload.*
 import uk.gov.hmrc.securitiestransferchargefrontend.forms.stf.fileUpload.{AmountPaidForSecuritiesFormProvider, SecuritiesTargetFormProvider}
+import uk.gov.hmrc.securitiestransferchargefrontend.models.JourneyType.{SH03, STF}
 
 class StcRowValidationServiceSpec extends SpecBase {
 
@@ -46,7 +48,7 @@ class StcRowValidationServiceSpec extends SpecBase {
       stcConditionalRowValidator = new StcConditionalRowValidator(
         support = support,
         messagesApi = messagesApi,
-        totalMarketValueFormProvider = new TotalMarketValueFormProvider
+        totalMarketValueFormProvider = new BulkTotalMarketValueFormProvider
       )
     )
 
@@ -99,7 +101,7 @@ class StcRowValidationServiceSpec extends SpecBase {
         )
       )
 
-      val result = service.validateStream(Seq(row).iterator, headers, affinityGroupKeyInd, "stf", 25, 10000)
+      val result = service.validateStream(Seq(row).iterator, headers, affinityGroupKeyInd, STF, 25, 10000)
 
       result.isRight mustBe true
       result.toOption.get.head.validationErrors mustBe Seq.empty
@@ -128,7 +130,7 @@ class StcRowValidationServiceSpec extends SpecBase {
         )
       )
 
-      val result = service.validateStream(Seq(row).iterator, headers, affinityGroupKeyInd, "stf", 25, 10000)
+      val result = service.validateStream(Seq(row).iterator, headers, affinityGroupKeyInd, STF, 25, 10000)
 
       result.isRight mustBe true
       val errors = result.toOption.get.head.validationErrors.map(_.fieldName)
@@ -174,7 +176,7 @@ class StcRowValidationServiceSpec extends SpecBase {
         Seq(badRow1, badRow2, badRow3).iterator,
         headers,
         affinityGroupKeyInd,
-        "stf",
+        STF,
         maxErrorsAllowed = 10,
         maxRows = 10000
       )
@@ -193,7 +195,7 @@ class StcRowValidationServiceSpec extends SpecBase {
         Seq(row1, row2).iterator,
         headers,
         affinityGroupKeyInd,
-        "stf",
+        STF,
         maxErrorsAllowed = 25,
         maxRows = 1
       )
@@ -223,7 +225,7 @@ class StcRowValidationServiceSpec extends SpecBase {
         Seq(row).iterator,
         headers,
         affinityGroupKeyAgent,
-        templateType = "sh03",
+        SH03,
         maxErrorsAllowed = 25,
         maxRows = 10000
       )
@@ -247,7 +249,7 @@ class StcRowValidationServiceSpec extends SpecBase {
         )
       )
 
-      val result = service.validateStream(Seq(row).iterator, headers, affinityGroupKeyInd, "stf", 25, 10000)
+      val result = service.validateStream(Seq(row).iterator, headers, affinityGroupKeyInd, STF, 25, 10000)
 
       result.isRight mustBe true
       val errors = result.toOption.get.head.validationErrors

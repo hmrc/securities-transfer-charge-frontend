@@ -34,7 +34,7 @@ import scala.concurrent.{ExecutionContext, Future}
 
 class HowToNotifyAboutSecuritiesTransferController @Inject()(
                                        override val messagesApi: MessagesApi,
-                                       @Named("bulk") orgNavigator: Navigator,
+                                       @Named("organisations") orgNavigator: Navigator,
                                        stcAuthEnrolled: StcAuthEnrolledAction,
                                        getData: StcDataRetrievalAction,
                                        requireData: StcDataRequiredAction,
