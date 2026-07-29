@@ -38,6 +38,8 @@ class StcBasicRowValidator @Inject()(
 
   private implicit val messages: Messages =
     messagesApi.preferred(Seq(Lang("en")))
+    
+  private val firstChargingPoint = appConfig.firstChargingPoint
 
   def validate(
                 row: ParsedStcRow,
@@ -48,7 +50,7 @@ class StcBasicRowValidator @Inject()(
     template match {
 
       case StcTemplate.STF =>
-        validateSTF(row, affinityKey, appConfig)
+        validateSTF(row, affinityKey)
 
       case StcTemplate.SH03 =>
         validateSH03(row, affinityKey)
@@ -58,13 +60,13 @@ class StcBasicRowValidator @Inject()(
     }
   }
 
-  def validateSTF(row: ParsedStcRow, affinityKey:String, appConfig: FrontendAppConfig)(implicit cols: ColumnIndexBuilder): Seq[StcRowValidationError] =
+  def validateSTF(row: ParsedStcRow, affinityKey:String)(implicit cols: ColumnIndexBuilder): Seq[StcRowValidationError] =
     validateNameOfSeller(row) ++
       validateSellerAddressInUk(row) ++
       validateConnectedPersons(row, affinityKey) ++
       validateApplyingForRelief(row, affinityKey) ++
       validateSecuritiesTarget(row, affinityKey) ++
-      validateChargingPoint(row, affinityKey, appConfig) ++
+      validateChargingPoint(row, affinityKey) ++
       validateTaxRate(row) ++
       validateWhatTypeOfSecurities(row, affinityKey) ++
       validateSecuritiesQuantity(row, affinityKey) ++
@@ -75,7 +77,7 @@ class StcBasicRowValidator @Inject()(
     validateWhatTypeOfSecurities(row,affinityKey) ++
       validateSecuritiesQuantity(row,affinityKey) ++
       validateAmountPaidForSecurities(row,affinityKey) ++
-      validateChargingPoint(row,affinityKey, appConfig) ++
+      validateChargingPoint(row,affinityKey) ++
       validateMaxSharePrice(row) ++
       validateMinSharePrice(row) ++
       validateSharePurchaseReason(row) ++
@@ -91,7 +93,7 @@ class StcBasicRowValidator @Inject()(
       validateConnectedPersons(row, affinityKey) ++
       validateApplyingForRelief(row, affinityKey) ++
       validateSecuritiesTarget(row, affinityKey) ++
-      validateChargingPoint(row, affinityKey, appConfig) ++
+      validateChargingPoint(row, affinityKey) ++
       validateTaxRate(row) ++
       validateTypeOfShares(row, affinityKey) ++
       validateSecuritiesQuantity(row, affinityKey) ++
@@ -132,8 +134,7 @@ class StcBasicRowValidator @Inject()(
 
   private def validateChargingPoint(
                                      row: ParsedStcRow,
-                                     affinityKey:String,
-                                     appConfig: FrontendAppConfig
+                                     affinityKey: String
                                    )(implicit cols: ColumnIndexBuilder): Seq[StcRowValidationError] = {
 
     row.chargingPoint match {
@@ -165,7 +166,7 @@ class StcBasicRowValidator @Inject()(
           )
         )
 
-      case ParsedValue.Valid(date) if date.isBefore(appConfig.firstChargingPoint) =>
+      case ParsedValue.Valid(date) if date.isBefore(firstChargingPoint) =>
         Seq(
           support.error(
             row.rowNumber,
