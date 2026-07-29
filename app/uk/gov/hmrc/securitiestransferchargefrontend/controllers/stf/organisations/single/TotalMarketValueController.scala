@@ -32,7 +32,7 @@ import scala.concurrent.{ExecutionContext, Future}
 
 class TotalMarketValueController @Inject()(
                                         override val messagesApi: MessagesApi,
-                                        @Named("organisations") navigator: Navigator,
+                                        @Named("bulk") navigator: Navigator,
                                         stcAuthEnrolled: StcAuthEnrolledAction,
                                         getData: StcDataRetrievalAction,
                                         requireData: StcDataRequiredAction,

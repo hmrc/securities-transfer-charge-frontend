@@ -367,17 +367,29 @@ org.whatTypeOfSecurities.checkYourAnswersLabel = What type of securities is the 
 org.whatTypeOfSecurities.error.required = Enter the type of securities the business is buying
 org.whatTypeOfSecurities.change.hidden = Change what type of securities the business is buying
 
-org.totalMarketValue.title = What is the total market value of these securities?
-org.totalMarketValue.heading = What is the total market value of these securities?
-org.totalMarketValue.checkYourAnswersLabel = What is the total market value of these securities?
-org.totalMarketValue.error.nonNumeric = The market value of the securities must be a number and can include up to two decimal places, like £30 or £28.60
-org.totalMarketValue.error.required = Enter the total market value of the securities
-org.totalMarketValue.error.invalidNumeric = The market value of the securities must be a number and can include up to two decimal places, like £30 or £28.60
-org.totalMarketValue.error.aboveMaximum = The market value of the securities must be £999,999,999 or below
-org.totalMarketValue.error.negative = The market value of the securities must be £0 or more
-org.totalMarketValue.error.belowMinimum = The market value must be {0} or more
-org.totalMarketValue.change.hidden = Change the market value of the securities
-org.totalMarketValue.hint = For example, £600 or £193.54
+org.stf.totalMarketValue.title = What is the total market value of these securities?
+org.stf.totalMarketValue.heading = What is the total market value of these securities?
+org.stf.totalMarketValue.checkYourAnswersLabel = What is the total market value of these securities?
+org.stf.totalMarketValue.error.nonNumeric = The market value of the securities must be a number and can include up to two decimal places, like £30 or £28.60
+org.stf.totalMarketValue.error.required = Enter the total market value of the securities
+org.stf.totalMarketValue.error.invalidNumeric = The market value of the securities must be a number and can include up to two decimal places, like £30 or £28.60
+org.stf.totalMarketValue.error.aboveMaximum = The market value of the securities must be £999,999,999 or below
+org.stf.totalMarketValue.error.negative = The market value of the securities must be £0 or more
+org.stf.totalMarketValue.error.belowMinimum = The market value must be {0} or more
+org.stf.totalMarketValue.change.hidden = Change the market value of the securities
+org.stf.totalMarketValue.hint = For example, £600 or £193.54
+
+org.sh03.totalMarketValue.title = What is the total market value of these securities?
+org.sh03.totalMarketValue.heading = What is the total market value of these securities?
+org.sh03.totalMarketValue.checkYourAnswersLabel = What is the total market value of these securities?
+org.sh03.totalMarketValue.error.nonNumeric = The market value of the shares must be a number and can include up to two decimal places, like £30 or £28.60
+org.sh03.totalMarketValue.error.required = Enter the market value of the shares in pounds
+org.sh03.totalMarketValue.error.invalidNumeric = The market value of the shares must be a number and can include up to two decimal places, like £30 or £28.60
+org.sh03.totalMarketValue.error.aboveMaximum = The market value of the shares must be £999,999,999 or below
+org.sh03.totalMarketValue.error.negative = The market value of the shares must be £0.01 or more
+org.sh03.totalMarketValue.error.belowMinimum = The market value of the shares must be £0.01 or more
+org.sh03.totalMarketValue.change.hidden = Change the market value of the shares
+org.sh03.totalMarketValue.hint = For example, £600 or £193.54
 
 templateInstructions.title = How to use the template
 templateInstructions.heading = How to use the template
@@ -652,12 +664,12 @@ fileUpload.agent.amountPaidForSecurities.error.negative = The amount paid for th
 fileUpload.agent.amountPaidForSecurities.error.belowMinimum = The amount paid for the shares must be £0.01 or more
 fileUpload.agent.amountPaidForSecurities.error.aboveMaximum = The amount paid for the shares must be £999,999,999 or below
 
-fileUpload.org.amountPaidForSecurities.error.required = Enter the amount paid for the securities
-fileUpload.org.amountPaidForSecurities.error.invalidNumeric = The amount paid for the securities must be a number and can include up to two decimal places, like £30 or £28.60
-fileUpload.org.amountPaidForSecurities.error.nonNumeric = The amount paid for the securities must be a number and can include up to two decimal places, like £30 or £28.60
-fileUpload.org.amountPaidForSecurities.error.negative = The amount paid for the securities must be £0.01 or more
-fileUpload.org.amountPaidForSecurities.error.belowMinimum = The amount paid for the securities must be £0.01 or more
-fileUpload.org.amountPaidForSecurities.error.aboveMaximum = The amount paid for the securities must be £999,999,999 or below
+fileUpload.org.amountPaidForSecurities.error.required = Enter the amount paid for the shares
+fileUpload.org.amountPaidForSecurities.error.invalidNumeric = The amount paid for the shares must be a number and can include up to two decimal places, like £30 or £28.60
+fileUpload.org.amountPaidForSecurities.error.nonNumeric = The amount paid for the shares must be a number and can include up to two decimal places, like £30 or £28.60
+fileUpload.org.amountPaidForSecurities.error.negative = The amount paid for the shares must be £0.01 or more
+fileUpload.org.amountPaidForSecurities.error.belowMinimum = The amount paid for the shares must be £0.01 or more
+fileUpload.org.amountPaidForSecurities.error.aboveMaximum = The amount paid for the shares must be £999,999,999 or below
 
 fileUpload.individual.amountPaidForSecurities.error.required = Enter the amount you paid for the securities
 fileUpload.individual.amountPaidForSecurities.error.invalidNumeric = The amount paid for the securities must be a number and can include up to two decimal places, like £30 or £28.60
@@ -721,18 +733,18 @@ fileUploaded.error.virus.title = Your file contains a virus
 fileUploaded.error.virus.heading = Your file contains a virus
 fileUploaded.error.virus.p = The file you have uploaded contains a virus, you will need to upload a different file.
 
-agent.totalMarketValue.title = What is the total market value of the shares?
-agent.totalMarketValue.heading = What is the total market value of the shares?
-agent.totalMarketValue.checkYourAnswersLabel = What is the total market value of the shares?
-agent.totalMarketValue.error.nonNumeric = The market value of the shares must be a number and can include up to two decimal places, like £30 or £28.60
-agent.totalMarketValue.error.required = Enter the market value of the shares in pounds
-agent.totalMarketValue.error.invalidNumeric = The market value of the shares must be a number and can include up to two decimal places, like £30 or £28.60
-agent.totalMarketValue.error.aboveMaximum = The market value of the shares must be £999,999,999 or below
-agent.totalMarketValue.error.belowMinimum = The market value of the shares must be £0.01 or more
-agent.totalMarketValue.change.hidden = Change the market value of the shares
-agent.totalMarketValue.hint = For example, £600 or £193.54
-agent.totalMarketValue.error.negative = The market value of the shares must be £0.01 or more
-agent.totalMarketValue.checkYourAnswersLabel = What is the total market value of the shares?
+agent.sh03.totalMarketValue.title = What is the total market value of the shares?
+agent.sh03.totalMarketValue.heading = What is the total market value of the shares?
+agent.sh03.totalMarketValue.checkYourAnswersLabel = What is the total market value of the shares?
+agent.sh03.totalMarketValue.error.nonNumeric = The market value of the shares must be a number and can include up to two decimal places, like £30 or £28.60
+agent.sh03.totalMarketValue.error.required = Enter the market value of the shares in pounds
+agent.sh03.totalMarketValue.error.invalidNumeric = The market value of the shares must be a number and can include up to two decimal places, like £30 or £28.60
+agent.sh03.totalMarketValue.error.aboveMaximum = The market value of the shares must be £999,999,999 or below
+agent.sh03.totalMarketValue.error.belowMinimum = The market value of the shares must be £0.01 or more
+agent.sh03.totalMarketValue.change.hidden = Change the market value of the shares
+agent.sh03.totalMarketValue.hint = For example, £600 or £193.54
+agent.sh03.totalMarketValue.error.negative = The market value of the shares must be £0.01 or more
+agent.sh03.totalMarketValue.checkYourAnswersLabel = What is the total market value of the shares?
 
 fileUploaded.error.encryptedFile.title = There was a problem uploading your file
 fileUploaded.error.encryptedFile.heading = There was a problem uploading your file
@@ -1094,3 +1106,25 @@ agent.sh03.templateInstructions.step2 = Complete the template, using one row for
 agent.sh03.templateInstructions.step3 = Upload the file on the next page as a .csv or an .xlsx
 agent.sh03.templateInstructions.p2 = Remember, do not edit the first three rows, or change the order of the columns.
 agent.sh03.templateInstructions.p3 = Once you have uploaded and submitted the file it will show in your recent submissions, you can then pay the tax due.
+
+
+org.sh03.bulk.companyDetails.title = Company details
+org.sh03.bulk.companyDetails.heading = Company details
+org.sh03.bulk.companyDetails.companyName.label = Company name
+org.sh03.bulk.companyDetails.crn.label = Company registration number (CRN)
+org.sh03.bulk.companyDetails.crn.hint = This is also called a company number. For example, SN898989 or 12345678
+
+org.sh03.bulk.companyDetails.companyName.error.required = Enter the company name
+org.sh03.bulk.companyDetails.companyName.error.length = Company name must be 160 characters or fewer
+org.sh03.bulk.companyDetails.crn.error.required = Enter the company registration number
+org.sh03.bulk.companyDetails.crn.error.invalid = Company registration number can only be numbers or letters
+org.sh03.bulk.companyDetails.crn.error.length = Company registration number must be 8 characters long
+
+org.sh03.templateInstructions.title = How to use the template
+org.sh03.templateInstructions.heading = How to use the template
+org.sh03.templateInstructions.p1 = Use the template to tell us about more than one share purchase at a time.
+org.sh03.templateInstructions.step1 = Download the template
+org.sh03.templateInstructions.step2 = Complete the template, using one row for each class of shares the company is purchasing.
+org.sh03.templateInstructions.step3 = Upload the file on the next page as a .csv or an .xlsx
+org.sh03.templateInstructions.p2 = Remember, do not edit the first three rows, or change the order of the columns.
+org.sh03.templateInstructions.p3 = Once you have uploaded and submitted the file it will show in your recent submissions, you can then pay the tax due.

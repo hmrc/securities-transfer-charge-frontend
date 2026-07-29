@@ -31,7 +31,7 @@
 
 @(form: Form[_], mode: Mode, backLinkCall: Call)(implicit request: Request[_], messages: Messages)
 
-@layout(pageTitle = title(form, messages("totalMarketValue.title")), backLinkUrl = Some(backLinkCall.url)) {
+@layout(pageTitle = title(form, messages("individual.totalMarketValue.title")), backLinkUrl = Some(backLinkCall.url)) {
 
     @formHelper(action = routes.TotalMarketValueController.onSubmit(mode), Symbol("autoComplete") -> "off") {
 
@@ -43,11 +43,11 @@
         @govukInput(
             InputViewModel(
                 field = form("value"),
-                label = LabelViewModel(messages("totalMarketValue.heading")).asPageHeading(Large)
+                label = LabelViewModel(messages("individual.totalMarketValue.heading")).asPageHeading(Large)
             )
             .withPrefix(PrefixOrSuffix(content = "£"))
             .withWidth(Fixed10)
-            .withHint(HintViewModel(messages("totalMarketValue.hint")))
+            .withHint(HintViewModel(messages("individual.totalMarketValue.hint")))
 
         )
 

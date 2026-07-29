@@ -53,7 +53,7 @@ class TotalMarketValueControllerSpec extends SpecBase with MockitoSugar {
     "must return OK and the correct view for a GET" in {
 
       val application = applicationBuilder(userAnswers = Some(emptyUserAnswers),affinityGroup = orgAffinity)
-        .overrides(bind[Navigator].qualifiedWith("organisations").toInstance(getNavigator))
+        .overrides(bind[Navigator].qualifiedWith("bulk").toInstance(getNavigator))
         .build()
 
       running(application) {
@@ -73,7 +73,7 @@ class TotalMarketValueControllerSpec extends SpecBase with MockitoSugar {
       val userAnswers = emptyUserAnswers.set(TotalMarketValuePage, validAnswer).success.value
 
       val application = applicationBuilder(userAnswers = Some(userAnswers), affinityGroup = orgAffinity)
-        .overrides(bind[Navigator].qualifiedWith("organisations").toInstance(getNavigator))
+        .overrides(bind[Navigator].qualifiedWith("bulk").toInstance(getNavigator))
         .build()
 
       running(application) {
@@ -96,7 +96,7 @@ class TotalMarketValueControllerSpec extends SpecBase with MockitoSugar {
 
       val application =
         applicationBuilder(userAnswers = Some(emptyUserAnswers), sessionRepository = mockSessionRepository, affinityGroup = orgAffinity)
-          .overrides(bind[Navigator].qualifiedWith("organisations").toInstance(getNavigator))
+          .overrides(bind[Navigator].qualifiedWith("bulk").toInstance(getNavigator))
           .build()
 
       running(application) {
@@ -115,7 +115,7 @@ class TotalMarketValueControllerSpec extends SpecBase with MockitoSugar {
 
       val application =
         applicationBuilder(userAnswers = Some(emptyUserAnswers), affinityGroup = orgAffinity)
-          .overrides(bind[Navigator].qualifiedWith("organisations").toInstance(getNavigator))
+          .overrides(bind[Navigator].qualifiedWith("bulk").toInstance(getNavigator))
           .build()
           
       running(application) {

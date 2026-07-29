@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.organisations.single
+package uk.gov.hmrc.securitiestransferchargefrontend.controllers.sh03.organisations.bulk
 
 import play.api.data.Form
 import play.api.i18n.{I18nSupport, MessagesApi}
@@ -22,36 +22,36 @@ import play.api.mvc.{Action, AnyContent, Call, MessagesControllerComponents}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.actions.*
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.shared.SaveAndReturnButton.isReturn
-import uk.gov.hmrc.securitiestransferchargefrontend.forms.stf.shared.NameOfSellerFormProvider
+import uk.gov.hmrc.securitiestransferchargefrontend.forms.sh03.organisations.bulk.CompanyDetailsFormProvider
+import uk.gov.hmrc.securitiestransferchargefrontend.models.sh03.bulk.CompanyDetails
 import uk.gov.hmrc.securitiestransferchargefrontend.models.{Mode, UserAnswers}
 import uk.gov.hmrc.securitiestransferchargefrontend.navigation.Navigator
-import uk.gov.hmrc.securitiestransferchargefrontend.pages.stf.single.NameOfSellerPage
-import uk.gov.hmrc.securitiestransferchargefrontend.views.html.stf.organisations.single.NameOfSellerView
+import uk.gov.hmrc.securitiestransferchargefrontend.pages.sh03.bulk.BulkCompanyDetailsPage
+import uk.gov.hmrc.securitiestransferchargefrontend.views.html.sh03.organisations.bulk.CompanyDetailsView
 
 import javax.inject.{Inject, Named}
 import scala.concurrent.{ExecutionContext, Future}
-import scala.language.postfixOps
 
-class NameOfSellerController @Inject()(
+class CompanyDetailsController @Inject()(
                                         override val messagesApi: MessagesApi,
-                                        @Named("bulk") navigator: Navigator,
+                                        @Named("orgSh03") navigator: Navigator,
                                         stcAuthEnrolled: StcAuthEnrolledAction,
                                         getData: StcDataRetrievalAction,
                                         requireData: StcDataRequiredAction,
-                                        formProvider: NameOfSellerFormProvider,
+                                        formProvider: CompanyDetailsFormProvider,
                                         val controllerComponents: MessagesControllerComponents,
-                                        view: NameOfSellerView
+                                        view: CompanyDetailsView
                                     )(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport {
 
-  val form: Form[String] = formProvider()
+  val form: Form[CompanyDetails] = formProvider()
 
   lazy val backLinkCall: Mode => UserAnswers => Call =
-    mode => userAnswers => navigator.previousPage(NameOfSellerPage, mode, userAnswers)
+    mode => userAnswers => navigator.previousPage(BulkCompanyDetailsPage, mode, userAnswers)
 
   def onPageLoad(mode: Mode): Action[AnyContent] = (stcAuthEnrolled andThen getData andThen requireData) {
     implicit request =>
 
-      val preparedForm = request.userAnswers.get(NameOfSellerPage) match {
+      val preparedForm = request.userAnswers.get(BulkCompanyDetailsPage) match {
         case None => form
         case Some(value) => form.fill(value)
       }
@@ -68,8 +68,8 @@ class NameOfSellerController @Inject()(
 
         value =>
           for {
-            updatedAnswers <- Future.fromTry(request.userAnswers.set(NameOfSellerPage, value))
-            nextPage       <- navigator.nextPage(NameOfSellerPage, mode, updatedAnswers,isReturn(request))
+            updatedAnswers <- Future.fromTry(request.userAnswers.set(BulkCompanyDetailsPage, value))
+            nextPage       <- navigator.nextPage(BulkCompanyDetailsPage, mode, updatedAnswers, isReturn(request))
           } yield Redirect(nextPage)
       )
   }

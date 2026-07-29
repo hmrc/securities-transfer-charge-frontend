@@ -54,7 +54,7 @@ class DetailsOfThisTransferControllerSpec extends SpecBase with MockitoSugar {
       val updatedAnswers = emptyUserAnswers.set(ConnectedPersonsPage,true).success.value
 
       val application = applicationBuilder(userAnswers = Some(updatedAnswers), affinityGroup = orgAffinity)
-        .overrides(bind[Navigator].qualifiedWith("organisations").toInstance(getNavigator))
+        .overrides(bind[Navigator].qualifiedWith("bulk").toInstance(getNavigator))
         .build()
 
 
@@ -76,7 +76,7 @@ class DetailsOfThisTransferControllerSpec extends SpecBase with MockitoSugar {
       val updatedAnswers = answers.set(ConnectedPersonsPage,true).success.value
 
       val application = applicationBuilder(userAnswers = Some(updatedAnswers), affinityGroup = orgAffinity)
-        .overrides(bind[Navigator].qualifiedWith("organisations").toInstance(getNavigator))
+        .overrides(bind[Navigator].qualifiedWith("bulk").toInstance(getNavigator))
         .build()
 
       running(application) {
@@ -98,7 +98,7 @@ class DetailsOfThisTransferControllerSpec extends SpecBase with MockitoSugar {
 
       val application =
         applicationBuilder(userAnswers = Some(updatedAnswers),affinityGroup = orgAffinity)
-          .overrides(bind[Navigator].qualifiedWith("organisations").toInstance(getNavigator))
+          .overrides(bind[Navigator].qualifiedWith("bulk").toInstance(getNavigator))
           .build()
 
       running(application) {
@@ -124,7 +124,7 @@ class DetailsOfThisTransferControllerSpec extends SpecBase with MockitoSugar {
       val updatedAnswers = emptyUserAnswers.set(ConnectedPersonsPage, true).success.value
 
       val application = applicationBuilder(userAnswers = Some(updatedAnswers), affinityGroup = orgAffinity)
-        .overrides(bind[Navigator].qualifiedWith("organisations").toInstance(getNavigator))
+        .overrides(bind[Navigator].qualifiedWith("bulk").toInstance(getNavigator))
         .build()
 
       running(application) {

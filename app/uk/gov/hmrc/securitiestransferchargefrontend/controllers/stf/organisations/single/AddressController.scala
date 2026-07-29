@@ -35,7 +35,7 @@ class AddressController @Inject()(val controllerComponents: MessagesControllerCo
                                   auth: StcAuthEnrolledAction,
                                   getData: StcDataRetrievalAction,
                                   requireData: StcDataRequiredAction,
-                                  @Named("organisations") val navigator: Navigator,
+                                  @Named("bulk") val navigator: Navigator,
                                   config: FrontendAppConfig)
                                  (implicit ec: ExecutionContext) extends AbstractAddressController(alf):
   

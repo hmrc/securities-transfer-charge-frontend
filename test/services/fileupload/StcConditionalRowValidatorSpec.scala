@@ -18,7 +18,7 @@ package services.fileupload
 
 import base.SpecBase
 import play.api.i18n.MessagesApi
-import uk.gov.hmrc.securitiestransferchargefrontend.forms.stf.shared.TotalMarketValueFormProvider
+import uk.gov.hmrc.securitiestransferchargefrontend.forms.shared.TotalMarketValueFormProvider
 import uk.gov.hmrc.securitiestransferchargefrontend.models.stf.fileupload.*
 import uk.gov.hmrc.securitiestransferchargefrontend.services.fileupload.*
 

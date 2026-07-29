@@ -48,7 +48,7 @@ class WhatReliefAreYouApplyingForControllerSpec extends SpecBase with MockitoSug
     "must return OK and the correct view for a GET" in {
 
       val application = applicationBuilder(userAnswers = Some(emptyUserAnswers), affinityGroup = orgAffinity)
-        .overrides(bind[Navigator].qualifiedWith("organisations").toInstance(getNavigator))
+        .overrides(bind[Navigator].qualifiedWith("bulk").toInstance(getNavigator))
         .build()
 
       running(application) {
@@ -70,7 +70,7 @@ class WhatReliefAreYouApplyingForControllerSpec extends SpecBase with MockitoSug
       val userAnswers = UserAnswers(testUserId, testGroupIdentifier, submissionId).set(WhatReliefAreYouApplyingForPage, "answer").success.value
 
       val application = applicationBuilder(userAnswers = Some(userAnswers), affinityGroup = orgAffinity)
-        .overrides(bind[Navigator].qualifiedWith("organisations").toInstance(getNavigator))
+        .overrides(bind[Navigator].qualifiedWith("bulk").toInstance(getNavigator))
         .build()
 
       running(application) {
@@ -111,7 +111,7 @@ class WhatReliefAreYouApplyingForControllerSpec extends SpecBase with MockitoSug
     "must return a Bad Request and errors when invalid data is submitted" in {
 
       val application = applicationBuilder(userAnswers = Some(emptyUserAnswers), affinityGroup = orgAffinity)
-      .overrides(bind[Navigator].qualifiedWith("organisations").toInstance(getNavigator))
+      .overrides(bind[Navigator].qualifiedWith("bulk").toInstance(getNavigator))
       .build()
 
       running(application) {

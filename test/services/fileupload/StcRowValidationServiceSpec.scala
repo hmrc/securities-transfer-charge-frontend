@@ -21,7 +21,7 @@ import play.api.i18n.MessagesApi
 import uk.gov.hmrc.securitiestransferchargefrontend.forms.stf.shared.*
 import uk.gov.hmrc.securitiestransferchargefrontend.models.stf.fileupload.{FileParseError, ParsedCell, ParsedRow}
 import uk.gov.hmrc.securitiestransferchargefrontend.services.fileupload.*
-import uk.gov.hmrc.securitiestransferchargefrontend.forms.stf.fileUpload.{SecuritiesTargetFormProvider,AmountPaidForSecuritiesFormProvider}
+import uk.gov.hmrc.securitiestransferchargefrontend.forms.stf.fileUpload.{AmountPaidForSecuritiesFormProvider, SecuritiesTargetFormProvider}
 
 class StcRowValidationServiceSpec extends SpecBase {
 

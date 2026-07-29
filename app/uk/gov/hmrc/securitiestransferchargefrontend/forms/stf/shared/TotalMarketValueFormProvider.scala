@@ -23,18 +23,13 @@ import javax.inject.Inject
 
 class TotalMarketValueFormProvider @Inject() extends Mappings {
 
-  private val maxValue = BigDecimal("999999999")
-  private val minValue = BigDecimal("0.01")
-
-  def apply(affinityKey:String): Form[BigDecimal] =
+  def apply(): Form[BigDecimal] =
     Form(
       "value" -> currency(
-        s"$affinityKey.totalMarketValue.error.required",
-        s"$affinityKey.totalMarketValue.error.invalidNumeric",
-        s"$affinityKey.totalMarketValue.error.nonNumeric",
-        s"$affinityKey.totalMarketValue.error.negative"
+        "individual.totalMarketValue.error.required",
+        "individual.totalMarketValue.error.invalidNumeric",
+        "individual.totalMarketValue.error.nonNumeric"
       )
-        .verifying(maximumCurrency(maxValue, s"$affinityKey.totalMarketValue.error.aboveMaximum"))
-        .verifying(minimumCurrency(minValue, s"$affinityKey.totalMarketValue.error.belowMinimum"))
+      .verifying(maximumCurrency(Int.MaxValue, "individual.totalMarketValue.error.aboveMaximum"))
     )
 }

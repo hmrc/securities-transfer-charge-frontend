@@ -33,7 +33,7 @@ import scala.concurrent.{ExecutionContext, Future}
 
 class ApplyingForReliefController @Inject()(
                                          override val messagesApi: MessagesApi,
-                                         @Named("organisations") navigator: Navigator,
+                                         @Named("bulk") navigator: Navigator,
                                          stcAuthEnrolled: StcAuthEnrolledAction,
                                          getData: StcDataRetrievalAction,
                                          requireData: StcDataRequiredAction,

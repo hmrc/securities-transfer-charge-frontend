@@ -14,64 +14,61 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.organisations.single
+package uk.gov.hmrc.securitiestransferchargefrontend.controllers.sh03.organisations.bulk
 
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, Call, MessagesControllerComponents}
-import play.twirl.api.Html
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.actions.*
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.actions.requests.StcDataRequest
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.shared.SaveAndReturnButton.isReturn
-import uk.gov.hmrc.securitiestransferchargefrontend.forms.stf.shared.SecuritiesTargetFormProvider
-import uk.gov.hmrc.securitiestransferchargefrontend.models.stf.SecuritiesTarget
+import uk.gov.hmrc.securitiestransferchargefrontend.forms.sh03.shared.RoleAtPurchasingCompanyFormProvider
 import uk.gov.hmrc.securitiestransferchargefrontend.models.{Mode, UserAnswers}
 import uk.gov.hmrc.securitiestransferchargefrontend.navigation.Navigator
-import uk.gov.hmrc.securitiestransferchargefrontend.pages.stf.single.SecuritiesTargetPage
-import uk.gov.hmrc.securitiestransferchargefrontend.views.html.stf.organisations.single.SecuritiesTargetView
+import uk.gov.hmrc.securitiestransferchargefrontend.pages.sh03.bulk.BulkRoleAtPurchasingCompanyPage
+import uk.gov.hmrc.securitiestransferchargefrontend.views.html.sh03.organisations.bulk.RoleAtPurchasingCompanyView
 
 import javax.inject.{Inject, Named}
 import scala.concurrent.{ExecutionContext, Future}
 
-class SecuritiesTargetController @Inject()(
-                                      override val messagesApi: MessagesApi,
-                                      @Named("bulk") navigator: Navigator,
-                                      stcAuthEnrolled: StcAuthEnrolledAction,
-                                      getData: StcDataRetrievalAction,
-                                      requireData: StcDataRequiredAction,
-                                      formProvider: SecuritiesTargetFormProvider,
-                                      val controllerComponents: MessagesControllerComponents,
-                                      view: SecuritiesTargetView
-                                     )(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport {
+class RoleAtPurchasingCompanyController @Inject()(
+                                                   override val messagesApi: MessagesApi,
+                                                   @Named("orgSh03") navigator: Navigator,
+                                                   stcAuthEnrolled: StcAuthEnrolledAction,
+                                                   getData: StcDataRetrievalAction,
+                                                   requireData: StcDataRequiredAction,
+                                                   formProvider: RoleAtPurchasingCompanyFormProvider,
+                                                   val controllerComponents: MessagesControllerComponents,
+                                                   view: RoleAtPurchasingCompanyView
+                                                 )(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport {
 
   private def form(implicit request: StcDataRequest[_]) =
     formProvider(request.request.affinityGroupKey)
 
   lazy val backLinkCall: Mode => UserAnswers => Call =
-    mode => userAnswers => navigator.previousPage(SecuritiesTargetPage, mode, userAnswers)
+    mode => userAnswers => navigator.previousPage(BulkRoleAtPurchasingCompanyPage, mode, userAnswers)
 
   def onPageLoad(mode: Mode): Action[AnyContent] = (stcAuthEnrolled andThen getData andThen requireData) {
     implicit request =>
 
-      val preparedForm = request.userAnswers.get(SecuritiesTargetPage) match {
+      val preparedForm = request.userAnswers.get(BulkRoleAtPurchasingCompanyPage) match {
         case None => form
         case Some(value) => form.fill(value)
       }
 
-      Ok(view(preparedForm, mode, backLinkCall(mode)(request.userAnswers)): Html)
+      Ok(view(preparedForm, mode, backLinkCall(mode)(request.userAnswers)))
   }
 
   def onSubmit(mode: Mode): Action[AnyContent] = (stcAuthEnrolled andThen getData andThen requireData).async {
     implicit request =>
-
       form.bindFromRequest().fold(
         formWithErrors =>
-          Future.successful(BadRequest(view(formWithErrors, mode, backLinkCall(mode)(request.userAnswers)): Html)),
+          Future.successful(BadRequest(view(formWithErrors, mode, backLinkCall(mode)(request.userAnswers)))),
 
         value =>
           for {
-            updatedAnswers <- Future.fromTry(request.userAnswers.set(SecuritiesTargetPage, value))
-            nextPage       <- navigator.nextPage(SecuritiesTargetPage, mode, updatedAnswers, isReturn(request))
+            updatedAnswers <- Future.fromTry(request.userAnswers.set(BulkRoleAtPurchasingCompanyPage, value))
+            nextPage <- navigator.nextPage(BulkRoleAtPurchasingCompanyPage, mode, updatedAnswers, isReturn(request))
           } yield Redirect(nextPage)
       )
   }

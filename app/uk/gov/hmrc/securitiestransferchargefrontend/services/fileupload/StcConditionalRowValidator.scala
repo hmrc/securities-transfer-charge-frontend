@@ -17,7 +17,8 @@
 package uk.gov.hmrc.securitiestransferchargefrontend.services.fileupload
 
 import play.api.i18n.{Lang, Messages, MessagesApi}
-import uk.gov.hmrc.securitiestransferchargefrontend.forms.stf.shared.TotalMarketValueFormProvider
+import uk.gov.hmrc.securitiestransferchargefrontend.forms.shared.BulkTotalMarketValueFormProvider
+import uk.gov.hmrc.securitiestransferchargefrontend.models.JourneyType
 import uk.gov.hmrc.securitiestransferchargefrontend.models.stf.fileupload.{ParsedStcRow, StcRowValidationError}
 
 import javax.inject.{Inject, Singleton}
@@ -26,7 +27,7 @@ import javax.inject.{Inject, Singleton}
 class StcConditionalRowValidator @Inject()(
                                             support: StcValidationSupport,
                                             messagesApi: MessagesApi,
-                                            totalMarketValueFormProvider: TotalMarketValueFormProvider
+                                            totalMarketValueFormProvider: BulkTotalMarketValueFormProvider
                                           ) {
 
   private implicit val messages: Messages =
@@ -35,48 +36,52 @@ class StcConditionalRowValidator @Inject()(
   def validate(
                 row: ParsedStcRow,
                 template: StcTemplate,
-                affinityKey: String
+                affinityKey: String,
+                journeyType: JourneyType
               )(implicit cols: ColumnIndexBuilder): Seq[StcRowValidationError] = {
 
     template match {
 
       case StcTemplate.STF =>
-        validateSTF(row, affinityKey)
+        validateSTF(row, affinityKey, journeyType)
 
       case StcTemplate.SH03 =>
-        validateSH03(row, affinityKey)
+        validateSH03(row, affinityKey, journeyType)
 
       case StcTemplate.STFAgent =>
-        validateAgentSTF(row, affinityKey)
+        validateAgentSTF(row, affinityKey, journeyType)
     }
   }
 
   def validateAgentSTF(
                         row: ParsedStcRow,
-                        affinityKey: String
+                        affinityKey: String,
+                        journeyType: JourneyType
                       )(implicit cols: ColumnIndexBuilder): Seq[StcRowValidationError] =
     validateReliefType(row, affinityKey) ++
       validateTypeOfSecurities(row, affinityKey) ++
       validateBuyerAddress(row) ++
       validateSellerAddress(row) ++
-      validateTotalMarketValue(row, affinityKey)
+      validateTotalMarketValue(row, affinityKey, journeyType)
 
 
   def validateSTF(
                    row: ParsedStcRow,
-                   affinityKey: String
+                   affinityKey: String,
+                   journeyType: JourneyType
                  )(implicit cols: ColumnIndexBuilder): Seq[StcRowValidationError] =
     validateReliefType(row, affinityKey) ++
       validateTypeOfShares(row, affinityKey) ++
       validateSellerAddress(row) ++
-      validateTotalMarketValue(row, affinityKey)
+      validateTotalMarketValue(row, affinityKey, journeyType)
 
   def validateSH03(
                     row: ParsedStcRow,
-                    affinityKey: String
+                    affinityKey: String,
+                    journeyType: JourneyType
                   )(implicit cols: ColumnIndexBuilder): Seq[StcRowValidationError] =
     validateReliefType(row, affinityKey) ++ 
-      validateTotalMarketValue(row, affinityKey)
+      validateTotalMarketValue(row, affinityKey, journeyType)
 
   private def validateReliefType(
                                   row: ParsedStcRow,
@@ -222,13 +227,14 @@ class StcConditionalRowValidator @Inject()(
 
   private def validateTotalMarketValue(
                                         row: ParsedStcRow,
-                                        affinityKey: String
+                                        affinityKey: String,
+                                        journeyType: JourneyType
                                       )(implicit cols: ColumnIndexBuilder): Seq[StcRowValidationError] = {
 
     row.connectedPersons match {
 
       case Some(true) =>
-        val form = totalMarketValueFormProvider(affinityKey).bind(
+        val form = totalMarketValueFormProvider(affinityKey, journeyType).bind(
           Map("value" -> row.totalMarketValue.getOrElse(""))
         )
 

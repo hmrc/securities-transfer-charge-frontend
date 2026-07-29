@@ -45,7 +45,7 @@ class ConfirmAddressController @Inject()(
                                           val controllerComponents: MessagesControllerComponents,
                                           view: ConfirmAddressView,
                                           addressService: AddressService,
-                                          @Named("organisations") navigator: Navigator
+                                          @Named("bulk") navigator: Navigator
                                         )(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport {
 
   def onPageLoad: Action[AnyContent] =
