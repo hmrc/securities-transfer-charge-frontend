@@ -314,8 +314,8 @@ org.chargingPoint.error.invalid = The date the business bought the securities mu
 org.chargingPoint.error.futureDate = The date the business bought the securities must be today’s date or a date in the past
 org.chargingPoint.change.hidden = ChargingPoint
 
-fileUpload.org.chargingPoint.error.invalid = The date the business bought the securities must be a real date
-fileUpload.org.chargingPoint.error.required.all = Enter the date the business bought the securities
+fileUpload.org.chargingPoint.error.invalid = The charging point must be a real date
+fileUpload.org.chargingPoint.error.required.all = Enter the charging point
 fileUpload.org.chargingPoint.error.futureDate = The day the business bought the securities must be today’s date or a date in the past
 fileUpload.org.chargingPoint.error.beforeFirstDate = PLACEHOLDER ERROR MESSAGE
 
@@ -368,17 +368,24 @@ org.whatTypeOfSecurities.checkYourAnswersLabel = What type of securities is the 
 org.whatTypeOfSecurities.error.required = Enter the type of securities the business is buying
 org.whatTypeOfSecurities.change.hidden = Change what type of securities the business is buying
 
-org.stf.totalMarketValue.title = What is the total market value of these securities?
-org.stf.totalMarketValue.heading = What is the total market value of these securities?
-org.stf.totalMarketValue.checkYourAnswersLabel = What is the total market value of these securities?
-org.stf.totalMarketValue.error.nonNumeric = The market value of the securities must be a number and can include up to two decimal places, like £30 or £28.60
-org.stf.totalMarketValue.error.required = Enter the total market value of the securities
-org.stf.totalMarketValue.error.invalidNumeric = The market value of the securities must be a number and can include up to two decimal places, like £30 or £28.60
-org.stf.totalMarketValue.error.aboveMaximum = The market value of the securities must be £999,999,999 or below
-org.stf.totalMarketValue.error.negative = The market value of the securities must be £0 or more
-org.stf.totalMarketValue.error.belowMinimum = The market value must be {0} or more
-org.stf.totalMarketValue.change.hidden = Change the market value of the securities
-org.stf.totalMarketValue.hint = For example, £600 or £193.54
+org.totalMarketValue.title = What is the total market value of these securities?
+org.totalMarketValue.heading = What is the total market value of these securities?
+org.totalMarketValue.checkYourAnswersLabel = What is the total market value of these securities?
+org.totalMarketValue.error.nonNumeric = The market value of the securities must be a number and can include up to two decimal places, like £30 or £28.60
+org.totalMarketValue.error.required = Enter the total market value of the securities
+org.totalMarketValue.error.invalidNumeric = The market value of the securities must be a number and can include up to two decimal places, like £30 or £28.60
+org.totalMarketValue.error.aboveMaximum = The market value of the securities must be £999,999,999 or below
+org.totalMarketValue.error.negative = The market value of the securities must be £0 or more
+org.totalMarketValue.error.belowMinimum = The market value must be {0} or more
+org.totalMarketValue.change.hidden = Change the market value of the securities
+org.totalMarketValue.hint = For example, £600 or £193.54
+
+org.stf.bulk.totalMarketValue.error.nonNumeric = The market value of the shares must be a number and can include up to two decimal places, like £30 or £28.60
+org.stf.bulk.totalMarketValue.error.required = Enter the market value of the shares in pounds
+org.stf.bulk.totalMarketValue.error.invalidNumeric = The market value of the shares must be a number and can include up to two decimal places, like £30 or £28.60
+org.stf.bulk.totalMarketValue.error.aboveMaximum = The market value of the shares must be £999,999,999 or below
+org.stf.bulk.totalMarketValue.error.belowMinimum = The market value of the shares must be £0.01 or more
+org.stf.bulk.totalMarketValue.error.negative = The market value of the shares must be £0.01 or more
 
 org.sh03.totalMarketValue.title = What is the total market value of these securities?
 org.sh03.totalMarketValue.heading = What is the total market value of these securities?
@@ -558,10 +565,10 @@ fileUpload.error.buyerCountry.required = Enter a country
 fileUpload.error.buyerCountry.invalidCharacters = Country can only include letters, numbers and the following characters: , . - ’
 
 individual.fileUpload.error.connectedPersons.invalid = Enter ‘yes’ if you and the buyer are connected persons
-org.fileUpload.error.connectedPersons.invalid = Enter ‘yes’ if the business and the buyer are connected persons
+org.fileUpload.error.connectedPersons.invalid = Enter 'yes' if the business and the seller are connected persons, or 'no' if they are not connected
 agent.fileUpload.error.connectedPersons.invalid = Enter ‘yes’ if the buyer and seller are connected persons, or ‘no’ if they are not connected
 individual.fileUpload.error.applyingForRelief.invalid = Enter ‘yes’ if you are applying for a relief, or ‘no’ if you are not applying for a relief
-org.fileUpload.error.applyingForRelief.invalid = Enter ‘yes’ if the business is applying for a relief, or ‘no’ if the business is not applying for a relief
+org.fileUpload.error.applyingForRelief.invalid = Enter 'yes' if the business is applying for a relief, or 'no' if the buyer is not applying for a relief
 agent.fileUpload.error.applyingForRelief.invalid = Enter ‘yes’ if the buyer is applying for a relief, or ‘no’ if the buyer is not applying for a relief
 individual.fileUpload.error.whatReliefAreYouApplyingFor.invalid = Enter the name of the relief you are applying for. See a <a target="_blank" href="#" class="govuk-link">full list of reliefs (opens in new tab)</a>.
 org.fileUpload.error.whatReliefAreYouApplyingFor.invalid = Enter the name of the relief the business is applying for. See a <a target="_blank" href="#" class="govuk-link">full list of reliefs (opens in new tab)</a>.
@@ -589,10 +596,10 @@ individual.fileUpload.error.securitiesQuantity.minimum = The number of shares mu
 individual.fileUpload.error.securitiesQuantity.maximum = The number of shares must be a whole number between 1 and 999,999,999
 individual.fileUpload.error.securitiesQuantity.wholeNumber = The number of shares you are buying must be a whole number
 
-org.fileUpload.error.securitiesQuantity.required = Enter the number of shares the business is buying
-org.fileUpload.error.securitiesQuantity.nonNumeric = The number of shares must be a whole number between 1 and 999,999,999
-org.fileUpload.error.securitiesQuantity.minimum = The number of shares must be a whole number between 1 and 999,999,999
-org.fileUpload.error.securitiesQuantity.maximum = The number of shares must be a whole number between 1 and 999,999,999
+org.fileUpload.error.securitiesQuantity.required = Enter the number of shares the business is purchasing
+org.fileUpload.error.securitiesQuantity.nonNumeric = The amount of shares must be a number
+org.fileUpload.error.securitiesQuantity.minimum = The number of shares must be at least 1
+org.fileUpload.error.securitiesQuantity.maximum = The number of shares must be below 999,999,999
 
 agent.fileUpload.error.securitiesQuantity.required = Enter the number of shares the buyer is purchasing
 agent.fileUpload.error.securitiesQuantity.nonNumeric = The amount of shares must be a number
@@ -600,11 +607,11 @@ agent.fileUpload.error.securitiesQuantity.minimum = The number of shares must be
 agent.fileUpload.error.securitiesQuantity.maximum = The number of shares must be below 999,999,999
 
 individual.fileUpload.chargingPoint.error.required = Enter the date you bought the securities
-org.fileUpload.chargingPoint.error.required = Enter the date the business bought the securities
+org.fileUpload.chargingPoint.error.required = Enter the charging point
 agent.fileUpload.chargingPoint.error.required = Enter the date the buyer purchased the securities
 
 individual.fileUpload.chargingPoint.error.futureDate = The day you bought the securities must be today’s date or a date in the past
-org.fileUpload.chargingPoint.error.futureDate = The day the business bought the securities must be today’s date or a date in the past
+org.fileUpload.chargingPoint.error.futureDate = The charging point must be today's date or a date in the past
 agent.fileUpload.chargingPoint.error.futureDate = The day the buyer purchased the securities must be today’s date or a date in the past
 
 minSharePrice.error.invalid = The minimum amount paid for the shares must be a number and can include up to two decimal places, like £30 or £28.60
@@ -615,7 +622,7 @@ maxSharePrice.error.invalid = The maximum amount paid for the shares must be a n
 maxSharePrice.error.maximum = The maximum amount paid for the shares must be £999,999,999 or less
 maxSharePrice.error.minimum = The maximum amount paid for the shares must be £0.01 or more
 
-sharePurchaseReason.required = Enter reason for share purchase
+sharePurchaseReason.required = Enter 'cancellation' if the shares are being purchased for cancellation, or 'treasury' if the shares are being purchased to place into treasury
 sharePurchaseReason.invalid = Enter ‘cancellation’ if the shares are being purchased for cancellation, or ‘treasury’ if the shares are being purchased to place into treasury
 
 purchasedForCancellation.invalid = Enter ‘yes’ if the shares purchased for cancellation shares also qualify as treasury shares
@@ -668,7 +675,7 @@ fileUpload.agent.amountPaidForSecurities.error.negative = The amount paid for th
 fileUpload.agent.amountPaidForSecurities.error.belowMinimum = The amount paid for the shares must be £0.01 or more
 fileUpload.agent.amountPaidForSecurities.error.aboveMaximum = The amount paid for the shares must be £999,999,999 or below
 
-fileUpload.org.amountPaidForSecurities.error.required = Enter the amount paid for the shares
+fileUpload.org.amountPaidForSecurities.error.required = Enter the amount paid for the shares in pounds
 fileUpload.org.amountPaidForSecurities.error.invalidNumeric = The amount paid for the shares must be a number and can include up to two decimal places, like £30 or £28.60
 fileUpload.org.amountPaidForSecurities.error.nonNumeric = The amount paid for the shares must be a number and can include up to two decimal places, like £30 or £28.60
 fileUpload.org.amountPaidForSecurities.error.negative = The amount paid for the shares must be £0.01 or more
@@ -737,18 +744,31 @@ fileUploaded.error.virus.title = Your file contains a virus
 fileUploaded.error.virus.heading = Your file contains a virus
 fileUploaded.error.virus.p = The file you have uploaded contains a virus, you will need to upload a different file.
 
-agent.sh03.totalMarketValue.title = What is the total market value of the shares?
-agent.sh03.totalMarketValue.heading = What is the total market value of the shares?
-agent.sh03.totalMarketValue.checkYourAnswersLabel = What is the total market value of the shares?
-agent.sh03.totalMarketValue.error.nonNumeric = The market value of the shares must be a number and can include up to two decimal places, like £30 or £28.60
-agent.sh03.totalMarketValue.error.required = Enter the market value of the shares in pounds
-agent.sh03.totalMarketValue.error.invalidNumeric = The market value of the shares must be a number and can include up to two decimal places, like £30 or £28.60
-agent.sh03.totalMarketValue.error.aboveMaximum = The market value of the shares must be £999,999,999 or below
-agent.sh03.totalMarketValue.error.belowMinimum = The market value of the shares must be £0.01 or more
-agent.sh03.totalMarketValue.change.hidden = Change the market value of the shares
-agent.sh03.totalMarketValue.hint = For example, £600 or £193.54
-agent.sh03.totalMarketValue.error.negative = The market value of the shares must be £0.01 or more
-agent.sh03.totalMarketValue.checkYourAnswersLabel = What is the total market value of the shares?
+agent.totalMarketValue.title = What is the total market value of the shares?
+agent.totalMarketValue.heading = What is the total market value of the shares?
+agent.totalMarketValue.checkYourAnswersLabel = What is the total market value of the shares?
+agent.totalMarketValue.error.nonNumeric = The market value of the shares must be a number and can include up to two decimal places, like £30 or £28.60
+agent.totalMarketValue.error.required = Enter the market value of the shares in pounds
+agent.totalMarketValue.error.invalidNumeric = The market value of the shares must be a number and can include up to two decimal places, like £30 or £28.60
+agent.totalMarketValue.error.aboveMaximum = The market value of the shares must be £999,999,999 or below
+agent.totalMarketValue.error.belowMinimum = The market value of the shares must be £0.01 or more
+agent.totalMarketValue.change.hidden = Change the market value of the shares
+agent.totalMarketValue.hint = For example, £600 or £193.54
+agent.totalMarketValue.error.negative = The market value of the shares must be £0.01 or more
+agent.totalMarketValue.checkYourAnswersLabel = What is the total market value of the shares?
+
+agent.sh03.bulk.totalMarketValue.title = What is the total market value of the shares?
+agent.sh03.bulk.totalMarketValue.heading = What is the total market value of the shares?
+agent.sh03.bulk.totalMarketValue.checkYourAnswersLabel = What is the total market value of the shares?
+agent.sh03.bulk.totalMarketValue.error.nonNumeric = The market value of the shares must be a number and can include up to two decimal places, like £30 or £28.60
+agent.sh03.bulk.totalMarketValue.error.required = Enter the market value of the shares in pounds
+agent.sh03.bulk.totalMarketValue.error.invalidNumeric = The market value of the shares must be a number and can include up to two decimal places, like £30 or £28.60
+agent.sh03.bulk.totalMarketValue.error.aboveMaximum = The market value of the shares must be £999,999,999 or below
+agent.sh03.bulk.totalMarketValue.error.belowMinimum = The market value of the shares must be £0.01 or more
+agent.sh03.bulk.totalMarketValue.change.hidden = Change the market value of the shares
+agent.sh03.bulk.totalMarketValue.hint = For example, £600 or £193.54
+agent.sh03.bulk.totalMarketValue.error.negative = The market value of the shares must be £0.01 or more
+agent.sh03.bulk.totalMarketValue.checkYourAnswersLabel = What is the total market value of the shares?
 
 fileUploaded.error.encryptedFile.title = There was a problem uploading your file
 fileUploaded.error.encryptedFile.heading = There was a problem uploading your file
