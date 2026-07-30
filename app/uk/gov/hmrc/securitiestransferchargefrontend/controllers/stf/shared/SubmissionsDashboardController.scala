@@ -48,7 +48,7 @@ class SubmissionsDashboardController @Inject()(
                                                 idClient: SubmissionIdClient,
                                                 saveAndReturnClient: SaveAndReturnClient,
                                                 @Named("individuals") individualsNavigator: Navigator,
-                                                @Named("bulk") orgNavigator: Navigator,
+                                                @Named("organisations") orgNavigator: Navigator,
                                                 @Named("agents") agentNavigator: Navigator,
                                                 auditService: AuditService)
                                               (implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport with Logging {
