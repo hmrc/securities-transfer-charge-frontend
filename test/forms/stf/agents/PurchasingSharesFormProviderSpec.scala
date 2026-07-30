@@ -16,25 +16,25 @@
 
 package forms.stf.agents
 
-import forms.behaviours.OptionFieldBehaviours
+import forms.behaviours.BooleanFieldBehaviours
 import play.api.data.FormError
-import uk.gov.hmrc.securitiestransferchargefrontend.forms.stf.agents.WhatTypeOfSecuritiesFormProvider
-import uk.gov.hmrc.securitiestransferchargefrontend.models.stf.WhatTypeOfSecurities
+import uk.gov.hmrc.securitiestransferchargefrontend.forms.stf.agents.PurchasingSharesFormProvider
 
-class WhatTypeOfSecuritiesFormProviderSpec extends OptionFieldBehaviours {
+class PurchasingSharesFormProviderSpec extends BooleanFieldBehaviours {
 
-  val form = new WhatTypeOfSecuritiesFormProvider()()
+  val form = new PurchasingSharesFormProvider()()
 
+  val requiredKey = "agent.purchasingShares.error.required"
+  val invalidKey = "error.boolean"
+  
   ".value" - {
 
     val fieldName = "value"
-    val requiredKey = "agent.whatTypeOfSecurities.error.required"
 
-    behave like optionsField[WhatTypeOfSecurities](
+    behave like booleanField(
       form,
       fieldName,
-      validValues  = WhatTypeOfSecurities.values,
-      invalidError = FormError(fieldName, "error.invalid")
+      invalidError = FormError(fieldName, invalidKey)
     )
 
     behave like mandatoryField(

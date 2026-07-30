@@ -30,7 +30,6 @@ import uk.gov.hmrc.securitiestransferchargefrontend.pages.Page
 import uk.gov.hmrc.securitiestransferchargefrontend.pages.stf.shared.{AgentReferencePage, HowToNotifyAboutSecuritiesTransferPage, SubmissionsDashboardPage}
 import uk.gov.hmrc.securitiestransferchargefrontend.pages.stf.single.*
 import uk.gov.hmrc.securitiestransferchargefrontend.services.AnswerPersistenceService
-import uk.gov.hmrc.securitiestransferchargefrontend.models.stf.WhatTypeOfSecurities
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.routes
 
 import scala.concurrent.{ExecutionContext, Future}
@@ -77,7 +76,7 @@ class ForwardRoutes(answerPersistenceService: AnswerPersistenceService,
       if (enterDate.isBefore(firstDate)) defaultPage
       else agentSingleRoutes.TaxRateController.onPageLoad(NormalMode)
     }
-    case TaxRatePage => userAnswers => dataRequired(TaxRatePage, userAnswers, agentSingleRoutes.WhatTypeOfSecuritiesController.onPageLoad(NormalMode))
+    case TaxRatePage => userAnswers => dataRequired(TaxRatePage, userAnswers, agentSingleRoutes.PurchasingSharesController.onPageLoad(NormalMode))
     case OtherSecuritiesTypePage => userAnswers => dataRequired(OtherSecuritiesTypePage, userAnswers, agentSingleRoutes.AmountPaidForSecuritiesController.onPageLoad(NormalMode))
     case AmountPaidForSecuritiesPage => userAnswers =>
       dataDependent(ConnectedPersonsPage, userAnswers) { isConnected =>
@@ -87,10 +86,12 @@ class ForwardRoutes(answerPersistenceService: AnswerPersistenceService,
           stfSingleCyaRoutes.CheckYourAnswersController.onPageLoad()
       }
     case TotalMarketValuePage => userAnswers => dataRequired(TotalMarketValuePage, userAnswers, stfSingleCyaRoutes.CheckYourAnswersController.onPageLoad())
-    case WhatTypeOfSecuritiesPage => userAnswers =>
-      dataDependent(WhatTypeOfSecuritiesPage, userAnswers) {
-        case WhatTypeOfSecurities.Shares => agentSingleRoutes.DetailsOfThisTransferController.onPageLoad(NormalMode)
-        case WhatTypeOfSecurities.Other => agentSingleRoutes.OtherSecuritiesTypeController.onPageLoad(NormalMode)
+    case PurchasingSharesPage => userAnswers =>
+      dataDependent(PurchasingSharesPage,userAnswers) { isPurchasingShares =>
+        if(isPurchasingShares)
+          agentSingleRoutes.DetailsOfThisTransferController.onPageLoad(NormalMode)
+        else
+          agentSingleRoutes.OtherSecuritiesTypeController.onPageLoad(NormalMode)
       }
     case DetailsOfThisTransferPage => userAnswers => dataRequired(DetailsOfThisTransferPage, userAnswers, stfSingleCyaRoutes.CheckYourAnswersController.onPageLoad())  
 

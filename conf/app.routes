@@ -230,10 +230,10 @@ POST       /stf/agent/tax-rate                                  uk.gov.hmrc.secu
 GET        /stf/agent/change/tax-rate                           uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.agents.single.TaxRateController.onPageLoad(mode: Mode = CheckMode)
 POST       /stf/agent/change/tax-rate                           uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.agents.single.TaxRateController.onSubmit(mode: Mode = CheckMode)
 
-GET        /stf/agent/securities-type                           uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.agents.single.WhatTypeOfSecuritiesController.onPageLoad(mode: Mode = NormalMode)
-POST       /stf/agent/securities-type                           uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.agents.single.WhatTypeOfSecuritiesController.onSubmit(mode: Mode = NormalMode)
-GET        /stf/agent/change/securities-type                    uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.agents.single.WhatTypeOfSecuritiesController.onPageLoad(mode: Mode = CheckMode)
-POST       /stf/agent/change/securities-type                    uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.agents.single.WhatTypeOfSecuritiesController.onSubmit(mode: Mode = CheckMode)
+GET        /stf/agent/purchasing-shares                           uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.agents.single.PurchasingSharesController.onPageLoad(mode: Mode = NormalMode)
+POST       /stf/agent/purchasing-shares                           uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.agents.single.PurchasingSharesController.onSubmit(mode: Mode = NormalMode)
+GET        /stf/agent/change/purchasing-shares                    uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.agents.single.PurchasingSharesController.onPageLoad(mode: Mode = CheckMode)
+POST       /stf/agent/change/purchasing-shares                    uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.agents.single.PurchasingSharesController.onSubmit(mode: Mode = CheckMode)
 
 GET        /stf/agent/share-details                             uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.agents.single.DetailsOfThisTransferController.onPageLoad(mode: Mode = NormalMode)
 POST       /stf/agent/share-details                             uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.agents.single.DetailsOfThisTransferController.onSubmit(mode: Mode = NormalMode)
