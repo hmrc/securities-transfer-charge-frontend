@@ -58,10 +58,10 @@ class BackwardsRoutes(defaultPage: Call):
     }
     case ChargingPointPage => _ => agentSingleRoutes.SecuritiesTargetController.onPageLoad(NormalMode)
     case TaxRatePage => _ => agentSingleRoutes.ChargingPointController.onPageLoad(NormalMode)
-    case WhatTypeOfSecuritiesPage => _ => agentSingleRoutes.TaxRateController.onPageLoad(NormalMode)
-    case OtherSecuritiesTypePage => _ => agentSingleRoutes.WhatTypeOfSecuritiesController.onPageLoad(NormalMode)
+    case PurchasingSharesPage => _ => agentSingleRoutes.TaxRateController.onPageLoad(NormalMode)
+    case OtherSecuritiesTypePage => _ => agentSingleRoutes.PurchasingSharesController.onPageLoad(NormalMode)
     case AmountPaidForSecuritiesPage => _ => agentSingleRoutes.OtherSecuritiesTypeController.onPageLoad(NormalMode)
-    case DetailsOfThisTransferPage => _ => agentSingleRoutes.WhatTypeOfSecuritiesController.onPageLoad(NormalMode)
+    case DetailsOfThisTransferPage => _ => agentSingleRoutes.PurchasingSharesController.onPageLoad(NormalMode)
     case TotalMarketValuePage => _ => agentSingleRoutes.AmountPaidForSecuritiesController.onPageLoad(NormalMode)
     case _ => _ => defaultPage
   }

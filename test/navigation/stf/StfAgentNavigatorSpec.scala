@@ -193,27 +193,27 @@ class StfAgentNavigatorSpec extends SpecBase with ScalaFutures {
         }
       }
 
-      "must go from TaxRatePage to WhatTypeOfSecuritiesPage" in {
+      "must go from TaxRatePage to PurchasingSharesPage" in {
         val answers = emptyUserAnswers.set(TaxRatePage, TaxRate.HalfPercent).get
         val result = navigator.nextPage(TaxRatePage, NormalMode, answers)(fakeRequest)
         whenReady(result) { res =>
-          res mustBe agentSingleRoutes.WhatTypeOfSecuritiesController.onPageLoad(NormalMode)
+          res mustBe agentSingleRoutes.PurchasingSharesController.onPageLoad(NormalMode)
         }
       }
 
-      "must go from WhatTypeOfSecuritiesPage to OtherSecuritiesTypePage when 'Other' is selected" in {
-        val answers = emptyUserAnswers.set(WhatTypeOfSecuritiesPage, WhatTypeOfSecurities.Other).get
-        val result = navigator.nextPage(WhatTypeOfSecuritiesPage, NormalMode, answers)(fakeRequest)
-        whenReady(result) { res =>
-          res mustBe agentSingleRoutes.OtherSecuritiesTypeController.onPageLoad(NormalMode)
-        }
-      }
-
-      "must go from WhatTypeOfSecuritiesPage to DetailsOfThisTransferPage when 'Shares' is selected" in {
-        val answers = emptyUserAnswers.set(WhatTypeOfSecuritiesPage, WhatTypeOfSecurities.Shares).get
-        val result = navigator.nextPage(WhatTypeOfSecuritiesPage, NormalMode, answers)(fakeRequest)
+      "must go from PurchasingSharesPage to DetailsOfThisTransferPage if true" in {
+        val answers = emptyUserAnswers.set(PurchasingSharesPage, true).get
+        val result = navigator.nextPage(PurchasingSharesPage, NormalMode, answers)(fakeRequest)
         whenReady(result) { res =>
           res mustBe agentSingleRoutes.DetailsOfThisTransferController.onPageLoad(NormalMode)
+        }
+      }
+
+      "must go from PurchasingSharesPage to OtherSecuritiesTypePage if false" in {
+        val answers = emptyUserAnswers.set(PurchasingSharesPage, false).get
+        val result = navigator.nextPage(PurchasingSharesPage, NormalMode, answers)(fakeRequest)
+        whenReady(result) { res =>
+          res mustBe agentSingleRoutes.OtherSecuritiesTypeController.onPageLoad(NormalMode)
         }
       }
 
@@ -365,14 +365,14 @@ class StfAgentNavigatorSpec extends SpecBase with ScalaFutures {
         result mustBe agentSingleRoutes.ChargingPointController.onPageLoad(NormalMode)
       }
 
-      "must go from the WhatTypeOfSecuritiesPage to TaxRatePage" in {
-        val result = navigator.previousPage(WhatTypeOfSecuritiesPage, NormalMode, emptyUserAnswers)
+      "must go from the PurchasingSharesPage to TaxRatePage" in {
+        val result = navigator.previousPage(PurchasingSharesPage, NormalMode, emptyUserAnswers)
         result mustBe agentSingleRoutes.TaxRateController.onPageLoad(NormalMode)
       }
 
-      "must go from the OtherSecuritiesTypePage to WhatTypeOfSecuritiesPage" in {
+      "must go from the OtherSecuritiesTypePage to PurchasingSharesPage" in {
         val result = navigator.previousPage(OtherSecuritiesTypePage, NormalMode, emptyUserAnswers)
-        result mustBe agentSingleRoutes.WhatTypeOfSecuritiesController.onPageLoad(NormalMode)
+        result mustBe agentSingleRoutes.PurchasingSharesController.onPageLoad(NormalMode)
       }
 
       "must go from the AmountPaidForSecuritiesPage to OtherSecuritiesTypePage" in {
@@ -380,9 +380,9 @@ class StfAgentNavigatorSpec extends SpecBase with ScalaFutures {
         result mustBe agentSingleRoutes.OtherSecuritiesTypeController.onPageLoad(NormalMode)
       }
 
-      "must go from the DetailsOfThisTransferPage to WhatTypeOfSecurities" in {
+      "must go from the DetailsOfThisTransferPage to PurchasingSharesPage" in {
         val result = navigator.previousPage(DetailsOfThisTransferPage, NormalMode, emptyUserAnswers)
-        result mustBe agentSingleRoutes.WhatTypeOfSecuritiesController.onPageLoad(NormalMode)
+        result mustBe agentSingleRoutes.PurchasingSharesController.onPageLoad(NormalMode)
       }
 
       "must go from the TotalMarketValuePage to AmountPaidForSecuritiesPage" in {
