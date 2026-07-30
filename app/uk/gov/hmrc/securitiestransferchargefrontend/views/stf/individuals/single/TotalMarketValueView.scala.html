@@ -19,7 +19,6 @@
 @import uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.individuals.single.routes
 @import uk.gov.hmrc.securitiestransferchargefrontend.views.html.templates
 @import uk.gov.hmrc.securitiestransferchargefrontend.views.html.components.SaveAndReturnButton
-
 @this(
     layout: templates.Layout,
     formHelper: FormWithCSRF,
@@ -31,23 +30,22 @@
 
 @(form: Form[_], mode: Mode, backLinkCall: Call)(implicit request: Request[_], messages: Messages)
 
-@layout(pageTitle = title(form, messages("individual.totalMarketValue.title")), backLinkUrl = Some(backLinkCall.url)) {
+@layout(pageTitle = title(form, messages("totalMarketValue.title")), backLinkUrl = Some(backLinkCall.url)) {
 
     @formHelper(action = routes.TotalMarketValueController.onSubmit(mode), Symbol("autoComplete") -> "off") {
 
         @if(form.errors.nonEmpty) {
             @govukErrorSummary(ErrorSummaryViewModel(form))
         }
-
         <span class="govuk-caption-l">@messages("transfer.details.caption")</span>
         @govukInput(
             InputViewModel(
                 field = form("value"),
-                label = LabelViewModel(messages("individual.totalMarketValue.heading")).asPageHeading(Large)
+                label = LabelViewModel(messages("totalMarketValue.heading")).asPageHeading(Large)
             )
             .withPrefix(PrefixOrSuffix(content = "£"))
             .withWidth(Fixed10)
-            .withHint(HintViewModel(messages("individual.totalMarketValue.hint")))
+            .withHint(HintViewModel(messages("totalMarketValue.hint")))
 
         )
 
@@ -56,7 +54,6 @@
                 messages("site.save-and-continue.button")
             )
         )
-
         @saveAndReturnButton()
     }
 }

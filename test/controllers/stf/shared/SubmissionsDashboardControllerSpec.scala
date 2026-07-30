@@ -155,7 +155,7 @@ class SubmissionsDashboardControllerSpec extends SpecBase with MockitoSugar with
                 bind[SubmissionIdClient].toInstance(mockIdClient),
                 bind[AuditService].toInstance(mockAuditService),
                 bind[Navigator].qualifiedWith("individuals").toInstance(getNavigator),
-                bind[Navigator].qualifiedWith("bulk").toInstance(getNavigator),
+                bind[Navigator].qualifiedWith("organisations").toInstance(getNavigator),
                 bind[Navigator].qualifiedWith("agents").toInstance(getNavigator)
               )
               .build()
