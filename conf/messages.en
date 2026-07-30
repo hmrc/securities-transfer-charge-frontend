@@ -689,13 +689,11 @@ fileUpload.individual.amountPaidForSecurities.error.negative = The amount paid f
 fileUpload.individual.amountPaidForSecurities.error.belowMinimum = The amount paid for the securities must be £0.01 or more
 fileUpload.individual.amountPaidForSecurities.error.aboveMaximum = The amount you paid for the securities must be £999,999,999 or below
 
-agent.whatTypeOfSecurities.title = What type of securities is the buyer purchasing?
-agent.whatTypeOfSecurities.heading = What type of securities is the buyer purchasing?
-agent.whatTypeOfSecurities.shares = Shares
-agent.whatTypeOfSecurities.other = Other
-agent.whatTypeOfSecurities.error.required = Select the type of securities the buyer is purchasing
-agent.whatTypeOfSecurities.checkYourAnswersLabel = What type of securities is the buyer purchasing?
-agent.whatTypeOfSecurities.change.hidden = Change the type of securities the buyer is purchasing
+agent.purchasingShares.title = Is the buyer purchasing shares?
+agent.purchasingShares.heading = Is the buyer purchasing shares?
+agent.purchasingShares.error.required = Select yes if the buyer is purchasing shares
+agent.purchasingShares.checkYourAnswersLabel = Is the buyer purchasing shares?
+agent.purchasingShares.change.hidden = Change if the buyer is purchasing shares
 
 agent.amountPaidForSecurities.error.required = Enter the amount paid for the securities
 agent.amountPaidForSecurities.error.invalidNumeric = The amount paid for the securities must be a number and can include up to two decimal places, like £30 or £28.60

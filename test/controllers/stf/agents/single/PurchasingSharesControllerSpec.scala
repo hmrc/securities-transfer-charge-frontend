@@ -28,25 +28,24 @@ import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.securitiestransferchargefrontend.clients.SaveAndReturnClient
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.routes
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.agents.single.routes as agentSingleRoutes
-import uk.gov.hmrc.securitiestransferchargefrontend.forms.stf.agents.WhatTypeOfSecuritiesFormProvider
-import uk.gov.hmrc.securitiestransferchargefrontend.models.stf.WhatTypeOfSecurities
+import uk.gov.hmrc.securitiestransferchargefrontend.forms.stf.agents.PurchasingSharesFormProvider
 import uk.gov.hmrc.securitiestransferchargefrontend.models.{NormalMode, UserAnswers}
 import uk.gov.hmrc.securitiestransferchargefrontend.navigation.Navigator
-import uk.gov.hmrc.securitiestransferchargefrontend.pages.stf.single.WhatTypeOfSecuritiesPage
-import uk.gov.hmrc.securitiestransferchargefrontend.views.html.stf.agents.single.WhatTypeOfSecuritiesView
+import uk.gov.hmrc.securitiestransferchargefrontend.pages.stf.single.PurchasingSharesPage
+import uk.gov.hmrc.securitiestransferchargefrontend.views.html.stf.agents.single.PurchasingSharesView
 
 import scala.concurrent.Future
 import base.Fixtures.testUserAnswers
 
-class WhatTypeOfSecuritiesControllerSpec extends SpecBase with MockitoSugar {
+class PurchasingSharesControllerSpec extends SpecBase with MockitoSugar {
 
 
-  lazy val whatTypeOfSecuritiesRoute: String = agentSingleRoutes.WhatTypeOfSecuritiesController.onPageLoad(NormalMode).url
+  lazy val purchasingSharesRoute: String = agentSingleRoutes.PurchasingSharesController.onPageLoad(NormalMode).url
 
-  val formProvider = new WhatTypeOfSecuritiesFormProvider()
-  val form: Form[WhatTypeOfSecurities] = formProvider()
+  val formProvider = new PurchasingSharesFormProvider()
+  val form: Form[Boolean] = formProvider()
 
-  "WhatTypeOfSecurities Controller" - {
+  "PurchasingSharesController" - {
 
     "must return OK and the correct view for a GET" in {
 
@@ -58,11 +57,11 @@ class WhatTypeOfSecuritiesControllerSpec extends SpecBase with MockitoSugar {
         .build()
 
       running(application) {
-        val request = FakeRequest(GET, whatTypeOfSecuritiesRoute)
+        val request = FakeRequest(GET, purchasingSharesRoute)
 
         val result = route(application, request).value
 
-        val view = application.injector.instanceOf[WhatTypeOfSecuritiesView]
+        val view = application.injector.instanceOf[PurchasingSharesView]
 
         status(result) mustEqual OK
         contentAsString(result) mustEqual view(form, NormalMode, affinityGroupKeyOrg, testBackLinkRoute)(request, messages(application)).toString
@@ -71,7 +70,7 @@ class WhatTypeOfSecuritiesControllerSpec extends SpecBase with MockitoSugar {
 
     "must populate the view correctly on a GET when the question has previously been answered" in {
 
-      val userAnswers = testUserAnswers.set(WhatTypeOfSecuritiesPage, WhatTypeOfSecurities.values.head).success.value
+      val userAnswers = testUserAnswers.set(PurchasingSharesPage, true).success.value
 
       val application = applicationBuilder(
         userAnswers = Some(userAnswers),
@@ -81,14 +80,14 @@ class WhatTypeOfSecuritiesControllerSpec extends SpecBase with MockitoSugar {
         .build()
 
       running(application) {
-        val request = FakeRequest(GET, whatTypeOfSecuritiesRoute)
+        val request = FakeRequest(GET, purchasingSharesRoute)
 
-        val view = application.injector.instanceOf[WhatTypeOfSecuritiesView]
+        val view = application.injector.instanceOf[PurchasingSharesView]
 
         val result = route(application, request).value
 
         status(result) mustEqual OK
-        contentAsString(result) mustEqual view(form.fill(WhatTypeOfSecurities.values.head), NormalMode, affinityGroupKeyOrg, testBackLinkRoute)(request, messages(application)).toString
+        contentAsString(result) mustEqual view(form.fill(true), NormalMode, affinityGroupKeyOrg, testBackLinkRoute)(request, messages(application)).toString
       }
     }
 
@@ -108,8 +107,8 @@ class WhatTypeOfSecuritiesControllerSpec extends SpecBase with MockitoSugar {
 
       running(application) {
         val request =
-          FakeRequest(POST, whatTypeOfSecuritiesRoute)
-            .withFormUrlEncodedBody(("value", WhatTypeOfSecurities.values.head.toString))
+          FakeRequest(POST, purchasingSharesRoute)
+            .withFormUrlEncodedBody(("value", "true"))
 
         val result = route(application, request).value
 
@@ -128,12 +127,12 @@ class WhatTypeOfSecuritiesControllerSpec extends SpecBase with MockitoSugar {
 
       running(application) {
         val request =
-          FakeRequest(POST, whatTypeOfSecuritiesRoute)
+          FakeRequest(POST, purchasingSharesRoute)
             .withFormUrlEncodedBody(("value", "invalid value"))
 
         val boundForm = form.bind(Map("value" -> "invalid value"))
 
-        val view = application.injector.instanceOf[WhatTypeOfSecuritiesView]
+        val view = application.injector.instanceOf[PurchasingSharesView]
 
         val result = route(application, request).value
 
@@ -150,7 +149,7 @@ class WhatTypeOfSecuritiesControllerSpec extends SpecBase with MockitoSugar {
       ).build()
 
       running(application) {
-        val request = FakeRequest(GET, whatTypeOfSecuritiesRoute)
+        val request = FakeRequest(GET, purchasingSharesRoute)
 
         val result = route(application, request).value
 
@@ -168,8 +167,8 @@ class WhatTypeOfSecuritiesControllerSpec extends SpecBase with MockitoSugar {
 
       running(application) {
         val request =
-          FakeRequest(POST, whatTypeOfSecuritiesRoute)
-            .withFormUrlEncodedBody(("value", WhatTypeOfSecurities.values.head.toString))
+          FakeRequest(POST, purchasingSharesRoute)
+            .withFormUrlEncodedBody(("value", "true"))
 
         val result = route(application, request).value
 
