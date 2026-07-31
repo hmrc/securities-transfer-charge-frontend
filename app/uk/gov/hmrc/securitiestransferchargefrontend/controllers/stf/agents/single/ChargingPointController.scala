@@ -42,7 +42,7 @@ class ChargingPointController @Inject()(
                                       )(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport {
 
   lazy val backLinkCall: Mode => UserAnswers => Call =
-    mode => userAnswers => navigator.previousPage(ChargingPointPage, mode, userAnswers)
+    mode => userAnswers => navigator.previousPageCall(ChargingPointPage, mode, userAnswers)
 
   def onPageLoad(mode: Mode): Action[AnyContent] = (stcAuthEnrolled andThen getData andThen requireData).async {
     implicit request =>
@@ -69,7 +69,7 @@ class ChargingPointController @Inject()(
         value =>
           for {
             updatedAnswers <- Future.fromTry(request.userAnswers.set(ChargingPointPage, value))
-            nextPage       <- navigator.nextPage(ChargingPointPage, mode, updatedAnswers, isReturn(request))
+            nextPage       <- navigator.nextPageCall(ChargingPointPage, mode, updatedAnswers, isReturn(request))
           } yield Redirect(nextPage)
       )
   }

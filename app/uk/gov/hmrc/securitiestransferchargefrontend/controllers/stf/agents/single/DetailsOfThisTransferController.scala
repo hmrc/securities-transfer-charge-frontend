@@ -49,7 +49,7 @@ class DetailsOfThisTransferController @Inject()(
 
 
   lazy val backLinkCall: Mode => UserAnswers => Call =
-    mode => userAnswers => navigator.previousPage(DetailsOfThisTransferPage, mode, userAnswers)
+    mode => userAnswers => navigator.previousPageCall(DetailsOfThisTransferPage, mode, userAnswers)
 
   def onPageLoad(mode: Mode): Action[AnyContent] = (stcAuthEnrolled andThen getData andThen requireData) {
     implicit request =>
@@ -71,7 +71,7 @@ class DetailsOfThisTransferController @Inject()(
         detailsOfTransfer =>
           for {
             updatedAnswers <- Future.fromTry(request.userAnswers.set(DetailsOfThisTransferPage, detailsOfTransfer))
-            nextPage <- navigator.nextPage(DetailsOfThisTransferPage, mode, updatedAnswers, isReturn(request))
+            nextPage <- navigator.nextPageCall(DetailsOfThisTransferPage, mode, updatedAnswers, isReturn(request))
           } yield Redirect(nextPage)
       )
   }

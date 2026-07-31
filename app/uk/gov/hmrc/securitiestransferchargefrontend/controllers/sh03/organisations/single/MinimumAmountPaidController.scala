@@ -46,7 +46,7 @@ class MinimumAmountPaidController @Inject()(
     formProvider(request.request.affinityGroupKey)
 
   lazy val backLinkCall: Mode => UserAnswers => Call =
-    mode => userAnswers => navigator.previousPage(MinimumAmountPaidPage, mode, userAnswers)
+    mode => userAnswers => navigator.previousPageCall(MinimumAmountPaidPage, mode, userAnswers)
 
   def onPageLoad(mode: Mode): Action[AnyContent] = (stcAuthEnrolled andThen getData andThen requireData) {
     implicit request =>
@@ -69,7 +69,7 @@ class MinimumAmountPaidController @Inject()(
         amount =>
           for {
             updatedAnswers <- Future.fromTry(request.userAnswers.set(MinimumAmountPaidPage, amount))
-            nextPage       <- navigator.nextPage(MinimumAmountPaidPage, mode, updatedAnswers, isReturn(request))
+            nextPage       <- navigator.nextPageCall(MinimumAmountPaidPage, mode, updatedAnswers, isReturn(request))
           } yield Redirect(nextPage)
       )
   }

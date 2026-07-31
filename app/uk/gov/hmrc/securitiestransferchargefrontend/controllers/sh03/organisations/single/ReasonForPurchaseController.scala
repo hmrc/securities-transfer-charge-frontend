@@ -46,7 +46,7 @@ class ReasonForPurchaseController @Inject()(
   val form: Form[ReasonForPurchase] = formProvider()
 
   lazy val backLinkCall: Mode => UserAnswers => Call =
-    mode => userAnswers => navigator.previousPage(ReasonForPurchasePage, mode, userAnswers)
+    mode => userAnswers => navigator.previousPageCall(ReasonForPurchasePage, mode, userAnswers)
 
   def onPageLoad(mode: Mode): Action[AnyContent] =  (stcAuthEnrolled andThen getData andThen requireData) {
     implicit request =>
@@ -69,7 +69,7 @@ class ReasonForPurchaseController @Inject()(
         reasonForPurchase =>
           for {
             updatedAnswers <- Future.fromTry(request.userAnswers.set(ReasonForPurchasePage, reasonForPurchase))
-            nextPage <- navigator.nextPage(ReasonForPurchasePage, mode, updatedAnswers, isReturn(request))
+            nextPage <- navigator.nextPageCall(ReasonForPurchasePage, mode, updatedAnswers, isReturn(request))
           } yield Redirect(nextPage)
       )
   }

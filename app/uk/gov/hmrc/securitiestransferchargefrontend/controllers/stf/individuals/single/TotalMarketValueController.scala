@@ -43,7 +43,7 @@ class TotalMarketValueController @Inject()( override val messagesApi: MessagesAp
   private val form = formProvider()
 
   lazy val backLinkCall: Mode => UserAnswers => Call =
-    mode => userAnswers => navigator.previousPage(TotalMarketValuePage, mode, userAnswers)
+    mode => userAnswers => navigator.previousPageCall(TotalMarketValuePage, mode, userAnswers)
 
   def onPageLoad(mode: Mode): Action[AnyContent] = (stcAuthEnrolled andThen getData andThen requireData) {
     implicit request =>
@@ -65,7 +65,7 @@ class TotalMarketValueController @Inject()( override val messagesApi: MessagesAp
         value =>
           for {
             updatedAnswers <- Future.fromTry(request.userAnswers.set(TotalMarketValuePage, value))
-            nextPage       <- navigator.nextPage(TotalMarketValuePage, mode, updatedAnswers, isReturn(request))
+            nextPage       <- navigator.nextPageCall(TotalMarketValuePage, mode, updatedAnswers, isReturn(request))
           } yield Redirect(nextPage)
       )
   }

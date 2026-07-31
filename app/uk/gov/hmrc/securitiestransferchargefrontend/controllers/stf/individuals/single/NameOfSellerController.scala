@@ -46,7 +46,7 @@ class NameOfSellerController @Inject()(
   val form: Form[String] = formProvider()
 
   lazy val backLinkCall: Mode => UserAnswers => Call =
-    mode => userAnswers => navigator.previousPage(NameOfSellerPage, mode, userAnswers)
+    mode => userAnswers => navigator.previousPageCall(NameOfSellerPage, mode, userAnswers)
 
   def onPageLoad(mode: Mode): Action[AnyContent] = (stcAuthEnrolled andThen getData andThen requireData) {
     implicit request =>
@@ -68,7 +68,7 @@ class NameOfSellerController @Inject()(
         nameOfSeller =>
           for {
             updatedAnswers <- Future.fromTry(request.userAnswers.set(NameOfSellerPage, nameOfSeller))
-            nextPage       <- navigator.nextPage(NameOfSellerPage, mode, updatedAnswers, isReturn(request))
+            nextPage       <- navigator.nextPageCall(NameOfSellerPage, mode, updatedAnswers, isReturn(request))
           } yield Redirect(nextPage)
       )
   }

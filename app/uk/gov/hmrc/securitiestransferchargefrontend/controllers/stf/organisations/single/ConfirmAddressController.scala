@@ -69,7 +69,7 @@ class ConfirmAddressController @Inject()(
             .getOrFail(new SubscriptionDataNotFoundException("Subscription data not found"))
           address = addressService.extractConfirmableAddress(subscriptionData.subscriptionDetails)
           updatedAnswers <- Future.fromTry(request.userAnswers.set(ConfirmAddressPage, address))
-          nextPage <- navigator.nextPage(ConfirmAddressPage, NormalMode, updatedAnswers, isReturn(request))
+          nextPage <- navigator.nextPageCall(ConfirmAddressPage, NormalMode, updatedAnswers, isReturn(request))
         } yield Redirect(nextPage)
         ).recover {
         case _: SubscriptionDataNotFoundException => Redirect(navigator.errorPage(ConfirmAddressPage))

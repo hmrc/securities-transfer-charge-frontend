@@ -45,7 +45,7 @@ class MaximumAmountPaidController @Inject()(
   private def form(implicit request: StcDataRequest[_]) = formProvider(request.request.affinityGroupKey)
     
   lazy val backLinkCall: Mode => UserAnswers => Call =
-    mode => userAnswers => navigator.previousPage(MaximumAmountPaidPage, mode, userAnswers)
+    mode => userAnswers => navigator.previousPageCall(MaximumAmountPaidPage, mode, userAnswers)
 
   def onPageLoad(mode: Mode): Action[AnyContent] = (stcAuthEnrolled andThen getData andThen requireData) {
     implicit request =>
@@ -65,7 +65,7 @@ class MaximumAmountPaidController @Inject()(
         value =>
           for {
             updatedAnswers <- Future.fromTry(request.userAnswers.set(MaximumAmountPaidPage, value))
-            nextPage <- navigator.nextPage(MaximumAmountPaidPage, mode, updatedAnswers, isReturn(request))
+            nextPage <- navigator.nextPageCall(MaximumAmountPaidPage, mode, updatedAnswers, isReturn(request))
           } yield Redirect(nextPage)
       )
   }

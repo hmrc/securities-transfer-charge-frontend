@@ -38,7 +38,7 @@ class CannotSubmitFormErrorController @Inject()(
                                                ) extends FrontendBaseController with I18nSupport {
 
   lazy val backLinkCall: Mode => UserAnswers => Call =
-    mode => userAnswers => navigator.previousPage(CannotSubmitFormErrorPage, mode, userAnswers)
+    mode => userAnswers => navigator.previousPageCall(CannotSubmitFormErrorPage, mode, userAnswers)
 
   def onPageLoad(): Action[AnyContent] = (stcAuthEnrolled andThen getData andThen requireData) {
     implicit request =>

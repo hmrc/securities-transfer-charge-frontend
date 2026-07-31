@@ -42,7 +42,7 @@ class ApplyingForReliefController @Inject()(
                                  )(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport {
   
   lazy val backLinkCall: Mode => UserAnswers => Call =
-    mode => userAnswers => navigator.previousPage(ApplyingForReliefPage, mode, userAnswers)
+    mode => userAnswers => navigator.previousPageCall(ApplyingForReliefPage, mode, userAnswers)
 
   def onPageLoad(mode: Mode): Action[AnyContent] = (stcAuthEnrolled andThen getData andThen requireData) {
     implicit request =>
@@ -75,7 +75,7 @@ class ApplyingForReliefController @Inject()(
         applyingForRelief =>
           for {
             updatedAnswers <- Future.fromTry(request.userAnswers.set(ApplyingForReliefPage, applyingForRelief))
-            nextPage <- navigator.nextPage(ApplyingForReliefPage, mode, updatedAnswers, isReturn(request))
+            nextPage <- navigator.nextPageCall(ApplyingForReliefPage, mode, updatedAnswers, isReturn(request))
           } yield Redirect(nextPage)
       )
   }

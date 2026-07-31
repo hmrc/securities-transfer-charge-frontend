@@ -167,7 +167,7 @@ class SubmissionsDashboardControllerSpec extends SpecBase with MockitoSugar with
             val result = route(application, request).value
 
             status(result) mustEqual SEE_OTHER
-            redirectLocation(result).value mustEqual testNextPage.url
+            redirectLocation(result).value mustEqual testNextPageCall.url
 
             verify(mockIdClient).nextSubmissionId()(any())
 

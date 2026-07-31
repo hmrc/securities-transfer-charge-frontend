@@ -43,7 +43,7 @@ class CompanyDetailsController @Inject()(
                                         )(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport {
 
   lazy val backLinkCall: Mode => UserAnswers => Call =
-    mode => userAnswers => navigator.previousPage(CompanyDetailsPage, mode, userAnswers)
+    mode => userAnswers => navigator.previousPageCall(CompanyDetailsPage, mode, userAnswers)
 
   def onPageLoad(mode: Mode): Action[AnyContent] = (stcAuthEnrolled andThen getData andThen requireData).async {
     implicit request =>
@@ -72,7 +72,7 @@ class CompanyDetailsController @Inject()(
         value =>
           for {
             updatedAnswers <- Future.fromTry(request.userAnswers.set(CompanyDetailsPage, value))
-            nextPage <- navigator.nextPage(CompanyDetailsPage, mode, updatedAnswers, isReturn(request))
+            nextPage <- navigator.nextPageCall(CompanyDetailsPage, mode, updatedAnswers, isReturn(request))
           } yield Redirect(nextPage)
       )
   }

@@ -23,14 +23,40 @@ import uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.shared.route
 import uk.gov.hmrc.securitiestransferchargefrontend.models.{NormalMode, UserAnswers}
 import uk.gov.hmrc.securitiestransferchargefrontend.navigation.NavigationHelper
 import uk.gov.hmrc.securitiestransferchargefrontend.pages.*
-import uk.gov.hmrc.securitiestransferchargefrontend.pages.stf.shared.HowToNotifyAboutSecuritiesTransferPage
+import uk.gov.hmrc.securitiestransferchargefrontend.pages.stf.shared.{HowToNotifyAboutSecuritiesTransferPage, SubmissionsDashboardPage}
 import uk.gov.hmrc.securitiestransferchargefrontend.pages.stf.single.*
+import uk.gov.hmrc.securitiestransferchargefrontend.pages.JourneyRecoveryPage
 
 class BackwardsRoutes(defaultPage: Call):
 
   val navHelper: NavigationHelper = new NavigationHelper(defaultPage)
 
   import navHelper.*
+
+  def predecessorRoutesPage(page: Page, userAnswers: Option[UserAnswers]): Page = page match {
+    case HowToNotifyAboutSecuritiesTransferPage => SubmissionsDashboardPage
+    case ConfirmAddressPage => HowToNotifyAboutSecuritiesTransferPage
+    case StfBuyersAddressPage => HowToNotifyAboutSecuritiesTransferPage
+    case NameOfSellerPage => ConfirmAddressPage
+    case StfSellerAddressPage => NameOfSellerPage
+    case ConnectedPersonsPage => StfSellerAddressPage
+    case ApplyingForReliefPage => ConnectedPersonsPage
+    case WhatReliefAreYouApplyingForPage => ApplyingForReliefPage
+    case SecuritiesTargetPage =>
+      userAnswers.flatMap(_.get(ApplyingForReliefPage)) match {
+        case Some(true) => WhatReliefAreYouApplyingForPage
+        case Some(false) => ApplyingForReliefPage
+        case _ => JourneyRecoveryPage
+      }
+    case ChargingPointPage => SecuritiesTargetPage
+    case TaxRatePage => ChargingPointPage
+    case WhatTypeOfSecuritiesPage => TaxRatePage
+    case DetailsOfThisTransferPage => WhatTypeOfSecuritiesPage
+    case OtherSecuritiesTypePage => WhatTypeOfSecuritiesPage
+    case AmountPaidForSecuritiesPage => OtherSecuritiesTypePage
+    case TotalMarketValuePage => AmountPaidForSecuritiesPage
+    case _ => JourneyRecoveryPage
+  }
 
   def predecessorRoutes(page: Page): Option[UserAnswers] => Call = page match {
 

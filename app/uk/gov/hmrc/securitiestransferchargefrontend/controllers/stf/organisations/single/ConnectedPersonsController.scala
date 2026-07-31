@@ -45,7 +45,7 @@ class ConnectedPersonsController @Inject()(
   val form: Form[Boolean] = formProvider()
   
   lazy val backLinkCall: Mode => UserAnswers => Call =
-    mode => userAnswers => navigator.previousPage(ConnectedPersonsPage, mode, userAnswers)
+    mode => userAnswers => navigator.previousPageCall(ConnectedPersonsPage, mode, userAnswers)
 
   def onPageLoad(mode: Mode): Action[AnyContent] = (stcAuthEnrolled andThen getData andThen requireData) {
     implicit request =>
@@ -68,7 +68,7 @@ class ConnectedPersonsController @Inject()(
         areConnected =>
           for {
             updatedAnswers <- Future.fromTry(request.userAnswers.set(ConnectedPersonsPage, areConnected))
-            nextPage <- navigator.nextPage(ConnectedPersonsPage, mode, updatedAnswers,isReturn(request))
+            nextPage <- navigator.nextPageCall(ConnectedPersonsPage, mode, updatedAnswers,isReturn(request))
           } yield Redirect(nextPage)
       )
   }

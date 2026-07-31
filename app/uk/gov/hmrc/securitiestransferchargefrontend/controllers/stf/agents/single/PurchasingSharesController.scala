@@ -45,7 +45,7 @@ class PurchasingSharesController @Inject()(
   val form: Form[Boolean] = formProvider()
 
   lazy val backLinkCall: Mode => UserAnswers => Call =
-    mode => userAnswers => navigator.previousPage(PurchasingSharesPage, mode, userAnswers)
+    mode => userAnswers => navigator.previousPageCall(PurchasingSharesPage, mode, userAnswers)
 
   def onPageLoad(mode: Mode): Action[AnyContent] = (stcAuthEnrolled andThen getData andThen requireData) {
     implicit request =>
@@ -72,7 +72,7 @@ class PurchasingSharesController @Inject()(
         isPurchasingShares =>
           for {
             updatedAnswers <- Future.fromTry(request.userAnswers.set(PurchasingSharesPage, isPurchasingShares))
-            nextPage <- navigator.nextPage(PurchasingSharesPage, mode, updatedAnswers, isReturn(request))
+            nextPage <- navigator.nextPageCall(PurchasingSharesPage, mode, updatedAnswers, isReturn(request))
           } yield Redirect(nextPage)
       )
   }

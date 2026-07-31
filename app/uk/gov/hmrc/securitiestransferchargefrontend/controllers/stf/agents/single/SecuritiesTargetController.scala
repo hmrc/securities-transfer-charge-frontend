@@ -48,7 +48,7 @@ class SecuritiesTargetController @Inject()(
     formProvider(request.request.affinityGroupKey)
 
   lazy val backLinkCall: Mode => UserAnswers => Call =
-    mode => userAnswers => navigator.previousPage(SecuritiesTargetPage, mode, userAnswers)
+    mode => userAnswers => navigator.previousPageCall(SecuritiesTargetPage, mode, userAnswers)
 
   def onPageLoad(mode: Mode): Action[AnyContent] = (stcAuthEnrolled andThen getData andThen requireData) {
     implicit request =>
@@ -71,7 +71,7 @@ class SecuritiesTargetController @Inject()(
         value =>
           for {
             updatedAnswers <- Future.fromTry(request.userAnswers.set(SecuritiesTargetPage, value))
-            nextPage       <- navigator.nextPage(SecuritiesTargetPage, mode, updatedAnswers, isReturn(request))
+            nextPage       <- navigator.nextPageCall(SecuritiesTargetPage, mode, updatedAnswers, isReturn(request))
           } yield Redirect(nextPage)
       )
   }

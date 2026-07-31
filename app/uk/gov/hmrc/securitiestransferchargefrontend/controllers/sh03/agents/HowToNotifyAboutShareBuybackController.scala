@@ -45,7 +45,7 @@ class HowToNotifyAboutShareBuybackController @Inject()(
                                      ) extends FrontendBaseController with I18nSupport {
 
   lazy val backLinkCall: Mode => Option[UserAnswers] => Call =
-    mode => userAnswers => navigator.previousPage(HowToNotifyAboutShareBuybackPage, mode, userAnswers)
+    mode => userAnswers => navigator.previousPageCall(HowToNotifyAboutShareBuybackPage, mode, userAnswers)
 
   def onPageLoad(): Action[AnyContent] = (stcAuthEnrolled andThen getData) {implicit request =>
 

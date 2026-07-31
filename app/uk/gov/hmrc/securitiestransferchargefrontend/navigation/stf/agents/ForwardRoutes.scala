@@ -26,11 +26,12 @@ import uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.shared.singl
 import uk.gov.hmrc.securitiestransferchargefrontend.models.stf.HowToNotifyAboutSecuritiesTransfer.{MoreThanOneAtATime, OneAtATime}
 import uk.gov.hmrc.securitiestransferchargefrontend.models.{NormalMode, UserAnswers}
 import uk.gov.hmrc.securitiestransferchargefrontend.navigation.PersistentNavigationHelper
-import uk.gov.hmrc.securitiestransferchargefrontend.pages.Page
+import uk.gov.hmrc.securitiestransferchargefrontend.pages.{CheckYourAnswersPage, JourneyRecoveryPage, Page}
 import uk.gov.hmrc.securitiestransferchargefrontend.pages.stf.shared.{AgentReferencePage, HowToNotifyAboutSecuritiesTransferPage, SubmissionsDashboardPage}
 import uk.gov.hmrc.securitiestransferchargefrontend.pages.stf.single.*
 import uk.gov.hmrc.securitiestransferchargefrontend.services.AnswerPersistenceService
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.routes
+import uk.gov.hmrc.securitiestransferchargefrontend.pages.stf.bulk.TemplateInstructionsPage
 
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -45,6 +46,58 @@ class ForwardRoutes(answerPersistenceService: AnswerPersistenceService,
   import helper.*
 
   private val firstDate = appConfig.firstChargingPoint
+
+  def forwardRoutesPage(page: Page, userAnswers: UserAnswers): Page = page match {
+    case SubmissionsDashboardPage => HowToNotifyAboutSecuritiesTransferPage
+    case HowToNotifyAboutSecuritiesTransferPage =>
+      userAnswers.get(HowToNotifyAboutSecuritiesTransferPage) match {
+        case Some(OneAtATime) => AgentReferencePage
+        case Some(MoreThanOneAtATime) => TemplateInstructionsPage
+        case _ => JourneyRecoveryPage
+      }
+    case AgentReferencePage =>
+      userAnswers.get(HowToNotifyAboutSecuritiesTransferPage) match {
+        case Some(OneAtATime) => NameOfBuyerPage
+        case Some(MoreThanOneAtATime) => CheckYourAnswersPage
+        case _ => JourneyRecoveryPage
+      }
+    case NameOfBuyerPage => StfBuyersAddressPage
+    case StfBuyersAddressPage => NameOfSellerPage
+    case NameOfSellerPage => StfSellerAddressPage
+    case StfSellerAddressPage => ConnectedPersonsPage
+    case ConnectedPersonsPage => ApplyingForReliefPage
+    case ApplyingForReliefPage =>
+      userAnswers.get(ApplyingForReliefPage) match {
+        case Some(true) => WhatReliefAreYouApplyingForPage
+        case Some(false) => SecuritiesTargetPage
+        case _ => JourneyRecoveryPage
+      }
+    case WhatReliefAreYouApplyingForPage => SecuritiesTargetPage
+    case SecuritiesTargetPage => ChargingPointPage
+    case ChargingPointPage =>
+      userAnswers.get(ChargingPointPage) match {
+        case Some(date) if date.isBefore(firstDate) => JourneyRecoveryPage
+        case Some(_) => TaxRatePage
+        case _ => JourneyRecoveryPage
+      }
+    case TaxRatePage => PurchasingSharesPage
+    case PurchasingSharesPage =>
+      userAnswers.get(PurchasingSharesPage) match {
+        case Some(true) => DetailsOfThisTransferPage
+        case Some(false) => OtherSecuritiesTypePage
+        case _ => JourneyRecoveryPage
+      }
+    case OtherSecuritiesTypePage => AmountPaidForSecuritiesPage
+    case DetailsOfThisTransferPage => CheckYourAnswersPage
+    case AmountPaidForSecuritiesPage =>
+      userAnswers.get(ConnectedPersonsPage) match {
+        case Some(true) => TotalMarketValuePage
+        case Some(false) => CheckYourAnswersPage
+        case _ => JourneyRecoveryPage
+      }
+    case TotalMarketValuePage => CheckYourAnswersPage
+    case _ => JourneyRecoveryPage
+  }
 
   def forwardRoutes(page: Page)(implicit hc: HeaderCarrier): UserAnswers => Future[Call] = page match {
 

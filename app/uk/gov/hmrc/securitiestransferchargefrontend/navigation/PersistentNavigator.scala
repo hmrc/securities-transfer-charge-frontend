@@ -1,5 +1,5 @@
 /*
- * Copyright 2026 HM Revenue & Customs
+ * Copyright 2024 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,11 +16,27 @@
 
 package uk.gov.hmrc.securitiestransferchargefrontend.navigation
 
-import play.api.mvc.Request
+import play.api.mvc.Call
+import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.securitiestransferchargefrontend.domain.{SubmissionId, UserId}
-import uk.gov.hmrc.securitiestransferchargefrontend.models.UserAnswers
+import uk.gov.hmrc.securitiestransferchargefrontend.models.{Mode, UserAnswers}
+import uk.gov.hmrc.securitiestransferchargefrontend.pages.Page
+import uk.gov.hmrc.securitiestransferchargefrontend.services.AnswerPersistenceService
 
-import scala.concurrent.Future
+import scala.concurrent.{ExecutionContext, Future}
 
 trait PersistentNavigator extends Navigator:
-  def restore(submissionId: SubmissionId, userId: UserId)(implicit request: Request[?]): Future[UserAnswers]
+  
+  val answerPersistenceService: AnswerPersistenceService
+  
+  override def nextPageCall(page: Page, mode: Mode, userAnswers: UserAnswers, isReturn: Boolean = false)(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[Call] = {
+    val actualNextPg = nextPage(page, mode, userAnswers)
+    val actualNextCall = pageToCall(actualNextPg)
+    val redirectPg = nextPage(page, mode, userAnswers, isReturn)
+    val redirectCall = pageToCall(redirectPg)
+    val updatedAnswers = userAnswers.setNextPage(actualNextCall)
+    
+    answerPersistenceService.save(updatedAnswers).map(_ => redirectCall)
+  }
+  
+  def restore(submissionId: SubmissionId, userId: UserId)(implicit hc: HeaderCarrier): Future[UserAnswers]

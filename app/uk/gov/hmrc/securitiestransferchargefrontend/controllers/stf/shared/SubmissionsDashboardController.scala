@@ -22,6 +22,7 @@ import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import uk.gov.hmrc.auth.core.AffinityGroup
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
+import uk.gov.hmrc.play.http.HeaderCarrierConverter
 import uk.gov.hmrc.securitiestransferchargefrontend.clients.{SaveAndReturnClient, SubmissionIdClient}
 import uk.gov.hmrc.securitiestransferchargefrontend.config.FrontendAppConfig
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.actions.{StcAuthEnrolledAction, StcDataRetrievalAction}
@@ -74,6 +75,8 @@ class SubmissionsDashboardController @Inject()(
 
   def onSubmit(): Action[AnyContent] = (stcAuthEnrolled andThen getData).async {
     implicit request =>
+      implicit val hc: HeaderCarrier = HeaderCarrierConverter.fromRequestAndSession(request, request.session)
+      implicit val execContext: ExecutionContext = ec
 
       val innerRequest = request.request
       val userId = UserId(innerRequest.internalId)
@@ -85,13 +88,13 @@ class SubmissionsDashboardController @Inject()(
 
         call <- innerRequest.affinityGroup match {
           case AffinityGroup.Organisation =>
-            orgNavigator.nextPage(SubmissionsDashboardPage, NormalMode, emptyAnswers)
+            orgNavigator.nextPageCall(SubmissionsDashboardPage, NormalMode, emptyAnswers)
 
           case AffinityGroup.Agent =>
-            agentNavigator.nextPage(SubmissionsDashboardPage, NormalMode, emptyAnswers)
+            agentNavigator.nextPageCall(SubmissionsDashboardPage, NormalMode, emptyAnswers)
 
           case _ =>
-            individualsNavigator.nextPage(SubmissionsDashboardPage, NormalMode, emptyAnswers)
+            individualsNavigator.nextPageCall(SubmissionsDashboardPage, NormalMode, emptyAnswers)
         }
       } yield {
         auditService.audit(AuditModel(StartSubmission, userId, innerRequest.affinityGroup, innerRequest.credentialId, submissionId))

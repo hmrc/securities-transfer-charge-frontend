@@ -48,7 +48,7 @@ class DetailsOfThisSharePurchaseController @Inject()(
     formProvider(requireMarketValue,request.request.affinityGroupKey)
 
   lazy val backLinkCall: Mode => UserAnswers => Call =
-    mode => userAnswers => navigator.previousPage(DetailsOfThisSharePurchasePage, mode, userAnswers)
+    mode => userAnswers => navigator.previousPageCall(DetailsOfThisSharePurchasePage, mode, userAnswers)
 
   def onPageLoad(mode: Mode): Action[AnyContent] = (stcAuthEnrolled andThen getData andThen requireData) {
     implicit request =>
@@ -71,7 +71,7 @@ class DetailsOfThisSharePurchaseController @Inject()(
         detailsOfTransfer =>
           for {
             updatedAnswers <- Future.fromTry(request.userAnswers.set(DetailsOfThisSharePurchasePage, detailsOfTransfer))
-            nextPage <- navigator.nextPage(DetailsOfThisSharePurchasePage, mode, updatedAnswers, isReturn(request))
+            nextPage <- navigator.nextPageCall(DetailsOfThisSharePurchasePage, mode, updatedAnswers, isReturn(request))
           } yield Redirect(nextPage)
       )
   }

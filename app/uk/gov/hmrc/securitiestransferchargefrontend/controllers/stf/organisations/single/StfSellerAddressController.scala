@@ -50,6 +50,6 @@ class StfSellerAddressController @Inject()(val controllerComponents: MessagesCon
       for {
         address <- super.alfReturn(addressId)
         userAnswers <- Future.fromTry(request.userAnswers.set(StfSellerAddressPage, address))
-        nextPage <- navigator.nextPage(StfSellerAddressPage, NormalMode, userAnswers)
+        nextPage <- navigator.nextPageCall(StfSellerAddressPage, NormalMode, userAnswers)
       } yield Redirect(nextPage)
   }

@@ -25,14 +25,47 @@ import uk.gov.hmrc.securitiestransferchargefrontend.models.stf.HowToNotifyAboutS
 import uk.gov.hmrc.securitiestransferchargefrontend.models.{JourneyType, NormalMode, UserAnswers}
 import uk.gov.hmrc.securitiestransferchargefrontend.navigation.NavigationHelper
 import uk.gov.hmrc.securitiestransferchargefrontend.pages.*
-import uk.gov.hmrc.securitiestransferchargefrontend.pages.stf.shared.{AgentReferencePage, HowToNotifyAboutSecuritiesTransferPage}
+import uk.gov.hmrc.securitiestransferchargefrontend.pages.stf.shared.{AgentReferencePage, HowToNotifyAboutSecuritiesTransferPage, SubmissionsDashboardPage}
 import uk.gov.hmrc.securitiestransferchargefrontend.pages.stf.single.*
+import uk.gov.hmrc.securitiestransferchargefrontend.pages.JourneyRecoveryPage
+import uk.gov.hmrc.securitiestransferchargefrontend.pages.stf.bulk.FileUploadPage
 
 class BackwardsRoutes(defaultPage: Call):
 
   val navHelper: NavigationHelper = new NavigationHelper(defaultPage)
 
   import navHelper.*
+
+  def predecessorRoutesPage(page: Page, userAnswers: Option[UserAnswers]): Page = page match {
+    case HowToNotifyAboutSecuritiesTransferPage => SubmissionsDashboardPage
+    case AgentReferencePage =>
+      userAnswers.flatMap(_.get(HowToNotifyAboutSecuritiesTransferPage)) match {
+        case Some(OneAtATime) => HowToNotifyAboutSecuritiesTransferPage
+        case Some(MoreThanOneAtATime) => FileUploadPage
+        case _ => JourneyRecoveryPage
+      }
+    case NameOfBuyerPage => AgentReferencePage
+    case StfBuyersAddressPage => NameOfBuyerPage
+    case NameOfSellerPage => StfBuyersAddressPage
+    case StfSellerAddressPage => NameOfSellerPage
+    case ConnectedPersonsPage => StfSellerAddressPage
+    case ApplyingForReliefPage => ConnectedPersonsPage
+    case WhatReliefAreYouApplyingForPage => ApplyingForReliefPage
+    case SecuritiesTargetPage =>
+      userAnswers.flatMap(_.get(ApplyingForReliefPage)) match {
+        case Some(true) => WhatReliefAreYouApplyingForPage
+        case Some(false) => ApplyingForReliefPage
+        case _ => JourneyRecoveryPage
+      }
+    case ChargingPointPage => SecuritiesTargetPage
+    case TaxRatePage => ChargingPointPage
+    case PurchasingSharesPage => TaxRatePage
+    case DetailsOfThisTransferPage => PurchasingSharesPage
+    case OtherSecuritiesTypePage => PurchasingSharesPage
+    case AmountPaidForSecuritiesPage => OtherSecuritiesTypePage
+    case TotalMarketValuePage => AmountPaidForSecuritiesPage
+    case _ => JourneyRecoveryPage
+  }
 
   def predecessorRoutes(page: Page): Option[UserAnswers] => Call = page match {
 

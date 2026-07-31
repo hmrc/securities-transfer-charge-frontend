@@ -46,7 +46,7 @@ class TaxRateController @Inject()(
   val form: Form[TaxRate] = formProvider()
 
   lazy val backLinkCall: Mode => UserAnswers => Call =
-    mode => userAnswers => navigator.previousPage(TaxRatePage, mode, userAnswers)
+    mode => userAnswers => navigator.previousPageCall(TaxRatePage, mode, userAnswers)
 
   def onPageLoad(mode: Mode): Action[AnyContent] = (stcAuthEnrolled andThen getData andThen requireData) {
     implicit request =>
@@ -69,7 +69,7 @@ class TaxRateController @Inject()(
         value =>
           for {
             updatedAnswers <- Future.fromTry(request.userAnswers.set(TaxRatePage, value))
-            nextPage       <- navigator.nextPage(TaxRatePage, mode, updatedAnswers, isReturn(request))
+            nextPage       <- navigator.nextPageCall(TaxRatePage, mode, updatedAnswers, isReturn(request))
           } yield Redirect(nextPage)
       )
   }

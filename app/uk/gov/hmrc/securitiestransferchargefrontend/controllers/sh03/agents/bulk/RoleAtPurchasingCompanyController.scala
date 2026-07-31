@@ -46,7 +46,7 @@ class RoleAtPurchasingCompanyController @Inject()(
     formProvider(request.request.affinityGroupKey)
 
   lazy val backLinkCall: Mode => UserAnswers => Call =
-    mode => userAnswers => navigator.previousPage(BulkRoleAtPurchasingCompanyPage, mode, userAnswers)
+    mode => userAnswers => navigator.previousPageCall(BulkRoleAtPurchasingCompanyPage, mode, userAnswers)
 
   def onPageLoad(mode: Mode): Action[AnyContent] = (stcAuthEnrolled andThen getData andThen requireData) {
     implicit request =>
@@ -68,7 +68,7 @@ class RoleAtPurchasingCompanyController @Inject()(
         value =>
           for {
             updatedAnswers <- Future.fromTry(request.userAnswers.set(BulkRoleAtPurchasingCompanyPage, value))
-            nextPage <- navigator.nextPage(BulkRoleAtPurchasingCompanyPage, mode, updatedAnswers, isReturn(request))
+            nextPage <- navigator.nextPageCall(BulkRoleAtPurchasingCompanyPage, mode, updatedAnswers, isReturn(request))
           } yield Redirect(nextPage)
       )
   }

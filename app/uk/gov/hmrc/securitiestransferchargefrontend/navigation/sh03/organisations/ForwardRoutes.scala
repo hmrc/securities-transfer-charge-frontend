@@ -25,8 +25,9 @@ import uk.gov.hmrc.securitiestransferchargefrontend.models.sh03.HowToNotifyAbout
 import uk.gov.hmrc.securitiestransferchargefrontend.models.sh03.shared.{ReasonForPurchase, RoleAtPurchasingCompany}
 import uk.gov.hmrc.securitiestransferchargefrontend.models.{NormalMode, UserAnswers}
 import uk.gov.hmrc.securitiestransferchargefrontend.navigation.PersistentNavigationHelper
-import uk.gov.hmrc.securitiestransferchargefrontend.pages.Page
+import uk.gov.hmrc.securitiestransferchargefrontend.pages.{CheckYourAnswersPage, JourneyRecoveryPage, Page}
 import uk.gov.hmrc.securitiestransferchargefrontend.pages.sh03.*
+import uk.gov.hmrc.securitiestransferchargefrontend.pages.sh03.bulk.CannotSubmitFormErrorPage
 import uk.gov.hmrc.securitiestransferchargefrontend.services.AnswerPersistenceService
 
 import scala.concurrent.{ExecutionContext, Future}
@@ -42,6 +43,60 @@ class ForwardRoutes(answerPersistenceService: AnswerPersistenceService,
   import helper.*
 
   private val firstDate = appConfig.firstChargingPoint
+
+  def forwardRoutesPage(page: Page, userAnswers: UserAnswers): Page = page match {
+    case BeforeYouStartPage => HowToNotifyAboutShareBuybackPage
+    case HowToNotifyAboutShareBuybackPage =>
+      userAnswers.get(HowToNotifyAboutShareBuybackPage) match {
+        case Some(OneAtATime) => CompanyDetailsPage
+        case Some(MoreThanOneAtATime) => JourneyRecoveryPage
+        case _ => JourneyRecoveryPage
+      }
+    case CompanyDetailsPage =>
+      if (userAnswers.get(CompanyDetailsPage).isDefined) ReasonForPurchasePage else JourneyRecoveryPage
+    case ReasonForPurchasePage =>
+      userAnswers.get(ReasonForPurchasePage) match {
+        case Some(ReasonForPurchase.ForCancellation) => TreasurySharesPage
+        case Some(ReasonForPurchase.ToPlaceIntoTreasury) => ConnectedPersonsPage
+        case _ => JourneyRecoveryPage
+      }
+    case TreasurySharesPage =>
+      if (userAnswers.get(TreasurySharesPage).isDefined) ConnectedPersonsPage else JourneyRecoveryPage
+    case ConnectedPersonsPage =>
+      if (userAnswers.get(ConnectedPersonsPage).isDefined) ApplyingForReliefPage else JourneyRecoveryPage
+    case ApplyingForReliefPage =>
+      userAnswers.get(ApplyingForReliefPage) match {
+        case Some(false) => DetailsOfThisSharePurchasePage
+        case Some(true) => WhatReliefAreYouApplyingForPage
+        case _ => JourneyRecoveryPage
+      }
+    case WhatReliefAreYouApplyingForPage =>
+      if (userAnswers.get(WhatReliefAreYouApplyingForPage).isDefined) DetailsOfThisSharePurchasePage else JourneyRecoveryPage
+    case DetailsOfThisSharePurchasePage =>
+      userAnswers.get(CompanyDetailsPage) match {
+        case Some(companyDetails) if companyDetails.isPlc => MaximumAmountPaidPage
+        case Some(_) => ChargingPointPage
+        case _ => JourneyRecoveryPage
+      }
+    case MaximumAmountPaidPage =>
+      if (userAnswers.get(MaximumAmountPaidPage).isDefined) MinimumAmountPaidPage else JourneyRecoveryPage
+    case MinimumAmountPaidPage =>
+      if (userAnswers.get(MinimumAmountPaidPage).isDefined) ChargingPointPage else JourneyRecoveryPage
+    case ChargingPointPage =>
+      userAnswers.get(ChargingPointPage) match {
+        case Some(enterDate) if enterDate.isBefore(firstDate) => JourneyRecoveryPage
+        case Some(_) => RoleAtPurchasingCompanyPage
+        case _ => JourneyRecoveryPage
+      }
+    case RoleAtPurchasingCompanyPage =>
+      userAnswers.get(RoleAtPurchasingCompanyPage) match {
+        case Some(roleAtPurchasingCompany) if roleAtPurchasingCompany.role == RoleAtPurchasingCompany.unsupportedRole =>
+          CannotSubmitFormErrorPage
+        case Some(_) => CheckYourAnswersPage
+        case _ => JourneyRecoveryPage
+      }
+    case _ => JourneyRecoveryPage
+  }
 
   def forwardRoutes(page: Page)(implicit hc: HeaderCarrier): UserAnswers => Future[Call] = page match {
 

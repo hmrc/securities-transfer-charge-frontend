@@ -19,7 +19,9 @@ package uk.gov.hmrc.securitiestransferchargefrontend.controllers.sh03.organisati
 import play.api.data.Form
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, Call, MessagesControllerComponents}
+import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
+import uk.gov.hmrc.play.http.HeaderCarrierConverter
 import uk.gov.hmrc.securitiestransferchargefrontend.clients.SubmissionIdClient
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.actions.*
 import uk.gov.hmrc.securitiestransferchargefrontend.domain.{GroupIdentifier, UserId}
@@ -45,7 +47,7 @@ class HowToNotifyAboutShareBuybackController @Inject()(
                                                       )(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport {
 
   lazy val backLinkCall: Mode => Option[UserAnswers] => Call =
-    mode => userAnswers => navigator.previousPage(HowToNotifyAboutShareBuybackPage, mode, userAnswers)
+    mode => userAnswers => navigator.previousPageCall(HowToNotifyAboutShareBuybackPage, mode, userAnswers)
 
   def onPageLoad(): Action[AnyContent] = (stcAuthEnrolled andThen getData) { implicit request =>
     val innerRequest = request.request
@@ -65,6 +67,7 @@ class HowToNotifyAboutShareBuybackController @Inject()(
 
   def onSubmit(): Action[AnyContent] = (stcAuthEnrolled andThen getData).async {
     implicit request =>
+      implicit val hc: HeaderCarrier = HeaderCarrierConverter.fromRequestAndSession(request, request.session)
       val innerRequest = request.request
       val userId = UserId(innerRequest.internalId)
       val group = GroupIdentifier(innerRequest.groupIdentifier)
@@ -79,7 +82,7 @@ class HowToNotifyAboutShareBuybackController @Inject()(
             submissionId <- idClient.nextSubmissionId()
             emptyAnswers = UserAnswers.empty(userId)(group)(submissionId)
             updatedAnswers <- Future.fromTry(emptyAnswers.set(HowToNotifyAboutShareBuybackPage, howToNotify))
-            nextPage <- navigator.nextPage(HowToNotifyAboutShareBuybackPage, NormalMode, updatedAnswers)
+            nextPage <- navigator.nextPageCall(HowToNotifyAboutShareBuybackPage, NormalMode, updatedAnswers)
           } yield Redirect(nextPage)
       )
   }

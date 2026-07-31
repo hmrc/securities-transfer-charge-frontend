@@ -45,7 +45,7 @@ class WhatReliefAreYouApplyingForController @Inject()(
   val form = formProvider()
 
   lazy val backLinkCall: Mode => UserAnswers => Call =
-    mode => userAnswers => navigator.previousPage(WhatReliefAreYouApplyingForPage, mode, userAnswers)
+    mode => userAnswers => navigator.previousPageCall(WhatReliefAreYouApplyingForPage, mode, userAnswers)
 
   def onPageLoad(mode: Mode): Action[AnyContent] = (stcAuthEnrolled andThen getData andThen requireData) {
     implicit request =>
@@ -68,7 +68,7 @@ class WhatReliefAreYouApplyingForController @Inject()(
         relief =>
           for {
             updatedAnswers <- Future.fromTry(request.userAnswers.set(WhatReliefAreYouApplyingForPage, relief))
-            nextPage       <- navigator.nextPage(WhatReliefAreYouApplyingForPage, mode, updatedAnswers, isReturn(request))
+            nextPage       <- navigator.nextPageCall(WhatReliefAreYouApplyingForPage, mode, updatedAnswers, isReturn(request))
           } yield Redirect(nextPage)
       )
   }

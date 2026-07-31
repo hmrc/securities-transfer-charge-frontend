@@ -28,8 +28,9 @@ import play.api.Application
 import play.api.i18n.{Messages, MessagesApi}
 import play.api.inject.bind
 import play.api.inject.guice.GuiceApplicationBuilder
-import play.api.mvc.{AnyContent, AnyContentAsEmpty, Call, Request}
+import play.api.mvc.{AnyContent, AnyContentAsEmpty, Call}
 import play.api.test.FakeRequest
+import scala.concurrent.Future
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.securitiestransferchargefrontend.clients.SaveAndReturnClient
 import uk.gov.hmrc.securitiestransferchargefrontend.clients.registration.Subscription
@@ -42,9 +43,11 @@ import uk.gov.hmrc.securitiestransferchargefrontend.navigation.Navigator
 import uk.gov.hmrc.securitiestransferchargefrontend.pages.Page
 import uk.gov.hmrc.securitiestransferchargefrontend.repositories.SessionRepository
 import uk.gov.hmrc.auth.core.AffinityGroup
+import uk.gov.hmrc.securitiestransferchargefrontend.pages.*
+import uk.gov.hmrc.securitiestransferchargefrontend.pages.stf.single.NameOfBuyerPage
 
 import java.time.LocalDate
-import scala.concurrent.{ExecutionContext, Future}
+import scala.concurrent.ExecutionContext
 
 trait SpecBase
   extends AnyFreeSpec
@@ -83,14 +86,27 @@ trait SpecBase
   def emptyUserAnswers: UserAnswers = UserAnswers.empty(testUserId)(testGroupIdentifier)(submissionId)
 
   val testBackLinkRoute: Call = Call("GET", "/back-link")
-  val testNextPage = Call("GET", "/next-page")
-  val testErrorPage = Call("GET", "/error-page")
+  val testNextPageCall = Call("GET", "/next-page")
+  val testErrorPageCall = Call("GET", "/error-page")
+  val testNextPage: Page = NameOfBuyerPage
+  val testPreviousPage: Page = JourneyRecoveryPage
 
   def getNavigator: Navigator = new Navigator {
-    override def nextPage(page: Page, mode: Mode, userAnswers: UserAnswers, isReturn: Boolean = false)(implicit request: Request[_]): Future[Call] = Future.successful(testNextPage)
-    override def previousPage(page: Page, mode: Mode, userAnswers: UserAnswers): Call = testBackLinkRoute
-    override def previousPage(page: Page, mode: Mode, userAnswers: Option[UserAnswers]): Call = testBackLinkRoute
-    override def errorPage(forPage: Page): Call = testErrorPage
+    override def nextPage(page: Page, mode: Mode, userAnswers: UserAnswers, isReturn: Boolean = false): Page = testNextPage
+    override def previousPage(page: Page, mode: Mode, userAnswers: UserAnswers): Page = testPreviousPage
+    override def previousPage(page: Page, mode: Mode, userAnswers: Option[UserAnswers]): Page = testPreviousPage
+    override def errorPage(forPage: Page): Call = testErrorPageCall
+    override protected def pageToCall(page: Page): Call = {
+      if(page.equals(testNextPage)) {
+        testNextPageCall
+      } else {
+        testBackLinkRoute
+      }
+    }
+    override def nextPageCall(page: Page, mode: Mode, userAnswers: UserAnswers, isReturn: Boolean = false)
+                             (implicit hc: HeaderCarrier, ec: ExecutionContext): scala.concurrent.Future[Call] = {
+      Future.successful(pageToCall(nextPage(page, mode, userAnswers, isReturn)))
+    }
   }
   
   val fakeRequest: FakeRequest[AnyContentAsEmpty.type] = FakeRequest().withHeaders("sessionId" -> sessionId)

@@ -45,7 +45,7 @@ class AgentReferenceController @Inject()(
                                           view: AgentReferenceView
                                         )(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport {
   lazy val backLinkCall: Mode => Option[UserAnswers] => Call =
-    mode => userAnswers => navigator.previousPage(BulkAgentReferencePage, mode, userAnswers)
+    mode => userAnswers => navigator.previousPageCall(BulkAgentReferencePage, mode, userAnswers)
 
   val form: Form[AgentReference] = formProvider()
 
@@ -76,7 +76,7 @@ class AgentReferenceController @Inject()(
             submissionId <- idClient.nextSubmissionId()
             emptyAnswers = UserAnswers.empty(userId)(group)(submissionId)
             updatedAnswers <- Future.fromTry(emptyAnswers.set(BulkAgentReferencePage, value))
-            nextPage       <- navigator.nextPage(BulkAgentReferencePage, mode, updatedAnswers, isReturn(request))
+            nextPage       <- navigator.nextPageCall(BulkAgentReferencePage, mode, updatedAnswers, isReturn(request))
           } yield Redirect(nextPage)
       )
   }

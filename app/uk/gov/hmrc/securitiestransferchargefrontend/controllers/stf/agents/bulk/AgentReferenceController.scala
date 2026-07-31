@@ -47,7 +47,7 @@ class AgentReferenceController @Inject()(
   val form: Form[AgentReference] = formProvider()
 
   lazy val backLinkCall: Mode => UserAnswers => Call =
-    mode => userAnswers => navigator.previousPage(AgentReferencePage, mode, userAnswers)
+    mode => userAnswers => navigator.previousPageCall(AgentReferencePage, mode, userAnswers)
 
   def onPageLoad(mode: Mode): Action[AnyContent] = (stcAuthEnrolled andThen getData andThen requireData) {
     implicit request =>
@@ -70,7 +70,7 @@ class AgentReferenceController @Inject()(
         value =>
           for {
             updatedAnswers <- Future.fromTry(request.userAnswers.set(AgentReferencePage, value))
-            nextPage       <- navigator.nextPage(AgentReferencePage, mode, updatedAnswers, isReturn(request))
+            nextPage       <- navigator.nextPageCall(AgentReferencePage, mode, updatedAnswers, isReturn(request))
           } yield Redirect(nextPage)
       )
   }

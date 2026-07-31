@@ -47,7 +47,7 @@ class HowToNotifyAboutSecuritiesTransferController @Inject()(
   val form: Form[HowToNotifyAboutSecuritiesTransfer] = formProvider()
 
   lazy val backLinkCall: Mode => UserAnswers => Call =
-    mode => userAnswers => navigator.previousPage(HowToNotifyAboutSecuritiesTransferPage, mode, userAnswers)
+    mode => userAnswers => navigator.previousPageCall(HowToNotifyAboutSecuritiesTransferPage, mode, userAnswers)
 
   def onPageLoad(mode: Mode): Action[AnyContent] = (stcAuthEnrolled andThen getData andThen requireData){
     implicit request =>
@@ -74,7 +74,7 @@ class HowToNotifyAboutSecuritiesTransferController @Inject()(
         howToNotify =>
           for {
             updatedAnswers <- Future.fromTry(request.userAnswers.set(HowToNotifyAboutSecuritiesTransferPage, howToNotify))
-            nextPage       <- navigator.nextPage(HowToNotifyAboutSecuritiesTransferPage, mode, updatedAnswers, isReturn(request))
+            nextPage       <- navigator.nextPageCall(HowToNotifyAboutSecuritiesTransferPage, mode, updatedAnswers, isReturn(request))
           } yield Redirect(nextPage)
       )
   }

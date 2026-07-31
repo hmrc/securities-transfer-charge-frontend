@@ -103,7 +103,7 @@ class ChargingPointControllerSpec extends SpecBase {
         val result = route(application, postRequest()).value
 
         status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual testNextPage.url
+        redirectLocation(result).value mustEqual testNextPageCall.url
       }
     }
 

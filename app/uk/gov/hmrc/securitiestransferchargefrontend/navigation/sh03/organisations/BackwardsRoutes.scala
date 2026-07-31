@@ -25,12 +25,48 @@ import uk.gov.hmrc.securitiestransferchargefrontend.models.{NormalMode, UserAnsw
 import uk.gov.hmrc.securitiestransferchargefrontend.navigation.NavigationHelper
 import uk.gov.hmrc.securitiestransferchargefrontend.pages.*
 import uk.gov.hmrc.securitiestransferchargefrontend.pages.sh03.*
+import uk.gov.hmrc.securitiestransferchargefrontend.pages.sh03.bulk.{BulkCompanyDetailsPage, BulkRoleAtPurchasingCompanyPage, CannotSubmitFormErrorPage}
+import uk.gov.hmrc.securitiestransferchargefrontend.pages.JourneyRecoveryPage
 
 class BackwardsRoutes(defaultPage: Call):
 
   val navHelper: NavigationHelper = new NavigationHelper(defaultPage)
 
   import navHelper.*
+
+  def predecessorRoutesPage(page: Page, userAnswers: Option[UserAnswers]): Page = page match {
+    case HowToNotifyAboutShareBuybackPage => BeforeYouStartPage
+    case CompanyDetailsPage => HowToNotifyAboutShareBuybackPage
+    case ReasonForPurchasePage => CompanyDetailsPage
+    case TreasurySharesPage => ReasonForPurchasePage
+    case ConnectedPersonsPage =>
+      userAnswers.flatMap(_.get(ReasonForPurchasePage)) match {
+        case Some(ReasonForPurchase.ForCancellation) => TreasurySharesPage
+        case Some(ReasonForPurchase.ToPlaceIntoTreasury) => ReasonForPurchasePage
+        case _ => JourneyRecoveryPage
+      }
+    case ApplyingForReliefPage => ConnectedPersonsPage
+    case WhatReliefAreYouApplyingForPage => ApplyingForReliefPage
+    case DetailsOfThisSharePurchasePage =>
+      userAnswers.flatMap(_.get(ApplyingForReliefPage)) match {
+        case Some(true) => WhatReliefAreYouApplyingForPage
+        case Some(false) => ApplyingForReliefPage
+        case _ => JourneyRecoveryPage
+      }
+    case MaximumAmountPaidPage => DetailsOfThisSharePurchasePage
+    case MinimumAmountPaidPage => MaximumAmountPaidPage
+    case ChargingPointPage =>
+      userAnswers.flatMap(_.get(CompanyDetailsPage)) match {
+        case Some(companyDetails) if companyDetails.isPlc => MinimumAmountPaidPage
+        case Some(_) => DetailsOfThisSharePurchasePage
+        case _ => JourneyRecoveryPage
+      }
+    case RoleAtPurchasingCompanyPage => ChargingPointPage
+    case BulkCompanyDetailsPage => HowToNotifyAboutShareBuybackPage
+    case BulkRoleAtPurchasingCompanyPage => JourneyRecoveryPage
+    case CannotSubmitFormErrorPage => BulkRoleAtPurchasingCompanyPage
+    case _ => JourneyRecoveryPage
+  }
 
   def predecessorRoutes(page: Page): Option[UserAnswers] => Call = page match {
     case HowToNotifyAboutShareBuybackPage => _ => sharedRoutes.BeforeYouStartController.onPageLoad()

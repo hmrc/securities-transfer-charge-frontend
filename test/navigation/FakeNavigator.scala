@@ -16,21 +16,28 @@
 
 package navigation
 
-import play.api.mvc.{Call, Request}
+import play.api.mvc.Call
+import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.securitiestransferchargefrontend.models.{Mode, UserAnswers}
 import uk.gov.hmrc.securitiestransferchargefrontend.navigation.Navigator
 import uk.gov.hmrc.securitiestransferchargefrontend.pages.Page
+import uk.gov.hmrc.securitiestransferchargefrontend.pages.*
 
-import scala.concurrent.Future
+import scala.concurrent.{ExecutionContext, Future}
 
 class FakeNavigator(desiredRoute: Call) extends Navigator {
 
-  override def nextPage(page: Page, mode: Mode, userAnswers: UserAnswers, isReturn: Boolean = false)(implicit request: Request[?]): Future[Call] =
-    Future.successful(desiredRoute)
+  override def nextPage(page: Page, mode: Mode, userAnswers: UserAnswers, isReturn: Boolean = false): Page = JourneyRecoveryPage
 
   override def errorPage(forPage: Page): Call = desiredRoute
 
-  override def previousPage(page: Page, mode: Mode, userAnswers: UserAnswers): Call = desiredRoute
+  override def previousPage(page: Page, mode: Mode, userAnswers: UserAnswers): Page = JourneyRecoveryPage
 
-  override def previousPage(page: Page, mode: Mode, userAnswers: Option[UserAnswers]): Call = desiredRoute
+  override def previousPage(page: Page, mode: Mode, userAnswers: Option[UserAnswers]): Page = JourneyRecoveryPage
+
+  override protected def pageToCall(page: Page): Call = desiredRoute
+
+  override def nextPageCall(page: Page, mode: Mode, userAnswers: UserAnswers, isReturn: Boolean = false)(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[Call] = {
+    Future.successful(desiredRoute)
+  }
 }

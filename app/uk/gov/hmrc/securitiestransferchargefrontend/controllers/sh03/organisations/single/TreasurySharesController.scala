@@ -44,7 +44,7 @@ class TreasurySharesController @Inject()(
   
 
   lazy val backLinkCall: Mode => UserAnswers => Call =
-    mode => userAnswers => navigator.previousPage(TreasurySharesPage, mode, userAnswers)
+    mode => userAnswers => navigator.previousPageCall(TreasurySharesPage, mode, userAnswers)
 
   def onPageLoad(mode: Mode): Action[AnyContent] = (stcAuthEnrolled andThen getData andThen requireData) {
     implicit request =>
@@ -73,7 +73,7 @@ class TreasurySharesController @Inject()(
         areTreasuryShares =>
           for {
             updatedAnswers <- Future.fromTry(request.userAnswers.set(TreasurySharesPage, areTreasuryShares))
-            nextPage <- navigator.nextPage(TreasurySharesPage, mode, updatedAnswers, isReturn(request))
+            nextPage <- navigator.nextPageCall(TreasurySharesPage, mode, updatedAnswers, isReturn(request))
           } yield Redirect(nextPage)
       )
   }
