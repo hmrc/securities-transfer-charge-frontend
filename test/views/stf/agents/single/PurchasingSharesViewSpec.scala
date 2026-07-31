@@ -64,9 +64,9 @@ class PurchasingSharesViewSpec extends ViewBaseSpec {
 
     "have the correct radio buttons" in {
       val radios = doc.select(".govuk-radios").text()
-
       radios must include(ExpectedContent.yes)
       radios must include(ExpectedContent.no)
+      doc.select("govuk-radios--inline") mustBe empty
     }
 
     "have a save and continue button" in {
