@@ -21,6 +21,8 @@ import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.actions.*
 import uk.gov.hmrc.securitiestransferchargefrontend.views.html.sh03.organisations.bulk.TemplateInstructionsView
+import uk.gov.hmrc.securitiestransferchargefrontend.utils.CommonHelpers.linkToTemplateFor
+import uk.gov.hmrc.securitiestransferchargefrontend.models.JourneyType.SH03
 
 import javax.inject.Inject
 
@@ -32,6 +34,7 @@ class TemplateInstructionsController @Inject()(
                                               ) extends FrontendBaseController with I18nSupport {
 
   def onPageLoad(): Action[AnyContent] = stcAuthEnrolled { implicit request =>
-    Ok(view())
+    val templateUrl = linkToTemplateFor(SH03)(request.affinityGroup)
+    Ok(view(templateUrl))
   }
 }
