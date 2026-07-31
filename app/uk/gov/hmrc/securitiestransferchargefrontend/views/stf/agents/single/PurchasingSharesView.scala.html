@@ -37,11 +37,11 @@
     @formHelper(action = agentRoutes.PurchasingSharesController.onSubmit(mode), Symbol("autoComplete") -> "off") {
 
         @if(form.errors.nonEmpty) {
-            @govukErrorSummary(ErrorSummaryViewModel(form,  errorLinkOverrides = Map("value" -> "value_0")))
+            @govukErrorSummary(ErrorSummaryViewModel(form))
         }
         <span  class="govuk-caption-l">@messages("transfer.details.caption")</span>
         @govukRadios(
-            RadiosViewModel.yesNo(
+            RadiosViewModel.yesNoStacked(
                 field = form("value"),
                 legend = LegendViewModel(messages("agent.purchasingShares.heading")).asPageHeading(Large)
              )
