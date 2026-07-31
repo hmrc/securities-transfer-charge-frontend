@@ -14,35 +14,35 @@
  * limitations under the License.
  */
 
-package views.stf.agents.single
+package views.stf.organisations.single
 
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
 import play.api.Application
 import uk.gov.hmrc.securitiestransferchargefrontend.forms.stf.shared.PurchasingSharesFormProvider
 import uk.gov.hmrc.securitiestransferchargefrontend.models.NormalMode
-import uk.gov.hmrc.securitiestransferchargefrontend.views.html.stf.agents.single.PurchasingSharesView
+import uk.gov.hmrc.securitiestransferchargefrontend.views.html.stf.organisations.single.PurchasingSharesView
 import views.ViewBaseSpec
 
 
 class PurchasingSharesViewSpec extends ViewBaseSpec {
 
   override def fakeApplication(): Application =
-    applicationBuilder(affinityGroup = agentAffinity).build()
+    applicationBuilder(affinityGroup = orgAffinity).build()
 
   private val viewInstance = app.injector.instanceOf[PurchasingSharesView]
   private val formProvider = new PurchasingSharesFormProvider()
 
-  private val form = formProvider(affinityKey = affinityGroupKeyAgent)
+  private val form = formProvider(affinityKey = affinityGroupKeyOrg)
 
   def view(): Document = Jsoup.parse(
     viewInstance(form, NormalMode, testBackLinkRoute)(fakeRequest, messages).body
   )
 
   object ExpectedContent {
-    val title: String = messages("agent.purchasingShares.title")
+    val title: String = messages("org.purchasingShares.title")
     val caption: String = messages("transfer.details.caption")
-    val heading: String = messages("agent.purchasingShares.heading")
+    val heading: String = messages("org.purchasingShares.heading")
     val saveAndContinue: String = messages("site.save-and-continue.button")
     val saveAndReturn: String = messages("site.save-and-return.button")
     val yes: String = messages("site.yes")
@@ -64,6 +64,7 @@ class PurchasingSharesViewSpec extends ViewBaseSpec {
 
     "have the correct radio buttons" in {
       val radios = doc.select(".govuk-radios").text()
+
       radios must include(ExpectedContent.yes)
       radios must include(ExpectedContent.no)
       doc.select("govuk-radios--inline") mustBe empty

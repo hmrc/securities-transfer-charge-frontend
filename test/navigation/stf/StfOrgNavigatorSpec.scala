@@ -177,25 +177,25 @@ class StfOrgNavigatorSpec extends SpecBase with ScalaFutures {
         }
       }
 
-      "must go from the TaxRatePage to WhatTypeOfSecuritiesController" in {
+      "must go from the TaxRatePage to PurchasingSharesController" in {
         val answers = emptyUserAnswers.set(TaxRatePage, TaxRate.HalfPercent).get
         val result = navigator.nextPage(TaxRatePage, NormalMode, answers)(fakeRequest)
         whenReady(result) { res =>
-          res mustBe orgSingleRoutes.WhatTypeOfSecuritiesController.onPageLoad(NormalMode)
+          res mustBe orgSingleRoutes.PurchasingSharesController.onPageLoad(NormalMode)
         }
       }
 
-      "must go from the WhatTypeOfSecuritiesPage to DetailsOfThisTransferController when shares is selected" in {
-        val answers = emptyUserAnswers.set(WhatTypeOfSecuritiesPage, WhatTypeOfSecurities.Shares).get
-        val result = navigator.nextPage(WhatTypeOfSecuritiesPage, NormalMode, answers)(fakeRequest)
+      "must go from the PurchasingSharesPage to DetailsOfThisTransferController if true" in {
+        val answers = emptyUserAnswers.set(PurchasingSharesPage, true).get
+        val result = navigator.nextPage(PurchasingSharesPage, NormalMode, answers)(fakeRequest)
         whenReady(result) { res =>
           res mustBe orgSingleRoutes.DetailsOfThisTransferController.onPageLoad(NormalMode)
         }
       }
 
-      "must go from the WhatTypeOfSecuritiesPage to OtherSecuritiesTypeController when other is selected" in {
-        val answers = emptyUserAnswers.set(WhatTypeOfSecuritiesPage, WhatTypeOfSecurities.Other).get
-        val result = navigator.nextPage(WhatTypeOfSecuritiesPage, NormalMode, answers)(fakeRequest)
+      "must go from the PurchasingSharesPage to OtherSecuritiesTypeController if false" in {
+        val answers = emptyUserAnswers.set(PurchasingSharesPage,false).get
+        val result = navigator.nextPage(PurchasingSharesPage, NormalMode, answers)(fakeRequest)
         whenReady(result) { res =>
           res mustBe orgSingleRoutes.OtherSecuritiesTypeController.onPageLoad(NormalMode)
         }
@@ -275,18 +275,18 @@ class StfOrgNavigatorSpec extends SpecBase with ScalaFutures {
         result mustBe orgSingleRoutes.OtherSecuritiesTypeController.onPageLoad(NormalMode)
       }
 
-      "must go from the OtherSecuritiesTypePage to WhatTypeOfSecurities" in {
+      "must go from the OtherSecuritiesTypePage to PurchasingShares" in {
         val result = navigator.previousPage(OtherSecuritiesTypePage, NormalMode, emptyUserAnswers)
-        result mustBe orgSingleRoutes.WhatTypeOfSecuritiesController.onPageLoad(NormalMode)
+        result mustBe orgSingleRoutes.PurchasingSharesController.onPageLoad(NormalMode)
       }
 
-      "must go from the DetailsOfThisTransferPage to WhatTypeOfSecurities" in {
+      "must go from the DetailsOfThisTransferPage to PurchasingShares" in {
         val result = navigator.previousPage(DetailsOfThisTransferPage, NormalMode, emptyUserAnswers)
-        result mustBe orgSingleRoutes.WhatTypeOfSecuritiesController.onPageLoad(NormalMode)
+        result mustBe orgSingleRoutes.PurchasingSharesController.onPageLoad(NormalMode)
       }
 
-      "must go from the WhatTypeOfSecuritiesPage to TaxRate" in {
-        val result = navigator.previousPage(WhatTypeOfSecuritiesPage, NormalMode, emptyUserAnswers)
+      "must go from the PurchasingShares to TaxRate" in {
+        val result = navigator.previousPage(PurchasingSharesPage, NormalMode, emptyUserAnswers)
         result mustBe orgSingleRoutes.TaxRateController.onPageLoad(NormalMode)
       }
 

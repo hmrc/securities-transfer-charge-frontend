@@ -14,18 +14,17 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.securitiestransferchargefrontend.forms.stf.organisations
+package uk.gov.hmrc.securitiestransferchargefrontend.forms.stf.shared
 
 import play.api.data.Form
 import uk.gov.hmrc.securitiestransferchargefrontend.forms.mappings.Mappings
-import uk.gov.hmrc.securitiestransferchargefrontend.models.stf.WhatTypeOfSecurities
 
 import javax.inject.Inject
 
-class WhatTypeOfSecuritiesFormProvider @Inject() extends Mappings {
+class PurchasingSharesFormProvider @Inject() extends Mappings {
 
-  def apply(): Form[WhatTypeOfSecurities] =
+  def apply(affinityKey:String): Form[Boolean] =
     Form(
-      "value" -> enumerable[WhatTypeOfSecurities]("org.whatTypeOfSecurities.error.required")
+      "value" -> boolean(s"$affinityKey.purchasingShares.error.required")
     )
 }

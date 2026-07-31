@@ -30,7 +30,7 @@
     saveAndReturnButton:SaveAndReturnButton
 )
 
-@(form: Form[_], mode: Mode, affinityGroupKey: String, backLinkCall: Call)(implicit request: Request[_], messages: Messages)
+@(form: Form[_], mode: Mode, backLinkCall: Call)(implicit request: Request[_], messages: Messages)
 
 @layout(pageTitle = title(form, messages("agent.purchasingShares.title"),Some(messages("transfer.details.caption"))), backLinkUrl = Some(backLinkCall.url)) {
 

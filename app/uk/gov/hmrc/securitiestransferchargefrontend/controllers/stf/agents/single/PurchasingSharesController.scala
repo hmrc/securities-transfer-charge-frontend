@@ -16,13 +16,13 @@
 
 package uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.agents.single
 
-import play.api.data.Form
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, Call, MessagesControllerComponents}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.actions.*
+import uk.gov.hmrc.securitiestransferchargefrontend.controllers.actions.requests.StcDataRequest
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.shared.SaveAndReturnButton.isReturn
-import uk.gov.hmrc.securitiestransferchargefrontend.forms.stf.agents.PurchasingSharesFormProvider
+import uk.gov.hmrc.securitiestransferchargefrontend.forms.stf.shared.PurchasingSharesFormProvider
 import uk.gov.hmrc.securitiestransferchargefrontend.models.{Mode, UserAnswers}
 import uk.gov.hmrc.securitiestransferchargefrontend.navigation.Navigator
 import uk.gov.hmrc.securitiestransferchargefrontend.pages.stf.single.PurchasingSharesPage
@@ -42,32 +42,29 @@ class PurchasingSharesController @Inject()(
                                             view: PurchasingSharesView
                                      )(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport {
 
-  val form: Form[Boolean] = formProvider()
+  private def form(implicit request: StcDataRequest[_]) =
+    formProvider(request.request.affinityGroupKey)
 
   lazy val backLinkCall: Mode => UserAnswers => Call =
     mode => userAnswers => navigator.previousPage(PurchasingSharesPage, mode, userAnswers)
 
   def onPageLoad(mode: Mode): Action[AnyContent] = (stcAuthEnrolled andThen getData andThen requireData) {
     implicit request =>
-
-      val innerRequest = request.request
-
+      
       val preparedForm = request.userAnswers.get(PurchasingSharesPage) match {
         case None => form
         case Some(value) => form.fill(value)
       }
 
-      Ok(view(preparedForm, mode, innerRequest.affinityGroupKey, backLinkCall(mode)(request.userAnswers)))
+      Ok(view(preparedForm, mode, backLinkCall(mode)(request.userAnswers)))
   }
 
   def onSubmit(mode: Mode): Action[AnyContent] = (stcAuthEnrolled andThen getData andThen requireData).async {
     implicit request =>
-
-      val innerRequest = request.request
-
+      
       form.bindFromRequest().fold(
         formWithErrors =>
-          Future.successful(BadRequest(view(formWithErrors, mode, innerRequest.affinityGroupKey, backLinkCall(mode)(request.userAnswers)))),
+          Future.successful(BadRequest(view(formWithErrors, mode,backLinkCall(mode)(request.userAnswers)))),
 
         isPurchasingShares =>
           for {
