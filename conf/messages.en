@@ -565,10 +565,10 @@ fileUpload.error.buyerCountry.required = Enter a country
 fileUpload.error.buyerCountry.invalidCharacters = Country can only include letters, numbers and the following characters: , . - ’
 
 individual.fileUpload.error.connectedPersons.invalid = Enter ‘yes’ if you and the buyer are connected persons
-org.fileUpload.error.connectedPersons.invalid = Enter 'yes' if the business and the seller are connected persons, or 'no' if they are not connected
+org.fileUpload.error.connectedPersons.invalid = Enter ‘yes’ if the business and the seller are connected persons, or ‘no’ if they are not connected
 agent.fileUpload.error.connectedPersons.invalid = Enter ‘yes’ if the buyer and seller are connected persons, or ‘no’ if they are not connected
 individual.fileUpload.error.applyingForRelief.invalid = Enter ‘yes’ if you are applying for a relief, or ‘no’ if you are not applying for a relief
-org.fileUpload.error.applyingForRelief.invalid = Enter 'yes' if the business is applying for a relief, or 'no' if the buyer is not applying for a relief
+org.fileUpload.error.applyingForRelief.invalid = Enter ‘yes’ if the business is applying for a relief, or ‘no’ if the buyer is not applying for a relief
 agent.fileUpload.error.applyingForRelief.invalid = Enter ‘yes’ if the buyer is applying for a relief, or ‘no’ if the buyer is not applying for a relief
 individual.fileUpload.error.whatReliefAreYouApplyingFor.invalid = Enter the name of the relief you are applying for. See a <a target="_blank" href="#" class="govuk-link">full list of reliefs (opens in new tab)</a>.
 org.fileUpload.error.whatReliefAreYouApplyingFor.invalid = Enter the name of the relief the business is applying for. See a <a target="_blank" href="#" class="govuk-link">full list of reliefs (opens in new tab)</a>.
@@ -611,7 +611,7 @@ org.fileUpload.chargingPoint.error.required = Enter the charging point
 agent.fileUpload.chargingPoint.error.required = Enter the date the buyer purchased the securities
 
 individual.fileUpload.chargingPoint.error.futureDate = The day you bought the securities must be today’s date or a date in the past
-org.fileUpload.chargingPoint.error.futureDate = The charging point must be today's date or a date in the past
+org.fileUpload.chargingPoint.error.futureDate = The charging point must be today’s date or a date in the past
 agent.fileUpload.chargingPoint.error.futureDate = The day the buyer purchased the securities must be today’s date or a date in the past
 
 minSharePrice.error.invalid = The minimum amount paid for the shares must be a number and can include up to two decimal places, like £30 or £28.60
@@ -622,7 +622,7 @@ maxSharePrice.error.invalid = The maximum amount paid for the shares must be a n
 maxSharePrice.error.maximum = The maximum amount paid for the shares must be £999,999,999 or less
 maxSharePrice.error.minimum = The maximum amount paid for the shares must be £0.01 or more
 
-sharePurchaseReason.required = Enter 'cancellation' if the shares are being purchased for cancellation, or 'treasury' if the shares are being purchased to place into treasury
+sharePurchaseReason.required = Enter ‘cancellation’ if the shares are being purchased for cancellation, or ‘treasury’ if the shares are being purchased to place into treasury
 sharePurchaseReason.invalid = Enter ‘cancellation’ if the shares are being purchased for cancellation, or ‘treasury’ if the shares are being purchased to place into treasury
 
 purchasedForCancellation.invalid = Enter ‘yes’ if the shares purchased for cancellation shares also qualify as treasury shares

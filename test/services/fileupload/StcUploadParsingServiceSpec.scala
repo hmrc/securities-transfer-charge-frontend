@@ -156,16 +156,21 @@ class StcUploadParsingServiceSpec extends AnyWordSpec with Matchers with EitherV
     }
 
     "return InvalidTemplate when no template configuration is found for the given journey keys" in new Setup {
-      when(fileUploadConfig.template(eqTo(testAffinityGroup), eqTo("unknown"))).thenReturn(None)
+      when(fileUploadConfig.template(eqTo(testAffinityGroup), eqTo(STF))).thenReturn(None)
 
       mockStream(validRow1Cells, Seq(validRow2, validRow3, ParsedRow(4, Seq(ParsedCell(1, "Data")))))
 
-      val result: Either[FileParseError, List[ParsedRow]] = service.withVerifiedTemplateStream(uploadedFile, testAffinityGroup, "unknown") { (_, stream) => Right(stream.toList) }
+      val result: Either[FileParseError, List[ParsedRow]] = service.withVerifiedTemplateStream(uploadedFile, testAffinityGroup, STF) { (_, stream) => Right(stream.toList) }
 
       result mustBe Left(FileParseError.InvalidTemplate)
     }
 
     "propagate file parsing errors" in new Setup {
+      
+      when(fileUploadConfig.template(eqTo(testAffinityGroup), eqTo(STF))).thenReturn(
+        Some(TemplateDefinition(27, hashRow(validRow1Cells ++ validRow2Cells ++ validRow3Cells)))
+      )
+      
       when(fileParsingService.withParsedStream[Seq[ParsedRow]](any[UploadedFile], any[Int])(any()))
         .thenReturn(Left(FileParseError.InvalidXlsx("broken workbook")))
 
