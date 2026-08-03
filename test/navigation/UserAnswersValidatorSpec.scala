@@ -97,6 +97,8 @@ class UserAnswersValidatorSpec extends AnyFreeSpec with Matchers with ScalaFutur
     }
 
     override def errorPage(forPage: Page): Call = errorPageCall
+
+    override val userAnswersValidator: UserAnswersValidator = new base.stubs.StubUserAnswersValidator(this)
   }
 
   def createUserAnswers(data: Map[String, String]): UserAnswers = {

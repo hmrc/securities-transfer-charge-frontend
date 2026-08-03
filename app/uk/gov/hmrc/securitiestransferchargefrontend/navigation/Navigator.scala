@@ -29,6 +29,7 @@ trait Navigator:
   def previousPage(page: Page, mode: Mode, userAnswers: UserAnswers): Call
   def previousPage(page: Page, mode: Mode, userAnswers: Option[UserAnswers]): Call
   def errorPage(forPage: Page): Call
+  val userAnswersValidator: UserAnswersValidator
 
 
 abstract class AbstractModeNavigator(implicit ex: ExecutionContext) extends Navigator:
