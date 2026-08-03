@@ -24,7 +24,6 @@ import uk.gov.hmrc.securitiestransferchargefrontend.queries.Gettable
 import scala.concurrent.{ExecutionContext, Future}
 import com.google.common.collect.BiMap
 
-
 abstract class UserAnswersValidator(navigator: Navigator)(implicit ec: ExecutionContext) {
 
   protected type GettablePage[A] = Page & Gettable[A]
