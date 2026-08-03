@@ -30,6 +30,7 @@ trait Navigator:
   def previousPage(page: Page, mode: Mode, userAnswers: Option[UserAnswers]): Call
   def errorPage(forPage: Page): Call
 
+
 abstract class AbstractModeNavigator(implicit ex: ExecutionContext) extends Navigator:
 
   def forwardRoutes(page: Page)(implicit hc: HeaderCarrier): UserAnswers => Future[Call]

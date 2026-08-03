@@ -16,4 +16,6 @@
 
 package uk.gov.hmrc.securitiestransferchargefrontend.pages
 
-case object JourneyRecoveryPage extends ErrorPage
+import uk.gov.hmrc.securitiestransferchargefrontend.queries.Gettable
+
+case object JourneyRecoveryPage extends ErrorPage with Gettable[Nothing]
