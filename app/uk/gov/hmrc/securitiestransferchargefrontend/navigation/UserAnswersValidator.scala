@@ -24,46 +24,55 @@ import uk.gov.hmrc.securitiestransferchargefrontend.queries.Gettable
 import scala.concurrent.{ExecutionContext, Future}
 import com.google.common.collect.BiMap
 
-/*
- * Used to walk the journey using the navigator and check if all the data is present in the UserAnswers.
- * If data is missing, it will return the page used to collect the missing data.
- * If the data is present:
- * If the page is a CYA page, it will return true.
- * If the page is an error page, it will return false.
- */
+
 abstract class UserAnswersValidator(navigator: Navigator)(implicit ec: ExecutionContext) {
 
   protected type GettablePage[A] = Page & Gettable[A]
-  private val jrPage: GettablePage[?] = JourneyRecoveryPage
+  private val recoveryPage: GettablePage[?] = JourneyRecoveryPage
 
-  final def callForMissingData[A](userAnswers: UserAnswers)(page: GettablePage[A])(implicit request: Request[?]): Future[Either[Call, Boolean]] = {
-    callForMissingDataInternal(userAnswers, page)
+
+  /*
+   * Uses the navigator to walk the page graph and check if all the data is present in the UserAnswers.
+   * Returns:
+    * - Left(Call) if a page is missing data, where the Call is the page that should be displayed to the user to fill in the missing data.
+    * - Right(true) if all data is present and the user can continue to the next page.
+    * - Right(false) if an error page is found.
+   */
+  final def validate[A](userAnswers: UserAnswers)(implicit request: Request[?]): Future[Either[Call, Boolean]] = {
+    validateRec(userAnswers, startPage)
   }
 
-  private def callForMissingDataInternal(userAnswers: UserAnswers, page: GettablePage[?])(implicit request: Request[?]): Future[Either[Call, Boolean]] = {
+  private def validateRec(userAnswers: UserAnswers, page: GettablePage[?])(implicit request: Request[?]): Future[Either[Call, Boolean]] = {
     if (isCyaPage(page))
       Future.successful(Right(true))
     else if (isErrorPage(page))
       Future.successful(Right(false))
-    else if (!pageHasDataAtPath(userAnswers, page))
+    else if (!pageHasValidDataAtPath(userAnswers, page))
       Future.successful(Left(callForPage(page)))
     else {
       navigator.nextPage(page, NormalMode, userAnswers).flatMap { nextCall =>
         val nextPage: GettablePage[?] = callToPage(nextCall)
-        callForMissingDataInternal(userAnswers, nextPage)
+        validateRec(userAnswers, nextPage)
       }
     }
   }
 
+  protected val startPage: GettablePage[?]
   protected val pageCallMap: BiMap[GettablePage[?], Call]
-  
+
+  // Default implementation of pageHasValidDataAtPath, can be overridden in subclasses
+  // where additional validation logic is required for specific pages.
+  protected def pageHasValidDataAtPath(userAnswers: UserAnswers, page: GettablePage[?]): Boolean =
+    pageHasDataAtPath(userAnswers, page)
+
   private def callToPage(call: Call): GettablePage[?] = 
-    pageCallMap.inverse().getOrDefault(call, jrPage)
+    pageCallMap.inverse().getOrDefault(call, recoveryPage)
      
   private def callForPage(page: GettablePage[?]): Call = 
     pageCallMap.getOrDefault(page, navigator.errorPage(page))
 
-  protected def isCyaPage(page: GettablePage[?]): Boolean
+  protected def isCyaPage(page: GettablePage[?]): Boolean = 
+    page.isInstanceOf[uk.gov.hmrc.securitiestransferchargefrontend.pages.CyaPage]
   
   protected def isErrorPage(page: GettablePage[?]): Boolean = 
     page.isInstanceOf[uk.gov.hmrc.securitiestransferchargefrontend.pages.ErrorPage]
