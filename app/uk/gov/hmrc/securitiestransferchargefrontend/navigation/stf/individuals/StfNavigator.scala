@@ -16,16 +16,19 @@
 
 package uk.gov.hmrc.securitiestransferchargefrontend.navigation.stf.individuals
 
+import com.google.common.collect.{BiMap, HashBiMap}
 import play.api.mvc.{Call, Request}
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.play.http.HeaderCarrierConverter
 import uk.gov.hmrc.securitiestransferchargefrontend.config.FrontendAppConfig
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.routes
+import uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.individuals.single.routes as individualSingleRoutes
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.shared.routes as sharedRoutes
 import uk.gov.hmrc.securitiestransferchargefrontend.domain.{SubmissionId, UserId}
-import uk.gov.hmrc.securitiestransferchargefrontend.models.UserAnswers
-import uk.gov.hmrc.securitiestransferchargefrontend.navigation.{AbstractModeNavigator, PersistentNavigator}
+import uk.gov.hmrc.securitiestransferchargefrontend.models.{NormalMode, UserAnswers}
+import uk.gov.hmrc.securitiestransferchargefrontend.navigation.{AbstractModeNavigator, PersistentNavigator, UserAnswersValidator}
 import uk.gov.hmrc.securitiestransferchargefrontend.pages.*
+import uk.gov.hmrc.securitiestransferchargefrontend.pages.stf.single.*
 import uk.gov.hmrc.securitiestransferchargefrontend.services.AnswerPersistenceService
 
 import javax.inject.Inject
@@ -58,5 +61,33 @@ class StfNavigator @Inject()(appConfig: FrontendAppConfig,
   def restore(submissionId: SubmissionId, userId: UserId)(implicit request: Request[?]): Future[UserAnswers] = {
     implicit val hc: HeaderCarrier = HeaderCarrierConverter.fromRequestAndSession(request, request.session)
     answerPersistenceService.load(submissionId, userId)
+  }
+
+  val userAnswersValidator: UserAnswersValidator = new UserAnswersValidator(this) {
+
+    override protected val startPage: GettablePage[?] = ConfirmAddressPage
+
+    override protected val pageCallMap: BiMap[GettablePage[?], Call] = {
+      val map = HashBiMap.create[GettablePage[?], Call]()
+      
+      // STF Individual single journey pages only
+      map.put(ConfirmAddressPage, individualSingleRoutes.ConfirmAddressController.onPageLoad())
+      map.put(StfBuyersAddressPage, individualSingleRoutes.AddressController.onPageLoad())
+      map.put(NameOfSellerPage, individualSingleRoutes.NameOfSellerController.onPageLoad(NormalMode))
+      map.put(StfSellerAddressPage, individualSingleRoutes.StfSellerAddressController.onPageLoad())
+      map.put(ConnectedPersonsPage, individualSingleRoutes.ConnectedPersonsController.onPageLoad(NormalMode))
+      map.put(ApplyingForReliefPage, individualSingleRoutes.ApplyingForReliefController.onPageLoad(NormalMode))
+      map.put(WhatReliefAreYouApplyingForPage, individualSingleRoutes.WhatReliefAreYouApplyingForController.onPageLoad(NormalMode))
+      map.put(SecuritiesTargetPage, individualSingleRoutes.SecuritiesTargetController.onPageLoad(NormalMode))
+      map.put(ChargingPointPage, individualSingleRoutes.ChargingPointController.onPageLoad(NormalMode))
+      map.put(TaxRatePage, individualSingleRoutes.TaxRateController.onPageLoad(NormalMode))
+      map.put(WhatTypeOfSecuritiesPage, individualSingleRoutes.WhatTypeOfSecuritiesController.onPageLoad(NormalMode))
+      map.put(DetailsOfThisTransferPage, individualSingleRoutes.DetailsOfThisTransferController.onPageLoad(NormalMode))
+      map.put(OtherSecuritiesTypePage, individualSingleRoutes.OtherSecuritiesTypeController.onPageLoad(NormalMode))
+      map.put(AmountPaidForSecuritiesPage, individualSingleRoutes.AmountPaidForSecuritiesController.onPageLoad(NormalMode))
+      map.put(TotalMarketValuePage, individualSingleRoutes.TotalMarketValueController.onPageLoad(NormalMode))
+      
+      map
+    }
   }
 }
