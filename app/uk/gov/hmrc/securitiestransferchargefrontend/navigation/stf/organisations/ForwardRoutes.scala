@@ -20,17 +20,16 @@ import play.api.mvc.Call
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.securitiestransferchargefrontend.config.FrontendAppConfig
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.routes
-import uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.organisations.single.routes as orgSingleRoutes
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.organisations.bulk.routes as orgBulkRoutes
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.organisations.routes as orgRoutes
+import uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.organisations.single.routes as orgSingleRoutes
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.shared.single.routes as stfSingleCyaRoutes
 import uk.gov.hmrc.securitiestransferchargefrontend.models.stf.HowToNotifyAboutSecuritiesTransfer.{MoreThanOneAtATime, OneAtATime}
-import uk.gov.hmrc.securitiestransferchargefrontend.models.stf.WhatTypeOfSecurities
 import uk.gov.hmrc.securitiestransferchargefrontend.models.{NormalMode, UserAnswers}
 import uk.gov.hmrc.securitiestransferchargefrontend.navigation.PersistentNavigationHelper
 import uk.gov.hmrc.securitiestransferchargefrontend.pages.*
 import uk.gov.hmrc.securitiestransferchargefrontend.pages.stf.shared.{HowToNotifyAboutSecuritiesTransferPage, SubmissionsDashboardPage}
-import uk.gov.hmrc.securitiestransferchargefrontend.pages.stf.single.{AmountPaidForSecuritiesPage, ApplyingForReliefPage, ChargingPointPage, ConfirmAddressPage, ConnectedPersonsPage, DetailsOfThisTransferPage, NameOfSellerPage, OtherSecuritiesTypePage, SecuritiesTargetPage, StfBuyersAddressPage, StfSellerAddressPage, TaxRatePage, TotalMarketValuePage, WhatReliefAreYouApplyingForPage, WhatTypeOfSecuritiesPage}
+import uk.gov.hmrc.securitiestransferchargefrontend.pages.stf.single.*
 import uk.gov.hmrc.securitiestransferchargefrontend.services.AnswerPersistenceService
 
 import scala.concurrent.{ExecutionContext, Future}
@@ -72,12 +71,14 @@ class ForwardRoutes(answerPersistenceService: AnswerPersistenceService,
       if (enterDate.isBefore(firstDate)) routes.JourneyRecoveryController.onPageLoad()
       else orgSingleRoutes.TaxRateController.onPageLoad(NormalMode)
     }
-    case TaxRatePage => userAnswers => dataRequired(TaxRatePage, userAnswers, orgSingleRoutes.WhatTypeOfSecuritiesController.onPageLoad(NormalMode))
+    case TaxRatePage => userAnswers => dataRequired(TaxRatePage, userAnswers, orgSingleRoutes.PurchasingSharesController.onPageLoad(NormalMode))
     case OtherSecuritiesTypePage => userAnswers => dataRequired(OtherSecuritiesTypePage, userAnswers, orgSingleRoutes.AmountPaidForSecuritiesController.onPageLoad(NormalMode))
-    case WhatTypeOfSecuritiesPage => userAnswers =>
-      dataDependent(WhatTypeOfSecuritiesPage, userAnswers) {
-        case WhatTypeOfSecurities.Shares => orgSingleRoutes.DetailsOfThisTransferController.onPageLoad(NormalMode)
-        case WhatTypeOfSecurities.Other => orgSingleRoutes.OtherSecuritiesTypeController.onPageLoad(NormalMode)
+    case PurchasingSharesPage => userAnswers =>
+      dataDependent(PurchasingSharesPage,userAnswers) { isPurchasingShares =>
+        if(isPurchasingShares)
+          orgSingleRoutes.DetailsOfThisTransferController.onPageLoad(NormalMode)
+        else
+          orgSingleRoutes.OtherSecuritiesTypeController.onPageLoad(NormalMode)
       }
     case DetailsOfThisTransferPage => userAnswers => dataRequired(DetailsOfThisTransferPage, userAnswers, stfSingleCyaRoutes.CheckYourAnswersController.onPageLoad())
     case AmountPaidForSecuritiesPage => userAnswers =>

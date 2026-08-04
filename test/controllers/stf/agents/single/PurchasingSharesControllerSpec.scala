@@ -28,7 +28,7 @@ import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.securitiestransferchargefrontend.clients.SaveAndReturnClient
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.routes
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.agents.single.routes as agentSingleRoutes
-import uk.gov.hmrc.securitiestransferchargefrontend.forms.stf.agents.PurchasingSharesFormProvider
+import uk.gov.hmrc.securitiestransferchargefrontend.forms.stf.shared.PurchasingSharesFormProvider
 import uk.gov.hmrc.securitiestransferchargefrontend.models.{NormalMode, UserAnswers}
 import uk.gov.hmrc.securitiestransferchargefrontend.navigation.Navigator
 import uk.gov.hmrc.securitiestransferchargefrontend.pages.stf.single.PurchasingSharesPage
@@ -43,7 +43,7 @@ class PurchasingSharesControllerSpec extends SpecBase with MockitoSugar {
   lazy val purchasingSharesRoute: String = agentSingleRoutes.PurchasingSharesController.onPageLoad(NormalMode).url
 
   val formProvider = new PurchasingSharesFormProvider()
-  val form: Form[Boolean] = formProvider()
+  val form: Form[Boolean] = formProvider(affinityKey = affinityGroupKeyAgent)
 
   "PurchasingSharesController" - {
 
@@ -64,7 +64,7 @@ class PurchasingSharesControllerSpec extends SpecBase with MockitoSugar {
         val view = application.injector.instanceOf[PurchasingSharesView]
 
         status(result) mustEqual OK
-        contentAsString(result) mustEqual view(form, NormalMode, affinityGroupKeyOrg, testBackLinkRoute)(request, messages(application)).toString
+        contentAsString(result) mustEqual view(form, NormalMode, testBackLinkRoute)(request, messages(application)).toString
       }
     }
 
@@ -87,7 +87,7 @@ class PurchasingSharesControllerSpec extends SpecBase with MockitoSugar {
         val result = route(application, request).value
 
         status(result) mustEqual OK
-        contentAsString(result) mustEqual view(form.fill(true), NormalMode, affinityGroupKeyOrg, testBackLinkRoute)(request, messages(application)).toString
+        contentAsString(result) mustEqual view(form.fill(true), NormalMode, testBackLinkRoute)(request, messages(application)).toString
       }
     }
 
@@ -137,7 +137,7 @@ class PurchasingSharesControllerSpec extends SpecBase with MockitoSugar {
         val result = route(application, request).value
 
         status(result) mustEqual BAD_REQUEST
-        contentAsString(result) mustEqual view(boundForm, NormalMode, affinityGroupKeyOrg, testBackLinkRoute)(request, messages(application)).toString
+        contentAsString(result) mustEqual view(boundForm, NormalMode, testBackLinkRoute)(request, messages(application)).toString
       }
     }
 

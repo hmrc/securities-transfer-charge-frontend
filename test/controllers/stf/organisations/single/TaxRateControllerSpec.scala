@@ -85,6 +85,7 @@ class TaxRateControllerSpec extends SpecBase with MockitoSugar {
 
       val application =
         applicationBuilder(userAnswers = Some(userAnswers),affinityGroup = orgAffinity)
+          .overrides(bind[Navigator].qualifiedWith("organisations").toInstance(getNavigator))
           .build()
 
       running(application) {
@@ -95,7 +96,7 @@ class TaxRateControllerSpec extends SpecBase with MockitoSugar {
         val result = route(application, request).value
 
         status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual orgSingleRoutes.WhatTypeOfSecuritiesController.onPageLoad(NormalMode).url
+        redirectLocation(result).value mustEqual testNextPage.url
       }
     }
 

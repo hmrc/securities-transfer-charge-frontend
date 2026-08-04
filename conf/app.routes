@@ -153,10 +153,10 @@ POST       /stf/org/security-type                         uk.gov.hmrc.securities
 GET        /stf/org/change/security-type                  uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.organisations.single.OtherSecuritiesTypeController.onPageLoad(mode: Mode = CheckMode)
 POST       /stf/org/change/security-type                  uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.organisations.single.OtherSecuritiesTypeController.onSubmit(mode: Mode = CheckMode)
 
-GET        /stf/org/securities-type                       uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.organisations.single.WhatTypeOfSecuritiesController.onPageLoad(mode: Mode = NormalMode)
-POST       /stf/org/securities-type                       uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.organisations.single.WhatTypeOfSecuritiesController.onSubmit(mode: Mode = NormalMode)
-GET        /stf/org/change/securities-type                uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.organisations.single.WhatTypeOfSecuritiesController.onPageLoad(mode: Mode = CheckMode)
-POST       /stf/org/change/securities-type                uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.organisations.single.WhatTypeOfSecuritiesController.onSubmit(mode: Mode = CheckMode)
+GET        /stf/org/purchasing-shares                      uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.organisations.single.PurchasingSharesController.onPageLoad(mode: Mode = NormalMode)
+POST       /stf/org/purchasing-shares                       uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.organisations.single.PurchasingSharesController.onSubmit(mode: Mode = NormalMode)
+GET        /stf/org/change/purchasing-shares                uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.organisations.single.PurchasingSharesController.onPageLoad(mode: Mode = CheckMode)
+POST       /stf/org/change/purchasing-shares                uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.organisations.single.PurchasingSharesController.onSubmit(mode: Mode = CheckMode)
 
 GET        /stf/org/consideration                         uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.organisations.single.AmountPaidForSecuritiesController.onPageLoad(mode: Mode = NormalMode)
 POST       /stf/org/consideration                         uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.organisations.single.AmountPaidForSecuritiesController.onSubmit(mode: Mode = NormalMode)

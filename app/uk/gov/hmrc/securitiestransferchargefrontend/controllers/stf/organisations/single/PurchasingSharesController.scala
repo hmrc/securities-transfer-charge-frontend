@@ -16,64 +16,60 @@
 
 package uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.organisations.single
 
-import play.api.data.Form
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, Call, MessagesControllerComponents}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.actions.*
+import uk.gov.hmrc.securitiestransferchargefrontend.controllers.actions.requests.StcDataRequest
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.shared.SaveAndReturnButton.isReturn
-import uk.gov.hmrc.securitiestransferchargefrontend.forms.stf.organisations.WhatTypeOfSecuritiesFormProvider
-import uk.gov.hmrc.securitiestransferchargefrontend.models.stf.WhatTypeOfSecurities
+import uk.gov.hmrc.securitiestransferchargefrontend.forms.stf.shared.PurchasingSharesFormProvider
 import uk.gov.hmrc.securitiestransferchargefrontend.models.{Mode, UserAnswers}
 import uk.gov.hmrc.securitiestransferchargefrontend.navigation.Navigator
-import uk.gov.hmrc.securitiestransferchargefrontend.pages.stf.single.WhatTypeOfSecuritiesPage
-import uk.gov.hmrc.securitiestransferchargefrontend.views.html.stf.organisations.single.WhatTypeOfSecuritiesView
+import uk.gov.hmrc.securitiestransferchargefrontend.pages.stf.single.PurchasingSharesPage
+import uk.gov.hmrc.securitiestransferchargefrontend.views.html.stf.organisations.single.PurchasingSharesView
 
 import javax.inject.{Inject, Named}
 import scala.concurrent.{ExecutionContext, Future}
 
-class WhatTypeOfSecuritiesController @Inject()(
-                                       override val messagesApi: MessagesApi,
-                                       @Named("organisations") navigator: Navigator,
-                                       stcAuthEnrolled: StcAuthEnrolledAction,
-                                       getData: StcDataRetrievalAction,
-                                       requireData: StcDataRequiredAction,
-                                       formProvider: WhatTypeOfSecuritiesFormProvider,
-                                       val controllerComponents: MessagesControllerComponents,
-                                       view: WhatTypeOfSecuritiesView
+class PurchasingSharesController @Inject()(
+                                            override val messagesApi: MessagesApi,
+                                            @Named("organisations") navigator: Navigator,
+                                            stcAuthEnrolled: StcAuthEnrolledAction,
+                                            getData: StcDataRetrievalAction,
+                                            requireData: StcDataRequiredAction,
+                                            formProvider: PurchasingSharesFormProvider,
+                                            val controllerComponents: MessagesControllerComponents,
+                                            view: PurchasingSharesView
                                      )(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport {
 
-  val form: Form[WhatTypeOfSecurities] = formProvider()
+  private def form(implicit request: StcDataRequest[_]) =
+    formProvider(request.request.affinityGroupKey)
 
   lazy val backLinkCall: Mode => UserAnswers => Call =
-    mode => userAnswers => navigator.previousPage(WhatTypeOfSecuritiesPage, mode, userAnswers)
+    mode => userAnswers => navigator.previousPage(PurchasingSharesPage, mode, userAnswers)
 
   def onPageLoad(mode: Mode): Action[AnyContent] = (stcAuthEnrolled andThen getData andThen requireData) {
     implicit request =>
-
-      val innerRequest = request.request
-
-      val preparedForm = request.userAnswers.get(WhatTypeOfSecuritiesPage) match {
+      
+      val preparedForm = request.userAnswers.get(PurchasingSharesPage) match {
         case None => form
         case Some(value) => form.fill(value)
       }
 
-      Ok(view(preparedForm, mode, innerRequest.affinityGroupKey, backLinkCall(mode)(request.userAnswers)))
+      Ok(view(preparedForm, mode, backLinkCall(mode)(request.userAnswers)))
   }
 
   def onSubmit(mode: Mode): Action[AnyContent] = (stcAuthEnrolled andThen getData andThen requireData).async {
     implicit request =>
-
-      val innerRequest = request.request
-
+      
       form.bindFromRequest().fold(
         formWithErrors =>
-          Future.successful(BadRequest(view(formWithErrors, mode, innerRequest.affinityGroupKey, backLinkCall(mode)(request.userAnswers)))),
+          Future.successful(BadRequest(view(formWithErrors, mode, backLinkCall(mode)(request.userAnswers)))),
 
-        securitiesType =>
+        isPurchasingShares =>
           for {
-            updatedAnswers <- Future.fromTry(request.userAnswers.set(WhatTypeOfSecuritiesPage, securitiesType))
-            nextPage <- navigator.nextPage(WhatTypeOfSecuritiesPage, mode, updatedAnswers, isReturn(request))
+            updatedAnswers <- Future.fromTry(request.userAnswers.set(PurchasingSharesPage, isPurchasingShares))
+            nextPage <- navigator.nextPage(PurchasingSharesPage, mode, updatedAnswers, isReturn(request))
           } yield Redirect(nextPage)
       )
   }
