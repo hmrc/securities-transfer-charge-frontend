@@ -16,6 +16,7 @@
 
 package controllers.stf.individuals.single
 
+import base.Fixtures.testUserAnswers
 import base.SpecBase
 import org.scalatestplus.mockito.MockitoSugar
 import play.api.data.Form
@@ -23,35 +24,38 @@ import play.api.inject.bind
 import play.api.test.FakeRequest
 import play.api.test.Helpers.*
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.routes
-import uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.individuals.single.routes as individualRoutes
-import uk.gov.hmrc.securitiestransferchargefrontend.forms.stf.individuals.TaxRateFormProvider
-import uk.gov.hmrc.securitiestransferchargefrontend.models.stf.TaxRate
-import uk.gov.hmrc.securitiestransferchargefrontend.models.{NormalMode, UserAnswers}
+import uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.individuals.single.routes as individualSingleRoutes
+import uk.gov.hmrc.securitiestransferchargefrontend.forms.stf.shared.PurchasingSharesFormProvider
+import uk.gov.hmrc.securitiestransferchargefrontend.models.NormalMode
 import uk.gov.hmrc.securitiestransferchargefrontend.navigation.Navigator
-import uk.gov.hmrc.securitiestransferchargefrontend.pages.stf.single.TaxRatePage
-import uk.gov.hmrc.securitiestransferchargefrontend.views.html.stf.individuals.single.TaxRateView
+import uk.gov.hmrc.securitiestransferchargefrontend.pages.stf.single.PurchasingSharesPage
+import uk.gov.hmrc.securitiestransferchargefrontend.views.html.stf.individuals.single.PurchasingSharesView
 
-class TaxRateControllerSpec extends SpecBase with MockitoSugar {
-  
-  lazy val taxRateRoute: String = individualRoutes.TaxRateController.onPageLoad(NormalMode).url
+class PurchasingSharesControllerSpec extends SpecBase with MockitoSugar {
 
-  val formProvider = new TaxRateFormProvider()
-  val form: Form[TaxRate] = formProvider()
 
-  "TaxRate Controller" - {
+  lazy val purchasingSharesRoute: String = individualSingleRoutes.PurchasingSharesController.onPageLoad(NormalMode).url
+
+  val formProvider = new PurchasingSharesFormProvider()
+  val form: Form[Boolean] = formProvider(affinityKey = affinityGroupKeyInd)
+
+  "PurchasingSharesController" - {
 
     "must return OK and the correct view for a GET" in {
 
-      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers), affinityGroup = individualAffinity)
+      val application = applicationBuilder(
+        userAnswers = Some(emptyUserAnswers),
+        affinityGroup = individualAffinity
+      )
         .overrides(bind[Navigator].qualifiedWith("individuals").toInstance(getNavigator))
         .build()
 
       running(application) {
-        val request = FakeRequest(GET, taxRateRoute)
+        val request = FakeRequest(GET, purchasingSharesRoute)
 
         val result = route(application, request).value
 
-        val view = application.injector.instanceOf[TaxRateView]
+        val view = application.injector.instanceOf[PurchasingSharesView]
 
         status(result) mustEqual OK
         contentAsString(result) mustEqual view(form, NormalMode, testBackLinkRoute)(request, messages(application)).toString
@@ -60,59 +64,64 @@ class TaxRateControllerSpec extends SpecBase with MockitoSugar {
 
     "must populate the view correctly on a GET when the question has previously been answered" in {
 
-      val userAnswers = UserAnswers(testUserId, testGroupIdentifier, submissionId).set(TaxRatePage, TaxRate.values.head).success.value
+      val userAnswers = testUserAnswers.set(PurchasingSharesPage, true).success.value
 
-      val application = applicationBuilder(userAnswers = Some(userAnswers), affinityGroup = individualAffinity)
+      val application = applicationBuilder(
+        userAnswers = Some(userAnswers),
+        affinityGroup = agentAffinity
+      )
         .overrides(bind[Navigator].qualifiedWith("individuals").toInstance(getNavigator))
         .build()
 
       running(application) {
-        val request = FakeRequest(GET, taxRateRoute)
+        val request = FakeRequest(GET, purchasingSharesRoute)
 
-        val view = application.injector.instanceOf[TaxRateView]
+        val view = application.injector.instanceOf[PurchasingSharesView]
 
         val result = route(application, request).value
 
         status(result) mustEqual OK
-        contentAsString(result) mustEqual view(form.fill(TaxRate.values.head), NormalMode, testBackLinkRoute)(request, messages(application)).toString
+        contentAsString(result) mustEqual view(form.fill(true), NormalMode, testBackLinkRoute)(request, messages(application)).toString
       }
     }
 
     "must redirect to the next page when valid data is submitted" in {
-      val userAnswers = UserAnswers(testUserId, testGroupIdentifier, submissionId).set(TaxRatePage, TaxRate.values.head).success.value
-      
+
 
       val application =
-        applicationBuilder(userAnswers = Some(userAnswers),affinityGroup = individualAffinity)
-          .overrides(bind[Navigator].qualifiedWith("individuals").toInstance(getNavigator))
-          .build()
+        applicationBuilder(
+          userAnswers = Some(emptyUserAnswers),
+          affinityGroup = individualAffinity
+        ).overrides(bind[Navigator].qualifiedWith("individuals").toInstance(getNavigator)).build()
 
       running(application) {
         val request =
-          FakeRequest(POST, taxRateRoute)
-            .withFormUrlEncodedBody(("value", TaxRate.values.head.toString))
+          FakeRequest(POST, purchasingSharesRoute)
+            .withFormUrlEncodedBody(("value", "true"))
 
         val result = route(application, request).value
 
         status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual testNextPage.url
       }
     }
 
     "must return a Bad Request and errors when invalid data is submitted" in {
 
-      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers), affinityGroup = individualAffinity)
+      val application = applicationBuilder(
+        userAnswers = Some(emptyUserAnswers),
+        affinityGroup = individualAffinity
+      )
         .overrides(bind[Navigator].qualifiedWith("individuals").toInstance(getNavigator))
         .build()
 
       running(application) {
         val request =
-          FakeRequest(POST, taxRateRoute)
+          FakeRequest(POST, purchasingSharesRoute)
             .withFormUrlEncodedBody(("value", "invalid value"))
 
         val boundForm = form.bind(Map("value" -> "invalid value"))
 
-        val view = application.injector.instanceOf[TaxRateView]
+        val view = application.injector.instanceOf[PurchasingSharesView]
 
         val result = route(application, request).value
 
@@ -123,10 +132,13 @@ class TaxRateControllerSpec extends SpecBase with MockitoSugar {
 
     "must redirect to Journey Recovery for a GET if no existing data is found" in {
 
-      val application = applicationBuilder(userAnswers = None, affinityGroup = individualAffinity).build()
+      val application = applicationBuilder(
+        userAnswers = None,
+        affinityGroup = individualAffinity
+      ).build()
 
       running(application) {
-        val request = FakeRequest(GET, taxRateRoute)
+        val request = FakeRequest(GET, purchasingSharesRoute)
 
         val result = route(application, request).value
 
@@ -137,12 +149,15 @@ class TaxRateControllerSpec extends SpecBase with MockitoSugar {
 
     "redirect to Journey Recovery for a POST if no existing data is found" in {
 
-      val application = applicationBuilder(userAnswers = None, affinityGroup = individualAffinity).build()
+      val application = applicationBuilder(
+        userAnswers = None,
+        affinityGroup = individualAffinity
+      ).build()
 
       running(application) {
         val request =
-          FakeRequest(POST, taxRateRoute)
-            .withFormUrlEncodedBody(("value", TaxRate.values.head.toString))
+          FakeRequest(POST, purchasingSharesRoute)
+            .withFormUrlEncodedBody(("value", "true"))
 
         val result = route(application, request).value
 

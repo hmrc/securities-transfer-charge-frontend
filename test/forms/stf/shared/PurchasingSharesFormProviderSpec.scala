@@ -22,7 +22,7 @@ import uk.gov.hmrc.securitiestransferchargefrontend.forms.stf.shared.PurchasingS
 
 class PurchasingSharesFormProviderSpec extends BooleanFieldBehaviours {
 
-  private val affinityKeys: Seq[String] = Seq("org", "agent")
+  private val affinityKeys: Seq[String] = Seq("org", "agent","individual")
 
   val fieldName = "value"
 

@@ -25,12 +25,11 @@ import uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.individuals.
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.individuals.single.routes as individualSingleRoutes
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.shared.single.routes as stfSingleCyaRoutes
 import uk.gov.hmrc.securitiestransferchargefrontend.models.stf.HowToNotifyAboutSecuritiesTransfer.{MoreThanOneAtATime, OneAtATime}
-import uk.gov.hmrc.securitiestransferchargefrontend.models.stf.WhatTypeOfSecurities
 import uk.gov.hmrc.securitiestransferchargefrontend.models.{NormalMode, UserAnswers}
 import uk.gov.hmrc.securitiestransferchargefrontend.navigation.*
 import uk.gov.hmrc.securitiestransferchargefrontend.pages.*
 import uk.gov.hmrc.securitiestransferchargefrontend.pages.stf.shared.{HowToNotifyAboutSecuritiesTransferPage, SubmissionsDashboardPage}
-import uk.gov.hmrc.securitiestransferchargefrontend.pages.stf.single.{AmountPaidForSecuritiesPage, ApplyingForReliefPage, ChargingPointPage, ConfirmAddressPage, ConnectedPersonsPage, DetailsOfThisTransferPage, NameOfSellerPage, OtherSecuritiesTypePage, SecuritiesTargetPage, StfBuyersAddressPage, StfSellerAddressPage, TaxRatePage, TotalMarketValuePage, WhatReliefAreYouApplyingForPage, WhatTypeOfSecuritiesPage}
+import uk.gov.hmrc.securitiestransferchargefrontend.pages.stf.single.*
 import uk.gov.hmrc.securitiestransferchargefrontend.services.AnswerPersistenceService
 
 import scala.concurrent.{ExecutionContext, Future}
@@ -72,12 +71,14 @@ class ForwardRoutes(answerPersistenceService: AnswerPersistenceService,
       if (enterDate.isBefore(firstDate)) routes.JourneyRecoveryController.onPageLoad()
       else individualSingleRoutes.TaxRateController.onPageLoad(NormalMode)
     }
-    case TaxRatePage => userAnswers => dataRequired(TaxRatePage, userAnswers, individualSingleRoutes.WhatTypeOfSecuritiesController.onPageLoad(NormalMode))
+    case TaxRatePage => userAnswers => dataRequired(TaxRatePage, userAnswers, individualSingleRoutes.PurchasingSharesController.onPageLoad(NormalMode))
     case OtherSecuritiesTypePage => userAnswers => dataRequired(OtherSecuritiesTypePage, userAnswers, individualSingleRoutes.AmountPaidForSecuritiesController.onPageLoad(NormalMode))
-    case WhatTypeOfSecuritiesPage => userAnswers =>
-      dataDependent(WhatTypeOfSecuritiesPage, userAnswers) {
-        case WhatTypeOfSecurities.Shares => individualSingleRoutes.DetailsOfThisTransferController.onPageLoad(NormalMode)
-        case WhatTypeOfSecurities.Other => individualSingleRoutes.OtherSecuritiesTypeController.onPageLoad(NormalMode)
+    case PurchasingSharesPage => userAnswers =>
+      dataDependent(PurchasingSharesPage,userAnswers) { isPurchasingShares =>
+        if(isPurchasingShares)
+          individualSingleRoutes.DetailsOfThisTransferController.onPageLoad(NormalMode)
+        else
+          individualSingleRoutes.OtherSecuritiesTypeController.onPageLoad(NormalMode)
       }
     case DetailsOfThisTransferPage => userAnswers => dataRequired(DetailsOfThisTransferPage, userAnswers, stfSingleCyaRoutes.CheckYourAnswersController.onPageLoad())
     case AmountPaidForSecuritiesPage => userAnswers =>

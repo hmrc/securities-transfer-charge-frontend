@@ -164,13 +164,11 @@ otherSecuritiesType.checkYourAnswersLabel = What type of securities are you buyi
 otherSecuritiesType.error.required = Enter the type of securities you’re buying
 otherSecuritiesType.change.hidden = Change what type of securities are you buying
 
-individual.whatTypeOfSecurities.title = What type of securities are you buying?
-individual.whatTypeOfSecurities.heading = What type of securities are you buying?
-individual.whatTypeOfSecurities.shares = Shares
-individual.whatTypeOfSecurities.other = Other
-individual.whatTypeOfSecurities.checkYourAnswersLabel = What type of securities are you buying?
-individual.whatTypeOfSecurities.error.required = Select the type of securities you are buying
-individual.whatTypeOfSecurities.change.hidden = Change what type of securities are you buying
+individual.purchasingShares.title = Are you buying shares?
+individual.purchasingShares.heading = Are you buying shares?
+individual.purchasingShares.error.required = Select yes if you’re buying shares
+individual.purchasingShares.checkYourAnswersLabel = Are you buying shares?
+individual.purchasingShares.change.hidden = Change if you are buying shares
 
 totalMarketValue.title = What is the total market value of these securities?
 totalMarketValue.heading = What is the total market value of these securities?

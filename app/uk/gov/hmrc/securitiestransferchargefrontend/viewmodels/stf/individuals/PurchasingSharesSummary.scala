@@ -17,33 +17,27 @@
 package uk.gov.hmrc.securitiestransferchargefrontend.viewmodels.stf.individuals
 
 import play.api.i18n.Messages
-import play.twirl.api.HtmlFormat
-import uk.gov.hmrc.govukfrontend.views.viewmodels.content.HtmlContent
 import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.SummaryListRow
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.individuals.single.routes
 import uk.gov.hmrc.securitiestransferchargefrontend.models.{CheckMode, UserAnswers}
-import uk.gov.hmrc.securitiestransferchargefrontend.pages.stf.single.WhatTypeOfSecuritiesPage
+import uk.gov.hmrc.securitiestransferchargefrontend.pages.stf.single.PurchasingSharesPage
 import uk.gov.hmrc.securitiestransferchargefrontend.viewmodels.govuk.summarylist.*
 import uk.gov.hmrc.securitiestransferchargefrontend.viewmodels.implicits.*
 
-object WhatTypeOfSecuritiesSummary  {
+object PurchasingSharesSummary  {
 
   def row(answers: UserAnswers)(implicit messages: Messages): Option[SummaryListRow] =
-    answers.get(WhatTypeOfSecuritiesPage).map {
+    answers.get(PurchasingSharesPage).map {
       answer =>
 
-        val value = ValueViewModel(
-          HtmlContent(
-            HtmlFormat.escape(messages(s"whatTypeOfSecurities.$answer"))
-          )
-        )
+        val value = if (answer) "site.yes" else "site.no"
 
         SummaryListRowViewModel(
-          key     = "whatTypeOfSecurities.checkYourAnswersLabel",
-          value   = value,
+          key     = "individual.purchasingShares.checkYourAnswersLabel",
+          value   = ValueViewModel(value),
           actions = Seq(
-            ActionItemViewModel("site.change", routes.WhatTypeOfSecuritiesController.onPageLoad(CheckMode).url)
-              .withVisuallyHiddenText(messages("whatTypeOfSecurities.change.hidden"))
+            ActionItemViewModel("site.change", routes.PurchasingSharesController.onPageLoad(CheckMode).url)
+              .withVisuallyHiddenText(messages("individual.purchasingShares.change.hidden"))
           )
         )
     }
