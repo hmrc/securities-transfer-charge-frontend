@@ -53,7 +53,8 @@
         @govukInput(
             InputViewModel(
                 field = form("companyRegistrationNumber"),
-                label = LabelViewModel(messages("org.sh03.companyDetails.heading")).asPageHeading(Large)            )
+                label = LabelViewModel(messages("org.sh03.companyDetails.heading")).asPageHeading(Large)
+            )
             .withHint(HintViewModel(messages("org.sh03.companyDetails.crn.hint")))
             .withWidth(Fixed10)
         )
@@ -61,7 +62,7 @@
         @govukRadios(
             RadiosViewModel.yesNoStacked(
                 field = form("value"),
-                legend = LegendViewModel(messages("org.sh03.companyDetails.heading")).asPageHeading(Large)
+                legend = LegendViewModel(messages("org.sh03.companyDetails.heading"))
             )
         )
 
