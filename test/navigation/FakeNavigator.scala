@@ -16,14 +16,15 @@
 
 package navigation
 
+import base.stubs.StubUserAnswersValidator
 import play.api.mvc.{Call, Request}
 import uk.gov.hmrc.securitiestransferchargefrontend.models.{Mode, UserAnswers}
-import uk.gov.hmrc.securitiestransferchargefrontend.navigation.Navigator
+import uk.gov.hmrc.securitiestransferchargefrontend.navigation.{Navigator, UserAnswersValidator}
 import uk.gov.hmrc.securitiestransferchargefrontend.pages.Page
 
-import scala.concurrent.Future
+import scala.concurrent.{ExecutionContext, Future}
 
-class FakeNavigator(desiredRoute: Call) extends Navigator {
+class FakeNavigator(desiredRoute: Call)(implicit ec: ExecutionContext) extends Navigator {
 
   override def nextPage(page: Page, mode: Mode, userAnswers: UserAnswers, isReturn: Boolean = false)(implicit request: Request[?]): Future[Call] =
     Future.successful(desiredRoute)
@@ -33,4 +34,6 @@ class FakeNavigator(desiredRoute: Call) extends Navigator {
   override def previousPage(page: Page, mode: Mode, userAnswers: UserAnswers): Call = desiredRoute
 
   override def previousPage(page: Page, mode: Mode, userAnswers: Option[UserAnswers]): Call = desiredRoute
+
+  override val userAnswersValidator: UserAnswersValidator = new StubUserAnswersValidator(this)
 }

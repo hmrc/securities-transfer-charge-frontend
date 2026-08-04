@@ -38,6 +38,9 @@ case class UserAnswers(userId: UserId,
   def get[A](page: Gettable[A])(implicit rds: Reads[A]): Option[A] =
     Reads.optionNoError(Reads.at(page.path)).reads(data).getOrElse(None)
 
+  def exists[A](page: Gettable[A])(implicit rds: Reads[A]): Boolean =
+    Reads.optionNoError(Reads.at(page.path)).reads(data).isSuccess
+    
   def set[A](page: Settable[A], value: A)(implicit writes: Writes[A]): Try[UserAnswers] = {
 
     val updatedData = data.setObject(page.path, Json.toJson(value)) match {

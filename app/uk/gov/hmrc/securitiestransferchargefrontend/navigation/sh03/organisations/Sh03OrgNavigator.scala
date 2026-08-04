@@ -16,17 +16,20 @@
 
 package uk.gov.hmrc.securitiestransferchargefrontend.navigation.sh03.organisations
 
+import com.google.common.collect.{BiMap, HashBiMap}
 import com.google.inject.Singleton
 import play.api.mvc.{Call, Request}
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.play.http.HeaderCarrierConverter
 import uk.gov.hmrc.securitiestransferchargefrontend.config.FrontendAppConfig
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.routes
+import uk.gov.hmrc.securitiestransferchargefrontend.controllers.sh03.organisations.single.routes as sh03OrgSingleRoutes
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.shared.routes as sharedRoutes
 import uk.gov.hmrc.securitiestransferchargefrontend.domain.{SubmissionId, UserId}
-import uk.gov.hmrc.securitiestransferchargefrontend.models.UserAnswers
-import uk.gov.hmrc.securitiestransferchargefrontend.navigation.{AbstractModeNavigator, PersistentNavigator}
+import uk.gov.hmrc.securitiestransferchargefrontend.models.{NormalMode, UserAnswers}
+import uk.gov.hmrc.securitiestransferchargefrontend.navigation.{AbstractModeNavigator, PersistentNavigator, UserAnswersValidator}
 import uk.gov.hmrc.securitiestransferchargefrontend.pages.Page
+import uk.gov.hmrc.securitiestransferchargefrontend.pages.sh03.*
 import uk.gov.hmrc.securitiestransferchargefrontend.services.AnswerPersistenceService
 
 import javax.inject.Inject
@@ -60,5 +63,29 @@ class Sh03OrgNavigator @Inject()(
   def restore(submissionId: SubmissionId, userId: UserId)(implicit request: Request[?]): Future[UserAnswers] = {
     implicit val hc: HeaderCarrier = HeaderCarrierConverter.fromRequestAndSession(request, request.session)
     answerPersistenceService.load(submissionId, userId)
+  }
+
+  val userAnswersValidator: UserAnswersValidator = new UserAnswersValidator(this) {
+
+    override protected val startPage: GettablePage[?] = CompanyDetailsPage
+
+    override protected val pageCallMap: BiMap[GettablePage[?], Call] = {
+      val map = HashBiMap.create[GettablePage[?], Call]()
+      
+      // SH03 Organisation single journey pages only
+      map.put(CompanyDetailsPage, sh03OrgSingleRoutes.CompanyDetailsController.onPageLoad(NormalMode))
+      map.put(ReasonForPurchasePage, sh03OrgSingleRoutes.ReasonForPurchaseController.onPageLoad(NormalMode))
+      map.put(TreasurySharesPage, sh03OrgSingleRoutes.TreasurySharesController.onPageLoad(NormalMode))
+      map.put(ConnectedPersonsPage, sh03OrgSingleRoutes.ConnectedPersonsController.onPageLoad(NormalMode))
+      map.put(ApplyingForReliefPage, sh03OrgSingleRoutes.ApplyingForReliefController.onPageLoad(NormalMode))
+      map.put(WhatReliefAreYouApplyingForPage, sh03OrgSingleRoutes.WhatReliefAreYouApplyingForController.onPageLoad(NormalMode))
+      map.put(DetailsOfThisSharePurchasePage, sh03OrgSingleRoutes.DetailsOfThisSharePurchaseController.onPageLoad(NormalMode))
+      map.put(MaximumAmountPaidPage, sh03OrgSingleRoutes.MaximumAmountPaidController.onPageLoad(NormalMode))
+      map.put(MinimumAmountPaidPage, sh03OrgSingleRoutes.MinimumAmountPaidController.onPageLoad(NormalMode))
+      map.put(ChargingPointPage, sh03OrgSingleRoutes.ChargingPointController.onPageLoad(NormalMode))
+      map.put(RoleAtPurchasingCompanyPage, sh03OrgSingleRoutes.RoleAtPurchasingCompanyController.onPageLoad(NormalMode))
+      
+      map
+    }
   }
 }

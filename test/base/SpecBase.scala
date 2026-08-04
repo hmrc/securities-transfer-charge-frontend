@@ -38,7 +38,7 @@ import uk.gov.hmrc.securitiestransferchargefrontend.controllers.actions.*
 import uk.gov.hmrc.securitiestransferchargefrontend.domain.{GroupIdentifier, SubmissionId, UserId}
 import uk.gov.hmrc.securitiestransferchargefrontend.models.requests.DataRequest
 import uk.gov.hmrc.securitiestransferchargefrontend.models.{Mode, UserAnswers}
-import uk.gov.hmrc.securitiestransferchargefrontend.navigation.Navigator
+import uk.gov.hmrc.securitiestransferchargefrontend.navigation.{Navigator, UserAnswersValidator}
 import uk.gov.hmrc.securitiestransferchargefrontend.pages.Page
 import uk.gov.hmrc.securitiestransferchargefrontend.repositories.SessionRepository
 import uk.gov.hmrc.auth.core.AffinityGroup
@@ -91,6 +91,7 @@ trait SpecBase
     override def previousPage(page: Page, mode: Mode, userAnswers: UserAnswers): Call = testBackLinkRoute
     override def previousPage(page: Page, mode: Mode, userAnswers: Option[UserAnswers]): Call = testBackLinkRoute
     override def errorPage(forPage: Page): Call = testErrorPage
+    override val userAnswersValidator: UserAnswersValidator = new base.stubs.StubUserAnswersValidator(this)
   }
   
   val fakeRequest: FakeRequest[AnyContentAsEmpty.type] = FakeRequest().withHeaders("sessionId" -> sessionId)
