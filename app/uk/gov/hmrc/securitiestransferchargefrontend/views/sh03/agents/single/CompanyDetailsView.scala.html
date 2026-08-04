@@ -19,6 +19,8 @@
 @import uk.gov.hmrc.securitiestransferchargefrontend.controllers.sh03.agents.single.routes
 @import uk.gov.hmrc.securitiestransferchargefrontend.views.html.components.SaveAndReturnButton
 @import uk.gov.hmrc.securitiestransferchargefrontend.viewmodels.InputWidth._
+@import uk.gov.hmrc.securitiestransferchargefrontend.viewmodels.LabelSize.Large
+
 
 @this(
     layout: Layout,
@@ -45,14 +47,14 @@
         @govukInput(
             InputViewModel(
                 field = form("companyName"),
-                label = LabelViewModel(messages("agent.sh03.companyDetails.companyName.label"))
+                label = LabelViewModel(messages("agent.sh03.companyDetails.companyName.label")).asPageHeading(Large)
             )
         )
 
         @govukInput(
             InputViewModel(
                 field = form("companyRegistrationNumber"),
-                label = LabelViewModel(messages("agent.sh03.companyDetails.crn.label"))
+                label = LabelViewModel(messages("agent.sh03.companyDetails.crn.label")).asPageHeading(Large)
             )
             .withHint(HintViewModel(messages("agent.sh03.companyDetails.crn.hint")))
             .withWidth(Fixed10)

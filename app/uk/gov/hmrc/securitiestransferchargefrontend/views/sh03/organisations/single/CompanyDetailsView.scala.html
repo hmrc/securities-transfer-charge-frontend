@@ -53,20 +53,15 @@
         @govukInput(
             InputViewModel(
                 field = form("companyRegistrationNumber"),
-                label = LabelViewModel(messages("org.sh03.companyDetails.crn.label"))
-            )
+                label = LabelViewModel(messages("org.sh03.companyDetails.heading")).asPageHeading(Large)            )
             .withHint(HintViewModel(messages("org.sh03.companyDetails.crn.hint")))
             .withWidth(Fixed10)
         )
 
         @govukRadios(
-            RadiosViewModel(
-                field = form("isPlc"),
-                items = Seq(
-                    RadioItem(content = Text(messages("site.yes")), value = Some("true")),
-                    RadioItem(content = Text(messages("site.no")), value = Some("false"))
-                ),
-                legend = LegendViewModel(messages("org.sh03.companyDetails.isPlc.label"))
+            RadiosViewModel.yesNoStacked(
+                field = form("value"),
+                legend = LegendViewModel(messages("org.sh03.companyDetails.heading")).asPageHeading(Large)
             )
         )
 
