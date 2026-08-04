@@ -14,33 +14,41 @@
  * limitations under the License.
  */
 
-package forms.stf.agents
+package forms.stf.shared
 
 import forms.behaviours.BooleanFieldBehaviours
 import play.api.data.FormError
-import uk.gov.hmrc.securitiestransferchargefrontend.forms.stf.agents.PurchasingSharesFormProvider
+import uk.gov.hmrc.securitiestransferchargefrontend.forms.stf.shared.PurchasingSharesFormProvider
 
 class PurchasingSharesFormProviderSpec extends BooleanFieldBehaviours {
 
-  val form = new PurchasingSharesFormProvider()()
+  private val affinityKeys: Seq[String] = Seq("org", "agent")
 
-  val requiredKey = "agent.purchasingShares.error.required"
+  val fieldName = "value"
+
   val invalidKey = "error.boolean"
-  
+
   ".value" - {
 
-    val fieldName = "value"
+    affinityKeys.foreach { key =>
 
-    behave like booleanField(
-      form,
-      fieldName,
-      invalidError = FormError(fieldName, invalidKey)
-    )
+      s"when affinityKey is $key" - {
 
-    behave like mandatoryField(
-      form,
-      fieldName,
-      requiredError = FormError(fieldName, requiredKey)
-    )
+        val form = new PurchasingSharesFormProvider()(affinityKey = key)
+        val requiredKey = s"$key.purchasingShares.error.required"
+
+        behave like booleanField(
+          form,
+          fieldName,
+          invalidError = FormError(fieldName, invalidKey)
+        )
+
+        behave like mandatoryField(
+          form,
+          fieldName,
+          requiredError = FormError(fieldName, requiredKey)
+        )
+      }
+    }
   }
 }

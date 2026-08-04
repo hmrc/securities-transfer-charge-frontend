@@ -18,7 +18,6 @@
 @import uk.gov.hmrc.securitiestransferchargefrontend.controllers.routes
 @import uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.organisations.single.routes as orgRoutes
 @import uk.gov.hmrc.securitiestransferchargefrontend.views.html.templates
-@import uk.gov.hmrc.securitiestransferchargefrontend.models.stf.WhatTypeOfSecurities
 @import uk.gov.hmrc.securitiestransferchargefrontend.views.html.components.SaveAndReturnButton
 
 
@@ -31,22 +30,21 @@
     saveAndReturnButton:SaveAndReturnButton
 )
 
-@(form: Form[_], mode: Mode, affinityGroupKey: String, backLinkCall: Call)(implicit request: Request[_], messages: Messages)
+@(form: Form[_], mode: Mode, backLinkCall: Call)(implicit request: Request[_], messages: Messages)
 
-@layout(pageTitle = title(form, messages("org.whatTypeOfSecurities.title"),Some(messages("transfer.details.caption"))), backLinkUrl = Some(backLinkCall.url)) {
+@layout(pageTitle = title(form, messages("org.purchasingShares.title"),Some(messages("transfer.details.caption"))), backLinkUrl = Some(backLinkCall.url)) {
 
-    @formHelper(action = orgRoutes.WhatTypeOfSecuritiesController.onSubmit(mode), Symbol("autoComplete") -> "off") {
+    @formHelper(action = orgRoutes.PurchasingSharesController.onSubmit(mode), Symbol("autoComplete") -> "off") {
 
         @if(form.errors.nonEmpty) {
-            @govukErrorSummary(ErrorSummaryViewModel(form,  errorLinkOverrides = Map("value" -> "value_0")))
+            @govukErrorSummary(ErrorSummaryViewModel(form))
         }
         <span  class="govuk-caption-l">@messages("transfer.details.caption")</span>
         @govukRadios(
-            RadiosViewModel(
-                field  = form("value"),
-                legend = LegendViewModel(messages("org.whatTypeOfSecurities.heading")).asPageHeading(Large),
-                items  = WhatTypeOfSecurities.options(affinityGroupKey)
-            )
+            RadiosViewModel.yesNoStacked(
+                field = form("value"),
+                legend = LegendViewModel(messages("org.purchasingShares.heading")).asPageHeading(Large)
+             )
         )
 
         @govukButton(ButtonViewModel(messages("site.save-and-continue.button")))
