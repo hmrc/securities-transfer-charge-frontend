@@ -16,19 +16,23 @@
 
 package uk.gov.hmrc.securitiestransferchargefrontend.navigation.stf.agents
 
+import com.google.common.collect.{BiMap, HashBiMap}
 import com.google.inject.Singleton
 import play.api.mvc.{Call, Request}
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.play.http.HeaderCarrierConverter
 import uk.gov.hmrc.securitiestransferchargefrontend.config.FrontendAppConfig
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.routes
+import uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.agents.single.routes as agentSingleRoutes
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.shared.routes as sharedRoutes
 import uk.gov.hmrc.securitiestransferchargefrontend.domain.{SubmissionId, UserId}
-import uk.gov.hmrc.securitiestransferchargefrontend.models.UserAnswers
+import uk.gov.hmrc.securitiestransferchargefrontend.models.{NormalMode, UserAnswers}
 import uk.gov.hmrc.securitiestransferchargefrontend.navigation.stf.agents
 import uk.gov.hmrc.securitiestransferchargefrontend.navigation.stf.agents.{BackwardsRoutes, ForwardRoutes}
-import uk.gov.hmrc.securitiestransferchargefrontend.navigation.{AbstractModeNavigator, PersistentNavigator}
+import uk.gov.hmrc.securitiestransferchargefrontend.navigation.{AbstractModeNavigator, PersistentNavigator, UserAnswersValidator}
 import uk.gov.hmrc.securitiestransferchargefrontend.pages.*
+import uk.gov.hmrc.securitiestransferchargefrontend.pages.stf.shared.*
+import uk.gov.hmrc.securitiestransferchargefrontend.pages.stf.single.*
 import uk.gov.hmrc.securitiestransferchargefrontend.services.AnswerPersistenceService
 
 import javax.inject.Inject
@@ -61,4 +65,33 @@ class StfAgentNavigator @Inject()(appConfig: FrontendAppConfig,
   def restore(submissionId: SubmissionId, userId: UserId)(implicit request: Request[?]): Future[UserAnswers] = {
     implicit val hc: HeaderCarrier = HeaderCarrierConverter.fromRequestAndSession(request, request.session)
     answerPersistenceService.load(submissionId, userId)
+  }
+
+  val userAnswersValidator: UserAnswersValidator = new UserAnswersValidator(this) {
+
+    override protected val startPage: GettablePage[?] = AgentReferencePage
+
+    override protected val pageCallMap: BiMap[GettablePage[?], Call] = {
+      val map = HashBiMap.create[GettablePage[?], Call]()
+      
+      // STF Agent single journey pages only
+      map.put(AgentReferencePage, agentSingleRoutes.AgentReferenceController.onPageLoad(NormalMode))
+      map.put(NameOfBuyerPage, agentSingleRoutes.NameOfBuyerController.onPageLoad(NormalMode))
+      map.put(StfBuyersAddressPage, agentSingleRoutes.AddressController.onPageLoad())
+      map.put(NameOfSellerPage, agentSingleRoutes.NameOfSellerController.onPageLoad(NormalMode))
+      map.put(StfSellerAddressPage, agentSingleRoutes.StfSellerAddressController.onPageLoad())
+      map.put(ConnectedPersonsPage, agentSingleRoutes.ConnectedPersonsController.onPageLoad(NormalMode))
+      map.put(ApplyingForReliefPage, agentSingleRoutes.ApplyingForReliefController.onPageLoad(NormalMode))
+      map.put(WhatReliefAreYouApplyingForPage, agentSingleRoutes.WhatReliefAreYouApplyingForController.onPageLoad(NormalMode))
+      map.put(SecuritiesTargetPage, agentSingleRoutes.SecuritiesTargetController.onPageLoad(NormalMode))
+      map.put(ChargingPointPage, agentSingleRoutes.ChargingPointController.onPageLoad(NormalMode))
+      map.put(TaxRatePage, agentSingleRoutes.TaxRateController.onPageLoad(NormalMode))
+      map.put(PurchasingSharesPage, agentSingleRoutes.PurchasingSharesController.onPageLoad(NormalMode))
+      map.put(DetailsOfThisTransferPage, agentSingleRoutes.DetailsOfThisTransferController.onPageLoad(NormalMode))
+      map.put(OtherSecuritiesTypePage, agentSingleRoutes.OtherSecuritiesTypeController.onPageLoad(NormalMode))
+      map.put(AmountPaidForSecuritiesPage, agentSingleRoutes.AmountPaidForSecuritiesController.onPageLoad(NormalMode))
+      map.put(TotalMarketValuePage, agentSingleRoutes.TotalMarketValueController.onPageLoad(NormalMode))
+      
+      map
+    }
   }

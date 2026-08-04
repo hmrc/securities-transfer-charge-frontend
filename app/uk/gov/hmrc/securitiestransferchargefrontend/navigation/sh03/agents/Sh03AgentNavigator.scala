@@ -16,25 +16,28 @@
 
 package uk.gov.hmrc.securitiestransferchargefrontend.navigation.sh03.agents
 
+import com.google.common.collect.{BiMap, HashBiMap}
 import com.google.inject.Singleton
 import play.api.mvc.{Call, Request}
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.play.http.HeaderCarrierConverter
 import uk.gov.hmrc.securitiestransferchargefrontend.config.FrontendAppConfig
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.routes
+import uk.gov.hmrc.securitiestransferchargefrontend.controllers.sh03.agents.single.routes as sh03AgentSingleRoutes
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.shared.routes as sharedRoutes
 import uk.gov.hmrc.securitiestransferchargefrontend.domain.{SubmissionId, UserId}
-import uk.gov.hmrc.securitiestransferchargefrontend.models.UserAnswers
+import uk.gov.hmrc.securitiestransferchargefrontend.models.{NormalMode, UserAnswers}
 import uk.gov.hmrc.securitiestransferchargefrontend.navigation.sh03.agents
-import uk.gov.hmrc.securitiestransferchargefrontend.navigation.{AbstractModeNavigator, PersistentNavigator}
+import uk.gov.hmrc.securitiestransferchargefrontend.navigation.{AbstractModeNavigator, PersistentNavigator, UserAnswersValidator}
 import uk.gov.hmrc.securitiestransferchargefrontend.pages.*
+import uk.gov.hmrc.securitiestransferchargefrontend.pages.sh03.*
 import uk.gov.hmrc.securitiestransferchargefrontend.services.AnswerPersistenceService
 
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
-class Sh03AgentNavigator @Inject()(answerPersistenceService: AnswerPersistenceService,appConfig: FrontendAppConfig)
+class Sh03AgentNavigator @Inject()(answerPersistenceService: AnswerPersistenceService, appConfig: FrontendAppConfig)
                                   (implicit ec: ExecutionContext) extends AbstractModeNavigator with PersistentNavigator:
 
   override lazy val dashboardPage: Call = sharedRoutes.SubmissionsDashboardController.onPageLoad()
@@ -59,4 +62,29 @@ class Sh03AgentNavigator @Inject()(answerPersistenceService: AnswerPersistenceSe
   def restore(submissionId: SubmissionId, userId: UserId)(implicit request: Request[?]): Future[UserAnswers] = {
     implicit val hc: HeaderCarrier = HeaderCarrierConverter.fromRequestAndSession(request, request.session)
     answerPersistenceService.load(submissionId, userId)
+  }
+
+  val userAnswersValidator: UserAnswersValidator = new UserAnswersValidator(this) {
+
+    override protected val startPage: GettablePage[?] = AgentReferencePage
+
+    override protected val pageCallMap: BiMap[GettablePage[?], Call] = {
+      val map = HashBiMap.create[GettablePage[?], Call]()
+      
+      // SH03 Agent single journey pages only
+      map.put(AgentReferencePage, sh03AgentSingleRoutes.AgentReferenceController.onPageLoad(NormalMode))
+      map.put(CompanyDetailsPage, sh03AgentSingleRoutes.CompanyDetailsController.onPageLoad(NormalMode))
+      map.put(ReasonForPurchasePage, sh03AgentSingleRoutes.ReasonForPurchaseController.onPageLoad(NormalMode))
+      map.put(TreasurySharesPage, sh03AgentSingleRoutes.TreasurySharesController.onPageLoad(NormalMode))
+      map.put(ConnectedPersonsPage, sh03AgentSingleRoutes.ConnectedPersonsController.onPageLoad(NormalMode))
+      map.put(ApplyingForReliefPage, sh03AgentSingleRoutes.ApplyingForReliefController.onPageLoad(NormalMode))
+      map.put(WhatReliefAreYouApplyingForPage, sh03AgentSingleRoutes.WhatReliefAreYouApplyingForController.onPageLoad(NormalMode))
+      map.put(DetailsOfThisSharePurchasePage, sh03AgentSingleRoutes.DetailsOfThisSharePurchaseController.onPageLoad(NormalMode))
+      map.put(MaximumAmountPaidPage, sh03AgentSingleRoutes.MaximumAmountPaidController.onPageLoad(NormalMode))
+      map.put(MinimumAmountPaidPage, sh03AgentSingleRoutes.MinimumAmountPaidController.onPageLoad(NormalMode))
+      map.put(ChargingPointPage, sh03AgentSingleRoutes.ChargingPointController.onPageLoad(NormalMode))
+      map.put(RoleAtPurchasingCompanyPage, sh03AgentSingleRoutes.RoleAtPurchasingCompanyController.onPageLoad(NormalMode))
+      
+      map
+    }
   }
