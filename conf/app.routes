@@ -78,10 +78,10 @@ POST       /stf/security-type                             uk.gov.hmrc.securities
 GET        /stf/change/security-type                      uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.individuals.single.OtherSecuritiesTypeController.onPageLoad(mode: Mode = CheckMode)
 POST       /stf/change/security-type                      uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.individuals.single.OtherSecuritiesTypeController.onSubmit(mode: Mode = CheckMode)
 
-GET        /stf/purchasing-shares                           uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.individuals.single.PurchasingSharesController.onPageLoad(mode: Mode = NormalMode)
-POST       /stf/purchasing-shares                          uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.individuals.single.PurchasingSharesController.onSubmit(mode: Mode = NormalMode)
-GET        /stf/change/purchasing-shares                    uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.individuals.single.PurchasingSharesController.onPageLoad(mode: Mode = CheckMode)
-POST       /stf/change/purchasing-shares                    uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.individuals.single.PurchasingSharesController.onSubmit(mode: Mode = CheckMode)
+GET        /stf/buying-shares                          uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.individuals.single.PurchasingSharesController.onPageLoad(mode: Mode = NormalMode)
+POST       /stf/buying-shares                          uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.individuals.single.PurchasingSharesController.onSubmit(mode: Mode = NormalMode)
+GET        /stf/change/buying-shares                   uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.individuals.single.PurchasingSharesController.onPageLoad(mode: Mode = CheckMode)
+POST       /stf/change/buying-shares                   uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.individuals.single.PurchasingSharesController.onSubmit(mode: Mode = CheckMode)
 
 GET        /stf/share-details                             uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.individuals.single.DetailsOfThisTransferController.onPageLoad(mode: Mode = NormalMode)
 POST       /stf/share-details                             uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.individuals.single.DetailsOfThisTransferController.onSubmit(mode: Mode = NormalMode)
