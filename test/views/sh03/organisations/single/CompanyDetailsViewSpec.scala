@@ -72,7 +72,7 @@ class CompanyDetailsViewSpec extends ViewBaseSpec {
     }
 
     "must contain PLC radio buttons" in {
-      doc.text() must include(ExpectedContent.isPlcLabel)
+      doc.getElementsByClass("govuk-fieldset__legend").text() must include(ExpectedContent.isPlcLabel)
       doc.text() must include(messages("site.yes"))
       doc.text() must include(messages("site.no"))
     }

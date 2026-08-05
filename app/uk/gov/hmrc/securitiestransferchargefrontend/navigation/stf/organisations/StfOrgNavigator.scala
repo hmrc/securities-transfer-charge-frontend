@@ -83,12 +83,12 @@ class StfOrgNavigator @Inject()(appConfig: FrontendAppConfig,
       map.put(SecuritiesTargetPage, orgSingleRoutes.SecuritiesTargetController.onPageLoad(NormalMode))
       map.put(ChargingPointPage, orgSingleRoutes.ChargingPointController.onPageLoad(NormalMode))
       map.put(TaxRatePage, orgSingleRoutes.TaxRateController.onPageLoad(NormalMode))
-      map.put(WhatTypeOfSecuritiesPage, orgSingleRoutes.WhatTypeOfSecuritiesController.onPageLoad(NormalMode))
+      map.put(PurchasingSharesPage, orgSingleRoutes.PurchasingSharesController.onPageLoad(NormalMode))
       map.put(DetailsOfThisTransferPage, orgSingleRoutes.DetailsOfThisTransferController.onPageLoad(NormalMode))
       map.put(OtherSecuritiesTypePage, orgSingleRoutes.OtherSecuritiesTypeController.onPageLoad(NormalMode))
       map.put(AmountPaidForSecuritiesPage, orgSingleRoutes.AmountPaidForSecuritiesController.onPageLoad(NormalMode))
       map.put(TotalMarketValuePage, orgSingleRoutes.TotalMarketValueController.onPageLoad(NormalMode))
-      
+
       map
     }
   }
