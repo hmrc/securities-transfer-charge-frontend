@@ -41,7 +41,10 @@ class CompanyDetailsViewSpec extends ViewBaseSpec {
   object ExpectedContent {
     val title: String = messages(s"$messageKeyPrefix.title")
     val heading: String = messages(s"$messageKeyPrefix.heading")
-    val hint: String = messages(s"$messageKeyPrefix.crn.hint")
+    val companyNameLabel: String = messages(s"$messageKeyPrefix.companyName.label")
+    val crnLabel: String = messages(s"$messageKeyPrefix.crn.label")
+    val crnHint: String = messages(s"$messageKeyPrefix.crn.hint")
+    val isPlcLabel: String = messages(s"$messageKeyPrefix.isPlc.label")
     val saveAndContinue: String = messages("site.save-and-continue.button")
     val saveAndReturn: String = messages("site.save-and-return.button")
   }
@@ -57,8 +60,21 @@ class CompanyDetailsViewSpec extends ViewBaseSpec {
       doc.select("h1").text() must include(ExpectedContent.heading)
     }
 
-    "display the correct hint text" in {
-      doc.hintText mustBe Some(ExpectedContent.hint)
+    "must contain company name input" in {
+      doc.select("#companyName").size() mustBe 1
+      doc.select("label[for=companyName]").text() must include(ExpectedContent.companyNameLabel)
+    }
+
+    "must contain CRN input with hint text" in {
+      doc.select("#companyRegistrationNumber").size() mustBe 1
+      doc.select("label[for=companyRegistrationNumber]").text() must include(ExpectedContent.crnLabel)
+      doc.text() must include(ExpectedContent.crnHint)
+    }
+
+    "must contain PLC radio buttons" in {
+      doc.getElementsByClass("govuk-fieldset__legend").text() must include(ExpectedContent.isPlcLabel)
+      doc.text() must include(messages("site.yes"))
+      doc.text() must include(messages("site.no"))
     }
 
     "must contain save and continue button" in {
@@ -73,6 +89,44 @@ class CompanyDetailsViewSpec extends ViewBaseSpec {
 
     "must have back link" in {
       doc.hasBackLink mustBe true
+    }
+  }
+
+  "CompanyDetailsView with errors" - {
+
+    "must show error summary when there are errors" in {
+      val formWithErrors = form.bind(Map("companyName" -> ""))
+      val doc = Jsoup.parse(viewInstance(formWithErrors, NormalMode, testBackLinkRoute)(fakeRequest, messages).body)
+      doc.hasErrorSummary mustBe true
+    }
+
+    "must show error for company name" in {
+      val formWithErrors = form.bind(Map(
+        "companyName" -> "",
+        "companyRegistrationNumber" -> "AB123456",
+        "isPlc" -> "true"
+      ))
+      val doc = Jsoup.parse(viewInstance(formWithErrors, NormalMode, testBackLinkRoute)(fakeRequest, messages).body)
+      doc.text() must include(messages(s"$messageKeyPrefix.companyName.error.required"))
+    }
+
+    "must show error for CRN" in {
+      val formWithErrors = form.bind(Map(
+        "companyName" -> "Test Company",
+        "companyRegistrationNumber" -> "ABC",
+        "isPlc" -> "true"
+      ))
+      val doc = Jsoup.parse(viewInstance(formWithErrors, NormalMode, testBackLinkRoute)(fakeRequest, messages).body)
+      doc.text() must include(messages(s"$messageKeyPrefix.crn.error.length"))
+    }
+
+    "must show error for PLC selection" in {
+      val formWithErrors = form.bind(Map(
+        "companyName" -> "Test Company",
+        "companyRegistrationNumber" -> "AB123456"
+      ))
+      val doc = Jsoup.parse(viewInstance(formWithErrors, NormalMode, testBackLinkRoute)(fakeRequest, messages).body)
+      doc.text() must include(messages(s"$messageKeyPrefix.isPlc.error.required"))
     }
   }
 }

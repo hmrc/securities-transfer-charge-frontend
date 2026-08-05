@@ -946,13 +946,19 @@ org.sh03.whatReliefAreYouApplyingFor.change.hidden = Change the relief are you a
 org.sh03.whatReliefAreYouApplyingFor.p = Start typing the name of the relief and select from the list. See a
 org.sh03.whatReliefAreYouApplyingFor.details.content.link.text = full list of reliefs
 
-org.sh03.companyDetails.title = What is the company registration number (CRN)?
-org.sh03.companyDetails.heading = What is the company registration number (CRN)?
+org.sh03.companyDetails.title = Company details
+org.sh03.companyDetails.heading = Company details
+org.sh03.companyDetails.companyName.label = Company name
+org.sh03.companyDetails.companyName.error.required = Enter the company name
+org.sh03.companyDetails.companyName.error.length = Company name must be 160 characters or fewer
+org.sh03.companyDetails.crn.label = Company registration number (CRN)
 org.sh03.companyDetails.crn.hint = This is also called a company number. For example, SN898989 or 12345678
-org.sh03.companyDetails.checkYourAnswersLabel = What is the company registration number (CRN)?
 org.sh03.companyDetails.crn.error.required = Enter the company registration number
 org.sh03.companyDetails.crn.error.invalid = Company registration number can only be numbers or letters
 org.sh03.companyDetails.crn.error.length = Company registration number must be 8 characters long
+org.sh03.companyDetails.isPlc.label = Is the purchasing company a Public Limited Company (PLC)?
+org.sh03.companyDetails.isPlc.error.required = Select yes if the purchasing company is a Public Limited Company (PLC)
+org.sh03.companyDetails.checkYourAnswersLabel = What is the company registration number (CRN)?
 org.sh03.companyDetails.change.hidden = Change company registration number (CRN)
 
 org.sh03.treasuryShares.title = Do these shares also qualify as treasury shares?
