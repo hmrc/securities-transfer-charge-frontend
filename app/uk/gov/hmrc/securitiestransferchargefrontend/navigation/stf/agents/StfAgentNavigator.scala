@@ -94,4 +94,11 @@ class StfAgentNavigator @Inject()(appConfig: FrontendAppConfig,
       
       map
     }
+
+    override protected def pageHasValidDataAtPath(userAnswers: UserAnswers, page: GettablePage[_]): Boolean = page match {
+      case AgentReferencePage => true // Optional data, so always valid
+      case DetailsOfThisTransferPage if userAnswers.get(ConnectedPersonsPage).contains(true) =>
+        userAnswers.get(DetailsOfThisTransferPage).map(_.marketValue).isDefined
+      case _ => super.pageHasValidDataAtPath(userAnswers, page)
+    }
   }
