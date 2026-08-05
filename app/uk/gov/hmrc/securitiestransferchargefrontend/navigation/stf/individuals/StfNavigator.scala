@@ -81,7 +81,7 @@ class StfNavigator @Inject()(appConfig: FrontendAppConfig,
       map.put(SecuritiesTargetPage, individualSingleRoutes.SecuritiesTargetController.onPageLoad(NormalMode))
       map.put(ChargingPointPage, individualSingleRoutes.ChargingPointController.onPageLoad(NormalMode))
       map.put(TaxRatePage, individualSingleRoutes.TaxRateController.onPageLoad(NormalMode))
-      map.put(WhatTypeOfSecuritiesPage, individualSingleRoutes.WhatTypeOfSecuritiesController.onPageLoad(NormalMode))
+      map.put(PurchasingSharesPage, individualSingleRoutes.PurchasingSharesController.onPageLoad(NormalMode))
       map.put(DetailsOfThisTransferPage, individualSingleRoutes.DetailsOfThisTransferController.onPageLoad(NormalMode))
       map.put(OtherSecuritiesTypePage, individualSingleRoutes.OtherSecuritiesTypeController.onPageLoad(NormalMode))
       map.put(AmountPaidForSecuritiesPage, individualSingleRoutes.AmountPaidForSecuritiesController.onPageLoad(NormalMode))

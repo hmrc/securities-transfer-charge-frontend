@@ -13,7 +13,6 @@ GET         /refresh-session                              uk.gov.hmrc.securities
 GET         /there-is-a-problem                           uk.gov.hmrc.securitiestransferchargefrontend.controllers.JourneyRecoveryController.onPageLoad(continueUrl: Option[RedirectUrl] ?= None)
 GET        /check-your-answers                            uk.gov.hmrc.securitiestransferchargefrontend.controllers.CheckYourAnswersController.onPageLoad()
 
-
 GET        /stf/bulk/check-your-answers                 uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.shared.bulk.CheckYourAnswersController.onPageLoad()
 GET        /stf/single/check-your-answers                   uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.shared.single.CheckYourAnswersController.onPageLoad()
 
@@ -79,10 +78,10 @@ POST       /stf/security-type                             uk.gov.hmrc.securities
 GET        /stf/change/security-type                      uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.individuals.single.OtherSecuritiesTypeController.onPageLoad(mode: Mode = CheckMode)
 POST       /stf/change/security-type                      uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.individuals.single.OtherSecuritiesTypeController.onSubmit(mode: Mode = CheckMode)
 
-GET        /stf/securities-type                           uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.individuals.single.WhatTypeOfSecuritiesController.onPageLoad(mode: Mode = NormalMode)
-POST       /stf/securities-type                           uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.individuals.single.WhatTypeOfSecuritiesController.onSubmit(mode: Mode = NormalMode)
-GET        /stf/change/securities-type                    uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.individuals.single.WhatTypeOfSecuritiesController.onPageLoad(mode: Mode = CheckMode)
-POST       /stf/change/securities-type                    uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.individuals.single.WhatTypeOfSecuritiesController.onSubmit(mode: Mode = CheckMode)
+GET        /stf/purchasing-shares                           uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.individuals.single.PurchasingSharesController.onPageLoad(mode: Mode = NormalMode)
+POST       /stf/purchasing-shares                          uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.individuals.single.PurchasingSharesController.onSubmit(mode: Mode = NormalMode)
+GET        /stf/change/purchasing-shares                    uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.individuals.single.PurchasingSharesController.onPageLoad(mode: Mode = CheckMode)
+POST       /stf/change/purchasing-shares                    uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.individuals.single.PurchasingSharesController.onSubmit(mode: Mode = CheckMode)
 
 GET        /stf/share-details                             uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.individuals.single.DetailsOfThisTransferController.onPageLoad(mode: Mode = NormalMode)
 POST       /stf/share-details                             uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.individuals.single.DetailsOfThisTransferController.onSubmit(mode: Mode = NormalMode)
