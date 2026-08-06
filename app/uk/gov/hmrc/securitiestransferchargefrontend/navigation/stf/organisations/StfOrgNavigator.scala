@@ -101,7 +101,7 @@ class StfOrgNavigator @Inject()(appConfig: FrontendAppConfig,
 
     override protected val startPage: GettablePage[?] = ConfirmAddressPage
 
-    override protected val pageCallMap: BiMap[GettablePage[?], Call] = {
+    override protected lazy val pageCallMap: BiMap[GettablePage[?], Call] = {
       val map = HashBiMap.create[GettablePage[?], Call]()
       
       // STF Organisation single journey pages only

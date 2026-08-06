@@ -72,7 +72,7 @@ class StfAgentNavigator @Inject()(appConfig: FrontendAppConfig,
 
     override protected val startPage: GettablePage[?] = AgentReferencePage
 
-    override protected val pageCallMap: BiMap[GettablePage[?], Call] = {
+    override protected lazy val pageCallMap: BiMap[GettablePage[?], Call] = {
       val map = HashBiMap.create[GettablePage[?], Call]()
       
       // STF Agent single journey pages only

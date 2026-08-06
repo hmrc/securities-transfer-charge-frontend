@@ -68,7 +68,7 @@ class Sh03AgentNavigator @Inject()(answerPersistenceService: AnswerPersistenceSe
 
     override protected val startPage: GettablePage[?] = AgentReferencePage
 
-    override protected val pageCallMap: BiMap[GettablePage[?], Call] = {
+    override protected lazy val pageCallMap: BiMap[GettablePage[?], Call] = {
       val map = HashBiMap.create[GettablePage[?], Call]()
       
       // SH03 Agent single journey pages only
