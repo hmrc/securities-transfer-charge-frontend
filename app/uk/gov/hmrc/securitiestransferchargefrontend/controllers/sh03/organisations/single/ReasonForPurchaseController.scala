@@ -21,12 +21,14 @@ import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, Call, MessagesControllerComponents}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.actions.*
+import uk.gov.hmrc.securitiestransferchargefrontend.controllers.actions.requests.StcDataRequest
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.shared.SaveAndReturnButton.isReturn
 import uk.gov.hmrc.securitiestransferchargefrontend.forms.sh03.shared.ReasonForPurchaseFormProvider
 import uk.gov.hmrc.securitiestransferchargefrontend.models.sh03.shared.ReasonForPurchase
+import uk.gov.hmrc.securitiestransferchargefrontend.models.sh03.shared.ReasonForPurchase.{ForCancellation, ToPlaceIntoTreasury}
 import uk.gov.hmrc.securitiestransferchargefrontend.models.{Mode, UserAnswers}
 import uk.gov.hmrc.securitiestransferchargefrontend.navigation.Navigator
-import uk.gov.hmrc.securitiestransferchargefrontend.pages.sh03.ReasonForPurchasePage
+import uk.gov.hmrc.securitiestransferchargefrontend.pages.sh03.{ReasonForPurchasePage, TreasurySharesPage}
 import uk.gov.hmrc.securitiestransferchargefrontend.views.html.sh03.organisations.single.ReasonForPurchaseView
 
 import javax.inject.{Inject, Named}
@@ -67,10 +69,19 @@ class ReasonForPurchaseController @Inject()(
           Future.successful(BadRequest(view(formWithErrors, mode, backLinkCall(mode)(request.userAnswers)))),
 
         reasonForPurchase =>
+          checkAndHandleUpdate(reasonForPurchase)
           for {
             updatedAnswers <- Future.fromTry(request.userAnswers.set(ReasonForPurchasePage, reasonForPurchase))
             nextPage <- navigator.nextPage(ReasonForPurchasePage, mode, updatedAnswers, isReturn(request))
           } yield Redirect(nextPage)
       )
   }
+
+  def checkAndHandleUpdate(newValue: ReasonForPurchase)(implicit request: StcDataRequest[AnyContent]): Unit =
+    request.userAnswers.get(ReasonForPurchasePage).foreach { oldReasonForPurchase =>
+      if (oldReasonForPurchase == ForCancellation && newValue == ToPlaceIntoTreasury) {
+        request.userAnswers.remove(TreasurySharesPage)
+      }
+    }
+    
 }

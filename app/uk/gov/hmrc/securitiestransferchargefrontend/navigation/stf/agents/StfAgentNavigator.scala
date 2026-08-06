@@ -99,6 +99,9 @@ class StfAgentNavigator @Inject()(appConfig: FrontendAppConfig,
       case AgentReferencePage => true // Optional data, so always valid
       case DetailsOfThisTransferPage if userAnswers.get(ConnectedPersonsPage).contains(true) =>
         userAnswers.get(DetailsOfThisTransferPage).map(_.marketValue).isDefined
+      case SecuritiesTargetPage => // CRN is optional
+        userAnswers.get(SecuritiesTargetPage).map(_.businessName).isDefined
       case _ => super.pageHasValidDataAtPath(userAnswers, page)
+
     }
   }

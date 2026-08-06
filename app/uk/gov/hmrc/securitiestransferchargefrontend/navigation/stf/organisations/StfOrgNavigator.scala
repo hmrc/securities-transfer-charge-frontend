@@ -95,6 +95,8 @@ class StfOrgNavigator @Inject()(appConfig: FrontendAppConfig,
     override protected def pageHasValidDataAtPath(userAnswers: UserAnswers, page: GettablePage[_]): Boolean = page match {
       case DetailsOfThisTransferPage if userAnswers.get(ConnectedPersonsPage).contains(true) =>
         userAnswers.get(DetailsOfThisTransferPage).map(_.marketValue).isDefined
+      case SecuritiesTargetPage => // CRN is optional
+        userAnswers.get(SecuritiesTargetPage).map(_.businessName).isDefined
       case _ => super.pageHasValidDataAtPath(userAnswers, page)
     }
   }
