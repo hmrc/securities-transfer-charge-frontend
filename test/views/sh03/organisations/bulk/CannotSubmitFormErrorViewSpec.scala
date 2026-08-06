@@ -37,9 +37,7 @@ class CannotSubmitFormErrorViewSpec extends ViewBaseSpec {
     val title: String = messages("org.sh03.cannotSubmitFormError.title")
     val heading: String = messages("org.sh03.cannotSubmitFormError.heading")
 
-    val para1Value: String = messages("org.sh03.cannotSubmitFormError.error.p1")
-    val para2Value: String = messages("org.sh03.cannotSubmitFormError.error.p2")
-
+    val para1Value: String = messages("org.sh03.cannotSubmitFormError.p1")
 
     val item1: String = messages("org.sh03.cannotSubmitFormError.item1")
     val item2: String = messages("org.sh03.cannotSubmitFormError.item2")
@@ -50,10 +48,7 @@ class CannotSubmitFormErrorViewSpec extends ViewBaseSpec {
     val item7: String = messages("org.sh03.cannotSubmitFormError.item7")
     val item8: String = messages("org.sh03.cannotSubmitFormError.item8")
 
-
-    val para3Value: String = messages("org.sh03.cannotSubmitFormError.error.p3")
-
-    val saveAndReturnLink: String = messages("save-and-return-to-dashboard.link")
+    val returnLink: String = messages("return-to-dashboard.link")
   }
 
   "The CannotSubmitFormErrorView" - {
@@ -70,10 +65,6 @@ class CannotSubmitFormErrorViewSpec extends ViewBaseSpec {
 
       "display the correct of first paragraph content" in {
         cannotSubmitFormErrorView.para(1) mustBe Some(ExpectedContent.para1Value)
-      }
-
-      "display the correct second paragraph" in {
-        cannotSubmitFormErrorView.para(2) mustBe Some(ExpectedContent.para2Value)
       }
 
       "display a bulleted list with 8 items" in {
@@ -112,19 +103,14 @@ class CannotSubmitFormErrorViewSpec extends ViewBaseSpec {
         cannotSubmitFormErrorView.select("ul.govuk-list.govuk-list--bullet li").get(7).text() mustBe ExpectedContent.item8
       }
 
-
-      "display the correct third paragraph" in {
-        cannotSubmitFormErrorView.para(3) mustBe Some(ExpectedContent.para3Value)
-      }
-
       "back link url to the role purchasing company page" in {
         cannotSubmitFormErrorView.select(".govuk-back-link").attr("href") mustBe testBackLinkRoute.url
       }
 
-      "have a save and return link back to the submission dashboard page" in {
-        val saveAndReturnLink = cannotSubmitFormErrorView.select(".govuk-body a.govuk-link").first()
-        saveAndReturnLink.text() mustBe ExpectedContent.saveAndReturnLink
-        saveAndReturnLink.attr("href") mustBe routes.SubmissionsDashboardController.onPageLoad().url
+      "have a link to return back to the submission dashboard page" in {
+        val returnLink = cannotSubmitFormErrorView.select("p.govuk-body a.govuk-link").first()
+        returnLink.text() mustBe ExpectedContent.returnLink
+        returnLink.attr("href") mustBe routes.SubmissionsDashboardController.onPageLoad().url
       }
     }
   }
