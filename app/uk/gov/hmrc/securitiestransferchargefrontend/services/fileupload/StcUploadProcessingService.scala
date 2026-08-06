@@ -16,6 +16,8 @@
 
 package uk.gov.hmrc.securitiestransferchargefrontend.services.fileupload
 
+import uk.gov.hmrc.securitiestransferchargefrontend.models.JourneyType
+
 import javax.inject.{Inject, Singleton}
 import uk.gov.hmrc.securitiestransferchargefrontend.models.stf.fileupload.{FileParseError, StcFileValidationResponse, UploadedFile}
 
@@ -25,8 +27,8 @@ class StcUploadProcessingService @Inject()(
                                             stcFileValidationService: StcFileValidationService
                                           ) {
 
-  def process(uploadedFile: UploadedFile, affinityKey: String, templateType: String): Either[FileParseError, StcFileValidationResponse] =
-    stcUploadParsingService.withVerifiedTemplateStream(uploadedFile, affinityKey, templateType) { (headers, rowStream) =>
-      stcFileValidationService.validateStream(rowStream, headers, affinityKey, templateType)
+  def process(uploadedFile: UploadedFile, affinityKey: String, journeyType: JourneyType): Either[FileParseError, StcFileValidationResponse] =
+    stcUploadParsingService.withVerifiedTemplateStream(uploadedFile, affinityKey, journeyType) { (headers, rowStream) =>
+      stcFileValidationService.validateStream(rowStream, headers, affinityKey, journeyType)
     }
 }

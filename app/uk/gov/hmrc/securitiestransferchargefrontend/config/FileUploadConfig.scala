@@ -17,6 +17,7 @@
 package uk.gov.hmrc.securitiestransferchargefrontend.config
 
 import play.api.Configuration
+import uk.gov.hmrc.securitiestransferchargefrontend.models.JourneyType
 
 import javax.inject.{Inject, Singleton}
 
@@ -38,7 +39,8 @@ class FileUploadConfig @Inject()(configuration: Configuration) {
   val maxErrorsAllowed: Int =
     configuration.getOptional[Int]("file-upload.max-errors-allowed").getOrElse(25)
 
-  def template(affinityKey: String, templateType: String): Option[TemplateDefinition] = {
+  def template(affinityKey: String, journeyType: JourneyType): Option[TemplateDefinition] = {
+    val templateType = journeyType.value
     for {
       cols <- configuration.getOptional[Int](s"file-upload.templates.$affinityKey.$templateType.expected-columns")
       sig  <- configuration.getOptional[String](s"file-upload.templates.$affinityKey.$templateType.signature")

@@ -1159,3 +1159,25 @@ agent.sh03.templateInstructions.step2 = Complete the template, using one row for
 agent.sh03.templateInstructions.step3 = Upload the file on the next page as a .csv or an .xlsx
 agent.sh03.templateInstructions.p2 = Remember, do not edit the first three rows, or change the order of the columns.
 agent.sh03.templateInstructions.p3 = Once you have uploaded and submitted the file it will show in your recent submissions, you can then pay the tax due.
+
+
+org.sh03.bulk.companyDetails.title = Company details
+org.sh03.bulk.companyDetails.heading = Company details
+org.sh03.bulk.companyDetails.companyName.label = Company name
+org.sh03.bulk.companyDetails.crn.label = Company registration number (CRN)
+org.sh03.bulk.companyDetails.crn.hint = This is also called a company number. For example, SN898989 or 12345678
+
+org.sh03.bulk.companyDetails.companyName.error.required = Enter the company name
+org.sh03.bulk.companyDetails.companyName.error.length = Company name must be 160 characters or fewer
+org.sh03.bulk.companyDetails.crn.error.required = Enter the company registration number
+org.sh03.bulk.companyDetails.crn.error.invalid = Company registration number can only be numbers or letters
+org.sh03.bulk.companyDetails.crn.error.length = Company registration number must be 8 characters long
+
+org.sh03.templateInstructions.title = How to use the template
+org.sh03.templateInstructions.heading = How to use the template
+org.sh03.templateInstructions.p1 = Use the template to tell us about more than one share purchase at a time.
+org.sh03.templateInstructions.step1 = Download the template
+org.sh03.templateInstructions.step2 = Complete the template, using one row for each class of shares the company is purchasing.
+org.sh03.templateInstructions.step3 = Upload the file on the next page as a .csv or an .xlsx
+org.sh03.templateInstructions.p2 = Remember, do not edit the first three rows, or change the order of the columns.
+org.sh03.templateInstructions.p3 = Once you have uploaded and submitted the file it will show in your recent submissions, you can then pay the tax due.

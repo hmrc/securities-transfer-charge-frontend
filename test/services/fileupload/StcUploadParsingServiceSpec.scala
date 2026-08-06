@@ -16,7 +16,7 @@
 
 package services.fileupload
 
-import org.mockito.ArgumentMatchers.{any, eq => eqTo}
+import org.mockito.ArgumentMatchers.{any, eq as eqTo}
 import org.mockito.Mockito.{verify, when}
 import org.scalatest.EitherValues
 import org.scalatest.matchers.must.Matchers.mustBe
@@ -24,6 +24,8 @@ import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpec
 import org.scalatestplus.mockito.MockitoSugar
 import uk.gov.hmrc.securitiestransferchargefrontend.config.{FileUploadConfig, TemplateDefinition}
+import uk.gov.hmrc.securitiestransferchargefrontend.models.JourneyType
+import uk.gov.hmrc.securitiestransferchargefrontend.models.JourneyType.{SH03, STF}
 import uk.gov.hmrc.securitiestransferchargefrontend.models.stf.fileupload.*
 import uk.gov.hmrc.securitiestransferchargefrontend.services.fileupload.{FileParsingService, StcUploadParsingService}
 
@@ -49,7 +51,7 @@ class StcUploadParsingServiceSpec extends AnyWordSpec with Matchers with EitherV
 
   private val fileUploadConfig = mock[FileUploadConfig]
   when(fileUploadConfig.firstDataRow).thenReturn(4)
-  when(fileUploadConfig.template(any[String], any[String])).thenReturn(
+  when(fileUploadConfig.template(any[String], any[JourneyType])).thenReturn(
     Some(TemplateDefinition(27, hashRow(validRow1Cells ++ validRow2Cells ++ validRow3Cells)))
   )
 
@@ -86,7 +88,7 @@ class StcUploadParsingServiceSpec extends AnyWordSpec with Matchers with EitherV
 
       mockStream(validRow1Cells, Seq(validRow2, validRow3, dataRow, emptyDataRow))
 
-      val result: Either[FileParseError, List[ParsedRow]] = service.withVerifiedTemplateStream(uploadedFile, testAffinityGroup, "stf") { (_, stream) =>
+      val result: Either[FileParseError, List[ParsedRow]] = service.withVerifiedTemplateStream(uploadedFile, testAffinityGroup, STF) { (_, stream) =>
         Right(stream.toList)
       }
 
@@ -100,7 +102,7 @@ class StcUploadParsingServiceSpec extends AnyWordSpec with Matchers with EitherV
 
       mockStream(validRow1Cells, Seq(validRow2, validRow3, dataRow1, dataRow2))
 
-      val result: Either[FileParseError, List[ParsedRow]] = service.withVerifiedTemplateStream(uploadedFile, testAffinityGroup, "stf") { (_, stream) =>
+      val result: Either[FileParseError, List[ParsedRow]] = service.withVerifiedTemplateStream(uploadedFile, testAffinityGroup, STF) { (_, stream) =>
         Right(stream.toList)
       }
 
@@ -110,7 +112,7 @@ class StcUploadParsingServiceSpec extends AnyWordSpec with Matchers with EitherV
     "return EmptyFile when there are no data rows after filtering" in new Setup {
       mockStream(validRow1Cells, Seq(validRow2, validRow3, ParsedRow(4, Seq(ParsedCell(1, ""))), ParsedRow(5, Seq(ParsedCell(1, " ")))))
 
-      val result: Either[FileParseError, List[ParsedRow]] = service.withVerifiedTemplateStream(uploadedFile, testAffinityGroup, "stf") { (_, stream) => Right(stream.toList) }
+      val result: Either[FileParseError, List[ParsedRow]] = service.withVerifiedTemplateStream(uploadedFile, testAffinityGroup, STF) { (_, stream) => Right(stream.toList) }
 
       result mustBe Left(FileParseError.EmptyFile)
     }
@@ -118,7 +120,7 @@ class StcUploadParsingServiceSpec extends AnyWordSpec with Matchers with EitherV
     "return EmptyFile when the parsed file contains only template rows" in new Setup {
       mockStream(validRow1Cells, Seq(validRow2, validRow3))
 
-      val result: Either[FileParseError, List[ParsedRow]] = service.withVerifiedTemplateStream(uploadedFile, testAffinityGroup, "stf") { (_, stream) => Right(stream.toList) }
+      val result: Either[FileParseError, List[ParsedRow]] = service.withVerifiedTemplateStream(uploadedFile, testAffinityGroup, STF) { (_, stream) => Right(stream.toList) }
 
       result mustBe Left(FileParseError.EmptyFile)
     }
@@ -128,7 +130,7 @@ class StcUploadParsingServiceSpec extends AnyWordSpec with Matchers with EitherV
 
       mockStream(invalidHeaders, Seq(validRow2, validRow3, ParsedRow(4, Seq(ParsedCell(1, "Data")))))
 
-      val result: Either[FileParseError, List[ParsedRow]] = service.withVerifiedTemplateStream(uploadedFile, testAffinityGroup, "stf") { (_, stream) => Right(stream.toList) }
+      val result: Either[FileParseError, List[ParsedRow]] = service.withVerifiedTemplateStream(uploadedFile, testAffinityGroup, STF) { (_, stream) => Right(stream.toList) }
 
       result mustBe Left(FileParseError.InvalidTemplate)
     }
@@ -138,7 +140,7 @@ class StcUploadParsingServiceSpec extends AnyWordSpec with Matchers with EitherV
 
       mockStream(validRow1Cells, Seq(invalidRow2, validRow3, ParsedRow(4, Seq(ParsedCell(1, "Data")))))
 
-      val result: Either[FileParseError, List[ParsedRow]] = service.withVerifiedTemplateStream(uploadedFile, testAffinityGroup, "stf") { (_, stream) => Right(stream.toList) }
+      val result: Either[FileParseError, List[ParsedRow]] = service.withVerifiedTemplateStream(uploadedFile, testAffinityGroup, STF) { (_, stream) => Right(stream.toList) }
 
       result mustBe Left(FileParseError.InvalidTemplate)
     }
@@ -148,26 +150,31 @@ class StcUploadParsingServiceSpec extends AnyWordSpec with Matchers with EitherV
 
       mockStream(validRow1Cells, Seq(validRow2, invalidRow3, ParsedRow(4, Seq(ParsedCell(1, "Data")))))
 
-      val result: Either[FileParseError, List[ParsedRow]] = service.withVerifiedTemplateStream(uploadedFile, testAffinityGroup, "stf") { (_, stream) => Right(stream.toList) }
+      val result: Either[FileParseError, List[ParsedRow]] = service.withVerifiedTemplateStream(uploadedFile, testAffinityGroup, STF) { (_, stream) => Right(stream.toList) }
 
       result mustBe Left(FileParseError.InvalidTemplate)
     }
 
     "return InvalidTemplate when no template configuration is found for the given journey keys" in new Setup {
-      when(fileUploadConfig.template(eqTo(testAffinityGroup), eqTo("unknown"))).thenReturn(None)
+      when(fileUploadConfig.template(eqTo(testAffinityGroup), eqTo(STF))).thenReturn(None)
 
       mockStream(validRow1Cells, Seq(validRow2, validRow3, ParsedRow(4, Seq(ParsedCell(1, "Data")))))
 
-      val result: Either[FileParseError, List[ParsedRow]] = service.withVerifiedTemplateStream(uploadedFile, testAffinityGroup, "unknown") { (_, stream) => Right(stream.toList) }
+      val result: Either[FileParseError, List[ParsedRow]] = service.withVerifiedTemplateStream(uploadedFile, testAffinityGroup, STF) { (_, stream) => Right(stream.toList) }
 
       result mustBe Left(FileParseError.InvalidTemplate)
     }
 
     "propagate file parsing errors" in new Setup {
+      
+      when(fileUploadConfig.template(eqTo(testAffinityGroup), eqTo(STF))).thenReturn(
+        Some(TemplateDefinition(27, hashRow(validRow1Cells ++ validRow2Cells ++ validRow3Cells)))
+      )
+      
       when(fileParsingService.withParsedStream[Seq[ParsedRow]](any[UploadedFile], any[Int])(any()))
         .thenReturn(Left(FileParseError.InvalidXlsx("broken workbook")))
 
-      val result: Either[FileParseError, List[ParsedRow]] = service.withVerifiedTemplateStream(uploadedFile, testAffinityGroup, "stf") { (_, stream) => Right(stream.toList) }
+      val result: Either[FileParseError, List[ParsedRow]] = service.withVerifiedTemplateStream(uploadedFile, testAffinityGroup, STF) { (_, stream) => Right(stream.toList) }
 
       result mustBe Left(FileParseError.InvalidXlsx("broken workbook"))
     }
@@ -179,33 +186,33 @@ class StcUploadParsingServiceSpec extends AnyWordSpec with Matchers with EitherV
 
       when(mockConfig.firstDataRow).thenReturn(4)
 
-      when(mockConfig.template(eqTo("individual"), eqTo("stf"))).thenReturn(
+      when(mockConfig.template(eqTo("individual"), eqTo(STF))).thenReturn(
         Some(TemplateDefinition(expectedColumns = 27, signature = "ind-hash"))
       )
-      when(mockConfig.template(eqTo("org"), eqTo("stf"))).thenReturn(
+      when(mockConfig.template(eqTo("org"), eqTo(STF))).thenReturn(
         Some(TemplateDefinition(expectedColumns = 21, signature = "org-hash"))
       )
 
-      when(mockConfig.template(eqTo("agent"), eqTo("stf"))).thenReturn(
+      when(mockConfig.template(eqTo("agent"), eqTo(STF))).thenReturn(
         Some(TemplateDefinition(expectedColumns = 29, signature = "agent-hash"))
       )
 
-      when(mockConfig.template(eqTo("agent"), eqTo("sh03"))).thenReturn(
+      when(mockConfig.template(eqTo("agent"), eqTo(SH03))).thenReturn(
         Some(TemplateDefinition(expectedColumns = 33, signature = "sh03-agent-hash"))
       )
 
       when(mockParser.withParsedStream[Unit](any(), any())(any())).thenReturn(Right(()))
 
-      currentService.withVerifiedTemplateStream(uploadedFile, "individual", "stf") { (_, _) => Right(()) }
+      currentService.withVerifiedTemplateStream(uploadedFile, "individual", STF) { (_, _) => Right(()) }
       verify(mockParser).withParsedStream[Unit](eqTo(uploadedFile), eqTo(27))(any())
 
-      currentService.withVerifiedTemplateStream(uploadedFile, "org", "stf") { (_, _) => Right(()) }
+      currentService.withVerifiedTemplateStream(uploadedFile, "org", STF) { (_, _) => Right(()) }
       verify(mockParser).withParsedStream[Unit](eqTo(uploadedFile), eqTo(21))(any())
 
-      currentService.withVerifiedTemplateStream(uploadedFile, "agent", "stf") { (_, _) => Right(()) }
+      currentService.withVerifiedTemplateStream(uploadedFile, "agent", STF) { (_, _) => Right(()) }
       verify(mockParser).withParsedStream[Unit](eqTo(uploadedFile), eqTo(29))(any())
 
-      currentService.withVerifiedTemplateStream(uploadedFile, "agent", "sh03") { (_, _) => Right(()) }
+      currentService.withVerifiedTemplateStream(uploadedFile, "agent", SH03) { (_, _) => Right(()) }
       verify(mockParser).withParsedStream[Unit](eqTo(uploadedFile), eqTo(33))(any())
     }
   }

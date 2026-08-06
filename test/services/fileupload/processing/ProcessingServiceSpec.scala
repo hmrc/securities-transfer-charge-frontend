@@ -31,6 +31,7 @@ import uk.gov.hmrc.securitiestransferchargefrontend.connectors.{SubscriptionConn
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.actions.StcAuthorisedRequest
 import uk.gov.hmrc.securitiestransferchargefrontend.domain.{CredentialId, SubscriptionId}
 import uk.gov.hmrc.securitiestransferchargefrontend.models.JourneyType.STF
+import uk.gov.hmrc.securitiestransferchargefrontend.models.JourneyType
 import uk.gov.hmrc.securitiestransferchargefrontend.models.stf.fileupload.{FileParseError, ParsedStcRow}
 import uk.gov.hmrc.securitiestransferchargefrontend.models.stf.upscan.UpscanJourneyStatus.*
 import uk.gov.hmrc.securitiestransferchargefrontend.models.stf.upscan.{FileUpload, UpscanJourneyStatus}
@@ -82,7 +83,7 @@ class ProcessingServiceSpec extends SpecBase with MockitoSugar with BeforeAndAft
       stubStatusUpdates()
 
       when(
-        mockUpscanProcessingService.process(any[FileUpload], any[String], any[String])(any)
+        mockUpscanProcessingService.process(any[FileUpload], any[String], any[JourneyType])(any)
       ).thenReturn(
         Future.successful(
           Left(FileParseError.EmptyFile)
@@ -96,7 +97,7 @@ class ProcessingServiceSpec extends SpecBase with MockitoSugar with BeforeAndAft
             reference,
             fileUpload,
             affinityKey,
-            "stf"
+            STF
           )(any(), any())
         )
 
@@ -110,7 +111,7 @@ class ProcessingServiceSpec extends SpecBase with MockitoSugar with BeforeAndAft
       stubStatusUpdates()
 
       when(
-        mockUpscanProcessingService.process(any[FileUpload], any[String], any[String])(any())
+        mockUpscanProcessingService.process(any[FileUpload], any[String], any[JourneyType])(any())
       ).thenReturn(
         Future.successful(
           Left(FileParseError.RowLimitExceeded(100, 10))
@@ -124,7 +125,7 @@ class ProcessingServiceSpec extends SpecBase with MockitoSugar with BeforeAndAft
             reference,
             fileUpload,
             affinityKey,
-            "stf"
+            STF
           )(any(), any())
         )
 
@@ -138,7 +139,7 @@ class ProcessingServiceSpec extends SpecBase with MockitoSugar with BeforeAndAft
       stubStatusUpdates()
 
       when(
-        mockUpscanProcessingService.process(any[FileUpload], any[String], any[String])(any())
+        mockUpscanProcessingService.process(any[FileUpload], any[String], any[JourneyType])(any())
       ).thenReturn(
         Future.successful(
           Left(FileParseError.EmptyFile)
@@ -152,7 +153,7 @@ class ProcessingServiceSpec extends SpecBase with MockitoSugar with BeforeAndAft
             reference,
             fileUpload,
             affinityKey,
-            "stf"
+            STF
           )(any(), any())
         )
 
@@ -166,7 +167,7 @@ class ProcessingServiceSpec extends SpecBase with MockitoSugar with BeforeAndAft
       stubStatusUpdates()
 
       when(
-        mockUpscanProcessingService.process(any[FileUpload], any[String], any[String])(any())
+        mockUpscanProcessingService.process(any[FileUpload], any[String], any[JourneyType])(any())
       ).thenReturn(
         Future.successful(
           Left(FileParseError.InvalidTemplate)
@@ -180,7 +181,7 @@ class ProcessingServiceSpec extends SpecBase with MockitoSugar with BeforeAndAft
             reference,
             fileUpload,
             affinityKey,
-            "stf"
+            STF
           )(any(), any())
         )
 
@@ -194,7 +195,7 @@ class ProcessingServiceSpec extends SpecBase with MockitoSugar with BeforeAndAft
       stubStatusUpdates()
 
       when(
-        mockUpscanProcessingService.process(any[FileUpload], any[String], any[String])(any())
+        mockUpscanProcessingService.process(any[FileUpload], any[String], any[JourneyType])(any())
       ).thenReturn(
         Future.successful(
           Left(FileParseError.MissingWorksheet("test"))
@@ -208,7 +209,7 @@ class ProcessingServiceSpec extends SpecBase with MockitoSugar with BeforeAndAft
             reference,
             fileUpload,
             affinityKey,
-            "stf"
+            STF
           )(any(), any())
         )
 
@@ -224,7 +225,7 @@ class ProcessingServiceSpec extends SpecBase with MockitoSugar with BeforeAndAft
 
 
       when(
-        mockUpscanProcessingService.process(any[FileUpload], any[String], any[String])(any())
+        mockUpscanProcessingService.process(any[FileUpload], any[String], any[JourneyType])(any())
       ).thenReturn(
         Future.successful(
           Right(validationResponse)
@@ -238,7 +239,7 @@ class ProcessingServiceSpec extends SpecBase with MockitoSugar with BeforeAndAft
             reference,
             fileUpload,
             affinityKey,
-            "stf"
+            STF
           )(any(), any())
         )
 
@@ -261,7 +262,7 @@ class ProcessingServiceSpec extends SpecBase with MockitoSugar with BeforeAndAft
       ).thenReturn(Future.unit)
 
       when(
-        mockUpscanProcessingService.process(any[FileUpload], any[String], any[String])(any())
+        mockUpscanProcessingService.process(any[FileUpload], any[String], any[JourneyType])(any())
       ).thenReturn(
         Future.successful(
           Right(validationResponse)
@@ -275,7 +276,7 @@ class ProcessingServiceSpec extends SpecBase with MockitoSugar with BeforeAndAft
             reference,
             fileUpload,
             affinityKey,
-            "stf"
+            STF
           )(any(), any())
         )
 
@@ -324,7 +325,7 @@ class ProcessingServiceSpec extends SpecBase with MockitoSugar with BeforeAndAft
         mockUpscanProcessingService.process(
           any[FileUpload],
           any[String],
-          any[String]
+          any[JourneyType]
         )(any())
       ).thenReturn(
         Future.successful(
@@ -339,7 +340,7 @@ class ProcessingServiceSpec extends SpecBase with MockitoSugar with BeforeAndAft
             reference,
             fileUpload,
             affinityKey,
-            "stf"
+            STF
           )
         )
 
@@ -360,7 +361,7 @@ class ProcessingServiceSpec extends SpecBase with MockitoSugar with BeforeAndAft
       stubStatusUpdates()
 
       when(
-        mockUpscanProcessingService.process(any[FileUpload], any[String], any[String])(any())
+        mockUpscanProcessingService.process(any[FileUpload], any[String], any[JourneyType])(any())
       ).thenReturn(
         Future.failed(
           UpscanDownloadException("download failed", exception)
@@ -374,7 +375,7 @@ class ProcessingServiceSpec extends SpecBase with MockitoSugar with BeforeAndAft
             reference,
             fileUpload,
             affinityKey,
-            "stf"
+            STF
           )(any(), any())
         )
 
@@ -388,7 +389,7 @@ class ProcessingServiceSpec extends SpecBase with MockitoSugar with BeforeAndAft
       stubStatusUpdates()
 
       when(
-        mockUpscanProcessingService.process(any[FileUpload], any[String], any[String])(any())
+        mockUpscanProcessingService.process(any[FileUpload], any[String], any[JourneyType])(any())
       ).thenReturn(
         Future.successful(
           Left(FileParseError.EmptyFile)
@@ -402,7 +403,7 @@ class ProcessingServiceSpec extends SpecBase with MockitoSugar with BeforeAndAft
             reference,
             fileUpload,
             affinityKey,
-            "stf"
+            STF
           )(any(), any())
         )
 

@@ -26,6 +26,7 @@ import uk.gov.hmrc.securitiestransferchargefrontend.controllers.fileUpload.route
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.routes.JourneyRecoveryController
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.agents.bulk.routes as stfBulkRoutes
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.sh03.agents.bulk.routes as sh03BulkRoutes
+import uk.gov.hmrc.securitiestransferchargefrontend.controllers.sh03.organisations.bulk.routes as sh03OrgBulkRoutes
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.sh03.shared.bulk.routes as sh03CyaRoutes
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.shared.bulk.routes as stfCyaRoutes
 import uk.gov.hmrc.securitiestransferchargefrontend.models.{JourneyType, NormalMode}
@@ -104,7 +105,7 @@ class FileProcessingController @Inject()(
         Future.successful(Redirect(routes.BulkUploadFileEmptyController.onPageLoad(journeyType)))
 
       case UpscanJourneyStatus.Ready =>
-        processingService.processReadyUpload(reference, fileUpload, affinityKey, journeyType.value)
+        processingService.processReadyUpload(reference, fileUpload, affinityKey, journeyType)
         Future.successful(spinnerPage(counter))
 
       case UpscanJourneyStatus.Processing | UpscanJourneyStatus.Initiated => Future.successful(spinnerPage(counter))
@@ -136,6 +137,8 @@ class FileProcessingController @Inject()(
           case (AffinityGroup.Agent, JourneyType.STF) => Future.successful(Redirect(stfBulkRoutes.AgentReferenceController.onPageLoad(NormalMode)))
 
           case (AffinityGroup.Agent, JourneyType.SH03) => Future.successful(Redirect(sh03BulkRoutes.RoleAtPurchasingCompanyController.onPageLoad(NormalMode)))
+
+          case (AffinityGroup.Organisation, JourneyType.SH03) => Future.successful(Redirect(sh03OrgBulkRoutes.RoleAtPurchasingCompanyController.onPageLoad(NormalMode)))
 
           case (_, JourneyType.SH03) => Future.successful(Redirect(sh03CyaRoutes.CheckYourAnswersController.onPageLoad()))
           case (_, JourneyType.STF) => Future.successful(Redirect(stfCyaRoutes.CheckYourAnswersController.onPageLoad()))

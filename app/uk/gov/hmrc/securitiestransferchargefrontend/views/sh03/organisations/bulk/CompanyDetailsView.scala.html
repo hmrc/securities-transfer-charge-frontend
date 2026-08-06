@@ -1,0 +1,67 @@
+@*
+ * Copyright 2026 HM Revenue & Customs
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *@
+
+@import uk.gov.hmrc.securitiestransferchargefrontend.models.sh03.bulk.CompanyDetails
+@import uk.gov.hmrc.securitiestransferchargefrontend.views.html.templates.Layout
+@import uk.gov.hmrc.securitiestransferchargefrontend.controllers.sh03.organisations.bulk.routes
+@import uk.gov.hmrc.securitiestransferchargefrontend.views.html.components.SaveAndReturnButton
+@import uk.gov.hmrc.securitiestransferchargefrontend.viewmodels.InputWidth._
+
+@this(
+    layout: Layout,
+    formHelper: FormWithCSRF,
+    govukErrorSummary: GovukErrorSummary,
+    govukInput: GovukInput,
+    govukRadios: GovukRadios,
+    govukButton: GovukButton,
+    saveAndReturnButton: SaveAndReturnButton
+)
+
+@(form: Form[CompanyDetails], mode: Mode,backLinkCall: Call)(implicit request: Request[_], messages: Messages)
+
+@layout(pageTitle = title(form, messages("org.sh03.bulk.companyDetails.title"), Some(messages("sh03.section.name"))), backLinkUrl = Some(backLinkCall.url)) {
+
+    @formHelper(action = routes.CompanyDetailsController.onSubmit(mode)) {
+
+        @if(form.errors.nonEmpty) {
+            @govukErrorSummary(ErrorSummaryViewModel(form))
+        }
+
+        <h1 class="govuk-heading-l">@messages("org.sh03.bulk.companyDetails.heading")</h1>
+
+        @govukInput(
+            InputViewModel(
+                field = form("companyName"),
+                label = LabelViewModel(messages("org.sh03.bulk.companyDetails.companyName.label"))
+            )
+        )
+
+        @govukInput(
+            InputViewModel(
+                field = form("companyRegistrationNumber"),
+                label = LabelViewModel(messages("org.sh03.bulk.companyDetails.crn.label"))
+            )
+            .withHint(HintViewModel(messages("org.sh03.bulk.companyDetails.crn.hint")))
+            .withWidth(Fixed10)
+        )
+
+        @govukButton(
+            ButtonViewModel(messages("site.save-and-continue.button"))
+        )
+
+        @saveAndReturnButton()
+    }
+}
