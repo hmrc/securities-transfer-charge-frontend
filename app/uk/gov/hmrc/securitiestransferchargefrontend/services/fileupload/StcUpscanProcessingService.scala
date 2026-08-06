@@ -18,6 +18,7 @@ package uk.gov.hmrc.securitiestransferchargefrontend.services.fileupload
 
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.securitiestransferchargefrontend.connectors.UpscanFileDownloadConnector
+import uk.gov.hmrc.securitiestransferchargefrontend.models.JourneyType
 import uk.gov.hmrc.securitiestransferchargefrontend.models.stf.fileupload.{FileParseError, StcFileValidationResponse, UploadedFile}
 import uk.gov.hmrc.securitiestransferchargefrontend.models.stf.upscan.{FileUpload, UpscanJourneyStatus}
 
@@ -25,7 +26,7 @@ import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
 
 trait StcUpscanProcessingService {
-  def process(fileUpload: FileUpload, affinityKey: String, templateType: String)(implicit hc: HeaderCarrier): Future[Either[FileParseError, StcFileValidationResponse]]
+  def process(fileUpload: FileUpload, affinityKey: String, journeyType: JourneyType)(implicit hc: HeaderCarrier): Future[Either[FileParseError, StcFileValidationResponse]]
 }
 
 @Singleton
@@ -35,7 +36,7 @@ class StcUpscanProcessingServiceImpl @Inject()(
                                                 fileParserSelector: FileParserSelector
                                               )(implicit ec: ExecutionContext) extends StcUpscanProcessingService {
 
-  override def process(fileUpload: FileUpload, affinityKey: String, templateType: String)(implicit hc: HeaderCarrier): Future[Either[FileParseError, StcFileValidationResponse]] = {
+  override def process(fileUpload: FileUpload, affinityKey: String, journeyType: JourneyType)(implicit hc: HeaderCarrier): Future[Either[FileParseError, StcFileValidationResponse]] = {
     if (fileUpload.status != UpscanJourneyStatus.Ready) {
       Future.failed(
         new IllegalArgumentException(
@@ -61,7 +62,7 @@ class StcUpscanProcessingServiceImpl @Inject()(
               inputStream = inputStream
             )
 
-            stcUploadProcessingService.process(uploadedFile, affinityKey, templateType)
+            stcUploadProcessingService.process(uploadedFile, affinityKey, journeyType)
           }
       }
     }

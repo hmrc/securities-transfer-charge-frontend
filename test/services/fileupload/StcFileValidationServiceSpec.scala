@@ -17,10 +17,11 @@
 package services.fileupload
 
 import base.SpecBase
-import org.mockito.ArgumentMatchers.{any, eq => eqTo}
+import org.mockito.ArgumentMatchers.{any, eq as eqTo}
 import org.mockito.Mockito.when
 import org.scalatestplus.mockito.MockitoSugar.mock
 import uk.gov.hmrc.securitiestransferchargefrontend.config.FileUploadConfig
+import uk.gov.hmrc.securitiestransferchargefrontend.models.JourneyType.STF
 import uk.gov.hmrc.securitiestransferchargefrontend.models.stf.fileupload.*
 import uk.gov.hmrc.securitiestransferchargefrontend.models.stf.fileupload.ParsedValue.Missing
 import uk.gov.hmrc.securitiestransferchargefrontend.services.fileupload.*
@@ -135,11 +136,11 @@ class StcFileValidationServiceSpec extends SpecBase {
 
       when(
         stcRowValidationService.validateStream(
-          any(), eqTo(headers), eqTo(affinityGroupKeyInd), eqTo("stf"), eqTo(25), eqTo(10000)
+          any(), eqTo(headers), eqTo(affinityGroupKeyInd), eqTo(STF), eqTo(25), eqTo(10000)
         )
       ).thenReturn(Right(Seq(validatedRow1, validatedRow2)))
 
-      val result = service.validateStream(rowStream, headers, affinityGroupKeyInd, "stf")
+      val result = service.validateStream(rowStream, headers, affinityGroupKeyInd, STF)
 
       result.isRight mustBe true
       val response = result.toOption.get

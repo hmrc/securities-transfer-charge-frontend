@@ -16,6 +16,7 @@
 
 package uk.gov.hmrc.securitiestransferchargefrontend.services.fileupload
 
+import uk.gov.hmrc.securitiestransferchargefrontend.models.JourneyType
 import uk.gov.hmrc.securitiestransferchargefrontend.models.stf.fileupload.{FileParseError, ParsedRow, ValidatedStcRow}
 
 import javax.inject.{Inject, Singleton}
@@ -31,7 +32,7 @@ class StcRowValidationService @Inject()(
                       rowStream: Iterator[ParsedRow],
                       headers: Seq[String],
                       affinityKey: String,
-                      templateType: String,
+                      journeyType: JourneyType,
                       maxErrorsAllowed: Int,
                       maxRows: Int
                     ): Either[FileParseError, Seq[ValidatedStcRow]] = {
@@ -39,13 +40,10 @@ class StcRowValidationService @Inject()(
     implicit val columnIndex: ColumnIndexBuilder = new ColumnIndexBuilder(headers)
     val mapper = new StcRowMapper(columnIndex)
 
-    val resolvedTemplate = (templateType.toLowerCase, affinityKey.toLowerCase) match {
-      case ("stf", "agent") => Right(StcTemplate.STFAgent)
-
-      case ("stf", _) => Right(StcTemplate.STF)
-
-      case ("sh03", _) => Right(StcTemplate.SH03)
-
+    val resolvedTemplate = (journeyType, affinityKey.toLowerCase) match {
+      case (JourneyType.STF, "agent") => Right(StcTemplate.STFAgent)
+      case (JourneyType.STF, _) => Right(StcTemplate.STF)
+      case (JourneyType.SH03, _) => Right(StcTemplate.SH03)
       case _ => Left(FileParseError.InvalidTemplate)
     }
 
@@ -66,7 +64,7 @@ class StcRowValidationService @Inject()(
 
           val errors =
             (stcBasicRowValidator.validate(parsedRow, template, affinityKey) ++
-              stcConditionalRowValidator.validate(parsedRow, template, affinityKey))
+              stcConditionalRowValidator.validate(parsedRow, template, affinityKey, journeyType))
                 .sortBy(_.columnIndex)
 
           val updatedErrorCount = blockingErrorCount + errors.count(_.blocking)

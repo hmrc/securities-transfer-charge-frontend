@@ -14,27 +14,32 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.securitiestransferchargefrontend.forms.stf.shared
+package uk.gov.hmrc.securitiestransferchargefrontend.forms.shared
 
 import play.api.data.Form
 import uk.gov.hmrc.securitiestransferchargefrontend.forms.mappings.Mappings
+import uk.gov.hmrc.securitiestransferchargefrontend.models.JourneyType
 
 import javax.inject.Inject
 
-class TotalMarketValueFormProvider @Inject() extends Mappings {
+class BulkTotalMarketValueFormProvider @Inject() extends Mappings {
 
   private val maxValue = BigDecimal("999999999")
   private val minValue = BigDecimal("0.01")
 
-  def apply(affinityKey:String): Form[BigDecimal] =
+  def apply(affinityKey: String, journeyType: JourneyType): Form[BigDecimal] = {
+
+    val journeyKey = journeyType.value
+
     Form(
       "value" -> currency(
-        s"$affinityKey.totalMarketValue.error.required",
-        s"$affinityKey.totalMarketValue.error.invalidNumeric",
-        s"$affinityKey.totalMarketValue.error.nonNumeric",
-        s"$affinityKey.totalMarketValue.error.negative"
+        s"$affinityKey.$journeyKey.totalMarketValue.error.required",
+        s"$affinityKey.$journeyKey.totalMarketValue.error.invalidNumeric",
+        s"$affinityKey.$journeyKey.totalMarketValue.error.nonNumeric",
+        s"$affinityKey.$journeyKey.totalMarketValue.error.negative"
       )
-        .verifying(maximumCurrency(maxValue, s"$affinityKey.totalMarketValue.error.aboveMaximum"))
-        .verifying(minimumCurrency(minValue, s"$affinityKey.totalMarketValue.error.belowMinimum"))
+        .verifying(maximumCurrency(maxValue, s"$affinityKey.$journeyKey.totalMarketValue.error.aboveMaximum"))
+        .verifying(minimumCurrency(minValue, s"$affinityKey.$journeyKey.totalMarketValue.error.belowMinimum"))
     )
+  }
 }

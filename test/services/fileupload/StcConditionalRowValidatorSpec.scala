@@ -18,7 +18,8 @@ package services.fileupload
 
 import base.SpecBase
 import play.api.i18n.MessagesApi
-import uk.gov.hmrc.securitiestransferchargefrontend.forms.stf.shared.TotalMarketValueFormProvider
+import uk.gov.hmrc.securitiestransferchargefrontend.forms.shared.BulkTotalMarketValueFormProvider
+import uk.gov.hmrc.securitiestransferchargefrontend.models.JourneyType.{SH03, STF}
 import uk.gov.hmrc.securitiestransferchargefrontend.models.stf.fileupload.*
 import uk.gov.hmrc.securitiestransferchargefrontend.services.fileupload.*
 
@@ -73,13 +74,13 @@ class StcConditionalRowValidatorSpec extends SpecBase {
     new StcConditionalRowValidator(
       support = new StcValidationSupport,
       messagesApi = messagesApi,
-      totalMarketValueFormProvider = new TotalMarketValueFormProvider
+      totalMarketValueFormProvider = new BulkTotalMarketValueFormProvider
     )
 
   "StcConditionalRowValidator.validate STF" - {
 
     "return no errors for a valid conditional row" in {
-      val result = validator.validate(validParsedRow, StcTemplate.STF,affinityGroupKeyInd)
+      val result = validator.validate(validParsedRow, StcTemplate.STF,affinityGroupKeyInd, STF)
       result mustBe Seq.empty
     }
 
@@ -88,7 +89,7 @@ class StcConditionalRowValidatorSpec extends SpecBase {
         validParsedRow.copy(
           applyingForRelief = Some(true),
           whatReliefAreYouApplyingFor = None
-        ), StcTemplate.STF,affinityGroupKeyInd
+        ), StcTemplate.STF,affinityGroupKeyInd, STF
       )
 
       result.exists(_.fieldName == "whatReliefAreYouApplyingFor") mustBe true
@@ -99,7 +100,7 @@ class StcConditionalRowValidatorSpec extends SpecBase {
         validParsedRow.copy(
           applyingForRelief = Some(true),
           whatReliefAreYouApplyingFor = Some("Made Up Relief")
-        ), StcTemplate.STF,affinityGroupKeyInd
+        ), StcTemplate.STF,affinityGroupKeyInd, STF
       )
 
       result.exists(_.fieldName == "whatReliefAreYouApplyingFor") mustBe true
@@ -110,7 +111,7 @@ class StcConditionalRowValidatorSpec extends SpecBase {
         validParsedRow.copy(
           applyingForRelief = Some(false),
           whatReliefAreYouApplyingFor = Some("Made Up Relief")
-        ), StcTemplate.STF,affinityGroupKeyInd
+        ), StcTemplate.STF,affinityGroupKeyInd, STF
       )
 
       result.exists(_.fieldName == "whatReliefAreYouApplyingFor") mustBe false
@@ -121,7 +122,7 @@ class StcConditionalRowValidatorSpec extends SpecBase {
         validParsedRow.copy(
           whatTypeOfSecurities = Some("shares"),
           typeOfShares = None
-        ), StcTemplate.STF,affinityGroupKeyInd
+        ), StcTemplate.STF,affinityGroupKeyInd, STF
       )
 
       result.exists(_.fieldName == "typeOfShares") mustBe true
@@ -132,7 +133,7 @@ class StcConditionalRowValidatorSpec extends SpecBase {
         validParsedRow.copy(
           whatTypeOfSecurities = Some("Loan notes"),
           typeOfShares = None
-        ), StcTemplate.STF,affinityGroupKeyInd
+        ), StcTemplate.STF,affinityGroupKeyInd, STF
       )
 
       result.map(_.fieldName) must not contain "typeOfShares"
@@ -143,7 +144,7 @@ class StcConditionalRowValidatorSpec extends SpecBase {
         validParsedRow.copy(
           sellerAddressInUK = Some(true),
           sellerAddressLine1 = None
-        ), StcTemplate.STF,affinityGroupKeyInd
+        ), StcTemplate.STF,affinityGroupKeyInd, STF
       )
 
       result.exists(_.fieldName == "sellerAddressLine1") mustBe true
@@ -169,7 +170,7 @@ class StcConditionalRowValidatorSpec extends SpecBase {
         val result = validator.validate(
           modifyRow(validParsedRow),
           StcTemplate.STF,
-          affinityGroupKeyInd
+          affinityGroupKeyInd, STF
         )
 
         result.exists(_.fieldName == fieldName) mustBe true
@@ -227,7 +228,7 @@ class StcConditionalRowValidatorSpec extends SpecBase {
         val result = validator.validate(
           modifyRow(validParsedRow),
           StcTemplate.STF,
-          affinityGroupKeyInd
+          affinityGroupKeyInd, STF
         )
 
         val error = result.find(_.fieldName == fieldName)
@@ -242,7 +243,7 @@ class StcConditionalRowValidatorSpec extends SpecBase {
         validParsedRow.copy(
           sellerAddressInUK = Some(true),
           sellerPostcode = None
-        ), StcTemplate.STF,affinityGroupKeyInd
+        ), StcTemplate.STF,affinityGroupKeyInd, STF
       )
 
       result.exists(_.fieldName == "sellerPostcode") mustBe true
@@ -253,7 +254,7 @@ class StcConditionalRowValidatorSpec extends SpecBase {
         validParsedRow.copy(
           sellerAddressInUK = Some(true),
           sellerPostcode = Some("not a postcode")
-        ), StcTemplate.STF,affinityGroupKeyInd
+        ), StcTemplate.STF,affinityGroupKeyInd, STF
       )
 
       result.exists(_.fieldName == "sellerPostcode") mustBe true
@@ -266,7 +267,7 @@ class StcConditionalRowValidatorSpec extends SpecBase {
         validParsedRow.copy(
           sellerAddressInUK = Some(false),
           sellerCountry = Some(longCountry)
-        ), StcTemplate.STF,affinityGroupKeyInd
+        ), StcTemplate.STF,affinityGroupKeyInd, STF
       )
 
       result.exists(_.fieldName == "sellerCountry") mustBe true
@@ -277,7 +278,7 @@ class StcConditionalRowValidatorSpec extends SpecBase {
         validParsedRow.copy(
           connectedPersons = Some(true),
           totalMarketValue = None
-        ), StcTemplate.STF,affinityGroupKeyInd
+        ), StcTemplate.STF,affinityGroupKeyInd, STF
       )
 
       result.exists(_.fieldName == "totalMarketValue") mustBe true
@@ -288,7 +289,7 @@ class StcConditionalRowValidatorSpec extends SpecBase {
         validParsedRow.copy(
           connectedPersons = Some(true),
           totalMarketValue = Some("1000000000")
-        ), StcTemplate.STF,affinityGroupKeyInd
+        ), StcTemplate.STF,affinityGroupKeyInd, STF
       )
 
       result.exists(_.fieldName == "totalMarketValue") mustBe true
@@ -299,7 +300,7 @@ class StcConditionalRowValidatorSpec extends SpecBase {
         validParsedRow.copy(
           connectedPersons = Some(true),
           totalMarketValue = Some("0")
-        ), StcTemplate.STF,affinityGroupKeyInd
+        ), StcTemplate.STF,affinityGroupKeyInd, STF
       )
 
       result.exists(_.fieldName == "totalMarketValue") mustBe true
@@ -310,7 +311,7 @@ class StcConditionalRowValidatorSpec extends SpecBase {
         validParsedRow.copy(
           connectedPersons = Some(true),
           totalMarketValue = Some("100.123")
-        ), StcTemplate.STF,affinityGroupKeyInd
+        ), StcTemplate.STF,affinityGroupKeyInd, STF
       )
 
       result.exists(_.fieldName == "totalMarketValue") mustBe true
@@ -321,7 +322,7 @@ class StcConditionalRowValidatorSpec extends SpecBase {
         validParsedRow.copy(
           connectedPersons = Some(false),
           totalMarketValue = Some("NOT A NUMBER")
-        ), StcTemplate.STF,affinityGroupKeyInd
+        ), StcTemplate.STF,affinityGroupKeyInd, STF
       )
 
       result.exists(_.fieldName == "totalMarketValue") mustBe false
@@ -336,7 +337,7 @@ class StcConditionalRowValidatorSpec extends SpecBase {
         validParsedRow.copy(
           sellerAddressInUK = Some(false),
           sellerCountry = Some(longCountry)
-        ), StcTemplate.STFAgent, affinityGroupKeyAgent
+        ), StcTemplate.STFAgent, affinityGroupKeyAgent, STF
       )
 
       result.exists(_.fieldName == "sellerCountry") mustBe true
@@ -349,7 +350,7 @@ class StcConditionalRowValidatorSpec extends SpecBase {
         validParsedRow.copy(
           sellerAddressInUK = Some(false),
           sellerCountry = Some(invalidCountry)
-        ), StcTemplate.STFAgent, affinityGroupKeyAgent
+        ), StcTemplate.STFAgent, affinityGroupKeyAgent, STF
       )
 
       result.exists(_.fieldName == "sellerCountry") mustBe true
@@ -361,7 +362,7 @@ class StcConditionalRowValidatorSpec extends SpecBase {
         validParsedRow.copy(
           sellerAddressInUK = Some(false),
           sellerCountry = None
-        ), StcTemplate.STFAgent, affinityGroupKeyAgent
+        ), StcTemplate.STFAgent, affinityGroupKeyAgent, STF
       )
 
       result.exists(_.fieldName == "sellerCountry") mustBe true
@@ -374,7 +375,7 @@ class StcConditionalRowValidatorSpec extends SpecBase {
         validParsedRow.copy(
           buyerAddressInUK = Some(false),
           buyerCountry = Some(longCountry)
-        ), StcTemplate.STFAgent, affinityGroupKeyAgent
+        ), StcTemplate.STFAgent, affinityGroupKeyAgent, STF
       )
 
       result.exists(_.fieldName == "buyerCountry") mustBe true
@@ -387,7 +388,7 @@ class StcConditionalRowValidatorSpec extends SpecBase {
         validParsedRow.copy(
           buyerAddressInUK = Some(false),
           buyerCountry = Some(invalidCountry)
-        ), StcTemplate.STFAgent, affinityGroupKeyAgent
+        ), StcTemplate.STFAgent, affinityGroupKeyAgent, STF
       )
 
       result.exists(_.fieldName == "buyerCountry") mustBe true
@@ -399,7 +400,7 @@ class StcConditionalRowValidatorSpec extends SpecBase {
         validParsedRow.copy(
           buyerAddressInUK = Some(false),
           buyerCountry = None
-        ), StcTemplate.STFAgent, affinityGroupKeyAgent
+        ), StcTemplate.STFAgent, affinityGroupKeyAgent, STF
       )
 
       result.exists(_.fieldName == "buyerCountry") mustBe true
@@ -411,7 +412,7 @@ class StcConditionalRowValidatorSpec extends SpecBase {
         validParsedRow.copy(
           buyerAddressInUK = Some(false),
           buyerPostcode = None
-        ), StcTemplate.STFAgent, affinityGroupKeyAgent
+        ), StcTemplate.STFAgent, affinityGroupKeyAgent, STF
       )
 
       result.exists(_.fieldName == "buyerPostcode") mustBe true
@@ -423,7 +424,7 @@ class StcConditionalRowValidatorSpec extends SpecBase {
         validParsedRow.copy(
           buyerAddressInUK = Some(true),
           buyerPostcode = None
-        ), StcTemplate.STFAgent, affinityGroupKeyAgent
+        ), StcTemplate.STFAgent, affinityGroupKeyAgent, STF
       )
 
       result.exists(_.fieldName == "buyerPostcode") mustBe true
@@ -435,7 +436,7 @@ class StcConditionalRowValidatorSpec extends SpecBase {
         validParsedRow.copy(
           sellerAddressInUK = Some(false),
           sellerPostcode = None
-        ), StcTemplate.STFAgent, affinityGroupKeyAgent
+        ), StcTemplate.STFAgent, affinityGroupKeyAgent, STF
       )
 
       result.exists(_.fieldName == "sellerPostcode") mustBe true
@@ -447,7 +448,7 @@ class StcConditionalRowValidatorSpec extends SpecBase {
         validParsedRow.copy(
           sellerAddressInUK = Some(true),
           sellerPostcode = None
-        ), StcTemplate.STFAgent, affinityGroupKeyAgent
+        ), StcTemplate.STFAgent, affinityGroupKeyAgent, STF
       )
 
       result.exists(_.fieldName == "sellerPostcode") mustBe true
@@ -459,7 +460,7 @@ class StcConditionalRowValidatorSpec extends SpecBase {
         validParsedRow.copy(
           sellerAddressInUK = Some(true),
           sellerPostcode = Some("%%%%")
-        ), StcTemplate.STFAgent, affinityGroupKeyAgent
+        ), StcTemplate.STFAgent, affinityGroupKeyAgent, STF
       )
 
       result.exists(_.fieldName == "sellerPostcode") mustBe true
@@ -471,7 +472,7 @@ class StcConditionalRowValidatorSpec extends SpecBase {
         validParsedRow.copy(
           sellerAddressInUK = Some(false),
           sellerPostcode = Some("%%%%")
-        ), StcTemplate.STFAgent, affinityGroupKeyAgent
+        ), StcTemplate.STFAgent, affinityGroupKeyAgent, STF
       )
 
       result.exists(_.fieldName == "sellerPostcode") mustBe true
@@ -483,7 +484,7 @@ class StcConditionalRowValidatorSpec extends SpecBase {
         validParsedRow.copy(
           buyerAddressInUK = Some(true),
           buyerPostcode = Some("%%%%")
-        ), StcTemplate.STFAgent, affinityGroupKeyAgent
+        ), StcTemplate.STFAgent, affinityGroupKeyAgent, STF
       )
 
       result.exists(_.fieldName == "buyerPostcode") mustBe true
@@ -495,7 +496,7 @@ class StcConditionalRowValidatorSpec extends SpecBase {
         validParsedRow.copy(
           buyerAddressInUK = Some(false),
           buyerPostcode = Some("%%%%")
-        ), StcTemplate.STFAgent, affinityGroupKeyAgent
+        ), StcTemplate.STFAgent, affinityGroupKeyAgent, STF
       )
 
       result.exists(_.fieldName == "buyerPostcode") mustBe true
@@ -506,7 +507,7 @@ class StcConditionalRowValidatorSpec extends SpecBase {
       val result = validator.validate(
         validParsedRow.copy(applyingForRelief = Some(true),
           whatReliefAreYouApplyingFor = Some("invalid relief")
-        ), StcTemplate.STFAgent, affinityGroupKeyAgent
+        ), StcTemplate.STFAgent, affinityGroupKeyAgent, STF
       )
 
       result.exists(_.fieldName == "whatReliefAreYouApplyingFor") mustBe true
@@ -520,7 +521,7 @@ class StcConditionalRowValidatorSpec extends SpecBase {
         validParsedRow.copy(typeOfShares = Some("shares"),
           whatTypeOfSecurities = Some(invalidSecurityTypeLength)
 
-        ), StcTemplate.STFAgent, affinityGroupKeyAgent
+        ), StcTemplate.STFAgent, affinityGroupKeyAgent, STF
       )
 
       result.exists(_.fieldName == "whatTypeOfSecurities") mustBe true
@@ -532,7 +533,7 @@ class StcConditionalRowValidatorSpec extends SpecBase {
         validParsedRow.copy(
           typeOfShares = Some("shares"),
           whatTypeOfSecurities = None
-        ), StcTemplate.STFAgent, affinityGroupKeyAgent
+        ), StcTemplate.STFAgent, affinityGroupKeyAgent, STF
       )
       result.exists(_.fieldName == "whatTypeOfSecurities") mustBe true
     }
@@ -542,7 +543,7 @@ class StcConditionalRowValidatorSpec extends SpecBase {
       val result = validator.validate(
         validParsedRow.copy( connectedPersons = Some(true),
           totalMarketValue = None
-        ), StcTemplate.STFAgent, affinityGroupKeyAgent
+        ), StcTemplate.STFAgent, affinityGroupKeyAgent, STF
       )
       result.exists(_.fieldName == "totalMarketValue") mustBe true
     }
@@ -552,7 +553,7 @@ class StcConditionalRowValidatorSpec extends SpecBase {
         validParsedRow.copy(
           applyingForRelief = Some(true),
           whatReliefAreYouApplyingFor = None
-        ), StcTemplate.STFAgent, affinityGroupKeyAgent
+        ), StcTemplate.STFAgent, affinityGroupKeyAgent, STF
       )
 
       result.exists(_.fieldName == "whatReliefAreYouApplyingFor") mustBe true
@@ -562,7 +563,7 @@ class StcConditionalRowValidatorSpec extends SpecBase {
   "StcConditionalRowValidator.validate SH03" - {
 
     "return no errors for a valid conditional row" in {
-      val result = validator.validate(validParsedRow, StcTemplate.SH03,affinityGroupKeyInd)
+      val result = validator.validate(validParsedRow, StcTemplate.SH03,affinityGroupKeyInd, SH03)
       result mustBe Seq.empty
     }
 
@@ -571,7 +572,7 @@ class StcConditionalRowValidatorSpec extends SpecBase {
         validParsedRow.copy(
           applyingForRelief = Some(true),
           whatReliefAreYouApplyingFor = None
-        ), StcTemplate.SH03,affinityGroupKeyInd
+        ), StcTemplate.SH03,affinityGroupKeyInd, SH03
       )
 
       result.exists(_.fieldName == "whatReliefAreYouApplyingFor") mustBe true
@@ -582,7 +583,7 @@ class StcConditionalRowValidatorSpec extends SpecBase {
         validParsedRow.copy(
           connectedPersons = Some(true),
           totalMarketValue = None
-        ), StcTemplate.SH03, affinityGroupKeyInd
+        ), StcTemplate.SH03, affinityGroupKeyInd, SH03
       )
 
       result.exists(_.fieldName == "totalMarketValue") mustBe true

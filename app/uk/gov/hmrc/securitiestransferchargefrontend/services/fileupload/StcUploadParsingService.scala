@@ -17,6 +17,7 @@
 package uk.gov.hmrc.securitiestransferchargefrontend.services.fileupload
 
 import uk.gov.hmrc.securitiestransferchargefrontend.config.FileUploadConfig
+import uk.gov.hmrc.securitiestransferchargefrontend.models.JourneyType
 import uk.gov.hmrc.securitiestransferchargefrontend.models.stf.fileupload.{FileParseError, ParsedRow, UploadedFile}
 
 import java.nio.charset.StandardCharsets
@@ -32,10 +33,10 @@ class StcUploadParsingService @Inject()(
   def withVerifiedTemplateStream[A](
                                      uploadedFile: UploadedFile,
                                      affinityKey: String,
-                                     templateType: String
+                                     journeyType: JourneyType
                                    )(block: (Seq[String], Iterator[ParsedRow]) => Either[FileParseError, A]): Either[FileParseError, A] = {
 
-    fileUploadConfig.template(affinityKey, templateType) match {
+    fileUploadConfig.template(affinityKey, journeyType) match {
       case None =>
         Left(FileParseError.InvalidTemplate)
 
