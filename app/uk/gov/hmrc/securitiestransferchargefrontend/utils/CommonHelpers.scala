@@ -46,7 +46,7 @@ object CommonHelpers {
       case AffinityGroup.Agent => "/securities-transfer-charge/assets/Bulk_Securities_Transfer_Charge_template_v1a.xlsx"
     }
     case JourneyType.SH03 => {
-      case AffinityGroup.Organisation => "/securities-transfer-charge/assets/Bulk_SH03_template_v1.xlsx"
+      case AffinityGroup.Organisation => "/securities-transfer-charge/assets/Org_Securities_Transfer_Charge_SH03_template_v1.xlsx"
       case AffinityGroup.Agent => "/securities-transfer-charge/assets/Bulk_SH03_template_v1.xlsx"
     }
 }

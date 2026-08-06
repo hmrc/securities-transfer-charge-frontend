@@ -1099,6 +1099,9 @@ org.sh03.cannotSubmitFormError.item5 = Receiver
 org.sh03.cannotSubmitFormError.item6 = Receiver manager
 org.sh03.cannotSubmitFormError.item7 = CIC manager
 org.sh03.cannotSubmitFormError.item8 = Someone submitting on behalf of a UK Societas (UKS)
+org.sh03.cannotSubmitFormError.error.p1 = The details of this share buyback must be provided by someone in an approved role at the company.
+org.sh03.cannotSubmitFormError.error.p2 = Approved roles include:
+org.sh03.cannotSubmitFormError.error.p3 = You can save your submission as a draft, and submit it once you have this information.
 
 org.sh03.applyingForRelief.title = Is the business applying for a relief?
 org.sh03.applyingForRelief.heading = Is the business applying for a relief?

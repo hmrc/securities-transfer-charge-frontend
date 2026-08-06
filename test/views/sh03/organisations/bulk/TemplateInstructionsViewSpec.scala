@@ -43,8 +43,8 @@ class TemplateInstructionsViewSpec extends ViewBaseSpec {
     val para1Value: String = messages("org.sh03.templateInstructions.p1")
 
     val step1: String = messages("org.sh03.templateInstructions.step1")
-    val downloadHref = "/securities-transfer-charge/assets/Bulk_SH03_template_v1.xlsx"
-    val downloadFileName = "Bulk SH03 template v1.xlsx"
+    val downloadHref = "/securities-transfer-charge/assets/Org_Securities_Transfer_Charge_SH03_template_v1.xlsx"
+    val downloadFileName = "Org_Securities_Transfer_Charge_SH03_template_v1.xlsx"
 
     val step2: String = messages("org.sh03.templateInstructions.step2")
     val step3: String = messages("org.sh03.templateInstructions.step3")

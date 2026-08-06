@@ -115,7 +115,7 @@ class StcBasicRowValidatorSpec extends SpecBase {
         StcTemplate.STF, "org"
       )
 
-      result.exists(e => e.fieldName == "chargingPoint" && e.message == messages("Enter the charging point")) mustBe true
+      result.exists(e => e.fieldName == "chargingPoint" && e.message == "Enter the charging point") mustBe true
     }
 
     "return charging point invalid error when date is unparsable" in {
@@ -124,7 +124,7 @@ class StcBasicRowValidatorSpec extends SpecBase {
         StcTemplate.STF, "org"
       )
 
-      result.exists(e => e.fieldName == "chargingPoint" && e.message == messages("The charging point must be a real date")) mustBe true
+      result.exists(e => e.fieldName == "chargingPoint" && e.message == "The charging point must be a real date") mustBe true
     }
 
     "return charging point future date error when date is in the future" in {

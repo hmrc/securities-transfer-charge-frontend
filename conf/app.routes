@@ -449,4 +449,4 @@ POST       /sh03/org/bulk/role-purchasing-company                 uk.gov.hmrc.se
 GET        /sh03/org/bulk/change/role-purchasing-company          uk.gov.hmrc.securitiestransferchargefrontend.controllers.sh03.organisations.bulk.RoleAtPurchasingCompanyController.onPageLoad(mode: Mode = CheckMode)
 POST       /sh03/org/bulk/change/role-purchasing-company          uk.gov.hmrc.securitiestransferchargefrontend.controllers.sh03.organisations.bulk.RoleAtPurchasingCompanyController.onSubmit(mode: Mode = CheckMode)
 
-GET        /sh03/org/cannot-submit-form                       uk.gov.hmrc.securitiestransferchargefrontend.controllers.sh03.organisations.bulk.CannotSubmitFormErrorController.onPageLoad()
+GET        /sh03/org/bulk/cannot-submit-form                       uk.gov.hmrc.securitiestransferchargefrontend.controllers.sh03.organisations.bulk.CannotSubmitFormErrorController.onPageLoad()
