@@ -1,5 +1,5 @@
-@*
- * Copyright 2026 HM Revenue & Customs
+/*
+ * Copyright 2024 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -12,22 +12,24 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- *@
+ */
 
-@import uk.gov.hmrc.securitiestransferchargefrontend.views.html.templates
+package uk.gov.hmrc.securitiestransferchargefrontend.services.stf.shared
 
-@this(
-    layout: templates.Layout
-)
+import play.api.i18n.Lang
+import uk.gov.hmrc.securitiestransferchargefrontend.utils.DateTimeFormats
 
-@()(implicit request: Request[_], messages: Messages)
+import java.time.LocalDate
+import javax.inject.{Inject, Singleton}
 
-@layout(
-    pageTitle = titleNoForm(messages("unauthorised.title")),
-    timeout   = false
-) {
+@Singleton
+class FormattingService @Inject() {
 
-    <h1 class="govuk-heading-xl">@messages("unauthorised.heading")</h1>
+  def formatTaxDue(taxDue: BigDecimal): String = {
+    f"£$taxDue%.2f"
+  }
 
-    <p class="govuk-body">@messages("unauthorised.guidance")</p>
+  def formatPaymentDueDate(paymentDueDate: LocalDate)(implicit lang: Lang): String = {
+    paymentDueDate.format(DateTimeFormats.dateTimeFormat())
+  }
 }

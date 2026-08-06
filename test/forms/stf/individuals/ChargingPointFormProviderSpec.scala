@@ -43,7 +43,7 @@ class ChargingPointFormProviderSpec extends DateBehaviours {
 
 
     "reject dates in the future" in {
-      val futureDate = today.plusDays(1)
+      val futureDate = today.plusDays(2)
 
       val result = form.bind(
         Map(

@@ -27,17 +27,18 @@ import uk.gov.hmrc.securitiestransferchargefrontend.viewmodels.implicits.*
 
 object NameOfSellerSummary  {
 
-  def row(answers: UserAnswers)(implicit messages: Messages): Option[SummaryListRow] =
-    answers.get(NameOfSellerPage).map {
-      answer =>
+  def row(answers: UserAnswers)(implicit messages: Messages): Option[SummaryListRow] = {
+    val value = answers.get(NameOfSellerPage)
+      .map(HtmlFormat.escape(_).toString)
+      .getOrElse(messages("site.notProvided"))
 
-        SummaryListRowViewModel(
-          key     = "nameOfSeller.checkYourAnswersLabel",
-          value   = ValueViewModel(HtmlFormat.escape(answer).toString),
-          actions = Seq(
-            ActionItemViewModel("site.change", routes.NameOfSellerController.onPageLoad(CheckMode).url)
-              .withVisuallyHiddenText(messages("nameOfSeller.change.hidden"))
-          )
-        )
-    }
+    Some(SummaryListRowViewModel(
+      key     = "nameOfSeller.checkYourAnswersLabel",
+      value   = ValueViewModel(value),
+      actions = Seq(
+        ActionItemViewModel("site.change", routes.NameOfSellerController.onPageLoad(CheckMode).url)
+          .withVisuallyHiddenText(messages("nameOfSeller.change.hidden"))
+      )
+    ))
+  }
 }

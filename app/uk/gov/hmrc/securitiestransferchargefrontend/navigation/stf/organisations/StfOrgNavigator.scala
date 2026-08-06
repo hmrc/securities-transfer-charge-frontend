@@ -25,13 +25,15 @@ import uk.gov.hmrc.securitiestransferchargefrontend.config.FrontendAppConfig
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.routes
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.organisations.single.routes as orgSingleRoutes
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.shared.routes as sharedRoutes
+import uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.shared.single.routes as stfSingleCyaRoutes
 import uk.gov.hmrc.securitiestransferchargefrontend.domain.{SubmissionId, UserId}
-import uk.gov.hmrc.securitiestransferchargefrontend.models.{NormalMode, UserAnswers}
+import uk.gov.hmrc.securitiestransferchargefrontend.models.{CheckMode, NormalMode, UserAnswers}
 import uk.gov.hmrc.securitiestransferchargefrontend.navigation.stf.organisations.{BackwardsRoutes, ForwardRoutes}
 import uk.gov.hmrc.securitiestransferchargefrontend.navigation.{AbstractModeNavigator, PersistentNavigator, UserAnswersValidator}
-import uk.gov.hmrc.securitiestransferchargefrontend.pages.*
 import uk.gov.hmrc.securitiestransferchargefrontend.pages.stf.single.*
+import uk.gov.hmrc.securitiestransferchargefrontend.pages.*
 import uk.gov.hmrc.securitiestransferchargefrontend.services.AnswerPersistenceService
+import uk.gov.hmrc.securitiestransferchargefrontend.pages.stf.shared.*
 
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
@@ -58,7 +60,37 @@ class StfOrgNavigator @Inject()(appConfig: FrontendAppConfig,
     case _ => defaultPage
   }
 
-  val checkRouteMap: Page => UserAnswers => Call = _ => _ => routes.CheckYourAnswersController.onPageLoad()
+  val checkRouteMap: Page => UserAnswers => Call = page => userAnswers => {
+    page match {
+      case ConnectedPersonsPage =>
+        userAnswers.get(ConnectedPersonsPage) match {
+          case Some(true) =>
+            userAnswers.get(PurchasingSharesPage) match {
+              case Some(false) => // false = Other securities
+                if (userAnswers.get(TotalMarketValuePage).isEmpty) {
+                  orgSingleRoutes.TotalMarketValueController.onPageLoad(CheckMode)
+                } else {
+                  routes.CheckYourAnswersController.onPageLoad()
+                }
+              case Some(true) => // true = Shares
+                userAnswers.get(DetailsOfThisTransferPage) match {
+                  case Some(details) if details.marketValue.isEmpty =>
+                    orgSingleRoutes.DetailsOfThisTransferController.onPageLoad(CheckMode)
+                  case _ =>
+                    routes.CheckYourAnswersController.onPageLoad()
+                }
+              case _ =>
+                routes.CheckYourAnswersController.onPageLoad()
+            }
+          case Some(false) =>
+            routes.CheckYourAnswersController.onPageLoad()
+          case None =>
+            routes.CheckYourAnswersController.onPageLoad()
+        }
+
+      case _ => routes.CheckYourAnswersController.onPageLoad()
+    }
+  }
 
   def restore(submissionId: SubmissionId, userId: UserId)(implicit request: Request[?]): Future[UserAnswers] = {
     implicit val hc: HeaderCarrier = HeaderCarrierConverter.fromRequestAndSession(request, request.session)
@@ -88,7 +120,19 @@ class StfOrgNavigator @Inject()(appConfig: FrontendAppConfig,
       map.put(OtherSecuritiesTypePage, orgSingleRoutes.OtherSecuritiesTypeController.onPageLoad(NormalMode))
       map.put(AmountPaidForSecuritiesPage, orgSingleRoutes.AmountPaidForSecuritiesController.onPageLoad(NormalMode))
       map.put(TotalMarketValuePage, orgSingleRoutes.TotalMarketValueController.onPageLoad(NormalMode))
-
+      map.put(CheckYourAnswersPage, stfSingleCyaRoutes.CheckYourAnswersController.onPageLoad())
+      
       map
+    }
+
+    override protected def pageHasValidDataAtPath(userAnswers: UserAnswers, page: GettablePage[?]): Boolean = {
+      page match {
+        case SecuritiesTargetPage => userAnswers.get(SecuritiesTargetPage).exists(_.businessName.nonEmpty)
+        case DetailsOfThisTransferPage => userAnswers.get(ConnectedPersonsPage) match {
+            case Some(true) => userAnswers.get(DetailsOfThisTransferPage).exists(_.marketValue.isDefined)
+            case _ => userAnswers.get(DetailsOfThisTransferPage).isDefined
+          }
+        case _ => super.pageHasValidDataAtPath(userAnswers, page)
+      }
     }
   }

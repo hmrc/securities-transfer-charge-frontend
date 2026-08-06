@@ -18,6 +18,7 @@ package uk.gov.hmrc.securitiestransferchargefrontend.utils
 
 import play.api.i18n.Lang
 
+import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 import java.util.Locale
 
@@ -36,4 +37,8 @@ object DateTimeFormats {
 
   val dateTimeHintFormat: DateTimeFormatter =
     DateTimeFormatter.ofPattern("d M yyyy")
+
+  def formatDate(date: LocalDate)(implicit lang: Lang): String = {
+    date.format(dateTimeFormat())
+  }
 }

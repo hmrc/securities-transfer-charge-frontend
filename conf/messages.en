@@ -15,6 +15,7 @@ site.signIn = Sign in
 site.govuk = GOV.UK
 site.upload.file = Upload file
 site.or = or
+site.notProvided = Not provided
 
 date.day = Day
 date.month = Month
@@ -39,8 +40,64 @@ index.title = securities-transfer-charge-frontend
 index.heading = securities-transfer-charge-frontend
 index.guidance = Welcome to your new frontend. Please see the README file for a guide to getting started.
 
+sectionTitle.stf = Securities Transfer (STF)
+
 checkYourAnswers.title = Check your answers
 checkYourAnswers.heading = Check your answers
+
+confirmation.title = Submission complete
+confirmation.heading = Submission complete
+confirmation.subheading = Your reference number
+
+confirmation.title = Submission complete
+confirmation.heading = Submission complete
+confirmation.whatHappensNext = What happens next
+confirmation.guidance = We have received your securities transfer details. You will receive a confirmation email shortly.
+
+checkYourAnswers.yourDetails.heading = Your details
+checkYourAnswers.sellerDetails.heading = Seller details
+checkYourAnswers.transferDetails.heading = Transfer details
+checkYourAnswers.securitiesDetails.heading = Securities details
+checkYourAnswers.businessName = Business name
+checkYourAnswers.companyCrn = Company registration number (CRN)
+checkYourAnswers.numberOfShares = Number of shares
+checkYourAnswers.typeOfShares = Type or class of shares
+checkYourAnswers.amountPaidForShares = Amount paid for shares
+checkYourAnswers.marketValueOfShares = Market value of the shares
+checkYourAnswers.taxDue.heading = Tax due: {0}
+checkYourAnswers.declaration.heading = Declaration
+checkYourAnswers.declaration.body = By submitting this form I confirm that the details I am providing are correct to the best of my knowledge.
+checkYourAnswers.taxDue.body = We have calculated the tax due based on the information provided. This amount does not include penalties or interest.
+checkYourAnswers.acceptAndSend = Accept and send
+checkYourAnswers.saveAndReturn = Save and return to dashboard
+
+checkYourAnswers.confirmAddress = Address
+checkYourAnswers.confirmAddress.change.hidde = Change buyer’s address
+checkYourAnswers.buyerAddress = Buyer address
+checkYourAnswers.buyerAddress.change.hidden = Change buyer’s address
+checkYourAnswers.sellerAddress = Address
+checkYourAnswers.sellerAddress.change.hidden = Change seller’s address
+checkYourAnswers.securitiesTarget.change.hidden = securities target
+
+# Check Your Answers Page - STF Individuals
+checkYourAnswers.title = Check your answers
+checkYourAnswers.heading = Check your answers
+
+# Sections
+checkYourAnswers.sellerDetails.heading = Seller details
+checkYourAnswers.transferDetails.heading = Transfer details
+checkYourAnswers.securitiesDetails.heading = Securities details
+
+# Tax and Declaration
+checkYourAnswers.taxDue.heading = Tax due: {0}
+checkYourAnswers.taxDue.body = We have calculated the tax due based on the information provided. This amount does not include penalties or interest.
+checkYourAnswers.paymentDueBy = Payment due by:
+checkYourAnswers.declaration.heading = Declaration
+checkYourAnswers.declaration.body = By submitting this form I confirm that the details I am providing are correct to the best of my knowledge.
+
+# Buttons
+checkYourAnswers.acceptAndSend = Accept and send
+checkYourAnswers.saveAndReturn = Save and return to dashboard
 
 journeyRecovery.continue.title = Sorry, there is a problem with the service
 journeyRecovery.continue.heading = Sorry, there is a problem with the service
@@ -86,16 +143,16 @@ individual.howToNotifyAboutSecuritiesTransfer.error.required = Select a way to t
 
 nameOfSeller.title = What’s the seller’s name?
 nameOfSeller.heading = What’s the seller’s name?
-nameOfSeller.checkYourAnswersLabel = What’s the seller’s name?
+nameOfSeller.checkYourAnswersLabel = Name
 nameOfSeller.error.required = Enter the seller’s full name
 nameOfSeller.error.length = Seller’s name must be 35 characters or less
-nameOfSeller.change.hidden = NameOfSeller
+nameOfSeller.change.hidden = Change seller’s name
 nameOfSeller.hint = This can be a business, person or another entity.
 
 connectedPersons.title = Connected persons
 connectedPersons.heading = Connected persons
 connectedPersons.legend = Are you and the seller of these securities connected?
-connectedPersons.checkYourAnswersLabel = Connected persons
+connectedPersons.checkYourAnswersLabel = Are you and the seller of these securities connected?
 connectedPersons.error.required = Select yes if you and the seller are ‘connected persons’
 connectedPersons.p = We need to know if you and the seller of these securities are considered ‘connected persons’ for tax purposes. Connected persons include spouses, civil partners and close relatives.
 connectedPersons.details.summary = Read more about connected persons
@@ -106,21 +163,21 @@ connectedPersons.details.content.l3 = your husband’s, wife’s or civil partne
 connectedPersons.details.content.l4 = the trustees of a settlement of which you are a settlor, or of which a person who is still alive and who is connected with you is a settlor
 connectedPersons.details.content.p2 = Relative means a brother, sister, ancestor or descendant. It does not include nephews, nieces, uncles and aunts.
 connectedPersons.details.content.link.text = Read HMRC guidance on connected persons
-connectedPersons.change.hidden = Change connected persons
+connectedPersons.change.hidden = Change if you and the seller are connected
 
 applyingForRelief.title = Are you applying for a relief?
 applyingForRelief.heading = Are you applying for a relief?
 applyingForRelief.checkYourAnswersLabel = Are you applying for a relief?
 applyingForRelief.error.required = Select yes if you are applying for a relief
-applyingForRelief.change.hidden = Change applying for a relief
+applyingForRelief.change.hidden = Change if you are applying for a relief
 applyingForRelief.p = See a
 applyingForRelief.details.content.link.text = full list of reliefs
 
 whatReliefAreYouApplyingFor.title = What relief are you applying for?
 whatReliefAreYouApplyingFor.heading = What relief are you applying for?
-whatReliefAreYouApplyingFor.checkYourAnswersLabel = What relief are you applying for?
+whatReliefAreYouApplyingFor.checkYourAnswersLabel = Type of relief
 whatReliefAreYouApplyingFor.error.required = Enter the type of relief you’re applying for
-whatReliefAreYouApplyingFor.change.hidden = Change what relief are you applying for
+whatReliefAreYouApplyingFor.change.hidden = Change type of relief
 whatReliefAreYouApplyingFor.p = Start typing the name of the relief and select from the list.
 whatReliefAreYouApplyingFor.details.content.link.text = See a full list of reliefs
 
@@ -139,7 +196,7 @@ securitiesTarget.crn.change.hidden = CRN
 chargingPoint.title = When did you buy these securities?
 chargingPoint.heading = When did you buy these securities?
 chargingPoint.hint = This is also called the charging point. For example, 27 3 2024
-chargingPoint.checkYourAnswersLabel = When did you buy the securities?
+chargingPoint.checkYourAnswersLabel = When did you buy these securities?
 chargingPoint.error.required.all = Enter the date you bought the securities
 chargingPoint.error.required.two = The date you bought the securities must include {0} and {1}
 chargingPoint.error.required = The date you bought the securities must include a {0}
@@ -160,7 +217,7 @@ taxRate.change.hidden = TaxRate
 
 otherSecuritiesType.title = Enter the type of securities you are buying
 otherSecuritiesType.heading = Enter the type of securities you are buying
-otherSecuritiesType.checkYourAnswersLabel = What type of securities are you buying?
+otherSecuritiesType.checkYourAnswersLabel = Type of securities
 otherSecuritiesType.error.required = Enter the type of securities you’re buying
 otherSecuritiesType.change.hidden = Change what type of securities are you buying
 
@@ -173,7 +230,7 @@ individual.purchasingShares.change.hidden = Change if you are buying shares
 totalMarketValue.title = What is the total market value of these securities?
 totalMarketValue.heading = What is the total market value of these securities?
 totalMarketValue.hint = For example, £600 or £193.54
-totalMarketValue.checkYourAnswersLabel = What is the total market value of these securities?
+totalMarketValue.checkYourAnswersLabel = Total market value of the securities
 totalMarketValue.error.nonNumeric = The market value of the securities must be a number and can include up to two decimal places, like £30 or £28.60
 totalMarketValue.error.required = Enter the total market value of the securities
 totalMarketValue.error.invalidNumeric = Enter the market value of the securities using up to two decimal places
@@ -183,7 +240,7 @@ totalMarketValue.change.hidden = Change the market value of the securities
 
 amountPaidForSecurities.title = How much did you pay for these securities?
 amountPaidForSecurities.heading = How much did you pay for these securities?
-amountPaidForSecurities.checkYourAnswersLabel = How much did you pay for these securities?
+amountPaidForSecurities.checkYourAnswersLabel = Amount paid for securities
 amountPaidForSecurities.p1 = Enter the total amount of consideration given in exchange for these securities as a cash amount.
 amountPaidForSecurities.p2 = You do not need to provide details about conversion or exchange rates, or how valuations of non-monetary items were reached.
 amountPaidForSecurities.hint = For example, £600 or £193.54
@@ -253,6 +310,10 @@ individual.chargingPoint.error.invalid = The date you bought the securities must
 individual.amountPaidForSecurities.error.required = Enter the amount you paid for the securities
 
 detailsOfThisTransfer.title = What are the details of this transfer?
+detailsOfThisTransfer.numberOfShares.checkYourAnswersLabel = Number of shares
+detailsOfThisTransfer.typeOfShares.checkYourAnswersLabel = Type or class of shares
+detailsOfThisTransfer.amountPaid.checkYourAnswersLabel = Amount paid for shares
+detailsOfThisTransfer.marketValue.checkYourAnswersLabel = Market value of the shares
 detailsOfThisTransfer.heading = What are the details of this transfer?
 detailsOfThisTransfer.numberOfShares = Number of shares
 detailsOfThisTransfer.typeOfShares = Type or class of shares

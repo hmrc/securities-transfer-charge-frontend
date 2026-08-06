@@ -17,8 +17,6 @@
 package uk.gov.hmrc.securitiestransferchargefrontend.viewmodels.stf.individuals
 
 import play.api.i18n.Messages
-import play.twirl.api.{Html, HtmlFormat}
-import uk.gov.hmrc.govukfrontend.views.viewmodels.content.HtmlContent
 import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.SummaryListRow
 import uk.gov.hmrc.securitiestransferchargefrontend.config.CurrencyFormatter.currencyFormat
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.individuals.single.routes
@@ -29,26 +27,53 @@ import uk.gov.hmrc.securitiestransferchargefrontend.viewmodels.implicits.*
 
 object DetailsOfThisTransferSummary {
 
-  def row(answers: UserAnswers)(implicit messages: Messages): Option[SummaryListRow] =
-    answers.get(DetailsOfThisTransferPage).map {
-      answer =>
+  def rows(answers: UserAnswers, showMarketValue: Boolean = true)(implicit messages: Messages): Seq[SummaryListRow] = {
+    val details = answers.get(DetailsOfThisTransferPage)
+    val numberOfShares = details.map(_.numberOfShares.toString).getOrElse(messages("site.notProvided"))
+    val typeOfShares = details.map(_.typeOfShares).getOrElse(messages("site.notProvided"))
+    val amountPaid = details.map(d => currencyFormat(d.amountPaid)).getOrElse(messages("site.notProvided"))
+    val marketValue = details.flatMap(_.marketValue).map(currencyFormat).getOrElse(messages("site.notProvided"))
 
-        val value = Html(
-          s"""
-             |${HtmlFormat.escape(answer.numberOfShares.toString).body}<br/>
-             |${HtmlFormat.escape(answer.typeOfShares).body}<br/>
-             |${HtmlFormat.escape(currencyFormat(answer.amountPaid)).body}<br/>
-             |${answer.marketValue.map(v => HtmlFormat.escape(currencyFormat(v)).body).getOrElse("")}
-             |""".stripMargin
+    val baseRows = Seq(
+      SummaryListRowViewModel(
+        key     = "checkYourAnswers.numberOfShares",
+        value   = ValueViewModel(numberOfShares),
+        actions = Seq(
+          ActionItemViewModel("site.change", routes.DetailsOfThisTransferController.onPageLoad(CheckMode).url)
+            .withVisuallyHiddenText(messages("detailsOfThisTransfer.change.hidden"))
         )
-
-        SummaryListRowViewModel(
-          key = "detailsOfThisTransfer.checkYourAnswersLabel",
-          value = ValueViewModel(HtmlContent(value)),
-          actions = Seq(
-            ActionItemViewModel("site.change", routes.DetailsOfThisTransferController.onPageLoad(CheckMode).url)
-              .withVisuallyHiddenText(messages("detailsOfThisTransfer.change.hidden"))
-          )
+      ),
+      SummaryListRowViewModel(
+        key     = "checkYourAnswers.typeOfShares",
+        value   = ValueViewModel(typeOfShares),
+        actions = Seq(
+          ActionItemViewModel("site.change", routes.DetailsOfThisTransferController.onPageLoad(CheckMode).url)
+            .withVisuallyHiddenText(messages("detailsOfThisTransfer.change.hidden"))
         )
+      ),
+      SummaryListRowViewModel(
+        key     = "checkYourAnswers.amountPaidForShares",
+        value   = ValueViewModel(amountPaid),
+        actions = Seq(
+          ActionItemViewModel("site.change", routes.DetailsOfThisTransferController.onPageLoad(CheckMode).url)
+            .withVisuallyHiddenText(messages("detailsOfThisTransfer.change.hidden"))
+        )
+      )
+    )
+    
+    val marketValueRow = if (showMarketValue) {
+      Seq(SummaryListRowViewModel(
+        key     = "checkYourAnswers.marketValueOfShares",
+        value   = ValueViewModel(marketValue),
+        actions = Seq(
+          ActionItemViewModel("site.change", routes.DetailsOfThisTransferController.onPageLoad(CheckMode).url)
+            .withVisuallyHiddenText(messages("detailsOfThisTransfer.change.hidden"))
+        )
+      ))
+    } else {
+      Seq.empty
     }
+    
+    baseRows ++ marketValueRow
+  }
 }

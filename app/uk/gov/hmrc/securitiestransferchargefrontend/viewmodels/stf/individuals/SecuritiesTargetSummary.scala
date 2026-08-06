@@ -20,24 +20,33 @@ import play.api.i18n.Messages
 import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.SummaryListRow
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.individuals.single.routes
 import uk.gov.hmrc.securitiestransferchargefrontend.models.{CheckMode, UserAnswers}
-import uk.gov.hmrc.securitiestransferchargefrontend.pages.stf.single.PurchasingSharesPage
+import uk.gov.hmrc.securitiestransferchargefrontend.pages.stf.single.SecuritiesTargetPage
 import uk.gov.hmrc.securitiestransferchargefrontend.viewmodels.govuk.summarylist.*
 import uk.gov.hmrc.securitiestransferchargefrontend.viewmodels.implicits.*
 
-object PurchasingSharesSummary {
+object SecuritiesTargetSummary  {
 
-  def row(userAnswers: UserAnswers)(implicit messages: Messages): SummaryListRow = {
+  def row(answers: UserAnswers)(implicit messages: Messages): Seq[SummaryListRow] = {
+    val target = answers.get(SecuritiesTargetPage)
     
-    val purchasingShares = userAnswers.get(PurchasingSharesPage).getOrElse(false)
-    val value = if (purchasingShares) "site.yes" else "site.no"
-
-    SummaryListRowViewModel(
-      key = "individual.purchasingShares.checkYourAnswersLabel",
-      value = ValueViewModel(value),
+    val businessNameRow = SummaryListRowViewModel(
+      key     = "checkYourAnswers.businessName",
+      value   = ValueViewModel(target.map(_.businessName).getOrElse(messages("site.notProvided"))),
       actions = Seq(
-        ActionItemViewModel("site.change", routes.PurchasingSharesController.onPageLoad(CheckMode).url)
-          .withVisuallyHiddenText(messages("individual.purchasingShares.change.hidden"))
+        ActionItemViewModel("site.change", routes.SecuritiesTargetController.onPageLoad(CheckMode).url)
+          .withVisuallyHiddenText(messages("checkYourAnswers.securitiesTarget.change.hidden"))
       )
     )
+    
+    val crnRow = SummaryListRowViewModel(
+      key     = "checkYourAnswers.companyCrn",
+      value   = ValueViewModel(target.flatMap(_.crn).getOrElse(messages("site.notProvided"))),
+      actions = Seq(
+        ActionItemViewModel("site.change", routes.SecuritiesTargetController.onPageLoad(CheckMode).url)
+          .withVisuallyHiddenText(messages("checkYourAnswers.securitiesTarget.change.hidden"))
+      )
+    )
+    
+    Seq(businessNameRow, crnRow)
   }
 }
