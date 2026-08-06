@@ -20,12 +20,13 @@ import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, Call, MessagesControllerComponents}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.actions.*
+import uk.gov.hmrc.securitiestransferchargefrontend.controllers.actions.requests.StcDataRequest
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.shared.SaveAndReturnButton.isReturn
 import uk.gov.hmrc.securitiestransferchargefrontend.forms.sh03.shared.CompanyDetailsFormProvider
 import uk.gov.hmrc.securitiestransferchargefrontend.models.sh03.shared.CompanyDetails
 import uk.gov.hmrc.securitiestransferchargefrontend.models.{Mode, UserAnswers}
 import uk.gov.hmrc.securitiestransferchargefrontend.navigation.Navigator
-import uk.gov.hmrc.securitiestransferchargefrontend.pages.sh03.CompanyDetailsPage
+import uk.gov.hmrc.securitiestransferchargefrontend.pages.sh03.{CompanyDetailsPage, MaximumAmountPaidPage, MinimumAmountPaidPage}
 import uk.gov.hmrc.securitiestransferchargefrontend.views.html.sh03.agents.single.CompanyDetailsView
 
 import javax.inject.{Inject, Named}
@@ -44,7 +45,7 @@ class CompanyDetailsController @Inject()(
 
   lazy val backLinkCall: Mode => UserAnswers => Call =
     mode => userAnswers => navigator.previousPage(CompanyDetailsPage, mode, userAnswers)
-
+  
   def onPageLoad(mode: Mode): Action[AnyContent] = (stcAuthEnrolled andThen getData andThen requireData).async {
     implicit request =>
       val innerRequest = request.request
@@ -68,10 +69,20 @@ class CompanyDetailsController @Inject()(
         formWithErrors =>
           Future.successful(BadRequest(view(formWithErrors, mode, backLinkCall(mode)(request.userAnswers)))),
         value =>
+          checkAndHandleUpdate(value)
           for {
             updatedAnswers <- Future.fromTry(request.userAnswers.set(CompanyDetailsPage, value))
             nextPage <- navigator.nextPage(CompanyDetailsPage, mode, updatedAnswers, isReturn(request))
           } yield Redirect(nextPage)
       )
   }
+
+  private def checkAndHandleUpdate(companyDetails: CompanyDetails)(implicit request: StcDataRequest[AnyContent]): Unit =
+    request.userAnswers.get(CompanyDetailsPage).map(_.isPlc).foreach { wasPlc =>
+      if (wasPlc && !companyDetails.isPlc) {
+        request.userAnswers.remove(MinimumAmountPaidPage)
+        request.userAnswers.remove(MaximumAmountPaidPage)
+      }
+    }
+  
 }
