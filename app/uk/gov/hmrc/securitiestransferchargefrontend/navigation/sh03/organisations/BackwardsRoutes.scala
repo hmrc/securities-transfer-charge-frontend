@@ -20,11 +20,15 @@ import play.api.mvc.Call
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.sh03.organisations.routes as sh03OrgRoutes
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.sh03.organisations.single.routes as sh03OrgSingleRoutes
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.sh03.shared.routes as sharedRoutes
+import uk.gov.hmrc.securitiestransferchargefrontend.controllers.sh03.organisations.bulk.routes as sh03OrgBulkRoutes
+import uk.gov.hmrc.securitiestransferchargefrontend.controllers.fileUpload.routes
 import uk.gov.hmrc.securitiestransferchargefrontend.models.sh03.shared.ReasonForPurchase
 import uk.gov.hmrc.securitiestransferchargefrontend.models.{NormalMode, UserAnswers}
 import uk.gov.hmrc.securitiestransferchargefrontend.navigation.NavigationHelper
 import uk.gov.hmrc.securitiestransferchargefrontend.pages.*
 import uk.gov.hmrc.securitiestransferchargefrontend.pages.sh03.*
+import uk.gov.hmrc.securitiestransferchargefrontend.pages.sh03.bulk.{BulkCompanyDetailsPage, BulkRoleAtPurchasingCompanyPage, CannotSubmitFormErrorPage}
+import uk.gov.hmrc.securitiestransferchargefrontend.models.JourneyType.SH03
 
 class BackwardsRoutes(defaultPage: Call):
 
@@ -70,5 +74,8 @@ class BackwardsRoutes(defaultPage: Call):
         }
       }
     case RoleAtPurchasingCompanyPage => _ => sh03OrgSingleRoutes.ChargingPointController.onPageLoad(NormalMode)
+    case BulkCompanyDetailsPage => _ => sh03OrgRoutes.HowToNotifyAboutShareBuybackController.onPageLoad()
+    case BulkRoleAtPurchasingCompanyPage => _ => routes.FileUploadController.onPageLoad(SH03)
+    case CannotSubmitFormErrorPage => _ => sh03OrgBulkRoutes.RoleAtPurchasingCompanyController.onPageLoad(NormalMode)
     case _ => _ => defaultPage
   }
