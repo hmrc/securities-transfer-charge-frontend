@@ -23,12 +23,19 @@ import uk.gov.hmrc.securitiestransferchargefrontend.repositories.SessionReposito
 import scala.concurrent.Future
 
 class StubSessionRepository extends SessionRepository:
+  private var store: Map[UserId, UserAnswers] = Map.empty
 
-  override def get(id: UserId): Future[Option[UserAnswers]] = Future.successful(None)
+  override def get(id: UserId): Future[Option[UserAnswers]] = Future.successful(store.get(id))
 
-  override def set(answers: UserAnswers): Future[Unit] = Future.successful(())
+  override def set(answers: UserAnswers): Future[Unit] = {
+    store = store + (answers.userId -> answers)
+    Future.successful(())
+  }
 
-  override def clear(id: UserId): Future[Unit] = Future.successful(())
+  override def clear(id: UserId): Future[Unit] = {
+    store = store - id
+    Future.successful(())
+  }
 
   override def keepAlive(id: UserId): Future[Unit] = Future.successful(())
 

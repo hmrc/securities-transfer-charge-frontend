@@ -17,11 +17,20 @@
 package uk.gov.hmrc.securitiestransferchargefrontend.pages.sh03
 
 import play.api.libs.json.JsPath
+import uk.gov.hmrc.securitiestransferchargefrontend.models.UserAnswers
 import uk.gov.hmrc.securitiestransferchargefrontend.pages.QuestionPage
 
-case object ApplyingForReliefPage extends QuestionPage[Boolean] {
+import scala.util.{Success, Try}
+
+case object ApplyingForReliefPage extends QuestionPage[Boolean]:
 
   override def path: JsPath = JsPath \ toString
 
   override def toString: String = "applyingForRelief"
-}
+
+  override def cleanup(applyingForRelief: Option[Boolean], userAnswers: UserAnswers): Try[UserAnswers] =
+    if applyingForRelief.contains(false) then
+      userAnswers.remove(WhatReliefAreYouApplyingForPage)
+    else Success(userAnswers)
+  
+

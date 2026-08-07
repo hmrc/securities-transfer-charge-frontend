@@ -17,6 +17,7 @@
 package uk.gov.hmrc.securitiestransferchargefrontend.utils
 
 import play.api.Logger
+import play.api.libs.json.Reads
 import uk.gov.hmrc.auth.core.AffinityGroup
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.actions.requests.StcDataRequest
 import uk.gov.hmrc.securitiestransferchargefrontend.models.JourneyType
@@ -38,7 +39,7 @@ object CommonHelpers {
 
   def requireMarketValue(implicit request: StcDataRequest[_]): Boolean =
     request.userAnswers.get(ConnectedPersonsPage).contains(true)
-
+  
   val linkToTemplateFor: JourneyType => AffinityGroup => String =
     case JourneyType.STF => {
       case AffinityGroup.Individual => "/securities-transfer-charge/assets/Bulk_Securities_Transfer_Charge_template_v1i.xlsx"

@@ -76,4 +76,5 @@ class CompanyDetailsController @Inject()(
           } yield Redirect(nextPage)
       )
   }
+  
 }

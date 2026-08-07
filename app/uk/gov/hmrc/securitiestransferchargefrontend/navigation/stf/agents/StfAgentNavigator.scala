@@ -26,7 +26,7 @@ import uk.gov.hmrc.securitiestransferchargefrontend.controllers.routes
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.agents.single.routes as agentSingleRoutes
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.shared.routes as sharedRoutes
 import uk.gov.hmrc.securitiestransferchargefrontend.domain.{SubmissionId, UserId}
-import uk.gov.hmrc.securitiestransferchargefrontend.models.{NormalMode, UserAnswers}
+import uk.gov.hmrc.securitiestransferchargefrontend.models.{Mode, NormalMode, UserAnswers}
 import uk.gov.hmrc.securitiestransferchargefrontend.navigation.stf.agents
 import uk.gov.hmrc.securitiestransferchargefrontend.navigation.stf.agents.{BackwardsRoutes, ForwardRoutes}
 import uk.gov.hmrc.securitiestransferchargefrontend.navigation.{AbstractModeNavigator, PersistentNavigator, UserAnswersValidator}
@@ -50,11 +50,11 @@ class StfAgentNavigator @Inject()(appConfig: FrontendAppConfig,
   val forwardRoutes: ForwardRoutes = new ForwardRoutes(answerPersistenceService, appConfig, defaultPage, errorPages)
   val backwardsRoutes: BackwardsRoutes = new BackwardsRoutes(defaultPage)
 
-  override def forwardRoutes(page: Page)(implicit hc: HeaderCarrier): UserAnswers => Future[Call] =
-    forwardRoutes.forwardRoutes(page)(hc)
+  override def forwardRoutes(page: Page, mode: Mode)(implicit hc: HeaderCarrier): UserAnswers => Future[Call] =
+    forwardRoutes.forwardRoutes(page, mode)(hc)
 
-  override def predecessorRoutes(page: Page): Option[UserAnswers] => Call =
-    backwardsRoutes.predecessorRoutes(page)
+  override def predecessorRoutes(page: Page, mode: Mode): Option[UserAnswers] => Call =
+    backwardsRoutes.predecessorRoutes(page, mode)
 
   def errorPage(forPage: Page): Call = forPage match {
     case _ => defaultPage
@@ -93,5 +93,15 @@ class StfAgentNavigator @Inject()(appConfig: FrontendAppConfig,
       map.put(TotalMarketValuePage, agentSingleRoutes.TotalMarketValueController.onPageLoad(NormalMode))
       
       map
+    }
+
+    override protected def pageHasValidDataAtPath(userAnswers: UserAnswers, page: GettablePage[_]): Boolean = page match {
+      case AgentReferencePage => true // Optional data, so always valid
+      case DetailsOfThisTransferPage if userAnswers.get(ConnectedPersonsPage).contains(true) =>
+        userAnswers.get(DetailsOfThisTransferPage).map(_.marketValue).isDefined
+      case SecuritiesTargetPage => // CRN is optional
+        userAnswers.get(SecuritiesTargetPage).map(_.businessName).isDefined
+      case _ => super.pageHasValidDataAtPath(userAnswers, page)
+
     }
   }
