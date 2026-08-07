@@ -122,8 +122,8 @@ class StcRowValidationServiceSpec extends SpecBase {
           ParsedCell(columnIndex.find(StcColumns.companyRegistrationNumber).getOrElse(-1), "12345678"),
           ParsedCell(columnIndex.find(StcColumns.chargingPoint).getOrElse(-1), "20/02/2026"),
           ParsedCell(columnIndex.find(StcColumns.taxRate).getOrElse(-1), "0.5%"),
-          ParsedCell(columnIndex.find(StcColumns.whatTypeOfSecurities).getOrElse(-1), "shares"),
-          ParsedCell(columnIndex.find(StcColumns.typeOfShares).getOrElse(-1), ""),
+          ParsedCell(columnIndex.find(StcColumns.whatTypeOfSecurities).getOrElse(-1), ""),
+          ParsedCell(columnIndex.find(StcColumns.typeOfShares).getOrElse(-1), "shares"),
           ParsedCell(columnIndex.find(StcColumns.securitiesQuantity).getOrElse(-1), "100"),
           ParsedCell(columnIndex.find(StcColumns.amountPaidForSecurities).getOrElse(-1), "1000"),
           ParsedCell(columnIndex.find(StcColumns.totalMarketValue).getOrElse(-1), "")
@@ -141,7 +141,7 @@ class StcRowValidationServiceSpec extends SpecBase {
         "sellerPostcode",
         "whatReliefAreYouApplyingFor",
         "totalMarketValue",
-        "typeOfShares"
+        "whatTypeOfSecurities"
       )
     }
 
@@ -160,8 +160,8 @@ class StcRowValidationServiceSpec extends SpecBase {
           ParsedCell(columnIndex.find(StcColumns.companyRegistrationNumber).getOrElse(-1), "12345678"),
           ParsedCell(columnIndex.find(StcColumns.chargingPoint).getOrElse(-1), "20/02/2026"),
           ParsedCell(columnIndex.find(StcColumns.taxRate).getOrElse(-1), "0.5%"),
-          ParsedCell(columnIndex.find(StcColumns.whatTypeOfSecurities).getOrElse(-1), "shares"),
-          ParsedCell(columnIndex.find(StcColumns.typeOfShares).getOrElse(-1), ""),
+          ParsedCell(columnIndex.find(StcColumns.whatTypeOfSecurities).getOrElse(-1), ""),
+          ParsedCell(columnIndex.find(StcColumns.typeOfShares).getOrElse(-1), "shares"),
           ParsedCell(columnIndex.find(StcColumns.securitiesQuantity).getOrElse(-1), "100"),
           ParsedCell(columnIndex.find(StcColumns.amountPaidForSecurities).getOrElse(-1), "1000"),
           ParsedCell(columnIndex.find(StcColumns.totalMarketValue).getOrElse(-1), "")
