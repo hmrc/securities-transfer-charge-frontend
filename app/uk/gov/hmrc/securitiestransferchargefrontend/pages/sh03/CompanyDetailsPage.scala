@@ -23,5 +23,5 @@ import uk.gov.hmrc.securitiestransferchargefrontend.pages.QuestionPage
 case object CompanyDetailsPage extends QuestionPage[CompanyDetails] {
   override def path: JsPath = JsPath \ toString
 
-  override def toString: String = "CompanyDetailsPage"
+  override def toString: String = "companyDetails"
 }

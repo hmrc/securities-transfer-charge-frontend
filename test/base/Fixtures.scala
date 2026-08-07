@@ -25,8 +25,11 @@ import uk.gov.hmrc.auth.core.retrieve.Retrieval
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.securitiestransferchargefrontend.connectors.AlfAddressConnector
 import uk.gov.hmrc.securitiestransferchargefrontend.domain.{CredentialId, GroupIdentifier, SubmissionId, SubscriptionId, UserId}
-import uk.gov.hmrc.securitiestransferchargefrontend.models.stf.{AlfAddress, AlfConfirmedAddress, ConfirmableAddress, Country, UploadedFileError}
+import uk.gov.hmrc.securitiestransferchargefrontend.models.stf.{Address, AlfAddress, AlfConfirmedAddress, ConfirmableAddress, Country, DetailsOfThisTransfer, SecuritiesTarget, UploadedFileError}
 import uk.gov.hmrc.securitiestransferchargefrontend.models.UserAnswers
+import uk.gov.hmrc.securitiestransferchargefrontend.models.sh03.shared.{CompanyDetails, DetailsOfThisSharePurchase}
+import uk.gov.hmrc.securitiestransferchargefrontend.models.shared.AgentReference
+import uk.gov.hmrc.securitiestransferchargefrontend.models.submission.{Agent, Individual, Organisation}
 
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -62,10 +65,10 @@ object Fixtures {
 
   val enrolledForStc: Enrolments =
     Enrolments(Set(stcEnrolment))
-  
+
   val individualAffinity: AffinityGroup = AffinityGroup.Individual
   val organisationAffinity: AffinityGroup = AffinityGroup.Organisation
-  
+
   val emptyUserAnswers: UserAnswers = UserAnswers.empty(testInternalId)(testGroupIdentifier)(testSubmissionId)
 
   val fakeAlfAddress: AlfAddress = AlfAddress(
@@ -83,6 +86,57 @@ object Fixtures {
     postcode = "ZZ1 1ZZ",
     country = Some(Country("United Kingdom", "GB"))
   )
+
+  val individualAffinityData: Individual = Individual(
+    name = "John Doe",
+    address = Address(
+      addressLine1 = "10 Downing Street",
+      addressLine2 = Some("Westminster"),
+      addressLine3 = Some("London"),
+      postcode = "SW1A 2AA",
+      countryCode = "GBR"
+    ),
+    phone = "01234567890",
+    email = "foo@bar.com",
+    nino = "NY054388A"
+  )
+
+  val organisationAffinityData: Organisation = Organisation(
+    name = "Some organisation",
+    address = Address(
+      addressLine1 = "50 Google Street",
+      addressLine2 = Some("SpringField"),
+      addressLine3 = Some("Leeds"),
+      postcode = "LS1 111",
+      countryCode = "GBR"
+    ),
+    phone = "07777777777",
+    email = "foo@bar.com",
+    utr = "CT111111")
+
+  val agentAffinityData: Agent = Agent(
+    name = "Good Agent",
+    address = Address(
+      addressLine1 = "1 Agent Street",
+      addressLine2 = Some("SummerCamp"),
+      addressLine3 = Some("Manor"),
+      postcode = "ZZ1 1ZZ",
+      countryCode = "GBR"
+    ),
+    phone = "07777777777",
+    email = "foo@bar.com")
+
+  val securitiesTarget: SecuritiesTarget = SecuritiesTarget(businessName = "Business 1", crn = Some("12345678"))
+
+  val sftDetailsOfThisTransfer: DetailsOfThisTransfer = DetailsOfThisTransfer(numberOfShares = 10,
+    typeOfShares = "Ordinary", amountPaid = BigDecimal(500), marketValue = Some(BigDecimal(100)))
+  
+  val agentReference: AgentReference = AgentReference(Some("Ref-1234"))
+  
+  val sh03CompanyDetails: CompanyDetails = CompanyDetails(companyName = "Company 1",companyRegistrationNumber = "12345678",isPlc = true)
+  
+  val sh03DetailsOfThisSharePurchase: DetailsOfThisSharePurchase =  DetailsOfThisSharePurchase(numberOfShares = 500, 
+    typeOfShares = "Ordinary", amountPaid = BigDecimal(56999), marketValue = Some(BigDecimal(3)))
 
   val uploadedFileErrors: Seq[UploadedFileError] = Seq(
     UploadedFileError(cell = "J6", error = "The seller's name cannot contain numbers"),

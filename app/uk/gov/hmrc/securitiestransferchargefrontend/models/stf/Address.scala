@@ -23,7 +23,7 @@ case class Address(
                     addressLine2: Option[String],
                     addressLine3: Option[String],
                     postcode: String,
-                    countryCode: String
+                    countryCode: String //Todo should this be country not code ??
                   )
 
 object Address {

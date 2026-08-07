@@ -26,7 +26,7 @@ final case class SingleTransferRequest(
   recordId: Int,
   transactionDetails: SingleTransferTransactionDetails,
   contingentDetails: Option[Seq[SingleTransferContingentDetails]],
-  mainSellerDetails: SingleTransferSellerDetails,
+  mainSellerDetails: Option[SingleTransferSellerDetails],
   otherSellers: Option[Seq[SingleTransferOtherSellerName]],
   mainBuyerDetails: SingleTransferBuyerDetails,
   otherBuyers: Option[Seq[SingleTransferOtherBuyerName]],
