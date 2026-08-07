@@ -27,9 +27,9 @@
     saveAndReturnButton: SaveAndReturnButton
 )
 
-@(viewModel: CheckYourAnswersViewModel)(implicit request: Request[_], messages: Messages)
+@(viewModel: CheckYourAnswersViewModel, backLinkCall: Call)(implicit request: Request[_], messages: Messages)
 
-@layout(pageTitle = titleNoForm(messages(CheckYourAnswersViewModel.MessageKeys.title), Some(messages("sectionTitle.stf")))) {
+@layout(pageTitle = titleNoForm(messages(CheckYourAnswersViewModel.MessageKeys.title), Some(messages("sectionTitle.stf"))), backLinkUrl = Some(backLinkCall.url)) {
 
     <h1 class="govuk-heading-l govuk-!-margin-bottom-7">@messages(CheckYourAnswersViewModel.MessageKeys.heading)</h1>
 

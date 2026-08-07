@@ -18,12 +18,12 @@ package uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.individuals
 
 import com.google.inject.Inject
 import play.api.i18n.{I18nSupport, Lang, Messages, MessagesApi}
-import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
+import play.api.mvc.{Action, AnyContent, Call, MessagesControllerComponents}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.actions.*
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.actions.requests.StcDataRequest
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.shared.SaveAndReturnButton.isReturn
-import uk.gov.hmrc.securitiestransferchargefrontend.models.{NormalMode, UserAnswers}
+import uk.gov.hmrc.securitiestransferchargefrontend.models.{Mode, NormalMode, UserAnswers}
 import uk.gov.hmrc.securitiestransferchargefrontend.navigation.Navigator
 import uk.gov.hmrc.securitiestransferchargefrontend.services.stf.TaxDueCalculationService
 import uk.gov.hmrc.securitiestransferchargefrontend.services.stf.shared.CheckYourAnswersService
@@ -49,6 +49,8 @@ class CheckYourAnswersController @Inject()(
                                             formattingService: FormattingService
                                           )(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport {
 
+  lazy val backLinkCall: Mode => UserAnswers => Call = mode => userAnswers => navigator.previousPage(CheckYourAnswersPage, mode, userAnswers)
+    
   def onPageLoad(): Action[AnyContent] = (stcAuthEnrolled andThen getData andThen requireData).async {
     implicit request =>
       implicit val messages: Messages = messagesApi.preferred(request)
@@ -80,7 +82,7 @@ class CheckYourAnswersController @Inject()(
       taxDueFormatted = taxDueFormatted,
       paymentDueDateFormatted = paymentDueDateFormatted
     )
-    Ok(view(viewModel))
+    Ok(view(viewModel, backLinkCall(NormalMode)(request.userAnswers)))
   }
 
   def onSubmit(): Action[AnyContent] = (stcAuthEnrolled andThen getData andThen requireData).async {
