@@ -20,8 +20,9 @@ import play.api.mvc.Call
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.sh03.organisations.routes as sh03OrgRoutes
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.sh03.organisations.single.routes as sh03OrgSingleRoutes
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.sh03.shared.routes as sharedRoutes
+import uk.gov.hmrc.securitiestransferchargefrontend.controllers.sh03.shared.single.routes as sh03CyaRoutes
 import uk.gov.hmrc.securitiestransferchargefrontend.models.sh03.shared.ReasonForPurchase
-import uk.gov.hmrc.securitiestransferchargefrontend.models.{NormalMode, UserAnswers}
+import uk.gov.hmrc.securitiestransferchargefrontend.models.{CheckMode, Mode, NormalMode, UserAnswers}
 import uk.gov.hmrc.securitiestransferchargefrontend.navigation.NavigationHelper
 import uk.gov.hmrc.securitiestransferchargefrontend.pages.*
 import uk.gov.hmrc.securitiestransferchargefrontend.pages.sh03.*
@@ -32,7 +33,12 @@ class BackwardsRoutes(defaultPage: Call):
 
   import navHelper.*
 
-  def predecessorRoutes(page: Page): Option[UserAnswers] => Call = page match {
+  def predecessorRoutes(page: Page, mode: Mode): Option[UserAnswers] => Call = mode match {
+    case NormalMode => normalRoutes(page)
+    case CheckMode => checkRoutes(page)
+  }
+  
+  def normalRoutes(page: Page): Option[UserAnswers] => Call = page match {
     case HowToNotifyAboutShareBuybackPage => _ => sharedRoutes.BeforeYouStartController.onPageLoad()
     case CompanyDetailsPage => _ => sh03OrgRoutes.HowToNotifyAboutShareBuybackController.onPageLoad()
     case ReasonForPurchasePage => _ => sh03OrgSingleRoutes.CompanyDetailsController.onPageLoad(NormalMode)
@@ -71,4 +77,8 @@ class BackwardsRoutes(defaultPage: Call):
       }
     case RoleAtPurchasingCompanyPage => _ => sh03OrgSingleRoutes.ChargingPointController.onPageLoad(NormalMode)
     case _ => _ => defaultPage
+  }
+  
+  private def checkRoutes(page: Page): Option[UserAnswers] => Call = page match {
+    case _ => _ => sh03CyaRoutes.CheckYourAnswersController.onPageLoad()
   }
