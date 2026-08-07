@@ -19,7 +19,7 @@ package uk.gov.hmrc.securitiestransferchargefrontend.navigation
 import play.api.mvc.{Call, Request}
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.play.http.HeaderCarrierConverter
-import uk.gov.hmrc.securitiestransferchargefrontend.models.{CheckMode, Mode, NormalMode, UserAnswers}
+import uk.gov.hmrc.securitiestransferchargefrontend.models.{Mode, UserAnswers}
 import uk.gov.hmrc.securitiestransferchargefrontend.pages.Page
 
 import scala.concurrent.{ExecutionContext, Future}
@@ -34,25 +34,19 @@ trait Navigator:
 
 abstract class AbstractModeNavigator(implicit ex: ExecutionContext) extends Navigator:
 
-  def forwardRoutes(page: Page)(implicit hc: HeaderCarrier): UserAnswers => Future[Call]
-  def predecessorRoutes(page: Page): Option[UserAnswers] => Call
+  def forwardRoutes(page: Page, mode: Mode)(implicit hc: HeaderCarrier): UserAnswers => Future[Call]
+  def predecessorRoutes(page: Page, mode: Mode): Option[UserAnswers] => Call
+
   lazy val dashboardPage: Call
-  val checkRouteMap: Page => UserAnswers => Call
 
   def nextPage(page: Page, mode: Mode, userAnswers: UserAnswers, isReturn: Boolean)(implicit request: Request[?]): Future[Call] = {
     implicit lazy val hc: HeaderCarrier = HeaderCarrierConverter.fromRequestAndSession(request, request.session)
     val maybeRedirectToDashboard: Call => Call = if (isReturn) _ => dashboardPage else identity
-    (mode match {
-      case NormalMode             => forwardRoutes(page)(hc)(userAnswers)
-      case CheckMode              => Future.successful(checkRouteMap(page)(userAnswers))
-    }).map(maybeRedirectToDashboard)
+    forwardRoutes(page, mode)(hc)(userAnswers).map(maybeRedirectToDashboard)
   }
 
   override def previousPage(page: Page, mode: Mode, userAnswers: UserAnswers): Call =
     previousPage(page, mode, Some(userAnswers))
 
   override def previousPage(page: Page, mode: Mode, userAnswers: Option[UserAnswers]): Call =
-    mode match {
-      case NormalMode => predecessorRoutes(page)(userAnswers)
-      case CheckMode => userAnswers.map(checkRouteMap(page)).getOrElse(errorPage(page))
-    }
+    predecessorRoutes(page, mode)(userAnswers)
