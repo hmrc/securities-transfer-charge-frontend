@@ -17,11 +17,26 @@
 package uk.gov.hmrc.securitiestransferchargefrontend.pages.stf.single
 
 import play.api.libs.json.JsPath
+import uk.gov.hmrc.securitiestransferchargefrontend.models.UserAnswers
 import uk.gov.hmrc.securitiestransferchargefrontend.pages.QuestionPage
 
-case object ConnectedPersonsPage extends QuestionPage[Boolean] {
+import scala.util.Try
+
+case object ConnectedPersonsPage extends QuestionPage[Boolean]:
 
   override def path: JsPath = JsPath \ toString
 
   override def toString: String = "connectedPersons"
-}
+
+  override def cleanup(connected: Option[Boolean], userAnswers: UserAnswers): Try[UserAnswers] =
+    if connected.contains(false) then
+      clearTotalMarketValueOther(userAnswers).flatMap(clearTotalMarketValueShares)
+    else super.cleanup(connected, userAnswers)
+
+  private def clearTotalMarketValueOther(userAnswers: UserAnswers): Try[UserAnswers] =
+    userAnswers.remove(TotalMarketValuePage)
+
+  private def clearTotalMarketValueShares(userAnswers: UserAnswers): Try[UserAnswers] =
+    userAnswers.get(DetailsOfThisTransferPage).fold(Try(userAnswers)) { details =>
+      userAnswers.set(DetailsOfThisTransferPage, details.copy(marketValue = None))
+    }

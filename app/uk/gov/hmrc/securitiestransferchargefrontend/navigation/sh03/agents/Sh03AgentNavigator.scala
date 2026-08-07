@@ -87,4 +87,11 @@ class Sh03AgentNavigator @Inject()(answerPersistenceService: AnswerPersistenceSe
       
       map
     }
+
+    override protected def pageHasValidDataAtPath(userAnswers: UserAnswers, page: GettablePage[_]): Boolean = page match {
+      case AgentReferencePage => true // Optional data, so always valid
+      case DetailsOfThisSharePurchasePage if userAnswers.get(ConnectedPersonsPage).contains(true) =>
+        userAnswers.get(DetailsOfThisSharePurchasePage).map(_.marketValue).isDefined
+      case _ => super.pageHasValidDataAtPath(userAnswers, page)
+    }
   }

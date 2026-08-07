@@ -17,11 +17,22 @@
 package uk.gov.hmrc.securitiestransferchargefrontend.pages.sh03
 
 import play.api.libs.json.JsPath
+import uk.gov.hmrc.securitiestransferchargefrontend.models.UserAnswers
 import uk.gov.hmrc.securitiestransferchargefrontend.models.sh03.shared.CompanyDetails
 import uk.gov.hmrc.securitiestransferchargefrontend.pages.QuestionPage
 
-case object CompanyDetailsPage extends QuestionPage[CompanyDetails] {
+import scala.util.Try
+
+case object CompanyDetailsPage extends QuestionPage[CompanyDetails]:
   override def path: JsPath = JsPath \ toString
 
   override def toString: String = "CompanyDetailsPage"
-}
+
+  override def cleanup(details: Option[CompanyDetails], userAnswers: UserAnswers): Try[UserAnswers] =
+    if details.exists(!_.isPlc) then
+      clearMinAndMaxSharePrice(userAnswers)
+    else super.cleanup(details, userAnswers)
+
+  private def clearMinAndMaxSharePrice(userAnswers: UserAnswers): Try[UserAnswers] =
+    userAnswers.remove(MinimumAmountPaidPage)
+      .flatMap(_.remove(MaximumAmountPaidPage))

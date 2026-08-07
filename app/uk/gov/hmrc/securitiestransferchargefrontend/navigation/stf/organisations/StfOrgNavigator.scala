@@ -134,14 +134,11 @@ class StfOrgNavigator @Inject()(appConfig: FrontendAppConfig,
       map
     }
 
-    override protected def pageHasValidDataAtPath(userAnswers: UserAnswers, page: GettablePage[?]): Boolean = {
-      page match {
-        case SecuritiesTargetPage => userAnswers.get(SecuritiesTargetPage).exists(_.businessName.nonEmpty)
-        case DetailsOfThisTransferPage => userAnswers.get(ConnectedPersonsPage) match {
-            case Some(true) => userAnswers.get(DetailsOfThisTransferPage).exists(_.marketValue.isDefined)
-            case _ => userAnswers.get(DetailsOfThisTransferPage).isDefined
-          }
-        case _ => super.pageHasValidDataAtPath(userAnswers, page)
-      }
+    override protected def pageHasValidDataAtPath(userAnswers: UserAnswers, page: GettablePage[_]): Boolean = page match {
+      case DetailsOfThisTransferPage if userAnswers.get(ConnectedPersonsPage).contains(true) =>
+        userAnswers.get(DetailsOfThisTransferPage).map(_.marketValue).isDefined
+      case SecuritiesTargetPage => // CRN is optional
+        userAnswers.get(SecuritiesTargetPage).map(_.businessName).isDefined
+      case _ => super.pageHasValidDataAtPath(userAnswers, page)
     }
   }
