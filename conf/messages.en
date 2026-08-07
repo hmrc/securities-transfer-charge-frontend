@@ -967,6 +967,8 @@ org.sh03.shareBuyback.oneAtATime = One transfer at a time
 org.sh03.shareBuyback.oneAtATime.hint = Tell us about a purchase of one type of shares, between the business and one seller
 org.sh03.shareBuyback.moreThanOneAtATime = More than one transfer at a time
 org.sh03.shareBuyback.moreThanOneAtATime.hint = Tell us about several share purchases at once using our template. You can download the template, complete a row for each purchase, and upload it on the following pages. You can include purchases from different sellers and of different types of shares
+org.sh03.shareBuyback.error.required = Select a way to tell us about this share buyback
+
 
 org.sh03.whatReliefAreYouApplyingFor.title = Enter the relief the business is applying for
 org.sh03.whatReliefAreYouApplyingFor.heading = Enter the relief the business is applying for
