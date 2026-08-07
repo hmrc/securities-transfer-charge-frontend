@@ -40,7 +40,7 @@ object DetailsOfThisTransferSummary {
         value   = ValueViewModel(numberOfShares),
         actions = Seq(
           ActionItemViewModel("site.change", routes.DetailsOfThisTransferController.onPageLoad(CheckMode).url)
-            .withVisuallyHiddenText(messages("detailsOfThisTransfer.change.hidden"))
+            .withVisuallyHiddenText(messages("detailsOfThisTransfer.numberOfShares.change.hidden"))
         )
       ),
       SummaryListRowViewModel(
@@ -48,7 +48,7 @@ object DetailsOfThisTransferSummary {
         value   = ValueViewModel(typeOfShares),
         actions = Seq(
           ActionItemViewModel("site.change", routes.DetailsOfThisTransferController.onPageLoad(CheckMode).url)
-            .withVisuallyHiddenText(messages("detailsOfThisTransfer.change.hidden"))
+            .withVisuallyHiddenText(messages("detailsOfThisTransfer.typeOfShares.change.hidden"))
         )
       ),
       SummaryListRowViewModel(
@@ -56,7 +56,7 @@ object DetailsOfThisTransferSummary {
         value   = ValueViewModel(amountPaid),
         actions = Seq(
           ActionItemViewModel("site.change", routes.DetailsOfThisTransferController.onPageLoad(CheckMode).url)
-            .withVisuallyHiddenText(messages("detailsOfThisTransfer.change.hidden"))
+            .withVisuallyHiddenText(messages("detailsOfThisTransfer.amountPaid.change.hidden"))
         )
       )
     )
@@ -67,7 +67,7 @@ object DetailsOfThisTransferSummary {
         value   = ValueViewModel(marketValue),
         actions = Seq(
           ActionItemViewModel("site.change", routes.DetailsOfThisTransferController.onPageLoad(CheckMode).url)
-            .withVisuallyHiddenText(messages("detailsOfThisTransfer.change.hidden"))
+            .withVisuallyHiddenText(messages("detailsOfThisTransfer.marketValue.change.hidden"))
         )
       ))
     } else {

@@ -58,7 +58,7 @@ checkYourAnswers.yourDetails.heading = Your details
 checkYourAnswers.sellerDetails.heading = Seller details
 checkYourAnswers.transferDetails.heading = Transfer details
 checkYourAnswers.securitiesDetails.heading = Securities details
-checkYourAnswers.businessName = Business name
+checkYourAnswers.businessName = Business the securities are in
 checkYourAnswers.companyCrn = Company registration number (CRN)
 checkYourAnswers.numberOfShares = Number of shares
 checkYourAnswers.typeOfShares = Type or class of shares
@@ -77,7 +77,8 @@ checkYourAnswers.buyerAddress = Buyer address
 checkYourAnswers.buyerAddress.change.hidden = Change buyer’s address
 checkYourAnswers.sellerAddress = Address
 checkYourAnswers.sellerAddress.change.hidden = Change seller’s address
-checkYourAnswers.securitiesTarget.change.hidden = securities target
+checkYourAnswers.securitiesTarget.businessName.change.hidden = Change the business the securities are in
+checkYourAnswers.securitiesTarget.crn.change.hidden = Change company registration number (CRN)
 
 # Check Your Answers Page - STF Individuals
 checkYourAnswers.title = Check your answers
@@ -202,7 +203,7 @@ chargingPoint.error.required.two = The date you bought the securities must inclu
 chargingPoint.error.required = The date you bought the securities must include a {0}
 chargingPoint.error.invalid = The date you bought the securities must be a real date
 chargingPoint.error.futureDate = The day you bought the securities must be today’s date or a date in the past
-chargingPoint.change.hidden = ChargingPoint
+chargingPoint.change.hidden = Change the date you bought these securities
 
 taxRate.title = Tax rate
 taxRate.heading = Tax rate
@@ -213,19 +214,19 @@ taxRate.half = 0.5%
 taxRate.oneAndHalf = 1.5%
 taxRate.checkYourAnswersLabel = Tax rate
 taxRate.error.required = Select a tax rate
-taxRate.change.hidden = TaxRate
+taxRate.change.hidden = Change tax rate
 
 otherSecuritiesType.title = Enter the type of securities you are buying
 otherSecuritiesType.heading = Enter the type of securities you are buying
 otherSecuritiesType.checkYourAnswersLabel = Type of securities
 otherSecuritiesType.error.required = Enter the type of securities you’re buying
-otherSecuritiesType.change.hidden = Change what type of securities are you buying
+otherSecuritiesType.change.hidden = Change type of securities
 
 individual.purchasingShares.title = Are you buying shares?
 individual.purchasingShares.heading = Are you buying shares?
 individual.purchasingShares.error.required = Select yes if you’re buying shares
 individual.purchasingShares.checkYourAnswersLabel = Are you buying shares?
-individual.purchasingShares.change.hidden = Change if you are buying shares
+individual.purchasingShares.change.hidden = Change if you’re buying shares
 
 totalMarketValue.title = What is the total market value of these securities?
 totalMarketValue.heading = What is the total market value of these securities?
@@ -236,7 +237,7 @@ totalMarketValue.error.required = Enter the total market value of the securities
 totalMarketValue.error.invalidNumeric = Enter the market value of the securities using up to two decimal places
 totalMarketValue.error.aboveMaximum = The market value of the securities must be {0} or less
 totalMarketValue.error.belowMinimum = The market value of the securities must be greater than zero
-totalMarketValue.change.hidden = Change the market value of the securities
+totalMarketValue.change.hidden = Change total market value of the securities
 
 amountPaidForSecurities.title = How much did you pay for these securities?
 amountPaidForSecurities.heading = How much did you pay for these securities?
@@ -249,7 +250,7 @@ amountPaidForSecurities.error.required = Enter the amount you paid for the secur
 amountPaidForSecurities.error.invalidNumeric = Enter your amountPaidForSecurities using up to two decimal places
 amountPaidForSecurities.error.aboveMaximum = amountPaidForSecurities must be {0} or less
 amountPaidForSecurities.error.belowMinimum = amountPaidForSecurities must be {0} or more
-amountPaidForSecurities.change.hidden = amountPaidForSecurities
+amountPaidForSecurities.change.hidden = Change amount paid for securities
 
 individual.amountPaidForSecurities.error.nonNumeric = The amount you paid for the securities must be a number
 individual.amountPaidForSecurities.error.required = Enter the amount you paid for the securities
@@ -320,7 +321,10 @@ detailsOfThisTransfer.typeOfShares = Type or class of shares
 detailsOfThisTransfer.amountPaid = Amount paid for the shares
 detailsOfThisTransfer.marketValue = Market value of the shares
 detailsOfThisTransfer.checkYourAnswersLabel = What are the details of this transfer?
-detailsOfThisTransfer.change.hidden = Change what are the details of this transfer
+detailsOfThisTransfer.numberOfShares.change.hidden = Change number of shares
+detailsOfThisTransfer.typeOfShares.change.hidden = Change type or class of shares
+detailsOfThisTransfer.amountPaid.change.hidden = Change amount paid for shares
+detailsOfThisTransfer.marketValue.change.hidden = Change market value of the shares
 detailsOfThisTransfer.error.numberOfShares.wholeNumber = The number of shares must be a whole number between 1 and 999,999,999
 detailsOfThisTransfer.error.numberOfShares.min = The number of shares must be at least 1
 detailsOfThisTransfer.error.numberOfShares.max = The number of shares must be below 999,999,999

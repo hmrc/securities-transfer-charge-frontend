@@ -34,7 +34,7 @@ object SecuritiesTargetSummary  {
       value   = ValueViewModel(target.map(_.businessName).getOrElse(messages("site.notProvided"))),
       actions = Seq(
         ActionItemViewModel("site.change", routes.SecuritiesTargetController.onPageLoad(CheckMode).url)
-          .withVisuallyHiddenText(messages("checkYourAnswers.securitiesTarget.change.hidden"))
+          .withVisuallyHiddenText(messages("checkYourAnswers.securitiesTarget.businessName.change.hidden"))
       )
     )
     
@@ -43,7 +43,7 @@ object SecuritiesTargetSummary  {
       value   = ValueViewModel(target.flatMap(_.crn).getOrElse(messages("site.notProvided"))),
       actions = Seq(
         ActionItemViewModel("site.change", routes.SecuritiesTargetController.onPageLoad(CheckMode).url)
-          .withVisuallyHiddenText(messages("checkYourAnswers.securitiesTarget.change.hidden"))
+          .withVisuallyHiddenText(messages("checkYourAnswers.securitiesTarget.crn.change.hidden"))
       )
     )
     
