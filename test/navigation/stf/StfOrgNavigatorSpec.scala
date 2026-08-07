@@ -39,7 +39,6 @@ import java.time.LocalDate
 
 class StfOrgNavigatorSpec extends SpecBase with ScalaFutures {
 
-  private lazy val cyaPage = stfSingleCyaRoutes.CheckYourAnswersController.onPageLoad()
   private val mockConfig: FrontendAppConfig = mock[FrontendAppConfig]
   when(mockConfig.firstChargingPoint).thenReturn(LocalDate.of(2026, 1, 1))
 

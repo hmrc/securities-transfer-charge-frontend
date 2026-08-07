@@ -21,18 +21,17 @@ import play.api.mvc.{Call, Request}
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.play.http.HeaderCarrierConverter
 import uk.gov.hmrc.securitiestransferchargefrontend.config.FrontendAppConfig
-import uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.individuals.single.routes as individualSingleRoutes
-import uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.shared.routes as sharedRoutes
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.routes
+import uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.individuals.single.routes as individualSingleRoutes
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.individuals.single.routes as stfSingleCyaRoutes
+import uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.shared.routes as sharedRoutes
 import uk.gov.hmrc.securitiestransferchargefrontend.domain.{SubmissionId, UserId}
-import uk.gov.hmrc.securitiestransferchargefrontend.models.{CheckMode, NormalMode, UserAnswers}
-import uk.gov.hmrc.securitiestransferchargefrontend.models.{Mode, NormalMode, UserAnswers}
+import uk.gov.hmrc.securitiestransferchargefrontend.models.{CheckMode, Mode, NormalMode, UserAnswers}
 import uk.gov.hmrc.securitiestransferchargefrontend.navigation.{AbstractModeNavigator, PersistentNavigator, UserAnswersValidator}
+import uk.gov.hmrc.securitiestransferchargefrontend.pages.Page
+import uk.gov.hmrc.securitiestransferchargefrontend.pages.stf.shared.*
 import uk.gov.hmrc.securitiestransferchargefrontend.pages.stf.single.*
 import uk.gov.hmrc.securitiestransferchargefrontend.services.AnswerPersistenceService
-import uk.gov.hmrc.securitiestransferchargefrontend.pages.stf.shared.*
-import uk.gov.hmrc.securitiestransferchargefrontend.pages.Page
 
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
