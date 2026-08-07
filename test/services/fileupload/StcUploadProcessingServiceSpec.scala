@@ -17,9 +17,10 @@
 package services.fileupload
 
 import base.SpecBase
-import org.mockito.ArgumentMatchers.{any, eq => eqTo}
+import org.mockito.ArgumentMatchers.{any, eq as eqTo}
 import org.mockito.Mockito.when
 import org.scalatestplus.mockito.MockitoSugar
+import uk.gov.hmrc.securitiestransferchargefrontend.models.JourneyType.STF
 import uk.gov.hmrc.securitiestransferchargefrontend.models.stf.fileupload.*
 import uk.gov.hmrc.securitiestransferchargefrontend.services.fileupload.{StcFileValidationService, StcUploadParsingService, StcUploadProcessingService}
 
@@ -104,17 +105,17 @@ class StcUploadProcessingServiceSpec extends SpecBase with MockitoSugar {
         stcUploadParsingService.withVerifiedTemplateStream[StcFileValidationResponse](
           eqTo(uploadedFile),
           eqTo(affinityGroupKeyInd),
-          eqTo("stf")
+          eqTo(STF)
         )(any())
       ).thenAnswer { invocation =>
         val block = invocation.getArgument(3).asInstanceOf[(Seq[String], Iterator[ParsedRow]) => Either[FileParseError, StcFileValidationResponse]]
         block(headers, rowStream)
       }
 
-      when(stcFileValidationService.validateStream(rowStream, headers, affinityGroupKeyInd, "stf"))
+      when(stcFileValidationService.validateStream(rowStream, headers, affinityGroupKeyInd, STF))
         .thenReturn(Right(validationResponse))
 
-      service.process(uploadedFile, affinityGroupKeyInd, "stf") mustBe Right(validationResponse)
+      service.process(uploadedFile, affinityGroupKeyInd, STF) mustBe Right(validationResponse)
     }
 
     "return parse errors without validating" in {
@@ -122,11 +123,11 @@ class StcUploadProcessingServiceSpec extends SpecBase with MockitoSugar {
         stcUploadParsingService.withVerifiedTemplateStream[StcFileValidationResponse](
           eqTo(uploadedFile),
           eqTo(affinityGroupKeyInd),
-          eqTo("stf")
+          eqTo(STF)
         )(any())
       ).thenReturn(Left(FileParseError.EmptyFile))
 
-      service.process(uploadedFile, affinityGroupKeyInd, "stf") mustBe Left(FileParseError.EmptyFile)
+      service.process(uploadedFile, affinityGroupKeyInd, STF) mustBe Left(FileParseError.EmptyFile)
     }
   }
 }

@@ -78,10 +78,10 @@ POST       /stf/security-type                             uk.gov.hmrc.securities
 GET        /stf/change/security-type                      uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.individuals.single.OtherSecuritiesTypeController.onPageLoad(mode: Mode = CheckMode)
 POST       /stf/change/security-type                      uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.individuals.single.OtherSecuritiesTypeController.onSubmit(mode: Mode = CheckMode)
 
-GET        /stf/purchasing-shares                           uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.individuals.single.PurchasingSharesController.onPageLoad(mode: Mode = NormalMode)
-POST       /stf/purchasing-shares                          uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.individuals.single.PurchasingSharesController.onSubmit(mode: Mode = NormalMode)
-GET        /stf/change/purchasing-shares                    uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.individuals.single.PurchasingSharesController.onPageLoad(mode: Mode = CheckMode)
-POST       /stf/change/purchasing-shares                    uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.individuals.single.PurchasingSharesController.onSubmit(mode: Mode = CheckMode)
+GET        /stf/buying-shares                          uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.individuals.single.PurchasingSharesController.onPageLoad(mode: Mode = NormalMode)
+POST       /stf/buying-shares                          uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.individuals.single.PurchasingSharesController.onSubmit(mode: Mode = NormalMode)
+GET        /stf/change/buying-shares                   uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.individuals.single.PurchasingSharesController.onPageLoad(mode: Mode = CheckMode)
+POST       /stf/change/buying-shares                   uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.individuals.single.PurchasingSharesController.onSubmit(mode: Mode = CheckMode)
 
 GET        /stf/share-details                             uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.individuals.single.DetailsOfThisTransferController.onPageLoad(mode: Mode = NormalMode)
 POST       /stf/share-details                             uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.individuals.single.DetailsOfThisTransferController.onSubmit(mode: Mode = NormalMode)
@@ -361,10 +361,10 @@ POST       /sh03/org/change/share-purchase                 uk.gov.hmrc.securitie
 GET        /sh03/org/how-many-transfers                   uk.gov.hmrc.securitiestransferchargefrontend.controllers.sh03.organisations.HowToNotifyAboutShareBuybackController.onPageLoad()
 POST       /sh03/org/how-many-transfers                   uk.gov.hmrc.securitiestransferchargefrontend.controllers.sh03.organisations.HowToNotifyAboutShareBuybackController.onSubmit()
 
-GET        /sh03/org/company-number                             uk.gov.hmrc.securitiestransferchargefrontend.controllers.sh03.organisations.single.CompanyDetailsController.onPageLoad(mode: Mode = NormalMode)
-POST       /sh03/org/company-number                             uk.gov.hmrc.securitiestransferchargefrontend.controllers.sh03.organisations.single.CompanyDetailsController.onSubmit(mode: Mode = NormalMode)
-GET        /sh03/org/change/company-number                      uk.gov.hmrc.securitiestransferchargefrontend.controllers.sh03.organisations.single.CompanyDetailsController.onPageLoad(mode: Mode = CheckMode)
-POST       /sh03/org/change/company-number                     uk.gov.hmrc.securitiestransferchargefrontend.controllers.sh03.organisations.single.CompanyDetailsController.onSubmit(mode: Mode = CheckMode)
+GET        /sh03/org/company-details                             uk.gov.hmrc.securitiestransferchargefrontend.controllers.sh03.organisations.single.CompanyDetailsController.onPageLoad(mode: Mode = NormalMode)
+POST       /sh03/org/company-details                             uk.gov.hmrc.securitiestransferchargefrontend.controllers.sh03.organisations.single.CompanyDetailsController.onSubmit(mode: Mode = NormalMode)
+GET        /sh03/org/change/company-details                      uk.gov.hmrc.securitiestransferchargefrontend.controllers.sh03.organisations.single.CompanyDetailsController.onPageLoad(mode: Mode = CheckMode)
+POST       /sh03/org/change/company-details                     uk.gov.hmrc.securitiestransferchargefrontend.controllers.sh03.organisations.single.CompanyDetailsController.onSubmit(mode: Mode = CheckMode)
 
 GET        /sh03/org/treasury-shares                       uk.gov.hmrc.securitiestransferchargefrontend.controllers.sh03.organisations.single.TreasurySharesController.onPageLoad(mode: Mode = NormalMode)
 POST       /sh03/org/treasury-shares                       uk.gov.hmrc.securitiestransferchargefrontend.controllers.sh03.organisations.single.TreasurySharesController.onSubmit(mode: Mode = NormalMode)
@@ -434,3 +434,18 @@ POST       /sh03/agent/bulk/change/role-purchasing-company          uk.gov.hmrc.
 GET        /sh03/agent/bulk/cannot-submit-form                       uk.gov.hmrc.securitiestransferchargefrontend.controllers.sh03.agents.bulk.CannotSubmitFormErrorController.onPageLoad()
 
 GET        /sh03/bulk/check-your-answers                             uk.gov.hmrc.securitiestransferchargefrontend.controllers.sh03.shared.bulk.CheckYourAnswersController.onPageLoad()
+
+
+GET        /sh03/org/bulk/company-details                       uk.gov.hmrc.securitiestransferchargefrontend.controllers.sh03.organisations.bulk.CompanyDetailsController.onPageLoad(mode: Mode = NormalMode)
+POST       /sh03/org/bulk/company-details                       uk.gov.hmrc.securitiestransferchargefrontend.controllers.sh03.organisations.bulk.CompanyDetailsController.onSubmit(mode: Mode = NormalMode)
+GET        /sh03/org/bulk/company-details                       uk.gov.hmrc.securitiestransferchargefrontend.controllers.sh03.organisations.bulk.CompanyDetailsController.onPageLoad(mode: Mode = CheckMode)
+POST       /sh03/org/bulk/company-details                       uk.gov.hmrc.securitiestransferchargefrontend.controllers.sh03.organisations.bulk.CompanyDetailsController.onSubmit(mode: Mode = CheckMode)
+
+GET        /sh03/org/bulk/template                       uk.gov.hmrc.securitiestransferchargefrontend.controllers.sh03.organisations.bulk.TemplateInstructionsController.onPageLoad()
+
+GET        /sh03/org/bulk/role-purchasing-company                 uk.gov.hmrc.securitiestransferchargefrontend.controllers.sh03.organisations.bulk.RoleAtPurchasingCompanyController.onPageLoad(mode: Mode = NormalMode)
+POST       /sh03/org/bulk/role-purchasing-company                 uk.gov.hmrc.securitiestransferchargefrontend.controllers.sh03.organisations.bulk.RoleAtPurchasingCompanyController.onSubmit(mode: Mode = NormalMode)
+GET        /sh03/org/bulk/change/role-purchasing-company          uk.gov.hmrc.securitiestransferchargefrontend.controllers.sh03.organisations.bulk.RoleAtPurchasingCompanyController.onPageLoad(mode: Mode = CheckMode)
+POST       /sh03/org/bulk/change/role-purchasing-company          uk.gov.hmrc.securitiestransferchargefrontend.controllers.sh03.organisations.bulk.RoleAtPurchasingCompanyController.onSubmit(mode: Mode = CheckMode)
+
+GET        /sh03/org/bulk/cannot-submit-form                       uk.gov.hmrc.securitiestransferchargefrontend.controllers.sh03.organisations.bulk.CannotSubmitFormErrorController.onPageLoad()

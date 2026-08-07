@@ -32,8 +32,8 @@ class TotalMarketValueFormProviderSpec extends CurrencyFieldBehaviours {
 
     val fieldName = "value"
 
-    val minimum = 0
-    val maximum = Int.MaxValue
+    val minimum = BigDecimal("0.01")
+    val maximum = BigDecimal("999999999")
 
     val validDataGenerator =
       Gen.choose[BigDecimal](minimum, maximum)

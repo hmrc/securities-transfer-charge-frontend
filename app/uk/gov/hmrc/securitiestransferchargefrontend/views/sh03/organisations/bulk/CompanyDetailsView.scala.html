@@ -14,12 +14,11 @@
  * limitations under the License.
  *@
 
+@import uk.gov.hmrc.securitiestransferchargefrontend.models.sh03.bulk.CompanyDetails
 @import uk.gov.hmrc.securitiestransferchargefrontend.views.html.templates.Layout
-@import uk.gov.hmrc.securitiestransferchargefrontend.controllers.sh03.organisations.single.routes
+@import uk.gov.hmrc.securitiestransferchargefrontend.controllers.sh03.organisations.bulk.routes
 @import uk.gov.hmrc.securitiestransferchargefrontend.views.html.components.SaveAndReturnButton
 @import uk.gov.hmrc.securitiestransferchargefrontend.viewmodels.InputWidth._
-@import uk.gov.hmrc.securitiestransferchargefrontend.viewmodels.LabelSize.Large
-
 
 @this(
     layout: Layout,
@@ -31,9 +30,9 @@
     saveAndReturnButton: SaveAndReturnButton
 )
 
-@(form: Form[_], mode: Mode,backLinkCall: Call)(implicit request: Request[_], messages: Messages)
+@(form: Form[CompanyDetails], mode: Mode,backLinkCall: Call)(implicit request: Request[_], messages: Messages)
 
-@layout(pageTitle = title(form, messages("org.sh03.companyDetails.title"), Some(messages("sh03.section.name"))), backLinkUrl = Some(backLinkCall.url)) {
+@layout(pageTitle = title(form, messages("org.sh03.bulk.companyDetails.title"), Some(messages("sh03.section.name"))), backLinkUrl = Some(backLinkCall.url)) {
 
     @formHelper(action = routes.CompanyDetailsController.onSubmit(mode)) {
 
@@ -41,29 +40,22 @@
             @govukErrorSummary(ErrorSummaryViewModel(form))
         }
 
-        <h1 class="govuk-heading-l">@messages("org.sh03.companyDetails.heading")</h1>
+        <h1 class="govuk-heading-l">@messages("org.sh03.bulk.companyDetails.heading")</h1>
 
         @govukInput(
             InputViewModel(
                 field = form("companyName"),
-                label = LabelViewModel(messages("org.sh03.companyDetails.companyName.label"))
+                label = LabelViewModel(messages("org.sh03.bulk.companyDetails.companyName.label"))
             )
         )
 
         @govukInput(
             InputViewModel(
                 field = form("companyRegistrationNumber"),
-                label = LabelViewModel(messages("org.sh03.companyDetails.crn.label"))
+                label = LabelViewModel(messages("org.sh03.bulk.companyDetails.crn.label"))
             )
-            .withHint(HintViewModel(messages("org.sh03.companyDetails.crn.hint")))
+            .withHint(HintViewModel(messages("org.sh03.bulk.companyDetails.crn.hint")))
             .withWidth(Fixed10)
-        )
-
-        @govukRadios(
-            RadiosViewModel.yesNoStacked(
-                field = form("isPlc"),
-                legend = LegendViewModel(messages("org.sh03.companyDetails.isPlc.label"))
-            )
         )
 
         @govukButton(

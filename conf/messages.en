@@ -312,8 +312,8 @@ org.chargingPoint.error.invalid = The date the business bought the securities mu
 org.chargingPoint.error.futureDate = The date the business bought the securities must be today’s date or a date in the past
 org.chargingPoint.change.hidden = ChargingPoint
 
-fileUpload.org.chargingPoint.error.invalid = The date the business bought the securities must be a real date
-fileUpload.org.chargingPoint.error.required.all = Enter the date the business bought the securities
+fileUpload.org.chargingPoint.error.invalid = The charging point must be a real date
+fileUpload.org.chargingPoint.error.required.all = Enter the charging point
 fileUpload.org.chargingPoint.error.futureDate = The day the business bought the securities must be today’s date or a date in the past
 fileUpload.org.chargingPoint.error.beforeFirstDate = PLACEHOLDER ERROR MESSAGE
 
@@ -375,6 +375,25 @@ org.totalMarketValue.error.negative = The market value of the securities must be
 org.totalMarketValue.error.belowMinimum = The market value must be {0} or more
 org.totalMarketValue.change.hidden = Change the market value of the securities
 org.totalMarketValue.hint = For example, £600 or £193.54
+
+org.stf.bulk.totalMarketValue.error.nonNumeric = The market value of the shares must be a number and can include up to two decimal places, like £30 or £28.60
+org.stf.bulk.totalMarketValue.error.required = Enter the market value of the shares in pounds
+org.stf.bulk.totalMarketValue.error.invalidNumeric = The market value of the shares must be a number and can include up to two decimal places, like £30 or £28.60
+org.stf.bulk.totalMarketValue.error.aboveMaximum = The market value of the shares must be £999,999,999 or below
+org.stf.bulk.totalMarketValue.error.belowMinimum = The market value of the shares must be £0.01 or more
+org.stf.bulk.totalMarketValue.error.negative = The market value of the shares must be £0.01 or more
+
+org.sh03.totalMarketValue.title = What is the total market value of these securities?
+org.sh03.totalMarketValue.heading = What is the total market value of these securities?
+org.sh03.totalMarketValue.checkYourAnswersLabel = What is the total market value of these securities?
+org.sh03.totalMarketValue.error.nonNumeric = The market value of the shares must be a number and can include up to two decimal places, like £30 or £28.60
+org.sh03.totalMarketValue.error.required = Enter the market value of the shares in pounds
+org.sh03.totalMarketValue.error.invalidNumeric = The market value of the shares must be a number and can include up to two decimal places, like £30 or £28.60
+org.sh03.totalMarketValue.error.aboveMaximum = The market value of the shares must be £999,999,999 or below
+org.sh03.totalMarketValue.error.negative = The market value of the shares must be £0.01 or more
+org.sh03.totalMarketValue.error.belowMinimum = The market value of the shares must be £0.01 or more
+org.sh03.totalMarketValue.change.hidden = Change the market value of the shares
+org.sh03.totalMarketValue.hint = For example, £600 or £193.54
 
 templateInstructions.title = How to use the template
 templateInstructions.heading = How to use the template
@@ -542,10 +561,10 @@ fileUpload.error.buyerCountry.required = Enter a country
 fileUpload.error.buyerCountry.invalidCharacters = Country can only include letters, numbers and the following characters: , . - ’
 
 individual.fileUpload.error.connectedPersons.invalid = Enter ‘yes’ if you and the buyer are connected persons
-org.fileUpload.error.connectedPersons.invalid = Enter ‘yes’ if the business and the buyer are connected persons
+org.fileUpload.error.connectedPersons.invalid = Enter ‘yes’ if the business and the seller are connected persons, or ‘no’ if they are not connected
 agent.fileUpload.error.connectedPersons.invalid = Enter ‘yes’ if the buyer and seller are connected persons, or ‘no’ if they are not connected
 individual.fileUpload.error.applyingForRelief.invalid = Enter ‘yes’ if you are applying for a relief, or ‘no’ if you are not applying for a relief
-org.fileUpload.error.applyingForRelief.invalid = Enter ‘yes’ if the business is applying for a relief, or ‘no’ if the business is not applying for a relief
+org.fileUpload.error.applyingForRelief.invalid = Enter ‘yes’ if the business is applying for a relief, or ‘no’ if the buyer is not applying for a relief
 agent.fileUpload.error.applyingForRelief.invalid = Enter ‘yes’ if the buyer is applying for a relief, or ‘no’ if the buyer is not applying for a relief
 individual.fileUpload.error.whatReliefAreYouApplyingFor.invalid = Enter the name of the relief you are applying for. See a <a target="_blank" href="#" class="govuk-link">full list of reliefs (opens in new tab)</a>.
 org.fileUpload.error.whatReliefAreYouApplyingFor.invalid = Enter the name of the relief the business is applying for. See a <a target="_blank" href="#" class="govuk-link">full list of reliefs (opens in new tab)</a>.
@@ -573,10 +592,10 @@ individual.fileUpload.error.securitiesQuantity.minimum = The number of shares mu
 individual.fileUpload.error.securitiesQuantity.maximum = The number of shares must be a whole number between 1 and 999,999,999
 individual.fileUpload.error.securitiesQuantity.wholeNumber = The number of shares you are buying must be a whole number
 
-org.fileUpload.error.securitiesQuantity.required = Enter the number of shares the business is buying
-org.fileUpload.error.securitiesQuantity.nonNumeric = The number of shares must be a whole number between 1 and 999,999,999
-org.fileUpload.error.securitiesQuantity.minimum = The number of shares must be a whole number between 1 and 999,999,999
-org.fileUpload.error.securitiesQuantity.maximum = The number of shares must be a whole number between 1 and 999,999,999
+org.fileUpload.error.securitiesQuantity.required = Enter the number of shares the business is purchasing
+org.fileUpload.error.securitiesQuantity.nonNumeric = The amount of shares must be a number
+org.fileUpload.error.securitiesQuantity.minimum = The number of shares must be at least 1
+org.fileUpload.error.securitiesQuantity.maximum = The number of shares must be below 999,999,999
 
 agent.fileUpload.error.securitiesQuantity.required = Enter the number of shares the buyer is purchasing
 agent.fileUpload.error.securitiesQuantity.nonNumeric = The amount of shares must be a number
@@ -584,11 +603,11 @@ agent.fileUpload.error.securitiesQuantity.minimum = The number of shares must be
 agent.fileUpload.error.securitiesQuantity.maximum = The number of shares must be below 999,999,999
 
 individual.fileUpload.chargingPoint.error.required = Enter the date you bought the securities
-org.fileUpload.chargingPoint.error.required = Enter the date the business bought the securities
+org.fileUpload.chargingPoint.error.required = Enter the charging point
 agent.fileUpload.chargingPoint.error.required = Enter the date the buyer purchased the securities
 
 individual.fileUpload.chargingPoint.error.futureDate = The day you bought the securities must be today’s date or a date in the past
-org.fileUpload.chargingPoint.error.futureDate = The day the business bought the securities must be today’s date or a date in the past
+org.fileUpload.chargingPoint.error.futureDate = The charging point must be today’s date or a date in the past
 agent.fileUpload.chargingPoint.error.futureDate = The day the buyer purchased the securities must be today’s date or a date in the past
 
 minSharePrice.error.invalid = The minimum amount paid for the shares must be a number and can include up to two decimal places, like £30 or £28.60
@@ -599,7 +618,7 @@ maxSharePrice.error.invalid = The maximum amount paid for the shares must be a n
 maxSharePrice.error.maximum = The maximum amount paid for the shares must be £999,999,999 or less
 maxSharePrice.error.minimum = The maximum amount paid for the shares must be £0.01 or more
 
-sharePurchaseReason.required = Enter reason for share purchase
+sharePurchaseReason.required = Enter ‘cancellation’ if the shares are being purchased for cancellation, or ‘treasury’ if the shares are being purchased to place into treasury
 sharePurchaseReason.invalid = Enter ‘cancellation’ if the shares are being purchased for cancellation, or ‘treasury’ if the shares are being purchased to place into treasury
 
 purchasedForCancellation.invalid = Enter ‘yes’ if the shares purchased for cancellation shares also qualify as treasury shares
@@ -652,12 +671,12 @@ fileUpload.agent.amountPaidForSecurities.error.negative = The amount paid for th
 fileUpload.agent.amountPaidForSecurities.error.belowMinimum = The amount paid for the shares must be £0.01 or more
 fileUpload.agent.amountPaidForSecurities.error.aboveMaximum = The amount paid for the shares must be £999,999,999 or below
 
-fileUpload.org.amountPaidForSecurities.error.required = Enter the amount paid for the securities
-fileUpload.org.amountPaidForSecurities.error.invalidNumeric = The amount paid for the securities must be a number and can include up to two decimal places, like £30 or £28.60
-fileUpload.org.amountPaidForSecurities.error.nonNumeric = The amount paid for the securities must be a number and can include up to two decimal places, like £30 or £28.60
-fileUpload.org.amountPaidForSecurities.error.negative = The amount paid for the securities must be £0.01 or more
-fileUpload.org.amountPaidForSecurities.error.belowMinimum = The amount paid for the securities must be £0.01 or more
-fileUpload.org.amountPaidForSecurities.error.aboveMaximum = The amount paid for the securities must be £999,999,999 or below
+fileUpload.org.amountPaidForSecurities.error.required = Enter the amount paid for the shares in pounds
+fileUpload.org.amountPaidForSecurities.error.invalidNumeric = The amount paid for the shares must be a number and can include up to two decimal places, like £30 or £28.60
+fileUpload.org.amountPaidForSecurities.error.nonNumeric = The amount paid for the shares must be a number and can include up to two decimal places, like £30 or £28.60
+fileUpload.org.amountPaidForSecurities.error.negative = The amount paid for the shares must be £0.01 or more
+fileUpload.org.amountPaidForSecurities.error.belowMinimum = The amount paid for the shares must be £0.01 or more
+fileUpload.org.amountPaidForSecurities.error.aboveMaximum = The amount paid for the shares must be £999,999,999 or below
 
 fileUpload.individual.amountPaidForSecurities.error.required = Enter the amount you paid for the securities
 fileUpload.individual.amountPaidForSecurities.error.invalidNumeric = The amount paid for the securities must be a number and can include up to two decimal places, like £30 or £28.60
@@ -731,6 +750,19 @@ agent.totalMarketValue.change.hidden = Change the market value of the shares
 agent.totalMarketValue.hint = For example, £600 or £193.54
 agent.totalMarketValue.error.negative = The market value of the shares must be £0.01 or more
 agent.totalMarketValue.checkYourAnswersLabel = What is the total market value of the shares?
+
+agent.sh03.bulk.totalMarketValue.title = What is the total market value of the shares?
+agent.sh03.bulk.totalMarketValue.heading = What is the total market value of the shares?
+agent.sh03.bulk.totalMarketValue.checkYourAnswersLabel = What is the total market value of the shares?
+agent.sh03.bulk.totalMarketValue.error.nonNumeric = The market value of the shares must be a number and can include up to two decimal places, like £30 or £28.60
+agent.sh03.bulk.totalMarketValue.error.required = Enter the market value of the shares in pounds
+agent.sh03.bulk.totalMarketValue.error.invalidNumeric = The market value of the shares must be a number and can include up to two decimal places, like £30 or £28.60
+agent.sh03.bulk.totalMarketValue.error.aboveMaximum = The market value of the shares must be £999,999,999 or below
+agent.sh03.bulk.totalMarketValue.error.belowMinimum = The market value of the shares must be £0.01 or more
+agent.sh03.bulk.totalMarketValue.change.hidden = Change the market value of the shares
+agent.sh03.bulk.totalMarketValue.hint = For example, £600 or £193.54
+agent.sh03.bulk.totalMarketValue.error.negative = The market value of the shares must be £0.01 or more
+agent.sh03.bulk.totalMarketValue.checkYourAnswersLabel = What is the total market value of the shares?
 
 fileUploaded.error.encryptedFile.title = There was a problem uploading your file
 fileUploaded.error.encryptedFile.heading = There was a problem uploading your file
@@ -935,6 +967,8 @@ org.sh03.shareBuyback.oneAtATime = One transfer at a time
 org.sh03.shareBuyback.oneAtATime.hint = Tell us about a purchase of one type of shares, between the business and one seller
 org.sh03.shareBuyback.moreThanOneAtATime = More than one transfer at a time
 org.sh03.shareBuyback.moreThanOneAtATime.hint = Tell us about several share purchases at once using our template. You can download the template, complete a row for each purchase, and upload it on the following pages. You can include purchases from different sellers and of different types of shares
+org.sh03.shareBuyback.error.required = Select a way to tell us about this share buyback
+
 
 org.sh03.whatReliefAreYouApplyingFor.title = Enter the relief the business is applying for
 org.sh03.whatReliefAreYouApplyingFor.heading = Enter the relief the business is applying for
@@ -1098,3 +1132,25 @@ agent.sh03.templateInstructions.step2 = Complete the template, using one row for
 agent.sh03.templateInstructions.step3 = Upload the file on the next page as a .csv or an .xlsx
 agent.sh03.templateInstructions.p2 = Remember, do not edit the first three rows, or change the order of the columns.
 agent.sh03.templateInstructions.p3 = Once you have uploaded and submitted the file it will show in your recent submissions, you can then pay the tax due.
+
+
+org.sh03.bulk.companyDetails.title = Company details
+org.sh03.bulk.companyDetails.heading = Company details
+org.sh03.bulk.companyDetails.companyName.label = Company name
+org.sh03.bulk.companyDetails.crn.label = Company registration number (CRN)
+org.sh03.bulk.companyDetails.crn.hint = This is also called a company number. For example, SN898989 or 12345678
+
+org.sh03.bulk.companyDetails.companyName.error.required = Enter the company name
+org.sh03.bulk.companyDetails.companyName.error.length = Company name must be 160 characters or fewer
+org.sh03.bulk.companyDetails.crn.error.required = Enter the company registration number
+org.sh03.bulk.companyDetails.crn.error.invalid = Company registration number can only be numbers or letters
+org.sh03.bulk.companyDetails.crn.error.length = Company registration number must be 8 characters long
+
+org.sh03.templateInstructions.title = How to use the template
+org.sh03.templateInstructions.heading = How to use the template
+org.sh03.templateInstructions.p1 = Use the template to tell us about more than one share purchase at a time.
+org.sh03.templateInstructions.step1 = Download the template
+org.sh03.templateInstructions.step2 = Complete the template, using one row for each class of shares the company is purchasing.
+org.sh03.templateInstructions.step3 = Upload the file on the next page as a .csv or an .xlsx
+org.sh03.templateInstructions.p2 = Remember, do not edit the first three rows, or change the order of the columns.
+org.sh03.templateInstructions.p3 = Once you have uploaded and submitted the file it will show in your recent submissions, you can then pay the tax due.
