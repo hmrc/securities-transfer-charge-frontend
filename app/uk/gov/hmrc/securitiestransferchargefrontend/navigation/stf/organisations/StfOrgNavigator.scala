@@ -60,35 +60,44 @@ class StfOrgNavigator @Inject()(appConfig: FrontendAppConfig,
     case _ => defaultPage
   }
 
+  private def checkYourAnswersRoute: Call = 
+    stfSingleCyaRoutes.CheckYourAnswersController.onPageLoad()
+
+  private def routeForOtherSecurities(userAnswers: UserAnswers): Call = {
+    if (userAnswers.get(TotalMarketValuePage).isDefined) {
+      checkYourAnswersRoute
+    } else {
+      orgSingleRoutes.TotalMarketValueController.onPageLoad(CheckMode)
+    }
+  }
+
+  private def routeForShares(userAnswers: UserAnswers): Call = {
+    val hasMarketValue = userAnswers.get(DetailsOfThisTransferPage)
+      .exists(_.marketValue.isDefined)
+    
+    if (hasMarketValue) {
+      checkYourAnswersRoute
+    } else {
+      orgSingleRoutes.DetailsOfThisTransferController.onPageLoad(CheckMode)
+    }
+  }
+
   val checkRouteMap: Page => UserAnswers => Call = page => userAnswers => {
     page match {
       case ConnectedPersonsPage =>
-        userAnswers.get(ConnectedPersonsPage) match {
-          case Some(true) =>
-            userAnswers.get(PurchasingSharesPage) match {
-              case Some(false) => // false = Other securities
-                if (userAnswers.get(TotalMarketValuePage).isEmpty) {
-                  orgSingleRoutes.TotalMarketValueController.onPageLoad(CheckMode)
-                } else {
-                  routes.CheckYourAnswersController.onPageLoad()
-                }
-              case Some(true) => // true = Shares
-                userAnswers.get(DetailsOfThisTransferPage) match {
-                  case Some(details) if details.marketValue.isEmpty =>
-                    orgSingleRoutes.DetailsOfThisTransferController.onPageLoad(CheckMode)
-                  case _ =>
-                    routes.CheckYourAnswersController.onPageLoad()
-                }
-              case _ =>
-                routes.CheckYourAnswersController.onPageLoad()
-            }
-          case Some(false) =>
-            routes.CheckYourAnswersController.onPageLoad()
-          case None =>
-            routes.CheckYourAnswersController.onPageLoad()
+        val isConnectedPerson = userAnswers.get(ConnectedPersonsPage).getOrElse(false)
+        
+        if (!isConnectedPerson) {
+          checkYourAnswersRoute
+        } else {
+          userAnswers.get(PurchasingSharesPage) match {
+            case Some(false) => routeForOtherSecurities(userAnswers) // Other securities
+            case Some(true)  => routeForShares(userAnswers)          // Shares
+            case None        => checkYourAnswersRoute
+          }
         }
 
-      case _ => routes.CheckYourAnswersController.onPageLoad()
+      case _ => checkYourAnswersRoute
     }
   }
 
