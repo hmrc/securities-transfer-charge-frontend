@@ -26,12 +26,10 @@ import uk.gov.hmrc.securitiestransferchargefrontend.viewmodels.implicits.*
 
 object ApplyingForReliefSummary  {
 
-  def row(answers: UserAnswers)(implicit messages: Messages): SummaryListRow = {
-    val value = answers.get(ApplyingForReliefPage) match {
-      case Some(true) => messages("site.yes")
-      case Some(false) => messages("site.no")
-      case None => messages("site.notProvided")
-    }
+  def row(userAnswers: UserAnswers)(implicit messages: Messages): SummaryListRow = {
+
+    val applyingForRelief = userAnswers.get(ApplyingForReliefPage).getOrElse(false)
+    val value = if (applyingForRelief) "site.yes" else "site.no"
 
     SummaryListRowViewModel(
       key     = "applyingForRelief.checkYourAnswersLabel",
