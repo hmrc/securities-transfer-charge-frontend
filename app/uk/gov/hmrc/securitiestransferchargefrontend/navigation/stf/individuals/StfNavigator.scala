@@ -27,6 +27,7 @@ import uk.gov.hmrc.securitiestransferchargefrontend.controllers.routes
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.individuals.single.routes as stfSingleCyaRoutes
 import uk.gov.hmrc.securitiestransferchargefrontend.domain.{SubmissionId, UserId}
 import uk.gov.hmrc.securitiestransferchargefrontend.models.{CheckMode, NormalMode, UserAnswers}
+import uk.gov.hmrc.securitiestransferchargefrontend.models.{Mode, NormalMode, UserAnswers}
 import uk.gov.hmrc.securitiestransferchargefrontend.navigation.{AbstractModeNavigator, PersistentNavigator, UserAnswersValidator}
 import uk.gov.hmrc.securitiestransferchargefrontend.pages.stf.single.*
 import uk.gov.hmrc.securitiestransferchargefrontend.services.AnswerPersistenceService
@@ -48,17 +49,17 @@ class StfNavigator @Inject()(appConfig: FrontendAppConfig,
   val forwardRoutes: ForwardRoutes = new ForwardRoutes(answerPersistenceService, appConfig, defaultPage, errorPages)
   val backwardsRoutes: BackwardsRoutes = new BackwardsRoutes(defaultPage)
 
-  override def forwardRoutes(page: Page)(implicit hc: HeaderCarrier): UserAnswers => Future[Call] =
-    forwardRoutes.forwardRoutes(page)(hc)
+  override def forwardRoutes(page: Page, mode: Mode)(implicit hc: HeaderCarrier): UserAnswers => Future[Call] =
+    forwardRoutes.forwardRoutes(page, mode)(hc)
 
-  override def predecessorRoutes(page: Page): Option[UserAnswers] => Call =
-    backwardsRoutes.predecessorRoutes(page)
+  override def predecessorRoutes(page: Page, mode: Mode): Option[UserAnswers] => Call =
+    backwardsRoutes.predecessorRoutes(page, mode)
   
   def errorPage(forPage: Page): Call = forPage match {
     case _ => routes.JourneyRecoveryController.onPageLoad()
   }
 
-  private def checkYourAnswersRoute: Call = 
+  private def checkYourAnswersRoute: Call =
     stfSingleCyaRoutes.CheckYourAnswersController.onPageLoad()
 
   private def routeForOtherSecurities(userAnswers: UserAnswers): Call = {
@@ -72,7 +73,7 @@ class StfNavigator @Inject()(appConfig: FrontendAppConfig,
   private def routeForShares(userAnswers: UserAnswers): Call = {
     val hasMarketValue = userAnswers.get(DetailsOfThisTransferPage)
       .exists(_.marketValue.isDefined)
-    
+
     if (hasMarketValue) {
       checkYourAnswersRoute
     } else {
@@ -84,7 +85,7 @@ class StfNavigator @Inject()(appConfig: FrontendAppConfig,
     page match {
       case ConnectedPersonsPage =>
         val isConnectedPerson = userAnswers.get(ConnectedPersonsPage).getOrElse(false)
-        
+
         if (!isConnectedPerson) {
           checkYourAnswersRoute
         } else {
@@ -128,7 +129,7 @@ class StfNavigator @Inject()(appConfig: FrontendAppConfig,
       map.put(AmountPaidForSecuritiesPage, individualSingleRoutes.AmountPaidForSecuritiesController.onPageLoad(NormalMode))
       map.put(TotalMarketValuePage, individualSingleRoutes.TotalMarketValueController.onPageLoad(NormalMode))
       map.put(CheckYourAnswersPage, stfSingleCyaRoutes.CheckYourAnswersController.onPageLoad())
-      
+
       map
     }
 

@@ -24,6 +24,7 @@ import uk.gov.hmrc.securitiestransferchargefrontend.controllers.actions.*
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.shared.SaveAndReturnButton.isReturn
 import uk.gov.hmrc.securitiestransferchargefrontend.forms.sh03.shared.ReasonForPurchaseFormProvider
 import uk.gov.hmrc.securitiestransferchargefrontend.models.sh03.shared.ReasonForPurchase
+import uk.gov.hmrc.securitiestransferchargefrontend.models.sh03.shared.ReasonForPurchase.*
 import uk.gov.hmrc.securitiestransferchargefrontend.models.{Mode, UserAnswers}
 import uk.gov.hmrc.securitiestransferchargefrontend.navigation.Navigator
 import uk.gov.hmrc.securitiestransferchargefrontend.pages.sh03.ReasonForPurchasePage
@@ -73,4 +74,5 @@ class ReasonForPurchaseController @Inject()(
           } yield Redirect(nextPage)
       )
   }
+  
 }

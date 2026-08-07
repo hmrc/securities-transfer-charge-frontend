@@ -22,10 +22,9 @@ import org.mockito.Mockito.when
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatestplus.mockito.MockitoSugar.mock
 import uk.gov.hmrc.securitiestransferchargefrontend.config.FrontendAppConfig
-import uk.gov.hmrc.securitiestransferchargefrontend.controllers.routes
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.sh03.agents.routes as sh03AgentRoutes
-import uk.gov.hmrc.securitiestransferchargefrontend.controllers.sh03.shared.routes as sharedRoutes
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.sh03.agents.single.routes as sh03AgentSingleRoutes
+import uk.gov.hmrc.securitiestransferchargefrontend.controllers.sh03.shared.routes as sharedRoutes
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.sh03.shared.single.routes as sh03SingleCyaRoutes
 import uk.gov.hmrc.securitiestransferchargefrontend.models.sh03.HowToNotifyAboutShareBuyback
 import uk.gov.hmrc.securitiestransferchargefrontend.models.sh03.shared.*
@@ -42,7 +41,7 @@ class Sh03AgentNavigatorSpec extends SpecBase with ScalaFutures {
   private val mockConfig: FrontendAppConfig = mock[FrontendAppConfig]
   when(mockConfig.firstChargingPoint).thenReturn(LocalDate.of(2026, 1, 1))
 
-
+  private lazy val cyaPage = sh03SingleCyaRoutes.CheckYourAnswersController.onPageLoad()
   val navigator = new Sh03AgentNavigator(StubAnswerPersistenceService(), mockConfig)
 
   private val companyDetails = CompanyDetails(
@@ -206,7 +205,7 @@ class Sh03AgentNavigatorSpec extends SpecBase with ScalaFutures {
         val answers = emptyUserAnswers.set(RoleAtPurchasingCompanyPage, RoleAtPurchasingCompany(role = "Director", uksOrgan = None)).get
         val result = navigator.nextPage(RoleAtPurchasingCompanyPage, NormalMode, answers)(fakeRequest)
         whenReady(result) { res =>
-          res mustBe sh03SingleCyaRoutes.CheckYourAnswersController.onPageLoad()
+          res mustBe cyaPage
         }
       }
 
@@ -227,7 +226,7 @@ class Sh03AgentNavigatorSpec extends SpecBase with ScalaFutures {
       case object UnknownPage extends Page
       val result = navigator.nextPage(UnknownPage, CheckMode, UserAnswers(testUserId, testGroupIdentifier, submissionId))(fakeRequest)
       whenReady(result) { res =>
-        res mustBe routes.CheckYourAnswersController.onPageLoad()
+        res mustBe cyaPage
       }
     }
   }

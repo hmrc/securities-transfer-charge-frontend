@@ -24,7 +24,7 @@ import uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.agents.singl
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.agents.bulk.routes as agentBulkRoutes
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.individuals.single.routes as stfSingleCyaRoutes
 import uk.gov.hmrc.securitiestransferchargefrontend.models.stf.HowToNotifyAboutSecuritiesTransfer.{MoreThanOneAtATime, OneAtATime}
-import uk.gov.hmrc.securitiestransferchargefrontend.models.{NormalMode, UserAnswers}
+import uk.gov.hmrc.securitiestransferchargefrontend.models.{CheckMode, Mode, NormalMode, UserAnswers}
 import uk.gov.hmrc.securitiestransferchargefrontend.navigation.PersistentNavigationHelper
 import uk.gov.hmrc.securitiestransferchargefrontend.pages.Page
 import uk.gov.hmrc.securitiestransferchargefrontend.pages.stf.shared.{AgentReferencePage, HowToNotifyAboutSecuritiesTransferPage, SubmissionsDashboardPage}
@@ -45,8 +45,14 @@ class ForwardRoutes(answerPersistenceService: AnswerPersistenceService,
   import helper.*
 
   private val firstDate = appConfig.firstChargingPoint
-
-  def forwardRoutes(page: Page)(implicit hc: HeaderCarrier): UserAnswers => Future[Call] = page match {
+  private lazy val cyaPage = stfSingleCyaRoutes.CheckYourAnswersController.onPageLoad()
+  
+  def forwardRoutes(page: Page, mode: Mode)(implicit hc: HeaderCarrier): UserAnswers => Future[Call] = mode match {
+    case NormalMode => normalRoutes(page)
+    case CheckMode => checkRoutes(page)
+  }
+  
+  private def normalRoutes(page: Page)(implicit hc: HeaderCarrier): UserAnswers => Future[Call] = page match {
 
     case SubmissionsDashboardPage => userAnswers => goTo(agentRoutes.HowToNotifyAboutSecuritiesTransferController.onPageLoad(), Some(userAnswers))
     case HowToNotifyAboutSecuritiesTransferPage => userAnswers => {
@@ -83,9 +89,9 @@ class ForwardRoutes(answerPersistenceService: AnswerPersistenceService,
         if (isConnected)
           agentSingleRoutes.TotalMarketValueController.onPageLoad(NormalMode)
         else
-          stfSingleCyaRoutes.CheckYourAnswersController.onPageLoad()
+          cyaPage
       }
-    case TotalMarketValuePage => userAnswers => dataRequired(TotalMarketValuePage, userAnswers, stfSingleCyaRoutes.CheckYourAnswersController.onPageLoad())
+    case TotalMarketValuePage => userAnswers => dataRequired(TotalMarketValuePage, userAnswers, cyaPage)
     case PurchasingSharesPage => userAnswers =>
       dataDependent(PurchasingSharesPage,userAnswers) { isPurchasingShares =>
         if(isPurchasingShares)
@@ -93,7 +99,11 @@ class ForwardRoutes(answerPersistenceService: AnswerPersistenceService,
         else
           agentSingleRoutes.OtherSecuritiesTypeController.onPageLoad(NormalMode)
       }
-    case DetailsOfThisTransferPage => userAnswers => dataRequired(DetailsOfThisTransferPage, userAnswers, stfSingleCyaRoutes.CheckYourAnswersController.onPageLoad())  
+    case DetailsOfThisTransferPage => userAnswers => dataRequired(DetailsOfThisTransferPage, userAnswers, cyaPage)
 
     case _ => _ => Future.successful(defaultPage)
+  }
+  
+  def checkRoutes(page: Page)(implicit hc: HeaderCarrier): UserAnswers => Future[Call] = page match {
+    case _ => userAnswers => goTo(cyaPage, Some(userAnswers))
   }

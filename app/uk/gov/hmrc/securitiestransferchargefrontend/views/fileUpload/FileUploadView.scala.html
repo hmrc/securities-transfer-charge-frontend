@@ -59,10 +59,12 @@
                 name = "file",
                 id = "file-input",
                 label = Label(
+                    forAttr = Some("file-input"),
                     content = messages("fileUpload.label")
                 ),
                 attributes = Map(
-                    "accept" -> ".xlsx,.csv"
+                    "accept" -> ".xlsx,.csv",
+                    "aria-label" -> messages("fileUpload.label")
                 ),
                 errorMessage = error.map(err => ErrorMessage(content = Text(err))),
                 javascript = Some(true)

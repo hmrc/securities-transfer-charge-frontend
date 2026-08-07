@@ -68,8 +68,9 @@ class ConnectedPersonsController @Inject()(
         areConnected =>
           for {
             updatedAnswers <- Future.fromTry(request.userAnswers.set(ConnectedPersonsPage, areConnected))
-            nextPage <- navigator.nextPage(ConnectedPersonsPage, mode, updatedAnswers, isReturn(request))
+            nextPage       <- navigator.nextPage(ConnectedPersonsPage, mode, updatedAnswers, isReturn(request))
           } yield Redirect(nextPage)
       )
   }
+  
 }

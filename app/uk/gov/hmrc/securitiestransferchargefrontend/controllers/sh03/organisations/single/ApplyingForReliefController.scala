@@ -40,7 +40,7 @@ class ApplyingForReliefController @Inject()(
                                          val controllerComponents: MessagesControllerComponents,
                                          view: ApplyingForReliefView
                                  )(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport {
-  
+
   lazy val backLinkCall: Mode => UserAnswers => Call =
     mode => userAnswers => navigator.previousPage(ApplyingForReliefPage, mode, userAnswers)
 
@@ -79,4 +79,5 @@ class ApplyingForReliefController @Inject()(
           } yield Redirect(nextPage)
       )
   }
+
 }
