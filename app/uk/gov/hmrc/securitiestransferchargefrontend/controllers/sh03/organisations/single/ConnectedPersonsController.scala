@@ -21,13 +21,11 @@ import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, Call, MessagesControllerComponents}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.actions.*
-import uk.gov.hmrc.securitiestransferchargefrontend.controllers.actions.requests.StcDataRequest
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.shared.SaveAndReturnButton.isReturn
 import uk.gov.hmrc.securitiestransferchargefrontend.forms.sh03.organisations.single.ConnectedPersonsFormProvider
 import uk.gov.hmrc.securitiestransferchargefrontend.models.{Mode, UserAnswers}
 import uk.gov.hmrc.securitiestransferchargefrontend.navigation.Navigator
 import uk.gov.hmrc.securitiestransferchargefrontend.pages.sh03.ConnectedPersonsPage
-import uk.gov.hmrc.securitiestransferchargefrontend.pages.stf.single.{DetailsOfThisTransferPage, TotalMarketValuePage}
 import uk.gov.hmrc.securitiestransferchargefrontend.views.html.sh03.organisations.single.ConnectedPersonsView
 
 import javax.inject.{Inject, Named}
@@ -68,7 +66,6 @@ class ConnectedPersonsController @Inject()(
           Future.successful(BadRequest(view(formWithErrors, mode, backLinkCall(mode)(request.userAnswers)))),
 
         areConnected =>
-          checkAndHandleUpdate(areConnected)
           for {
             updatedAnswers <- Future.fromTry(request.userAnswers.set(ConnectedPersonsPage, areConnected))
             nextPage <- navigator.nextPage(ConnectedPersonsPage, mode, updatedAnswers, isReturn(request))
@@ -76,14 +73,5 @@ class ConnectedPersonsController @Inject()(
       )
   }
 
-  private def checkAndHandleUpdate(areConnected: Boolean)(implicit request: StcDataRequest[AnyContent]): Unit =
-    request.userAnswers.get(ConnectedPersonsPage).foreach { wereConnected =>
-      if (wereConnected && !areConnected) {
-        request.userAnswers.remove(TotalMarketValuePage)
-        request.userAnswers.get(DetailsOfThisTransferPage).foreach { details =>
-          val updated = details.copy(marketValue = None)
-          request.userAnswers.set(DetailsOfThisTransferPage, updated)
-        }
-      }
-    }
+  
 }

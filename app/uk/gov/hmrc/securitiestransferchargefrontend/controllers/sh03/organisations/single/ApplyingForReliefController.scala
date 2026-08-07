@@ -20,12 +20,11 @@ import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, Call, MessagesControllerComponents}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.actions.*
-import uk.gov.hmrc.securitiestransferchargefrontend.controllers.actions.requests.StcDataRequest
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.shared.SaveAndReturnButton.isReturn
 import uk.gov.hmrc.securitiestransferchargefrontend.forms.sh03.shared.ApplyingForReliefFormProvider
 import uk.gov.hmrc.securitiestransferchargefrontend.models.{Mode, UserAnswers}
 import uk.gov.hmrc.securitiestransferchargefrontend.navigation.Navigator
-import uk.gov.hmrc.securitiestransferchargefrontend.pages.sh03.{ApplyingForReliefPage, WhatReliefAreYouApplyingForPage}
+import uk.gov.hmrc.securitiestransferchargefrontend.pages.sh03.ApplyingForReliefPage
 import uk.gov.hmrc.securitiestransferchargefrontend.views.html.sh03.organisations.single.ApplyingForReliefView
 
 import javax.inject.{Inject, Named}
@@ -41,7 +40,7 @@ class ApplyingForReliefController @Inject()(
                                          val controllerComponents: MessagesControllerComponents,
                                          view: ApplyingForReliefView
                                  )(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport {
-  
+
   lazy val backLinkCall: Mode => UserAnswers => Call =
     mode => userAnswers => navigator.previousPage(ApplyingForReliefPage, mode, userAnswers)
 
@@ -74,7 +73,6 @@ class ApplyingForReliefController @Inject()(
           Future.successful(BadRequest(view(formWithErrors, mode, backLinkCall(mode)(request.userAnswers)))),
 
         applyingForRelief =>
-          checkAndHandleUpdate(applyingForRelief)
           for {
             updatedAnswers <- Future.fromTry(request.userAnswers.set(ApplyingForReliefPage, applyingForRelief))
             nextPage <- navigator.nextPage(ApplyingForReliefPage, mode, updatedAnswers, isReturn(request))
@@ -82,10 +80,4 @@ class ApplyingForReliefController @Inject()(
       )
   }
 
-  private def checkAndHandleUpdate(applyingForRelief: Boolean)(implicit request: StcDataRequest[?]): Unit =
-    request.userAnswers.get(ApplyingForReliefPage).foreach { wasApplyingForRelief =>
-      if (wasApplyingForRelief && !applyingForRelief) {
-        request.userAnswers.remove(WhatReliefAreYouApplyingForPage)
-      }
-    }
 }

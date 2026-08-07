@@ -25,7 +25,7 @@ import uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.shared.SaveA
 import uk.gov.hmrc.securitiestransferchargefrontend.forms.stf.shared.PurchasingSharesFormProvider
 import uk.gov.hmrc.securitiestransferchargefrontend.models.{Mode, UserAnswers}
 import uk.gov.hmrc.securitiestransferchargefrontend.navigation.Navigator
-import uk.gov.hmrc.securitiestransferchargefrontend.pages.stf.single.{AmountPaidForSecuritiesPage, DetailsOfThisTransferPage, OtherSecuritiesTypePage, PurchasingSharesPage, TotalMarketValuePage}
+import uk.gov.hmrc.securitiestransferchargefrontend.pages.stf.single.PurchasingSharesPage
 import uk.gov.hmrc.securitiestransferchargefrontend.views.html.stf.agents.single.PurchasingSharesView
 
 import javax.inject.{Inject, Named}
@@ -73,15 +73,4 @@ class PurchasingSharesController @Inject()(
           } yield Redirect(nextPage)
       )
   }
-  
-  def checkAndHandleUpdate(isPurchasingShares: Boolean)(implicit request: StcDataRequest[_]): Unit =
-    request.userAnswers.get(PurchasingSharesPage).foreach { wasPurchasingShares =>
-      if (isPurchasingShares && !wasPurchasingShares) {
-        request.userAnswers.remove(OtherSecuritiesTypePage)
-        request.userAnswers.remove(AmountPaidForSecuritiesPage)
-        request.userAnswers.remove(TotalMarketValuePage)
-      } else if (wasPurchasingShares && !isPurchasingShares) {
-        request.userAnswers.remove(DetailsOfThisTransferPage)
-      }
-    }
 }
