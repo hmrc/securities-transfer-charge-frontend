@@ -17,8 +17,6 @@
 package uk.gov.hmrc.securitiestransferchargefrontend.viewmodels.stf.individuals
 
 import play.api.i18n.Messages
-import play.twirl.api.HtmlFormat
-import uk.gov.hmrc.govukfrontend.views.viewmodels.content.HtmlContent
 import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.SummaryListRow
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.individuals.single.routes
 import uk.gov.hmrc.securitiestransferchargefrontend.models.{CheckMode, UserAnswers}
@@ -28,23 +26,18 @@ import uk.gov.hmrc.securitiestransferchargefrontend.viewmodels.implicits.*
 
 object TaxRateSummary  {
 
-  def row(answers: UserAnswers)(implicit messages: Messages): Option[SummaryListRow] =
-    answers.get(TaxRatePage).map {
-      answer =>
+  def row(answers: UserAnswers)(implicit messages: Messages): SummaryListRow = {
+    val value = answers.get(TaxRatePage)
+      .map(answer => messages(s"taxRate.$answer"))
+      .getOrElse(messages("site.notProvided"))
 
-        val value = ValueViewModel(
-          HtmlContent(
-            HtmlFormat.escape(messages(s"taxRate.$answer"))
-          )
-        )
-
-        SummaryListRowViewModel(
-          key     = "taxRate.checkYourAnswersLabel",
-          value   = value,
-          actions = Seq(
-            ActionItemViewModel("site.change", routes.TaxRateController.onPageLoad(CheckMode).url)
-              .withVisuallyHiddenText(messages("taxRate.change.hidden"))
-          )
-        )
-    }
+    SummaryListRowViewModel(
+      key     = "taxRate.checkYourAnswersLabel",
+      value   = ValueViewModel(value),
+      actions = Seq(
+        ActionItemViewModel("site.change", routes.TaxRateController.onPageLoad(CheckMode).url)
+          .withVisuallyHiddenText(messages("taxRate.change.hidden"))
+      )
+    )
+  }
 }

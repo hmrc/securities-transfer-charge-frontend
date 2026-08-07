@@ -27,17 +27,18 @@ import uk.gov.hmrc.securitiestransferchargefrontend.viewmodels.implicits.*
 
 object WhatReliefAreYouApplyingForSummary  {
 
-  def row(answers: UserAnswers)(implicit messages: Messages): Option[SummaryListRow] =
-    answers.get(WhatReliefAreYouApplyingForPage).map {
-      answer =>
+  def row(answers: UserAnswers)(implicit messages: Messages): Option[SummaryListRow] = {
+    val value = answers.get(WhatReliefAreYouApplyingForPage)
+      .map(HtmlFormat.escape(_).toString)
+      .getOrElse(messages("site.notProvided"))
 
-        SummaryListRowViewModel(
-          key     = "whatReliefAreYouApplyingFor.checkYourAnswersLabel",
-          value   = ValueViewModel(HtmlFormat.escape(answer).toString),
-          actions = Seq(
-            ActionItemViewModel("site.change", routes.WhatReliefAreYouApplyingForController.onPageLoad(CheckMode).url)
-              .withVisuallyHiddenText(messages("whatReliefAreYouApplyingFor.change.hidden"))
-          )
-        )
-    }
+    Some(SummaryListRowViewModel(
+      key     = "whatReliefAreYouApplyingFor.checkYourAnswersLabel",
+      value   = ValueViewModel(value),
+      actions = Seq(
+        ActionItemViewModel("site.change", routes.WhatReliefAreYouApplyingForController.onPageLoad(CheckMode).url)
+          .withVisuallyHiddenText(messages("whatReliefAreYouApplyingFor.change.hidden"))
+      )
+    ))
+  }
 }

@@ -20,11 +20,11 @@ import play.api.mvc.Call
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.individuals.routes as individualRoutes
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.individuals.single.routes as individualSingleRoutes
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.shared.routes as sharedRoutes
-import uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.shared.single.routes as stfSingleCyaRoutes
+import uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.individuals.single.routes as stfSingleCyaRoutes
 import uk.gov.hmrc.securitiestransferchargefrontend.models.{CheckMode, Mode, NormalMode, UserAnswers}
 import uk.gov.hmrc.securitiestransferchargefrontend.navigation.NavigationHelper
 import uk.gov.hmrc.securitiestransferchargefrontend.pages.*
-import uk.gov.hmrc.securitiestransferchargefrontend.pages.stf.shared.HowToNotifyAboutSecuritiesTransferPage
+import uk.gov.hmrc.securitiestransferchargefrontend.pages.stf.shared.{CheckYourAnswersPage, HowToNotifyAboutSecuritiesTransferPage}
 import uk.gov.hmrc.securitiestransferchargefrontend.pages.stf.single.*
 
 class BackwardsRoutes(defaultPage: Call):
@@ -60,6 +60,20 @@ class BackwardsRoutes(defaultPage: Call):
     case OtherSecuritiesTypePage => _ => individualSingleRoutes.PurchasingSharesController.onPageLoad(NormalMode)
     case AmountPaidForSecuritiesPage => _ => individualSingleRoutes.OtherSecuritiesTypeController.onPageLoad(NormalMode)
     case TotalMarketValuePage => _ => individualSingleRoutes.AmountPaidForSecuritiesController.onPageLoad(NormalMode)
+    case CheckYourAnswersPage => _.fold(defaultPage) { userAnswers =>
+      dataDependent(PurchasingSharesPage, userAnswers) { isPurchasingShares =>
+        if (isPurchasingShares) {
+          individualSingleRoutes.DetailsOfThisTransferController.onPageLoad(NormalMode)
+        } else {
+          dataDependent(ConnectedPersonsPage, userAnswers) { isConnectedPersons =>
+            if (isConnectedPersons)
+              individualSingleRoutes.TotalMarketValueController.onPageLoad(NormalMode)
+            else
+              individualSingleRoutes.AmountPaidForSecuritiesController.onPageLoad(NormalMode)
+          }
+        }
+      }
+    }
     case _ => _ => defaultPage
   }
   

@@ -32,5 +32,5 @@ case object ApplyingForReliefPage extends QuestionPage[Boolean]:
     if applyingForRelief.contains(false) then
       userAnswers.remove(WhatReliefAreYouApplyingForPage)
     else Success(userAnswers)
-  
+
 

@@ -32,7 +32,7 @@ case object ConnectedPersonsPage extends QuestionPage[Boolean]:
     if connected.contains(false) then
       clearMarketValue(userAnswers)
     else super.cleanup(connected, userAnswers)
-    
+
   private def clearMarketValue(userAnswers: UserAnswers): Try[UserAnswers] =
     userAnswers.get(DetailsOfThisSharePurchasePage).fold(Try(userAnswers)) { details =>
       userAnswers.set(DetailsOfThisSharePurchasePage, details.copy(marketValue = None))

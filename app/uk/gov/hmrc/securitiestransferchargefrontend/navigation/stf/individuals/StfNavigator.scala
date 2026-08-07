@@ -23,11 +23,13 @@ import uk.gov.hmrc.play.http.HeaderCarrierConverter
 import uk.gov.hmrc.securitiestransferchargefrontend.config.FrontendAppConfig
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.routes
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.individuals.single.routes as individualSingleRoutes
+import uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.individuals.single.routes as stfSingleCyaRoutes
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.shared.routes as sharedRoutes
 import uk.gov.hmrc.securitiestransferchargefrontend.domain.{SubmissionId, UserId}
-import uk.gov.hmrc.securitiestransferchargefrontend.models.{Mode, NormalMode, UserAnswers}
+import uk.gov.hmrc.securitiestransferchargefrontend.models.{CheckMode, Mode, NormalMode, UserAnswers}
 import uk.gov.hmrc.securitiestransferchargefrontend.navigation.{AbstractModeNavigator, PersistentNavigator, UserAnswersValidator}
-import uk.gov.hmrc.securitiestransferchargefrontend.pages.*
+import uk.gov.hmrc.securitiestransferchargefrontend.pages.Page
+import uk.gov.hmrc.securitiestransferchargefrontend.pages.stf.shared.*
 import uk.gov.hmrc.securitiestransferchargefrontend.pages.stf.single.*
 import uk.gov.hmrc.securitiestransferchargefrontend.services.AnswerPersistenceService
 
@@ -56,7 +58,46 @@ class StfNavigator @Inject()(appConfig: FrontendAppConfig,
     case _ => routes.JourneyRecoveryController.onPageLoad()
   }
 
-  val checkRouteMap: Page => UserAnswers => Call = _ => _ => routes.CheckYourAnswersController.onPageLoad()
+  private def checkYourAnswersRoute: Call =
+    stfSingleCyaRoutes.CheckYourAnswersController.onPageLoad()
+
+  private def routeForOtherSecurities(userAnswers: UserAnswers): Call = {
+    if (userAnswers.get(TotalMarketValuePage).isDefined) {
+      checkYourAnswersRoute
+    } else {
+      individualSingleRoutes.TotalMarketValueController.onPageLoad(CheckMode)
+    }
+  }
+
+  private def routeForShares(userAnswers: UserAnswers): Call = {
+    val hasMarketValue = userAnswers.get(DetailsOfThisTransferPage)
+      .exists(_.marketValue.isDefined)
+
+    if (hasMarketValue) {
+      checkYourAnswersRoute
+    } else {
+      individualSingleRoutes.DetailsOfThisTransferController.onPageLoad(CheckMode)
+    }
+  }
+
+  val checkRouteMap: Page => UserAnswers => Call = page => userAnswers => {
+    page match {
+      case ConnectedPersonsPage =>
+        val isConnectedPerson = userAnswers.get(ConnectedPersonsPage).getOrElse(false)
+
+        if (!isConnectedPerson) {
+          checkYourAnswersRoute
+        } else {
+          userAnswers.get(PurchasingSharesPage) match {
+            case Some(false) => routeForOtherSecurities(userAnswers) // Other securities
+            case Some(true)  => routeForShares(userAnswers)          // Shares
+            case None        => checkYourAnswersRoute
+          }
+        }
+
+      case _ => checkYourAnswersRoute
+    }
+  }
 
   def restore(submissionId: SubmissionId, userId: UserId)(implicit request: Request[?]): Future[UserAnswers] = {
     implicit val hc: HeaderCarrier = HeaderCarrierConverter.fromRequestAndSession(request, request.session)
@@ -67,7 +108,7 @@ class StfNavigator @Inject()(appConfig: FrontendAppConfig,
 
     override protected val startPage: GettablePage[?] = ConfirmAddressPage
 
-    override protected val pageCallMap: BiMap[GettablePage[?], Call] = {
+    override protected lazy val pageCallMap: BiMap[GettablePage[?], Call] = {
       val map = HashBiMap.create[GettablePage[?], Call]()
       
       // STF Individual single journey pages only
@@ -86,7 +127,8 @@ class StfNavigator @Inject()(appConfig: FrontendAppConfig,
       map.put(OtherSecuritiesTypePage, individualSingleRoutes.OtherSecuritiesTypeController.onPageLoad(NormalMode))
       map.put(AmountPaidForSecuritiesPage, individualSingleRoutes.AmountPaidForSecuritiesController.onPageLoad(NormalMode))
       map.put(TotalMarketValuePage, individualSingleRoutes.TotalMarketValueController.onPageLoad(NormalMode))
-      
+      map.put(CheckYourAnswersPage, stfSingleCyaRoutes.CheckYourAnswersController.onPageLoad())
+
       map
     }
 

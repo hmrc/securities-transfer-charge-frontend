@@ -1,4 +1,4 @@
-@*
+/*
  * Copyright 2026 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -12,22 +12,16 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- *@
+ */
 
-@import uk.gov.hmrc.securitiestransferchargefrontend.views.html.templates
+package uk.gov.hmrc.securitiestransferchargefrontend.pages.stf.shared
 
-@this(
-    layout: templates.Layout
-)
+import play.api.libs.json.JsPath
+import uk.gov.hmrc.securitiestransferchargefrontend.pages.CyaPage
+import uk.gov.hmrc.securitiestransferchargefrontend.queries.Gettable
 
-@()(implicit request: Request[_], messages: Messages)
-
-@layout(
-    pageTitle = titleNoForm(messages("unauthorised.title")),
-    timeout   = false
-) {
-
-    <h1 class="govuk-heading-xl">@messages("unauthorised.heading")</h1>
-
-    <p class="govuk-body">@messages("unauthorised.guidance")</p>
+case object CheckYourAnswersPage extends CyaPage with Gettable[Nothing] {
+  override def path: JsPath = JsPath \ toString
+  
+  override def toString: String = "checkYourAnswers"
 }

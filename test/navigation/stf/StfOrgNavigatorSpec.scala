@@ -27,7 +27,7 @@ import uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.organisation
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.organisations.routes as orgRoutes
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.organisations.single.routes as orgSingleRoutes
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.shared.routes as sharedRoutes
-import uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.shared.single.routes as stfSingleCyaRoutes
+import uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.individuals.single.routes as stfSingleCyaRoutes
 import uk.gov.hmrc.securitiestransferchargefrontend.models.*
 import uk.gov.hmrc.securitiestransferchargefrontend.models.stf.*
 import uk.gov.hmrc.securitiestransferchargefrontend.navigation.stf.organisations.StfOrgNavigator
@@ -39,7 +39,6 @@ import java.time.LocalDate
 
 class StfOrgNavigatorSpec extends SpecBase with ScalaFutures {
 
-  private lazy val cyaPage = stfSingleCyaRoutes.CheckYourAnswersController.onPageLoad()
   private val mockConfig: FrontendAppConfig = mock[FrontendAppConfig]
   when(mockConfig.firstChargingPoint).thenReturn(LocalDate.of(2026, 1, 1))
 
@@ -224,7 +223,7 @@ class StfOrgNavigatorSpec extends SpecBase with ScalaFutures {
         val updated = answers.set(ConnectedPersonsPage, false).get
         val result = navigator.nextPage(AmountPaidForSecuritiesPage, NormalMode, updated)(fakeRequest)
         whenReady(result) { res =>
-          res mustBe cyaPage
+          res mustBe stfSingleCyaRoutes.CheckYourAnswersController.onPageLoad()
         }
       }
 
@@ -233,7 +232,7 @@ class StfOrgNavigatorSpec extends SpecBase with ScalaFutures {
           typeOfShares = "ordinary share", amountPaid = BigDecimal(500), marketValue = Some(BigDecimal(1500)))).get
         val result = navigator.nextPage(DetailsOfThisTransferPage, NormalMode, answers)(fakeRequest)
         whenReady(result) { res =>
-          res mustBe cyaPage
+          res mustBe stfSingleCyaRoutes.CheckYourAnswersController.onPageLoad()
         }
       }
 
@@ -241,7 +240,7 @@ class StfOrgNavigatorSpec extends SpecBase with ScalaFutures {
         val answers = emptyUserAnswers.set(TotalMarketValuePage, BigDecimal(500)).get
         val result = navigator.nextPage(TotalMarketValuePage, NormalMode, answers)(fakeRequest)
         whenReady(result) { res =>
-          res mustBe cyaPage
+          res mustBe stfSingleCyaRoutes.CheckYourAnswersController.onPageLoad()
         }
       }
     }
@@ -253,7 +252,7 @@ class StfOrgNavigatorSpec extends SpecBase with ScalaFutures {
         case object UnknownPage extends Page
         val result = navigator.nextPage(UnknownPage, CheckMode, UserAnswers(testUserId, testGroupIdentifier, submissionId))(fakeRequest)
         whenReady(result) { res =>
-          res mustBe cyaPage
+          res mustBe stfSingleCyaRoutes.CheckYourAnswersController.onPageLoad()
         }
       }
     }

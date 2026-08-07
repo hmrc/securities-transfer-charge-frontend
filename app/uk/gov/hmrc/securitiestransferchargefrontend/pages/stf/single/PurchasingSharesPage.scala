@@ -35,7 +35,7 @@ case object PurchasingSharesPage extends QuestionPage[Boolean]:
       userAnswers.remove(DetailsOfThisTransferPage)
     else super.cleanup(isPurchasingShares, userAnswers)
     end if
-  
+
   private def clearOther(userAnswers: UserAnswers): Try[UserAnswers] =
     userAnswers.remove(OtherSecuritiesTypePage)
       .flatMap(_.remove(AmountPaidForSecuritiesPage))

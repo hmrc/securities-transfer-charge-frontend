@@ -29,7 +29,7 @@ case object CompanyDetailsPage extends QuestionPage[CompanyDetails]:
   override def toString: String = "CompanyDetailsPage"
 
   override def cleanup(details: Option[CompanyDetails], userAnswers: UserAnswers): Try[UserAnswers] =
-    if details.exists(!_.isPlc) then 
+    if details.exists(!_.isPlc) then
       clearMinAndMaxSharePrice(userAnswers)
     else super.cleanup(details, userAnswers)
 

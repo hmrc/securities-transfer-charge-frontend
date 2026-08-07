@@ -57,7 +57,7 @@ abstract class UserAnswersValidator(navigator: Navigator)(implicit ec: Execution
   }
 
   protected val startPage: GettablePage[?]
-  protected val pageCallMap: BiMap[GettablePage[?], Call]
+  protected lazy val pageCallMap: BiMap[GettablePage[?], Call]
 
   // Default implementation of pageHasValidDataAtPath, can be overridden in subclasses
   // where additional validation logic is required for specific pages.

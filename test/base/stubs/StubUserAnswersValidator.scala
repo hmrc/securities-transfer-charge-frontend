@@ -27,7 +27,7 @@ class StubUserAnswersValidator(navigator: Navigator)(implicit ec: ExecutionConte
   
   override protected val startPage: GettablePage[?] = JourneyRecoveryPage
   
-  override protected val pageCallMap: BiMap[GettablePage[?], Call] = {
+  override protected lazy val pageCallMap: BiMap[GettablePage[?], Call] = {
     val map = HashBiMap.create[GettablePage[?], Call]()
     map.put(JourneyRecoveryPage, Call("GET", "/journey-recovery"))
     map

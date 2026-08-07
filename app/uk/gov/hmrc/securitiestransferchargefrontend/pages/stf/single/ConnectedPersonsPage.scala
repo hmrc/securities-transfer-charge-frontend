@@ -35,7 +35,7 @@ case object ConnectedPersonsPage extends QuestionPage[Boolean]:
 
   private def clearTotalMarketValueOther(userAnswers: UserAnswers): Try[UserAnswers] =
     userAnswers.remove(TotalMarketValuePage)
-    
+
   private def clearTotalMarketValueShares(userAnswers: UserAnswers): Try[UserAnswers] =
     userAnswers.get(DetailsOfThisTransferPage).fold(Try(userAnswers)) { details =>
       userAnswers.set(DetailsOfThisTransferPage, details.copy(marketValue = None))
