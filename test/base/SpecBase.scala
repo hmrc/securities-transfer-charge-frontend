@@ -42,6 +42,7 @@ import uk.gov.hmrc.securitiestransferchargefrontend.navigation.{Navigator, UserA
 import uk.gov.hmrc.securitiestransferchargefrontend.pages.Page
 import uk.gov.hmrc.securitiestransferchargefrontend.repositories.SessionRepository
 import uk.gov.hmrc.auth.core.AffinityGroup
+import uk.gov.hmrc.securitiestransferchargefrontend.models.stf.*
 
 import java.time.LocalDate
 import scala.concurrent.{ExecutionContext, Future}
@@ -127,4 +128,89 @@ trait SpecBase
         bind[AlfAddressConnector].to[FakeAlfConnector],
         bind[SessionRepository].toInstance(sessionRepository)
       )
+
+  // Helper methods for creating common UserAnswers scenarios for STF
+  def buildStfUserAnswers(
+    buyerAddress: Option[ConfirmableAddress] = None,
+    stfBuyerAddress: Option[AlfConfirmedAddress] = None,
+    sellerName: Option[String] = None,
+    sellerAddress: Option[AlfConfirmedAddress] = None,
+    connectedPersons: Option[Boolean] = None,
+    applyingForRelief: Option[Boolean] = None,
+    reliefName: Option[String] = None,
+    securitiesTarget: Option[SecuritiesTarget] = None,
+    chargingPoint: Option[LocalDate] = None,
+    taxRate: Option[TaxRate] = None,
+    purchasingShares: Option[Boolean] = None,
+    detailsOfTransfer: Option[DetailsOfThisTransfer] = None,
+    otherSecuritiesType: Option[String] = None,
+    amountPaidForSecurities: Option[BigDecimal] = None,
+    totalMarketValue: Option[BigDecimal] = None
+  ): UserAnswers = {
+    import uk.gov.hmrc.securitiestransferchargefrontend.pages.stf.single._
+
+    var answers = emptyUserAnswers
+
+    buyerAddress.foreach { addr =>
+      answers = answers.set(ConfirmAddressPage, addr).success.value
+    }
+
+    stfBuyerAddress.foreach { addr =>
+      answers = answers.set(StfBuyersAddressPage, addr).success.value
+    }
+
+    sellerName.foreach { name =>
+      answers = answers.set(NameOfSellerPage, name).success.value
+    }
+
+    sellerAddress.foreach { addr =>
+      answers = answers.set(StfSellerAddressPage, addr).success.value
+    }
+
+    connectedPersons.foreach { value =>
+      answers = answers.set(ConnectedPersonsPage, value).success.value
+    }
+
+    applyingForRelief.foreach { value =>
+      answers = answers.set(ApplyingForReliefPage, value).success.value
+    }
+
+    reliefName.foreach { name =>
+      answers = answers.set(WhatReliefAreYouApplyingForPage, name).success.value
+    }
+
+    securitiesTarget.foreach { target =>
+      answers = answers.set(SecuritiesTargetPage, target).success.value
+    }
+
+    chargingPoint.foreach { date =>
+      answers = answers.set(ChargingPointPage, date).success.value
+    }
+
+    taxRate.foreach { rate =>
+      answers = answers.set(TaxRatePage, rate).success.value
+    }
+
+    purchasingShares.foreach { value =>
+      answers = answers.set(PurchasingSharesPage, value).success.value
+    }
+
+    detailsOfTransfer.foreach { details =>
+      answers = answers.set(DetailsOfThisTransferPage, details).success.value
+    }
+
+    otherSecuritiesType.foreach { secType =>
+      answers = answers.set(OtherSecuritiesTypePage, secType).success.value
+    }
+
+    amountPaidForSecurities.foreach { amount =>
+      answers = answers.set(AmountPaidForSecuritiesPage, amount).success.value
+    }
+
+    totalMarketValue.foreach { value =>
+      answers = answers.set(TotalMarketValuePage, value).success.value
+    }
+
+    answers
+  }
 }

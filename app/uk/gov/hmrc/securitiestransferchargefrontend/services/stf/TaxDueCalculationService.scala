@@ -28,8 +28,8 @@ import scala.math.BigDecimal.RoundingMode
 class TaxDueCalculationService @Inject()(reliefsDataSource: ReliefsDataSource) {
 
   private def getTaxRateValue(taxRate: TaxRate): BigDecimal = taxRate match {
-    case TaxRate.HalfPercent => BigDecimal("0.5")
-    case TaxRate.OneAndHalfPercent => BigDecimal("1.5")
+    case TaxRate.HalfPercent => BigDecimal("0.005")
+    case TaxRate.OneAndHalfPercent => BigDecimal("0.015")
   }
 
   def calculateTaxDue(userAnswers: UserAnswers): Option[BigDecimal] = {
@@ -68,7 +68,7 @@ class TaxDueCalculationService @Inject()(reliefsDataSource: ReliefsDataSource) {
       if applyingForRelief
       reliefName <- userAnswers.get(WhatReliefAreYouApplyingForPage)
       reliefData <- reliefsDataSource.reliefs.find(_.name == reliefName)
-    } yield BigDecimal(reliefData.rate)
+    } yield BigDecimal(reliefData.rate) / 100
   }
 
   def calculatePaymentDueDate(userAnswers: UserAnswers): Option[LocalDate] = {
