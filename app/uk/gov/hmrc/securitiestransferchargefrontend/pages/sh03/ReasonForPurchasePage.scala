@@ -17,12 +17,22 @@
 package uk.gov.hmrc.securitiestransferchargefrontend.pages.sh03
 
 import play.api.libs.json.JsPath
+import uk.gov.hmrc.securitiestransferchargefrontend.models.UserAnswers
 import uk.gov.hmrc.securitiestransferchargefrontend.models.sh03.shared.ReasonForPurchase
+import uk.gov.hmrc.securitiestransferchargefrontend.models.sh03.shared.ReasonForPurchase.ToPlaceIntoTreasury
 import uk.gov.hmrc.securitiestransferchargefrontend.pages.QuestionPage
 
-case object ReasonForPurchasePage extends QuestionPage[ReasonForPurchase] {
+import scala.util.Try
+
+case object ReasonForPurchasePage extends QuestionPage[ReasonForPurchase]:
 
   override def path: JsPath = JsPath \ toString
 
   override def toString: String = "reasonForPurchase"
-}
+
+  override def cleanup(reasonForPurchase: Option[ReasonForPurchase], userAnswers: UserAnswers): Try[UserAnswers] =
+    if reasonForPurchase.contains(ToPlaceIntoTreasury) then
+      userAnswers.remove(TreasurySharesPage)
+    else
+      super.cleanup(reasonForPurchase, userAnswers)
+

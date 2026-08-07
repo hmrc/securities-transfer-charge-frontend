@@ -21,13 +21,13 @@ import base.stubs.StubAnswerPersistenceService
 import org.mockito.Mockito.when
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatestplus.mockito.MockitoSugar.mock
+import play.api.mvc.Call
 import uk.gov.hmrc.securitiestransferchargefrontend.config.FrontendAppConfig
-import uk.gov.hmrc.securitiestransferchargefrontend.controllers.routes
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.sh03.organisations.routes as sh03OrgRoutes
-import uk.gov.hmrc.securitiestransferchargefrontend.controllers.sh03.shared.routes as sharedRoutes
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.sh03.organisations.single.routes as sh03OrgSingleRoutes
+import uk.gov.hmrc.securitiestransferchargefrontend.controllers.sh03.shared.routes as sharedRoutes
+import uk.gov.hmrc.securitiestransferchargefrontend.controllers.sh03.shared.single.routes as sh03CyaRoutes
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.sh03.organisations.bulk.routes as sh03OrgBulkRoutes
-import uk.gov.hmrc.securitiestransferchargefrontend.controllers.sh03.shared.single.routes as sh03SingleCyaRoute
 import uk.gov.hmrc.securitiestransferchargefrontend.models.sh03.HowToNotifyAboutShareBuyback
 import uk.gov.hmrc.securitiestransferchargefrontend.models.sh03.shared.*
 import uk.gov.hmrc.securitiestransferchargefrontend.models.{CheckMode, NormalMode, UserAnswers}
@@ -45,7 +45,7 @@ class Sh03OrgNavigatorSpec extends SpecBase with ScalaFutures {
   private val mockConfig: FrontendAppConfig = mock[FrontendAppConfig]
   when(mockConfig.firstChargingPoint).thenReturn(LocalDate.of(2026, 1, 1))
 
-
+  lazy val cyaPage: Call = sh03CyaRoutes.CheckYourAnswersController.onPageLoad()
   val navigator = new Sh03OrgNavigator(StubAnswerPersistenceService(), mockConfig)
 
   private val companyDetails = CompanyDetails(
@@ -201,7 +201,7 @@ class Sh03OrgNavigatorSpec extends SpecBase with ScalaFutures {
         val answers = emptyUserAnswers.set(RoleAtPurchasingCompanyPage, RoleAtPurchasingCompany(role = "Director", uksOrgan = None)).get
         val result = navigator.nextPage(RoleAtPurchasingCompanyPage, NormalMode, answers)(fakeRequest)
         whenReady(result) { res =>
-          res mustBe sh03SingleCyaRoute.CheckYourAnswersController.onPageLoad()
+          res mustBe cyaPage
         }
       }
 
@@ -212,7 +212,7 @@ class Sh03OrgNavigatorSpec extends SpecBase with ScalaFutures {
           res mustBe sh03OrgSingleRoutes.CannotSubmitFormErrorController.onPageLoad()
         }
       }
-      
+
       "Backwards routes" - {
 
         "must go from the BulkCompanyDetailsPage to HowToNotifyAboutShareBuybackPage" in {
@@ -240,7 +240,7 @@ class Sh03OrgNavigatorSpec extends SpecBase with ScalaFutures {
       case object UnknownPage extends Page
       val result = navigator.nextPage(UnknownPage, CheckMode, UserAnswers(testUserId, testGroupIdentifier, submissionId))(fakeRequest)
       whenReady(result) { res =>
-        res mustBe routes.CheckYourAnswersController.onPageLoad()
+        res mustBe cyaPage
       }
     }
   }
