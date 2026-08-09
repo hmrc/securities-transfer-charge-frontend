@@ -28,7 +28,7 @@ import uk.gov.hmrc.securitiestransferchargefrontend.models.stf.HowToNotifyAboutS
 import uk.gov.hmrc.securitiestransferchargefrontend.models.{CheckMode, Mode, NormalMode, UserAnswers}
 import uk.gov.hmrc.securitiestransferchargefrontend.navigation.PersistentNavigationHelper
 import uk.gov.hmrc.securitiestransferchargefrontend.pages.*
-import uk.gov.hmrc.securitiestransferchargefrontend.pages.stf.shared.{HowToNotifyAboutSecuritiesTransferPage, SubmissionsDashboardPage}
+import uk.gov.hmrc.securitiestransferchargefrontend.pages.stf.shared.{CheckYourAnswersPage, HowToNotifyAboutSecuritiesTransferPage, SubmissionsDashboardPage}
 import uk.gov.hmrc.securitiestransferchargefrontend.pages.stf.single.*
 import uk.gov.hmrc.securitiestransferchargefrontend.services.AnswerPersistenceService
 
@@ -92,7 +92,8 @@ class ForwardRoutes(answerPersistenceService: AnswerPersistenceService,
         if (isConnected) orgSingleRoutes.TotalMarketValueController.onPageLoad(NormalMode)
         else cyaPage
       }
-    case TotalMarketValuePage => userAnswers => dataRequired(TotalMarketValuePage, userAnswers, cyaPage)
+    case TotalMarketValuePage => userAnswers => dataRequired(TotalMarketValuePage, userAnswers, stfSingleCyaRoutes.CheckYourAnswersController.onPageLoad())
+    case CheckYourAnswersPage => userAnswers => goTo(stfSingleCyaRoutes.ConfirmationController.onPageLoad(), Some(userAnswers))
     case _ => _ => Future.successful(defaultPage)
   }
   
