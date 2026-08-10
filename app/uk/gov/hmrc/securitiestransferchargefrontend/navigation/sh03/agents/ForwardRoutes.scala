@@ -25,7 +25,7 @@ import uk.gov.hmrc.securitiestransferchargefrontend.controllers.sh03.shared.sing
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.sh03.shared.bulk.routes as sh03BulkCyaRoutes
 import uk.gov.hmrc.securitiestransferchargefrontend.models.sh03.HowToNotifyAboutShareBuyback.{MoreThanOneAtATime, OneAtATime}
 import uk.gov.hmrc.securitiestransferchargefrontend.models.sh03.shared.{ReasonForPurchase, RoleAtPurchasingCompany}
-import uk.gov.hmrc.securitiestransferchargefrontend.models.{NormalMode, UserAnswers}
+import uk.gov.hmrc.securitiestransferchargefrontend.models.{CheckMode, Mode, NormalMode, UserAnswers}
 import uk.gov.hmrc.securitiestransferchargefrontend.navigation.PersistentNavigationHelper
 import uk.gov.hmrc.securitiestransferchargefrontend.pages.Page
 import uk.gov.hmrc.securitiestransferchargefrontend.pages.sh03.*
@@ -45,8 +45,14 @@ class ForwardRoutes(answerPersistenceService: AnswerPersistenceService,
   import helper.*
 
   private val firstDate = appConfig.firstChargingPoint
-
-  def forwardRoutes(page: Page)(implicit hc: HeaderCarrier): UserAnswers => Future[Call] = page match {
+  private lazy val cyaPage = sh03SingleCyaRoutes.CheckYourAnswersController.onPageLoad()
+  
+  def forwardRoutes(page: Page, mode: Mode)(implicit hc: HeaderCarrier): UserAnswers => Future[Call] = mode match {
+    case NormalMode => normalRoutes(page)
+    case CheckMode => checkRoutes(page)
+  }
+  
+  private def normalRoutes(page: Page)(implicit hc: HeaderCarrier): UserAnswers => Future[Call] = page match {
 
     case HowToNotifyAboutShareBuybackPage => userAnswers => {
       dataDependent(HowToNotifyAboutShareBuybackPage, userAnswers) {
@@ -105,7 +111,7 @@ class ForwardRoutes(answerPersistenceService: AnswerPersistenceService,
           if (roleAtPurchasingCompany.role == RoleAtPurchasingCompany.unsupportedRole)
             sh03AgentSingleRoutes.CannotSubmitFormErrorController.onPageLoad()
           else
-            sh03SingleCyaRoutes.CheckYourAnswersController.onPageLoad()
+            cyaPage
       }
 
     case BulkAgentReferencePage => userAnswers =>
@@ -123,4 +129,8 @@ class ForwardRoutes(answerPersistenceService: AnswerPersistenceService,
       }
 
     case _ => _ => Future.successful(defaultPage)
+  }
+  
+  def checkRoutes(page: Page)(implicit hc: HeaderCarrier): UserAnswers => Future[Call] = page match {
+    case _ => userAnswers => goTo(cyaPage, Some(userAnswers))
   }

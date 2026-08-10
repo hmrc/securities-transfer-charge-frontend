@@ -71,7 +71,7 @@ class StcConditionalRowValidator @Inject()(
                    journeyType: JourneyType
                  )(implicit cols: ColumnIndexBuilder): Seq[StcRowValidationError] =
     validateReliefType(row, affinityKey) ++
-      validateTypeOfShares(row, affinityKey) ++
+      validateTypeOfSecurities(row, affinityKey) ++
       validateSellerAddress(row) ++
       validateTotalMarketValue(row, affinityKey, journeyType)
 
@@ -118,52 +118,6 @@ class StcConditionalRowValidator @Inject()(
                 row.rowNumber,
                 "whatReliefAreYouApplyingFor",
                 messages(s"$affinityKey.fileUpload.error.whatReliefAreYouApplyingFor.invalid")
-              )
-            )
-
-          case _ =>
-            Seq.empty
-        }
-
-      case _ =>
-        Seq.empty
-    }
-  }
-
-  private def validateTypeOfShares(
-                                    row: ParsedStcRow,
-                                    affinityKey: String
-                                  )(implicit cols: ColumnIndexBuilder): Seq[StcRowValidationError] = {
-
-    row.whatTypeOfSecurities match {
-
-      case Some(value) if StcSecurityType.isShares(value) =>
-
-        row.typeOfShares match {
-
-          case None =>
-            Seq(
-              support.error(
-                row.rowNumber,
-                "typeOfShares",
-                messages(s"$affinityKey.fileUpload.error.typeOfShares.required")
-              )
-            )
-
-          case Some(v) if v.trim.isEmpty =>
-            Seq(
-              support.error(
-                row.rowNumber,
-                "typeOfShares",
-                messages(s"$affinityKey.fileUpload.error.typeOfShares.required")
-              )
-            )
-          case Some(value) if value.length > support.typeOfShareMaxLength =>
-            Seq(
-              support.error(
-                row.rowNumber,
-                "typeOfShares",
-                messages(s"$affinityKey.fileUpload.error.typeOfShares.maxLength")
               )
             )
 

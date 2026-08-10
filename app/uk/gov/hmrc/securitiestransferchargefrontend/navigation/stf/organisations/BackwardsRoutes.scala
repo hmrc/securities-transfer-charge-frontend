@@ -20,7 +20,8 @@ import play.api.mvc.Call
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.organisations.routes as orgRoutes
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.organisations.single.routes as orgSingleRoutes
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.shared.routes as sharedRoutes
-import uk.gov.hmrc.securitiestransferchargefrontend.models.{NormalMode, UserAnswers}
+import uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.individuals.single.routes as stfSingleCyaRoutes
+import uk.gov.hmrc.securitiestransferchargefrontend.models.{CheckMode, Mode, NormalMode, UserAnswers}
 import uk.gov.hmrc.securitiestransferchargefrontend.navigation.NavigationHelper
 import uk.gov.hmrc.securitiestransferchargefrontend.pages.*
 import uk.gov.hmrc.securitiestransferchargefrontend.pages.stf.shared.HowToNotifyAboutSecuritiesTransferPage
@@ -32,7 +33,12 @@ class BackwardsRoutes(defaultPage: Call):
 
   import navHelper.*
 
-  def predecessorRoutes(page: Page): Option[UserAnswers] => Call = page match {
+  def predecessorRoutes(page: Page, mode: Mode): Option[UserAnswers] => Call = mode match {
+    case NormalMode => normalRoutes(page)
+    case CheckMode => checkRoutes(page)
+  }
+  
+  def normalRoutes(page: Page): Option[UserAnswers] => Call = page match {
 
     case HowToNotifyAboutSecuritiesTransferPage => _ => sharedRoutes.SubmissionsDashboardController.onPageLoad()
     case ConfirmAddressPage => _ => orgRoutes.HowToNotifyAboutSecuritiesTransferController.onPageLoad()
@@ -55,4 +61,8 @@ class BackwardsRoutes(defaultPage: Call):
     case AmountPaidForSecuritiesPage => _ => orgSingleRoutes.OtherSecuritiesTypeController.onPageLoad(NormalMode)
     case TotalMarketValuePage => _ => orgSingleRoutes.AmountPaidForSecuritiesController.onPageLoad(NormalMode)
     case _ => _ => defaultPage
+  }
+  
+  private def checkRoutes(page: Page): Option[UserAnswers] => Call = page match {
+    case _ => _ => stfSingleCyaRoutes.CheckYourAnswersController.onPageLoad()
   }

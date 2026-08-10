@@ -24,21 +24,20 @@ import uk.gov.hmrc.securitiestransferchargefrontend.pages.stf.single.PurchasingS
 import uk.gov.hmrc.securitiestransferchargefrontend.viewmodels.govuk.summarylist.*
 import uk.gov.hmrc.securitiestransferchargefrontend.viewmodels.implicits.*
 
-object PurchasingSharesSummary  {
+object PurchasingSharesSummary {
 
-  def row(answers: UserAnswers)(implicit messages: Messages): Option[SummaryListRow] =
-    answers.get(PurchasingSharesPage).map {
-      answer =>
+  def row(userAnswers: UserAnswers)(implicit messages: Messages): SummaryListRow = {
+    
+    val purchasingShares = userAnswers.get(PurchasingSharesPage).getOrElse(false)
+    val value = if (purchasingShares) "site.yes" else "site.no"
 
-        val value = if (answer) "site.yes" else "site.no"
-
-        SummaryListRowViewModel(
-          key     = "individual.purchasingShares.checkYourAnswersLabel",
-          value   = ValueViewModel(value),
-          actions = Seq(
-            ActionItemViewModel("site.change", routes.PurchasingSharesController.onPageLoad(CheckMode).url)
-              .withVisuallyHiddenText(messages("individual.purchasingShares.change.hidden"))
-          )
-        )
-    }
+    SummaryListRowViewModel(
+      key = "individual.purchasingShares.checkYourAnswersLabel",
+      value = ValueViewModel(value),
+      actions = Seq(
+        ActionItemViewModel("site.change", routes.PurchasingSharesController.onPageLoad(CheckMode).url)
+          .withVisuallyHiddenText(messages("individual.purchasingShares.change.hidden"))
+      )
+    )
+  }
 }

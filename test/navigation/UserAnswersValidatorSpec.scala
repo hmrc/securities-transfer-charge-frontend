@@ -126,7 +126,7 @@ class UserAnswersValidatorSpec extends AnyFreeSpec with Matchers with ScalaFutur
 
         val validator = new UserAnswersValidator(navigator) {
           override protected val startPage: GettablePage[?] = TestStartPage
-          override protected val pageCallMap: BiMap[GettablePage[?], Call] = {
+          override protected lazy val pageCallMap: BiMap[GettablePage[?], Call] = {
             val map = HashBiMap.create[GettablePage[?], Call]()
             map.put(TestStartPage, startPageCall)
             map.put(TestPage1, page1Call)
@@ -155,7 +155,7 @@ class UserAnswersValidatorSpec extends AnyFreeSpec with Matchers with ScalaFutur
 
         val validator = new UserAnswersValidator(navigator) {
           override protected val startPage: GettablePage[?] = TestStartPage
-          override protected val pageCallMap: BiMap[GettablePage[?], Call] = {
+          override protected lazy val pageCallMap: BiMap[GettablePage[?], Call] = {
             val map = HashBiMap.create[GettablePage[?], Call]()
             map.put(TestStartPage, startPageCall)
             map.put(TestPage1, page1Call)
@@ -184,7 +184,7 @@ class UserAnswersValidatorSpec extends AnyFreeSpec with Matchers with ScalaFutur
 
         val validator = new UserAnswersValidator(navigator) {
           override protected val startPage: GettablePage[?] = TestStartPage
-          override protected val pageCallMap: BiMap[GettablePage[?], Call] = {
+          override protected lazy val pageCallMap: BiMap[GettablePage[?], Call] = {
             val map = HashBiMap.create[GettablePage[?], Call]()
             map.put(TestStartPage, startPageCall)
             map.put(TestPage1, page1Call)
@@ -212,7 +212,7 @@ class UserAnswersValidatorSpec extends AnyFreeSpec with Matchers with ScalaFutur
 
         val validator = new UserAnswersValidator(navigator) {
           override protected val startPage: GettablePage[?] = TestStartPage
-          override protected val pageCallMap: BiMap[GettablePage[?], Call] = {
+          override protected lazy val pageCallMap: BiMap[GettablePage[?], Call] = {
             val map = HashBiMap.create[GettablePage[?], Call]()
             map.put(TestStartPage, startPageCall)
             map.put(TestPage1, page1Call)
@@ -237,7 +237,7 @@ class UserAnswersValidatorSpec extends AnyFreeSpec with Matchers with ScalaFutur
 
         val validator = new UserAnswersValidator(navigator) {
           override protected val startPage: GettablePage[?] = TestStartPage
-          override protected val pageCallMap: BiMap[GettablePage[?], Call] = {
+          override protected lazy val pageCallMap: BiMap[GettablePage[?], Call] = {
             val map = HashBiMap.create[GettablePage[?], Call]()
             map.put(TestStartPage, startPageCall)
             map.put(TestPage1, page1Call)
@@ -261,7 +261,7 @@ class UserAnswersValidatorSpec extends AnyFreeSpec with Matchers with ScalaFutur
 
         val validator = new UserAnswersValidator(navigator) {
           override protected val startPage: GettablePage[?] = TestStartPage
-          override protected val pageCallMap: BiMap[GettablePage[?], Call] = {
+          override protected lazy val pageCallMap: BiMap[GettablePage[?], Call] = {
             val map = HashBiMap.create[GettablePage[?], Call]()
             map.put(TestStartPage, startPageCall)
             map.put(TestPage1, page1Call)
@@ -289,7 +289,7 @@ class UserAnswersValidatorSpec extends AnyFreeSpec with Matchers with ScalaFutur
 
         val validator = new UserAnswersValidator(navigator) {
           override protected val startPage: GettablePage[?] = TestStartPage
-          override protected val pageCallMap: BiMap[GettablePage[?], Call] = {
+          override protected lazy val pageCallMap: BiMap[GettablePage[?], Call] = {
             val map = HashBiMap.create[GettablePage[?], Call]()
             map.put(TestStartPage, startPageCall)
             // unknownCall is not in the map

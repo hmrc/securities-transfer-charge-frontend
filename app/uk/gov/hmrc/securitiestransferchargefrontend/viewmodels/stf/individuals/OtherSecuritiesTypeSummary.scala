@@ -17,7 +17,6 @@
 package uk.gov.hmrc.securitiestransferchargefrontend.viewmodels.stf.individuals
 
 import play.api.i18n.Messages
-import play.twirl.api.HtmlFormat
 import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.SummaryListRow
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.individuals.single.routes
 import uk.gov.hmrc.securitiestransferchargefrontend.models.{CheckMode, UserAnswers}
@@ -27,17 +26,16 @@ import uk.gov.hmrc.securitiestransferchargefrontend.viewmodels.implicits.*
 
 object OtherSecuritiesTypeSummary  {
 
-  def row(answers: UserAnswers)(implicit messages: Messages): Option[SummaryListRow] =
-    answers.get(OtherSecuritiesTypePage).map {
-      answer =>
+  def row(answers: UserAnswers)(implicit messages: Messages): Option[SummaryListRow] = {
+    val value = answers.get(OtherSecuritiesTypePage).getOrElse(messages("site.notProvided"))
 
-        SummaryListRowViewModel(
-          key     = "otherSecuritiesType.checkYourAnswersLabel",
-          value   = ValueViewModel(HtmlFormat.escape(answer).toString),
-          actions = Seq(
-            ActionItemViewModel("site.change", routes.OtherSecuritiesTypeController.onPageLoad(CheckMode).url)
-              .withVisuallyHiddenText(messages("otherSecuritiesType.change.hidden"))
-          )
-        )
-    }
+    Some(SummaryListRowViewModel(
+      key     = "otherSecuritiesType.checkYourAnswersLabel",
+      value   = ValueViewModel(value),
+      actions = Seq(
+        ActionItemViewModel("site.change", routes.OtherSecuritiesTypeController.onPageLoad(CheckMode).url)
+          .withVisuallyHiddenText(messages("otherSecuritiesType.change.hidden"))
+      )
+    ))
+  }
 }

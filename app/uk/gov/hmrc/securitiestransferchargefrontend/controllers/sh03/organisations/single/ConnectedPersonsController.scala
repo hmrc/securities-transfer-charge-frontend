@@ -72,4 +72,6 @@ class ConnectedPersonsController @Inject()(
           } yield Redirect(nextPage)
       )
   }
+
+  
 }

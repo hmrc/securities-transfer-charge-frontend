@@ -27,7 +27,7 @@ import uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.individuals.
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.individuals.routes as individualRoutes
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.individuals.single.routes as individualSingleRoutes
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.shared.routes as sharedRoutes
-import uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.shared.single.routes as stfSingleCyaRoutes
+import uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.individuals.single.routes as stfSingleCyaRoutes
 import uk.gov.hmrc.securitiestransferchargefrontend.models.*
 import uk.gov.hmrc.securitiestransferchargefrontend.models.stf.*
 import uk.gov.hmrc.securitiestransferchargefrontend.navigation.stf.individuals.StfNavigator
@@ -252,7 +252,7 @@ class StfNavigatorSpec extends SpecBase with ScalaFutures {
         case object UnknownPage extends Page
         val result = navigator.nextPage(UnknownPage, CheckMode, UserAnswers(testUserId, testGroupIdentifier, submissionId))(fakeRequest)
         whenReady(result) { res =>
-          res mustBe routes.CheckYourAnswersController.onPageLoad()
+          res mustBe stfSingleCyaRoutes.CheckYourAnswersController.onPageLoad()
         }
       }
     }

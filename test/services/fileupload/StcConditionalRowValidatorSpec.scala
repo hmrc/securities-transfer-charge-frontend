@@ -117,15 +117,15 @@ class StcConditionalRowValidatorSpec extends SpecBase {
       result.exists(_.fieldName == "whatReliefAreYouApplyingFor") mustBe false
     }
 
-    "require type of shares when what type of securities is shares" in {
+    "require the type of securities when purchasing shares" in {
       val result = validator.validate(
         validParsedRow.copy(
-          whatTypeOfSecurities = Some("shares"),
-          typeOfShares = None
+          whatTypeOfSecurities = None,
+          typeOfShares = Some("shares")
         ), StcTemplate.STF,affinityGroupKeyInd, STF
       )
 
-      result.exists(_.fieldName == "typeOfShares") mustBe true
+      result.exists(_.fieldName == "whatTypeOfSecurities") mustBe true
     }
 
     "not require type of shares when security type is not shares" in {

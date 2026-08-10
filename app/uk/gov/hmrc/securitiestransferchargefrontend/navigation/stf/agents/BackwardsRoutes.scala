@@ -21,8 +21,9 @@ import uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.agents.route
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.agents.single.routes as agentSingleRoutes
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.shared.routes as sharedRoutes
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.fileUpload.routes as bulkSharedRoutes
+import uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.individuals.single.routes as stfSingleCyaRoutes
 import uk.gov.hmrc.securitiestransferchargefrontend.models.stf.HowToNotifyAboutSecuritiesTransfer.{MoreThanOneAtATime, OneAtATime}
-import uk.gov.hmrc.securitiestransferchargefrontend.models.{JourneyType, NormalMode, UserAnswers}
+import uk.gov.hmrc.securitiestransferchargefrontend.models.{CheckMode, JourneyType, Mode, NormalMode, UserAnswers}
 import uk.gov.hmrc.securitiestransferchargefrontend.navigation.NavigationHelper
 import uk.gov.hmrc.securitiestransferchargefrontend.pages.*
 import uk.gov.hmrc.securitiestransferchargefrontend.pages.stf.shared.{AgentReferencePage, HowToNotifyAboutSecuritiesTransferPage}
@@ -34,7 +35,12 @@ class BackwardsRoutes(defaultPage: Call):
 
   import navHelper.*
 
-  def predecessorRoutes(page: Page): Option[UserAnswers] => Call = page match {
+  def predecessorRoutes(page: Page, mode: Mode): Option[UserAnswers] => Call = mode match {
+    case NormalMode => normalRoutes(page)
+    case CheckMode => checkRoutes(page)
+  }
+  
+  def normalRoutes(page: Page): Option[UserAnswers] => Call = page match {
 
     case HowToNotifyAboutSecuritiesTransferPage => _ => sharedRoutes.SubmissionsDashboardController.onPageLoad()
     case AgentReferencePage => _.fold(defaultPage) { userAnswers =>
@@ -64,4 +70,8 @@ class BackwardsRoutes(defaultPage: Call):
     case DetailsOfThisTransferPage => _ => agentSingleRoutes.PurchasingSharesController.onPageLoad(NormalMode)
     case TotalMarketValuePage => _ => agentSingleRoutes.AmountPaidForSecuritiesController.onPageLoad(NormalMode)
     case _ => _ => defaultPage
+  }
+  
+  private def checkRoutes(page: Page): Option[UserAnswers] => Call = page match {
+    case _ => _ => stfSingleCyaRoutes.CheckYourAnswersController.onPageLoad()
   }

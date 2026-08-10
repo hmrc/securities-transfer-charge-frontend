@@ -44,7 +44,7 @@ class CompanyDetailsController @Inject()(
 
   lazy val backLinkCall: Mode => UserAnswers => Call =
     mode => userAnswers => navigator.previousPage(CompanyDetailsPage, mode, userAnswers)
-
+  
   def onPageLoad(mode: Mode): Action[AnyContent] = (stcAuthEnrolled andThen getData andThen requireData).async {
     implicit request =>
       val innerRequest = request.request
@@ -74,4 +74,5 @@ class CompanyDetailsController @Inject()(
           } yield Redirect(nextPage)
       )
   }
+  
 }

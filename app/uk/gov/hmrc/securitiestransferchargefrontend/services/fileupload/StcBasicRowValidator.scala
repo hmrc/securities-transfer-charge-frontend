@@ -196,7 +196,7 @@ class StcBasicRowValidator @Inject()(
           )
         )
 
-      case Some(securities) if securities.length > 100 =>
+      case Some(securities) if securities.length > support.typeOfShareMaxLength =>
         Seq(
           support.error(
             row.rowNumber,

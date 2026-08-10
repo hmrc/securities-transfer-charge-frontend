@@ -23,13 +23,15 @@ import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.play.http.HeaderCarrierConverter
 import uk.gov.hmrc.securitiestransferchargefrontend.config.FrontendAppConfig
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.routes
+import uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.individuals.single.routes as stfSingleCyaRoutes
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.organisations.single.routes as orgSingleRoutes
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.shared.routes as sharedRoutes
 import uk.gov.hmrc.securitiestransferchargefrontend.domain.{SubmissionId, UserId}
-import uk.gov.hmrc.securitiestransferchargefrontend.models.{NormalMode, UserAnswers}
+import uk.gov.hmrc.securitiestransferchargefrontend.models.{CheckMode, Mode, NormalMode, UserAnswers}
 import uk.gov.hmrc.securitiestransferchargefrontend.navigation.stf.organisations.{BackwardsRoutes, ForwardRoutes}
 import uk.gov.hmrc.securitiestransferchargefrontend.navigation.{AbstractModeNavigator, PersistentNavigator, UserAnswersValidator}
 import uk.gov.hmrc.securitiestransferchargefrontend.pages.*
+import uk.gov.hmrc.securitiestransferchargefrontend.pages.stf.shared.*
 import uk.gov.hmrc.securitiestransferchargefrontend.pages.stf.single.*
 import uk.gov.hmrc.securitiestransferchargefrontend.services.AnswerPersistenceService
 
@@ -48,17 +50,56 @@ class StfOrgNavigator @Inject()(appConfig: FrontendAppConfig,
   val forwardRoutes: ForwardRoutes = new ForwardRoutes(answerPersistenceService, appConfig,defaultPage, errorPages)
   val backwardsRoutes: BackwardsRoutes = new BackwardsRoutes(defaultPage)
 
-  override def forwardRoutes(page: Page)(implicit hc: HeaderCarrier): UserAnswers => Future[Call] =
-    forwardRoutes.forwardRoutes(page)(hc)
+  override def forwardRoutes(page: Page, mode: Mode)(implicit hc: HeaderCarrier): UserAnswers => Future[Call] =
+    forwardRoutes.forwardRoutes(page, mode)(hc)
 
-  override def predecessorRoutes(page: Page): Option[UserAnswers] => Call =
-    backwardsRoutes.predecessorRoutes(page)
+  override def predecessorRoutes(page: Page, mode: Mode): Option[UserAnswers] => Call =
+    backwardsRoutes.predecessorRoutes(page, mode)
 
   def errorPage(forPage: Page): Call = forPage match {
     case _ => defaultPage
   }
 
-  val checkRouteMap: Page => UserAnswers => Call = _ => _ => routes.CheckYourAnswersController.onPageLoad()
+  private def checkYourAnswersRoute: Call =
+    stfSingleCyaRoutes.CheckYourAnswersController.onPageLoad()
+
+  private def routeForOtherSecurities(userAnswers: UserAnswers): Call = {
+    if (userAnswers.get(TotalMarketValuePage).isDefined) {
+      checkYourAnswersRoute
+    } else {
+      orgSingleRoutes.TotalMarketValueController.onPageLoad(CheckMode)
+    }
+  }
+
+  private def routeForShares(userAnswers: UserAnswers): Call = {
+    val hasMarketValue = userAnswers.get(DetailsOfThisTransferPage)
+      .exists(_.marketValue.isDefined)
+
+    if (hasMarketValue) {
+      checkYourAnswersRoute
+    } else {
+      orgSingleRoutes.DetailsOfThisTransferController.onPageLoad(CheckMode)
+    }
+  }
+
+  val checkRouteMap: Page => UserAnswers => Call = page => userAnswers => {
+    page match {
+      case ConnectedPersonsPage =>
+        val isConnectedPerson = userAnswers.get(ConnectedPersonsPage).getOrElse(false)
+
+        if (!isConnectedPerson) {
+          checkYourAnswersRoute
+        } else {
+          userAnswers.get(PurchasingSharesPage) match {
+            case Some(false) => routeForOtherSecurities(userAnswers) // Other securities
+            case Some(true)  => routeForShares(userAnswers)          // Shares
+            case None        => checkYourAnswersRoute
+          }
+        }
+
+      case _ => checkYourAnswersRoute
+    }
+  }
 
   def restore(submissionId: SubmissionId, userId: UserId)(implicit request: Request[?]): Future[UserAnswers] = {
     implicit val hc: HeaderCarrier = HeaderCarrierConverter.fromRequestAndSession(request, request.session)
@@ -69,7 +110,7 @@ class StfOrgNavigator @Inject()(appConfig: FrontendAppConfig,
 
     override protected val startPage: GettablePage[?] = ConfirmAddressPage
 
-    override protected val pageCallMap: BiMap[GettablePage[?], Call] = {
+    override protected lazy val pageCallMap: BiMap[GettablePage[?], Call] = {
       val map = HashBiMap.create[GettablePage[?], Call]()
       
       // STF Organisation single journey pages only
@@ -88,7 +129,16 @@ class StfOrgNavigator @Inject()(appConfig: FrontendAppConfig,
       map.put(OtherSecuritiesTypePage, orgSingleRoutes.OtherSecuritiesTypeController.onPageLoad(NormalMode))
       map.put(AmountPaidForSecuritiesPage, orgSingleRoutes.AmountPaidForSecuritiesController.onPageLoad(NormalMode))
       map.put(TotalMarketValuePage, orgSingleRoutes.TotalMarketValueController.onPageLoad(NormalMode))
+      map.put(CheckYourAnswersPage, stfSingleCyaRoutes.CheckYourAnswersController.onPageLoad())
 
       map
+    }
+
+    override protected def pageHasValidDataAtPath(userAnswers: UserAnswers, page: GettablePage[_]): Boolean = page match {
+      case DetailsOfThisTransferPage if userAnswers.get(ConnectedPersonsPage).contains(true) =>
+        userAnswers.get(DetailsOfThisTransferPage).map(_.marketValue).isDefined
+      case SecuritiesTargetPage => // CRN is optional
+        userAnswers.get(SecuritiesTargetPage).map(_.businessName).isDefined
+      case _ => super.pageHasValidDataAtPath(userAnswers, page)
     }
   }

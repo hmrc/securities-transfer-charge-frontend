@@ -26,7 +26,7 @@ import uk.gov.hmrc.securitiestransferchargefrontend.controllers.routes
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.sh03.agents.single.routes as sh03AgentSingleRoutes
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.shared.routes as sharedRoutes
 import uk.gov.hmrc.securitiestransferchargefrontend.domain.{SubmissionId, UserId}
-import uk.gov.hmrc.securitiestransferchargefrontend.models.{NormalMode, UserAnswers}
+import uk.gov.hmrc.securitiestransferchargefrontend.models.{Mode, NormalMode, UserAnswers}
 import uk.gov.hmrc.securitiestransferchargefrontend.navigation.sh03.agents
 import uk.gov.hmrc.securitiestransferchargefrontend.navigation.{AbstractModeNavigator, PersistentNavigator, UserAnswersValidator}
 import uk.gov.hmrc.securitiestransferchargefrontend.pages.*
@@ -47,11 +47,11 @@ class Sh03AgentNavigator @Inject()(answerPersistenceService: AnswerPersistenceSe
   val forwardRoutes: ForwardRoutes = new ForwardRoutes(answerPersistenceService, defaultPage, errorPages,appConfig)
   val backwardsRoutes: BackwardsRoutes = new BackwardsRoutes(defaultPage)
 
-  override def forwardRoutes(page: Page)(implicit hc: HeaderCarrier): UserAnswers => Future[Call] =
-    forwardRoutes.forwardRoutes(page)(hc)
+  override def forwardRoutes(page: Page, mode: Mode)(implicit hc: HeaderCarrier): UserAnswers => Future[Call] =
+    forwardRoutes.forwardRoutes(page, mode)(hc)
 
-  override def predecessorRoutes(page: Page): Option[UserAnswers] => Call =
-    backwardsRoutes.predecessorRoutes(page)
+  override def predecessorRoutes(page: Page, mode: Mode): Option[UserAnswers] => Call =
+    backwardsRoutes.predecessorRoutes(page, mode)
 
   def errorPage(forPage: Page): Call = forPage match {
     case _ => defaultPage
@@ -68,7 +68,7 @@ class Sh03AgentNavigator @Inject()(answerPersistenceService: AnswerPersistenceSe
 
     override protected val startPage: GettablePage[?] = AgentReferencePage
 
-    override protected val pageCallMap: BiMap[GettablePage[?], Call] = {
+    override protected lazy val pageCallMap: BiMap[GettablePage[?], Call] = {
       val map = HashBiMap.create[GettablePage[?], Call]()
       
       // SH03 Agent single journey pages only
@@ -86,5 +86,12 @@ class Sh03AgentNavigator @Inject()(answerPersistenceService: AnswerPersistenceSe
       map.put(RoleAtPurchasingCompanyPage, sh03AgentSingleRoutes.RoleAtPurchasingCompanyController.onPageLoad(NormalMode))
       
       map
+    }
+
+    override protected def pageHasValidDataAtPath(userAnswers: UserAnswers, page: GettablePage[_]): Boolean = page match {
+      case AgentReferencePage => true // Optional data, so always valid
+      case DetailsOfThisSharePurchasePage if userAnswers.get(ConnectedPersonsPage).contains(true) =>
+        userAnswers.get(DetailsOfThisSharePurchasePage).map(_.marketValue).isDefined
+      case _ => super.pageHasValidDataAtPath(userAnswers, page)
     }
   }

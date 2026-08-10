@@ -28,7 +28,7 @@ import uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.agents.singl
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.agents.bulk.routes as agentBulkRoutes
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.fileUpload.routes as bulkSharedRoutes
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.shared.routes as sharedRoutes
-import uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.shared.single.routes as stfSingleCyaRoutes
+import uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.individuals.single.routes as stfSingleCyaRoutes
 import uk.gov.hmrc.securitiestransferchargefrontend.models.JourneyType.STF
 import uk.gov.hmrc.securitiestransferchargefrontend.models.shared.AgentReference
 import uk.gov.hmrc.securitiestransferchargefrontend.models.stf.*
@@ -42,6 +42,7 @@ import java.time.LocalDate
 
 class StfAgentNavigatorSpec extends SpecBase with ScalaFutures {
 
+  private lazy val cyaPage = stfSingleCyaRoutes.CheckYourAnswersController.onPageLoad()
   private val mockConfig: FrontendAppConfig = mock[FrontendAppConfig]
   when(mockConfig.firstChargingPoint).thenReturn(LocalDate.of(2026, 1, 1))
 
@@ -221,7 +222,7 @@ class StfAgentNavigatorSpec extends SpecBase with ScalaFutures {
         val answers = emptyUserAnswers.set(DetailsOfThisTransferPage, detailsOfThisTransfer).get
         val result = navigator.nextPage(DetailsOfThisTransferPage, NormalMode, answers)(fakeRequest)
         whenReady(result) { res =>
-          res mustBe stfSingleCyaRoutes.CheckYourAnswersController.onPageLoad()
+          res mustBe cyaPage
         }
       }
 
@@ -249,7 +250,7 @@ class StfAgentNavigatorSpec extends SpecBase with ScalaFutures {
         val result = navigator.nextPage(AmountPaidForSecuritiesPage, NormalMode, answers)(fakeRequest)
 
         whenReady(result) { res =>
-          res mustBe stfSingleCyaRoutes.CheckYourAnswersController.onPageLoad()
+          res mustBe cyaPage
         }
       }
 
@@ -259,7 +260,7 @@ class StfAgentNavigatorSpec extends SpecBase with ScalaFutures {
         val result = navigator.nextPage(TotalMarketValuePage, NormalMode, answers)(fakeRequest)
 
         whenReady(result) { res =>
-          res mustBe stfSingleCyaRoutes.CheckYourAnswersController.onPageLoad()
+          res mustBe cyaPage
         }
       }
 
@@ -279,7 +280,7 @@ class StfAgentNavigatorSpec extends SpecBase with ScalaFutures {
         case object UnknownPage extends Page
         val result = navigator.nextPage(UnknownPage, CheckMode, UserAnswers(testUserId, testGroupIdentifier, submissionId))(fakeRequest)
         whenReady(result) { res =>
-          res mustBe routes.CheckYourAnswersController.onPageLoad()
+          res mustBe cyaPage
         }
       }
     }

@@ -27,17 +27,18 @@ import uk.gov.hmrc.securitiestransferchargefrontend.viewmodels.implicits.*
 
 object TotalMarketValueSummary  {
 
-  def row(answers: UserAnswers)(implicit messages: Messages): Option[SummaryListRow] =
-    answers.get(TotalMarketValuePage).map {
-      answer =>
+  def row(answers: UserAnswers)(implicit messages: Messages): SummaryListRow = {
+    val value = answers.get(TotalMarketValuePage)
+      .map(currencyFormat)
+      .getOrElse(messages("site.notProvided"))
 
-        SummaryListRowViewModel(
-          key     = "totalMarketValue.checkYourAnswersLabel",
-          value   = ValueViewModel(currencyFormat(answer)),
-          actions = Seq(
-            ActionItemViewModel("site.change", routes.TotalMarketValueController.onPageLoad(CheckMode).url)
-              .withVisuallyHiddenText(messages("totalMarketValue.change.hidden"))
-          )
-        )
-    }
+    SummaryListRowViewModel(
+      key     = "totalMarketValue.checkYourAnswersLabel",
+      value   = ValueViewModel(value),
+      actions = Seq(
+        ActionItemViewModel("site.change", routes.TotalMarketValueController.onPageLoad(CheckMode).url)
+          .withVisuallyHiddenText(messages("totalMarketValue.change.hidden"))
+      )
+    )
+  }
 }

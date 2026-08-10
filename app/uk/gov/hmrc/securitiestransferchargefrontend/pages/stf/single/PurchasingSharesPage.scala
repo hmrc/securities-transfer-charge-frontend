@@ -17,11 +17,27 @@
 package uk.gov.hmrc.securitiestransferchargefrontend.pages.stf.single
 
 import play.api.libs.json.JsPath
+import uk.gov.hmrc.securitiestransferchargefrontend.models.UserAnswers
 import uk.gov.hmrc.securitiestransferchargefrontend.pages.QuestionPage
 
-case object PurchasingSharesPage extends QuestionPage[Boolean] {
+import scala.util.Try
+
+case object PurchasingSharesPage extends QuestionPage[Boolean]:
 
   override def path: JsPath = JsPath \ toString
 
   override def toString: String = "purchasingShares"
-}
+
+  override def cleanup(isPurchasingShares: Option[Boolean], userAnswers: UserAnswers): Try[UserAnswers] =
+    if isPurchasingShares.contains(true) then
+      clearOther(userAnswers)
+    else if isPurchasingShares.contains(false) then
+      userAnswers.remove(DetailsOfThisTransferPage)
+    else super.cleanup(isPurchasingShares, userAnswers)
+    end if
+
+  private def clearOther(userAnswers: UserAnswers): Try[UserAnswers] =
+    userAnswers.remove(OtherSecuritiesTypePage)
+      .flatMap(_.remove(AmountPaidForSecuritiesPage))
+      .flatMap(_.remove(TotalMarketValuePage))
+
