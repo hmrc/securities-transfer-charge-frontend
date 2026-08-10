@@ -18,12 +18,13 @@ package services.fileupload
 
 import base.SpecBase
 import play.api.i18n.{Lang, Messages, MessagesApi}
-import uk.gov.hmrc.securitiestransferchargefrontend.forms.stf.fileUpload.{SecuritiesTargetFormProvider,AmountPaidForSecuritiesFormProvider}
+import uk.gov.hmrc.securitiestransferchargefrontend.forms.stf.fileUpload.{SecuritiesTargetFormProvider, AmountPaidForSecuritiesFormProvider}
 import uk.gov.hmrc.securitiestransferchargefrontend.forms.stf.shared.{NameOfBuyerFormProvider, NameOfSellerFormProvider}
 import uk.gov.hmrc.securitiestransferchargefrontend.models.stf.fileupload.*
 import uk.gov.hmrc.securitiestransferchargefrontend.models.stf.fileupload.ParsedValue.{Invalid, Missing, Valid}
 import uk.gov.hmrc.securitiestransferchargefrontend.services.fileupload.*
 import uk.gov.hmrc.securitiestransferchargefrontend.config.FrontendAppConfig
+import uk.gov.hmrc.securitiestransferchargefrontend.models.JourneyType
 
 import java.time.LocalDate
 
@@ -77,11 +78,11 @@ class StcBasicRowValidatorSpec extends SpecBase {
     new StcBasicRowValidator(
       support = new StcValidationSupport,
       messagesApi = messagesApi,
-      appConfig = appConfig,
       nameOfSellerFormProvider = new NameOfSellerFormProvider,
       securitiesTargetFormProvider = new SecuritiesTargetFormProvider,
       nameOfBuyerFormProvider = new NameOfBuyerFormProvider,
-      amountPaidForSecuritiesFormProvider = new AmountPaidForSecuritiesFormProvider
+      amountPaidForSecuritiesFormProvider = new AmountPaidForSecuritiesFormProvider,
+      appConfig = appConfig
     )
 
   private implicit val columnIndex: ColumnIndexBuilder =
@@ -104,7 +105,7 @@ class StcBasicRowValidatorSpec extends SpecBase {
   "StcBasicRowValidator.validate" - {
 
     "return no errors for a valid row" in {
-      val result = validator.validate(validRow, StcTemplate.STF, affinityGroupKeyInd)
+      val result = validator.validate(validRow, StcTemplate.STF, affinityGroupKeyInd, JourneyType.STF)
 
       result mustBe Seq.empty
     }
@@ -112,7 +113,7 @@ class StcBasicRowValidatorSpec extends SpecBase {
     "return charging point required error when missing" in {
       val result = validator.validate(
         validRow.copy(chargingPoint = Missing),
-        StcTemplate.STF, "org"
+        StcTemplate.STF, "org", JourneyType.STF
       )
 
       result.exists(e => e.fieldName == "chargingPoint" && e.message == "Enter the charging point") mustBe true
@@ -121,7 +122,7 @@ class StcBasicRowValidatorSpec extends SpecBase {
     "return charging point invalid error when date is unparsable" in {
       val result = validator.validate(
         validRow.copy(chargingPoint = Invalid("32/13/2026", "not a valid date")),
-        StcTemplate.STF, "org"
+        StcTemplate.STF, "org", JourneyType.STF
       )
 
       result.exists(e => e.fieldName == "chargingPoint" && e.message == "The charging point must be a real date") mustBe true
@@ -130,7 +131,7 @@ class StcBasicRowValidatorSpec extends SpecBase {
     "return charging point future date error when date is in the future" in {
       val result = validator.validate(
         validRow.copy(chargingPoint = Valid(LocalDate.now().plusDays(5))),
-        StcTemplate.STF, "org"
+        StcTemplate.STF, "org", JourneyType.STF
       )
 
       result.exists(e => e.fieldName == "chargingPoint" && e.message == messages("fileUpload.org.chargingPoint.error.futureDate")) mustBe true
@@ -139,7 +140,7 @@ class StcBasicRowValidatorSpec extends SpecBase {
     "return charging point too early error when date is before the earliest allowed date" in {
       val result = validator.validate(
         validRow.copy(chargingPoint = Valid(LocalDate.of(2025, 12, 31))),
-        StcTemplate.STF, "org"
+        StcTemplate.STF, "org", JourneyType.STF
       )
 
       result.exists(e => e.fieldName == "chargingPoint" && e.message == messages("fileUpload.org.chargingPoint.error.beforeFirstDate")) mustBe true
@@ -148,7 +149,7 @@ class StcBasicRowValidatorSpec extends SpecBase {
     "drop the prefix for charging point invalid error when affinityKey is 'individual'" in {
       val result = validator.validate(
         validRow.copy(chargingPoint = Invalid("32/13/2026", "not a valid date")),
-        StcTemplate.STF, "individual"
+        StcTemplate.STF, "individual", JourneyType.STF
       )
 
       result.exists(e => e.fieldName == "chargingPoint" && e.message == messages("chargingPoint.error.invalid")) mustBe true
@@ -157,7 +158,7 @@ class StcBasicRowValidatorSpec extends SpecBase {
     "return securities quantity whole number error when a decimal is provided" in {
       val result = validator.validate(
         validRow.copy(securitiesQuantity = Some("10.5")),
-        StcTemplate.STF, "org"
+        StcTemplate.STF, "org", JourneyType.STF
       )
 
       result.exists(e =>
@@ -169,7 +170,7 @@ class StcBasicRowValidatorSpec extends SpecBase {
     "return seller name required error" in {
       val result = validator.validate(
         validRow.copy(sellerName = None),
-        StcTemplate.STF, affinityGroupKeyInd
+        StcTemplate.STF, affinityGroupKeyInd, JourneyType.STF
       )
 
       result.exists(_.fieldName == "sellerName") mustBe true
@@ -178,7 +179,7 @@ class StcBasicRowValidatorSpec extends SpecBase {
     "return seller address in uk missing error" in {
       val result = validator.validate(
         validRow.copy(sellerAddressInUK = None),
-        StcTemplate.STF, affinityGroupKeyInd
+        StcTemplate.STF, affinityGroupKeyInd, JourneyType.STF
       )
 
       result.exists(_.fieldName == "sellerAddressInUK") mustBe true
@@ -187,7 +188,7 @@ class StcBasicRowValidatorSpec extends SpecBase {
     "return connected persons missing error" in {
       val result = validator.validate(
         validRow.copy(connectedPersons = None),
-        StcTemplate.STF, affinityGroupKeyInd
+        StcTemplate.STF, affinityGroupKeyInd, JourneyType.STF
       )
 
       result.exists(_.fieldName == "connectedPersons") mustBe true
@@ -196,7 +197,7 @@ class StcBasicRowValidatorSpec extends SpecBase {
     "return applying for relief missing error" in {
       val result = validator.validate(
         validRow.copy(applyingForRelief = None),
-        StcTemplate.STF, affinityGroupKeyInd
+        StcTemplate.STF, affinityGroupKeyInd, JourneyType.STF
       )
 
       result.exists(_.fieldName == "applyingForRelief") mustBe true
@@ -205,7 +206,7 @@ class StcBasicRowValidatorSpec extends SpecBase {
     "return tax rate invalid when missing" in {
       val result = validator.validate(
         validRow.copy(taxRate = None),
-        StcTemplate.STF, affinityGroupKeyInd
+        StcTemplate.STF, affinityGroupKeyInd, JourneyType.STF
       )
 
       result.exists(_.fieldName == "taxRate") mustBe true
@@ -214,7 +215,7 @@ class StcBasicRowValidatorSpec extends SpecBase {
     "return what type of securities required error" in {
       val result = validator.validate(
         validRow.copy(whatTypeOfSecurities = None),
-        StcTemplate.STF, affinityGroupKeyInd
+        StcTemplate.STF, affinityGroupKeyInd, JourneyType.STF
       )
 
       result.exists(_.fieldName == "whatTypeOfSecurities") mustBe true
@@ -223,7 +224,7 @@ class StcBasicRowValidatorSpec extends SpecBase {
     "return securities quantity required error" in {
       val result = validator.validate(
         validRow.copy(securitiesQuantity = None),
-        StcTemplate.STF, affinityGroupKeyInd
+        StcTemplate.STF, affinityGroupKeyInd, JourneyType.STF
       )
 
       result.exists(_.fieldName == "securitiesQuantity") mustBe true
@@ -232,7 +233,7 @@ class StcBasicRowValidatorSpec extends SpecBase {
     "return securities quantity minimum error" in {
       val result = validator.validate(
         validRow.copy(securitiesQuantity = Some("0")),
-        StcTemplate.STF, affinityGroupKeyInd
+        StcTemplate.STF, affinityGroupKeyInd, JourneyType.STF
       )
 
       result.exists(_.fieldName == "securitiesQuantity") mustBe true
@@ -241,7 +242,7 @@ class StcBasicRowValidatorSpec extends SpecBase {
     "return securities quantity maximum error" in {
       val result = validator.validate(
         validRow.copy(securitiesQuantity = Some("1000000000")),
-        StcTemplate.STF, affinityGroupKeyInd
+        StcTemplate.STF, affinityGroupKeyInd, JourneyType.STF
       )
 
       result.exists(_.fieldName == "securitiesQuantity") mustBe true
@@ -250,7 +251,7 @@ class StcBasicRowValidatorSpec extends SpecBase {
     "return amount paid required error" in {
       val result = validator.validate(
         validRow.copy(amountPaidForSecurities = None),
-        StcTemplate.STF, affinityGroupKeyInd
+        StcTemplate.STF, affinityGroupKeyInd, JourneyType.STF
       )
 
       result.exists(_.fieldName == "amountPaidForSecurities") mustBe true
@@ -259,7 +260,7 @@ class StcBasicRowValidatorSpec extends SpecBase {
     "return amount paid maximum error" in {
       val result = validator.validate(
         validRow.copy(amountPaidForSecurities = Some("1000000000")),
-        StcTemplate.STF, affinityGroupKeyInd
+        StcTemplate.STF, affinityGroupKeyInd, JourneyType.STF
       )
 
       result.exists(_.fieldName == "amountPaidForSecurities") mustBe true
@@ -270,7 +271,7 @@ class StcBasicRowValidatorSpec extends SpecBase {
       "return type of shares required error" in {
         val result = validator.validate(
           validRow.copy(typeOfShares = None),
-          StcTemplate.STFAgent, affinityGroupKeyAgent
+          StcTemplate.STFAgent, affinityGroupKeyAgent, JourneyType.STF
         )
 
         result.exists(_.fieldName == "typeOfShares") mustBe true
@@ -279,7 +280,7 @@ class StcBasicRowValidatorSpec extends SpecBase {
       "return seller name required error" in {
         val result = validator.validate(
           validRow.copy(sellerName = None),
-          StcTemplate.STFAgent, affinityGroupKeyAgent
+          StcTemplate.STFAgent, affinityGroupKeyAgent, JourneyType.STF
         )
 
         result.exists(_.fieldName == "sellerName") mustBe true
@@ -288,7 +289,7 @@ class StcBasicRowValidatorSpec extends SpecBase {
       "return buyer name required error" in {
         val result = validator.validate(
           validRow.copy(buyerName = None),
-          StcTemplate.STFAgent, affinityGroupKeyAgent
+          StcTemplate.STFAgent, affinityGroupKeyAgent, JourneyType.STF
         )
 
         result.exists(_.fieldName == "buyerName") mustBe true
@@ -297,7 +298,7 @@ class StcBasicRowValidatorSpec extends SpecBase {
       "return seller address in uk missing error" in {
         val result = validator.validate(
           validRow.copy(sellerAddressInUK = None),
-          StcTemplate.STFAgent, affinityGroupKeyAgent
+          StcTemplate.STFAgent, affinityGroupKeyAgent, JourneyType.STF
         )
 
         result.exists(_.fieldName == "sellerAddressInUK") mustBe true
@@ -306,7 +307,7 @@ class StcBasicRowValidatorSpec extends SpecBase {
       "return buyer address in uk missing error" in {
         val result = validator.validate(
           validRow.copy(buyerAddressInUK = None),
-          StcTemplate.STFAgent, affinityGroupKeyAgent
+          StcTemplate.STFAgent, affinityGroupKeyAgent, JourneyType.STF
         )
 
         result.exists(_.fieldName == "buyerAddressInUK") mustBe true
@@ -315,7 +316,7 @@ class StcBasicRowValidatorSpec extends SpecBase {
       "return connected persons missing error" in {
         val result = validator.validate(
           validRow.copy(connectedPersons = None),
-          StcTemplate.STFAgent, affinityGroupKeyAgent
+          StcTemplate.STFAgent, affinityGroupKeyAgent, JourneyType.STF
         )
 
         result.exists(_.fieldName == "connectedPersons") mustBe true
@@ -324,7 +325,7 @@ class StcBasicRowValidatorSpec extends SpecBase {
       "return applying for relief missing error" in {
         val result = validator.validate(
           validRow.copy(applyingForRelief = None),
-          StcTemplate.STFAgent, affinityGroupKeyAgent
+          StcTemplate.STFAgent, affinityGroupKeyAgent, JourneyType.STF
         )
 
         result.exists(_.fieldName == "applyingForRelief") mustBe true
@@ -333,7 +334,7 @@ class StcBasicRowValidatorSpec extends SpecBase {
       "return tax rate required error" in {
         val result = validator.validate(
           validRow.copy(taxRate = None),
-          StcTemplate.STFAgent, affinityGroupKeyAgent
+          StcTemplate.STFAgent, affinityGroupKeyAgent, JourneyType.STF
         )
 
         result.exists(_.fieldName == "taxRate") mustBe true
@@ -342,7 +343,7 @@ class StcBasicRowValidatorSpec extends SpecBase {
       "return securities quantity required error" in {
         val result = validator.validate(
           validRow.copy(securitiesQuantity = None),
-          StcTemplate.STFAgent, affinityGroupKeyAgent
+          StcTemplate.STFAgent, affinityGroupKeyAgent, JourneyType.STF
         )
 
         result.exists(_.fieldName == "securitiesQuantity") mustBe true
@@ -351,7 +352,7 @@ class StcBasicRowValidatorSpec extends SpecBase {
       "return charging point required error" in {
         val result = validator.validate(
           validRow.copy(chargingPoint = ParsedValue.Missing),
-          StcTemplate.STFAgent, affinityGroupKeyAgent
+          StcTemplate.STFAgent, affinityGroupKeyAgent, JourneyType.STF
         )
 
         result.exists(_.fieldName == "chargingPoint") mustBe true
@@ -360,7 +361,7 @@ class StcBasicRowValidatorSpec extends SpecBase {
       "return amount paid for securities required error" in {
         val result = validator.validate(
           validRow.copy(amountPaidForSecurities = None),
-          StcTemplate.STFAgent, affinityGroupKeyAgent
+          StcTemplate.STFAgent, affinityGroupKeyAgent, JourneyType.STF
         )
 
         result.exists(_.fieldName == "amountPaidForSecurities") mustBe true
@@ -369,7 +370,7 @@ class StcBasicRowValidatorSpec extends SpecBase {
       "return securities target required error" in {
         val result = validator.validate(
           validRow.copy(securitiesTarget = None),
-          StcTemplate.STFAgent, affinityGroupKeyAgent
+          StcTemplate.STFAgent, affinityGroupKeyAgent, JourneyType.STF
         )
 
         result.exists(_.fieldName == "securitiesTarget") mustBe true
@@ -389,14 +390,14 @@ class StcBasicRowValidatorSpec extends SpecBase {
           connectedPersons = Some(true),
           applyingForRelief = Some(false)
         )
-        val result = validator.validate(validSh03Row, StcTemplate.SH03, "agent")
+        val result = validator.validate(validSh03Row, StcTemplate.SH03, "agent", JourneyType.SH03)
         result mustBe Seq.empty
       }
 
       "return share purchase reason missing error" in {
         val result = validator.validate(
           validRow.copy(sharePurchaseReason = None),
-          StcTemplate.SH03, "agent"
+          StcTemplate.SH03, "agent", JourneyType.SH03
         )
         result.exists(e => e.fieldName == "sharePurchaseReason" && e.message == messages("sharePurchaseReason.required")) mustBe true
       }
@@ -404,7 +405,7 @@ class StcBasicRowValidatorSpec extends SpecBase {
       "return share purchase reason invalid error" in {
         val result = validator.validate(
           validRow.copy(sharePurchaseReason = Some("invalid reason")),
-          StcTemplate.SH03, "agent"
+          StcTemplate.SH03, "agent", JourneyType.SH03
         )
         result.exists(e => e.fieldName == "sharePurchaseReason" && e.message == messages("sharePurchaseReason.invalid")) mustBe true
       }
@@ -412,7 +413,7 @@ class StcBasicRowValidatorSpec extends SpecBase {
       "return purchase for cancellation missing error" in {
         val result = validator.validate(
           validRow.copy(purchaseForCancellation = None),
-          StcTemplate.SH03, "agent"
+          StcTemplate.SH03, "agent", JourneyType.SH03
         )
         result.exists(e => e.fieldName == "purchasedForCancellation" && e.message == messages("purchasedForCancellation.invalid")) mustBe true
       }
@@ -421,7 +422,7 @@ class StcBasicRowValidatorSpec extends SpecBase {
         "allow empty minSharePrice (optional for non-PLCs)" in {
           val result = validator.validate(
             validRow.copy(minSharePrice = None),
-            StcTemplate.SH03, "agent"
+            StcTemplate.SH03, "agent", JourneyType.SH03
           )
           result.exists(_.fieldName == "minSharePrice") mustBe false
         }
@@ -429,7 +430,7 @@ class StcBasicRowValidatorSpec extends SpecBase {
         "allow valid minSharePrice with commas" in {
           val result = validator.validate(
             validRow.copy(minSharePrice = Some("1,000.50")),
-            StcTemplate.SH03, "agent"
+            StcTemplate.SH03, "agent", JourneyType.SH03
           )
           result.exists(_.fieldName == "minSharePrice") mustBe false
         }
@@ -437,7 +438,7 @@ class StcBasicRowValidatorSpec extends SpecBase {
         "reject non-numeric minSharePrice" in {
           val result = validator.validate(
             validRow.copy(minSharePrice = Some("abc")),
-            StcTemplate.SH03, "agent"
+            StcTemplate.SH03, "agent", JourneyType.SH03
           )
           result.exists(e => e.fieldName == "minSharePrice" && e.message == "The minimum amount paid for the shares must be a number and can include up to two decimal places, like £30 or £28.60") mustBe true
         }
@@ -445,7 +446,7 @@ class StcBasicRowValidatorSpec extends SpecBase {
         "reject minSharePrice with more than two decimal places" in {
           val result = validator.validate(
             validRow.copy(minSharePrice = Some("10.123")),
-            StcTemplate.SH03, "agent"
+            StcTemplate.SH03, "agent", JourneyType.SH03
           )
           result.exists(e => e.fieldName == "minSharePrice" && e.message == "The minimum amount paid for the shares must be a number and can include up to two decimal places, like £30 or £28.60") mustBe true
         }
@@ -453,7 +454,7 @@ class StcBasicRowValidatorSpec extends SpecBase {
         "reject minSharePrice that is too high" in {
           val result = validator.validate(
             validRow.copy(minSharePrice = Some("1000000000")),
-            StcTemplate.SH03, "agent"
+            StcTemplate.SH03, "agent", JourneyType.SH03
           )
           result.exists(e => e.fieldName == "minSharePrice" && e.message == "The minimum amount paid for the shares must be £999,999,999 or less") mustBe true
         }
@@ -461,7 +462,7 @@ class StcBasicRowValidatorSpec extends SpecBase {
         "reject minSharePrice that is too low" in {
           val result = validator.validate(
             validRow.copy(minSharePrice = Some("0")),
-            StcTemplate.SH03, "agent"
+            StcTemplate.SH03, "agent", JourneyType.SH03
           )
           result.exists(e => e.fieldName == "minSharePrice" && e.message == "The minimum amount paid for the shares must be £0.01 or more") mustBe true
         }
@@ -471,7 +472,7 @@ class StcBasicRowValidatorSpec extends SpecBase {
         "allow empty maxSharePrice (optional for non-PLCs)" in {
           val result = validator.validate(
             validRow.copy(maxSharePrice = None),
-            StcTemplate.SH03, "agent"
+            StcTemplate.SH03, "agent", JourneyType.SH03
           )
           result.exists(_.fieldName == "maxSharePrice") mustBe false
         }
@@ -479,7 +480,7 @@ class StcBasicRowValidatorSpec extends SpecBase {
         "allow valid maxSharePrice with commas" in {
           val result = validator.validate(
             validRow.copy(maxSharePrice = Some("2,500,000")),
-            StcTemplate.SH03, "agent"
+            StcTemplate.SH03, "agent", JourneyType.SH03
           )
           result.exists(_.fieldName == "maxSharePrice") mustBe false
         }
@@ -487,7 +488,7 @@ class StcBasicRowValidatorSpec extends SpecBase {
         "reject non-numeric maxSharePrice" in {
           val result = validator.validate(
             validRow.copy(maxSharePrice = Some("abc")),
-            StcTemplate.SH03, "agent"
+            StcTemplate.SH03, "agent", JourneyType.SH03
           )
           result.exists(e => e.fieldName == "maxSharePrice" && e.message == "The maximum amount paid for the shares must be a number and can include up to two decimal places, like £30 or £28.60") mustBe true
         }
@@ -495,7 +496,7 @@ class StcBasicRowValidatorSpec extends SpecBase {
         "reject maxSharePrice with more than two decimal places" in {
           val result = validator.validate(
             validRow.copy(maxSharePrice = Some("10.123")),
-            StcTemplate.SH03, "agent"
+            StcTemplate.SH03, "agent", JourneyType.SH03
           )
           result.exists(e => e.fieldName == "maxSharePrice" && e.message == "The maximum amount paid for the shares must be a number and can include up to two decimal places, like £30 or £28.60") mustBe true
         }
@@ -503,7 +504,7 @@ class StcBasicRowValidatorSpec extends SpecBase {
         "reject maxSharePrice that is too high" in {
           val result = validator.validate(
             validRow.copy(maxSharePrice = Some("1000000000")),
-            StcTemplate.SH03, "agent"
+            StcTemplate.SH03, "agent", JourneyType.SH03
           )
           result.exists(e => e.fieldName == "maxSharePrice" && e.message == "The maximum amount paid for the shares must be £999,999,999 or less") mustBe true
         }
@@ -511,7 +512,7 @@ class StcBasicRowValidatorSpec extends SpecBase {
         "reject maxSharePrice that is too low" in {
           val result = validator.validate(
             validRow.copy(maxSharePrice = Some("0")),
-            StcTemplate.SH03, "agent"
+            StcTemplate.SH03, "agent", JourneyType.SH03
           )
           result.exists(e => e.fieldName == "maxSharePrice" && e.message == "The maximum amount paid for the shares must be £0.01 or more") mustBe true
         }
@@ -519,7 +520,7 @@ class StcBasicRowValidatorSpec extends SpecBase {
         "allow securitiesQuantity with commas" in {
           val result = validator.validate(
             validRow.copy(securitiesQuantity = Some("1,000,000")),
-            StcTemplate.STF, "agent"
+            StcTemplate.STF, "agent", JourneyType.STF
           )
           result.exists(_.fieldName == "securitiesQuantity") mustBe false
         }
