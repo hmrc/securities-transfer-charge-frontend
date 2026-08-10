@@ -20,6 +20,7 @@ import play.api.i18n.{Lang, Messages, MessagesApi}
 import uk.gov.hmrc.securitiestransferchargefrontend.config.FrontendAppConfig
 import uk.gov.hmrc.securitiestransferchargefrontend.forms.stf.fileUpload.{AmountPaidForSecuritiesFormProvider, SecuritiesTargetFormProvider}
 import uk.gov.hmrc.securitiestransferchargefrontend.forms.stf.shared.{NameOfBuyerFormProvider, NameOfSellerFormProvider}
+import uk.gov.hmrc.securitiestransferchargefrontend.models.JourneyType
 import uk.gov.hmrc.securitiestransferchargefrontend.models.stf.fileupload.{ParsedStcRow, ParsedValue, StcRowValidationError}
 
 import scala.util.{Failure, Success, Try}
@@ -44,23 +45,26 @@ class StcBasicRowValidator @Inject()(
   def validate(
                 row: ParsedStcRow,
                 template: StcTemplate,
-                affinityKey:String
+                affinityKey: String,
+                journeyType: JourneyType
               )(implicit cols: ColumnIndexBuilder): Seq[StcRowValidationError] = {
+    
+    val journeyTypeString = journeyType.value.toLowerCase
 
     template match {
 
       case StcTemplate.STF =>
-        validateSTF(row, affinityKey)
+        validateSTF(row, affinityKey, journeyTypeString)
 
       case StcTemplate.SH03 =>
-        validateSH03(row, affinityKey)
+        validateSH03(row, affinityKey, journeyTypeString)
 
       case StcTemplate.STFAgent =>
-        validateAgentSTF(row, affinityKey)
+        validateAgentSTF(row, affinityKey, journeyTypeString)
     }
   }
 
-  def validateSTF(row: ParsedStcRow, affinityKey:String)(implicit cols: ColumnIndexBuilder): Seq[StcRowValidationError] =
+  def validateSTF(row: ParsedStcRow, affinityKey: String, journeyTypeString: String)(implicit cols: ColumnIndexBuilder): Seq[StcRowValidationError] =
     validateNameOfSeller(row) ++
       validateSellerAddressInUk(row) ++
       validateConnectedPersons(row, affinityKey) ++
@@ -68,14 +72,14 @@ class StcBasicRowValidator @Inject()(
       validateSecuritiesTarget(row, affinityKey) ++
       validateChargingPoint(row, affinityKey) ++
       validateTaxRate(row) ++
-      validateWhatTypeOfSecurities(row, affinityKey) ++
-      validateSecuritiesQuantity(row, affinityKey) ++
+      validateWhatTypeOfSecurities(row, affinityKey, journeyTypeString) ++
+      validateSecuritiesQuantity(row, affinityKey, journeyTypeString) ++
       validateAmountPaidForSecurities(row, affinityKey)
 
 
-  def validateSH03(row: ParsedStcRow,affinityKey:String)(implicit cols: ColumnIndexBuilder): Seq[StcRowValidationError] =
-    validateWhatTypeOfSecurities(row,affinityKey) ++
-      validateSecuritiesQuantity(row,affinityKey) ++
+  def validateSH03(row: ParsedStcRow, affinityKey: String, journeyTypeString: String)(implicit cols: ColumnIndexBuilder): Seq[StcRowValidationError] =
+    validateWhatTypeOfSecurities(row,affinityKey, journeyTypeString) ++
+      validateSecuritiesQuantity(row, affinityKey, journeyTypeString) ++
       validateAmountPaidForSecurities(row,affinityKey) ++
       validateChargingPoint(row,affinityKey) ++
       validateMaxSharePrice(row) ++
@@ -85,7 +89,7 @@ class StcBasicRowValidator @Inject()(
       validateConnectedPersons(row, affinityKey) ++
       validateApplyingForRelief(row, affinityKey)
 
-  def validateAgentSTF(row: ParsedStcRow, affinityKey: String)(implicit cols: ColumnIndexBuilder): Seq[StcRowValidationError] =
+  def validateAgentSTF(row: ParsedStcRow, affinityKey: String, journeyTypeString: String)(implicit cols: ColumnIndexBuilder): Seq[StcRowValidationError] =
     validateNameOfBuyer(row) ++
       validateBuyerAddressInUk(row) ++
       validateNameOfSeller(row) ++
@@ -96,7 +100,7 @@ class StcBasicRowValidator @Inject()(
       validateChargingPoint(row, affinityKey) ++
       validateTaxRate(row) ++
       validateTypeOfShares(row, affinityKey) ++
-      validateSecuritiesQuantity(row, affinityKey) ++
+      validateSecuritiesQuantity(row, affinityKey, journeyTypeString) ++
       validateAmountPaidForSecurities(row, affinityKey)
 
 
@@ -180,7 +184,7 @@ class StcBasicRowValidator @Inject()(
     }
   }
 
-  private def validateWhatTypeOfSecurities(row: ParsedStcRow, affinityKey: String)(implicit cols: ColumnIndexBuilder): Seq[StcRowValidationError] =
+  private def validateWhatTypeOfSecurities(row: ParsedStcRow, affinityKey: String, journeyType: String)(implicit cols: ColumnIndexBuilder): Seq[StcRowValidationError] = {
     row.whatTypeOfSecurities.map(_.trim) match {
 
       case None | Some("") =>
@@ -188,7 +192,7 @@ class StcBasicRowValidator @Inject()(
           support.error(
             row.rowNumber,
             "whatTypeOfSecurities",
-            messages(s"$affinityKey.fileUpload.error.whatTypeOfSecurities.required")
+            messages(s"$affinityKey.$journeyType.fileUpload.error.whatTypeOfSecurities.required")
           )
         )
 
@@ -203,10 +207,12 @@ class StcBasicRowValidator @Inject()(
 
       case _ => Seq.empty
     }
+  }
 
   private def validateSecuritiesQuantity(
                                           row: ParsedStcRow,
-                                          affinityKey: String
+                                          affinityKey: String,
+                                          journeyType: String
                                         )(implicit cols: ColumnIndexBuilder): Seq[StcRowValidationError] = {
 
     row.securitiesQuantity match {
@@ -224,13 +230,27 @@ class StcBasicRowValidator @Inject()(
         Try(BigDecimal(stringValue.replace(",", ""))) match {
 
           case Failure(_) =>
-            Seq(
-              support.error(
-                row.rowNumber,
-                "securitiesQuantity",
-                messages(s"$affinityKey.detailsOfThisTransfer.error.numberOfShares.nonNumeric")
-              )
-            )
+            
+            journeyType match {
+              case "sh03" =>
+                Seq(
+                  support.error(
+                    row.rowNumber,
+                    "securitiesQuantity",
+                    messages(s"$affinityKey.$journeyType.detailsOfSharePurchase.error.numberOfShares.nonNumeric")
+                  )
+                )
+
+              case _ =>
+                Seq(
+                  support.error(
+                    row.rowNumber,
+                    "securitiesQuantity",
+                    messages(s"$affinityKey.detailsOfThisTransfer.error.numberOfShares.nonNumeric")
+                  )
+                )
+            }
+
 
           case Success(value) if !value.isWhole =>
             Seq(
