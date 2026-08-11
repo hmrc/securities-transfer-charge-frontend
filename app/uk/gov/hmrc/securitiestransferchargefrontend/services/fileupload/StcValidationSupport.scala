@@ -43,7 +43,7 @@ class StcValidationSupport {
   private val ukPostcodePattern: Regex =
     """(?i)^[A-Z]{1,2}\d[A-Z\d]?\s?\d[A-Z]{2}$""".r
 
-  val typeOfShareMaxLength = 255
+  val typeOfShareMaxLength = 100
   val maxCurrency: BigDecimal = BigDecimal(999999999)
   val minCurrency: BigDecimal = BigDecimal(0.01)
   val dateToday: LocalDate = LocalDate.now()
