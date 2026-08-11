@@ -111,10 +111,10 @@ class StfOrgNavigator @Inject()(appConfig: FrontendAppConfig,
 
     override protected val pageCallMap: PageCallBiMap =
       PageCallBiMapBuilder()
-        .addMappingNoCheck(ConfirmAddressPage, orgSingleRoutes.ConfirmAddressController.onPageLoad())
-        .addMappingNoCheck(StfBuyersAddressPage, orgSingleRoutes.AddressController.onPageLoad())
+        .addMappingNoCheck(ConfirmAddressPage, orgSingleRoutes.ConfirmAddressController.onPageLoad)
+        .addMappingNoCheck(StfBuyersAddressPage, orgSingleRoutes.AddressController.onPageLoad)
         .addMapping(NameOfSellerPage, orgSingleRoutes.NameOfSellerController.onPageLoad)
-        .addMappingNoCheck(StfSellerAddressPage, orgSingleRoutes.StfSellerAddressController.onPageLoad())
+        .addMappingNoCheck(StfSellerAddressPage, orgSingleRoutes.StfSellerAddressController.onPageLoad)
         .addMapping(ConnectedPersonsPage, orgSingleRoutes.ConnectedPersonsController.onPageLoad)
         .addMapping(ApplyingForReliefPage, orgSingleRoutes.ApplyingForReliefController.onPageLoad)
         .addMapping(WhatReliefAreYouApplyingForPage, orgSingleRoutes.WhatReliefAreYouApplyingForController.onPageLoad)
@@ -126,7 +126,7 @@ class StfOrgNavigator @Inject()(appConfig: FrontendAppConfig,
         .addMapping(OtherSecuritiesTypePage, orgSingleRoutes.OtherSecuritiesTypeController.onPageLoad)
         .addMapping(AmountPaidForSecuritiesPage, orgSingleRoutes.AmountPaidForSecuritiesController.onPageLoad)
         .addMapping(TotalMarketValuePage, orgSingleRoutes.TotalMarketValueController.onPageLoad)
-        .addMappingNoCheck(CheckYourAnswersPage, stfSingleCyaRoutes.CheckYourAnswersController.onPageLoad())
+        .addMappingNoCheck(CheckYourAnswersPage, stfSingleCyaRoutes.CheckYourAnswersController.onPageLoad)
         .build
 
     override protected def pageHasValidDataAtPath(userAnswers: UserAnswers, page: GettablePage[_]): Boolean = page match {

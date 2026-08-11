@@ -16,7 +16,6 @@
 
 package uk.gov.hmrc.securitiestransferchargefrontend.navigation.stf.individuals
 
-import com.google.common.collect.{BiMap, HashBiMap}
 import play.api.mvc.{Call, Request}
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.play.http.HeaderCarrierConverter
@@ -27,7 +26,7 @@ import uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.individuals.
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.shared.routes as sharedRoutes
 import uk.gov.hmrc.securitiestransferchargefrontend.domain.{SubmissionId, UserId}
 import uk.gov.hmrc.securitiestransferchargefrontend.models.{CheckMode, Mode, UserAnswers}
-import uk.gov.hmrc.securitiestransferchargefrontend.navigation.{AbstractModeNavigator, PersistentNavigator, UserAnswersValidator}
+import uk.gov.hmrc.securitiestransferchargefrontend.navigation.*
 import uk.gov.hmrc.securitiestransferchargefrontend.pages.Page
 import uk.gov.hmrc.securitiestransferchargefrontend.pages.stf.shared.*
 import uk.gov.hmrc.securitiestransferchargefrontend.pages.stf.single.*
@@ -108,29 +107,25 @@ class StfNavigator @Inject()(appConfig: FrontendAppConfig,
 
     override protected val startPage: GettablePage[?] = ConfirmAddressPage
 
-    override protected def pageCallMap(mode: Mode): BiMap[GettablePage[?], Call] = {
-      val map = HashBiMap.create[GettablePage[?], Call]()
-      
-      // STF Individual single journey pages only
-      map.put(ConfirmAddressPage, individualSingleRoutes.ConfirmAddressController.onPageLoad())
-      map.put(StfBuyersAddressPage, individualSingleRoutes.AddressController.onPageLoad())
-      map.put(NameOfSellerPage, individualSingleRoutes.NameOfSellerController.onPageLoad(mode))
-      map.put(StfSellerAddressPage, individualSingleRoutes.StfSellerAddressController.onPageLoad())
-      map.put(ConnectedPersonsPage, individualSingleRoutes.ConnectedPersonsController.onPageLoad(mode))
-      map.put(ApplyingForReliefPage, individualSingleRoutes.ApplyingForReliefController.onPageLoad(mode))
-      map.put(WhatReliefAreYouApplyingForPage, individualSingleRoutes.WhatReliefAreYouApplyingForController.onPageLoad(mode))
-      map.put(SecuritiesTargetPage, individualSingleRoutes.SecuritiesTargetController.onPageLoad(mode))
-      map.put(ChargingPointPage, individualSingleRoutes.ChargingPointController.onPageLoad(mode))
-      map.put(TaxRatePage, individualSingleRoutes.TaxRateController.onPageLoad(mode))
-      map.put(PurchasingSharesPage, individualSingleRoutes.PurchasingSharesController.onPageLoad(mode))
-      map.put(DetailsOfThisTransferPage, individualSingleRoutes.DetailsOfThisTransferController.onPageLoad(mode))
-      map.put(OtherSecuritiesTypePage, individualSingleRoutes.OtherSecuritiesTypeController.onPageLoad(mode))
-      map.put(AmountPaidForSecuritiesPage, individualSingleRoutes.AmountPaidForSecuritiesController.onPageLoad(mode))
-      map.put(TotalMarketValuePage, individualSingleRoutes.TotalMarketValueController.onPageLoad(mode))
-      map.put(CheckYourAnswersPage, stfSingleCyaRoutes.CheckYourAnswersController.onPageLoad())
-
-      map
-    }
+    override protected val pageCallMap: PageCallBiMap =
+      PageCallBiMapBuilder()
+        .addMappingNoCheck(ConfirmAddressPage, individualSingleRoutes.ConfirmAddressController.onPageLoad)
+        .addMappingNoCheck(StfBuyersAddressPage, individualSingleRoutes.AddressController.onPageLoad)
+        .addMapping(NameOfSellerPage, individualSingleRoutes.NameOfSellerController.onPageLoad)
+        .addMappingNoCheck(StfSellerAddressPage, individualSingleRoutes.StfSellerAddressController.onPageLoad)
+        .addMapping(ConnectedPersonsPage, individualSingleRoutes.ConnectedPersonsController.onPageLoad)
+        .addMapping(ApplyingForReliefPage, individualSingleRoutes.ApplyingForReliefController.onPageLoad)
+        .addMapping(WhatReliefAreYouApplyingForPage, individualSingleRoutes.WhatReliefAreYouApplyingForController.onPageLoad)
+        .addMapping(SecuritiesTargetPage, individualSingleRoutes.SecuritiesTargetController.onPageLoad)
+        .addMapping(ChargingPointPage, individualSingleRoutes.ChargingPointController.onPageLoad)
+        .addMapping(TaxRatePage, individualSingleRoutes.TaxRateController.onPageLoad)
+        .addMapping(PurchasingSharesPage, individualSingleRoutes.PurchasingSharesController.onPageLoad)
+        .addMapping(DetailsOfThisTransferPage, individualSingleRoutes.DetailsOfThisTransferController.onPageLoad)
+        .addMapping(OtherSecuritiesTypePage, individualSingleRoutes.OtherSecuritiesTypeController.onPageLoad)
+        .addMapping(AmountPaidForSecuritiesPage, individualSingleRoutes.AmountPaidForSecuritiesController.onPageLoad)
+        .addMapping(TotalMarketValuePage, individualSingleRoutes.TotalMarketValueController.onPageLoad)
+        .addMappingNoCheck(CheckYourAnswersPage, stfSingleCyaRoutes.CheckYourAnswersController.onPageLoad)
+        .build
 
     override protected def pageHasValidDataAtPath(userAnswers: UserAnswers, page: GettablePage[_]): Boolean = page match {
       case DetailsOfThisTransferPage if userAnswers.get(ConnectedPersonsPage).contains(true) =>
