@@ -647,7 +647,7 @@ individual.fileUpload.error.typeOfShares.required = If you are buying shares, en
 org.fileUpload.error.typeOfShares.required = If the business is buying shares, enter the type of shares
 agent.fileUpload.error.typeOfShares.required = If the buyer is purchasing shares, enter the type of shares
 agent.fileUpload.error.whatTypeOfSecurities.maxLength = The type or class of shares the buyer is purchasing must be 255 characters or fewer
-org.fileUpload.error.whatTypeOfSecurities.maxLength = The type of shares the business is purchasing must be 255 characters or fewer
+org.fileUpload.error.whatTypeOfSecurities.maxLength = The type of shares the business is purchasing must be 100 characters or fewer
 
 
 individual.fileUpload.error.typeOfShares.maxLength = The type of shares you are buying must be 255 characters or fewer
