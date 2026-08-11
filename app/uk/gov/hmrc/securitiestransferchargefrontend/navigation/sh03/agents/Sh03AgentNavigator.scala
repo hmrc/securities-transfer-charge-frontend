@@ -26,7 +26,7 @@ import uk.gov.hmrc.securitiestransferchargefrontend.controllers.routes
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.sh03.agents.single.routes as sh03AgentSingleRoutes
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.shared.routes as sharedRoutes
 import uk.gov.hmrc.securitiestransferchargefrontend.domain.{SubmissionId, UserId}
-import uk.gov.hmrc.securitiestransferchargefrontend.models.{Mode, NormalMode, UserAnswers}
+import uk.gov.hmrc.securitiestransferchargefrontend.models.{Mode, UserAnswers}
 import uk.gov.hmrc.securitiestransferchargefrontend.navigation.sh03.agents
 import uk.gov.hmrc.securitiestransferchargefrontend.navigation.{AbstractModeNavigator, PersistentNavigator, UserAnswersValidator}
 import uk.gov.hmrc.securitiestransferchargefrontend.pages.*
@@ -68,22 +68,22 @@ class Sh03AgentNavigator @Inject()(answerPersistenceService: AnswerPersistenceSe
 
     override protected val startPage: GettablePage[?] = AgentReferencePage
 
-    override protected lazy val pageCallMap: BiMap[GettablePage[?], Call] = {
+    override protected def pageCallMap(mode: Mode): BiMap[GettablePage[?], Call] = {
       val map = HashBiMap.create[GettablePage[?], Call]()
       
       // SH03 Agent single journey pages only
-      map.put(AgentReferencePage, sh03AgentSingleRoutes.AgentReferenceController.onPageLoad(NormalMode))
-      map.put(CompanyDetailsPage, sh03AgentSingleRoutes.CompanyDetailsController.onPageLoad(NormalMode))
-      map.put(ReasonForPurchasePage, sh03AgentSingleRoutes.ReasonForPurchaseController.onPageLoad(NormalMode))
-      map.put(TreasurySharesPage, sh03AgentSingleRoutes.TreasurySharesController.onPageLoad(NormalMode))
-      map.put(ConnectedPersonsPage, sh03AgentSingleRoutes.ConnectedPersonsController.onPageLoad(NormalMode))
-      map.put(ApplyingForReliefPage, sh03AgentSingleRoutes.ApplyingForReliefController.onPageLoad(NormalMode))
-      map.put(WhatReliefAreYouApplyingForPage, sh03AgentSingleRoutes.WhatReliefAreYouApplyingForController.onPageLoad(NormalMode))
-      map.put(DetailsOfThisSharePurchasePage, sh03AgentSingleRoutes.DetailsOfThisSharePurchaseController.onPageLoad(NormalMode))
-      map.put(MaximumAmountPaidPage, sh03AgentSingleRoutes.MaximumAmountPaidController.onPageLoad(NormalMode))
-      map.put(MinimumAmountPaidPage, sh03AgentSingleRoutes.MinimumAmountPaidController.onPageLoad(NormalMode))
-      map.put(ChargingPointPage, sh03AgentSingleRoutes.ChargingPointController.onPageLoad(NormalMode))
-      map.put(RoleAtPurchasingCompanyPage, sh03AgentSingleRoutes.RoleAtPurchasingCompanyController.onPageLoad(NormalMode))
+      map.put(AgentReferencePage, sh03AgentSingleRoutes.AgentReferenceController.onPageLoad(mode))
+      map.put(CompanyDetailsPage, sh03AgentSingleRoutes.CompanyDetailsController.onPageLoad(mode))
+      map.put(ReasonForPurchasePage, sh03AgentSingleRoutes.ReasonForPurchaseController.onPageLoad(mode))
+      map.put(TreasurySharesPage, sh03AgentSingleRoutes.TreasurySharesController.onPageLoad(mode))
+      map.put(ConnectedPersonsPage, sh03AgentSingleRoutes.ConnectedPersonsController.onPageLoad(mode))
+      map.put(ApplyingForReliefPage, sh03AgentSingleRoutes.ApplyingForReliefController.onPageLoad(mode))
+      map.put(WhatReliefAreYouApplyingForPage, sh03AgentSingleRoutes.WhatReliefAreYouApplyingForController.onPageLoad(mode))
+      map.put(DetailsOfThisSharePurchasePage, sh03AgentSingleRoutes.DetailsOfThisSharePurchaseController.onPageLoad(mode))
+      map.put(MaximumAmountPaidPage, sh03AgentSingleRoutes.MaximumAmountPaidController.onPageLoad(mode))
+      map.put(MinimumAmountPaidPage, sh03AgentSingleRoutes.MinimumAmountPaidController.onPageLoad(mode))
+      map.put(ChargingPointPage, sh03AgentSingleRoutes.ChargingPointController.onPageLoad(mode))
+      map.put(RoleAtPurchasingCompanyPage, sh03AgentSingleRoutes.RoleAtPurchasingCompanyController.onPageLoad(mode))
       
       map
     }

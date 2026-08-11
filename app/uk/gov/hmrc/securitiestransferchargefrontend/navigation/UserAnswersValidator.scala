@@ -16,19 +16,23 @@
 
 package uk.gov.hmrc.securitiestransferchargefrontend.navigation
 
+import com.google.common.collect.BiMap
 import play.api.mvc.{Call, Request}
-import uk.gov.hmrc.securitiestransferchargefrontend.models.{NormalMode, UserAnswers}
-import uk.gov.hmrc.securitiestransferchargefrontend.pages.{JourneyRecoveryPage, Page}
+import uk.gov.hmrc.securitiestransferchargefrontend.models.{CheckMode, Mode, NormalMode, UserAnswers}
+import uk.gov.hmrc.securitiestransferchargefrontend.pages.{CyaPage, ErrorPage, JourneyRecoveryPage, Page}
 import uk.gov.hmrc.securitiestransferchargefrontend.queries.Gettable
 
+import scala.collection.mutable
 import scala.concurrent.{ExecutionContext, Future}
-import com.google.common.collect.BiMap
 
 abstract class UserAnswersValidator(navigator: Navigator)(implicit ec: ExecutionContext) {
 
   protected type GettablePage[A] = Page & Gettable[A]
   private val recoveryPage: GettablePage[?] = JourneyRecoveryPage
 
+  // Cache for pageCallMap to avoid recreating during recursion
+  private val pageCallMapCache: mutable.Map[Mode, BiMap[GettablePage[?], Call]] =
+    mutable.Map.empty[Mode, BiMap[GettablePage[?], Call]]
 
   /*
    * Uses the navigator to walk the page graph and check if all the data is present in the UserAnswers.
@@ -47,34 +51,39 @@ abstract class UserAnswersValidator(navigator: Navigator)(implicit ec: Execution
     else if (isErrorPage(page))
       Future.successful(Right(false))
     else if (!pageHasValidDataAtPath(userAnswers, page))
-      Future.successful(Left(callForPage(page)))
+      Future.successful(Left(callForPage(page, CheckMode)))
     else {
       navigator.nextPage(page, NormalMode, userAnswers).flatMap { nextCall =>
-        val nextPage: GettablePage[?] = callToPage(nextCall)
+        val nextPage: GettablePage[?] = callToPage(nextCall, NormalMode)
         validateRec(userAnswers, nextPage)
       }
     }
   }
 
   protected val startPage: GettablePage[?]
-  protected lazy val pageCallMap: BiMap[GettablePage[?], Call]
+  protected def pageCallMap(mode: Mode): BiMap[GettablePage[?], Call]
+
+  // Cached version of pageCallMap to avoid recreating during recursion
+  private def getCachedPageCallMap(mode: Mode): BiMap[GettablePage[?], Call] = {
+    pageCallMapCache.getOrElseUpdate(mode, pageCallMap(mode))
+  }
 
   // Default implementation of pageHasValidDataAtPath, can be overridden in subclasses
   // where additional validation logic is required for specific pages.
   protected def pageHasValidDataAtPath(userAnswers: UserAnswers, page: GettablePage[?]): Boolean =
     pageHasDataAtPath(userAnswers, page)
 
-  private def callToPage(call: Call): GettablePage[?] = 
-    pageCallMap.inverse().getOrDefault(call, recoveryPage)
-     
-  private def callForPage(page: GettablePage[?]): Call = 
-    pageCallMap.getOrDefault(page, navigator.errorPage(page))
+  private def callToPage(call: Call, mode: Mode): GettablePage[?] =
+    getCachedPageCallMap(mode).inverse().getOrDefault(call, recoveryPage)
 
-  protected def isCyaPage(page: GettablePage[?]): Boolean = 
-    page.isInstanceOf[uk.gov.hmrc.securitiestransferchargefrontend.pages.CyaPage]
-  
-  protected def isErrorPage(page: GettablePage[?]): Boolean = 
-    page.isInstanceOf[uk.gov.hmrc.securitiestransferchargefrontend.pages.ErrorPage]
+  private def callForPage(page: GettablePage[?], mode: Mode): Call =
+    getCachedPageCallMap(mode).getOrDefault(page, navigator.errorPage(page))
+
+  private def isCyaPage(page: GettablePage[?]): Boolean =
+    page.isInstanceOf[CyaPage]
+
+  private def isErrorPage(page: GettablePage[?]): Boolean =
+    page.isInstanceOf[ErrorPage]
 
   private def pageHasDataAtPath(userAnswers: UserAnswers, page: GettablePage[?]): Boolean = {
     (userAnswers.data \ page.toString).toOption.isDefined

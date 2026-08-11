@@ -27,7 +27,7 @@ import uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.individuals.
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.organisations.single.routes as orgSingleRoutes
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.shared.routes as sharedRoutes
 import uk.gov.hmrc.securitiestransferchargefrontend.domain.{SubmissionId, UserId}
-import uk.gov.hmrc.securitiestransferchargefrontend.models.{CheckMode, Mode, NormalMode, UserAnswers}
+import uk.gov.hmrc.securitiestransferchargefrontend.models.{CheckMode, Mode, UserAnswers}
 import uk.gov.hmrc.securitiestransferchargefrontend.navigation.stf.organisations.{BackwardsRoutes, ForwardRoutes}
 import uk.gov.hmrc.securitiestransferchargefrontend.navigation.{AbstractModeNavigator, PersistentNavigator, UserAnswersValidator}
 import uk.gov.hmrc.securitiestransferchargefrontend.pages.*
@@ -110,25 +110,25 @@ class StfOrgNavigator @Inject()(appConfig: FrontendAppConfig,
 
     override protected val startPage: GettablePage[?] = ConfirmAddressPage
 
-    override protected lazy val pageCallMap: BiMap[GettablePage[?], Call] = {
+    override protected def pageCallMap(mode: Mode): BiMap[GettablePage[?], Call] = {
       val map = HashBiMap.create[GettablePage[?], Call]()
       
       // STF Organisation single journey pages only
       map.put(ConfirmAddressPage, orgSingleRoutes.ConfirmAddressController.onPageLoad())
       map.put(StfBuyersAddressPage, orgSingleRoutes.AddressController.onPageLoad())
-      map.put(NameOfSellerPage, orgSingleRoutes.NameOfSellerController.onPageLoad(NormalMode))
+      map.put(NameOfSellerPage, orgSingleRoutes.NameOfSellerController.onPageLoad(mode))
       map.put(StfSellerAddressPage, orgSingleRoutes.StfSellerAddressController.onPageLoad())
-      map.put(ConnectedPersonsPage, orgSingleRoutes.ConnectedPersonsController.onPageLoad(NormalMode))
-      map.put(ApplyingForReliefPage, orgSingleRoutes.ApplyingForReliefController.onPageLoad(NormalMode))
-      map.put(WhatReliefAreYouApplyingForPage, orgSingleRoutes.WhatReliefAreYouApplyingForController.onPageLoad(NormalMode))
-      map.put(SecuritiesTargetPage, orgSingleRoutes.SecuritiesTargetController.onPageLoad(NormalMode))
-      map.put(ChargingPointPage, orgSingleRoutes.ChargingPointController.onPageLoad(NormalMode))
-      map.put(TaxRatePage, orgSingleRoutes.TaxRateController.onPageLoad(NormalMode))
-      map.put(PurchasingSharesPage, orgSingleRoutes.PurchasingSharesController.onPageLoad(NormalMode))
-      map.put(DetailsOfThisTransferPage, orgSingleRoutes.DetailsOfThisTransferController.onPageLoad(NormalMode))
-      map.put(OtherSecuritiesTypePage, orgSingleRoutes.OtherSecuritiesTypeController.onPageLoad(NormalMode))
-      map.put(AmountPaidForSecuritiesPage, orgSingleRoutes.AmountPaidForSecuritiesController.onPageLoad(NormalMode))
-      map.put(TotalMarketValuePage, orgSingleRoutes.TotalMarketValueController.onPageLoad(NormalMode))
+      map.put(ConnectedPersonsPage, orgSingleRoutes.ConnectedPersonsController.onPageLoad(mode))
+      map.put(ApplyingForReliefPage, orgSingleRoutes.ApplyingForReliefController.onPageLoad(mode))
+      map.put(WhatReliefAreYouApplyingForPage, orgSingleRoutes.WhatReliefAreYouApplyingForController.onPageLoad(mode))
+      map.put(SecuritiesTargetPage, orgSingleRoutes.SecuritiesTargetController.onPageLoad(mode))
+      map.put(ChargingPointPage, orgSingleRoutes.ChargingPointController.onPageLoad(mode))
+      map.put(TaxRatePage, orgSingleRoutes.TaxRateController.onPageLoad(mode))
+      map.put(PurchasingSharesPage, orgSingleRoutes.PurchasingSharesController.onPageLoad(mode))
+      map.put(DetailsOfThisTransferPage, orgSingleRoutes.DetailsOfThisTransferController.onPageLoad(mode))
+      map.put(OtherSecuritiesTypePage, orgSingleRoutes.OtherSecuritiesTypeController.onPageLoad(mode))
+      map.put(AmountPaidForSecuritiesPage, orgSingleRoutes.AmountPaidForSecuritiesController.onPageLoad(mode))
+      map.put(TotalMarketValuePage, orgSingleRoutes.TotalMarketValueController.onPageLoad(mode))
       map.put(CheckYourAnswersPage, stfSingleCyaRoutes.CheckYourAnswersController.onPageLoad())
 
       map
@@ -136,9 +136,9 @@ class StfOrgNavigator @Inject()(appConfig: FrontendAppConfig,
 
     override protected def pageHasValidDataAtPath(userAnswers: UserAnswers, page: GettablePage[_]): Boolean = page match {
       case DetailsOfThisTransferPage if userAnswers.get(ConnectedPersonsPage).contains(true) =>
-        userAnswers.get(DetailsOfThisTransferPage).map(_.marketValue).isDefined
+        userAnswers.get(DetailsOfThisTransferPage).exists(_.marketValue.isDefined)
       case SecuritiesTargetPage => // CRN is optional
-        userAnswers.get(SecuritiesTargetPage).map(_.businessName).isDefined
+        userAnswers.get(SecuritiesTargetPage).exists(_.businessName.nonEmpty)
       case _ => super.pageHasValidDataAtPath(userAnswers, page)
     }
   }

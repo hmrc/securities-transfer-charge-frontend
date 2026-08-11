@@ -24,7 +24,7 @@ import play.api.libs.json.{JsString, Json}
 import play.api.mvc.{Call, Request}
 import play.api.test.FakeRequest
 import uk.gov.hmrc.securitiestransferchargefrontend.domain.{GroupIdentifier, SubmissionId, UserId}
-import uk.gov.hmrc.securitiestransferchargefrontend.models.UserAnswers
+import uk.gov.hmrc.securitiestransferchargefrontend.models.{Mode, UserAnswers}
 import uk.gov.hmrc.securitiestransferchargefrontend.navigation.{Navigator, UserAnswersValidator}
 import uk.gov.hmrc.securitiestransferchargefrontend.pages.{CyaPage, ErrorPage, Page, QuestionPage}
 import uk.gov.hmrc.securitiestransferchargefrontend.queries.Gettable
@@ -84,15 +84,15 @@ class UserAnswersValidatorSpec extends AnyFreeSpec with Matchers with ScalaFutur
       nextPageMap = nextPageMap + (page -> call)
     }
 
-    override def nextPage(page: Page, mode: uk.gov.hmrc.securitiestransferchargefrontend.models.Mode, userAnswers: UserAnswers, isReturn: Boolean = false)(implicit request: Request[_]): Future[Call] = {
+    override def nextPage(page: Page, mode: Mode, userAnswers: UserAnswers, isReturn: Boolean = false)(implicit request: Request[_]): Future[Call] = {
       Future.successful(nextPageMap.getOrElse(page, recoveryPageCall))
     }
 
-    override def previousPage(page: Page, mode: uk.gov.hmrc.securitiestransferchargefrontend.models.Mode, userAnswers: UserAnswers): Call = {
+    override def previousPage(page: Page, mode: Mode, userAnswers: UserAnswers): Call = {
       recoveryPageCall
     }
 
-    override def previousPage(page: Page, mode: uk.gov.hmrc.securitiestransferchargefrontend.models.Mode, userAnswers: Option[UserAnswers]): Call = {
+    override def previousPage(page: Page, mode: Mode, userAnswers: Option[UserAnswers]): Call = {
       recoveryPageCall
     }
 
@@ -126,7 +126,7 @@ class UserAnswersValidatorSpec extends AnyFreeSpec with Matchers with ScalaFutur
 
         val validator = new UserAnswersValidator(navigator) {
           override protected val startPage: GettablePage[?] = TestStartPage
-          override protected lazy val pageCallMap: BiMap[GettablePage[?], Call] = {
+          override protected def pageCallMap(mode: Mode): BiMap[GettablePage[?], Call] = {
             val map = HashBiMap.create[GettablePage[?], Call]()
             map.put(TestStartPage, startPageCall)
             map.put(TestPage1, page1Call)
@@ -155,7 +155,7 @@ class UserAnswersValidatorSpec extends AnyFreeSpec with Matchers with ScalaFutur
 
         val validator = new UserAnswersValidator(navigator) {
           override protected val startPage: GettablePage[?] = TestStartPage
-          override protected lazy val pageCallMap: BiMap[GettablePage[?], Call] = {
+          override protected def pageCallMap(mode: Mode): BiMap[GettablePage[?], Call] = {
             val map = HashBiMap.create[GettablePage[?], Call]()
             map.put(TestStartPage, startPageCall)
             map.put(TestPage1, page1Call)
@@ -184,7 +184,7 @@ class UserAnswersValidatorSpec extends AnyFreeSpec with Matchers with ScalaFutur
 
         val validator = new UserAnswersValidator(navigator) {
           override protected val startPage: GettablePage[?] = TestStartPage
-          override protected lazy val pageCallMap: BiMap[GettablePage[?], Call] = {
+          override protected def pageCallMap(mode: Mode): BiMap[GettablePage[?], Call] = {
             val map = HashBiMap.create[GettablePage[?], Call]()
             map.put(TestStartPage, startPageCall)
             map.put(TestPage1, page1Call)
@@ -212,7 +212,7 @@ class UserAnswersValidatorSpec extends AnyFreeSpec with Matchers with ScalaFutur
 
         val validator = new UserAnswersValidator(navigator) {
           override protected val startPage: GettablePage[?] = TestStartPage
-          override protected lazy val pageCallMap: BiMap[GettablePage[?], Call] = {
+          override protected def pageCallMap(mode: Mode): BiMap[GettablePage[?], Call] = {
             val map = HashBiMap.create[GettablePage[?], Call]()
             map.put(TestStartPage, startPageCall)
             map.put(TestPage1, page1Call)
@@ -237,7 +237,7 @@ class UserAnswersValidatorSpec extends AnyFreeSpec with Matchers with ScalaFutur
 
         val validator = new UserAnswersValidator(navigator) {
           override protected val startPage: GettablePage[?] = TestStartPage
-          override protected lazy val pageCallMap: BiMap[GettablePage[?], Call] = {
+          override protected def pageCallMap(mode: Mode): BiMap[GettablePage[?], Call] = {
             val map = HashBiMap.create[GettablePage[?], Call]()
             map.put(TestStartPage, startPageCall)
             map.put(TestPage1, page1Call)
@@ -261,7 +261,7 @@ class UserAnswersValidatorSpec extends AnyFreeSpec with Matchers with ScalaFutur
 
         val validator = new UserAnswersValidator(navigator) {
           override protected val startPage: GettablePage[?] = TestStartPage
-          override protected lazy val pageCallMap: BiMap[GettablePage[?], Call] = {
+          override protected def pageCallMap(mode: Mode): BiMap[GettablePage[?], Call] = {
             val map = HashBiMap.create[GettablePage[?], Call]()
             map.put(TestStartPage, startPageCall)
             map.put(TestPage1, page1Call)
@@ -289,7 +289,7 @@ class UserAnswersValidatorSpec extends AnyFreeSpec with Matchers with ScalaFutur
 
         val validator = new UserAnswersValidator(navigator) {
           override protected val startPage: GettablePage[?] = TestStartPage
-          override protected lazy val pageCallMap: BiMap[GettablePage[?], Call] = {
+          override protected def pageCallMap(mode: Mode): BiMap[GettablePage[?], Call] = {
             val map = HashBiMap.create[GettablePage[?], Call]()
             map.put(TestStartPage, startPageCall)
             // unknownCall is not in the map
