@@ -32,7 +32,7 @@ class StfSellerAddressControllerSpec extends SpecBase with MockitoSugar {
         .build()
 
       running(application) {
-        val request = FakeRequest(GET, orgSingleRoutes.StfSellerAddressController.onPageLoad().url)
+        val request = FakeRequest(GET, orgSingleRoutes.StfSellerAddressController.onPageLoad(NormalMode).url)
         val result = route(application, request).value
 
         status(result) mustEqual SEE_OTHER

@@ -44,7 +44,7 @@ class BackwardsRoutes(defaultPage: Call):
     case StfBuyersAddressPage => _ => individualRoutes.HowToNotifyAboutSecuritiesTransferController.onPageLoad()
     case NameOfSellerPage => _ => individualSingleRoutes.ConfirmAddressController.onPageLoad()
     case StfSellerAddressPage => _ => individualSingleRoutes.NameOfSellerController.onPageLoad(NormalMode)
-    case ConnectedPersonsPage => _ => individualSingleRoutes.StfSellerAddressController.onPageLoad()
+    case ConnectedPersonsPage => _ => individualSingleRoutes.StfSellerAddressController.onPageLoad(NormalMode)
     case ApplyingForReliefPage => _ => individualSingleRoutes.ConnectedPersonsController.onPageLoad(NormalMode)
     case WhatReliefAreYouApplyingForPage => _ => individualSingleRoutes.ApplyingForReliefController.onPageLoad(NormalMode)
     case SecuritiesTargetPage => _.fold(defaultPage) { userAnswers =>

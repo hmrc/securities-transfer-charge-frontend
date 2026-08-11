@@ -18,17 +18,15 @@ package uk.gov.hmrc.securitiestransferchargefrontend.navigation
 
 import play.api.mvc.{Call, Request}
 import uk.gov.hmrc.securitiestransferchargefrontend.models.{NormalMode, UserAnswers}
-import uk.gov.hmrc.securitiestransferchargefrontend.pages.{JourneyRecoveryPage, Page}
+import uk.gov.hmrc.securitiestransferchargefrontend.pages.{CyaPage, ErrorPage, JourneyRecoveryPage, Page}
 import uk.gov.hmrc.securitiestransferchargefrontend.queries.Gettable
 
 import scala.concurrent.{ExecutionContext, Future}
-import com.google.common.collect.BiMap
 
 abstract class UserAnswersValidator(navigator: Navigator)(implicit ec: ExecutionContext) {
 
   protected type GettablePage[A] = Page & Gettable[A]
   private val recoveryPage: GettablePage[?] = JourneyRecoveryPage
-
 
   /*
    * Uses the navigator to walk the page graph and check if all the data is present in the UserAnswers.
@@ -57,24 +55,24 @@ abstract class UserAnswersValidator(navigator: Navigator)(implicit ec: Execution
   }
 
   protected val startPage: GettablePage[?]
-  protected lazy val pageCallMap: BiMap[GettablePage[?], Call]
+  protected lazy val pageCallMap: PageCallBiMap
 
   // Default implementation of pageHasValidDataAtPath, can be overridden in subclasses
   // where additional validation logic is required for specific pages.
   protected def pageHasValidDataAtPath(userAnswers: UserAnswers, page: GettablePage[?]): Boolean =
     pageHasDataAtPath(userAnswers, page)
 
-  private def callToPage(call: Call): GettablePage[?] = 
-    pageCallMap.inverse().getOrDefault(call, recoveryPage)
-     
-  private def callForPage(page: GettablePage[?]): Call = 
-    pageCallMap.getOrDefault(page, navigator.errorPage(page))
+  private def callToPage(call: Call): GettablePage[?] =
+    pageCallMap.getPageFor(call).getOrElse(recoveryPage)
 
-  protected def isCyaPage(page: GettablePage[?]): Boolean = 
-    page.isInstanceOf[uk.gov.hmrc.securitiestransferchargefrontend.pages.CyaPage]
-  
-  protected def isErrorPage(page: GettablePage[?]): Boolean = 
-    page.isInstanceOf[uk.gov.hmrc.securitiestransferchargefrontend.pages.ErrorPage]
+  private def callForPage(page: GettablePage[?]): Call =
+    pageCallMap.getCallFor(page).getOrElse(navigator.errorPage(page))
+
+  private def isCyaPage(page: GettablePage[?]): Boolean =
+    page.isInstanceOf[CyaPage]
+
+  private def isErrorPage(page: GettablePage[?]): Boolean =
+    page.isInstanceOf[ErrorPage]
 
   private def pageHasDataAtPath(userAnswers: UserAnswers, page: GettablePage[?]): Boolean = {
     (userAnswers.data \ page.toString).toOption.isDefined

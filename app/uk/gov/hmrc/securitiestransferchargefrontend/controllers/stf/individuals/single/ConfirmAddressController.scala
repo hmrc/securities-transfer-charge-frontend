@@ -21,7 +21,7 @@ import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import uk.gov.hmrc.securitiestransferchargefrontend.connectors.{SubscriptionConnector, SubscriptionStatusErrorException}
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.actions.*
-import uk.gov.hmrc.securitiestransferchargefrontend.models.NormalMode
+import uk.gov.hmrc.securitiestransferchargefrontend.models.{Mode, NormalMode}
 import uk.gov.hmrc.securitiestransferchargefrontend.navigation.Navigator
 import uk.gov.hmrc.securitiestransferchargefrontend.pages.stf.single.ConfirmAddressPage
 import uk.gov.hmrc.securitiestransferchargefrontend.repositories.SubscriptionDataRepository
@@ -62,7 +62,7 @@ class ConfirmAddressController @Inject()(
         }
     }
 
-  def onSubmit: Action[AnyContent] =
+  def onSubmit(mode: Mode = NormalMode): Action[AnyContent] =
     (stcAuthEnrolled andThen getData andThen requireData).async { implicit request =>
       (
         for {
@@ -70,7 +70,7 @@ class ConfirmAddressController @Inject()(
             .getOrFail(new SubscriptionDataNotFoundException("Subscription data not found"))
           address = addressService.extractConfirmableAddress(subscriptionData.subscriptionDetails)
           updatedAnswers <- Future.fromTry(request.userAnswers.set(ConfirmAddressPage, address))
-          nextPage <- navigator.nextPage(ConfirmAddressPage, NormalMode, updatedAnswers)
+          nextPage <- navigator.nextPage(ConfirmAddressPage, mode, updatedAnswers)
         } yield Redirect(nextPage)
         ).recover {
         case _: SubscriptionDataNotFoundException => Redirect(kickOutPage)

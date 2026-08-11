@@ -21,7 +21,7 @@ import play.twirl.api.Html
 import uk.gov.hmrc.govukfrontend.views.viewmodels.content.HtmlContent
 import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.SummaryListRow
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.individuals.single.routes
-import uk.gov.hmrc.securitiestransferchargefrontend.models.UserAnswers
+import uk.gov.hmrc.securitiestransferchargefrontend.models.{CheckMode, UserAnswers}
 import uk.gov.hmrc.securitiestransferchargefrontend.pages.stf.single.StfSellerAddressPage
 import uk.gov.hmrc.securitiestransferchargefrontend.viewmodels.govuk.summarylist.*
 import uk.gov.hmrc.securitiestransferchargefrontend.viewmodels.implicits.*
@@ -42,7 +42,7 @@ object StfSellerAddressSummary  {
       key     = "checkYourAnswers.sellerAddress",
       value   = ValueViewModel(value),
       actions = Seq(
-        ActionItemViewModel("site.change", routes.StfSellerAddressController.onPageLoad().url)
+        ActionItemViewModel("site.change", routes.StfSellerAddressController.onPageLoad(CheckMode).url)
           .withVisuallyHiddenText(messages("checkYourAnswers.sellerAddress.change.hidden"))
       )
     ))

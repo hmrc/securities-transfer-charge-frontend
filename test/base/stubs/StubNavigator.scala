@@ -18,8 +18,9 @@ package base.stubs
 
 import play.api.mvc.{Call, Request}
 import uk.gov.hmrc.securitiestransferchargefrontend.models.{Mode, UserAnswers}
-import uk.gov.hmrc.securitiestransferchargefrontend.navigation.{Navigator, UserAnswersValidator}
+import uk.gov.hmrc.securitiestransferchargefrontend.navigation.{Navigator, PersistentNavigator, UserAnswersValidator}
 import uk.gov.hmrc.securitiestransferchargefrontend.pages.Page
+import uk.gov.hmrc.securitiestransferchargefrontend.domain.{SubmissionId, UserId}
 
 import scala.concurrent.Future
 
@@ -27,7 +28,6 @@ class StubNavigator(desiredCall: Call)(implicit ec: scala.concurrent.ExecutionCo
 
   override def nextPage(page: Page, mode: Mode, userAnswers: UserAnswers, isReturn: Boolean = false)(implicit request: Request[_]): Future[Call] = {
     Future.successful(desiredCall)
-
   }
 
   override def errorPage(forPage: Page): Call = desiredCall
@@ -37,4 +37,14 @@ class StubNavigator(desiredCall: Call)(implicit ec: scala.concurrent.ExecutionCo
   override def previousPage(page: Page, mode: Mode, userAnswers: Option[UserAnswers]): Call = desiredCall
 
   override val userAnswersValidator: UserAnswersValidator = new StubUserAnswersValidator(this)
+}
+
+class StubPersistentNavigator(desiredCall: Call, completeAnswers: UserAnswers, journeyPrefix: String = "stf", affinityPrefix: String = "")(implicit ec: scala.concurrent.ExecutionContext) 
+  extends StubNavigator(desiredCall) with PersistentNavigator {
+  
+  override def restore(submissionId: SubmissionId, userId: UserId)(implicit request: Request[?]): Future[UserAnswers] = {
+    Future.successful(completeAnswers)
+  }
+
+  override val userAnswersValidator: UserAnswersValidator = new CyaSuccessValidator(this, journeyPrefix, affinityPrefix)
 }

@@ -33,7 +33,7 @@
 
 @layout(pageTitle = titleNoForm(messages("org.confirmAddress.title"),Some(messages("sectionTitle.businessDetails")))) {
 
-@formHelper(action = routes.ConfirmAddressController.onSubmit()) {
+@formHelper(action = routes.ConfirmAddressController.onSubmit(uk.gov.hmrc.securitiestransferchargefrontend.models.NormalMode)) {
 
     <span class="govuk-caption-l">@messages("org.details.caption")</span>
     <h1 class="govuk-heading-l">@messages("org.confirmAddress.heading")</h1>

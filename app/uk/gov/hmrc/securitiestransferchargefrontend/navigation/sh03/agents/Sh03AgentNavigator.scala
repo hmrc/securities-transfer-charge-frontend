@@ -16,7 +16,6 @@
 
 package uk.gov.hmrc.securitiestransferchargefrontend.navigation.sh03.agents
 
-import com.google.common.collect.{BiMap, HashBiMap}
 import com.google.inject.Singleton
 import play.api.mvc.{Call, Request}
 import uk.gov.hmrc.http.HeaderCarrier
@@ -26,9 +25,9 @@ import uk.gov.hmrc.securitiestransferchargefrontend.controllers.routes
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.sh03.agents.single.routes as sh03AgentSingleRoutes
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.shared.routes as sharedRoutes
 import uk.gov.hmrc.securitiestransferchargefrontend.domain.{SubmissionId, UserId}
-import uk.gov.hmrc.securitiestransferchargefrontend.models.{Mode, NormalMode, UserAnswers}
+import uk.gov.hmrc.securitiestransferchargefrontend.models.{Mode, UserAnswers}
 import uk.gov.hmrc.securitiestransferchargefrontend.navigation.sh03.agents
-import uk.gov.hmrc.securitiestransferchargefrontend.navigation.{AbstractModeNavigator, PersistentNavigator, UserAnswersValidator}
+import uk.gov.hmrc.securitiestransferchargefrontend.navigation.*
 import uk.gov.hmrc.securitiestransferchargefrontend.pages.*
 import uk.gov.hmrc.securitiestransferchargefrontend.pages.sh03.*
 import uk.gov.hmrc.securitiestransferchargefrontend.services.AnswerPersistenceService
@@ -68,25 +67,21 @@ class Sh03AgentNavigator @Inject()(answerPersistenceService: AnswerPersistenceSe
 
     override protected val startPage: GettablePage[?] = AgentReferencePage
 
-    override protected lazy val pageCallMap: BiMap[GettablePage[?], Call] = {
-      val map = HashBiMap.create[GettablePage[?], Call]()
-      
-      // SH03 Agent single journey pages only
-      map.put(AgentReferencePage, sh03AgentSingleRoutes.AgentReferenceController.onPageLoad(NormalMode))
-      map.put(CompanyDetailsPage, sh03AgentSingleRoutes.CompanyDetailsController.onPageLoad(NormalMode))
-      map.put(ReasonForPurchasePage, sh03AgentSingleRoutes.ReasonForPurchaseController.onPageLoad(NormalMode))
-      map.put(TreasurySharesPage, sh03AgentSingleRoutes.TreasurySharesController.onPageLoad(NormalMode))
-      map.put(ConnectedPersonsPage, sh03AgentSingleRoutes.ConnectedPersonsController.onPageLoad(NormalMode))
-      map.put(ApplyingForReliefPage, sh03AgentSingleRoutes.ApplyingForReliefController.onPageLoad(NormalMode))
-      map.put(WhatReliefAreYouApplyingForPage, sh03AgentSingleRoutes.WhatReliefAreYouApplyingForController.onPageLoad(NormalMode))
-      map.put(DetailsOfThisSharePurchasePage, sh03AgentSingleRoutes.DetailsOfThisSharePurchaseController.onPageLoad(NormalMode))
-      map.put(MaximumAmountPaidPage, sh03AgentSingleRoutes.MaximumAmountPaidController.onPageLoad(NormalMode))
-      map.put(MinimumAmountPaidPage, sh03AgentSingleRoutes.MinimumAmountPaidController.onPageLoad(NormalMode))
-      map.put(ChargingPointPage, sh03AgentSingleRoutes.ChargingPointController.onPageLoad(NormalMode))
-      map.put(RoleAtPurchasingCompanyPage, sh03AgentSingleRoutes.RoleAtPurchasingCompanyController.onPageLoad(NormalMode))
-      
-      map
-    }
+    override protected lazy val pageCallMap: PageCallBiMap =
+      PageCallBiMapBuilder()
+        .addMapping(AgentReferencePage, sh03AgentSingleRoutes.AgentReferenceController.onPageLoad)
+        .addMapping(CompanyDetailsPage, sh03AgentSingleRoutes.CompanyDetailsController.onPageLoad)
+        .addMapping(ReasonForPurchasePage, sh03AgentSingleRoutes.ReasonForPurchaseController.onPageLoad)
+        .addMapping(TreasurySharesPage, sh03AgentSingleRoutes.TreasurySharesController.onPageLoad)
+        .addMapping(ConnectedPersonsPage, sh03AgentSingleRoutes.ConnectedPersonsController.onPageLoad)
+        .addMapping(ApplyingForReliefPage, sh03AgentSingleRoutes.ApplyingForReliefController.onPageLoad)
+        .addMapping(WhatReliefAreYouApplyingForPage, sh03AgentSingleRoutes.WhatReliefAreYouApplyingForController.onPageLoad)
+        .addMapping(DetailsOfThisSharePurchasePage, sh03AgentSingleRoutes.DetailsOfThisSharePurchaseController.onPageLoad)
+        .addMapping(MaximumAmountPaidPage, sh03AgentSingleRoutes.MaximumAmountPaidController.onPageLoad)
+        .addMapping(MinimumAmountPaidPage, sh03AgentSingleRoutes.MinimumAmountPaidController.onPageLoad)
+        .addMapping(ChargingPointPage, sh03AgentSingleRoutes.ChargingPointController.onPageLoad)
+        .addMapping(RoleAtPurchasingCompanyPage, sh03AgentSingleRoutes.RoleAtPurchasingCompanyController.onPageLoad)
+        .build
 
     override protected def pageHasValidDataAtPath(userAnswers: UserAnswers, page: GettablePage[_]): Boolean = page match {
       case AgentReferencePage => true // Optional data, so always valid

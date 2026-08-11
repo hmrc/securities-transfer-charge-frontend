@@ -16,7 +16,6 @@
 
 package uk.gov.hmrc.securitiestransferchargefrontend.navigation.sh03.organisations
 
-import com.google.common.collect.{BiMap, HashBiMap}
 import com.google.inject.Singleton
 import play.api.mvc.{Call, Request}
 import uk.gov.hmrc.http.HeaderCarrier
@@ -26,8 +25,8 @@ import uk.gov.hmrc.securitiestransferchargefrontend.controllers.routes
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.sh03.organisations.single.routes as sh03OrgSingleRoutes
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.shared.routes as sharedRoutes
 import uk.gov.hmrc.securitiestransferchargefrontend.domain.{SubmissionId, UserId}
-import uk.gov.hmrc.securitiestransferchargefrontend.models.{Mode, NormalMode, UserAnswers}
-import uk.gov.hmrc.securitiestransferchargefrontend.navigation.{AbstractModeNavigator, PersistentNavigator, UserAnswersValidator}
+import uk.gov.hmrc.securitiestransferchargefrontend.models.{Mode, UserAnswers}
+import uk.gov.hmrc.securitiestransferchargefrontend.navigation.*
 import uk.gov.hmrc.securitiestransferchargefrontend.pages.Page
 import uk.gov.hmrc.securitiestransferchargefrontend.pages.sh03.*
 import uk.gov.hmrc.securitiestransferchargefrontend.services.AnswerPersistenceService
@@ -69,24 +68,20 @@ class Sh03OrgNavigator @Inject()(
 
     override protected val startPage: GettablePage[?] = CompanyDetailsPage
 
-    override protected lazy val pageCallMap: BiMap[GettablePage[?], Call] = {
-      val map = HashBiMap.create[GettablePage[?], Call]()
-      
-      // SH03 Organisation single journey pages only
-      map.put(CompanyDetailsPage, sh03OrgSingleRoutes.CompanyDetailsController.onPageLoad(NormalMode))
-      map.put(ReasonForPurchasePage, sh03OrgSingleRoutes.ReasonForPurchaseController.onPageLoad(NormalMode))
-      map.put(TreasurySharesPage, sh03OrgSingleRoutes.TreasurySharesController.onPageLoad(NormalMode))
-      map.put(ConnectedPersonsPage, sh03OrgSingleRoutes.ConnectedPersonsController.onPageLoad(NormalMode))
-      map.put(ApplyingForReliefPage, sh03OrgSingleRoutes.ApplyingForReliefController.onPageLoad(NormalMode))
-      map.put(WhatReliefAreYouApplyingForPage, sh03OrgSingleRoutes.WhatReliefAreYouApplyingForController.onPageLoad(NormalMode))
-      map.put(DetailsOfThisSharePurchasePage, sh03OrgSingleRoutes.DetailsOfThisSharePurchaseController.onPageLoad(NormalMode))
-      map.put(MaximumAmountPaidPage, sh03OrgSingleRoutes.MaximumAmountPaidController.onPageLoad(NormalMode))
-      map.put(MinimumAmountPaidPage, sh03OrgSingleRoutes.MinimumAmountPaidController.onPageLoad(NormalMode))
-      map.put(ChargingPointPage, sh03OrgSingleRoutes.ChargingPointController.onPageLoad(NormalMode))
-      map.put(RoleAtPurchasingCompanyPage, sh03OrgSingleRoutes.RoleAtPurchasingCompanyController.onPageLoad(NormalMode))
-      
-      map
-    }
+    override protected lazy val pageCallMap: PageCallBiMap =
+      PageCallBiMapBuilder()
+        .addMapping(CompanyDetailsPage, sh03OrgSingleRoutes.CompanyDetailsController.onPageLoad)
+        .addMapping(ReasonForPurchasePage, sh03OrgSingleRoutes.ReasonForPurchaseController.onPageLoad)
+        .addMapping(TreasurySharesPage, sh03OrgSingleRoutes.TreasurySharesController.onPageLoad)
+        .addMapping(ConnectedPersonsPage, sh03OrgSingleRoutes.ConnectedPersonsController.onPageLoad)
+        .addMapping(ApplyingForReliefPage, sh03OrgSingleRoutes.ApplyingForReliefController.onPageLoad)
+        .addMapping(WhatReliefAreYouApplyingForPage, sh03OrgSingleRoutes.WhatReliefAreYouApplyingForController.onPageLoad)
+        .addMapping(DetailsOfThisSharePurchasePage, sh03OrgSingleRoutes.DetailsOfThisSharePurchaseController.onPageLoad)
+        .addMapping(MaximumAmountPaidPage, sh03OrgSingleRoutes.MaximumAmountPaidController.onPageLoad)
+        .addMapping(MinimumAmountPaidPage, sh03OrgSingleRoutes.MinimumAmountPaidController.onPageLoad)
+        .addMapping(ChargingPointPage, sh03OrgSingleRoutes.ChargingPointController.onPageLoad)
+        .addMapping(RoleAtPurchasingCompanyPage, sh03OrgSingleRoutes.RoleAtPurchasingCompanyController.onPageLoad)
+        .build
 
     override protected def pageHasValidDataAtPath(userAnswers: UserAnswers, page: GettablePage[_]): Boolean = page match {
       case DetailsOfThisSharePurchasePage if userAnswers.get(ConnectedPersonsPage).contains(true) =>

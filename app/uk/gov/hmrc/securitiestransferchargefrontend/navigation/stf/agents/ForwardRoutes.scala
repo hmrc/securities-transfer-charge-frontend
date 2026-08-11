@@ -69,7 +69,7 @@ class ForwardRoutes(answerPersistenceService: AnswerPersistenceService,
     }
     case NameOfBuyerPage => userAnswers => dataRequired(NameOfBuyerPage, userAnswers, agentSingleRoutes.AddressController.onPageLoad())
     case StfBuyersAddressPage => userAnswers => dataRequired(StfBuyersAddressPage, userAnswers, agentSingleRoutes.NameOfSellerController.onPageLoad(NormalMode))
-    case NameOfSellerPage => userAnswers => dataRequired(NameOfSellerPage, userAnswers, agentSingleRoutes.StfSellerAddressController.onPageLoad())
+    case NameOfSellerPage => userAnswers => dataRequired(NameOfSellerPage, userAnswers, agentSingleRoutes.StfSellerAddressController.onPageLoad(NormalMode))
     case StfSellerAddressPage => userAnswers => dataRequired(StfSellerAddressPage, userAnswers, agentSingleRoutes.ConnectedPersonsController.onPageLoad(NormalMode))
     case ConnectedPersonsPage => userAnswers => dataRequired(ConnectedPersonsPage, userAnswers, agentSingleRoutes.ApplyingForReliefController.onPageLoad(NormalMode))
     case ApplyingForReliefPage => userAnswers => dataDependent(ApplyingForReliefPage, userAnswers) {

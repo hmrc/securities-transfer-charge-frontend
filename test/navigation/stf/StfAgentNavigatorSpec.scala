@@ -126,7 +126,7 @@ class StfAgentNavigatorSpec extends SpecBase with ScalaFutures {
         val answers = emptyUserAnswers.set(NameOfSellerPage, "John").get
         val result = navigator.nextPage(NameOfSellerPage, NormalMode, answers)(fakeRequest)
         whenReady(result) { res =>
-          res mustBe agentSingleRoutes.StfSellerAddressController.onPageLoad()
+          res mustBe agentSingleRoutes.StfSellerAddressController.onPageLoad(NormalMode)
         }
       }
 
@@ -331,7 +331,7 @@ class StfAgentNavigatorSpec extends SpecBase with ScalaFutures {
 
       "must go from the ConnectedPersonsPage to StfSellerAddressPage" in {
         val result = navigator.previousPage(ConnectedPersonsPage, NormalMode, emptyUserAnswers)
-        result mustBe agentSingleRoutes.StfSellerAddressController.onPageLoad()
+        result mustBe agentSingleRoutes.StfSellerAddressController.onPageLoad(NormalMode)
       }
 
       "must go from the ApplyingForReliefPage to ConnectedPersonsPage" in {
