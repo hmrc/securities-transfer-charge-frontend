@@ -109,12 +109,12 @@ class StfOrgNavigator @Inject()(appConfig: FrontendAppConfig,
 
     override protected val startPage: GettablePage[?] = ConfirmAddressPage
 
-    override protected val pageCallMap: PageCallBiMap =
+    override protected lazy val pageCallMap: PageCallBiMap =
       PageCallBiMapBuilder()
         .addMappingNoCheck(ConfirmAddressPage, orgSingleRoutes.ConfirmAddressController.onPageLoad)
         .addMappingNoCheck(StfBuyersAddressPage, orgSingleRoutes.AddressController.onPageLoad)
         .addMapping(NameOfSellerPage, orgSingleRoutes.NameOfSellerController.onPageLoad)
-        .addMappingNoCheck(StfSellerAddressPage, orgSingleRoutes.StfSellerAddressController.onPageLoad)
+        .addMapping(StfSellerAddressPage, orgSingleRoutes.StfSellerAddressController.onPageLoad)
         .addMapping(ConnectedPersonsPage, orgSingleRoutes.ConnectedPersonsController.onPageLoad)
         .addMapping(ApplyingForReliefPage, orgSingleRoutes.ApplyingForReliefController.onPageLoad)
         .addMapping(WhatReliefAreYouApplyingForPage, orgSingleRoutes.WhatReliefAreYouApplyingForController.onPageLoad)

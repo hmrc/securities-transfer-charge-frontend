@@ -29,7 +29,7 @@ class StubUserAnswersValidator(navigator: Navigator)(implicit ec: ExecutionConte
 
   override protected val startPage: GettablePage[?] = JourneyRecoveryPage
 
-  override protected val pageCallMap: PageCallBiMap =
+  override protected lazy val pageCallMap: PageCallBiMap =
     PageCallBiMapBuilder()
       .addMappingNoCheck(JourneyRecoveryPage, () => Call("GET", "/journey-recovery"))
       .build
@@ -39,7 +39,7 @@ class CyaSuccessValidator(navigator: Navigator, journeyPrefix: String = "stf", a
 
   override protected val startPage: GettablePage[?] = CheckYourAnswersPage
 
-  override protected val pageCallMap: PageCallBiMap =
+  override protected lazy val pageCallMap: PageCallBiMap =
     PageCallBiMapBuilder()
       .addMappingNoCheck(ConfirmAddressPage, () => Call("GET", s"/securities-transfer-charge/$journeyPrefix/${affinityPrefix}confirm-address"))
       .addMappingNoCheck(StfBuyersAddressPage, () => Call("GET", s"/securities-transfer-charge/$journeyPrefix/${affinityPrefix}address"))

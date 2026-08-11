@@ -71,13 +71,13 @@ class StfAgentNavigator @Inject()(appConfig: FrontendAppConfig,
 
     override protected val startPage: GettablePage[?] = AgentReferencePage
 
-    override protected val pageCallMap: PageCallBiMap =
+    override protected lazy val pageCallMap: PageCallBiMap =
       PageCallBiMapBuilder()
         .addMapping(AgentReferencePage, agentSingleRoutes.AgentReferenceController.onPageLoad)
         .addMapping(NameOfBuyerPage, agentSingleRoutes.NameOfBuyerController.onPageLoad)
         .addMappingNoCheck(StfBuyersAddressPage, agentSingleRoutes.AddressController.onPageLoad)
         .addMapping(NameOfSellerPage, agentSingleRoutes.NameOfSellerController.onPageLoad)
-        .addMappingNoCheck(StfSellerAddressPage, agentSingleRoutes.StfSellerAddressController.onPageLoad)
+        .addMapping(StfSellerAddressPage, agentSingleRoutes.StfSellerAddressController.onPageLoad)
         .addMapping(ConnectedPersonsPage, agentSingleRoutes.ConnectedPersonsController.onPageLoad)
         .addMapping(ApplyingForReliefPage, agentSingleRoutes.ApplyingForReliefController.onPageLoad)
         .addMapping(WhatReliefAreYouApplyingForPage, agentSingleRoutes.WhatReliefAreYouApplyingForController.onPageLoad)

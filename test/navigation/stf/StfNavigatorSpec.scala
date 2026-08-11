@@ -109,7 +109,7 @@ class StfNavigatorSpec extends SpecBase with ScalaFutures {
         val answers = emptyUserAnswers.set(NameOfSellerPage, "John").get
         val result = navigator.nextPage(NameOfSellerPage, NormalMode, answers)(fakeRequest)
         whenReady(result) { res =>
-          res mustBe individualSingleRoutes.StfSellerAddressController.onPageLoad()
+          res mustBe individualSingleRoutes.StfSellerAddressController.onPageLoad(NormalMode)
         }
       }
 
@@ -324,7 +324,7 @@ class StfNavigatorSpec extends SpecBase with ScalaFutures {
 
       "must go from the ConnectedPersonsPage to StfSellerAddress" in {
         val result = navigator.previousPage(ConnectedPersonsPage, NormalMode, emptyUserAnswers)
-        result mustBe individualSingleRoutes.StfSellerAddressController.onPageLoad()
+        result mustBe individualSingleRoutes.StfSellerAddressController.onPageLoad(NormalMode)
       }
 
       "must go from the StfSellerAddressPage to NameOfSeller" in {

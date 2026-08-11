@@ -29,7 +29,7 @@
 
 @layout(pageTitle = titleNoForm(messages("confirmAddress.title"))) {
 
-@formHelper(action = routes.ConfirmAddressController.onSubmit()) {
+@formHelper(action = routes.ConfirmAddressController.onSubmit(uk.gov.hmrc.securitiestransferchargefrontend.models.NormalMode)) {
     <span class="govuk-caption-l">
         <span class="govuk-visually-hidden">
             @messages("section.caption.hidden")

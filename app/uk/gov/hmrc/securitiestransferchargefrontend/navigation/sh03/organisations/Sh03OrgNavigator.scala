@@ -68,7 +68,7 @@ class Sh03OrgNavigator @Inject()(
 
     override protected val startPage: GettablePage[?] = CompanyDetailsPage
 
-    override protected val pageCallMap: PageCallBiMap =
+    override protected lazy val pageCallMap: PageCallBiMap =
       PageCallBiMapBuilder()
         .addMapping(CompanyDetailsPage, sh03OrgSingleRoutes.CompanyDetailsController.onPageLoad)
         .addMapping(ReasonForPurchasePage, sh03OrgSingleRoutes.ReasonForPurchaseController.onPageLoad)

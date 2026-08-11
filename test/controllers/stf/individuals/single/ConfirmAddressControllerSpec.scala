@@ -30,7 +30,7 @@ import uk.gov.hmrc.securitiestransferchargefrontend.connectors.SubscriptionConne
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.routes
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.individuals.single.routes as individualRoutes
 import uk.gov.hmrc.securitiestransferchargefrontend.domain.SubscriptionId
-import uk.gov.hmrc.securitiestransferchargefrontend.models.UserAnswers
+import uk.gov.hmrc.securitiestransferchargefrontend.models.{NormalMode, UserAnswers}
 import uk.gov.hmrc.securitiestransferchargefrontend.repositories.{SubscriptionData, SubscriptionDataRepository}
 import uk.gov.hmrc.securitiestransferchargefrontend.services.AddressService
 import uk.gov.hmrc.securitiestransferchargefrontend.views.html.stf.individuals.single.ConfirmAddressView
@@ -104,7 +104,7 @@ class ConfirmAddressControllerSpec extends SpecBase {
       running(application) {
 
         val request =
-          FakeRequest(POST, individualRoutes.ConfirmAddressController.onSubmit().url)
+          FakeRequest(POST, individualRoutes.ConfirmAddressController.onSubmit(NormalMode).url)
 
         val result = route(application, request).value
 
@@ -130,7 +130,7 @@ class ConfirmAddressControllerSpec extends SpecBase {
       running(application) {
 
         val request =
-          FakeRequest(POST, individualRoutes.ConfirmAddressController.onSubmit().url)
+          FakeRequest(POST, individualRoutes.ConfirmAddressController.onSubmit(NormalMode).url)
 
         val result = route(application, request).value
 

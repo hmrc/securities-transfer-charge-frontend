@@ -67,7 +67,7 @@ class Sh03AgentNavigator @Inject()(answerPersistenceService: AnswerPersistenceSe
 
     override protected val startPage: GettablePage[?] = AgentReferencePage
 
-    override protected val pageCallMap: PageCallBiMap =
+    override protected lazy val pageCallMap: PageCallBiMap =
       PageCallBiMapBuilder()
         .addMapping(AgentReferencePage, sh03AgentSingleRoutes.AgentReferenceController.onPageLoad)
         .addMapping(CompanyDetailsPage, sh03AgentSingleRoutes.CompanyDetailsController.onPageLoad)
