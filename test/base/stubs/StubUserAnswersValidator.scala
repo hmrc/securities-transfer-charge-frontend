@@ -16,10 +16,9 @@
 
 package base.stubs
 
-import com.google.common.collect.{BiMap, HashBiMap}
 import play.api.mvc.Call
-import uk.gov.hmrc.securitiestransferchargefrontend.models.{Mode, UserAnswers}
-import uk.gov.hmrc.securitiestransferchargefrontend.navigation.{Navigator, UserAnswersValidator}
+import uk.gov.hmrc.securitiestransferchargefrontend.models.UserAnswers
+import uk.gov.hmrc.securitiestransferchargefrontend.navigation.{Navigator, PageCallBiMap, PageCallBiMapBuilder, UserAnswersValidator}
 import uk.gov.hmrc.securitiestransferchargefrontend.pages.JourneyRecoveryPage
 import uk.gov.hmrc.securitiestransferchargefrontend.pages.stf.shared.CheckYourAnswersPage
 import uk.gov.hmrc.securitiestransferchargefrontend.pages.stf.single.*
@@ -30,40 +29,36 @@ class StubUserAnswersValidator(navigator: Navigator)(implicit ec: ExecutionConte
 
   override protected val startPage: GettablePage[?] = JourneyRecoveryPage
 
-  override protected def pageCallMap(mode: Mode): BiMap[GettablePage[?], Call] = {
-    val map = HashBiMap.create[GettablePage[?], Call]()
-    map.put(JourneyRecoveryPage, Call("GET", "/journey-recovery"))
-    map
-  }
+  override protected val pageCallMap: PageCallBiMap =
+    PageCallBiMapBuilder()
+      .addMappingNoCheck(JourneyRecoveryPage, () => Call("GET", "/journey-recovery"))
+      .build
 }
 
-class CyaSuccessValidator(navigator: Navigator)(implicit ec: ExecutionContext) extends UserAnswersValidator(navigator) {
-  
+class CyaSuccessValidator(navigator: Navigator, journeyPrefix: String = "stf", affinityPrefix: String = "")(implicit ec: ExecutionContext) extends UserAnswersValidator(navigator) {
+
   override protected val startPage: GettablePage[?] = CheckYourAnswersPage
 
-  override protected def pageCallMap(mode: Mode): BiMap[GettablePage[?], Call] = {
-    val map = HashBiMap.create[GettablePage[?], Call]()
-    
-    map.put(ConfirmAddressPage, Call("GET", "/securities-transfer-charge/stf/confirm-address"))
-    map.put(StfBuyersAddressPage, Call("GET", "/securities-transfer-charge/stf/address"))
-    map.put(NameOfSellerPage, Call("GET", "/securities-transfer-charge/stf/change/seller-name"))
-    map.put(StfSellerAddressPage, Call("GET", "/securities-transfer-charge/stf/seller-address"))
-    map.put(ConnectedPersonsPage, Call("GET", "/securities-transfer-charge/stf/change/connected-persons"))
-    map.put(ApplyingForReliefPage, Call("GET", "/securities-transfer-charge/stf/change/applying-for-relief"))
-    map.put(WhatReliefAreYouApplyingForPage, Call("GET", "/securities-transfer-charge/stf/change/what-relief"))
-    map.put(SecuritiesTargetPage, Call("GET", "/securities-transfer-charge/stf/change/securities-target"))
-    map.put(ChargingPointPage, Call("GET", "/securities-transfer-charge/stf/change/charging-point"))
-    map.put(TaxRatePage, Call("GET", "/securities-transfer-charge/stf/change/tax-rate"))
-    map.put(PurchasingSharesPage, Call("GET", "/securities-transfer-charge/stf/change/buying-shares"))
-    map.put(DetailsOfThisTransferPage, Call("GET", "/securities-transfer-charge/stf/change/share-details"))
-    map.put(OtherSecuritiesTypePage, Call("GET", "/securities-transfer-charge/stf/change/other-securities-type"))
-    map.put(AmountPaidForSecuritiesPage, Call("GET", "/securities-transfer-charge/stf/change/amount-paid"))
-    map.put(TotalMarketValuePage, Call("GET", "/securities-transfer-charge/stf/change/total-market-value"))
-    map.put(CheckYourAnswersPage, Call("GET", "/check-your-answers"))
-    
-    map
-  }
-  
+  override protected val pageCallMap: PageCallBiMap =
+    PageCallBiMapBuilder()
+      .addMappingNoCheck(ConfirmAddressPage, () => Call("GET", s"/securities-transfer-charge/$journeyPrefix/${affinityPrefix}confirm-address"))
+      .addMappingNoCheck(StfBuyersAddressPage, () => Call("GET", s"/securities-transfer-charge/$journeyPrefix/${affinityPrefix}address"))
+      .addMappingNoCheck(NameOfSellerPage, () => Call("GET", s"/securities-transfer-charge/$journeyPrefix/${affinityPrefix}change/seller-name"))
+      .addMappingNoCheck(StfSellerAddressPage, () => Call("GET", s"/securities-transfer-charge/$journeyPrefix/${affinityPrefix}seller-address"))
+      .addMappingNoCheck(ConnectedPersonsPage, () => Call("GET", s"/securities-transfer-charge/$journeyPrefix/${affinityPrefix}change/connected-persons"))
+      .addMappingNoCheck(ApplyingForReliefPage, () => Call("GET", s"/securities-transfer-charge/$journeyPrefix/${affinityPrefix}change/applying-for-relief"))
+      .addMappingNoCheck(WhatReliefAreYouApplyingForPage, () => Call("GET", s"/securities-transfer-charge/$journeyPrefix/${affinityPrefix}change/what-relief"))
+      .addMappingNoCheck(SecuritiesTargetPage, () => Call("GET", s"/securities-transfer-charge/$journeyPrefix/${affinityPrefix}change/securities-target"))
+      .addMappingNoCheck(ChargingPointPage, () => Call("GET", s"/securities-transfer-charge/$journeyPrefix/${affinityPrefix}change/charging-point"))
+      .addMappingNoCheck(TaxRatePage, () => Call("GET", s"/securities-transfer-charge/$journeyPrefix/${affinityPrefix}change/tax-rate"))
+      .addMappingNoCheck(PurchasingSharesPage, () => Call("GET", s"/securities-transfer-charge/$journeyPrefix/${affinityPrefix}change/buying-shares"))
+      .addMappingNoCheck(DetailsOfThisTransferPage, () => Call("GET", s"/securities-transfer-charge/$journeyPrefix/${affinityPrefix}change/share-details"))
+      .addMappingNoCheck(OtherSecuritiesTypePage, () => Call("GET", s"/securities-transfer-charge/$journeyPrefix/${affinityPrefix}change/other-securities-type"))
+      .addMappingNoCheck(AmountPaidForSecuritiesPage, () => Call("GET", s"/securities-transfer-charge/$journeyPrefix/${affinityPrefix}change/amount-paid"))
+      .addMappingNoCheck(TotalMarketValuePage, () => Call("GET", s"/securities-transfer-charge/$journeyPrefix/${affinityPrefix}change/total-market-value"))
+      .addMappingNoCheck(CheckYourAnswersPage, () => Call("GET", "/check-your-answers"))
+      .build
+
   override protected def pageHasValidDataAtPath(userAnswers: UserAnswers, page: GettablePage[_]): Boolean = {
     page match {
       case DetailsOfThisTransferPage if userAnswers.get(ConnectedPersonsPage).contains(true) =>

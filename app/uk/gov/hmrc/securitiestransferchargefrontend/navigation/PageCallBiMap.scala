@@ -46,7 +46,9 @@ final class PageCallBiMapBuilder {
   }
   
   def addMappingNoCheck(page: GettablePage[?], callCreator: () => Call): PageCallBiMapBuilder = {
-    callPageMap += callCreator() -> page
+    val call = callCreator()
+    pageCallMap += page -> call
+    callPageMap += call -> page
     this
   }
 

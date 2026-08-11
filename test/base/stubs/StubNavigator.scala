@@ -39,12 +39,12 @@ class StubNavigator(desiredCall: Call)(implicit ec: scala.concurrent.ExecutionCo
   override val userAnswersValidator: UserAnswersValidator = new StubUserAnswersValidator(this)
 }
 
-class StubPersistentNavigator(desiredCall: Call, completeAnswers: UserAnswers)(implicit ec: scala.concurrent.ExecutionContext) 
+class StubPersistentNavigator(desiredCall: Call, completeAnswers: UserAnswers, journeyPrefix: String = "stf", affinityPrefix: String = "")(implicit ec: scala.concurrent.ExecutionContext) 
   extends StubNavigator(desiredCall) with PersistentNavigator {
   
   override def restore(submissionId: SubmissionId, userId: UserId)(implicit request: Request[?]): Future[UserAnswers] = {
     Future.successful(completeAnswers)
   }
 
-  override val userAnswersValidator: UserAnswersValidator = new CyaSuccessValidator(this)
+  override val userAnswersValidator: UserAnswersValidator = new CyaSuccessValidator(this, journeyPrefix, affinityPrefix)
 }

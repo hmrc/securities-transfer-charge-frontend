@@ -55,7 +55,7 @@ class CheckYourAnswersControllerSpec extends SpecBase {
   "CheckYourAnswersController" - {
 
     "must return OK and the correct view for a GET" in {
-      val stubNavigator = new StubPersistentNavigator(testNextPage, completeUserAnswers)
+      val stubNavigator = new StubPersistentNavigator(testNextPage, completeUserAnswers, "stf", "")
 
       val application = applicationBuilder(userAnswers = Some(completeUserAnswers))
         .overrides(
@@ -86,7 +86,7 @@ class CheckYourAnswersControllerSpec extends SpecBase {
     }
 
     "must redirect to next page for a POST" in {
-      val stubNavigator = new StubPersistentNavigator(testNextPage, completeUserAnswers)
+      val stubNavigator = new StubPersistentNavigator(testNextPage, completeUserAnswers, "stf", "")
 
       val application = applicationBuilder(userAnswers = Some(completeUserAnswers))
         .overrides(
@@ -288,7 +288,7 @@ class CheckYourAnswersControllerSpec extends SpecBase {
           marketValue = None
         )).success.value
 
-      val stubNavigator = new StubPersistentNavigator(testNextPage, answersWithNoCRN)
+      val stubNavigator = new StubPersistentNavigator(testNextPage, answersWithNoCRN, "stf", "")
 
       val application = applicationBuilder(userAnswers = Some(answersWithNoCRN))
         .overrides(
