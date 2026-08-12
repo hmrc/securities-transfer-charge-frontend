@@ -102,7 +102,7 @@ class RowTransformsSpec extends AnyWordSpec with Matchers {
           reliefPercentage = Some(100)
         ),
         contingentDetails = None,
-        mainSellerDetails = SingleTransferSellerDetails(
+        mainSellerDetails = Some(SingleTransferSellerDetails(
           sellerName = "Bob Seller",
           addr1 = "1 Seller Street",
           addr2 = Some("Seller District"),
@@ -110,7 +110,7 @@ class RowTransformsSpec extends AnyWordSpec with Matchers {
           addr4 = None,
           postcode = "LS1 1AA",
           country = "United Kingdom"
-        ),
+        )),
         otherSellers = None,
         mainBuyerDetails = SingleTransferBuyerDetails(
           buyerName = "John Doe",
@@ -155,7 +155,7 @@ class RowTransformsSpec extends AnyWordSpec with Matchers {
           reliefPercentage = Some(100)
         ),
         contingentDetails = None,
-        mainSellerDetails = SingleTransferSellerDetails(
+        mainSellerDetails = Some(SingleTransferSellerDetails(
           sellerName = "Bob Seller",
           addr1 = "1 Seller Street",
           addr2 = Some("Seller District"),
@@ -163,7 +163,7 @@ class RowTransformsSpec extends AnyWordSpec with Matchers {
           addr4 = None,
           postcode = "LS1 1AA",
           country = "United Kingdom"
-        ),
+        )),
         otherSellers = None,
         mainBuyerDetails = SingleTransferBuyerDetails(
           buyerName = "John Doe",

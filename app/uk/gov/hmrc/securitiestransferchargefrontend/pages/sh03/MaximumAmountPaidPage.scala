@@ -23,5 +23,5 @@ case object MaximumAmountPaidPage extends QuestionPage[BigDecimal] {
 
   override def path: JsPath = JsPath \ toString
 
-  override def toString: String = "maximumAmountPaidPage"
+  override def toString: String = "maximumAmountPaid"
 }

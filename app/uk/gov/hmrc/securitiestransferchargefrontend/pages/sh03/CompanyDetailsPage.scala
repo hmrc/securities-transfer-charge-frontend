@@ -26,7 +26,8 @@ import scala.util.Try
 case object CompanyDetailsPage extends QuestionPage[CompanyDetails]:
   override def path: JsPath = JsPath \ toString
 
-  override def toString: String = "CompanyDetailsPage"
+  override def toString: String = "companyDetails"
+
 
   override def cleanup(details: Option[CompanyDetails], userAnswers: UserAnswers): Try[UserAnswers] =
     if details.exists(!_.isPlc) then

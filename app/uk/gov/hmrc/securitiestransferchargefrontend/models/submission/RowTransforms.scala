@@ -94,7 +94,7 @@ object RowTransforms {
         reliefPercentage = reliefPercentage
       ),
       contingentDetails = None, // Needed once we do C&D
-      mainSellerDetails = SingleTransferSellerDetails(
+      mainSellerDetails = Some(SingleTransferSellerDetails(
         sellerName = required(row.sellerName, "sellerName", row.rowNumber),
         addr1 = required(row.sellerAddressLine1, "sellerAddressLine1", row.rowNumber),
         addr2 = row.sellerAddressLine2,
@@ -102,7 +102,7 @@ object RowTransforms {
         addr4 = row.sellerAddressLine4,
         postcode = required(row.sellerPostcode, "sellerPostcode", row.rowNumber),
         country = sellerCountry(row.sellerAddressInUK,row.sellerCountry,row.rowNumber)
-      ),
+      )),
       otherSellers = None, // No way to enter multiple sellers atm
       mainBuyerDetails = SingleTransferBuyerDetails(
         buyerName = buyerName,
@@ -190,7 +190,7 @@ object RowTransforms {
         reliefPercentage = reliefPercentage
       ),
       contingentDetails = None, // Needed once we do C&D
-      mainSellerDetails = SingleTransferSellerDetails(
+      mainSellerDetails = Some(SingleTransferSellerDetails(
         sellerName = required(row.sellerName, "sellerName", row.rowNumber),
         addr1 = required(row.sellerAddressLine1, "sellerAddressLine1", row.rowNumber),
         addr2 = row.sellerAddressLine2,
@@ -198,7 +198,7 @@ object RowTransforms {
         addr4 = row.sellerAddressLine4,
         postcode = required(row.sellerPostcode, "sellerPostcode", row.rowNumber),
         country = sellerCountry(row.sellerAddressInUK, row.sellerCountry, row.rowNumber)
-      ),
+      )),
       otherSellers = None, 
       mainBuyerDetails = SingleTransferBuyerDetails(
         buyerName = buyerName,
