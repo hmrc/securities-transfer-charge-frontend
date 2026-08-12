@@ -72,13 +72,12 @@ class StcBasicRowValidator @Inject()(
       validateSecuritiesTarget(row, affinityKey) ++
       validateChargingPoint(row, affinityKey) ++
       validateTaxRate(row) ++
-      validateWhatTypeOfSecurities(row, affinityKey, journeyTypeString) ++
       validateSecuritiesQuantity(row, affinityKey, journeyTypeString) ++
       validateAmountPaidForSecurities(row, affinityKey)
 
 
   def validateSH03(row: ParsedStcRow, affinityKey: String, journeyTypeString: String)(implicit cols: ColumnIndexBuilder): Seq[StcRowValidationError] =
-    validateWhatTypeOfSecurities(row,affinityKey, journeyTypeString) ++
+    validateWhatTypeOfSecurities(row, affinityKey, journeyTypeString) ++
       validateSecuritiesQuantity(row, affinityKey, journeyTypeString) ++
       validateAmountPaidForSecurities(row,affinityKey) ++
       validateChargingPoint(row,affinityKey) ++
