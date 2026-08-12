@@ -23,44 +23,34 @@ import uk.gov.hmrc.securitiestransferchargefrontend.queries.Gettable
 
 import scala.collection.mutable
 
-type GettablePage[A] = Page & Gettable[A]
-type CallCreator = Mode => Call
+type GettablePage = Page & Gettable[?]
+type CallCreator  = Mode => Call
+type UnitCreator  = ()   => Call
 
 trait PageCallBiMap:
-  def getCallFor(page: GettablePage[?]): Option[Call]
-  def getPageFor[A](call: Call): Option[GettablePage[?]]
+  def getCallFor(page: GettablePage): Option[Call]
+  def getPageFor(call: Call): Option[GettablePage]
 
-final class PageCallBiMapImpl(pageCallMap: collection.Map[GettablePage[?], Call], callPageMap: collection.Map[Call, GettablePage[?]]) extends PageCallBiMap {
-  override def getCallFor(page: GettablePage[?]): Option[Call] = pageCallMap.get(page)
-  override def getPageFor[A](call: Call): Option[GettablePage[?]] = callPageMap.get(call)
+final class PageCallBiMapImpl(pageCallMap: collection.Map[GettablePage, Call], callPageMap: collection.Map[Call, GettablePage]) extends PageCallBiMap {
+  override def getCallFor(page: GettablePage): Option[Call] = pageCallMap.get(page)
+  override def getPageFor(call: Call): Option[GettablePage] = callPageMap.get(call)
 }
 
 final class PageCallBiMapBuilder {
-  private val pageCallMap: mutable.Map[GettablePage[?], Call] = mutable.Map.empty
-  private val callPageMap: mutable.Map[Call, GettablePage[?]] = mutable.Map.empty
+  private val pageCallMap: mutable.Map[GettablePage, Call] = mutable.Map.empty
+  private val callPageMap: mutable.Map[Call, GettablePage] = mutable.Map.empty
 
-  def addMapping(page: GettablePage[?], callCreator: CallCreator): PageCallBiMapBuilder = {
+  def addMapping(page: GettablePage, callCreator: CallCreator): PageCallBiMapBuilder = {
     pageCallMap += page -> callCreator(CheckMode)
     callPageMap += callCreator(NormalMode) -> page
     this
   }
   
-  def addMappingNoCheck(page: GettablePage[?], callCreator: () => Call): PageCallBiMapBuilder = {
-    val call = callCreator()
-    pageCallMap += page -> call
-    callPageMap += call -> page
+  def addMappingNoCheck(page: GettablePage, callCreator: UnitCreator): PageCallBiMapBuilder = {
+    callPageMap += callCreator() -> page
     this
   }
 
   def build: PageCallBiMap = new PageCallBiMapImpl(pageCallMap.toMap, callPageMap.toMap)
 }
 
-/*
- * Usage example:
- *
- * val pageCallBiMapping =
- *   PageCallBiMapBuilder()
- *     .addMapping(AmountPaidForSecuritiesPage, orgSingleRoutes.AmountPaidForSecuritiesController.onPageLoad)
- *     .addMapping(OtherSecuritiesTypePage, orgSingleRoutes.OtherSecuritiesTypeController.onPageLoad)
- *     .build
-*/
