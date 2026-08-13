@@ -639,20 +639,19 @@ fileUpload.error.chargingPoint.invalidCharacters = The date you bought the secur
 fileUpload.error.taxRate.invalid = Enter a tax rate of ‘0.5%’ or ‘1.5%’
 
 individual.fileUpload.error.whatTypeOfSecurities.required = Enter the type of securities you are buying
+individual.fileUpload.error.typeOfShares.required = If you are buying shares, enter the type of shares
 org.stf.fileUpload.error.whatTypeOfSecurities.required = Enter the type of securities the business is buying
 org.sh03.fileUpload.error.whatTypeOfSecurities.required = Enter the type or class of shares the business is purchasing
 org.fileUpload.error.whatTypeOfSecurities.maxLength = The type or class of shares the business is purchasing must be 100 characters or fewer
-agent.fileUpload.error.whatTypeOfSecurities.required = Enter the class of shares the buyer is purchasing
-individual.fileUpload.error.typeOfShares.required = If you are buying shares, enter the type of shares
 org.fileUpload.error.typeOfShares.required = If the business is buying shares, enter the type of shares
+agent.fileUpload.error.whatTypeOfSecurities.required = Enter the class of shares the buyer is purchasing
 agent.fileUpload.error.typeOfShares.required = If the buyer is purchasing shares, enter the type of shares
-agent.fileUpload.error.whatTypeOfSecurities.maxLength = The type or class of shares the buyer is purchasing must be 255 characters or fewer
-org.fileUpload.error.whatTypeOfSecurities.maxLength = The type or class of shares the business is purchasing must be 100 characters or fewer
+agent.fileUpload.error.whatTypeOfSecurities.maxLength = The type or class of shares the buyer is purchasing must be 100 characters or fewer
 
 
-individual.fileUpload.error.typeOfShares.maxLength = The type of shares you are buying must be 255 characters or fewer
-org.fileUpload.error.typeOfShares.maxLength = The type of shares the business is purchasing must be 255 characters or fewer
-agent.fileUpload.error.typeOfShares.maxLength = The type of shares the buyer is purchasing must be 255 characters or fewer
+individual.fileUpload.error.typeOfShares.maxLength = The type of shares you are buying must be 100 characters or fewer
+org.fileUpload.error.typeOfShares.maxLength = The type of shares the business is purchasing must be 100 characters or fewer
+agent.fileUpload.error.typeOfShares.maxLength = The type of shares the buyer is purchasing must be 100 characters or fewer
 
 individual.fileUpload.error.securitiesQuantity.required = Enter the number of shares you are buying
 individual.fileUpload.error.securitiesQuantity.nonNumeric = The number of shares must be a whole number between 1 and 999,999,999
@@ -777,7 +776,7 @@ agent.otherSecuritiesType.heading = Enter the type of securities the buyer is pu
 agent.otherSecuritiesType.checkYourAnswersLabel = What type of securities is the buyer purchasing?
 agent.otherSecuritiesType.error.required = Enter the type of securities the buyer is purchasing
 agent.otherSecuritiesType.change.hidden = Change the type of securities the buyer is purchasing
-agent.otherSecuritiesType.error.length = The type of securities the buyer is purchasing must be 255 characters or fewer
+agent.otherSecuritiesType.error.length = The type of securities the buyer is purchasing must be 100 characters or fewer
 
 agent.detailsOfThisTransfer.error.numberOfShares.required = Enter the number of shares the buyer is purchasing
 agent.detailsOfThisTransfer.error.numberOfShares.nonNumeric = The amount of shares must be a number
