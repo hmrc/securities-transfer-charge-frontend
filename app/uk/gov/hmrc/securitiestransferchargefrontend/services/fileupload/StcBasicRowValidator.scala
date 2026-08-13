@@ -72,6 +72,7 @@ class StcBasicRowValidator @Inject()(
       validateSecuritiesTarget(row, affinityKey) ++
       validateChargingPoint(row, affinityKey) ++
       validateTaxRate(row) ++
+      validateWhatTypeOfSecurities(row, affinityKey, journeyTypeString) ++
       validateSecuritiesQuantity(row, affinityKey, journeyTypeString) ++
       validateAmountPaidForSecurities(row, affinityKey)
 
@@ -186,6 +187,7 @@ class StcBasicRowValidator @Inject()(
   private def validateWhatTypeOfSecurities(row: ParsedStcRow, affinityKey: String, journeyType: String)(implicit cols: ColumnIndexBuilder): Seq[StcRowValidationError] = {
     row.whatTypeOfSecurities.map(_.trim) match {
 
+      // The `whatTypeOfSecurities` field is required, so if it's missing or empty, we return an error.
       case None | Some("") =>
         Seq(
           support.error(

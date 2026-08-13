@@ -117,15 +117,15 @@ class StcConditionalRowValidatorSpec extends SpecBase {
       result.exists(_.fieldName == "whatReliefAreYouApplyingFor") mustBe false
     }
 
-    "require the type of securities when purchasing shares" in {
+    "require the type of shares when purchasing shares" in {
       val result = validator.validate(
         validParsedRow.copy(
-          whatTypeOfSecurities = None,
-          typeOfShares = Some("shares")
+          whatTypeOfSecurities = Some("shares"),
+          typeOfShares = None
         ), StcTemplate.STF,affinityGroupKeyInd, STF
       )
 
-      result.exists(_.fieldName == "whatTypeOfSecurities") mustBe true
+      result.exists(_.fieldName == "typeOfShares") mustBe true
     }
 
     "not require type of shares when security type is not shares" in {
@@ -513,29 +513,29 @@ class StcConditionalRowValidatorSpec extends SpecBase {
       result.exists(_.fieldName == "whatReliefAreYouApplyingFor") mustBe true
     }
 
-    "reject type of securities for invalid length" in {
+    "reject type of shares for invalid length" in {
 
       val invalidSecurityTypeLength = "a" * 270
 
       val result = validator.validate(
-        validParsedRow.copy(typeOfShares = Some("shares"),
-          whatTypeOfSecurities = Some(invalidSecurityTypeLength)
+        validParsedRow.copy(whatTypeOfSecurities = Some("shares"),
+          typeOfShares = Some(invalidSecurityTypeLength)
 
         ), StcTemplate.STFAgent, affinityGroupKeyAgent, STF
       )
 
-      result.exists(_.fieldName == "whatTypeOfSecurities") mustBe true
+      result.exists(_.fieldName == "typeOfShares") mustBe true
     }
 
-    "require type of securities when share type is shares" in {
+    "require type of shares when type of securities is shares" in {
 
       val result = validator.validate(
         validParsedRow.copy(
-          typeOfShares = Some("shares"),
-          whatTypeOfSecurities = None
+          whatTypeOfSecurities = Some("shares"),
+          typeOfShares = None
         ), StcTemplate.STFAgent, affinityGroupKeyAgent, STF
       )
-      result.exists(_.fieldName == "whatTypeOfSecurities") mustBe true
+      result.exists(_.fieldName == "typeOfShares") mustBe true
     }
 
     "require total market value when connected person is true" in {
