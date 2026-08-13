@@ -78,5 +78,11 @@ class BackwardsRoutes(defaultPage: Call):
   }
   
   private def checkRoutes(page: Page): Option[UserAnswers] => Call = page match {
+    case WhatReliefAreYouApplyingForPage => _ => individualSingleRoutes.ApplyingForReliefController.onPageLoad(CheckMode)
+    case DetailsOfThisTransferPage => _ => individualSingleRoutes.PurchasingSharesController.onPageLoad(CheckMode)
+    case OtherSecuritiesTypePage => _ => individualSingleRoutes.PurchasingSharesController.onPageLoad(CheckMode)
+    case TotalMarketValuePage => _ => individualSingleRoutes.PurchasingSharesController.onPageLoad(CheckMode)
+    case AmountPaidForSecuritiesPage => _ => individualSingleRoutes.PurchasingSharesController.onPageLoad(CheckMode)
+    case PurchasingSharesPage => _ => individualSingleRoutes.ConnectedPersonsController.onPageLoad(CheckMode)
     case _ => _ => stfSingleCyaRoutes.CheckYourAnswersController.onPageLoad()
   }
