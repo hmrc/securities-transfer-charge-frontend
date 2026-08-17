@@ -58,7 +58,6 @@ object CheckYourAnswersViewModel {
     paymentDueDateFormatted: Option[String]
   ): CheckYourAnswersViewModel = {
     val sectionHeadings = Seq(
-      MessageKeys.yourDetailsHeading,
       MessageKeys.sellerDetailsHeading,
       MessageKeys.transferDetailsHeading,
       MessageKeys.securitiesDetailsHeading
