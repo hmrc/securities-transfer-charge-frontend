@@ -65,7 +65,6 @@ class CheckYourAnswersController @Inject()(
 
   private def buildCheckYourAnswersPage(userAnswers: UserAnswers)(implicit messages: Messages, lang: Lang, request: StcDataRequest[AnyContent]): play.api.mvc.Result = {
     val summaryLists = Seq(
-      cyaService.buildYourDetailsRows(userAnswers)(messages),
       cyaService.buildSellerDetailsRows(userAnswers)(messages),
       cyaService.buildTransferDetailsRows(userAnswers)(messages),
       cyaService.buildSecuritiesDetailsRows(userAnswers)(messages)
