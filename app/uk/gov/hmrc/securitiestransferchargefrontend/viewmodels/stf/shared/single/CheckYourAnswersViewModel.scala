@@ -19,54 +19,54 @@ package uk.gov.hmrc.securitiestransferchargefrontend.viewmodels.stf.shared.singl
 import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.SummaryList
 
 case class SummarySection(
-  headingKey: String,
-  summaryList: SummaryList
-)
+                           headingKey: String,
+                           summaryList: SummaryList
+                         )
 
 case class CheckYourAnswersViewModel(
-  sections: Seq[SummarySection],
-  taxDueFormatted: Option[String],
-  paymentDueDateFormatted: Option[String]
-)
+                                      sections: Seq[SummarySection],
+                                      taxDueFormatted: Option[String],
+                                      paymentDueDateFormatted: Option[String]
+                                    )
 
 object CheckYourAnswersViewModel {
-  
+
   object MessageKeys {
     val title = "checkYourAnswers.title"
     val heading = "checkYourAnswers.heading"
-    
+
     // Section headings
     val yourDetailsHeading = "checkYourAnswers.yourDetails.heading"
     val sellerDetailsHeading = "checkYourAnswers.sellerDetails.heading"
     val transferDetailsHeading = "checkYourAnswers.transferDetails.heading"
     val securitiesDetailsHeading = "checkYourAnswers.securitiesDetails.heading"
-    
+
     // Tax due section
     val taxDueHeading = "checkYourAnswers.taxDue.heading"
     val taxDueBody = "checkYourAnswers.taxDue.body"
     val paymentDueBy = "checkYourAnswers.paymentDueBy"
-    
+
     // Declaration section
     val declarationHeading = "checkYourAnswers.declaration.heading"
     val declarationBody = "checkYourAnswers.declaration.body"
     val acceptAndSend = "checkYourAnswers.acceptAndSend"
   }
-  
+
   def fromSummaryLists(
-    summaryLists: Seq[SummaryList],
-    taxDueFormatted: Option[String],
-    paymentDueDateFormatted: Option[String]
-  ): CheckYourAnswersViewModel = {
+                        summaryLists: Seq[SummaryList],
+                        taxDueFormatted: Option[String],
+                        paymentDueDateFormatted: Option[String]
+                      ): CheckYourAnswersViewModel = {
     val sectionHeadings = Seq(
       MessageKeys.sellerDetailsHeading,
       MessageKeys.transferDetailsHeading,
       MessageKeys.securitiesDetailsHeading
     )
-    
+
     val sections = summaryLists.zip(sectionHeadings).map { case (list, heading) =>
       SummarySection(heading, list)
     }
-    
+
     CheckYourAnswersViewModel(sections, taxDueFormatted, paymentDueDateFormatted)
   }
 }
