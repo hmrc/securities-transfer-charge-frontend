@@ -259,6 +259,9 @@ POST       /stf/agent/security-type                         uk.gov.hmrc.securiti
 GET        /stf/agent/change/security-type                  uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.agents.single.OtherSecuritiesTypeController.onPageLoad(mode: Mode = CheckMode)
 POST       /stf/agent/change/security-type                  uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.agents.single.OtherSecuritiesTypeController.onSubmit(mode: Mode = CheckMode)
 
+GET        /stf/agent/check-your-answers                          uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.agents.single.CheckYourAnswersController.onPageLoad()
+POST       /stf/agent/check-your-answers                          uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.agents.single.CheckYourAnswersController.onSubmit()
+
 GET        /bulk-error-empty                            uk.gov.hmrc.securitiestransferchargefrontend.controllers.fileUpload.BulkUploadFileEmptyController.onPageLoad(transfer:JourneyType)
 GET        /bulk-error-type                             uk.gov.hmrc.securitiestransferchargefrontend.controllers.fileUpload.FileTypeErrorController.onPageLoad(transfer:JourneyType)
 GET        /bulk-error-virus                            uk.gov.hmrc.securitiestransferchargefrontend.controllers.fileUpload.BulkUploadVirusErrorController.onPageLoad(transfer:JourneyType)

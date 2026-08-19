@@ -24,7 +24,6 @@ import uk.gov.hmrc.securitiestransferchargefrontend.config.FrontendAppConfig
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.routes
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.agents.single.routes as agentSingleRoutes
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.shared.routes as sharedRoutes
-import uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.individuals.single.routes as stfSingleCyaRoutes
 import uk.gov.hmrc.securitiestransferchargefrontend.domain.{SubmissionId, UserId}
 import uk.gov.hmrc.securitiestransferchargefrontend.models.{Mode, UserAnswers}
 import uk.gov.hmrc.securitiestransferchargefrontend.navigation.stf.agents
@@ -89,7 +88,7 @@ class StfAgentNavigator @Inject()(appConfig: FrontendAppConfig,
         .addMapping(OtherSecuritiesTypePage, agentSingleRoutes.OtherSecuritiesTypeController.onPageLoad)
         .addMapping(AmountPaidForSecuritiesPage, agentSingleRoutes.AmountPaidForSecuritiesController.onPageLoad)
         .addMapping(TotalMarketValuePage, agentSingleRoutes.TotalMarketValueController.onPageLoad)
-        .addMappingNoCheck(CheckYourAnswersPage, stfSingleCyaRoutes.CheckYourAnswersController.onPageLoad)
+        .addMappingNoCheck(CheckYourAnswersPage, agentSingleRoutes.CheckYourAnswersController.onPageLoad)
         .build
 
     override protected def pageHasValidDataAtPath(userAnswers: UserAnswers, page: GettablePage[_]): Boolean = page match {

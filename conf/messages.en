@@ -56,6 +56,7 @@ confirmation.guidance = We have received your securities transfer details. You w
 
 checkYourAnswers.yourDetails.heading = Your details
 checkYourAnswers.sellerDetails.heading = Seller details
+checkYourAnswers.buyerDetails.heading = Buyer details
 checkYourAnswers.transferDetails.heading = Transfer details
 checkYourAnswers.securitiesDetails.heading = Securities details
 checkYourAnswers.businessName = Business the securities are in
@@ -99,6 +100,17 @@ checkYourAnswers.declaration.body = By submitting this form I confirm that the d
 # Buttons
 checkYourAnswers.acceptAndSend = Accept and send
 checkYourAnswers.saveAndReturn = Save and return to dashboard
+
+# Print
+checkYourAnswers.print.heading = Print this page
+checkYourAnswers.print.p1 = You can
+checkYourAnswers.print.p2 = print this page
+checkYourAnswers.print.p3 = before submitting.
+
+# Agent Declaration
+agent.checkYourAnswers.declaration.p1 = By submitting this form I confirm that:
+agent.checkYourAnswers.declaration.bullet1 = to the best of my knowledge, the details I am providing are correct
+agent.checkYourAnswers.declaration.bullet2 = I am authorised by the buyer to submit details on their behalf
 
 journeyRecovery.continue.title = Sorry, there is a problem with the service
 journeyRecovery.continue.heading = Sorry, there is a problem with the service
@@ -513,16 +525,25 @@ agent.nameOfBuyer.details.caption = Buyer details
 agent.nameOfBuyer.title = What’s the buyer’s name?
 agent.nameOfBuyer.heading = What’s the buyer’s name?
 agent.nameOfBuyer.hint = This is the individual, business or trust buying the securities
+agent.nameOfBuyer.checkYourAnswersLabel = Name
+agent.nameOfBuyer.change.hidden = Change buyer’s name
 agent.details.caption = Agent details
 agentReference.title = Add a reference
 agentReference.heading = Add a reference (optional)
-agentReference.checkYourAnswersLabel = Add a reference
+agentReference.checkYourAnswersLabel = Your reference
 agentReference.hint = You can add a reference for your own records and to help you find this submission later. It will not be used by HMRC.
 agentReference.error.length = Your reference must be 255 characters or fewer
-agentReference.change.hidden = Change add a reference
+agentReference.change.hidden = Change your reference
 
 nameOfBuyer.error.required = Enter the buyer’s name
 nameOfBuyer.error.length = Buyer’s name must be 35 characters or fewer
+
+agent.checkYourAnswers.buyerAddress = Address
+agent.checkYourAnswers.buyerAddress.change.hidden = Change buyer’s address
+
+agent.checkYourAnswers.sellerAddress = Address
+agent.checkYourAnswers.sellerAddress.change.hidden = Change seller’s address
+
 
 agent.howToNotifyAboutSecuritiesTransfer.title = How would you like to tell us about these securities transfers?
 agent.howToNotifyAboutSecuritiesTransfer.heading = How would you like to tell us about these securities transfers?
@@ -534,8 +555,8 @@ agent.howToNotifyAboutSecuritiesTransfer.error.required = Select a way to tell u
 
 agent.nameOfSeller.title = What’s the seller’s name?
 agent.nameOfSeller.heading = What’s the seller’s name?
-agent.nameOfSeller.checkYourAnswersLabel = What’s the seller’s name?
-agent.nameOfSeller.change.hidden = NameOfSeller
+agent.nameOfSeller.checkYourAnswersLabel = Name
+agent.nameOfSeller.change.hidden = Change seller’s name
 agent.nameOfSeller.hint = This is the individual, business or trust selling the securities
 
 agent.connectedPersons.title = Connected persons
@@ -545,7 +566,7 @@ agent.connectedPersons.checkYourAnswersLabel = Are the buyer and seller connecte
 agent.connectedPersons.error.required = Select yes if the buyer and seller are connected persons
 agent.connectedPersons.p = We need to know if the buyer and seller of these shares are considered ‘connected persons’ according to
 agent.connectedPersons.content.link.text = section 1122 of the Corporation Tax Act 2010
-agent.connectedPersons.change.hidden = Change connected persons
+agent.connectedPersons.change.hidden = Change if buyer and seller are connected persons
 
 agent.securitiesTarget.title = What business are the securities bought in?
 agent.securitiesTarget.heading = What business are the securities bought in?
@@ -694,7 +715,7 @@ agent.applyingForRelief.title = Is the buyer applying for a relief?
 agent.applyingForRelief.heading = Is the buyer applying for a relief?
 agent.applyingForRelief.checkYourAnswersLabel = Is the buyer applying for a relief?
 agent.applyingForRelief.error.required = Select yes if the buyer is  applying for a relief
-agent.applyingForRelief.change.hidden = ApplyingForRelief
+agent.applyingForRelief.change.hidden = Change if buyer is applying for a relief
 agent.applyingForRelief.p = See a
 agent.applyingForRelief.details.content.link.text = full list of reliefs
 
@@ -703,6 +724,8 @@ agent.whatReliefAreYouApplyingFor.heading = Enter the relief the buyer is applyi
 agent.whatReliefAreYouApplyingFor.p = Start typing the name of the relief and select from the list. See a
 agent.whatReliefAreYouApplyingFor.details.content.link.text = full list of reliefs
 agent.whatReliefAreYouApplyingFor.error.required = Start typing the name of the relief and select from the list
+agent.whatReliefAreYouApplyingFor.checkYourAnswersLabel = Type of relief
+agent.whatReliefAreYouApplyingFor.change.hidden = Change type of relief
 
 agent.taxRate.p1 = For most securities transfers, the buyer will be charged a tax rate of 0.5% of the consideration.
 agent.taxRate.p2 = If the securities are being transferred into a ‘depository receipt scheme’ or a ‘clearance service’, the buyer will need to pay the 1.5% tax rate in most circumstances. This is usually where the transfer is not integral to capital raising or where the clearance service has elected to remain in the 0.5% regime.
@@ -714,13 +737,13 @@ fileUpload.processing.paragraph = This may take a few seconds
 agent.chargingPoint.title = What’s the charging point?
 agent.chargingPoint.heading = What’s the charging point?
 agent.chargingPoint.hint = This is the date the securities were bought. For example, 27 3 2024
-agent.chargingPoint.checkYourAnswersLabel = What is the charging point?
+agent.chargingPoint.checkYourAnswersLabel = Charging point
 agent.chargingPoint.error.required.all = Enter the date the securities were bought
 agent.chargingPoint.error.required.two = The date the securities were bought must include {0} and {1}
 agent.chargingPoint.error.required = The date the securities were bought must include a {0}
 agent.chargingPoint.error.invalid = The date the securities were bought must be a real date
 agent.chargingPoint.error.futureDate = The date the securities were bought must be today’s date or a date in the past
-agent.chargingPoint.change.hidden = ChargingPoint
+agent.chargingPoint.change.hidden = Change charging point
 
 fileUpload.agent.chargingPoint.error.invalid = The charging point must be a real date
 fileUpload.agent.chargingPoint.error.required.all = Enter the charging point
@@ -765,17 +788,17 @@ agent.amountPaidForSecurities.error.negative = The amount paid for the securitie
 agent.amountPaidForSecurities.error.aboveMaximum = The amount paid for the securities must be £999,999,999 or below
 agent.amountPaidForSecurities.title = How much did the buyer pay for the securities?
 agent.amountPaidForSecurities.heading = How much did the buyer pay for the securities?
-agent.amountPaidForSecurities.checkYourAnswersLabel = How much did the buyer pay for the securities?
+agent.amountPaidForSecurities.checkYourAnswersLabel = Amount paid for the securities
 agent.amountPaidForSecurities.p1 = Enter the total amount of consideration given in exchange for these securities as a cash amount.
 agent.amountPaidForSecurities.p2 = You do not need to provide details about conversion or exchange rates, or how valuations of non-monetary items were reached.
 agent.amountPaidForSecurities.hint = For example, £600 or £193.54
-agent.amountPaidForSecurities.change.hidden = Change the amount the buyer paid for the securities
+agent.amountPaidForSecurities.change.hidden = Change amount paid for the securities
 
 agent.otherSecuritiesType.title = Enter the type of securities the buyer is purchasing
 agent.otherSecuritiesType.heading = Enter the type of securities the buyer is purchasing
-agent.otherSecuritiesType.checkYourAnswersLabel = What type of securities is the buyer purchasing?
+agent.otherSecuritiesType.checkYourAnswersLabel = Type of securities
 agent.otherSecuritiesType.error.required = Enter the type of securities the buyer is purchasing
-agent.otherSecuritiesType.change.hidden = Change the type of securities the buyer is purchasing
+agent.otherSecuritiesType.change.hidden = Change type of securities
 agent.otherSecuritiesType.error.length = The type of securities the buyer is purchasing must be 100 characters or fewer
 
 agent.detailsOfThisTransfer.error.numberOfShares.required = Enter the number of shares the buyer is purchasing
@@ -807,16 +830,15 @@ fileUploaded.error.virus.p = The file you have uploaded contains a virus, you wi
 
 agent.totalMarketValue.title = What is the total market value of the shares?
 agent.totalMarketValue.heading = What is the total market value of the shares?
-agent.totalMarketValue.checkYourAnswersLabel = What is the total market value of the shares?
 agent.totalMarketValue.error.nonNumeric = The market value of the shares must be a number and can include up to two decimal places, like £30 or £28.60
 agent.totalMarketValue.error.required = Enter the market value of the shares in pounds
 agent.totalMarketValue.error.invalidNumeric = The market value of the shares must be a number and can include up to two decimal places, like £30 or £28.60
 agent.totalMarketValue.error.aboveMaximum = The market value of the shares must be £999,999,999 or below
 agent.totalMarketValue.error.belowMinimum = The market value of the shares must be £0.01 or more
-agent.totalMarketValue.change.hidden = Change the market value of the shares
+agent.totalMarketValue.change.hidden = Change the market value of the securities
 agent.totalMarketValue.hint = For example, £600 or £193.54
 agent.totalMarketValue.error.negative = The market value of the shares must be £0.01 or more
-agent.totalMarketValue.checkYourAnswersLabel = What is the total market value of the shares?
+agent.totalMarketValue.checkYourAnswersLabel = Total market value of the securities
 
 agent.sh03.bulk.totalMarketValue.title = What is the total market value of the shares?
 agent.sh03.bulk.totalMarketValue.heading = What is the total market value of the shares?
