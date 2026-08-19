@@ -28,10 +28,10 @@ import uk.gov.hmrc.securitiestransferchargefrontend.pages.stf.single.*
 import java.time.LocalDate
 
 class StfAgentRowBuilderSpec extends SpecBase {
-  
+
   implicit val messages: Messages = stubMessagesApi().preferred(Seq.empty)
 
-  "CheckYourAnswersService" - {
+  "StfAgentRowBuilderSpec" - {
 
     "buildYourDetailsRows" - {
 

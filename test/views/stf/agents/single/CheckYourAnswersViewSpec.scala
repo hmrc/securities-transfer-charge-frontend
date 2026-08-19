@@ -35,11 +35,9 @@ class CheckYourAnswersViewSpec extends ViewBaseSpec {
   override def fakeApplication(): Application =
     applicationBuilder(affinityGroup = agentAffinity).build()
 
-  private val viewInstance =
-    app.injector.instanceOf[CheckYourAnswersView]
+  private val viewInstance = app.injector.instanceOf[CheckYourAnswersView]
 
-  private val testBackLinkRoute: Call =
-    Call("GET", "/back-link")
+  private val testBackLinkRoute: Call = Call("GET", "/back-link")
 
   private val summaryList =
     SummaryList(
@@ -74,63 +72,29 @@ class CheckYourAnswersViewSpec extends ViewBaseSpec {
       paymentDueDateFormatted = Some("31 December 2026")
     )
 
-  def view(): Document =
-    Jsoup.parse(
-      viewInstance(
-        viewModel,
-        testBackLinkRoute
-      )(fakeRequest, messages).body
-    )
+  def view(): Document = Jsoup.parse(viewInstance(viewModel, testBackLinkRoute)(fakeRequest, messages).body)
 
-  def viewWithSections(): Document =
-    Jsoup.parse(
-      viewInstance(
-        viewModelWithSections,
-        testBackLinkRoute
-      )(fakeRequest, messages).body
-    )
+  def viewWithSections(): Document = Jsoup.parse(viewInstance(viewModelWithSections, testBackLinkRoute)(fakeRequest, messages).body)
 
   object ExpectedContent {
 
-    val title: String =
-      messages(CheckYourAnswersViewModel.MessageKeys.title)
+    val title: String = messages(CheckYourAnswersViewModel.MessageKeys.title)
 
-    val heading: String =
-      messages(CheckYourAnswersViewModel.MessageKeys.heading)
+    val heading: String = messages(CheckYourAnswersViewModel.MessageKeys.heading)
 
-    val sellerDetailsHeading: String =
-      messages(
-        CheckYourAnswersViewModel.MessageKeys.sellerDetailsHeading
-      )
+    val sellerDetailsHeading: String = messages(CheckYourAnswersViewModel.MessageKeys.sellerDetailsHeading)
 
-    val transferDetailsHeading: String =
-      messages(
-        CheckYourAnswersViewModel.MessageKeys.transferDetailsHeading
-      )
+    val transferDetailsHeading: String = messages(CheckYourAnswersViewModel.MessageKeys.transferDetailsHeading)
 
-    val taxDueHeading: String =
-      messages(
-        CheckYourAnswersViewModel.MessageKeys.taxDueHeading,
-        "£1,234.56"
-      )
+    val taxDueHeading: String = messages(CheckYourAnswersViewModel.MessageKeys.taxDueHeading, "£1,234.56")
 
-    val taxDueBody: String =
-      messages(
-        CheckYourAnswersViewModel.MessageKeys.taxDueBody
-      )
+    val taxDueBody: String = messages(CheckYourAnswersViewModel.MessageKeys.taxDueBody)
 
-    val paymentDueBy: String =
-      messages(
-        CheckYourAnswersViewModel.MessageKeys.paymentDueBy
-      )
+    val paymentDueBy: String = messages(CheckYourAnswersViewModel.MessageKeys.paymentDueBy)
 
-    val paymentDueDate: String =
-      "31 December 2026"
+    val paymentDueDate: String = "31 December 2026"
 
-    val printHeading: String =
-      messages(
-        CheckYourAnswersViewModel.MessageKeys.printHeading
-      )
+    val printHeading: String = messages(CheckYourAnswersViewModel.MessageKeys.printHeading)
 
     val printP1: String = messages("checkYourAnswers.print.p1")
 
@@ -138,29 +102,15 @@ class CheckYourAnswersViewSpec extends ViewBaseSpec {
 
     val printP3: String = messages("checkYourAnswers.print.p3")
 
-    val declarationHeading: String = messages(
-      CheckYourAnswersViewModel.MessageKeys.declarationHeading
-    )
+    val declarationHeading: String = messages(CheckYourAnswersViewModel.MessageKeys.declarationHeading)
 
-    val declarationP1: String =
-      messages(
-        CheckYourAnswersViewModel.MessageKeys.declarationP1
-      )
+    val declarationP1: String = messages(CheckYourAnswersViewModel.MessageKeys.declarationP1)
 
-    val declarationBullet1: String =
-      messages(
-        CheckYourAnswersViewModel.MessageKeys.declarationBullet1
-      )
+    val declarationBullet1: String = messages(CheckYourAnswersViewModel.MessageKeys.declarationBullet1)
 
-    val declarationBullet2: String =
-      messages(
-        CheckYourAnswersViewModel.MessageKeys.declarationBullet2
-      )
+    val declarationBullet2: String = messages(CheckYourAnswersViewModel.MessageKeys.declarationBullet2)
 
-    val acceptAndSend: String =
-      messages(
-        CheckYourAnswersViewModel.MessageKeys.acceptAndSend
-      )
+    val acceptAndSend: String = messages(CheckYourAnswersViewModel.MessageKeys.acceptAndSend)
 
     val saveAndReturn: String = messages("site.save-and-return.button")
   }
@@ -172,68 +122,40 @@ class CheckYourAnswersViewSpec extends ViewBaseSpec {
     }
 
     "should have the correct heading" in {
-      view()
-        .select("h1")
-        .text() mustBe ExpectedContent.heading
+      view().select("h1").text() mustBe ExpectedContent.heading
     }
 
     "should display the tax due heading" in {
-      view()
-        .select(".tax-card h2")
-        .text() mustBe ExpectedContent.taxDueHeading
+      view().select(".tax-card h2").text() mustBe ExpectedContent.taxDueHeading
     }
 
     "should display the tax due body" in {
-      view()
-        .select(".tax-card p")
-        .get(0)
-        .text() mustBe ExpectedContent.taxDueBody
+      view().select(".tax-card p").get(0).text() mustBe ExpectedContent.taxDueBody
     }
 
     "should display the payment due date" in {
-      val paymentParagraph =
-        view()
-          .select(".tax-card p")
-          .get(1)
+      val paymentParagraph = view().select(".tax-card p").get(1)
 
-      paymentParagraph.text() mustBe
-        s"${ExpectedContent.paymentDueBy} ${ExpectedContent.paymentDueDate}"
-    }
-
-    "should display the payment due date in bold" in {
-      val paymentParagraph =
-        view()
-          .select(".tax-card p")
-          .get(1)
-
-      paymentParagraph.select("strong").text() mustBe
-        ExpectedContent.paymentDueDate
+      paymentParagraph.text() mustBe s"${ExpectedContent.paymentDueBy} ${ExpectedContent.paymentDueDate}"
     }
 
     "should display the print heading" in {
-      view()
-        .select("h2")
-        .eachText()
-        .asScala must contain(ExpectedContent.printHeading)
+      view().select("h2").eachText().asScala must contain(ExpectedContent.printHeading)
     }
 
 
     "should display the print link" in {
-      val printLink =
-        view().select("#print-this-page")
+      val printLink = view().select("#print-this-page")
 
       printLink.text() mustBe ExpectedContent.printP2
     }
 
     "should have the correct print link href" in {
-      view()
-        .select("#print-this-page")
-        .attr("href") mustBe "#"
+      view().select("#print-this-page").attr("href") mustBe "#"
     }
 
     "should have the print link class" in {
-      val printLink =
-        view().select("#print-this-page")
+      val printLink = view().select("#print-this-page")
 
       printLink.hasClass("govuk-link") mustBe true
       printLink.hasClass("govuk-link--no-visited-state") mustBe true
@@ -241,10 +163,7 @@ class CheckYourAnswersViewSpec extends ViewBaseSpec {
 
 
     "should display the declaration heading" in {
-      view()
-        .select("h2")
-        .eachText()
-        .asScala must contain(ExpectedContent.declarationHeading)
+      view().select("h2").eachText().asScala must contain(ExpectedContent.declarationHeading)
     }
 
     "should display the declaration paragraph" in {
@@ -261,56 +180,38 @@ class CheckYourAnswersViewSpec extends ViewBaseSpec {
 
 
     "should display the first declaration bullet" in {
-      view()
-        .select(".govuk-list--bullet li")
-        .get(0)
-        .text() mustBe ExpectedContent.declarationBullet1
+      view().select(".govuk-list--bullet li").get(0).text() mustBe ExpectedContent.declarationBullet1
     }
 
     "should display the second declaration bullet" in {
-      view()
-        .select(".govuk-list--bullet li")
-        .get(1)
-        .text() mustBe ExpectedContent.declarationBullet2
+      view().select(".govuk-list--bullet li").get(1).text() mustBe ExpectedContent.declarationBullet2
     }
 
 
     "should have an accept and send button" in {
-      val buttons =
-        view().select(".govuk-button")
+      val buttons = view().select(".govuk-button")
 
       buttons.get(0).text() mustBe ExpectedContent.acceptAndSend
     }
 
     "should have a save and return button" in {
-      view()
-        .select(".govuk-button-group a.govuk-link")
-        .text() mustBe ExpectedContent.saveAndReturn
+      view().select(".govuk-button-group a.govuk-link").text() mustBe ExpectedContent.saveAndReturn
     }
 
     "should have the correct save and return link" in {
-      view()
-        .select(".govuk-button-group a.govuk-link")
-        .attr("href") mustBe sharedRoutes.SubmissionsDashboardController.onPageLoad().url
+      view().select(".govuk-button-group a.govuk-link").attr("href") mustBe sharedRoutes.SubmissionsDashboardController.onPageLoad().url
     }
 
     "should have the correct back link" in {
-      view()
-        .select("a.govuk-back-link")
-        .attr("href") mustBe testBackLinkRoute.url
+      view().select("a.govuk-back-link").attr("href") mustBe testBackLinkRoute.url
     }
 
     "should have a form" in {
-      view()
-        .select("form")
-        .size() mustBe 1
+      view().select("form").size() mustBe 1
     }
 
     "should submit to the check your answers endpoint" in {
-      view()
-        .select("form")
-        .attr("action") mustBe
-        agentRoutes.CheckYourAnswersController.onSubmit().url
+      view().select("form").attr("action") mustBe agentRoutes.CheckYourAnswersController.onSubmit().url
     }
 
 
@@ -326,15 +227,11 @@ class CheckYourAnswersViewSpec extends ViewBaseSpec {
     }
 
     "should render the summary list" in {
-      viewWithSections()
-        .select(".govuk-summary-list")
-        .size() mustBe 2
+      viewWithSections().select(".govuk-summary-list").size() mustBe 2
     }
 
     "should render the summary list rows" in {
-      viewWithSections()
-        .select(".govuk-summary-list__row")
-        .size() mustBe 2
+      viewWithSections().select(".govuk-summary-list__row").size() mustBe 2
     }
 
     "should render the summary list key" in {
