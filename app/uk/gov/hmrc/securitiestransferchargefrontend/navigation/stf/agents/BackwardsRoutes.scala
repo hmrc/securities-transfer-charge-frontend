@@ -21,12 +21,11 @@ import uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.agents.route
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.agents.single.routes as agentSingleRoutes
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.shared.routes as sharedRoutes
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.fileUpload.routes as bulkSharedRoutes
-import uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.individuals.single.routes as stfSingleCyaRoutes
 import uk.gov.hmrc.securitiestransferchargefrontend.models.stf.HowToNotifyAboutSecuritiesTransfer.{MoreThanOneAtATime, OneAtATime}
 import uk.gov.hmrc.securitiestransferchargefrontend.models.{CheckMode, JourneyType, Mode, NormalMode, UserAnswers}
 import uk.gov.hmrc.securitiestransferchargefrontend.navigation.NavigationHelper
 import uk.gov.hmrc.securitiestransferchargefrontend.pages.*
-import uk.gov.hmrc.securitiestransferchargefrontend.pages.stf.shared.{AgentReferencePage, HowToNotifyAboutSecuritiesTransferPage}
+import uk.gov.hmrc.securitiestransferchargefrontend.pages.stf.shared.{AgentReferencePage, CheckYourAnswersPage, HowToNotifyAboutSecuritiesTransferPage}
 import uk.gov.hmrc.securitiestransferchargefrontend.pages.stf.single.*
 
 class BackwardsRoutes(defaultPage: Call):
@@ -69,9 +68,23 @@ class BackwardsRoutes(defaultPage: Call):
     case AmountPaidForSecuritiesPage => _ => agentSingleRoutes.OtherSecuritiesTypeController.onPageLoad(NormalMode)
     case DetailsOfThisTransferPage => _ => agentSingleRoutes.PurchasingSharesController.onPageLoad(NormalMode)
     case TotalMarketValuePage => _ => agentSingleRoutes.AmountPaidForSecuritiesController.onPageLoad(NormalMode)
+    case CheckYourAnswersPage => _.fold(defaultPage) { userAnswers =>
+      dataDependent(PurchasingSharesPage, userAnswers) { isPurchasingShares =>
+        if (isPurchasingShares) {
+          agentSingleRoutes.DetailsOfThisTransferController.onPageLoad(NormalMode)
+        } else {
+          dataDependent(ConnectedPersonsPage, userAnswers) { isConnectedPersons =>
+            if (isConnectedPersons)
+              agentSingleRoutes.TotalMarketValueController.onPageLoad(NormalMode)
+            else
+              agentSingleRoutes.AmountPaidForSecuritiesController.onPageLoad(NormalMode)
+          }
+        }
+      }
+    }
     case _ => _ => defaultPage
   }
   
   private def checkRoutes(page: Page): Option[UserAnswers] => Call = page match {
-    case _ => _ => stfSingleCyaRoutes.CheckYourAnswersController.onPageLoad()
+    case _ => _ => agentSingleRoutes.CheckYourAnswersController.onPageLoad()
   }

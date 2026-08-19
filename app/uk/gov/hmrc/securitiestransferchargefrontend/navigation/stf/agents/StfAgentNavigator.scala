@@ -25,7 +25,7 @@ import uk.gov.hmrc.securitiestransferchargefrontend.controllers.routes
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.agents.single.routes as agentSingleRoutes
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.shared.routes as sharedRoutes
 import uk.gov.hmrc.securitiestransferchargefrontend.domain.{SubmissionId, UserId}
-import uk.gov.hmrc.securitiestransferchargefrontend.models.{Mode, UserAnswers}
+import uk.gov.hmrc.securitiestransferchargefrontend.models.{CheckMode, Mode, UserAnswers}
 import uk.gov.hmrc.securitiestransferchargefrontend.navigation.stf.agents
 import uk.gov.hmrc.securitiestransferchargefrontend.navigation.stf.agents.{BackwardsRoutes, ForwardRoutes}
 import uk.gov.hmrc.securitiestransferchargefrontend.navigation.*
@@ -59,8 +59,46 @@ class StfAgentNavigator @Inject()(appConfig: FrontendAppConfig,
     case _ => defaultPage
   }
 
-  val checkRouteMap: Page => UserAnswers => Call = _ => _ => routes.CheckYourAnswersController.onPageLoad()
+  private def checkYourAnswersRoute: Call =
+    agentSingleRoutes.CheckYourAnswersController.onPageLoad()
 
+  private def routeForOtherSecurities(userAnswers: UserAnswers): Call = {
+    if (userAnswers.get(TotalMarketValuePage).isDefined) {
+      checkYourAnswersRoute
+    } else {
+      agentSingleRoutes.TotalMarketValueController.onPageLoad(CheckMode)
+    }
+  }
+
+  private def routeForShares(userAnswers: UserAnswers): Call = {
+    val hasMarketValue = userAnswers.get(DetailsOfThisTransferPage)
+      .exists(_.marketValue.isDefined)
+
+    if (hasMarketValue) {
+      checkYourAnswersRoute
+    } else {
+      agentSingleRoutes.DetailsOfThisTransferController.onPageLoad(CheckMode)
+    }
+  }
+
+  val checkRouteMap: Page => UserAnswers => Call = page => userAnswers => {
+    page match {
+      case ConnectedPersonsPage =>
+        val isConnectedPerson = userAnswers.get(ConnectedPersonsPage).getOrElse(false)
+
+        if (!isConnectedPerson) {
+          checkYourAnswersRoute
+        } else {
+          userAnswers.get(PurchasingSharesPage) match {
+            case Some(false) => routeForOtherSecurities(userAnswers) // Other securities
+            case Some(true) => routeForShares(userAnswers) // Shares
+            case None => checkYourAnswersRoute
+          }
+        }
+
+      case _ => checkYourAnswersRoute
+    }
+  }
   def restore(submissionId: SubmissionId, userId: UserId)(implicit request: Request[?]): Future[UserAnswers] = {
     implicit val hc: HeaderCarrier = HeaderCarrierConverter.fromRequestAndSession(request, request.session)
     answerPersistenceService.load(submissionId, userId)
