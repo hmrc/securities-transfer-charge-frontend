@@ -16,6 +16,7 @@
 
 package uk.gov.hmrc.securitiestransferchargefrontend.services.fileupload
 
+import play.api.Logging
 import uk.gov.hmrc.securitiestransferchargefrontend.config.FileUploadConfig
 import uk.gov.hmrc.securitiestransferchargefrontend.models.JourneyType
 import uk.gov.hmrc.securitiestransferchargefrontend.models.stf.fileupload.{FileParseError, ParsedRow, UploadedFile}
@@ -28,7 +29,7 @@ import javax.inject.{Inject, Singleton}
 class StcUploadParsingService @Inject()(
                                          fileUploadConfig: FileUploadConfig,
                                          fileParsingService: FileParsingService
-                                       ) {
+                                       ) extends Logging {
 
   def withVerifiedTemplateStream[A](
                                      uploadedFile: UploadedFile,
@@ -49,8 +50,13 @@ class StcUploadParsingService @Inject()(
           }.toList
 
           val allHeaderCells = headers ++ additionalHeaderRows.flatMap(_.cells.sortBy(_.columnIndex).map(_.rawValue))
-
-          if (hashBlock(allHeaderCells) != templateDef.signature) {
+          val actualHash = hashBlock(allHeaderCells)
+          if (actualHash != templateDef.signature) {
+            logger.warn(
+              s"""
+                 |Template signature mismatch for uploaded file ${uploadedFile.fileName}.
+                 |Expected: ${templateDef.signature}, Actual: $actualHash
+                """.stripMargin)
             Left(FileParseError.InvalidTemplate)
           } else {
             val dataStream = lazyRowIterator.filterNot(_.isCompletelyEmpty)

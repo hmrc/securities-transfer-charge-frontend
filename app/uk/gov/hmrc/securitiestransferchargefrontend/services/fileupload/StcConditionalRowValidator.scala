@@ -389,17 +389,18 @@ class StcConditionalRowValidator @Inject()(
                                       )(implicit cols: ColumnIndexBuilder): Seq[StcRowValidationError] = {
 
     Seq(
-      Option.when(row.whatTypeOfSecurities.isEmpty && row.typeOfShares.exists(_.equalsIgnoreCase("shares"))) {
+      // If we are dealing with shares, we need a share type
+      Option.when(row.whatTypeOfSecurities.exists(_.equalsIgnoreCase("shares")) && row.typeOfShares.isEmpty) {
         support.error(
           row.rowNumber,
-          "whatTypeOfSecurities",
+          "typeOfShares",
           messages(s"$affinityKey.fileUpload.error.typeOfShares.required")
         )
       },
-      Option.when(row.whatTypeOfSecurities.exists(_.length > support.typeOfShareMaxLength)) {
+      Option.when(row.typeOfShares.exists(_.length > support.typeOfShareMaxLength)) {
         support.error(
           row.rowNumber,
-          "whatTypeOfSecurities",
+          "typeOfShares",
           messages(s"$affinityKey.fileUpload.error.typeOfShares.maxLength")
         )
       }
