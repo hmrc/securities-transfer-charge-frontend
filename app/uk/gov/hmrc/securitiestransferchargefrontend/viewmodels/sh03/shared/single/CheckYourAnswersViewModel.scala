@@ -52,7 +52,7 @@ object CheckYourAnswersViewModel {
 
     // Declaration section
     val declarationHeading = "checkYourAnswers.declaration.heading"
-    val declarationConfirm = "checkYourAnswers.declaration.confirm"
+    val declarationConfirm = "sh03.checkYourAnswers.declaration.body"
     val declarationBullet1 = "checkYourAnswers.declaration.bullet1"
     val declarationBullet2 = "checkYourAnswers.declaration.bullet2"
     val acceptAndSend = "checkYourAnswers.acceptAndSend"

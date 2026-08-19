@@ -70,6 +70,7 @@ checkYourAnswers.declaration.body = By submitting this form I confirm that the d
 checkYourAnswers.taxDue.body = We have calculated the tax due based on the information provided. This amount does not include penalties or interest.
 checkYourAnswers.acceptAndSend = Accept and send
 checkYourAnswers.saveAndReturn = Save and return to dashboard
+checkYourAnswers.print.heading = Print this page
 
 checkYourAnswers.confirmAddress = Address
 checkYourAnswers.confirmAddress.change.hidde = Change buyer’s address
@@ -88,6 +89,7 @@ checkYourAnswers.heading = Check your answers
 checkYourAnswers.sellerDetails.heading = Seller details
 checkYourAnswers.transferDetails.heading = Transfer details
 checkYourAnswers.securitiesDetails.heading = Securities details
+checkYourAnswers.buyerDetails.heading = Buyer details
 
 # Tax and Declaration
 checkYourAnswers.taxDue.heading = Tax due: {0}
@@ -95,6 +97,10 @@ checkYourAnswers.taxDue.body = We have calculated the tax due based on the infor
 checkYourAnswers.paymentDueBy = Payment due by:
 checkYourAnswers.declaration.heading = Declaration
 checkYourAnswers.declaration.body = By submitting this form I confirm that the details I am providing are correct to the best of my knowledge.
+
+sh03.checkYourAnswers.declaration.body = By submitting this form I confirm that:
+checkYourAnswers.declaration.bullet1 = to the best of my knowledge, the details I am providing are correct
+checkYourAnswers.declaration.bullet2 = I am authorised by the buyer to submit details on their behalf
 
 # Buttons
 checkYourAnswers.acceptAndSend = Accept and send
@@ -516,7 +522,7 @@ agent.nameOfBuyer.hint = This is the individual, business or trust buying the se
 agent.details.caption = Agent details
 agentReference.title = Add a reference
 agentReference.heading = Add a reference (optional)
-agentReference.checkYourAnswersLabel = Add a reference
+agentReference.checkYourAnswersLabel = Your reference
 agentReference.hint = You can add a reference for your own records and to help you find this submission later. It will not be used by HMRC.
 agentReference.error.length = Your reference must be 255 characters or fewer
 agentReference.change.hidden = Change add a reference
@@ -924,7 +930,7 @@ agent.sh03.applyingForRelief.details.content.link.text = full list of reliefs
 
 agent.sh03.minimumAmountPaid.title = What is the minimum amount paid for the shares, in pounds?
 agent.sh03.minimumAmountPaid.heading = What is the minimum amount paid for the shares, in pounds?
-agent.sh03.minimumAmountPaid.checkYourAnswersLabel = What is the minimum amount paid for the shares, in pounds?
+agent.sh03.minimumAmountPaid.checkYourAnswersLabel = Minimum amount paid for the shares
 agent.sh03.minimumAmountPaid.change.hidden = What is the minimum amount paid for the shares, in pounds?
 agent.sh03.minimumAmountPaid.error.required = Enter the minimum amount paid for the shares
 agent.sh03.minimumAmountPaid.error.invalidNumeric = The minimum amount paid for the shares must be a number and can include up to two decimal places, like £30 or £28.60
@@ -957,7 +963,7 @@ agent.sh03.detailsOfSharePurchase.error.marketValue.nonNumeric = The market valu
 agent.sh03.detailsOfSharePurchase.error.marketValue.aboveMaximum = The market value of the shares must be £999,999,999 or below
 agent.sh03.detailsOfSharePurchase.error.marketValue.belowMinimum = The market value of the shares must be £0.01 or more
 
-agent.sh03.whatReliefAreYouApplyingFor.checkYourAnswersLabel = Enter the relief the buyer is applying for
+agent.sh03.whatReliefAreYouApplyingFor.checkYourAnswersLabel = Type of relief
 agent.sh03.whatReliefAreYouApplyingFor.change.hidden = Change what relief the buyer is applying for
 
 agent.sh03.roleAtPurchasingCompany.title = Who at the purchasing company provided the details of this share buyback?
@@ -1000,7 +1006,7 @@ agent.sh03.chargingPoint.change.hidden = Change the charging point
 
 agent.sh03.maximumAmountPaid.title = What is the maximum amount paid for the shares, in pounds?
 agent.sh03.maximumAmountPaid.heading = What is the maximum amount paid for the shares, in pounds?
-agent.sh03.maximumAmountPaid.checkYourAnswersLabel = What is the maximum amount paid for the shares, in pounds?
+agent.sh03.maximumAmountPaid.checkYourAnswersLabel = Maximum amount paid for the shares
 agent.sh03.maximumAmountPaid.error.required = Enter the maximum amount paid for the shares
 agent.sh03.maximumAmountPaid.error.invalidNumeric = The maximum amount paid for the shares must be a number and can include up to two decimal places, like £30 or £28.60
 agent.sh03.maximumAmountPaid.error.negative = The maximum amount paid for the shares must be £0.01 or more

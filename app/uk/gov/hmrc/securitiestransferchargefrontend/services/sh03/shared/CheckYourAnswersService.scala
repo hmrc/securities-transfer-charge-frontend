@@ -21,8 +21,7 @@ import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.SummaryListRow
 import uk.gov.hmrc.securitiestransferchargefrontend.models.UserAnswers
 import uk.gov.hmrc.securitiestransferchargefrontend.models.sh03.shared.ReasonForPurchase
 import uk.gov.hmrc.securitiestransferchargefrontend.pages.sh03.*
-import uk.gov.hmrc.securitiestransferchargefrontend.viewmodels.sh03.agents.{AgentReferenceSummary, ApplyingForReliefSummary, ChargingPointSummary, CompanyDetailsSummary, ConnectedPersonsSummary, DetailsOfThisSharePurchaseSummary, MaximumAmountPaidSummary, MinimumAmountPaidSummary, RoleAtPurchasingCompanySummary, TreasurySharesSummary, WhatReliefAreYouApplyingForSummary}
-import uk.gov.hmrc.securitiestransferchargefrontend.viewmodels.sh03.shared.*
+import uk.gov.hmrc.securitiestransferchargefrontend.viewmodels.sh03.agents.*
 
 import javax.inject.{Inject, Singleton}
 
