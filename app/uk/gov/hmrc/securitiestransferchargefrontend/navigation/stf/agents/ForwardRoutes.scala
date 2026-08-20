@@ -23,7 +23,7 @@ import uk.gov.hmrc.securitiestransferchargefrontend.controllers.routes
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.agents.bulk.routes as agentBulkRoutes
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.agents.routes as agentRoutes
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.agents.single.routes as agentSingleRoutes
-import uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.individuals.single.routes as stfSingleCyaRoutes
+import uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.shared.routes as sharedRoutes
 import uk.gov.hmrc.securitiestransferchargefrontend.models.stf.HowToNotifyAboutSecuritiesTransfer.{MoreThanOneAtATime, OneAtATime}
 import uk.gov.hmrc.securitiestransferchargefrontend.models.{CheckMode, Mode, NormalMode, UserAnswers}
 import uk.gov.hmrc.securitiestransferchargefrontend.navigation.PersistentNavigationHelper
@@ -100,7 +100,7 @@ class ForwardRoutes(answerPersistenceService: AnswerPersistenceService,
           agentSingleRoutes.OtherSecuritiesTypeController.onPageLoad(NormalMode)
       }
     case DetailsOfThisTransferPage => userAnswers => dataRequired(DetailsOfThisTransferPage, userAnswers, cyaPage)
-    case CheckYourAnswersPage => userAnswers => goTo(stfSingleCyaRoutes.ConfirmationController.onPageLoad(), Some(userAnswers))
+    case CheckYourAnswersPage => userAnswers => goTo(sharedRoutes.ConfirmationController.onPageLoad(), Some(userAnswers))
 
     case _ => _ => Future.successful(defaultPage)
   }
