@@ -112,7 +112,7 @@ class StfAgentNavigator @Inject()(appConfig: FrontendAppConfig,
       PageCallBiMapBuilder()
         .addMapping(AgentReferencePage, agentSingleRoutes.AgentReferenceController.onPageLoad)
         .addMapping(NameOfBuyerPage, agentSingleRoutes.NameOfBuyerController.onPageLoad)
-        .addMappingNoCheck(StfBuyersAddressPage, agentSingleRoutes.AddressController.onPageLoad)
+        .addMapping(StfBuyersAddressPage, agentSingleRoutes.AddressController.onPageLoad)
         .addMapping(NameOfSellerPage, agentSingleRoutes.NameOfSellerController.onPageLoad)
         .addMapping(StfSellerAddressPage, agentSingleRoutes.StfSellerAddressController.onPageLoad)
         .addMapping(ConnectedPersonsPage, agentSingleRoutes.ConnectedPersonsController.onPageLoad)

@@ -50,7 +50,7 @@ class BackwardsRoutes(defaultPage: Call):
     }
     case NameOfBuyerPage => _ => agentSingleRoutes.AgentReferenceController.onPageLoad(NormalMode)
     case StfBuyersAddressPage => _ => agentSingleRoutes.NameOfBuyerController.onPageLoad(NormalMode)
-    case NameOfSellerPage => _ => agentSingleRoutes.AddressController.onPageLoad()
+    case NameOfSellerPage => _ => agentSingleRoutes.AddressController.onPageLoad(NormalMode)
     case StfSellerAddressPage => _ => agentSingleRoutes.NameOfSellerController.onPageLoad(NormalMode)
     case ConnectedPersonsPage => _ => agentSingleRoutes.StfSellerAddressController.onPageLoad(NormalMode)
     case ApplyingForReliefPage => _ => agentSingleRoutes.ConnectedPersonsController.onPageLoad(NormalMode)
