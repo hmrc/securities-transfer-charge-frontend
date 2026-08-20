@@ -24,21 +24,20 @@ import uk.gov.hmrc.securitiestransferchargefrontend.pages.stf.single.ConnectedPe
 import uk.gov.hmrc.securitiestransferchargefrontend.viewmodels.govuk.summarylist.*
 import uk.gov.hmrc.securitiestransferchargefrontend.viewmodels.implicits.*
 
-object ConnectedPersonsSummary  {
+object ConnectedPersonsSummary {
 
-  def row(answers: UserAnswers)(implicit messages: Messages): Option[SummaryListRow] =
-    answers.get(ConnectedPersonsPage).map {
-      answer =>
+  def row(userAnswers: UserAnswers)(implicit messages: Messages): SummaryListRow = {
 
-        val value = if (answer) "site.yes" else "site.no"
+    val connectedPersons = userAnswers.get(ConnectedPersonsPage).getOrElse(false)
+    val value = if (connectedPersons) "site.yes" else "site.no"
 
-        SummaryListRowViewModel(
-          key     = "connectedPersons.checkYourAnswersLabel",
-          value   = ValueViewModel(value),
-          actions = Seq(
-            ActionItemViewModel("site.change", routes.ConnectedPersonsController.onPageLoad(CheckMode).url)
-              .withVisuallyHiddenText(messages("connectedPersons.change.hidden"))
-          )
-        )
-    }
+    SummaryListRowViewModel(
+      key = "org.connectedPersons.checkYourAnswersLabel",
+      value = ValueViewModel(value),
+      actions = Seq(
+        ActionItemViewModel("site.change", routes.ConnectedPersonsController.onPageLoad(CheckMode).url)
+          .withVisuallyHiddenText(messages("org.connectedPersons.change.hidden"))
+      )
+    )
+  }
 }

@@ -23,12 +23,12 @@ import uk.gov.hmrc.securitiestransferchargefrontend.controllers.routes
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.organisations.bulk.routes as orgBulkRoutes
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.organisations.routes as orgRoutes
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.organisations.single.routes as orgSingleRoutes
-import uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.individuals.single.routes as stfSingleCyaRoutes
+import uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.shared.routes as stfSharedRoutes
 import uk.gov.hmrc.securitiestransferchargefrontend.models.stf.HowToNotifyAboutSecuritiesTransfer.{MoreThanOneAtATime, OneAtATime}
 import uk.gov.hmrc.securitiestransferchargefrontend.models.{CheckMode, Mode, NormalMode, UserAnswers}
 import uk.gov.hmrc.securitiestransferchargefrontend.navigation.PersistentNavigationHelper
 import uk.gov.hmrc.securitiestransferchargefrontend.pages.*
-import uk.gov.hmrc.securitiestransferchargefrontend.pages.stf.shared.{HowToNotifyAboutSecuritiesTransferPage, SubmissionsDashboardPage}
+import uk.gov.hmrc.securitiestransferchargefrontend.pages.stf.shared.{CheckYourAnswersPage, HowToNotifyAboutSecuritiesTransferPage, SubmissionsDashboardPage}
 import uk.gov.hmrc.securitiestransferchargefrontend.pages.stf.single.*
 import uk.gov.hmrc.securitiestransferchargefrontend.services.AnswerPersistenceService
 
@@ -45,13 +45,13 @@ class ForwardRoutes(answerPersistenceService: AnswerPersistenceService,
   import helper.*
 
   private val firstDate = appConfig.firstChargingPoint
-  private lazy val cyaPage = stfSingleCyaRoutes.CheckYourAnswersController.onPageLoad()
-  
+  private lazy val cyaPage = orgSingleRoutes.CheckYourAnswersController.onPageLoad()
+
   def forwardRoutes(page: Page, mode: Mode)(implicit hc: HeaderCarrier): UserAnswers => Future[Call] = mode match {
     case NormalMode => normalRoutes(page)
     case CheckMode => checkRoutes(page)
   }
-  
+
   private def normalRoutes(page: Page)(implicit hc: HeaderCarrier): UserAnswers => Future[Call] = page match {
 
     case SubmissionsDashboardPage => userAnswers => goTo(orgRoutes.HowToNotifyAboutSecuritiesTransferController.onPageLoad(), Some(userAnswers))
@@ -73,15 +73,16 @@ class ForwardRoutes(answerPersistenceService: AnswerPersistenceService,
       }
     case WhatReliefAreYouApplyingForPage => userAnswers => dataRequired(WhatReliefAreYouApplyingForPage, userAnswers, orgSingleRoutes.SecuritiesTargetController.onPageLoad(NormalMode))
     case SecuritiesTargetPage => userAnswers => dataRequired(SecuritiesTargetPage, userAnswers, orgSingleRoutes.ChargingPointController.onPageLoad(NormalMode))
-    case ChargingPointPage => userAnswers => dataDependent(ChargingPointPage, userAnswers) {enterDate =>
-      if (enterDate.isBefore(firstDate)) routes.JourneyRecoveryController.onPageLoad()
-      else orgSingleRoutes.TaxRateController.onPageLoad(NormalMode)
-    }
+    case ChargingPointPage => userAnswers =>
+      dataDependent(ChargingPointPage, userAnswers) { enterDate =>
+        if (enterDate.isBefore(firstDate)) routes.JourneyRecoveryController.onPageLoad()
+        else orgSingleRoutes.TaxRateController.onPageLoad(NormalMode)
+      }
     case TaxRatePage => userAnswers => dataRequired(TaxRatePage, userAnswers, orgSingleRoutes.PurchasingSharesController.onPageLoad(NormalMode))
     case OtherSecuritiesTypePage => userAnswers => dataRequired(OtherSecuritiesTypePage, userAnswers, orgSingleRoutes.AmountPaidForSecuritiesController.onPageLoad(NormalMode))
     case PurchasingSharesPage => userAnswers =>
-      dataDependent(PurchasingSharesPage,userAnswers) { isPurchasingShares =>
-        if(isPurchasingShares)
+      dataDependent(PurchasingSharesPage, userAnswers) { isPurchasingShares =>
+        if (isPurchasingShares)
           orgSingleRoutes.DetailsOfThisTransferController.onPageLoad(NormalMode)
         else
           orgSingleRoutes.OtherSecuritiesTypeController.onPageLoad(NormalMode)
@@ -93,9 +94,10 @@ class ForwardRoutes(answerPersistenceService: AnswerPersistenceService,
         else cyaPage
       }
     case TotalMarketValuePage => userAnswers => dataRequired(TotalMarketValuePage, userAnswers, cyaPage)
+    case CheckYourAnswersPage => userAnswers => goTo(stfSharedRoutes.ConfirmationController.onPageLoad(), Some(userAnswers))
     case _ => _ => Future.successful(defaultPage)
   }
-  
+
   def checkRoutes(page: Page)(implicit hc: HeaderCarrier): UserAnswers => Future[Call] = page match {
     case _ => userAnswers => goTo(cyaPage, Some(userAnswers))
   }

@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.individuals.single
+package uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.organisations.single
 
 import com.google.inject.Inject
 import play.api.i18n.{I18nSupport, Lang, Messages, MessagesApi}
@@ -31,7 +31,7 @@ import uk.gov.hmrc.securitiestransferchargefrontend.pages.stf.single.*
 import uk.gov.hmrc.securitiestransferchargefrontend.services.stf.TaxDueCalculationService
 import uk.gov.hmrc.securitiestransferchargefrontend.services.stf.shared.FormattingService
 import uk.gov.hmrc.securitiestransferchargefrontend.viewmodels.govuk.summarylist.*
-import uk.gov.hmrc.securitiestransferchargefrontend.viewmodels.stf.individuals.*
+import uk.gov.hmrc.securitiestransferchargefrontend.viewmodels.stf.organisations.*
 import uk.gov.hmrc.securitiestransferchargefrontend.viewmodels.stf.shared.single.CheckYourAnswersViewModel
 import uk.gov.hmrc.securitiestransferchargefrontend.views.html.stf.shared.CheckYourAnswersView
 
@@ -40,7 +40,7 @@ import scala.concurrent.ExecutionContext
 
 class CheckYourAnswersController @Inject()(
                                             override val messagesApi: MessagesApi,
-                                            @Named("individuals") navigator: Navigator,
+                                            @Named("organisations") navigator: Navigator,
                                             stcAuthEnrolled: StcAuthEnrolledAction,
                                             getData: StcDataRetrievalAction,
                                             requireData: StcDataRequiredAction,
