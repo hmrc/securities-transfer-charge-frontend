@@ -19,7 +19,6 @@ package uk.gov.hmrc.securitiestransferchargefrontend.navigation.stf.agents
 import play.api.mvc.Call
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.securitiestransferchargefrontend.config.FrontendAppConfig
-import uk.gov.hmrc.securitiestransferchargefrontend.controllers.routes
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.agents.bulk.routes as agentBulkRoutes
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.agents.routes as agentRoutes
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.agents.single.routes as agentSingleRoutes
@@ -64,7 +63,7 @@ class ForwardRoutes(answerPersistenceService: AnswerPersistenceService,
     case AgentReferencePage => userAnswers => {
       dataDependent(HowToNotifyAboutSecuritiesTransferPage, userAnswers) {
         case OneAtATime => agentSingleRoutes.NameOfBuyerController.onPageLoad(NormalMode)
-        case MoreThanOneAtATime => routes.CheckYourAnswersController.onPageLoad()
+        case MoreThanOneAtATime => agentSingleRoutes.CheckYourAnswersController.onPageLoad()
       }
     }
     case NameOfBuyerPage => userAnswers => dataRequired(NameOfBuyerPage, userAnswers, agentSingleRoutes.AddressController.onPageLoad(NormalMode))
