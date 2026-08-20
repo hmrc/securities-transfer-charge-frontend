@@ -17,7 +17,12 @@ GET        /stf/bulk/check-your-answers                 uk.gov.hmrc.securitiestr
 GET        /stf/check-your-answers                      uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.individuals.single.CheckYourAnswersController.onPageLoad()
 POST       /stf/check-your-answers                      uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.individuals.single.CheckYourAnswersController.onSubmit()
 
-GET        /stf/confirmation                            uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.individuals.single.ConfirmationController.onPageLoad()
+GET        /stf/confirmation                            uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.shared.ConfirmationController.onPageLoad()
+
+GET        /stf/org/check-answers                  uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.organisations.single.CheckYourAnswersController.onPageLoad()
+POST       /stf/org/check-answers                  uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.organisations.single.CheckYourAnswersController.onSubmit()
+
+GET        /stf/org/confirmation                        uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.shared.ConfirmationController.onPageLoad()
 
 
 GET        /stf/account/sign-out-survey                   uk.gov.hmrc.securitiestransferchargefrontend.controllers.auth.AuthController.signOut()

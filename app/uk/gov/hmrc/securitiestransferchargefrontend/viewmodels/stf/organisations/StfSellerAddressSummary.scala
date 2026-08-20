@@ -17,27 +17,34 @@
 package uk.gov.hmrc.securitiestransferchargefrontend.viewmodels.stf.organisations
 
 import play.api.i18n.Messages
+import play.twirl.api.Html
+import uk.gov.hmrc.govukfrontend.views.viewmodels.content.HtmlContent
 import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.SummaryListRow
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.organisations.single.routes
 import uk.gov.hmrc.securitiestransferchargefrontend.models.{CheckMode, UserAnswers}
-import uk.gov.hmrc.securitiestransferchargefrontend.pages.stf.single.ApplyingForReliefPage
+import uk.gov.hmrc.securitiestransferchargefrontend.pages.stf.single.StfSellerAddressPage
 import uk.gov.hmrc.securitiestransferchargefrontend.viewmodels.govuk.summarylist.*
 import uk.gov.hmrc.securitiestransferchargefrontend.viewmodels.implicits.*
 
-object ApplyingForReliefSummary {
+object StfSellerAddressSummary {
 
-  def row(userAnswers: UserAnswers)(implicit messages: Messages): SummaryListRow = {
+  def row(answers: UserAnswers)(implicit messages: Messages): Option[SummaryListRow] = {
+    val value = answers.get(StfSellerAddressPage).map { address =>
+      val addressLines = Seq(
+        Some(address.address.lines.mkString("<br>")),
+        Some(s"<br>${address.address.postcode}"),
+        Some(s"<br>${address.address.country.name}")
+      ).flatten.mkString
+      HtmlContent(Html(addressLines))
+    }.getOrElse(HtmlContent(messages("site.notProvided")))
 
-    val applyingForRelief = userAnswers.get(ApplyingForReliefPage).getOrElse(false)
-    val value = if (applyingForRelief) "site.yes" else "site.no"
-
-    SummaryListRowViewModel(
-      key = "org.applyingForRelief.checkYourAnswersLabel",
+    Some(SummaryListRowViewModel(
+      key = "checkYourAnswers.sellerAddress",
       value = ValueViewModel(value),
       actions = Seq(
-        ActionItemViewModel("site.change", routes.ApplyingForReliefController.onPageLoad(CheckMode).url)
-          .withVisuallyHiddenText(messages("org.applyingForRelief.change.hidden"))
+        ActionItemViewModel("site.change", routes.StfSellerAddressController.onPageLoad(CheckMode).url)
+          .withVisuallyHiddenText(messages("checkYourAnswers.sellerAddress.change.hidden"))
       )
-    )
+    ))
   }
 }
