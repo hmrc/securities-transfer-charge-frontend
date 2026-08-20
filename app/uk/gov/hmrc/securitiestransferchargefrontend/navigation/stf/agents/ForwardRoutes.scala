@@ -23,6 +23,7 @@ import uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.agents.bulk.
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.agents.routes as agentRoutes
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.agents.single.routes as agentSingleRoutes
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.shared.routes as sharedRoutes
+import uk.gov.hmrc.securitiestransferchargefrontend.controllers.routes
 import uk.gov.hmrc.securitiestransferchargefrontend.models.stf.HowToNotifyAboutSecuritiesTransfer.{MoreThanOneAtATime, OneAtATime}
 import uk.gov.hmrc.securitiestransferchargefrontend.models.{CheckMode, Mode, NormalMode, UserAnswers}
 import uk.gov.hmrc.securitiestransferchargefrontend.navigation.PersistentNavigationHelper
@@ -63,7 +64,7 @@ class ForwardRoutes(answerPersistenceService: AnswerPersistenceService,
     case AgentReferencePage => userAnswers => {
       dataDependent(HowToNotifyAboutSecuritiesTransferPage, userAnswers) {
         case OneAtATime => agentSingleRoutes.NameOfBuyerController.onPageLoad(NormalMode)
-        case MoreThanOneAtATime => agentSingleRoutes.CheckYourAnswersController.onPageLoad()
+        case MoreThanOneAtATime => routes.CheckYourAnswersController.onPageLoad()
       }
     }
     case NameOfBuyerPage => userAnswers => dataRequired(NameOfBuyerPage, userAnswers, agentSingleRoutes.AddressController.onPageLoad(NormalMode))
