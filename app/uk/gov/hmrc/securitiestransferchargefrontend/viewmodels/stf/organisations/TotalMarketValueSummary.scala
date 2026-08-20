@@ -19,25 +19,26 @@ package uk.gov.hmrc.securitiestransferchargefrontend.viewmodels.stf.organisation
 import play.api.i18n.Messages
 import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.SummaryListRow
 import uk.gov.hmrc.securitiestransferchargefrontend.config.CurrencyFormatter.currencyFormat
-import uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.individuals.single.routes
+import uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.organisations.single.routes
 import uk.gov.hmrc.securitiestransferchargefrontend.models.{CheckMode, UserAnswers}
 import uk.gov.hmrc.securitiestransferchargefrontend.pages.stf.single.TotalMarketValuePage
 import uk.gov.hmrc.securitiestransferchargefrontend.viewmodels.govuk.summarylist.*
 import uk.gov.hmrc.securitiestransferchargefrontend.viewmodels.implicits.*
 
-object TotalMarketValueSummary  {
+object TotalMarketValueSummary {
 
-  def row(answers: UserAnswers)(implicit messages: Messages): Option[SummaryListRow] =
-    answers.get(TotalMarketValuePage).map {
-      answer =>
+  def row(answers: UserAnswers)(implicit messages: Messages): SummaryListRow = {
+    val value = answers.get(TotalMarketValuePage)
+      .map(currencyFormat)
+      .getOrElse(messages("site.notProvided"))
 
-        SummaryListRowViewModel(
-          key     = "org.totalMarketValue.checkYourAnswersLabel",
-          value   = ValueViewModel(currencyFormat(answer)),
-          actions = Seq(
-            ActionItemViewModel("site.change", routes.TotalMarketValueController.onPageLoad(CheckMode).url)
-              .withVisuallyHiddenText(messages("org.totalMarketValue.change.hidden"))
-          )
-        )
-    }
+    SummaryListRowViewModel(
+      key = "org.totalMarketValue.checkYourAnswersLabel",
+      value = ValueViewModel(value),
+      actions = Seq(
+        ActionItemViewModel("site.change", routes.TotalMarketValueController.onPageLoad(CheckMode).url)
+          .withVisuallyHiddenText(messages("org.totalMarketValue.change.hidden"))
+      )
+    )
+  }
 }

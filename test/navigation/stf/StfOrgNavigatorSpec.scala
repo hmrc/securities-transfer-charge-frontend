@@ -26,8 +26,8 @@ import uk.gov.hmrc.securitiestransferchargefrontend.controllers.routes
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.organisations.bulk.routes as orgBulkRoutes
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.organisations.routes as orgRoutes
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.organisations.single.routes as orgSingleRoutes
+import uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.organisations.single.routes as stfSingleCyaRoutes
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.shared.routes as sharedRoutes
-import uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.individuals.single.routes as stfSingleCyaRoutes
 import uk.gov.hmrc.securitiestransferchargefrontend.models.*
 import uk.gov.hmrc.securitiestransferchargefrontend.models.stf.*
 import uk.gov.hmrc.securitiestransferchargefrontend.navigation.stf.organisations.StfOrgNavigator
@@ -154,7 +154,7 @@ class StfOrgNavigatorSpec extends SpecBase with ScalaFutures {
       }
 
       "must go from the SecuritiesTargetPage to ChargingPointController" in {
-        val answers = emptyUserAnswers.set(SecuritiesTargetPage, SecuritiesTarget("Business 1",Some("12345678"))).get
+        val answers = emptyUserAnswers.set(SecuritiesTargetPage, SecuritiesTarget("Business 1", Some("12345678"))).get
         val result = navigator.nextPage(SecuritiesTargetPage, NormalMode, answers)(fakeRequest)
         whenReady(result) { res =>
           res mustBe orgSingleRoutes.ChargingPointController.onPageLoad(NormalMode)
@@ -162,7 +162,7 @@ class StfOrgNavigatorSpec extends SpecBase with ScalaFutures {
       }
 
       "must go from the ChargingPointPage to JourneyRecoveryController when the date entered is before 2026-01-01" in {
-        val answers = emptyUserAnswers.set(ChargingPointPage, LocalDate.of(2025,1,2)).get
+        val answers = emptyUserAnswers.set(ChargingPointPage, LocalDate.of(2025, 1, 2)).get
         val result = navigator.nextPage(ChargingPointPage, NormalMode, answers)(fakeRequest)
         whenReady(result) { res =>
           res mustBe routes.JourneyRecoveryController.onPageLoad()
@@ -194,7 +194,7 @@ class StfOrgNavigatorSpec extends SpecBase with ScalaFutures {
       }
 
       "must go from the PurchasingSharesPage to OtherSecuritiesTypeController if false" in {
-        val answers = emptyUserAnswers.set(PurchasingSharesPage,false).get
+        val answers = emptyUserAnswers.set(PurchasingSharesPage, false).get
         val result = navigator.nextPage(PurchasingSharesPage, NormalMode, answers)(fakeRequest)
         whenReady(result) { res =>
           res mustBe orgSingleRoutes.OtherSecuritiesTypeController.onPageLoad(NormalMode)

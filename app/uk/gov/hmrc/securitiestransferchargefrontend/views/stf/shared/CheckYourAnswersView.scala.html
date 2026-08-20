@@ -17,7 +17,6 @@
 @import uk.gov.hmrc.govukfrontend.views.html.components._
 @import uk.gov.hmrc.securitiestransferchargefrontend.viewmodels.stf.shared.single.CheckYourAnswersViewModel
 @import uk.gov.hmrc.securitiestransferchargefrontend.views.html.components.SaveAndReturnButton
-@import uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.individuals.single.routes as individualRoutes
 @import uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.shared.routes
 
 @this(
@@ -28,7 +27,7 @@
     saveAndReturnButton: SaveAndReturnButton
 )
 
-@(viewModel: CheckYourAnswersViewModel, backLinkCall: Call)(implicit request: Request[_], messages: Messages)
+@(viewModel: CheckYourAnswersViewModel, backLinkCall: Call, submitAction: Call)(implicit request: Request[_], messages: Messages)
 
 @layout(pageTitle = titleNoForm(messages(CheckYourAnswersViewModel.MessageKeys.title), Some(messages("sectionTitle.stf"))), backLinkUrl = Some(backLinkCall.url)) {
 
@@ -55,7 +54,7 @@
 
     <div class="govuk-button-group">
 
-        @formHelper(action = individualRoutes.CheckYourAnswersController.onSubmit()) {
+        @formHelper(action = submitAction) {
 
         @govukButton(
             ButtonViewModel(

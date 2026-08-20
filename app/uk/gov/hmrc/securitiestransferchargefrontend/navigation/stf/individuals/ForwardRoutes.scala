@@ -23,6 +23,7 @@ import uk.gov.hmrc.securitiestransferchargefrontend.controllers.routes
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.individuals.bulk.routes as individualBulkRoutes
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.individuals.routes as individualRoutes
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.individuals.single.routes as individualSingleRoutes
+import uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.shared.routes as stfSharedRoutes
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.individuals.single.routes as stfSingleCyaRoutes
 import uk.gov.hmrc.securitiestransferchargefrontend.models.stf.HowToNotifyAboutSecuritiesTransfer.{MoreThanOneAtATime, OneAtATime}
 import uk.gov.hmrc.securitiestransferchargefrontend.models.{CheckMode, Mode, NormalMode, UserAnswers}
@@ -40,8 +41,9 @@ class ForwardRoutes(answerPersistenceService: AnswerPersistenceService,
                     defaultPage: Call,
                     errorPages: Seq[Call])
                    (implicit ec: ExecutionContext):
-  
+
   val helper = new PersistentNavigationHelper(answerPersistenceService, defaultPage, errorPages)
+
   import helper.*
 
   private val firstDate = appConfig.firstChargingPoint
@@ -73,15 +75,16 @@ class ForwardRoutes(answerPersistenceService: AnswerPersistenceService,
       }
     case WhatReliefAreYouApplyingForPage => userAnswers => dataRequired(WhatReliefAreYouApplyingForPage, userAnswers, individualSingleRoutes.SecuritiesTargetController.onPageLoad(NormalMode))
     case SecuritiesTargetPage => userAnswers => dataRequired(SecuritiesTargetPage, userAnswers, individualSingleRoutes.ChargingPointController.onPageLoad(NormalMode))
-    case ChargingPointPage => userAnswers => dataDependent(ChargingPointPage, userAnswers) {enterDate =>
-      if (enterDate.isBefore(firstDate)) routes.JourneyRecoveryController.onPageLoad()
-      else individualSingleRoutes.TaxRateController.onPageLoad(NormalMode)
-    }
+    case ChargingPointPage => userAnswers =>
+      dataDependent(ChargingPointPage, userAnswers) { enterDate =>
+        if (enterDate.isBefore(firstDate)) routes.JourneyRecoveryController.onPageLoad()
+        else individualSingleRoutes.TaxRateController.onPageLoad(NormalMode)
+      }
     case TaxRatePage => userAnswers => dataRequired(TaxRatePage, userAnswers, individualSingleRoutes.PurchasingSharesController.onPageLoad(NormalMode))
     case OtherSecuritiesTypePage => userAnswers => dataRequired(OtherSecuritiesTypePage, userAnswers, individualSingleRoutes.AmountPaidForSecuritiesController.onPageLoad(NormalMode))
     case PurchasingSharesPage => userAnswers =>
-      dataDependent(PurchasingSharesPage,userAnswers) { isPurchasingShares =>
-        if(isPurchasingShares)
+      dataDependent(PurchasingSharesPage, userAnswers) { isPurchasingShares =>
+        if (isPurchasingShares)
           individualSingleRoutes.DetailsOfThisTransferController.onPageLoad(NormalMode)
         else
           individualSingleRoutes.OtherSecuritiesTypeController.onPageLoad(NormalMode)
@@ -93,11 +96,11 @@ class ForwardRoutes(answerPersistenceService: AnswerPersistenceService,
           userAnswers.get(ConnectedPersonsPage).fold(defaultPage) {
             isConnected =>
               if (isConnected) individualSingleRoutes.TotalMarketValueController.onPageLoad(NormalMode)
-              else stfSingleCyaRoutes.CheckYourAnswersController.onPageLoad()
+              else cyaPage
           }
       }
-    case TotalMarketValuePage => userAnswers => dataRequired(TotalMarketValuePage, userAnswers, stfSingleCyaRoutes.CheckYourAnswersController.onPageLoad())
-    case CheckYourAnswersPage => userAnswers => goTo(stfSingleCyaRoutes.ConfirmationController.onPageLoad(), Some(userAnswers))
+    case TotalMarketValuePage => userAnswers => dataRequired(TotalMarketValuePage, userAnswers, cyaPage)
+    case CheckYourAnswersPage => userAnswers => goTo(stfSharedRoutes.ConfirmationController.onPageLoad(), Some(userAnswers))
     case _ => _ => Future.successful(defaultPage)
   }
 
