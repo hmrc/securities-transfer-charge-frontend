@@ -54,7 +54,6 @@ object CheckYourAnswersViewModel {
 
     // Print section
     val printHeading = "checkYourAnswers.print.heading"
-    val printBody = "checkYourAnswers.print.body"
 
     // Agent Declaration section
     val declarationP1 = "agent.checkYourAnswers.declaration.p1"
