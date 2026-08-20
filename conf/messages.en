@@ -104,7 +104,7 @@ checkYourAnswers.saveAndReturn = Save and return to dashboard
 # Print
 checkYourAnswers.print.heading = Print this page
 checkYourAnswers.print.p1 = You can
-checkYourAnswers.print.p2 = print this page
+checkYourAnswers.print.content.link.text = print this page
 checkYourAnswers.print.p3 = before submitting.
 
 # Agent Declaration
@@ -335,7 +335,7 @@ detailsOfThisTransfer.marketValue = Market value of the shares
 detailsOfThisTransfer.checkYourAnswersLabel = What are the details of this transfer?
 detailsOfThisTransfer.numberOfShares.change.hidden = Change number of shares
 detailsOfThisTransfer.typeOfShares.change.hidden = Change type or class of shares
-detailsOfThisTransfer.amountPaid.change.hidden = Change amount paid for shares
+detailsOfThisTransfer.amountPaid.change.hidden = Change amount paid for the shares
 detailsOfThisTransfer.marketValue.change.hidden = Change market value of the shares
 detailsOfThisTransfer.error.numberOfShares.wholeNumber = The number of shares must be a whole number between 1 and 999,999,999
 detailsOfThisTransfer.error.numberOfShares.min = The number of shares must be at least 1
@@ -798,7 +798,7 @@ agent.otherSecuritiesType.title = Enter the type of securities the buyer is purc
 agent.otherSecuritiesType.heading = Enter the type of securities the buyer is purchasing
 agent.otherSecuritiesType.checkYourAnswersLabel = Type of securities
 agent.otherSecuritiesType.error.required = Enter the type of securities the buyer is purchasing
-agent.otherSecuritiesType.change.hidden = Change type of securities
+agent.otherSecuritiesType.change.hidden = Change the type of securities
 agent.otherSecuritiesType.error.length = The type of securities the buyer is purchasing must be 100 characters or fewer
 
 agent.detailsOfThisTransfer.error.numberOfShares.required = Enter the number of shares the buyer is purchasing
@@ -835,7 +835,7 @@ agent.totalMarketValue.error.required = Enter the market value of the shares in 
 agent.totalMarketValue.error.invalidNumeric = The market value of the shares must be a number and can include up to two decimal places, like £30 or £28.60
 agent.totalMarketValue.error.aboveMaximum = The market value of the shares must be £999,999,999 or below
 agent.totalMarketValue.error.belowMinimum = The market value of the shares must be £0.01 or more
-agent.totalMarketValue.change.hidden = Change the market value of the securities
+agent.totalMarketValue.change.hidden = Change the total market value of the securities
 agent.totalMarketValue.hint = For example, £600 or £193.54
 agent.totalMarketValue.error.negative = The market value of the shares must be £0.01 or more
 agent.totalMarketValue.checkYourAnswersLabel = Total market value of the securities

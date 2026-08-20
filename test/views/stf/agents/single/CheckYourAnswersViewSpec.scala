@@ -98,7 +98,7 @@ class CheckYourAnswersViewSpec extends ViewBaseSpec {
 
     val printP1: String = messages("checkYourAnswers.print.p1")
 
-    val printP2: String = messages("checkYourAnswers.print.p2")
+    val printP2: String = messages("checkYourAnswers.print.content.link.text")
 
     val printP3: String = messages("checkYourAnswers.print.p3")
 
