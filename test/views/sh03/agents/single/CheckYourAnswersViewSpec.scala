@@ -111,7 +111,7 @@ class CheckYourAnswersViewSpec extends ViewBaseSpec {
       printSectionHeading.size() mustBe 1
 
       val printLink = cyaView.select(s"a.govuk-link:contains(${ExpectedContent.printLinkText})")
-      printLink.attr("onclick") must include("window.print()")
+      printLink.attr("id") mustBe "print-this-page"
     }
 
     "display the declaration section correctly" - {
