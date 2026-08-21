@@ -105,7 +105,7 @@ class StfNavigator @Inject()(appConfig: FrontendAppConfig,
 
   val userAnswersValidator: UserAnswersValidator = new UserAnswersValidator(this) {
 
-    override protected val startPage: GettablePage[?] = ConfirmAddressPage
+    override protected val startPage: GettablePage[?] = NameOfSellerPage
 
     override protected lazy val pageCallMap: PageCallBiMap =
       PageCallBiMapBuilder()

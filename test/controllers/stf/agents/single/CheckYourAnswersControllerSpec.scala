@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package controllers.stf.individuals.single
+package controllers.stf.agents.single
 
 import base.SpecBase
 import base.stubs.StubPersistentNavigator
@@ -22,10 +22,11 @@ import com.google.inject.name.Names
 import play.api.inject.bind
 import play.api.test.FakeRequest
 import play.api.test.Helpers.*
-import uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.individuals.single.routes
+import uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.agents.single.routes
 import uk.gov.hmrc.securitiestransferchargefrontend.models.CheckMode
 import uk.gov.hmrc.securitiestransferchargefrontend.models.stf.*
 import uk.gov.hmrc.securitiestransferchargefrontend.navigation.{Navigator, PersistentNavigator}
+import uk.gov.hmrc.securitiestransferchargefrontend.pages.stf.shared.HowToNotifyAboutSecuritiesTransferPage
 import uk.gov.hmrc.securitiestransferchargefrontend.pages.stf.single.*
 
 import java.time.LocalDate
@@ -34,7 +35,8 @@ class CheckYourAnswersControllerSpec extends SpecBase {
 
   private def completeUserAnswers = {
     emptyUserAnswers
-      .set(ConfirmAddressPage, ConfirmableAddress(List("123 Main Street", "London"), "SW1A 1AA", Some(Country("United Kingdom", "GB")))).success.value
+      .set(HowToNotifyAboutSecuritiesTransferPage,HowToNotifyAboutSecuritiesTransfer.OneAtATime).success.value
+      .set(NameOfBuyerPage, "Buyer 1").success.value
       .set(StfBuyersAddressPage, AlfConfirmedAddress("audit-ref-123", Some("id-123"), AlfAddress(List("123 Main Street", "London"), "SW1A 1AA", Country("United Kingdom", "GB")))).success.value
       .set(NameOfSellerPage, "Jane Smith").success.value
       .set(StfSellerAddressPage, AlfConfirmedAddress("audit-ref-456", Some("id-456"), AlfAddress(List("456 High Street", "Manchester"), "M1 1AA", Country("United Kingdom", "GB")))).success.value
@@ -59,8 +61,8 @@ class CheckYourAnswersControllerSpec extends SpecBase {
 
       val application = applicationBuilder(userAnswers = Some(completeUserAnswers))
         .overrides(
-          bind[Navigator].qualifiedWith(Names.named("individuals")).toInstance(stubNavigator),
-          bind[PersistentNavigator].qualifiedWith(Names.named("individuals")).toInstance(stubNavigator)
+          bind[Navigator].qualifiedWith(Names.named("agents")).toInstance(stubNavigator),
+          bind[PersistentNavigator].qualifiedWith(Names.named("agents")).toInstance(stubNavigator)
         )
         .build()
 
@@ -87,11 +89,11 @@ class CheckYourAnswersControllerSpec extends SpecBase {
 
     "must redirect to next page for a POST" in {
       val stubNavigator = new StubPersistentNavigator(testNextPage, completeUserAnswers, "stf", "")
-
+      
       val application = applicationBuilder(userAnswers = Some(completeUserAnswers))
         .overrides(
-          bind[Navigator].qualifiedWith(Names.named("individuals")).toInstance(stubNavigator),
-          bind[PersistentNavigator].qualifiedWith(Names.named("individuals")).toInstance(stubNavigator)
+          bind[Navigator].qualifiedWith(Names.named("agents")).toInstance(stubNavigator),
+          bind[PersistentNavigator].qualifiedWith(Names.named("agents")).toInstance(stubNavigator)
         )
         .build()
 
@@ -278,8 +280,8 @@ class CheckYourAnswersControllerSpec extends SpecBase {
 
       val application = applicationBuilder(userAnswers = Some(answersWithNoCRN))
         .overrides(
-          bind[Navigator].qualifiedWith(Names.named("individuals")).toInstance(stubNavigator),
-          bind[PersistentNavigator].qualifiedWith(Names.named("individuals")).toInstance(stubNavigator)
+          bind[Navigator].qualifiedWith(Names.named("agents")).toInstance(stubNavigator),
+          bind[PersistentNavigator].qualifiedWith(Names.named("agents")).toInstance(stubNavigator)
         )
         .build()
 
@@ -303,136 +305,6 @@ class CheckYourAnswersControllerSpec extends SpecBase {
 
         status(result) mustEqual SEE_OTHER
         redirectLocation(result).value mustEqual routes.DetailsOfThisTransferController.onPageLoad(CheckMode).url
-      }
-    }
-  }
-
-  "CheckYourAnswersController methods" - {
-    val application = applicationBuilder(userAnswers = Some(emptyUserAnswers)).build()
-    
-    running(application) {
-      val controller = application.injector.instanceOf[uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.individuals.single.CheckYourAnswersController]
-      implicit val msgs = messages(application)
-
-      "buildYourDetailsRows" - {
-        "must use ConfirmAddressPage when available" in {
-          val userAnswers = buildStfUserAnswers(
-            buyerAddress = Some(base.Fixtures.confirmableAddress)
-          )
-
-          val rows = controller.buildYourDetailsRows(userAnswers)
-
-          rows.size mustBe 1
-        }
-
-        "must use StfBuyersAddressPage when ConfirmAddressPage not available" in {
-          val userAnswers = buildStfUserAnswers(
-            stfBuyerAddress = Some(base.Fixtures.fakeAlfConfirmedAddress)
-          )
-
-          val rows = controller.buildYourDetailsRows(userAnswers)
-
-          rows.size mustBe 1
-        }
-
-        "must fallback to ConfirmAddressSummary when neither page available" in {
-          val userAnswers = emptyUserAnswers
-
-          val rows = controller.buildYourDetailsRows(userAnswers)
-
-          rows.size mustBe 1
-        }
-      }
-
-      "buildSellerDetailsRows" - {
-        "must return seller name and address rows" in {
-          val userAnswers = buildStfUserAnswers(
-            sellerName = Some("Test Seller"),
-            sellerAddress = Some(base.Fixtures.fakeAlfConfirmedAddress)
-          )
-
-          val rows = controller.buildSellerDetailsRows(userAnswers)
-
-          rows.size mustBe 2
-        }
-      }
-
-      "buildTransferDetailsRows" - {
-        "must include relief row when applying for relief" in {
-          val userAnswers = buildStfUserAnswers(
-            connectedPersons = Some(true),
-            applyingForRelief = Some(true),
-            reliefName = Some("Test Relief"),
-            securitiesTarget = Some(SecuritiesTarget("Test Company", Some("12345678")))
-          )
-
-          val rows = controller.buildTransferDetailsRows(userAnswers)
-
-          rows.size must be >= 5
-        }
-
-        "must exclude relief row when not applying for relief" in {
-          val userAnswers = buildStfUserAnswers(
-            connectedPersons = Some(true),
-            applyingForRelief = Some(false),
-            securitiesTarget = Some(SecuritiesTarget("Test Company", Some("12345678")))
-          )
-
-          val rows = controller.buildTransferDetailsRows(userAnswers)
-
-          rows.size must be >= 4
-        }
-      }
-
-      "buildSecuritiesDetailsRows" - {
-        "must build shares details with market value for connected persons" in {
-          val detailsOfTransfer = DetailsOfThisTransfer(100, "Ordinary", BigDecimal("10000"), Some(BigDecimal("12000")))
-          val userAnswers = emptyUserAnswers
-            .set(PurchasingSharesPage, true).success.value
-            .set(ConnectedPersonsPage, true).success.value
-            .set(DetailsOfThisTransferPage, detailsOfTransfer).success.value
-
-          val rows = controller.buildSecuritiesDetailsRows(userAnswers)
-
-          rows.size mustBe 5
-        }
-
-        "must build shares details without market value for non-connected persons" in {
-          val detailsOfTransfer = DetailsOfThisTransfer(100, "Ordinary", BigDecimal("10000"), None)
-          val userAnswers = emptyUserAnswers
-            .set(PurchasingSharesPage, true).success.value
-            .set(ConnectedPersonsPage, false).success.value
-            .set(DetailsOfThisTransferPage, detailsOfTransfer).success.value
-
-          val rows = controller.buildSecuritiesDetailsRows(userAnswers)
-
-          rows.size mustBe 4
-        }
-
-        "must build other securities details with market value for connected persons" in {
-          val userAnswers = emptyUserAnswers
-            .set(PurchasingSharesPage, false).success.value
-            .set(ConnectedPersonsPage, true).success.value
-            .set(OtherSecuritiesTypePage, "Bonds").success.value
-            .set(AmountPaidForSecuritiesPage, BigDecimal("5000")).success.value
-            .set(TotalMarketValuePage, BigDecimal("6000")).success.value
-
-          val rows = controller.buildSecuritiesDetailsRows(userAnswers)
-
-          rows.size mustBe 4
-        }
-
-        "must build other securities details without market value for non-connected persons" in {
-          val userAnswers = emptyUserAnswers
-            .set(PurchasingSharesPage, false).success.value
-            .set(ConnectedPersonsPage, false).success.value
-            .set(OtherSecuritiesTypePage, "Bonds").success.value
-            .set(AmountPaidForSecuritiesPage, BigDecimal("5000")).success.value
-
-          val rows = controller.buildSecuritiesDetailsRows(userAnswers)
-
-          rows.size mustBe 3
-        }
       }
     }
   }

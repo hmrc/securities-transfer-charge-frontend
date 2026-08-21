@@ -14,30 +14,31 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.securitiestransferchargefrontend.viewmodels.stf.organisations
+package uk.gov.hmrc.securitiestransferchargefrontend.viewmodels.stf.agents
 
 import play.api.i18n.Messages
+import play.twirl.api.HtmlFormat
 import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.SummaryListRow
-import uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.organisations.single.routes
+import uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.agents.single.routes
 import uk.gov.hmrc.securitiestransferchargefrontend.models.{CheckMode, UserAnswers}
-import uk.gov.hmrc.securitiestransferchargefrontend.pages.stf.single.ApplyingForReliefPage
+import uk.gov.hmrc.securitiestransferchargefrontend.pages.stf.single.WhatReliefAreYouApplyingForPage
 import uk.gov.hmrc.securitiestransferchargefrontend.viewmodels.govuk.summarylist.*
 import uk.gov.hmrc.securitiestransferchargefrontend.viewmodels.implicits.*
 
-object ApplyingForReliefSummary {
+object WhatReliefAreYouApplyingForSummary {
 
-  def row(userAnswers: UserAnswers)(implicit messages: Messages): SummaryListRow = {
+  def row(answers: UserAnswers)(implicit messages: Messages): Option[SummaryListRow] = {
+    answers.get(WhatReliefAreYouApplyingForPage).map { answer =>
 
-    val applyingForRelief = userAnswers.get(ApplyingForReliefPage).getOrElse(false)
-    val value = if (applyingForRelief) "site.yes" else "site.no"
 
-    SummaryListRowViewModel(
-      key = "org.applyingForRelief.checkYourAnswersLabel",
-      value = ValueViewModel(value),
-      actions = Seq(
-        ActionItemViewModel("site.change", routes.ApplyingForReliefController.onPageLoad(CheckMode).url)
-          .withVisuallyHiddenText(messages("org.applyingForRelief.change.hidden"))
+      SummaryListRowViewModel(
+        key = "agent.whatReliefAreYouApplyingFor.checkYourAnswersLabel",
+        value = ValueViewModel(HtmlFormat.escape(answer).toString),
+        actions = Seq(
+          ActionItemViewModel("site.change", routes.WhatReliefAreYouApplyingForController.onPageLoad(CheckMode).url)
+            .withVisuallyHiddenText(messages("agent.whatReliefAreYouApplyingFor.change.hidden"))
+        )
       )
-    )
+    }
   }
 }

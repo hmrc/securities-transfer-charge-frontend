@@ -14,49 +14,48 @@
  * limitations under the License.
  */
 
-package services.stf.shared
+package models.stf.cya
 
 import base.{Fixtures, SpecBase}
 import play.api.i18n.Messages
 import play.api.test.Helpers.stubMessagesApi
+import uk.gov.hmrc.securitiestransferchargefrontend.models.shared.AgentReference
+import uk.gov.hmrc.securitiestransferchargefrontend.models.stf.TaxRate.HalfPercent
+import uk.gov.hmrc.securitiestransferchargefrontend.models.stf.cya.StfAgentRowBuilder
 import uk.gov.hmrc.securitiestransferchargefrontend.models.stf.{DetailsOfThisTransfer, SecuritiesTarget}
 import uk.gov.hmrc.securitiestransferchargefrontend.pages.stf.single.*
-import uk.gov.hmrc.securitiestransferchargefrontend.services.stf.shared.CheckYourAnswersService
 
-class CheckYourAnswersServiceSpec extends SpecBase {
+import java.time.LocalDate
 
-  val service = new CheckYourAnswersService()
+class StfAgentRowBuilderSpec extends SpecBase {
+
   implicit val messages: Messages = stubMessagesApi().preferred(Seq.empty)
 
-  "CheckYourAnswersService" - {
+  "StfAgentRowBuilderSpec" - {
 
     "buildYourDetailsRows" - {
-      "must use ConfirmAddressPage when available" in {
+
+      "must include the agent reference if available" in {
         val userAnswers = buildStfUserAnswers(
-          buyerAddress = Some(Fixtures.confirmableAddress)
+          agentReference = Some(AgentReference(Some("Reference1")))
         )
 
-        val rows = service.buildYourDetailsRows(userAnswers)
+        val rows = StfAgentRowBuilder.buildYourDetailsRows(userAnswers)
 
         rows.size mustBe 1
       }
+    }
 
-      "must use StfBuyersAddressPage when ConfirmAddressPage not available" in {
+    "buildBuyerDetailsRows" - {
+      "must return buyer name and address rows" in {
         val userAnswers = buildStfUserAnswers(
+          buyerName = Some("Test Seller"),
           stfBuyerAddress = Some(Fixtures.fakeAlfConfirmedAddress)
         )
 
-        val rows = service.buildYourDetailsRows(userAnswers)
+        val rows = StfAgentRowBuilder.buildBuyerDetailsRows(userAnswers)
 
-        rows.size mustBe 1
-      }
-
-      "must fallback to ConfirmAddressSummary when neither page available" in {
-        val userAnswers = emptyUserAnswers
-
-        val rows = service.buildYourDetailsRows(userAnswers)
-
-        rows.size mustBe 1
+        rows.size mustBe 2
       }
     }
 
@@ -67,7 +66,7 @@ class CheckYourAnswersServiceSpec extends SpecBase {
           sellerAddress = Some(Fixtures.fakeAlfConfirmedAddress)
         )
 
-        val rows = service.buildSellerDetailsRows(userAnswers)
+        val rows = StfAgentRowBuilder.buildSellerDetailsRows(userAnswers)
 
         rows.size mustBe 2
       }
@@ -79,24 +78,34 @@ class CheckYourAnswersServiceSpec extends SpecBase {
           connectedPersons = Some(true),
           applyingForRelief = Some(true),
           reliefName = Some("Test Relief"),
-          securitiesTarget = Some(SecuritiesTarget("Test Company", Some("12345678")))
+          securitiesTarget = Some(SecuritiesTarget("Test Company", Some("12345678"))),
+          chargingPoint = Some(LocalDate.now()),
+          taxRate = Some(HalfPercent),
+          purchasingShares = Some(false),
+          otherSecuritiesType = Some("loan notes"),
+          amountPaidForSecurities = Some(BigDecimal(245)),
+          totalMarketValue = Some(BigDecimal(50))
         )
 
-        val rows = service.buildTransferDetailsRows(userAnswers)
-
-        rows.size must be >= 5
+        val rows = StfAgentRowBuilder.buildTransferDetailsRows(userAnswers)
+        rows.size mustBe 11
       }
 
       "must exclude relief row when not applying for relief" in {
         val userAnswers = buildStfUserAnswers(
           connectedPersons = Some(true),
           applyingForRelief = Some(false),
-          securitiesTarget = Some(SecuritiesTarget("Test Company", Some("12345678")))
+          securitiesTarget = Some(SecuritiesTarget("Test Company", Some("12345678"))),
+          chargingPoint = Some(LocalDate.now()),
+          taxRate = Some(HalfPercent),
+          purchasingShares = Some(false),
+          otherSecuritiesType = Some("loan notes"),
+          amountPaidForSecurities = Some(BigDecimal(245)),
+          totalMarketValue = Some(BigDecimal(50))
         )
 
-        val rows = service.buildTransferDetailsRows(userAnswers)
-
-        rows.size must be >= 4
+        val rows = StfAgentRowBuilder.buildTransferDetailsRows(userAnswers)
+        rows.size mustBe 10
       }
     }
 
@@ -108,9 +117,9 @@ class CheckYourAnswersServiceSpec extends SpecBase {
           .set(ConnectedPersonsPage, true).success.value
           .set(DetailsOfThisTransferPage, detailsOfTransfer).success.value
 
-        val rows = service.buildSecuritiesDetailsRows(userAnswers)
+        val rows = StfAgentRowBuilder.buildSecuritiesDetailsRows(userAnswers)
 
-        rows.size mustBe 5
+        rows.size mustBe 4
       }
 
       "must build shares details without market value for non-connected persons" in {
@@ -120,9 +129,9 @@ class CheckYourAnswersServiceSpec extends SpecBase {
           .set(ConnectedPersonsPage, false).success.value
           .set(DetailsOfThisTransferPage, detailsOfTransfer).success.value
 
-        val rows = service.buildSecuritiesDetailsRows(userAnswers)
+        val rows = StfAgentRowBuilder.buildSecuritiesDetailsRows(userAnswers)
 
-        rows.size mustBe 4
+        rows.size mustBe 3
       }
 
       "must build other securities details with market value for connected persons" in {
@@ -133,21 +142,21 @@ class CheckYourAnswersServiceSpec extends SpecBase {
           .set(AmountPaidForSecuritiesPage, BigDecimal("5000")).success.value
           .set(TotalMarketValuePage, BigDecimal("6000")).success.value
 
-        val rows = service.buildSecuritiesDetailsRows(userAnswers)
+        val rows = StfAgentRowBuilder.buildSecuritiesDetailsRows(userAnswers)
 
-        rows.size mustBe 4
+        rows.size mustBe 3
       }
 
       "must build other securities details without market value for non-connected persons" in {
         val userAnswers = emptyUserAnswers
           .set(PurchasingSharesPage, false).success.value
           .set(ConnectedPersonsPage, false).success.value
-          .set(OtherSecuritiesTypePage, "Bonds").success.value
+          .set(OtherSecuritiesTypePage, "loan notes").success.value
           .set(AmountPaidForSecuritiesPage, BigDecimal("5000")).success.value
 
-        val rows = service.buildSecuritiesDetailsRows(userAnswers)
+        val rows = StfAgentRowBuilder.buildSecuritiesDetailsRows(userAnswers)
 
-        rows.size mustBe 3
+        rows.size mustBe 2
       }
     }
   }

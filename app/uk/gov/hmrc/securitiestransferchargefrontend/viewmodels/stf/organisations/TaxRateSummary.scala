@@ -20,23 +20,23 @@ import play.api.i18n.Messages
 import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.SummaryListRow
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.organisations.single.routes
 import uk.gov.hmrc.securitiestransferchargefrontend.models.{CheckMode, UserAnswers}
-import uk.gov.hmrc.securitiestransferchargefrontend.pages.stf.single.ApplyingForReliefPage
+import uk.gov.hmrc.securitiestransferchargefrontend.pages.stf.single.TaxRatePage
 import uk.gov.hmrc.securitiestransferchargefrontend.viewmodels.govuk.summarylist.*
 import uk.gov.hmrc.securitiestransferchargefrontend.viewmodels.implicits.*
 
-object ApplyingForReliefSummary {
+object TaxRateSummary {
 
-  def row(userAnswers: UserAnswers)(implicit messages: Messages): SummaryListRow = {
-
-    val applyingForRelief = userAnswers.get(ApplyingForReliefPage).getOrElse(false)
-    val value = if (applyingForRelief) "site.yes" else "site.no"
+  def row(answers: UserAnswers)(implicit messages: Messages): SummaryListRow = {
+    val value = answers.get(TaxRatePage)
+      .map(answer => messages(s"taxRate.$answer"))
+      .getOrElse(messages("site.notProvided"))
 
     SummaryListRowViewModel(
-      key = "org.applyingForRelief.checkYourAnswersLabel",
+      key = "taxRate.checkYourAnswersLabel",
       value = ValueViewModel(value),
       actions = Seq(
-        ActionItemViewModel("site.change", routes.ApplyingForReliefController.onPageLoad(CheckMode).url)
-          .withVisuallyHiddenText(messages("org.applyingForRelief.change.hidden"))
+        ActionItemViewModel("site.change", routes.TaxRateController.onPageLoad(CheckMode).url)
+          .withVisuallyHiddenText(messages("taxRate.change.hidden"))
       )
     )
   }

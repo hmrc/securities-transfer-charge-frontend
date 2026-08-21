@@ -14,26 +14,26 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.securitiestransferchargefrontend.services.stf.shared
+package uk.gov.hmrc.securitiestransferchargefrontend.models.stf.cya
 
 import play.api.i18n.Messages
 import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.SummaryListRow
 import uk.gov.hmrc.securitiestransferchargefrontend.models.UserAnswers
 import uk.gov.hmrc.securitiestransferchargefrontend.pages.stf.single.*
-import uk.gov.hmrc.securitiestransferchargefrontend.viewmodels.stf.individuals.*
+import uk.gov.hmrc.securitiestransferchargefrontend.viewmodels.stf.agents.*
 
-import javax.inject.{Inject, Singleton}
 
-@Singleton
-class CheckYourAnswersService @Inject() {
+object StfAgentRowBuilder  {
 
   def buildYourDetailsRows(userAnswers: UserAnswers)(implicit messages: Messages): Seq[SummaryListRow] = {
-    val addressRow = userAnswers.get(ConfirmAddressPage)
-      .map(_ => ConfirmAddressSummary.row(userAnswers))
-      .orElse(userAnswers.get(StfBuyersAddressPage).map(_ => StfBuyersAddressSummary.row(userAnswers)))
-      .getOrElse(ConfirmAddressSummary.row(userAnswers))
+    Seq(AgentReferenceSummary.row(userAnswers)).flatten
+  }
 
-    Seq(addressRow)
+  def buildBuyerDetailsRows(userAnswers: UserAnswers)(implicit messages: Messages): Seq[SummaryListRow] = {
+    Seq(
+      NameofBuyerSummary.row(userAnswers),
+      StfBuyersAddressSummary.row(userAnswers)
+    ).flatten
   }
 
   def buildSellerDetailsRows(userAnswers: UserAnswers)(implicit messages: Messages): Seq[SummaryListRow] = {
@@ -43,13 +43,14 @@ class CheckYourAnswersService @Inject() {
     ).flatten
   }
 
+
   def buildTransferDetailsRows(userAnswers: UserAnswers)(implicit messages: Messages): Seq[SummaryListRow] = {
     val applyingForRelief = userAnswers.get(ApplyingForReliefPage).contains(true)
 
     val baseRows = Seq(
       ConnectedPersonsSummary.row(userAnswers),
-      ApplyingForReliefSummary.row(userAnswers)
-    )
+      ApplyingForReliefSummary.row(userAnswers),
+    ).flatten
 
     val reliefRow = if (applyingForRelief) {
       WhatReliefAreYouApplyingForSummary.row(userAnswers).toSeq
@@ -59,46 +60,39 @@ class CheckYourAnswersService @Inject() {
 
     val additionalRows = Seq(
       ChargingPointSummary.row(userAnswers),
-      TaxRateSummary.row(userAnswers)
-    )
+      TaxRateSummary.row(userAnswers),
+      PurchasingSharesSummary.row(userAnswers)
+    ).flatten
 
-    baseRows ++ reliefRow ++ SecuritiesTargetSummary.row(userAnswers) ++ additionalRows
+    val securitiesTarget = SecuritiesTargetSummary.row(userAnswers).getOrElse(Seq.empty)
+
+    baseRows ++ reliefRow ++ securitiesTarget ++ additionalRows ++ buildSecuritiesDetailsRows(userAnswers)(messages)
   }
 
   def buildSecuritiesDetailsRows(userAnswers: UserAnswers)(implicit messages: Messages): Seq[SummaryListRow] = {
     val purchasingShares = userAnswers.get(PurchasingSharesPage).getOrElse(false)
     val isConnectedPersons = userAnswers.get(ConnectedPersonsPage).contains(true)
-    val whatTypeRow = PurchasingSharesSummary.row(userAnswers)
-
     if (purchasingShares)
-      buildSharesDetailsRows(userAnswers, whatTypeRow, isConnectedPersons)
+      buildSharesDetailsRows(userAnswers, isConnectedPersons)
     else
-      buildOtherSecuritiesDetailsRows(userAnswers, whatTypeRow, isConnectedPersons)
+      buildOtherSecuritiesDetailsRows(userAnswers, isConnectedPersons)
   }
 
 
   private def buildSharesDetailsRows(
                                       userAnswers: UserAnswers,
-                                      whatTypeRow: SummaryListRow,
                                       isConnectedPersons: Boolean
                                     )(implicit messages: Messages): Seq[SummaryListRow] = {
-    val shareDetailsRows = DetailsOfThisTransferSummary.rows(userAnswers, showMarketValue = isConnectedPersons)
-    Seq(whatTypeRow) ++ shareDetailsRows
+    DetailsOfThisTransferSummary.rows(userAnswers, showMarketValue = isConnectedPersons).getOrElse(Seq.empty)
   }
 
   private def buildOtherSecuritiesDetailsRows(
                                                userAnswers: UserAnswers,
-                                               whatTypeRow: SummaryListRow,
                                                isConnectedPersons: Boolean
                                              )(implicit messages: Messages): Seq[SummaryListRow] = {
-    val otherTypeRow = OtherSecuritiesTypeSummary.row(userAnswers).toSeq
-    val amountPaidRow = Seq(AmountPaidForSecuritiesSummary.row(userAnswers))
-    val marketValueRow = if (isConnectedPersons) {
-      Seq(TotalMarketValueSummary.row(userAnswers))
-    } else {
-      Seq.empty
-    }
-
-    Seq(whatTypeRow) ++ otherTypeRow ++ amountPaidRow ++ marketValueRow
+    val otherTypeRow = OtherSecuritiesTypeSummary.row(userAnswers)
+    val amountPaidRow = AmountPaidForSecuritiesSummary.row(userAnswers)
+    val marketValueRow = if (isConnectedPersons) TotalMarketValueSummary.row(userAnswers) else Seq.empty
+    Seq(otherTypeRow, amountPaidRow, marketValueRow).flatten
   }
 }

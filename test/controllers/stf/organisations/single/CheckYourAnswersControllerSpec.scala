@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package controllers.stf.individuals.single
+package controllers.stf.organisations.single
 
 import base.SpecBase
 import base.stubs.StubPersistentNavigator
@@ -22,7 +22,7 @@ import com.google.inject.name.Names
 import play.api.inject.bind
 import play.api.test.FakeRequest
 import play.api.test.Helpers.*
-import uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.individuals.single.routes
+import uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.organisations.single.routes
 import uk.gov.hmrc.securitiestransferchargefrontend.models.CheckMode
 import uk.gov.hmrc.securitiestransferchargefrontend.models.stf.*
 import uk.gov.hmrc.securitiestransferchargefrontend.navigation.{Navigator, PersistentNavigator}
@@ -59,8 +59,8 @@ class CheckYourAnswersControllerSpec extends SpecBase {
 
       val application = applicationBuilder(userAnswers = Some(completeUserAnswers))
         .overrides(
-          bind[Navigator].qualifiedWith(Names.named("individuals")).toInstance(stubNavigator),
-          bind[PersistentNavigator].qualifiedWith(Names.named("individuals")).toInstance(stubNavigator)
+          bind[Navigator].qualifiedWith(Names.named("organisations")).toInstance(stubNavigator),
+          bind[PersistentNavigator].qualifiedWith(Names.named("organisations")).toInstance(stubNavigator)
         )
         .build()
 
@@ -90,8 +90,8 @@ class CheckYourAnswersControllerSpec extends SpecBase {
 
       val application = applicationBuilder(userAnswers = Some(completeUserAnswers))
         .overrides(
-          bind[Navigator].qualifiedWith(Names.named("individuals")).toInstance(stubNavigator),
-          bind[PersistentNavigator].qualifiedWith(Names.named("individuals")).toInstance(stubNavigator)
+          bind[Navigator].qualifiedWith(Names.named("organisations")).toInstance(stubNavigator),
+          bind[PersistentNavigator].qualifiedWith(Names.named("organisations")).toInstance(stubNavigator)
         )
         .build()
 
@@ -278,8 +278,8 @@ class CheckYourAnswersControllerSpec extends SpecBase {
 
       val application = applicationBuilder(userAnswers = Some(answersWithNoCRN))
         .overrides(
-          bind[Navigator].qualifiedWith(Names.named("individuals")).toInstance(stubNavigator),
-          bind[PersistentNavigator].qualifiedWith(Names.named("individuals")).toInstance(stubNavigator)
+          bind[Navigator].qualifiedWith(Names.named("organisations")).toInstance(stubNavigator),
+          bind[PersistentNavigator].qualifiedWith(Names.named("organisations")).toInstance(stubNavigator)
         )
         .build()
 
@@ -311,7 +311,7 @@ class CheckYourAnswersControllerSpec extends SpecBase {
     val application = applicationBuilder(userAnswers = Some(emptyUserAnswers)).build()
     
     running(application) {
-      val controller = application.injector.instanceOf[uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.individuals.single.CheckYourAnswersController]
+      val controller = application.injector.instanceOf[uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.organisations.single.CheckYourAnswersController]
       implicit val msgs = messages(application)
 
       "buildYourDetailsRows" - {

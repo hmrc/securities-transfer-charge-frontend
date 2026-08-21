@@ -28,7 +28,6 @@ import uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.agents.singl
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.agents.bulk.routes as agentBulkRoutes
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.fileUpload.routes as bulkSharedRoutes
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.shared.routes as sharedRoutes
-import uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.individuals.single.routes as stfSingleCyaRoutes
 import uk.gov.hmrc.securitiestransferchargefrontend.models.JourneyType.STF
 import uk.gov.hmrc.securitiestransferchargefrontend.models.shared.AgentReference
 import uk.gov.hmrc.securitiestransferchargefrontend.models.stf.*
@@ -42,7 +41,7 @@ import java.time.LocalDate
 
 class StfAgentNavigatorSpec extends SpecBase with ScalaFutures {
 
-  private lazy val cyaPage = stfSingleCyaRoutes.CheckYourAnswersController.onPageLoad()
+  private lazy val cyaPage = agentSingleRoutes.CheckYourAnswersController.onPageLoad()
   private val mockConfig: FrontendAppConfig = mock[FrontendAppConfig]
   when(mockConfig.firstChargingPoint).thenReturn(LocalDate.of(2026, 1, 1))
 
@@ -110,7 +109,7 @@ class StfAgentNavigatorSpec extends SpecBase with ScalaFutures {
         val answers = emptyUserAnswers.set(NameOfBuyerPage, "John").get
         val result = navigator.nextPage(NameOfBuyerPage, NormalMode, answers)(fakeRequest)
         whenReady(result) { res =>
-          res mustBe agentSingleRoutes.AddressController.onPageLoad()
+          res mustBe agentSingleRoutes.AddressController.onPageLoad(NormalMode)
         }
       }
 
@@ -321,7 +320,7 @@ class StfAgentNavigatorSpec extends SpecBase with ScalaFutures {
 
       "must go from the NameOfSellerPage to StfBuyersAddressPage (AddressLookup)" in {
         val result = navigator.previousPage(NameOfSellerPage, NormalMode, emptyUserAnswers)
-        result mustBe agentSingleRoutes.AddressController.onPageLoad()
+        result mustBe agentSingleRoutes.AddressController.onPageLoad(NormalMode)
       }
 
       "must go from the StfSellerAddressPage to NameOfSellerPage" in {

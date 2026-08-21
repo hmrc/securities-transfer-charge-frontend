@@ -17,27 +17,32 @@
 package uk.gov.hmrc.securitiestransferchargefrontend.viewmodels.stf.agents
 
 import play.api.i18n.Messages
+import play.twirl.api.Html
+import uk.gov.hmrc.govukfrontend.views.viewmodels.content.HtmlContent
 import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.SummaryListRow
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.agents.single.routes
 import uk.gov.hmrc.securitiestransferchargefrontend.models.{CheckMode, UserAnswers}
-import uk.gov.hmrc.securitiestransferchargefrontend.pages.stf.single.ConnectedPersonsPage
+import uk.gov.hmrc.securitiestransferchargefrontend.pages.stf.single.StfBuyersAddressPage
 import uk.gov.hmrc.securitiestransferchargefrontend.viewmodels.govuk.summarylist.*
 import uk.gov.hmrc.securitiestransferchargefrontend.viewmodels.implicits.*
 
-object ConnectedPersonsSummary  {
+object StfBuyersAddressSummary {
 
   def row(answers: UserAnswers)(implicit messages: Messages): Option[SummaryListRow] =
-    answers.get(ConnectedPersonsPage).map {
-      answer =>
-
-        val value = if (answer) "site.yes" else "site.no"
+    answers.get(StfBuyersAddressPage).map {
+      address =>
+        val addressLines = Seq(
+          Some(address.address.lines.mkString("<br>")),
+          Some(s"<br>${address.address.postcode}"),
+          Some(s"<br>${address.address.country.name}")
+        ).flatten.mkString
 
         SummaryListRowViewModel(
-          key     = "agent.connectedPersons.checkYourAnswersLabel",
-          value   = ValueViewModel(value),
+          key = "agent.checkYourAnswers.buyerAddress",
+          value = ValueViewModel(HtmlContent(Html(addressLines))),
           actions = Seq(
-            ActionItemViewModel("site.change", routes.ConnectedPersonsController.onPageLoad(CheckMode).url)
-              .withVisuallyHiddenText(messages("agent.connectedPersons.change.hidden"))
+            ActionItemViewModel("site.change", routes.AddressController.onPageLoad(CheckMode).url)
+              .withVisuallyHiddenText(messages("agent.checkYourAnswers.buyerAddress.change.hidden"))
           )
         )
     }

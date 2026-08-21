@@ -25,21 +25,22 @@ import uk.gov.hmrc.securitiestransferchargefrontend.utils.DateTimeFormats.dateTi
 import uk.gov.hmrc.securitiestransferchargefrontend.viewmodels.govuk.summarylist.*
 import uk.gov.hmrc.securitiestransferchargefrontend.viewmodels.implicits.*
 
-object ChargingPointSummary  {
+object ChargingPointSummary {
 
-  def row(answers: UserAnswers)(implicit messages: Messages): Option[SummaryListRow] =
-    answers.get(ChargingPointPage).map {
-      answer =>
+  def row(answers: UserAnswers)(implicit messages: Messages): SummaryListRow = {
+    implicit val lang: Lang = messages.lang
 
-        implicit val lang: Lang = messages.lang
+    val value = answers.get(ChargingPointPage)
+      .map(_.format(dateTimeFormat()))
+      .getOrElse(messages("site.notProvided"))
 
-        SummaryListRowViewModel(
-          key     = "org.chargingPoint.checkYourAnswersLabel",
-          value   = ValueViewModel(answer.format(dateTimeFormat())),
-          actions = Seq(
-            ActionItemViewModel("site.change", routes.ChargingPointController.onPageLoad(CheckMode).url)
-              .withVisuallyHiddenText(messages("org.chargingPoint.change.hidden"))
-          )
-        )
-    }
+    SummaryListRowViewModel(
+      key = "org.chargingPoint.checkYourAnswersLabel",
+      value = ValueViewModel(value),
+      actions = Seq(
+        ActionItemViewModel("site.change", routes.ChargingPointController.onPageLoad(CheckMode).url)
+          .withVisuallyHiddenText(messages("org.chargingPoint.change.hidden"))
+      )
+    )
+  }
 }
