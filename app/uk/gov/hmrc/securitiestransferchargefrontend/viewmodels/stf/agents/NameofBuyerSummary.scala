@@ -17,27 +17,25 @@
 package uk.gov.hmrc.securitiestransferchargefrontend.viewmodels.stf.agents
 
 import play.api.i18n.Messages
+import play.twirl.api.HtmlFormat
 import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.SummaryListRow
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.agents.single.routes
 import uk.gov.hmrc.securitiestransferchargefrontend.models.{CheckMode, UserAnswers}
-import uk.gov.hmrc.securitiestransferchargefrontend.pages.stf.single.ConnectedPersonsPage
+import uk.gov.hmrc.securitiestransferchargefrontend.pages.stf.single.NameOfBuyerPage
 import uk.gov.hmrc.securitiestransferchargefrontend.viewmodels.govuk.summarylist.*
 import uk.gov.hmrc.securitiestransferchargefrontend.viewmodels.implicits.*
 
-object ConnectedPersonsSummary  {
+object NameofBuyerSummary  {
 
   def row(answers: UserAnswers)(implicit messages: Messages): Option[SummaryListRow] =
-    answers.get(ConnectedPersonsPage).map {
+    answers.get(NameOfBuyerPage).map {
       answer =>
-
-        val value = if (answer) "site.yes" else "site.no"
-
         SummaryListRowViewModel(
-          key     = "agent.connectedPersons.checkYourAnswersLabel",
-          value   = ValueViewModel(value),
+          key     = "agent.nameOfBuyer.checkYourAnswersLabel",
+          value   = ValueViewModel(HtmlFormat.escape(answer).toString),
           actions = Seq(
-            ActionItemViewModel("site.change", routes.ConnectedPersonsController.onPageLoad(CheckMode).url)
-              .withVisuallyHiddenText(messages("agent.connectedPersons.change.hidden"))
+            ActionItemViewModel("site.change", routes.NameOfBuyerController.onPageLoad(CheckMode).url)
+              .withVisuallyHiddenText(messages("agent.nameOfBuyer.change.hidden"))
           )
         )
     }

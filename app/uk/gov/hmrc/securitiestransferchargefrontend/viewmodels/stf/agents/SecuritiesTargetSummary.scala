@@ -21,25 +21,34 @@ import play.twirl.api.HtmlFormat
 import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.SummaryListRow
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.agents.single.routes
 import uk.gov.hmrc.securitiestransferchargefrontend.models.{CheckMode, UserAnswers}
-import uk.gov.hmrc.securitiestransferchargefrontend.pages.stf.shared.AgentReferencePage
+import uk.gov.hmrc.securitiestransferchargefrontend.pages.stf.single.SecuritiesTargetPage
 import uk.gov.hmrc.securitiestransferchargefrontend.viewmodels.govuk.summarylist.*
 import uk.gov.hmrc.securitiestransferchargefrontend.viewmodels.implicits.*
 
-object AgentReferenceSummary {
+object SecuritiesTargetSummary {
 
-  def row(answers: UserAnswers)(implicit messages: Messages): Option[SummaryListRow] = {
+  def row(answers: UserAnswers)(implicit messages: Messages): Option[Seq[SummaryListRow]] = {
+    answers.get(SecuritiesTargetPage).map { target =>
 
-    val value = answers.get(AgentReferencePage)
-      .flatMap(_.agentReference)
-      .getOrElse(messages("site.notProvided"))
-
-    Some(SummaryListRowViewModel(
-      key = "agentReference.checkYourAnswersLabel",
-      value = ValueViewModel(HtmlFormat.escape(value).toString),
-      actions = Seq(
-        ActionItemViewModel("site.change", routes.AgentReferenceController.onPageLoad(CheckMode).url)
-          .withVisuallyHiddenText(messages("agentReference.change.hidden"))
+      val businessNameRow = SummaryListRowViewModel(
+        key = "checkYourAnswers.businessName",
+        value = ValueViewModel(HtmlFormat.escape(target.businessName).toString),
+        actions = Seq(
+          ActionItemViewModel("site.change", routes.SecuritiesTargetController.onPageLoad(CheckMode).url)
+            .withVisuallyHiddenText(messages("checkYourAnswers.securitiesTarget.businessName.change.hidden"))
+        )
       )
-    ))
+
+      val crnRow = SummaryListRowViewModel(
+        key = "checkYourAnswers.companyCrn",
+        value = ValueViewModel(target.crn.getOrElse(messages("site.notProvided"))),
+        actions = Seq(
+          ActionItemViewModel("site.change", routes.SecuritiesTargetController.onPageLoad(CheckMode).url)
+            .withVisuallyHiddenText(messages("checkYourAnswers.securitiesTarget.crn.change.hidden"))
+        )
+      )
+
+      Seq(businessNameRow, crnRow)
+    }
   }
 }

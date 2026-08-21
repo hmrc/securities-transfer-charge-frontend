@@ -38,10 +38,12 @@ import uk.gov.hmrc.securitiestransferchargefrontend.connectors.AlfAddressConnect
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.actions.*
 import uk.gov.hmrc.securitiestransferchargefrontend.domain.{GroupIdentifier, SubmissionId, UserId}
 import uk.gov.hmrc.securitiestransferchargefrontend.models.requests.DataRequest
+import uk.gov.hmrc.securitiestransferchargefrontend.models.shared.AgentReference
 import uk.gov.hmrc.securitiestransferchargefrontend.models.stf.*
 import uk.gov.hmrc.securitiestransferchargefrontend.models.{Mode, UserAnswers}
 import uk.gov.hmrc.securitiestransferchargefrontend.navigation.{Navigator, UserAnswersValidator}
 import uk.gov.hmrc.securitiestransferchargefrontend.pages.Page
+import uk.gov.hmrc.securitiestransferchargefrontend.pages.stf.shared.AgentReferencePage
 import uk.gov.hmrc.securitiestransferchargefrontend.pages.stf.single.*
 import uk.gov.hmrc.securitiestransferchargefrontend.repositories.SessionRepository
 
@@ -90,12 +92,16 @@ trait SpecBase
 
   def getNavigator: Navigator = new Navigator {
     override def nextPage(page: Page, mode: Mode, userAnswers: UserAnswers, isReturn: Boolean = false)(implicit request: Request[_]): Future[Call] = Future.successful(testNextPage)
+
     override def previousPage(page: Page, mode: Mode, userAnswers: UserAnswers): Call = testBackLinkRoute
+
     override def previousPage(page: Page, mode: Mode, userAnswers: Option[UserAnswers]): Call = testBackLinkRoute
+
     override def errorPage(forPage: Page): Call = testErrorPage
+
     override val userAnswersValidator: UserAnswersValidator = new base.stubs.StubUserAnswersValidator(this)
   }
-  
+
   val fakeRequest: FakeRequest[AnyContentAsEmpty.type] = FakeRequest().withHeaders("sessionId" -> sessionId)
 
   def fakeDataRequest(userAnswers: UserAnswers): DataRequest[AnyContent] =
@@ -116,7 +122,7 @@ trait SpecBase
                                    affinityGroup: AffinityGroup = AffinityGroup.Individual,
                                    saveAndReturnClient: SaveAndReturnClient = FakeSaveAndReturnClient(),
                                    sessionRepository: SessionRepository = StubSessionRepository()
-                                   ): GuiceApplicationBuilder =
+                                  ): GuiceApplicationBuilder =
     new GuiceApplicationBuilder()
       .overrides(
         bind[IdentifierAction].to[FakeIdentifierAction],
@@ -132,22 +138,24 @@ trait SpecBase
 
   // Helper methods for creating common UserAnswers scenarios for STF
   def buildStfUserAnswers(
-    buyerAddress: Option[ConfirmableAddress] = None,
-    stfBuyerAddress: Option[AlfConfirmedAddress] = None,
-    sellerName: Option[String] = None,
-    sellerAddress: Option[AlfConfirmedAddress] = None,
-    connectedPersons: Option[Boolean] = None,
-    applyingForRelief: Option[Boolean] = None,
-    reliefName: Option[String] = None,
-    securitiesTarget: Option[SecuritiesTarget] = None,
-    chargingPoint: Option[LocalDate] = None,
-    taxRate: Option[TaxRate] = None,
-    purchasingShares: Option[Boolean] = None,
-    detailsOfTransfer: Option[DetailsOfThisTransfer] = None,
-    otherSecuritiesType: Option[String] = None,
-    amountPaidForSecurities: Option[BigDecimal] = None,
-    totalMarketValue: Option[BigDecimal] = None
-  ): UserAnswers = {
+                           buyerAddress: Option[ConfirmableAddress] = None,
+                           stfBuyerAddress: Option[AlfConfirmedAddress] = None,
+                           sellerName: Option[String] = None,
+                           sellerAddress: Option[AlfConfirmedAddress] = None,
+                           connectedPersons: Option[Boolean] = None,
+                           applyingForRelief: Option[Boolean] = None,
+                           reliefName: Option[String] = None,
+                           securitiesTarget: Option[SecuritiesTarget] = None,
+                           chargingPoint: Option[LocalDate] = None,
+                           taxRate: Option[TaxRate] = None,
+                           purchasingShares: Option[Boolean] = None,
+                           detailsOfTransfer: Option[DetailsOfThisTransfer] = None,
+                           otherSecuritiesType: Option[String] = None,
+                           amountPaidForSecurities: Option[BigDecimal] = None,
+                           totalMarketValue: Option[BigDecimal] = None,
+                           agentReference: Option[AgentReference] = None,
+                           buyerName: Option[String] = None
+                         ): UserAnswers = {
 
     var answers = emptyUserAnswers
 
@@ -209,6 +217,14 @@ trait SpecBase
 
     totalMarketValue.foreach { value =>
       answers = answers.set(TotalMarketValuePage, value).success.value
+    }
+
+    agentReference.foreach { agentReference =>
+      answers = answers.set(AgentReferencePage, agentReference).success.value
+    }
+
+    buyerName.foreach { name =>
+      answers = answers.set(NameOfBuyerPage, name).success.value
     }
 
     answers

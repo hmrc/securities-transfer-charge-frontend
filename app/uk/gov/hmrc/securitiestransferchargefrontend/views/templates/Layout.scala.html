@@ -35,7 +35,7 @@
     autocompleteJavascript: HmrcAccessibleAutocompleteJavascript
 )
 
-@(pageTitle: String, showBackLink: Boolean = true, backLinkUrl: Option[String] = None, timeout: Boolean = true, showSignOut: Boolean = true, showHmrcBanner: Boolean = false, refreshInterval: Option[Int] = None)(contentBlock: Html)(implicit rh: RequestHeader, messages: Messages)
+@(pageTitle: String, showBackLink: Boolean = true, backLinkUrl: Option[String] = None, timeout: Boolean = true, showSignOut: Boolean = true, showHmrcBanner: Boolean = false, refreshInterval: Option[Int] = None, additionalScripts: Option[Html] = None)(contentBlock: Html)(implicit rh: RequestHeader, messages: Messages)
 
 @head = {
     @refreshInterval.map { seconds =>
@@ -68,11 +68,16 @@
     @autocompleteCss()
 }
 
+@additionalScriptsBlock = {
+    @autocompleteJavascript()
+    @additionalScripts.getOrElse(HtmlFormat.empty)
+}
+
 @hmrcStandardPage(HmrcStandardPageParams(
     pageTitle = Some(pageTitle),
     templateOverrides = TemplateOverrides(
         additionalHeadBlock = Some(combinedAdditionalHead),
-        additionalScriptsBlock = Some(autocompleteJavascript())
+        additionalScriptsBlock = Some(additionalScriptsBlock)
     ),
     serviceURLs = ServiceURLs(
         serviceUrl = Some(IndexController.onPageLoad().url),

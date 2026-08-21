@@ -38,6 +38,7 @@ object CheckYourAnswersViewModel {
     // Section headings
     val yourDetailsHeading = "checkYourAnswers.yourDetails.heading"
     val sellerDetailsHeading = "checkYourAnswers.sellerDetails.heading"
+    val buyerDetailsHeading = "checkYourAnswers.buyerDetails.heading"
     val transferDetailsHeading = "checkYourAnswers.transferDetails.heading"
     val securitiesDetailsHeading = "checkYourAnswers.securitiesDetails.heading"
 
@@ -50,6 +51,14 @@ object CheckYourAnswersViewModel {
     val declarationHeading = "checkYourAnswers.declaration.heading"
     val declarationBody = "checkYourAnswers.declaration.body"
     val acceptAndSend = "checkYourAnswers.acceptAndSend"
+
+    // Print section
+    val printHeading = "checkYourAnswers.print.heading"
+
+    // Agent Declaration section
+    val declarationP1 = "agent.checkYourAnswers.declaration.p1"
+    val declarationBullet1 = "agent.checkYourAnswers.declaration.bullet1"
+    val declarationBullet2 = "agent.checkYourAnswers.declaration.bullet2"
   }
 
   def fromSummaryLists(
@@ -61,6 +70,25 @@ object CheckYourAnswersViewModel {
       MessageKeys.sellerDetailsHeading,
       MessageKeys.transferDetailsHeading,
       MessageKeys.securitiesDetailsHeading
+    )
+
+    val sections = summaryLists.zip(sectionHeadings).map { case (list, heading) =>
+      SummarySection(heading, list)
+    }
+
+    CheckYourAnswersViewModel(sections, taxDueFormatted, paymentDueDateFormatted)
+  }
+
+  def fromAgentSummaryLists(
+                        summaryLists: Seq[SummaryList],
+                        taxDueFormatted: Option[String],
+                        paymentDueDateFormatted: Option[String]
+                      ): CheckYourAnswersViewModel = {
+    val sectionHeadings = Seq(
+      MessageKeys.yourDetailsHeading,
+      MessageKeys.buyerDetailsHeading,
+      MessageKeys.sellerDetailsHeading,
+      MessageKeys.transferDetailsHeading,
     )
 
     val sections = summaryLists.zip(sectionHeadings).map { case (list, heading) =>

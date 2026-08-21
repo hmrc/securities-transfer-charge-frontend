@@ -81,6 +81,7 @@ class NameOfBuyerControllerSpec extends SpecBase with MockitoSugar {
     "must redirect to the next page when valid data is submitted" in {
       val application =
         applicationBuilder(userAnswers = Some(emptyUserAnswers), affinityGroup = agentAffinity)
+          .overrides(bind[Navigator].qualifiedWith("agents").toInstance(getNavigator))
           .build()
 
       running(application) {
@@ -91,7 +92,7 @@ class NameOfBuyerControllerSpec extends SpecBase with MockitoSugar {
         val result = route(application, request).value
 
         status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual agentRoutes.AddressController.onPageLoad().url
+        redirectLocation(result).value mustEqual testNextPage.url
       }
     }
 

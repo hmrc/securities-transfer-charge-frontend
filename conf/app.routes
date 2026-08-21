@@ -202,8 +202,9 @@ POST       /stf/agent/change/add-reference                uk.gov.hmrc.securities
 GET        /stf/agent/how-many-transfers                  uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.agents.HowToNotifyAboutSecuritiesTransferController.onPageLoad()
 POST       /stf/agent/how-many-transfers                  uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.agents.HowToNotifyAboutSecuritiesTransferController.onSubmit()
 
-GET        /stf/agent/address                             uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.agents.single.AddressController.onPageLoad()
-GET        /stf/agent/address/return                      uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.agents.single.AddressController.onReturn(id: String)
+GET        /stf/agent/buyer/address                             uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.agents.single.AddressController.onPageLoad(mode: Mode = NormalMode)
+GET        /stf/agent/change/buyer/address                       uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.agents.single.AddressController.onPageLoad(mode: Mode = CheckMode)
+GET        /stf/agent/buyer/address/return                      uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.agents.single.AddressController.onReturn(id: String, mode: Mode ?= NormalMode)
 
 GET        /stf/agent/seller-name                         uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.agents.single.NameOfSellerController.onPageLoad(mode: Mode = NormalMode)
 POST       /stf/agent/seller-name                         uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.agents.single.NameOfSellerController.onSubmit(mode: Mode = NormalMode)
@@ -263,6 +264,9 @@ GET        /stf/agent/security-type                         uk.gov.hmrc.securiti
 POST       /stf/agent/security-type                         uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.agents.single.OtherSecuritiesTypeController.onSubmit(mode: Mode = NormalMode)
 GET        /stf/agent/change/security-type                  uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.agents.single.OtherSecuritiesTypeController.onPageLoad(mode: Mode = CheckMode)
 POST       /stf/agent/change/security-type                  uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.agents.single.OtherSecuritiesTypeController.onSubmit(mode: Mode = CheckMode)
+
+GET        /stf/agent/check-your-answers                          uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.agents.single.CheckYourAnswersController.onPageLoad()
+POST       /stf/agent/check-your-answers                          uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.agents.single.CheckYourAnswersController.onSubmit()
 
 GET        /bulk-error-empty                            uk.gov.hmrc.securitiestransferchargefrontend.controllers.fileUpload.BulkUploadFileEmptyController.onPageLoad(transfer:JourneyType)
 GET        /bulk-error-type                             uk.gov.hmrc.securitiestransferchargefrontend.controllers.fileUpload.FileTypeErrorController.onPageLoad(transfer:JourneyType)
