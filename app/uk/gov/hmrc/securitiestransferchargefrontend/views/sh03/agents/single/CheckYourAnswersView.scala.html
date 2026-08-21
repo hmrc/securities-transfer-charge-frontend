@@ -17,7 +17,8 @@
 @import uk.gov.hmrc.govukfrontend.views.html.components._
 @import uk.gov.hmrc.securitiestransferchargefrontend.viewmodels.sh03.shared.single.CheckYourAnswersViewModel
 @import uk.gov.hmrc.securitiestransferchargefrontend.views.html.components.SaveAndReturnButton
-@import uk.gov.hmrc.securitiestransferchargefrontend.controllers.sh03.agents.single.routes
+@import uk.gov.hmrc.securitiestransferchargefrontend.controllers.sh03.agents.single.routes as agentRoutes
+@import views.html.helper.CSPNonce
 
 @this(
     layout: uk.gov.hmrc.securitiestransferchargefrontend.views.html.templates.Layout,
@@ -29,7 +30,10 @@
 
 @(viewModel: CheckYourAnswersViewModel, backLinkCall: Call)(implicit request: Request[_], messages: Messages)
 
-@layout(pageTitle = titleNoForm(messages(CheckYourAnswersViewModel.MessageKeys.title), Some(messages("sectionTitle.sh03"))), backLinkUrl = Some(backLinkCall.url)) {
+@layout(pageTitle = titleNoForm(messages(CheckYourAnswersViewModel.MessageKeys.title), Some(messages("sectionTitle.sh03"))), backLinkUrl = Some(backLinkCall.url),
+    additionalScripts = Some(
+    HtmlFormat.raw(
+    s"""<script ${CSPNonce.attr} src="${routes.Assets.versioned("javascripts/print.js").url}"></script>"""))) {
 
     <h1 class="govuk-heading-xl govuk-!-margin-bottom-7">@messages(CheckYourAnswersViewModel.MessageKeys.heading)</h1>
 
@@ -52,7 +56,7 @@
     <div class="govuk-!-margin-top-9">
         <h2 class="govuk-heading-m">@messages(CheckYourAnswersViewModel.MessageKeys.printHeading)</h2>
         <p class="govuk-body">
-            You can <a href="#" class="govuk-link govuk-link--no-visited-state" onclick="window.print(); return false;">print this page</a> before submitting.
+            You can <a href="#" class="govuk-link govuk-link--no-visited-state" id="print-this-page">print this page</a> before submitting.
         </p>
     </div>
 
@@ -65,7 +69,7 @@
         <li>@messages(CheckYourAnswersViewModel.MessageKeys.declarationBullet2)</li>
     </ul>
 
-    @formHelper(action = routes.CheckYourAnswersController.onSubmit()) {
+    @formHelper(action = agentRoutes.CheckYourAnswersController.onSubmit()) {
         <div class="govuk-button-group">
             @govukButton(
                 ButtonViewModel(
