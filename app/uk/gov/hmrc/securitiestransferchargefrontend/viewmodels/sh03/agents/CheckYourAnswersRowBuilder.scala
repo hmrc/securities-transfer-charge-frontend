@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.securitiestransferchargefrontend.services.sh03.shared
+package uk.gov.hmrc.securitiestransferchargefrontend.viewmodels.sh03.agents
 
 import play.api.i18n.Messages
 import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.SummaryListRow
@@ -23,10 +23,7 @@ import uk.gov.hmrc.securitiestransferchargefrontend.models.sh03.shared.ReasonFor
 import uk.gov.hmrc.securitiestransferchargefrontend.pages.sh03.*
 import uk.gov.hmrc.securitiestransferchargefrontend.viewmodels.sh03.agents.*
 
-import javax.inject.{Inject, Singleton}
-
-@Singleton
-class CheckYourAnswersService @Inject() {
+object CheckYourAnswersRowBuilder {
 
   def buildYourDetailsRows(userAnswers: UserAnswers)(implicit messages: Messages): Seq[SummaryListRow] = {
     Seq(AgentReferenceSummary.row(userAnswers)).flatten

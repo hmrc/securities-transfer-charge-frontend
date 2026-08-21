@@ -525,7 +525,7 @@ agentReference.heading = Add a reference (optional)
 agentReference.checkYourAnswersLabel = Your reference
 agentReference.hint = You can add a reference for your own records and to help you find this submission later. It will not be used by HMRC.
 agentReference.error.length = Your reference must be 255 characters or fewer
-agentReference.change.hidden = Change add a reference
+agentReference.change.hidden = Change your reference
 
 nameOfBuyer.error.required = Enter the buyer’s name
 nameOfBuyer.error.length = Buyer’s name must be 35 characters or fewer

@@ -17,72 +17,30 @@
 package uk.gov.hmrc.securitiestransferchargefrontend.controllers.sh03.shared.single
 
 import com.google.inject.Inject
-import play.api.i18n.{I18nSupport, Lang, Messages, MessagesApi}
-import play.api.mvc.{Action, AnyContent, Call, MessagesControllerComponents}
+import play.api.i18n.{I18nSupport, MessagesApi}
+import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.actions.*
-import uk.gov.hmrc.securitiestransferchargefrontend.controllers.actions.requests.StcDataRequest
-import uk.gov.hmrc.securitiestransferchargefrontend.models.{Mode, NormalMode, UserAnswers}
-import uk.gov.hmrc.securitiestransferchargefrontend.navigation.Navigator
-import uk.gov.hmrc.securitiestransferchargefrontend.pages.sh03.shared.CheckYourAnswersPage
-import uk.gov.hmrc.securitiestransferchargefrontend.services.stf.TaxDueCalculationService
-import uk.gov.hmrc.securitiestransferchargefrontend.services.sh03.shared.CheckYourAnswersService
-import uk.gov.hmrc.securitiestransferchargefrontend.services.stf.shared.FormattingService
 import uk.gov.hmrc.securitiestransferchargefrontend.viewmodels.govuk.summarylist.*
-import uk.gov.hmrc.securitiestransferchargefrontend.viewmodels.sh03.shared.single.CheckYourAnswersViewModel
-import uk.gov.hmrc.securitiestransferchargefrontend.views.html.sh03.agents.single.CheckYourAnswersView
+import uk.gov.hmrc.securitiestransferchargefrontend.views.html.CheckYourAnswersView
 
-import javax.inject.Named
 
 class CheckYourAnswersController @Inject()(
                                             override val messagesApi: MessagesApi,
-                                            @Named("agentsSh03") navigator: Navigator,
                                             stcAuthEnrolled: StcAuthEnrolledAction,
                                             getData: StcDataRetrievalAction,
                                             requireData: StcDataRequiredAction,
                                             val controllerComponents: MessagesControllerComponents,
-                                            view: CheckYourAnswersView,
-                                            cyaService: CheckYourAnswersService,
-                                            taxDueCalculationService: TaxDueCalculationService,
-                                            formattingService: FormattingService
-                                          )() extends FrontendBaseController with I18nSupport {
+                                            view: CheckYourAnswersView
+                                          ) extends FrontendBaseController with I18nSupport {
 
-  lazy val backLinkCall: Mode => UserAnswers => Call = mode => userAnswers => navigator.previousPage(CheckYourAnswersPage, mode, userAnswers)
-
-  def onPageLoad(): Action[AnyContent] = (stcAuthEnrolled andThen getData andThen requireData) {
+  def onPageLoad(): Action[AnyContent] =  (stcAuthEnrolled andThen getData andThen requireData) {
     implicit request =>
-      implicit val messages: Messages = messagesApi.preferred(request)
-      implicit val lang: Lang = messages.lang
 
-      buildCheckYourAnswersPage(request.userAnswers)
-  }
+      val list = SummaryListViewModel(
+        rows = Seq.empty 
+      )
 
-  private def buildCheckYourAnswersPage(userAnswers: UserAnswers)(implicit messages: Messages, lang: Lang, request: StcDataRequest[AnyContent]): play.api.mvc.Result = {
-    val yourDetailsList = SummaryListViewModel(rows = cyaService.buildYourDetailsRows(userAnswers))
-    val buyerDetailsList = SummaryListViewModel(rows = cyaService.buildBuyerDetailsRows(userAnswers))
-    val transferDetailsList = SummaryListViewModel(rows = cyaService.buildTransferDetailsRows(userAnswers))
-    val declarationList = SummaryListViewModel(rows = cyaService.buildDeclarationRows(userAnswers))
-
-    val taxDueFormatted = taxDueCalculationService.calculateTaxDue(userAnswers)
-      .map(formattingService.formatTaxDue)
-
-    val paymentDueDateFormatted = taxDueCalculationService.calculatePaymentDueDate(userAnswers)
-      .map(date => formattingService.formatPaymentDueDate(date)(lang))
-
-    val viewModel = CheckYourAnswersViewModel.fromSummaryLists(
-      yourDetails = yourDetailsList,
-      buyerDetails = buyerDetailsList,
-      transferDetails = transferDetailsList,
-      declarationDetails = declarationList,
-      taxDueFormatted = taxDueFormatted,
-      paymentDueDateFormatted = paymentDueDateFormatted
-    )
-
-    Ok(view(viewModel, backLinkCall(NormalMode)(request.userAnswers)))
-  }
-
-  def onSubmit(): Action[AnyContent] = (stcAuthEnrolled andThen getData andThen requireData) {
-    implicit request =>
-      Redirect(uk.gov.hmrc.securitiestransferchargefrontend.controllers.routes.JourneyRecoveryController.onPageLoad())
+      Ok(view(list))
   }
 }
