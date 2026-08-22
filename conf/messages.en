@@ -336,6 +336,7 @@ detailsOfThisTransfer.heading = What are the details of this transfer?
 detailsOfThisTransfer.numberOfShares = Number of shares
 detailsOfThisTransfer.typeOfShares = Type or class of shares
 detailsOfThisTransfer.amountPaid = Amount paid for the shares
+detailsOfThisTransfer.typeOfShares.change.hidden = Change type or class of shares
 detailsOfThisTransfer.marketValue = Market value of the shares
 detailsOfThisTransfer.checkYourAnswersLabel = What are the details of this transfer?
 detailsOfThisTransfer.numberOfShares.change.hidden = Change number of shares
