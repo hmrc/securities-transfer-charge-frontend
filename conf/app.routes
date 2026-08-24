@@ -372,6 +372,10 @@ POST       /sh03/agent/change/maximum-amount-shares             uk.gov.hmrc.secu
 GET        /sh03/agent/cannot-submit-form                       uk.gov.hmrc.securitiestransferchargefrontend.controllers.sh03.agents.single.CannotSubmitFormErrorController.onPageLoad()
 GET        /sh03/single/check-your-answers                       uk.gov.hmrc.securitiestransferchargefrontend.controllers.sh03.shared.single.CheckYourAnswersController.onPageLoad()
 
+
+GET        /sh03/agent/check-answers                                  uk.gov.hmrc.securitiestransferchargefrontend.controllers.sh03.agents.single.CheckYourAnswersController.onPageLoad()
+POST       /sh03/agent/check-answers                                  uk.gov.hmrc.securitiestransferchargefrontend.controllers.sh03.agents.single.CheckYourAnswersController.onSubmit()
+
 GET        /sh03/org/share-purchase                        uk.gov.hmrc.securitiestransferchargefrontend.controllers.sh03.organisations.single.ReasonForPurchaseController.onPageLoad(mode: Mode = NormalMode)
 POST       /sh03/org/share-purchase                        uk.gov.hmrc.securitiestransferchargefrontend.controllers.sh03.organisations.single.ReasonForPurchaseController.onSubmit(mode: Mode = NormalMode)
 GET        /sh03/org/change/share-purchase                 uk.gov.hmrc.securitiestransferchargefrontend.controllers.sh03.organisations.single.ReasonForPurchaseController.onPageLoad(mode: Mode = CheckMode)
