@@ -45,7 +45,7 @@ object DetailsOfThisSharePurchaseSummary  {
         value = ValueViewModel(HtmlFormat.escape(answer.typeOfShares).toString),
         actions = Seq(
           ActionItemViewModel("site.change", routes.DetailsOfThisSharePurchaseController.onPageLoad(CheckMode).url)
-            .withVisuallyHiddenText(messages("detailsOfThisTransfer.typeOfShares.change.hidden"))
+            .withVisuallyHiddenText(messages("agent.sh03.detailsOfThisTransfer.typeOfShares.change.hidden"))
         )
       )
 

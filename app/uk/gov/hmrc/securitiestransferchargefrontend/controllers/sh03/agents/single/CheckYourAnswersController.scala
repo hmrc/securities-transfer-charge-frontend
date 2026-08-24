@@ -26,7 +26,7 @@ import uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.shared.SaveA
 import uk.gov.hmrc.securitiestransferchargefrontend.models.{Mode, NormalMode, UserAnswers}
 import uk.gov.hmrc.securitiestransferchargefrontend.navigation.Navigator
 import uk.gov.hmrc.securitiestransferchargefrontend.pages.sh03.shared.CheckYourAnswersPage
-import uk.gov.hmrc.securitiestransferchargefrontend.services.stf.TaxDueCalculationService
+import uk.gov.hmrc.securitiestransferchargefrontend.services.sh03.TaxDueCalculationService
 import uk.gov.hmrc.securitiestransferchargefrontend.services.stf.shared.FormattingService
 import uk.gov.hmrc.securitiestransferchargefrontend.viewmodels.govuk.summarylist.*
 import uk.gov.hmrc.securitiestransferchargefrontend.viewmodels.sh03.shared.single.CheckYourAnswersViewModel
