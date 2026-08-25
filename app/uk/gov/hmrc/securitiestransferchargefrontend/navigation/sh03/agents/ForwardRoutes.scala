@@ -115,7 +115,7 @@ class ForwardRoutes(answerPersistenceService: AnswerPersistenceService,
             cyaPage
       }
 
-    case CheckYourAnswersPage => userAnswers => goTo(stfSharedRoutes.ConfirmationController.onPageLoad(), Some(userAnswers))
+    case CheckYourAnswersPage => _ => Future.successful(stfSharedRoutes.ConfirmationController.onPageLoad())
 
     case BulkAgentReferencePage => userAnswers =>
       dataRequired(BulkAgentReferencePage, userAnswers, sh03AgentBulkRoutes.CompanyDetailsController.onPageLoad(NormalMode))

@@ -32,6 +32,8 @@ import uk.gov.hmrc.securitiestransferchargefrontend.models.{CheckMode, NormalMod
 import uk.gov.hmrc.securitiestransferchargefrontend.navigation.sh03.agents.Sh03AgentNavigator
 import uk.gov.hmrc.securitiestransferchargefrontend.pages.Page
 import uk.gov.hmrc.securitiestransferchargefrontend.pages.sh03.*
+import uk.gov.hmrc.securitiestransferchargefrontend.pages.sh03.shared.CheckYourAnswersPage
+import uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.shared.routes as stfSharedRoutes
 
 import java.time.LocalDate
 
@@ -213,6 +215,13 @@ class Sh03AgentNavigatorSpec extends SpecBase with ScalaFutures {
         val result = navigator.nextPage(RoleAtPurchasingCompanyPage, NormalMode, answers)(fakeRequest)
         whenReady(result) { res =>
           res mustBe sh03AgentSingleRoutes.CannotSubmitFormErrorController.onPageLoad()
+        }
+      }
+
+      "must go from CheckYourAnswersPage to ConfirmationController" in {
+        val result = navigator.nextPage(CheckYourAnswersPage, NormalMode, emptyUserAnswers)(fakeRequest)
+        whenReady(result) { res =>
+          res mustBe stfSharedRoutes.ConfirmationController.onPageLoad()
         }
       }
     }
