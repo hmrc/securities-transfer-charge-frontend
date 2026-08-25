@@ -69,8 +69,8 @@ class CheckYourAnswersController @Inject()(
     val transferDetailsList = SummaryListViewModel(rows = CheckYourAnswersRowBuilder.buildTransferDetailsRows(userAnswers))
     val declarationList = SummaryListViewModel(rows = CheckYourAnswersRowBuilder.buildDeclarationRows(userAnswers))
 
-    val taxDueFormatted = taxDueCalculationService.calculateTaxDue(userAnswers)
-      .map(formattingService.formatTaxDue)
+    val taxDue = taxDueCalculationService.calculateTaxDue(userAnswers)
+    val taxDueFormatted = Some(formattingService.formatTaxDue(taxDue))
 
     val paymentDueDateFormatted = taxDueCalculationService.calculatePaymentDueDate(userAnswers)
       .map(date => formattingService.formatPaymentDueDate(date)(lang))
