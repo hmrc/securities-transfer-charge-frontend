@@ -16,6 +16,7 @@
 
 package uk.gov.hmrc.securitiestransferchargefrontend.services.sh03
 
+import uk.gov.hmrc.securitiestransferchargefrontend.config.FrontendAppConfig
 import uk.gov.hmrc.securitiestransferchargefrontend.models.{ReliefsDataSource, UserAnswers}
 import uk.gov.hmrc.securitiestransferchargefrontend.pages.sh03.{ApplyingForReliefPage, ChargingPointPage, DetailsOfThisSharePurchasePage, WhatReliefAreYouApplyingForPage}
 
@@ -24,33 +25,32 @@ import javax.inject.{Inject, Singleton}
 import scala.math.BigDecimal.RoundingMode
 
 @Singleton
-class TaxDueCalculationService @Inject()(reliefsDataSource: ReliefsDataSource) {
+class TaxDueCalculationService @Inject()(
+                                          reliefsDataSource: ReliefsDataSource,
+                                          appConfig: FrontendAppConfig
+                                        ) {
   
-  private val taxRate = BigDecimal("0.005")
+  private val taxRate = appConfig.taxRateSH03
 
-  def calculateTaxDue(userAnswers: UserAnswers): Option[BigDecimal] = {
-    for {
-      amountPaidValue <- getAmountPaid(userAnswers)
-      marketValue <- getMarketValue(userAnswers)
-    } yield {
-      val higherValue = amountPaidValue.max(marketValue)
-      val taxBeforeRelief = higherValue * taxRate
-      val reliefPercentage = getReliefPercentage(userAnswers).getOrElse(BigDecimal(0))
-      val reliefAmount = taxBeforeRelief * reliefPercentage
-      val taxAfterRelief = (taxBeforeRelief - reliefAmount).max(BigDecimal(0))
+  def calculateTaxDue(userAnswers: UserAnswers): BigDecimal = {
+    val amountPaidValue = getAmountPaid(userAnswers)
+    val marketValue = getMarketValue(userAnswers)
 
-      taxAfterRelief.setScale(2, RoundingMode.HALF_UP)
-    }
+    val higherValue = amountPaidValue.max(marketValue)
+    val taxBeforeRelief = higherValue * taxRate
+    val reliefPercentage = getReliefPercentage(userAnswers).getOrElse(BigDecimal(0))
+    val reliefAmount = taxBeforeRelief * reliefPercentage
+    val taxAfterRelief = (taxBeforeRelief - reliefAmount).max(BigDecimal(0))
+
+    taxAfterRelief.setScale(2, RoundingMode.HALF_UP)
   }
 
-  private def getAmountPaid(userAnswers: UserAnswers): Option[BigDecimal] = {
-    val amountPaidForShares = userAnswers.get(DetailsOfThisSharePurchasePage).map(_.amountPaid).getOrElse(BigDecimal(0))
-    Some(amountPaidForShares)
+  private def getAmountPaid(userAnswers: UserAnswers): BigDecimal = {
+    userAnswers.get(DetailsOfThisSharePurchasePage).map(_.amountPaid).getOrElse(BigDecimal(0))
   }
 
-  private def getMarketValue(userAnswers: UserAnswers): Option[BigDecimal] = {
-    val marketValueOfShares = userAnswers.get(DetailsOfThisSharePurchasePage).flatMap(_.marketValue).getOrElse(BigDecimal(0))
-    Some(marketValueOfShares)
+  private def getMarketValue(userAnswers: UserAnswers): BigDecimal = {
+    userAnswers.get(DetailsOfThisSharePurchasePage).flatMap(_.marketValue).getOrElse(BigDecimal(0))
   }
   
   private def getReliefPercentage(userAnswers: UserAnswers): Option[BigDecimal] = {

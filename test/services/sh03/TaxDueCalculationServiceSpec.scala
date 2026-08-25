@@ -23,13 +23,18 @@ import uk.gov.hmrc.securitiestransferchargefrontend.models.{Relief, ReliefsDataS
 import uk.gov.hmrc.securitiestransferchargefrontend.models.sh03.shared.DetailsOfThisSharePurchase
 import uk.gov.hmrc.securitiestransferchargefrontend.pages.sh03._
 import uk.gov.hmrc.securitiestransferchargefrontend.services.sh03.TaxDueCalculationService
+import uk.gov.hmrc.securitiestransferchargefrontend.config.FrontendAppConfig
 
 import java.time.LocalDate
 
 class TaxDueCalculationServiceSpec extends SpecBase with MockitoSugar {
 
   val mockReliefsDataSource: ReliefsDataSource = mock[ReliefsDataSource]
-  val service = new TaxDueCalculationService(mockReliefsDataSource)
+  val mockAppConfig: FrontendAppConfig = mock[FrontendAppConfig]
+  
+  when(mockAppConfig.taxRateSH03).thenReturn(BigDecimal("0.005"))
+  
+  val service = new TaxDueCalculationService(mockReliefsDataSource, mockAppConfig)
 
   "TaxDueCalculationService" - {
 
@@ -42,7 +47,7 @@ class TaxDueCalculationServiceSpec extends SpecBase with MockitoSugar {
 
         val result = service.calculateTaxDue(userAnswers)
 
-        result mustBe Some(BigDecimal("50.00"))
+        result mustBe BigDecimal("50.00")
       }
 
       "must calculate tax at fixed 0.5% when market value is higher" in {
@@ -53,7 +58,7 @@ class TaxDueCalculationServiceSpec extends SpecBase with MockitoSugar {
 
         val result = service.calculateTaxDue(userAnswers)
 
-        result mustBe Some(BigDecimal("50.00"))
+        result mustBe BigDecimal("50.00")
       }
 
       "must apply relief when relief is selected" in {
@@ -68,7 +73,7 @@ class TaxDueCalculationServiceSpec extends SpecBase with MockitoSugar {
 
         val result = service.calculateTaxDue(userAnswers)
 
-        result mustBe Some(BigDecimal("25.00"))
+        result mustBe BigDecimal("25.00")
       }
 
       "must apply 100% relief correctly" in {
@@ -83,7 +88,7 @@ class TaxDueCalculationServiceSpec extends SpecBase with MockitoSugar {
 
         val result = service.calculateTaxDue(userAnswers)
 
-        result mustBe Some(BigDecimal("0.00"))
+        result mustBe BigDecimal("0.00")
       }
 
       "must not apply negative tax" in {
@@ -98,7 +103,7 @@ class TaxDueCalculationServiceSpec extends SpecBase with MockitoSugar {
 
         val result = service.calculateTaxDue(userAnswers)
 
-        result mustBe Some(BigDecimal("0.00"))
+        result mustBe BigDecimal("0.00")
       }
 
       "must return Some(0.00) when required data is missing (defaults to 0)" in {
@@ -106,7 +111,7 @@ class TaxDueCalculationServiceSpec extends SpecBase with MockitoSugar {
 
         val result = service.calculateTaxDue(userAnswers)
 
-        result mustBe Some(BigDecimal("0.00"))
+        result mustBe BigDecimal("0.00")
       }
 
       "must round to 2 decimal places correctly" in {
@@ -117,7 +122,7 @@ class TaxDueCalculationServiceSpec extends SpecBase with MockitoSugar {
 
         val result = service.calculateTaxDue(userAnswers)
 
-        result mustBe Some(BigDecimal("50.01"))
+        result mustBe BigDecimal("50.01")
       }
     }
 
