@@ -73,8 +73,7 @@ class CheckYourAnswersViewSpec extends ViewBaseSpec {
 
     val fileDetailsHeading: String = messages("checkYourAnswers.bulk.fileDetails.heading")
 
-    val numberOfTransfers: String =
-      "2"
+    val numberOfTransfers: String = "2"
 
     val taxDueHeading: String = messages("checkYourAnswers.bulk.taxDue.heading", "£150.00")
 
