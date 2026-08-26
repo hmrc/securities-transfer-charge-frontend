@@ -14,6 +14,9 @@ GET         /there-is-a-problem                           uk.gov.hmrc.securities
 GET        /check-your-answers                            uk.gov.hmrc.securitiestransferchargefrontend.controllers.CheckYourAnswersController.onPageLoad()
 
 GET        /stf/bulk/check-your-answers                 uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.shared.bulk.CheckYourAnswersController.onPageLoad()
+GET        /stf/bulk/check-your-answers/:reference      uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.individuals.bulk.CheckYourAnswersController.onPageLoad(reference: String)
+POST       /stf/bulk/check-your-answers                 uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.individuals.bulk.CheckYourAnswersController.onSubmit()
+
 GET        /stf/check-your-answers                      uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.individuals.single.CheckYourAnswersController.onPageLoad()
 POST       /stf/check-your-answers                      uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.individuals.single.CheckYourAnswersController.onSubmit()
 
