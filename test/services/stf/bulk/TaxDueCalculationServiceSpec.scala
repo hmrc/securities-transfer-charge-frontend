@@ -37,7 +37,7 @@ class TaxDueCalculationServiceSpec extends AnyWordSpec with Matchers with FileUp
       val row = parsedStcRow(1).copy(
         amountPaidForSecurities = Some("10000"),
         totalMarketValue = Some("12000"),
-        taxRate = Some(BigDecimal("0.005")),
+        taxRate = Some(BigDecimal("0.5")),
         applyingForRelief = Some(false),
         whatReliefAreYouApplyingFor = None)
 
@@ -48,7 +48,7 @@ class TaxDueCalculationServiceSpec extends AnyWordSpec with Matchers with FileUp
       val row = parsedStcRow(2).copy(
         amountPaidForSecurities = Some("12000"),
         totalMarketValue = Some("10000"),
-        taxRate = Some(BigDecimal("0.005")),
+        taxRate = Some(BigDecimal("0.5")),
         applyingForRelief = Some(false),
         whatReliefAreYouApplyingFor = None
       )
@@ -59,7 +59,7 @@ class TaxDueCalculationServiceSpec extends AnyWordSpec with Matchers with FileUp
     "calculate tax without relief when relief is not being applied for" in {
       val row = parsedStcRow(3).copy(amountPaidForSecurities = Some("10000"),
         totalMarketValue = Some("12000"),
-        taxRate = Some(BigDecimal("0.005")),
+        taxRate = Some(BigDecimal("0.5")),
         applyingForRelief = Some(false),
         whatReliefAreYouApplyingFor = Some("Charity"))
 
@@ -72,7 +72,7 @@ class TaxDueCalculationServiceSpec extends AnyWordSpec with Matchers with FileUp
       when(mockReliefsDataSource.reliefs).thenReturn(Seq(relief))
       val row = parsedStcRow(4).copy(amountPaidForSecurities = Some("10000"),
         totalMarketValue = Some("12000"),
-        taxRate = Some(BigDecimal("0.005")),
+        taxRate = Some(BigDecimal("0.5")),
         applyingForRelief = Some(true),
         whatReliefAreYouApplyingFor = Some("Charity"))
       
@@ -85,7 +85,7 @@ class TaxDueCalculationServiceSpec extends AnyWordSpec with Matchers with FileUp
 
       val row = parsedStcRow(5).copy(amountPaidForSecurities = Some("10000"),
         totalMarketValue = Some("12000"),
-        taxRate = Some(BigDecimal("0.005")),
+        taxRate = Some(BigDecimal("0.5")),
         applyingForRelief = Some(true),
         whatReliefAreYouApplyingFor = Some("Unknown Relief"))
       service.calculateTaxDue(row) shouldBe Some(BigDecimal("60.00"))
@@ -94,7 +94,7 @@ class TaxDueCalculationServiceSpec extends AnyWordSpec with Matchers with FileUp
     "return the full tax amount when not applying for a relief" in {
       val row = parsedStcRow(6).copy(amountPaidForSecurities = Some("10000"),
         totalMarketValue = Some("12000"),
-        taxRate = Some(BigDecimal("0.005")),
+        taxRate = Some(BigDecimal("0.5")),
         applyingForRelief = Some(true),
         whatReliefAreYouApplyingFor = None)
 
@@ -104,7 +104,7 @@ class TaxDueCalculationServiceSpec extends AnyWordSpec with Matchers with FileUp
     "round the calculated tax to two decimal places" in {
       val row = parsedStcRow(7).copy(amountPaidForSecurities = Some("10001"),
         totalMarketValue = Some("10001"),
-        taxRate = Some(BigDecimal("0.005")),
+        taxRate = Some(BigDecimal("0.5")),
         applyingForRelief = Some(false),
         whatReliefAreYouApplyingFor = None)
 
@@ -114,7 +114,7 @@ class TaxDueCalculationServiceSpec extends AnyWordSpec with Matchers with FileUp
     "round half up when the third decimal place is 5 or greater" in {
       val row = parsedStcRow(8).copy(amountPaidForSecurities = Some("10005"),
         totalMarketValue = Some("10005"),
-        taxRate = Some(BigDecimal("0.005")),
+        taxRate = Some(BigDecimal("0.5")),
         applyingForRelief = Some(false),
         whatReliefAreYouApplyingFor = None)
 
@@ -124,22 +124,13 @@ class TaxDueCalculationServiceSpec extends AnyWordSpec with Matchers with FileUp
     "return None when the amount paid is missing" in {
       val row = parsedStcRow(9).copy(amountPaidForSecurities = None,
         totalMarketValue = Some("12000"),
-        taxRate = Some(BigDecimal("0.005")),
+        taxRate = Some(BigDecimal("0.5")),
         applyingForRelief = Some(false),
         whatReliefAreYouApplyingFor = None)
 
       service.calculateTaxDue(row) shouldBe None
     }
-
-    "return None when the market value is missing" in {
-      val row = parsedStcRow(10).copy(amountPaidForSecurities = Some("10000"),
-        totalMarketValue = None,
-        taxRate = Some(BigDecimal("0.005")),
-        applyingForRelief = Some(false),
-        whatReliefAreYouApplyingFor = None)
-      service.calculateTaxDue(row) shouldBe None
-    }
-
+    
     "return None when the tax rate is missing" in {
       val row = parsedStcRow(11).copy(amountPaidForSecurities = Some("10000"),
         totalMarketValue = Some("12000"),

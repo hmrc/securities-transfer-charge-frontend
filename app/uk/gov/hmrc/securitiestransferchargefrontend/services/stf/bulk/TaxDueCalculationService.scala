@@ -28,9 +28,9 @@ class TaxDueCalculationService @Inject()(reliefsDataSource: ReliefsDataSource) {
   def calculateTaxDue(row: ParsedStcRow): Option[BigDecimal] = {
     for {
       amountPaidValue <- getAmountPaid(row)
-      marketValue <- getMarketValue(row)
       taxRate <- getTaxRate(row)
     } yield {
+      val marketValue = getMarketValue(row)
       val higherValue = amountPaidValue.max(marketValue)
       val taxBeforeRelief = higherValue * taxRate
       val reliefPercentage = getReliefPercentage(row)
@@ -45,12 +45,11 @@ class TaxDueCalculationService @Inject()(reliefsDataSource: ReliefsDataSource) {
     row.amountPaidForSecurities.map(BigDecimal(_))
   }
 
-  private def getTaxRate(row: ParsedStcRow): Option[BigDecimal] = {
-    row.taxRate
-  }
+  private def getTaxRate(row: ParsedStcRow): Option[BigDecimal] =
+    row.taxRate.map(_ / 100)
 
-  private def getMarketValue(row: ParsedStcRow): Option[BigDecimal] = {
-    row.totalMarketValue.map(BigDecimal(_))
+  private def getMarketValue(row: ParsedStcRow): BigDecimal = {
+    row.totalMarketValue.map(BigDecimal(_)).getOrElse(BigDecimal(0))
   }
 
   private def getReliefPercentage(row: ParsedStcRow): BigDecimal = {
