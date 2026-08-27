@@ -28,6 +28,7 @@ import uk.gov.hmrc.securitiestransferchargefrontend.models.shared.AgentReference
 import uk.gov.hmrc.securitiestransferchargefrontend.models.{Mode, UserAnswers}
 import uk.gov.hmrc.securitiestransferchargefrontend.navigation.Navigator
 import uk.gov.hmrc.securitiestransferchargefrontend.pages.stf.shared.AgentReferencePage
+import uk.gov.hmrc.securitiestransferchargefrontend.services.AnswerPersistenceService
 import uk.gov.hmrc.securitiestransferchargefrontend.views.html.stf.agents.bulk.AgentReferenceView
 
 import javax.inject.{Inject, Named}
@@ -41,7 +42,8 @@ class AgentReferenceController @Inject()(
                                           requireData: StcDataRequiredAction,
                                           formProvider: AgentReferenceFormProvider,
                                           val controllerComponents: MessagesControllerComponents,
-                                          view: AgentReferenceView
+                                          view: AgentReferenceView,
+                                          answerPersistenceService: AnswerPersistenceService
                                         )(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport {
 
   val form: Form[AgentReference] = formProvider()
@@ -49,15 +51,19 @@ class AgentReferenceController @Inject()(
   lazy val backLinkCall: Mode => UserAnswers => Call =
     mode => userAnswers => navigator.previousPage(AgentReferencePage, mode, userAnswers)
 
-  def onPageLoad(mode: Mode): Action[AnyContent] = (stcAuthEnrolled andThen getData andThen requireData) {
+  def onPageLoad(mode: Mode, fileUploadReference: String): Action[AnyContent] = (stcAuthEnrolled andThen getData andThen requireData).async {
     implicit request =>
 
-      val preparedForm = request.userAnswers.get(AgentReferencePage) match {
-        case None => form
-        case Some(value) => form.fill(value)
-      }
+      val updatedAnswers = request.userAnswers.setFileUploadReference(fileUploadReference)
 
-      Ok(view(preparedForm, mode, backLinkCall(mode)(request.userAnswers)): Html)
+      answerPersistenceService.save(updatedAnswers).map { _ =>
+        val preparedForm = request.userAnswers.get(AgentReferencePage) match {
+          case None => form
+          case Some(value) => form.fill(value)
+        }
+
+        Ok(view(preparedForm, mode, backLinkCall(mode)(updatedAnswers)): Html)
+      }
   }
 
   def onSubmit(mode: Mode): Action[AnyContent] = (stcAuthEnrolled andThen getData andThen requireData).async {

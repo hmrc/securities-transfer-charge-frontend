@@ -433,7 +433,7 @@ class FileProcessingControllerSpec extends SpecBase with MockitoSugar {
 
 
               (affinityGroup, journeyType) match {
-                case (AffinityGroup.Agent, JourneyType.STF) => redirectLocation(result).value mustEqual stfBulkRoutes.AgentReferenceController.onPageLoad(NormalMode).url
+                case (AffinityGroup.Agent, JourneyType.STF) => redirectLocation(result).value mustEqual stfBulkRoutes.AgentReferenceController.onPageLoad(NormalMode, reference).url
 
                 case (AffinityGroup.Agent, JourneyType.SH03) => redirectLocation(result).value mustEqual sh03BulkRoutes.RoleAtPurchasingCompanyController.onPageLoad(NormalMode).url
 

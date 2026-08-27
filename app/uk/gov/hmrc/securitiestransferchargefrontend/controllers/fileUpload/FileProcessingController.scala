@@ -134,7 +134,7 @@ class FileProcessingController @Inject()(
 
       case UpscanJourneyStatus.Completed =>
         (request.affinityGroup, journeyType) match {
-          case (AffinityGroup.Agent, JourneyType.STF) => Future.successful(Redirect(stfBulkRoutes.AgentReferenceController.onPageLoad(NormalMode)))
+          case (AffinityGroup.Agent, JourneyType.STF) => Future.successful(Redirect(stfBulkRoutes.AgentReferenceController.onPageLoad(NormalMode, reference)))
 
           case (AffinityGroup.Agent, JourneyType.SH03) => Future.successful(Redirect(sh03BulkRoutes.RoleAtPurchasingCompanyController.onPageLoad(NormalMode)))
 
