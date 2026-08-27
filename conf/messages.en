@@ -550,6 +550,8 @@ agent.checkYourAnswers.buyerAddress.change.hidden = Change buyer’s address
 agent.checkYourAnswers.sellerAddress = Address
 agent.checkYourAnswers.sellerAddress.change.hidden = Change seller’s address
 
+agent.checkYourAnswers.fileDetails.heading = File details
+agent.checkYourAnswers.changeFile.hidden = Change file
 
 agent.howToNotifyAboutSecuritiesTransfer.title = How would you like to tell us about these securities transfers?
 agent.howToNotifyAboutSecuritiesTransfer.heading = How would you like to tell us about these securities transfers?

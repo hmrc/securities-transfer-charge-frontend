@@ -265,8 +265,11 @@ POST       /stf/agent/security-type                         uk.gov.hmrc.securiti
 GET        /stf/agent/change/security-type                  uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.agents.single.OtherSecuritiesTypeController.onPageLoad(mode: Mode = CheckMode)
 POST       /stf/agent/change/security-type                  uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.agents.single.OtherSecuritiesTypeController.onSubmit(mode: Mode = CheckMode)
 
-GET        /stf/agent/check-your-answers                          uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.agents.single.CheckYourAnswersController.onPageLoad()
-POST       /stf/agent/check-your-answers                          uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.agents.single.CheckYourAnswersController.onSubmit()
+GET        /stf/agent/bulk/check-your-answers           uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.agents.bulk.CheckYourAnswersController.onPageLoad()
+POST       /stf/agent/bulk/check-your-answers           uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.agents.bulk.CheckYourAnswersController.onSubmit()
+
+GET        /stf/agent/check-your-answers                uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.agents.single.CheckYourAnswersController.onPageLoad()
+POST       /stf/agent/check-your-answers                uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.agents.single.CheckYourAnswersController.onSubmit()
 
 GET        /bulk-error-empty                            uk.gov.hmrc.securitiestransferchargefrontend.controllers.fileUpload.BulkUploadFileEmptyController.onPageLoad(transfer:JourneyType)
 GET        /bulk-error-type                             uk.gov.hmrc.securitiestransferchargefrontend.controllers.fileUpload.FileTypeErrorController.onPageLoad(transfer:JourneyType)
@@ -294,9 +297,9 @@ POST       /stf/agent/change/total-market-value             uk.gov.hmrc.securiti
 
 GET        /stf/agent/template                             uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.agents.bulk.TemplateInstructionsController.onPageLoad()
 
-GET        /stf/agent/bulk/add-reference                   uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.agents.bulk.AgentReferenceController.onPageLoad(mode: Mode = NormalMode)
+GET        /stf/agent/bulk/add-reference                   uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.agents.bulk.AgentReferenceController.onPageLoad(mode: Mode = NormalMode, reference: String)
 POST       /stf/agent/bulk/add-reference                   uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.agents.bulk.AgentReferenceController.onSubmit(mode: Mode = NormalMode)
-GET        /stf/agent/bulk/change/add-reference            uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.agents.bulk.AgentReferenceController.onPageLoad(mode: Mode = CheckMode)
+GET        /stf/agent/bulk/change/add-reference            uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.agents.bulk.AgentReferenceController.onPageLoad(mode: Mode = CheckMode, reference: String)
 POST       /stf/agent/bulk/change/add-reference            uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.agents.bulk.AgentReferenceController.onSubmit(mode: Mode = CheckMode)
 
 GET         /submissions-dashboard/sh03                      uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.shared.SubmissionsDashboardController.startSh03()
