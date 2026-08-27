@@ -14,9 +14,19 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.securitiestransferchargefrontend.pages.stf.bulk
+package uk.gov.hmrc.securitiestransferchargefrontend.viewmodels.stf.fileupload
 
-import uk.gov.hmrc.securitiestransferchargefrontend.pages.Page
+import play.api.i18n.Messages
+import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.SummaryListRow
+import uk.gov.hmrc.securitiestransferchargefrontend.viewmodels.govuk.summarylist.*
+import uk.gov.hmrc.securitiestransferchargefrontend.viewmodels.implicits.*
 
-case object BulkCheckYourAnswersPage extends Page
+object NumberOfFilesSummary {
 
+  def row(rows: String)(implicit messages: Messages): SummaryListRow = {
+    SummaryListRowViewModel(
+      key = "bulk.fileDetails.numOfRows.checkYourAnswersLabel",
+      value = ValueViewModel(rows)
+    )
+  }
+}

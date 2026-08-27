@@ -21,8 +21,8 @@ import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.securitiestransferchargefrontend.config.FrontendAppConfig
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.sh03.agents.bulk.routes as sh03AgentBulkRoutes
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.sh03.agents.single.routes as sh03AgentSingleRoutes
-import uk.gov.hmrc.securitiestransferchargefrontend.controllers.sh03.shared.single.routes as sh03SingleCyaRoutes
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.sh03.shared.bulk.routes as sh03BulkCyaRoutes
+import uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.shared.routes as stfSharedRoutes
 import uk.gov.hmrc.securitiestransferchargefrontend.models.sh03.HowToNotifyAboutShareBuyback.{MoreThanOneAtATime, OneAtATime}
 import uk.gov.hmrc.securitiestransferchargefrontend.models.sh03.shared.{ReasonForPurchase, RoleAtPurchasingCompany}
 import uk.gov.hmrc.securitiestransferchargefrontend.models.{CheckMode, Mode, NormalMode, UserAnswers}
@@ -30,6 +30,7 @@ import uk.gov.hmrc.securitiestransferchargefrontend.navigation.PersistentNavigat
 import uk.gov.hmrc.securitiestransferchargefrontend.pages.Page
 import uk.gov.hmrc.securitiestransferchargefrontend.pages.sh03.*
 import uk.gov.hmrc.securitiestransferchargefrontend.pages.sh03.bulk.*
+import uk.gov.hmrc.securitiestransferchargefrontend.pages.sh03.shared.CheckYourAnswersPage
 import uk.gov.hmrc.securitiestransferchargefrontend.services.AnswerPersistenceService
 
 import scala.concurrent.{ExecutionContext, Future}
@@ -45,7 +46,7 @@ class ForwardRoutes(answerPersistenceService: AnswerPersistenceService,
   import helper.*
 
   private val firstDate = appConfig.firstChargingPoint
-  private lazy val cyaPage = sh03SingleCyaRoutes.CheckYourAnswersController.onPageLoad()
+  private lazy val cyaPage = sh03AgentSingleRoutes.CheckYourAnswersController.onPageLoad()
   
   def forwardRoutes(page: Page, mode: Mode)(implicit hc: HeaderCarrier): UserAnswers => Future[Call] = mode match {
     case NormalMode => normalRoutes(page)
@@ -114,6 +115,8 @@ class ForwardRoutes(answerPersistenceService: AnswerPersistenceService,
             cyaPage
       }
 
+    case CheckYourAnswersPage => _ => Future.successful(stfSharedRoutes.ConfirmationController.onPageLoad())
+
     case BulkAgentReferencePage => userAnswers =>
       dataRequired(BulkAgentReferencePage, userAnswers, sh03AgentBulkRoutes.CompanyDetailsController.onPageLoad(NormalMode))
 
@@ -130,7 +133,43 @@ class ForwardRoutes(answerPersistenceService: AnswerPersistenceService,
 
     case _ => _ => Future.successful(defaultPage)
   }
-  
+
   def checkRoutes(page: Page)(implicit hc: HeaderCarrier): UserAnswers => Future[Call] = page match {
+
+    case ReasonForPurchasePage => userAnswers =>
+      if (userAnswers.get(ReasonForPurchasePage).contains(ReasonForPurchase.ForCancellation) && userAnswers.get(TreasurySharesPage).isEmpty) {
+        goTo(sh03AgentSingleRoutes.TreasurySharesController.onPageLoad(CheckMode), Some(userAnswers))
+      } else {
+        goTo(cyaPage, Some(userAnswers))
+      }
+
+    case ApplyingForReliefPage => userAnswers =>
+      if (userAnswers.get(ApplyingForReliefPage).contains(true) && userAnswers.get(WhatReliefAreYouApplyingForPage).isEmpty) {
+        goTo(sh03AgentSingleRoutes.WhatReliefAreYouApplyingForController.onPageLoad(CheckMode), Some(userAnswers))
+      } else {
+        goTo(cyaPage, Some(userAnswers))
+      }
+
+    case CompanyDetailsPage => userAnswers =>
+      userAnswers.get(CompanyDetailsPage) match {
+        case Some(details) if details.isPlc && userAnswers.get(MaximumAmountPaidPage).isEmpty =>
+          goTo(sh03AgentSingleRoutes.MaximumAmountPaidController.onPageLoad(CheckMode), Some(userAnswers))
+        case _ => goTo(cyaPage, Some(userAnswers))
+      }
+
+    case MaximumAmountPaidPage => userAnswers =>
+      if (userAnswers.get(MinimumAmountPaidPage).isEmpty) {
+        goTo(sh03AgentSingleRoutes.MinimumAmountPaidController.onPageLoad(CheckMode), Some(userAnswers))
+      } else {
+        goTo(cyaPage, Some(userAnswers))
+      }
+
+    case ConnectedPersonsPage => userAnswers =>
+      if (userAnswers.get(ConnectedPersonsPage).contains(true)) {
+        goTo(sh03AgentSingleRoutes.DetailsOfThisSharePurchaseController.onPageLoad(CheckMode), Some(userAnswers))
+      } else {
+        goTo(cyaPage, Some(userAnswers))
+      }
+
     case _ => userAnswers => goTo(cyaPage, Some(userAnswers))
   }

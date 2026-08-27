@@ -41,6 +41,7 @@ index.heading = securities-transfer-charge-frontend
 index.guidance = Welcome to your new frontend. Please see the README file for a guide to getting started.
 
 sectionTitle.stf = Securities Transfer (STF)
+sectionTitle.sh03 = Share buyback (SH03)
 
 checkYourAnswers.title = Check your answers
 checkYourAnswers.heading = Check your answers
@@ -72,6 +73,7 @@ checkYourAnswers.declaration.body = By submitting this form I confirm that the d
 checkYourAnswers.taxDue.body = We have calculated the tax due based on the information provided. This amount does not include penalties or interest.
 checkYourAnswers.acceptAndSend = Accept and send
 checkYourAnswers.saveAndReturn = Save and return to dashboard
+checkYourAnswers.print.heading = Print this page
 
 checkYourAnswers.confirmAddress = Address
 checkYourAnswers.confirmAddress.change.hidde = Change address
@@ -91,6 +93,7 @@ checkYourAnswers.heading = Check your answers
 checkYourAnswers.sellerDetails.heading = Seller details
 checkYourAnswers.transferDetails.heading = Transfer details
 checkYourAnswers.securitiesDetails.heading = Securities details
+checkYourAnswers.buyerDetails.heading = Buyer details
 
 # Tax and Declaration
 checkYourAnswers.taxDue.heading = Tax due: {0}
@@ -98,6 +101,10 @@ checkYourAnswers.taxDue.body = We have calculated the tax due based on the infor
 checkYourAnswers.paymentDueBy = Payment due by:
 checkYourAnswers.declaration.heading = Declaration
 checkYourAnswers.declaration.body = By submitting this form I confirm that the details I am providing are correct to the best of my knowledge.
+
+sh03.checkYourAnswers.declaration.body = By submitting this form I confirm that:
+checkYourAnswers.declaration.bullet1 = to the best of my knowledge, the details I am providing are correct
+checkYourAnswers.declaration.bullet2 = I am authorised by the buyer to submit details on their behalf
 
 # Buttons
 checkYourAnswers.acceptAndSend = Accept and send
@@ -113,6 +120,27 @@ checkYourAnswers.print.p3 = before submitting.
 agent.checkYourAnswers.declaration.p1 = By submitting this form I confirm that:
 agent.checkYourAnswers.declaration.bullet1 = to the best of my knowledge, the details I am providing are correct
 agent.checkYourAnswers.declaration.bullet2 = I am authorised by the buyer to submit details on their behalf
+
+
+# Bulk Check Your Answers
+checkYourAnswers.bulk.title = Check your answers
+checkYourAnswers.bulk.heading = Check your answers
+checkYourAnswers.bulk.fileDetails.heading = File details
+checkYourAnswers.bulk.fileDetails.change.hidden = Change file
+checkYourAnswers.bulk.taxDue.heading = Tax due: {0}
+checkYourAnswers.bulk.taxDue.body.p1 = We have calculated the tax due based on the information provided. This amount does not include penalties or interest.
+checkYourAnswers.bulk.taxDue.body.p2 = Payment due by:
+checkYourAnswers.bulk.taxDue.section.seller.heading = Seller
+checkYourAnswers.bulk.taxDue.section.securities.heading = Securities bought in
+checkYourAnswers.bulk.taxDue.section.consideration.heading = Consideration
+checkYourAnswers.bulk.taxDue.section.taxDue.heading = Tax due
+checkYourAnswers.bulk.declaration.heading = Declaration
+checkYourAnswers.bulk.declaration.body = By submitting this form I confirm that the details I am providing are correct to the best of my knowledge.
+
+checkYourAnswers.returnToDashboard = Return to dashboard
+
+bulk.fileDetails.fileName.checkYourAnswersLabel = File name
+bulk.fileDetails.numOfRows.checkYourAnswersLabel = Number of transfers (rows) found
 
 journeyRecovery.continue.title = Sorry, there is a problem with the service
 journeyRecovery.continue.heading = Sorry, there is a problem with the service
@@ -315,6 +343,9 @@ agent.sh03.companyDetails.isPlc.label = Is the purchasing company a Public Limit
 agent.sh03.companyDetails.isPlc.error.required = Select yes if the purchasing company is a Public Limited Company (PLC)
 agent.sh03.companyDetails.checkYourAnswersLabel = Company details
 agent.sh03.companyDetails.change.hidden = Change company details
+agent.sh03.companyDetails.companyName.change.hidden = Change company name
+agent.sh03.companyDetails.crn.change.hidden = Change company registration number (CRN)
+agent.sh03.companyDetails.isPlc.change.hidden = Change if purchasing company is a Public Limited Company (PLC) or not
 
 fileUpload.individual.securitiesTarget.error.businessName.required = Enter the name of the business you’re buying securities in
 fileUpload.individual.securitiesTarget.error.businessName.length = Business name must be 160 characters or fewer
@@ -336,13 +367,14 @@ detailsOfThisTransfer.heading = What are the details of this transfer?
 detailsOfThisTransfer.numberOfShares = Number of shares
 detailsOfThisTransfer.typeOfShares = Type or class of shares
 detailsOfThisTransfer.amountPaid = Amount paid for the shares
+detailsOfThisTransfer.typeOfShares.change.hidden = Change type or class of shares
 detailsOfThisTransfer.marketValue = Market value of the shares
 detailsOfThisTransfer.checkYourAnswersLabel = What are the details of this transfer?
 detailsOfThisTransfer.numberOfShares.change.hidden = Change number of shares
 detailsOfThisTransfer.amountPaid.change.hidden = Change amount paid for shares
 org.detailsOfThisTransfer.amountPaid.change.hidden = Change amount paid for the shares
 detailsOfThisTransfer.amountPaid.change.hidden = Change amount paid for the shares
-detailsOfThisTransfer.marketValue.change.hidden = Change market value of the shares
+detailsOfThisTransfer.marketValue.change.hidden = Change market value of the shares in pounds
 detailsOfThisTransfer.error.numberOfShares.wholeNumber = The number of shares must be a whole number between 1 and 999,999,999
 detailsOfThisTransfer.error.numberOfShares.min = The number of shares must be at least 1
 detailsOfThisTransfer.error.numberOfShares.max = The number of shares must be below 999,999,999
@@ -839,16 +871,16 @@ fileUploaded.error.virus.title = Your file contains a virus
 fileUploaded.error.virus.heading = Your file contains a virus
 fileUploaded.error.virus.p = The file you have uploaded contains a virus, you will need to upload a different file.
 
-agent.totalMarketValue.title = What is the total market value of the shares?
-agent.totalMarketValue.heading = What is the total market value of the shares?
-agent.totalMarketValue.error.nonNumeric = The market value of the shares must be a number and can include up to two decimal places, like £30 or £28.60
-agent.totalMarketValue.error.required = Enter the market value of the shares in pounds
-agent.totalMarketValue.error.invalidNumeric = The market value of the shares must be a number and can include up to two decimal places, like £30 or £28.60
-agent.totalMarketValue.error.aboveMaximum = The market value of the shares must be £999,999,999 or below
-agent.totalMarketValue.error.belowMinimum = The market value of the shares must be £0.01 or more
+agent.totalMarketValue.title = What is the total market value of the securities?
+agent.totalMarketValue.heading = What is the total market value of the securities?
+agent.totalMarketValue.error.nonNumeric = The market value of the securities must be a number and can include up to two decimal places, like £30 or £28.60
+agent.totalMarketValue.error.required = Enter the market value of the securities in pounds
+agent.totalMarketValue.error.invalidNumeric = The market value of the securities must be a number and can include up to two decimal places, like £30 or £28.60
+agent.totalMarketValue.error.aboveMaximum = The market value of the securities must be £999,999,999 or below
+agent.totalMarketValue.error.belowMinimum = The market value of the securities must be £0.01 or more
 agent.totalMarketValue.change.hidden = Change the total market value of the securities
 agent.totalMarketValue.hint = For example, £600 or £193.54
-agent.totalMarketValue.error.negative = The market value of the shares must be £0.01 or more
+agent.totalMarketValue.error.negative = The market value of the securities must be £0.01 or more
 agent.totalMarketValue.checkYourAnswersLabel = Total market value of the securities
 
 agent.sh03.bulk.totalMarketValue.title = What is the total market value of the shares?
@@ -923,7 +955,7 @@ agent.sh03.reasonForPurchase.change.hidden = Change why these shares are being p
 agent.sh03.treasuryShares.title = Do these shares also qualify as treasury shares?
 agent.sh03.treasuryShares.heading = Do these shares also qualify as treasury shares?
 agent.sh03.treasuryShares.checkYourAnswersLabel = Do these shares also qualify as treasury shares?
-agent.sh03.treasuryShares.change.hidden = Change do these shares also qualify as treasury shares?
+agent.sh03.treasuryShares.change.hidden = Change if these shares also qualify as treasury shares
 agent.sh03.treasuryShares.error.required = Select yes if these shares also qualify as treasury shares
 
 agent.sh03.shareBuyback.title = How would you like to tell us about this share buyback?
@@ -941,7 +973,7 @@ agent.sh03.connectedPersons.checkYourAnswersLabel = Are the buyer and seller con
 agent.sh03.connectedPersons.error.required = Select yes if the buyer and seller are connected persons
 agent.sh03.connectedPersons.p = We need to know if the buyer and seller of these shares are considered ‘connected persons’ according to
 agent.sh03.connectedPersons.content.link.text = section 1122 of the Corporation Tax Act 2010
-agent.sh03.connectedPersons.change.hidden = Change connected persons
+agent.sh03.connectedPersons.change.hidden = Change if the buyer and seller are connected persons
 
 agent.sh03.applyingForRelief.error.required = Select yes if the buyer is applying for a relief
 
@@ -949,15 +981,15 @@ agent.sh03.applyingForRelief.title = Is the buyer applying for a relief?
 agent.sh03.applyingForRelief.heading = Is the buyer applying for a relief?
 agent.sh03.applyingForRelief.checkYourAnswersLabel = Is the buyer applying for a relief?
 agent.sh03.applyingForRelief.error.required = Select yes if the buyer is  applying for a relief
-agent.sh03.applyingForRelief.change.hidden = Change applying for a relief
+agent.sh03.applyingForRelief.change.hidden = Change if the buyer is applying for a relief
 agent.sh03.applyingForRelief.p = See a
 agent.sh03.applyingForRelief.details.content.link.text = full list of reliefs
 
 
 agent.sh03.minimumAmountPaid.title = What is the minimum amount paid for the shares, in pounds?
 agent.sh03.minimumAmountPaid.heading = What is the minimum amount paid for the shares, in pounds?
-agent.sh03.minimumAmountPaid.checkYourAnswersLabel = What is the minimum amount paid for the shares, in pounds?
-agent.sh03.minimumAmountPaid.change.hidden = What is the minimum amount paid for the shares, in pounds?
+agent.sh03.minimumAmountPaid.checkYourAnswersLabel = Minimum amount paid for the shares
+agent.sh03.minimumAmountPaid.change.hidden = Change the minimum amount paid for the shares
 agent.sh03.minimumAmountPaid.error.required = Enter the minimum amount paid for the shares
 agent.sh03.minimumAmountPaid.error.invalidNumeric = The minimum amount paid for the shares must be a number and can include up to two decimal places, like £30 or £28.60
 agent.sh03.minimumAmountPaid.error.nonNumeric = The minimum amount paid for the shares must be a number and can include up to two decimal places, like £30 or £28.60
@@ -988,9 +1020,10 @@ agent.sh03.detailsOfSharePurchase.error.marketValue.invalidNumeric = The market 
 agent.sh03.detailsOfSharePurchase.error.marketValue.nonNumeric = The market value of the shares must be a number and can include up to two decimal places, like £30 or £28.60
 agent.sh03.detailsOfSharePurchase.error.marketValue.aboveMaximum = The market value of the shares must be £999,999,999 or below
 agent.sh03.detailsOfSharePurchase.error.marketValue.belowMinimum = The market value of the shares must be £0.01 or more
+agent.sh03.detailsOfThisTransfer.typeOfShares.change.hidden = 	Change type or class of shares
 
-agent.sh03.whatReliefAreYouApplyingFor.checkYourAnswersLabel = Enter the relief the buyer is applying for
-agent.sh03.whatReliefAreYouApplyingFor.change.hidden = Change what relief the buyer is applying for
+agent.sh03.whatReliefAreYouApplyingFor.checkYourAnswersLabel = Type of relief
+agent.sh03.whatReliefAreYouApplyingFor.change.hidden = Change type of relief
 
 agent.sh03.roleAtPurchasingCompany.title = Who at the purchasing company provided the details of this share buyback?
 agent.sh03.roleAtPurchasingCompany.heading = Who at the purchasing company provided the details of this share buyback?
@@ -1028,11 +1061,11 @@ agent.sh03.chargingPoint.error.required.two = The charging point for this share 
 agent.sh03.chargingPoint.error.required = The charging point for this share buyback must include a {0}
 agent.sh03.chargingPoint.error.invalid = The charging point for this share buyback must be a real date
 agent.sh03.chargingPoint.error.futureDate = The charging point for this share buyback must be today’s date, or a date in the past
-agent.sh03.chargingPoint.change.hidden = Change the charging point
+agent.sh03.chargingPoint.change.hidden = Change charging point
 
 agent.sh03.maximumAmountPaid.title = What is the maximum amount paid for the shares, in pounds?
 agent.sh03.maximumAmountPaid.heading = What is the maximum amount paid for the shares, in pounds?
-agent.sh03.maximumAmountPaid.checkYourAnswersLabel = What is the maximum amount paid for the shares, in pounds?
+agent.sh03.maximumAmountPaid.checkYourAnswersLabel = Maximum amount paid for the shares
 agent.sh03.maximumAmountPaid.error.required = Enter the maximum amount paid for the shares
 agent.sh03.maximumAmountPaid.error.invalidNumeric = The maximum amount paid for the shares must be a number and can include up to two decimal places, like £30 or £28.60
 agent.sh03.maximumAmountPaid.error.negative = The maximum amount paid for the shares must be £0.01 or more

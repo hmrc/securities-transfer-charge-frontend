@@ -139,4 +139,7 @@ class FrontendAppConfig @Inject() (configuration: Configuration, servicesConfig:
   
   val govUKUrl: String = configuration.get[String]("urls.external.govUK")
   val reliefsGuidanceUrl: String = configuration.get[String]("urls.external.reliefsGuidance")
+  
+  // Tax calculation
+  val taxRateSH03: BigDecimal = BigDecimal(configuration.get[String]("tax-rate.sh03")) 
 }

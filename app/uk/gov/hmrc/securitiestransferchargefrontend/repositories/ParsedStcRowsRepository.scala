@@ -33,7 +33,7 @@ trait ParsedStcRowsRepository {
   def findByReference(reference: String): Future[Seq[ParsedStcRow]]
 
   def delete(reference: String): Future[Unit]
-  
+
   def findDocumentByReference(reference: String): Future[Option[ParsedStcRowsDocument]]
 }
 
@@ -75,7 +75,7 @@ class ParsedStcRowsRepositoryImpl @Inject()(
       .deleteOne(byReference(reference))
       .toFuture()
       .map(_ => ())
-      
+
   override def findDocumentByReference(reference: String): Future[Option[ParsedStcRowsDocument]] =
     collection
       .find(byReference(reference))
@@ -85,5 +85,5 @@ class ParsedStcRowsRepositoryImpl @Inject()(
     collection
       .drop()
       .toFuture()
-      .map(_ => ())
+      .map(_ => ())    
 }

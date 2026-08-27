@@ -38,7 +38,7 @@ class CheckYourAnswersController @Inject()(
     implicit request =>
 
       val list = SummaryListViewModel(
-        rows = Seq.empty
+        rows = Seq.empty 
       )
 
       Ok(view(list))

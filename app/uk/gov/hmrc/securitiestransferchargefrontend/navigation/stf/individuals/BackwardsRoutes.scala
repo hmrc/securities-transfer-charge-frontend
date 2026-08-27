@@ -21,9 +21,12 @@ import uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.individuals.
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.individuals.single.routes as individualSingleRoutes
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.shared.routes as sharedRoutes
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.individuals.single.routes as stfSingleCyaRoutes
+import uk.gov.hmrc.securitiestransferchargefrontend.controllers.fileUpload.routes as bulkRoutes
+import uk.gov.hmrc.securitiestransferchargefrontend.models.JourneyType.STF
 import uk.gov.hmrc.securitiestransferchargefrontend.models.{CheckMode, Mode, NormalMode, UserAnswers}
 import uk.gov.hmrc.securitiestransferchargefrontend.navigation.NavigationHelper
 import uk.gov.hmrc.securitiestransferchargefrontend.pages.*
+import uk.gov.hmrc.securitiestransferchargefrontend.pages.stf.bulk.BulkCheckYourAnswersPage
 import uk.gov.hmrc.securitiestransferchargefrontend.pages.stf.shared.{CheckYourAnswersPage, HowToNotifyAboutSecuritiesTransferPage}
 import uk.gov.hmrc.securitiestransferchargefrontend.pages.stf.single.*
 
@@ -74,6 +77,8 @@ class BackwardsRoutes(defaultPage: Call):
         }
       }
     }
+    
+    case BulkCheckYourAnswersPage => _ => bulkRoutes.FileUploadController.onPageLoad(STF)
     case _ => _ => defaultPage
   }
   

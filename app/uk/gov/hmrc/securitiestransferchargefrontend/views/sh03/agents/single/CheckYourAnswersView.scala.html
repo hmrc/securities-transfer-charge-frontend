@@ -15,11 +15,9 @@
  *@
 
 @import uk.gov.hmrc.govukfrontend.views.html.components._
-@import uk.gov.hmrc.securitiestransferchargefrontend.viewmodels.stf.shared.single.CheckYourAnswersViewModel
+@import uk.gov.hmrc.securitiestransferchargefrontend.viewmodels.sh03.shared.single.CheckYourAnswersViewModel
 @import uk.gov.hmrc.securitiestransferchargefrontend.views.html.components.SaveAndReturnButton
-@import uk.gov.hmrc.securitiestransferchargefrontend.views.html.components.PrintLink
-@import uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.agents.single.routes as agentRoutes
-@import uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.shared.routes as sharedRoutes
+@import uk.gov.hmrc.securitiestransferchargefrontend.controllers.sh03.agents.single.routes as agentRoutes
 @import views.html.helper.CSPNonce
 
 @this(
@@ -32,13 +30,12 @@
 
 @(viewModel: CheckYourAnswersViewModel, backLinkCall: Call)(implicit request: Request[_], messages: Messages)
 
-@layout(pageTitle = titleNoForm(messages(CheckYourAnswersViewModel.MessageKeys.title), Some(messages("sectionTitle.stf"))), backLinkUrl = Some(backLinkCall.url),
+@layout(pageTitle = titleNoForm(messages(CheckYourAnswersViewModel.MessageKeys.title), Some(messages("sectionTitle.sh03"))), backLinkUrl = Some(backLinkCall.url),
     additionalScripts = Some(
     HtmlFormat.raw(
-    s"""<script ${CSPNonce.attr} src="${routes.Assets.versioned("javascripts/print.js").url}"></script>"""
-    ))) {
+    s"""<script ${CSPNonce.attr} src="${routes.Assets.versioned("javascripts/print.js").url}"></script>"""))) {
 
-    <h1 class="govuk-heading-l govuk-!-margin-bottom-7">@messages(CheckYourAnswersViewModel.MessageKeys.heading)</h1>
+    <h1 class="govuk-heading-xl govuk-!-margin-bottom-7">@messages(CheckYourAnswersViewModel.MessageKeys.heading)</h1>
 
     @for((section, index) <- viewModel.sections.zipWithIndex) {
         <h2 class="govuk-heading-m @if(index > 0) {govuk-!-margin-top-9}">
@@ -56,37 +53,30 @@
         </p>
     </div>
 
-     <div class="govuk-!-margin-top-9">
+    <div class="govuk-!-margin-top-9">
         <h2 class="govuk-heading-m">@messages(CheckYourAnswersViewModel.MessageKeys.printHeading)</h2>
-         @PrintLink()
+        <p class="govuk-body">
+            You can <a href="#" class="govuk-link govuk-link--no-visited-state" id="print-this-page">print this page</a> before submitting.
+        </p>
     </div>
 
     <h2 class="govuk-heading-m govuk-!-margin-top-9">@messages(CheckYourAnswersViewModel.MessageKeys.declarationHeading)</h2>
-    <div>
-    <p class="govuk-body">
-        @messages(CheckYourAnswersViewModel.MessageKeys.declarationP1)
-    </p>
+    @govukSummaryList(viewModel.declarationList)
+
+    <p class="govuk-body">@messages(CheckYourAnswersViewModel.MessageKeys.declarationConfirm)</p>
     <ul class="govuk-list govuk-list--bullet govuk-!-margin-bottom-9">
         <li>@messages(CheckYourAnswersViewModel.MessageKeys.declarationBullet1)</li>
         <li>@messages(CheckYourAnswersViewModel.MessageKeys.declarationBullet2)</li>
     </ul>
-    </div>
 
-    <div class="govuk-button-group">
-
-        @formHelper(action = agentRoutes.CheckYourAnswersController.onSubmit()) {
-
-        @govukButton(
-            ButtonViewModel(
-                messages(CheckYourAnswersViewModel.MessageKeys.acceptAndSend)
+    @formHelper(action = agentRoutes.CheckYourAnswersController.onSubmit()) {
+        <div class="govuk-button-group">
+            @govukButton(
+                ButtonViewModel(
+                    messages(CheckYourAnswersViewModel.MessageKeys.acceptAndSend)
                 )
             )
-        }
-
-        <a class="govuk-link" href="@sharedRoutes.SubmissionsDashboardController.onPageLoad().url" style="margin-left: -11px">
             @saveAndReturnButton()
-        </a>
-
-    </div>
-
+        </div>
+    }
 }

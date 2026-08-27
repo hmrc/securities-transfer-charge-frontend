@@ -1,4 +1,4 @@
-/*
+@*
  * Copyright 2026 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -12,11 +12,14 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- */
+ *@
 
-package uk.gov.hmrc.securitiestransferchargefrontend.pages.stf.bulk
+@()(implicit messages: Messages)
 
-import uk.gov.hmrc.securitiestransferchargefrontend.pages.Page
-
-case object BulkCheckYourAnswersPage extends Page
-
+<p class="govuk-body">
+    @messages("checkYourAnswers.print.p1")
+    <a href="#" class="govuk-link govuk-link--no-visited-state" id="print-this-page">
+        @messages("checkYourAnswers.print.content.link.text")
+    </a>
+    @messages("checkYourAnswers.print.p3")
+</p>

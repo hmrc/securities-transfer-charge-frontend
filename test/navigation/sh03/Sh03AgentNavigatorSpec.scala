@@ -25,7 +25,6 @@ import uk.gov.hmrc.securitiestransferchargefrontend.config.FrontendAppConfig
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.sh03.agents.routes as sh03AgentRoutes
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.sh03.agents.single.routes as sh03AgentSingleRoutes
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.sh03.shared.routes as sharedRoutes
-import uk.gov.hmrc.securitiestransferchargefrontend.controllers.sh03.shared.single.routes as sh03SingleCyaRoutes
 import uk.gov.hmrc.securitiestransferchargefrontend.models.sh03.HowToNotifyAboutShareBuyback
 import uk.gov.hmrc.securitiestransferchargefrontend.models.sh03.shared.*
 import uk.gov.hmrc.securitiestransferchargefrontend.models.shared.AgentReference
@@ -33,6 +32,8 @@ import uk.gov.hmrc.securitiestransferchargefrontend.models.{CheckMode, NormalMod
 import uk.gov.hmrc.securitiestransferchargefrontend.navigation.sh03.agents.Sh03AgentNavigator
 import uk.gov.hmrc.securitiestransferchargefrontend.pages.Page
 import uk.gov.hmrc.securitiestransferchargefrontend.pages.sh03.*
+import uk.gov.hmrc.securitiestransferchargefrontend.pages.sh03.shared.CheckYourAnswersPage
+import uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.shared.routes as stfSharedRoutes
 
 import java.time.LocalDate
 
@@ -41,7 +42,7 @@ class Sh03AgentNavigatorSpec extends SpecBase with ScalaFutures {
   private val mockConfig: FrontendAppConfig = mock[FrontendAppConfig]
   when(mockConfig.firstChargingPoint).thenReturn(LocalDate.of(2026, 1, 1))
 
-  private lazy val cyaPage = sh03SingleCyaRoutes.CheckYourAnswersController.onPageLoad()
+  private lazy val cyaPage = sh03AgentSingleRoutes.CheckYourAnswersController.onPageLoad()
   val navigator = new Sh03AgentNavigator(StubAnswerPersistenceService(), mockConfig)
 
   private val companyDetails = CompanyDetails(
@@ -214,6 +215,13 @@ class Sh03AgentNavigatorSpec extends SpecBase with ScalaFutures {
         val result = navigator.nextPage(RoleAtPurchasingCompanyPage, NormalMode, answers)(fakeRequest)
         whenReady(result) { res =>
           res mustBe sh03AgentSingleRoutes.CannotSubmitFormErrorController.onPageLoad()
+        }
+      }
+
+      "must go from CheckYourAnswersPage to ConfirmationController" in {
+        val result = navigator.nextPage(CheckYourAnswersPage, NormalMode, emptyUserAnswers)(fakeRequest)
+        whenReady(result) { res =>
+          res mustBe stfSharedRoutes.ConfirmationController.onPageLoad()
         }
       }
     }

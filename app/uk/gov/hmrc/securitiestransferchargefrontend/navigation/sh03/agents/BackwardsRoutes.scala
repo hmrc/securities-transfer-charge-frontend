@@ -21,7 +21,6 @@ import uk.gov.hmrc.securitiestransferchargefrontend.controllers.sh03.agents.rout
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.sh03.agents.single.routes as sh03AgentSingleRoutes
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.sh03.agents.bulk.routes as sh03AgentBulkRoutes
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.sh03.shared.routes as sharedRoutes
-import uk.gov.hmrc.securitiestransferchargefrontend.controllers.sh03.shared.single.routes as sh03SingleCyaRoutes
 import uk.gov.hmrc.securitiestransferchargefrontend.models.sh03.shared.ReasonForPurchase
 import uk.gov.hmrc.securitiestransferchargefrontend.models.{CheckMode, Mode, NormalMode, UserAnswers}
 import uk.gov.hmrc.securitiestransferchargefrontend.navigation.NavigationHelper
@@ -30,6 +29,7 @@ import uk.gov.hmrc.securitiestransferchargefrontend.pages.sh03.*
 import uk.gov.hmrc.securitiestransferchargefrontend.pages.sh03.bulk.*
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.fileUpload.routes
 import uk.gov.hmrc.securitiestransferchargefrontend.models.JourneyType.SH03
+import uk.gov.hmrc.securitiestransferchargefrontend.pages.sh03.shared.CheckYourAnswersPage
 
 class BackwardsRoutes(defaultPage: Call):
 
@@ -77,6 +77,7 @@ class BackwardsRoutes(defaultPage: Call):
       }
     }
     case RoleAtPurchasingCompanyPage => _ => sh03AgentSingleRoutes.ChargingPointController.onPageLoad(NormalMode)
+    case CheckYourAnswersPage => _ => sh03AgentSingleRoutes.RoleAtPurchasingCompanyController.onPageLoad(NormalMode)
     case BulkAgentReferencePage => _ => sh03AgentRoutes.HowToNotifyAboutShareBuybackController.onPageLoad()
     case BulkCompanyDetailsPage => _ => sh03AgentBulkRoutes.AgentReferenceController.onPageLoad(NormalMode)
     case BulkRoleAtPurchasingCompanyPage => _ => routes.FileUploadController.onPageLoad(SH03)
@@ -85,5 +86,5 @@ class BackwardsRoutes(defaultPage: Call):
   }
   
   private def checkRoutes(page: Page): Option[UserAnswers] => Call = page match {
-    case _ => _ => sh03SingleCyaRoutes.CheckYourAnswersController.onPageLoad()
+    case _ => _ => sh03AgentSingleRoutes.CheckYourAnswersController.onPageLoad()
   }
