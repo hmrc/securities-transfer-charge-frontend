@@ -24,10 +24,10 @@ import uk.gov.hmrc.securitiestransferchargefrontend.viewmodels.implicits.*
 
 object NumberOfRowsSummary {
 
-  def row(numOfRows: Int)(implicit messages: Messages): Option[SummaryListRow] =
+  def row(numOfRows: String)(implicit messages: Messages): Option[SummaryListRow] =
         Some(SummaryListRowViewModel(
-          key = "Number of transfers (rows) found",
-          value = ValueViewModel(HtmlFormat.escape(numOfRows.toString).toString)
+          key = messages("agent.checkYourAnswers.numberOfRows.key"),
+          value = ValueViewModel(HtmlFormat.escape(numOfRows).toString)
         )
         )
 }

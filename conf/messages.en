@@ -551,7 +551,10 @@ agent.checkYourAnswers.sellerAddress = Address
 agent.checkYourAnswers.sellerAddress.change.hidden = Change seller’s address
 
 agent.checkYourAnswers.fileDetails.heading = File details
+agent.checkYourAnswers.fileDetails.key = File
 agent.checkYourAnswers.changeFile.hidden = Change file
+
+agent.checkYourAnswers.numberOfRows.key = Number of transfers (rows) found
 
 agent.howToNotifyAboutSecuritiesTransfer.title = How would you like to tell us about these securities transfers?
 agent.howToNotifyAboutSecuritiesTransfer.heading = How would you like to tell us about these securities transfers?

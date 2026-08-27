@@ -41,7 +41,7 @@ class TaxDueCalculationService @Inject()(reliefsDataSource: ReliefsDataSource) {
   def calculateTaxDueForRow(row: ParsedStcRow): Option[BigDecimal] = {
     for {
       amountPaid <- row.amountPaidForSecurities.map(BigDecimal(_))
-      marketValue <- row.totalMarketValue.map(BigDecimal(_))
+      marketValue = row.totalMarketValue.map(BigDecimal(_)).getOrElse(BigDecimal(0.00))
       taxRate <- row.taxRate.map(_ / 100)
     } yield {
       val higherValue = amountPaid.max(marketValue)
@@ -60,7 +60,7 @@ class TaxDueCalculationService @Inject()(reliefsDataSource: ReliefsDataSource) {
   }
 
   def formatCurrency(amount: BigDecimal): String = {
-    f"£$amount%.2f"
+    f"£$amount%,.2f"
   }
 
   def formatDate(date: LocalDate): String = {

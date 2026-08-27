@@ -27,7 +27,7 @@ object FileDetailsSummary {
   
   def row(fileName: String)(implicit messages: Messages): Option[SummaryListRow] =
         Some(SummaryListRowViewModel(
-          key = "File",
+          key = messages("agent.checkYourAnswers.fileDetails.key"),
           value = ValueViewModel(HtmlFormat.escape(fileName).toString),
           actions = Seq(
             ActionItemViewModel("site.change", routes.JourneyRecoveryController.onPageLoad().url)

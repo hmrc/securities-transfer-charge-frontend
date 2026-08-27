@@ -79,14 +79,19 @@ object StfAgentRowBuilder  {
       buildOtherSecuritiesDetailsRows(userAnswers, isConnectedPersons)
   }
 
+  def formatWithCommas(n: Int): String = {
+    "%,d".format(n)
+  }
+
   def buildFileDetailsCard(fileName: String, rows: Int)(implicit messages: Messages): SummaryList = {
+    val formattedRows = formatWithCommas(rows)
     SummaryList(
       card = Some(Card(
         title = Some(CardTitle(content = Text(messages("agent.checkYourAnswers.fileDetails.heading"))))
       )),
       rows = Seq(
         FileDetailsSummary.row(fileName),
-        NumberOfRowsSummary.row(rows)
+        NumberOfRowsSummary.row(formattedRows)
       ).flatten
     )
   }
