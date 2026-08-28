@@ -121,6 +121,27 @@ agent.checkYourAnswers.declaration.p1 = By submitting this form I confirm that:
 agent.checkYourAnswers.declaration.bullet1 = to the best of my knowledge, the details I am providing are correct
 agent.checkYourAnswers.declaration.bullet2 = I am authorised by the buyer to submit details on their behalf
 
+
+# Bulk Check Your Answers
+checkYourAnswers.bulk.title = Check your answers
+checkYourAnswers.bulk.heading = Check your answers
+checkYourAnswers.bulk.fileDetails.heading = File details
+checkYourAnswers.bulk.fileDetails.change.hidden = Change file
+checkYourAnswers.bulk.taxDue.heading = Tax due: {0}
+checkYourAnswers.bulk.taxDue.body.p1 = We have calculated the tax due based on the information provided. This amount does not include penalties or interest.
+checkYourAnswers.bulk.taxDue.body.p2 = Payment due by:
+checkYourAnswers.bulk.taxDue.section.seller.heading = Seller
+checkYourAnswers.bulk.taxDue.section.securities.heading = Securities bought in
+checkYourAnswers.bulk.taxDue.section.consideration.heading = Consideration
+checkYourAnswers.bulk.taxDue.section.taxDue.heading = Tax due
+checkYourAnswers.bulk.declaration.heading = Declaration
+checkYourAnswers.bulk.declaration.body = By submitting this form I confirm that the details I am providing are correct to the best of my knowledge.
+
+checkYourAnswers.returnToDashboard = Return to dashboard
+
+bulk.fileDetails.fileName.checkYourAnswersLabel = File name
+bulk.fileDetails.numOfRows.checkYourAnswersLabel = Number of transfers (rows) found
+
 journeyRecovery.continue.title = Sorry, there is a problem with the service
 journeyRecovery.continue.heading = Sorry, there is a problem with the service
 journeyRecovery.continue.guidance = [Add content to explain how to proceed.]
@@ -561,6 +582,11 @@ agent.checkYourAnswers.buyerAddress.change.hidden = Change buyer’s address
 agent.checkYourAnswers.sellerAddress = Address
 agent.checkYourAnswers.sellerAddress.change.hidden = Change seller’s address
 
+agent.checkYourAnswers.fileDetails.heading = File details
+agent.checkYourAnswers.fileDetails.key = File
+agent.checkYourAnswers.changeFile.hidden = Change file
+
+agent.checkYourAnswers.numberOfRows.key = Number of transfers (rows) found
 
 agent.howToNotifyAboutSecuritiesTransfer.title = How would you like to tell us about these securities transfers?
 agent.howToNotifyAboutSecuritiesTransfer.heading = How would you like to tell us about these securities transfers?

@@ -46,8 +46,9 @@ class AgentReferenceControllerSpec extends SpecBase with MockitoSugar {
 
   val formProvider = new AgentReferenceFormProvider()
   val form: Form[AgentReference] = formProvider()
+  val fileUploadReference = "fileUploadRef"
 
-  lazy val agentReferenceRoute: String = agentRoutes.AgentReferenceController.onPageLoad(NormalMode).url
+  lazy val agentReferenceRoute: String = agentRoutes.AgentReferenceController.onPageLoad(NormalMode, fileUploadReference).url
 
   "AgentReference Controller" - {
 
@@ -107,7 +108,7 @@ class AgentReferenceControllerSpec extends SpecBase with MockitoSugar {
         val result = route(application, request).value
 
         status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual routes.CheckYourAnswersController.onPageLoad().url
+        redirectLocation(result).value mustEqual agentRoutes.CheckYourAnswersController.onPageLoad().url
       }
     }
 

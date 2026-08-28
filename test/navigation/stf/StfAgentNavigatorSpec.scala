@@ -34,6 +34,7 @@ import uk.gov.hmrc.securitiestransferchargefrontend.models.stf.*
 import uk.gov.hmrc.securitiestransferchargefrontend.models.{CheckMode, NormalMode, UserAnswers}
 import uk.gov.hmrc.securitiestransferchargefrontend.navigation.stf.agents.StfAgentNavigator
 import uk.gov.hmrc.securitiestransferchargefrontend.pages.Page
+import uk.gov.hmrc.securitiestransferchargefrontend.pages.stf.bulk.BulkCheckYourAnswersPage
 import uk.gov.hmrc.securitiestransferchargefrontend.pages.stf.shared.{AgentReferencePage, HowToNotifyAboutSecuritiesTransferPage, SubmissionsDashboardPage}
 import uk.gov.hmrc.securitiestransferchargefrontend.pages.stf.single.*
 
@@ -267,7 +268,7 @@ class StfAgentNavigatorSpec extends SpecBase with ScalaFutures {
         val answers = emptyUserAnswers.set(HowToNotifyAboutSecuritiesTransferPage, HowToNotifyAboutSecuritiesTransfer.MoreThanOneAtATime).get.set(AgentReferencePage, AgentReference(Some("HMRC"))).get
         val result = navigator.nextPage(AgentReferencePage, NormalMode, answers)(fakeRequest)
         whenReady(result) { res =>
-          res mustBe routes.CheckYourAnswersController.onPageLoad()
+          res mustBe agentBulkRoutes.CheckYourAnswersController.onPageLoad()
         }
       }
     }
@@ -282,6 +283,19 @@ class StfAgentNavigatorSpec extends SpecBase with ScalaFutures {
           res mustBe cyaPage
         }
       }
+
+      "must go from the AgentReferencePage to BulkCheckYourAnswerPage in agent bulk upload journey" in {
+        val updatedUserAnswers = emptyUserAnswers.set(HowToNotifyAboutSecuritiesTransferPage, HowToNotifyAboutSecuritiesTransfer.MoreThanOneAtATime).success.value
+        val result = navigator.previousPage(AgentReferencePage, CheckMode, updatedUserAnswers)
+        result mustBe agentBulkRoutes.CheckYourAnswersController.onPageLoad()
+      }
+
+      "must go from the AgentReferencePage to CheckYourAnswersPage in agent individual upload journey" in {
+        val updatedUserAnswers = emptyUserAnswers.set(HowToNotifyAboutSecuritiesTransferPage, HowToNotifyAboutSecuritiesTransfer.OneAtATime).success.value
+        val result = navigator.previousPage(AgentReferencePage, CheckMode, updatedUserAnswers)
+        result mustBe cyaPage
+      }
+
     }
 
     "in Previous Pages" - {
@@ -389,6 +403,14 @@ class StfAgentNavigatorSpec extends SpecBase with ScalaFutures {
         val result = navigator.previousPage(TotalMarketValuePage, NormalMode, emptyUserAnswers)
         result mustBe agentSingleRoutes.AmountPaidForSecuritiesController.onPageLoad(NormalMode)
       }
+
+      "must go from the BulkCheckYourAnswersPage to AgentReferencePage" in {
+        val fileUploadRef = "testRef"
+        val userAnswersWithUploadRef = emptyUserAnswers.setFileUploadReference(fileUploadRef)
+        val result = navigator.previousPage(BulkCheckYourAnswersPage, NormalMode, userAnswersWithUploadRef)
+        result mustBe agentBulkRoutes.AgentReferenceController.onPageLoad(NormalMode, fileUploadRef)
+      }
+
     }
   }
 }

@@ -31,7 +31,7 @@ import uk.gov.hmrc.securitiestransferchargefrontend.controllers.routes.JourneyRe
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.agents.bulk.routes as stfBulkRoutes
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.sh03.agents.bulk.routes as sh03BulkRoutes
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.sh03.organisations.bulk.routes as sh03OrgBulkRoutes
-import uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.shared.bulk.routes as stfCyaRoutes
+import uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.individuals.bulk.routes as individualBulkRoutes
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.sh03.shared.bulk.routes as sh03CyaRoutes
 import uk.gov.hmrc.securitiestransferchargefrontend.models.stf.upscan.UpscanCallbackRequest.UploadDetails
 import uk.gov.hmrc.securitiestransferchargefrontend.models.{JourneyType, NormalMode}
@@ -433,13 +433,13 @@ class FileProcessingControllerSpec extends SpecBase with MockitoSugar {
 
 
               (affinityGroup, journeyType) match {
-                case (AffinityGroup.Agent, JourneyType.STF) => redirectLocation(result).value mustEqual stfBulkRoutes.AgentReferenceController.onPageLoad(NormalMode).url
+                case (AffinityGroup.Agent, JourneyType.STF) => redirectLocation(result).value mustEqual stfBulkRoutes.AgentReferenceController.onPageLoad(NormalMode, reference).url
 
                 case (AffinityGroup.Agent, JourneyType.SH03) => redirectLocation(result).value mustEqual sh03BulkRoutes.RoleAtPurchasingCompanyController.onPageLoad(NormalMode).url
 
                 case (AffinityGroup.Organisation, JourneyType.SH03) => redirectLocation(result).value mustEqual sh03OrgBulkRoutes.RoleAtPurchasingCompanyController.onPageLoad(NormalMode).url
 
-                case (_, JourneyType.STF) => redirectLocation(result).value mustEqual stfCyaRoutes.CheckYourAnswersController.onPageLoad().url
+                case (_, JourneyType.STF) => redirectLocation(result).value mustEqual individualBulkRoutes.CheckYourAnswersController.onPageLoad(reference).url
 
                 case (_, JourneyType.SH03) => redirectLocation(result).value mustEqual sh03CyaRoutes.CheckYourAnswersController.onPageLoad().url
               }

@@ -47,5 +47,8 @@ class NavigationHelper(defaultPage: Call):
    */
   protected[navigation] def userAnswersDependent(userAnswers: UserAnswers)(f: UserAnswers => Call): Call =
     f(userAnswers)
+  
+  protected[navigation] def getFileUploadRef(userAnswers: UserAnswers): String =
+    userAnswers.getFileUploadReference()
     
 

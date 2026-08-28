@@ -17,6 +17,7 @@
 @import uk.gov.hmrc.govukfrontend.views.html.components._
 @import uk.gov.hmrc.securitiestransferchargefrontend.viewmodels.stf.shared.single.CheckYourAnswersViewModel
 @import uk.gov.hmrc.securitiestransferchargefrontend.views.html.components.SaveAndReturnButton
+@import uk.gov.hmrc.securitiestransferchargefrontend.views.html.components.PrintLink
 @import uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.agents.single.routes as agentRoutes
 @import uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.shared.routes as sharedRoutes
 @import views.html.helper.CSPNonce
@@ -57,9 +58,7 @@
 
      <div class="govuk-!-margin-top-9">
         <h2 class="govuk-heading-m">@messages(CheckYourAnswersViewModel.MessageKeys.printHeading)</h2>
-        <p class="govuk-body">
-            @messages("checkYourAnswers.print.p1") <a href="#" class="govuk-link govuk-link--no-visited-state" id="print-this-page">@messages("checkYourAnswers.print.content.link.text")</a> @messages("checkYourAnswers.print.p3")
-        </p>
+         @PrintLink()
     </div>
 
     <h2 class="govuk-heading-m govuk-!-margin-top-9">@messages(CheckYourAnswersViewModel.MessageKeys.declarationHeading)</h2>

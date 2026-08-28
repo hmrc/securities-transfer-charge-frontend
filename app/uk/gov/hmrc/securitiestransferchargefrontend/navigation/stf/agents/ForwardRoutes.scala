@@ -23,7 +23,6 @@ import uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.agents.bulk.
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.agents.routes as agentRoutes
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.agents.single.routes as agentSingleRoutes
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.shared.routes as sharedRoutes
-import uk.gov.hmrc.securitiestransferchargefrontend.controllers.routes
 import uk.gov.hmrc.securitiestransferchargefrontend.models.stf.HowToNotifyAboutSecuritiesTransfer.{MoreThanOneAtATime, OneAtATime}
 import uk.gov.hmrc.securitiestransferchargefrontend.models.{CheckMode, Mode, NormalMode, UserAnswers}
 import uk.gov.hmrc.securitiestransferchargefrontend.navigation.PersistentNavigationHelper
@@ -46,6 +45,7 @@ class ForwardRoutes(answerPersistenceService: AnswerPersistenceService,
 
   private val firstDate = appConfig.firstChargingPoint
   private lazy val cyaPage = agentSingleRoutes.CheckYourAnswersController.onPageLoad()
+  private lazy val bulkCyaPage = agentBulkRoutes.CheckYourAnswersController.onPageLoad()
   
   def forwardRoutes(page: Page, mode: Mode)(implicit hc: HeaderCarrier): UserAnswers => Future[Call] = mode match {
     case NormalMode => normalRoutes(page)
@@ -64,7 +64,7 @@ class ForwardRoutes(answerPersistenceService: AnswerPersistenceService,
     case AgentReferencePage => userAnswers => {
       dataDependent(HowToNotifyAboutSecuritiesTransferPage, userAnswers) {
         case OneAtATime => agentSingleRoutes.NameOfBuyerController.onPageLoad(NormalMode)
-        case MoreThanOneAtATime => routes.CheckYourAnswersController.onPageLoad()
+        case MoreThanOneAtATime => bulkCyaPage
       }
     }
     case NameOfBuyerPage => userAnswers => dataRequired(NameOfBuyerPage, userAnswers, agentSingleRoutes.AddressController.onPageLoad(NormalMode))
@@ -106,5 +106,6 @@ class ForwardRoutes(answerPersistenceService: AnswerPersistenceService,
   }
   
   def checkRoutes(page: Page)(implicit hc: HeaderCarrier): UserAnswers => Future[Call] = page match {
+    case AgentReferencePage => userAnswers => goTo(bulkCyaPage, Some(userAnswers))
     case _ => userAnswers => goTo(cyaPage, Some(userAnswers))
   }

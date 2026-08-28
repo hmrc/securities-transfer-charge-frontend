@@ -17,6 +17,7 @@
 package uk.gov.hmrc.securitiestransferchargefrontend.models.stf.cya
 
 import play.api.i18n.Messages
+import uk.gov.hmrc.govukfrontend.views.Aliases.{Card, CardTitle, SummaryList, Text}
 import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.SummaryListRow
 import uk.gov.hmrc.securitiestransferchargefrontend.models.UserAnswers
 import uk.gov.hmrc.securitiestransferchargefrontend.pages.stf.single.*
@@ -78,6 +79,22 @@ object StfAgentRowBuilder  {
       buildOtherSecuritiesDetailsRows(userAnswers, isConnectedPersons)
   }
 
+  def formatWithCommas(n: Int): String = {
+    "%,d".format(n)
+  }
+
+  def buildFileDetailsCard(fileName: String, rows: Int)(implicit messages: Messages): SummaryList = {
+    val formattedRows = formatWithCommas(rows)
+    SummaryList(
+      card = Some(Card(
+        title = Some(CardTitle(content = Text(messages("agent.checkYourAnswers.fileDetails.heading"))))
+      )),
+      rows = Seq(
+        FileDetailsSummary.row(fileName),
+        NumberOfRowsSummary.row(formattedRows)
+      ).flatten
+    )
+  }
 
   private def buildSharesDetailsRows(
                                       userAnswers: UserAnswers,

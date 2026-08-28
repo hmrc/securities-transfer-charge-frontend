@@ -19,6 +19,7 @@ package models.stf.cya
 import base.{Fixtures, SpecBase}
 import play.api.i18n.Messages
 import play.api.test.Helpers.stubMessagesApi
+import uk.gov.hmrc.govukfrontend.views.Aliases.Text
 import uk.gov.hmrc.securitiestransferchargefrontend.models.shared.AgentReference
 import uk.gov.hmrc.securitiestransferchargefrontend.models.stf.TaxRate.HalfPercent
 import uk.gov.hmrc.securitiestransferchargefrontend.models.stf.cya.StfAgentRowBuilder
@@ -158,6 +159,18 @@ class StfAgentRowBuilderSpec extends SpecBase {
 
         rows.size mustBe 2
       }
+    }
+
+    "buildFileDetailsCard" - {
+        "must build summary list with file name and number of rows" in {
+          val fileName = "testFile.csv"
+          val noOfRows = 8
+          val result = StfAgentRowBuilder.buildFileDetailsCard(fileName, noOfRows)
+
+          result.rows.size mustBe 2
+          result.rows.head.value.content mustBe Text("testFile.csv")
+          result.rows.map(_.value.content) must contain(Text("8"))
+        }
     }
   }
 }

@@ -109,6 +109,7 @@ class UserAnswersValidatorSpec extends AnyFreeSpec with Matchers with ScalaFutur
       GroupIdentifier("test-group-id"),
       SubmissionId("test-submission-id"),
       None,
+      None,
       jsonData
     )
   }
