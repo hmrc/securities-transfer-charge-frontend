@@ -30,6 +30,7 @@ import uk.gov.hmrc.securitiestransferchargefrontend.pages.*
 import uk.gov.hmrc.securitiestransferchargefrontend.pages.sh03.*
 import uk.gov.hmrc.securitiestransferchargefrontend.pages.sh03.bulk.{BulkCompanyDetailsPage, BulkRoleAtPurchasingCompanyPage, CannotSubmitFormErrorPage}
 import uk.gov.hmrc.securitiestransferchargefrontend.models.JourneyType.SH03
+import uk.gov.hmrc.securitiestransferchargefrontend.pages.sh03.shared.CheckYourAnswersPage
 
 class BackwardsRoutes(defaultPage: Call):
 
@@ -80,6 +81,7 @@ class BackwardsRoutes(defaultPage: Call):
         }
       }
     case RoleAtPurchasingCompanyPage => _ => sh03OrgSingleRoutes.ChargingPointController.onPageLoad(NormalMode)
+    case CheckYourAnswersPage => _ => sh03OrgSingleRoutes.RoleAtPurchasingCompanyController.onPageLoad(NormalMode)
     case BulkCompanyDetailsPage => _ => sh03OrgRoutes.HowToNotifyAboutShareBuybackController.onPageLoad()
     case BulkRoleAtPurchasingCompanyPage => _ => routes.FileUploadController.onPageLoad(SH03)
     case CannotSubmitFormErrorPage => _ => sh03OrgBulkRoutes.RoleAtPurchasingCompanyController.onPageLoad(NormalMode)

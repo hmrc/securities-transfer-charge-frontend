@@ -36,6 +36,7 @@ import uk.gov.hmrc.securitiestransferchargefrontend.pages.sh03.*
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.fileUpload.routes as fileUploadRoutes
 import uk.gov.hmrc.securitiestransferchargefrontend.models.JourneyType.SH03
 import uk.gov.hmrc.securitiestransferchargefrontend.pages.sh03.bulk.{BulkCompanyDetailsPage, BulkRoleAtPurchasingCompanyPage, CannotSubmitFormErrorPage}
+import uk.gov.hmrc.securitiestransferchargefrontend.pages.sh03.shared.CheckYourAnswersPage
 
 import java.time.LocalDate
 
@@ -227,6 +228,11 @@ class Sh03OrgNavigatorSpec extends SpecBase with ScalaFutures {
         "must go from the CannotSubmitFormErrorPage to BulkRoleAtPurchasingCompanyPage" in {
           val result = navigator.previousPage(CannotSubmitFormErrorPage, NormalMode, emptyUserAnswers)
           result mustBe sh03OrgBulkRoutes.RoleAtPurchasingCompanyController.onPageLoad(NormalMode)
+        }
+
+        "must go from the CheckYourAnswersPage to RoleAtPurchasingCompanyPage" in {
+          val result = navigator.previousPage(CheckYourAnswersPage, NormalMode, emptyUserAnswers)
+          result mustBe sh03OrgSingleRoutes.RoleAtPurchasingCompanyController.onPageLoad(NormalMode)
         }
       }
     }

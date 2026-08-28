@@ -1131,7 +1131,7 @@ org.sh03.companyDetails.isPlc.change.hidden = Change if the company is a Public 
 org.sh03.treasuryShares.title = Do these shares also qualify as treasury shares?
 org.sh03.treasuryShares.heading = Do these shares also qualify as treasury shares?
 org.sh03.treasuryShares.checkYourAnswersLabel = Do these shares also qualify as treasury shares?
-org.sh03.treasuryShares.change.hidden = Change if these shares also qualify as treasury shares?
+org.sh03.treasuryShares.change.hidden = Change if these shares also qualify as treasury shares
 org.sh03.treasuryShares.error.required = Select yes if these shares also qualify as treasury shares
 
 org.sh03.connectedPersons.title = Connected persons
