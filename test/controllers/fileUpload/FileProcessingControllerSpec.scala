@@ -32,6 +32,7 @@ import uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.agents.bulk.
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.sh03.agents.bulk.routes as sh03BulkRoutes
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.sh03.organisations.bulk.routes as sh03OrgBulkRoutes
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.individuals.bulk.routes as individualBulkRoutes
+import uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.organisations.bulk.routes as orgBulkRoutes
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.sh03.shared.bulk.routes as sh03CyaRoutes
 import uk.gov.hmrc.securitiestransferchargefrontend.models.stf.upscan.UpscanCallbackRequest.UploadDetails
 import uk.gov.hmrc.securitiestransferchargefrontend.models.{JourneyType, NormalMode}
@@ -439,7 +440,8 @@ class FileProcessingControllerSpec extends SpecBase with MockitoSugar {
 
                 case (AffinityGroup.Organisation, JourneyType.SH03) => redirectLocation(result).value mustEqual sh03OrgBulkRoutes.RoleAtPurchasingCompanyController.onPageLoad(NormalMode).url
 
-                case (_, JourneyType.STF) => redirectLocation(result).value mustEqual individualBulkRoutes.CheckYourAnswersController.onPageLoad(reference).url
+                case (AffinityGroup.Individual, JourneyType.STF) => redirectLocation(result).value mustEqual individualBulkRoutes.CheckYourAnswersController.onPageLoad(reference).url
+                case (_, JourneyType.STF) => redirectLocation(result).value mustEqual orgBulkRoutes.CheckYourAnswersController.onPageLoad(reference).url
 
                 case (_, JourneyType.SH03) => redirectLocation(result).value mustEqual sh03CyaRoutes.CheckYourAnswersController.onPageLoad().url
               }

@@ -21,6 +21,7 @@ import uk.gov.hmrc.govukfrontend.views.Aliases.{Card, CardTitle, SummaryList, Te
 import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.SummaryListRow
 import uk.gov.hmrc.securitiestransferchargefrontend.models.UserAnswers
 import uk.gov.hmrc.securitiestransferchargefrontend.pages.stf.single.*
+import uk.gov.hmrc.securitiestransferchargefrontend.utils.CommonHelpers
 import uk.gov.hmrc.securitiestransferchargefrontend.viewmodels.stf.agents.*
 
 
@@ -79,12 +80,8 @@ object StfAgentRowBuilder  {
       buildOtherSecuritiesDetailsRows(userAnswers, isConnectedPersons)
   }
 
-  def formatWithCommas(n: Int): String = {
-    "%,d".format(n)
-  }
-
   def buildFileDetailsCard(fileName: String, rows: Int)(implicit messages: Messages): SummaryList = {
-    val formattedRows = formatWithCommas(rows)
+    val formattedRows = CommonHelpers.formatWithCommas(rows)
     SummaryList(
       card = Some(Card(
         title = Some(CardTitle(content = Text(messages("agent.checkYourAnswers.fileDetails.heading"))))
