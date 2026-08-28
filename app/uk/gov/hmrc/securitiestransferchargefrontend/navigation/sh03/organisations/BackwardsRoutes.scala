@@ -22,7 +22,6 @@ import uk.gov.hmrc.securitiestransferchargefrontend.controllers.sh03.organisatio
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.sh03.shared.routes as sharedRoutes
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.sh03.organisations.bulk.routes as sh03OrgBulkRoutes
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.fileUpload.routes
-import uk.gov.hmrc.securitiestransferchargefrontend.controllers.sh03.shared.single.routes as sh03CyaRoutes
 import uk.gov.hmrc.securitiestransferchargefrontend.models.sh03.shared.ReasonForPurchase
 import uk.gov.hmrc.securitiestransferchargefrontend.models.{CheckMode, Mode, NormalMode, UserAnswers}
 import uk.gov.hmrc.securitiestransferchargefrontend.navigation.NavigationHelper
@@ -89,5 +88,5 @@ class BackwardsRoutes(defaultPage: Call):
   }
 
   private def checkRoutes(page: Page): Option[UserAnswers] => Call = page match {
-    case _ => _ => sh03CyaRoutes.CheckYourAnswersController.onPageLoad()
+    case _ => _ => sh03OrgSingleRoutes.CheckYourAnswersController.onPageLoad()
   }
