@@ -47,7 +47,7 @@ class CheckYourAnswersController @Inject()(
                                             val controllerComponents: MessagesControllerComponents,
                                             view: CheckYourAnswersView,
                                             taxDueCalculationService: TaxDueCalculationService,
-                                            formattingService: FormattingService
+                                            formattingService: FormattingService,
                                           )(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport {
 
   lazy val backLinkCall: Mode => UserAnswers => Call = mode => userAnswers => navigator.previousPage(CheckYourAnswersPage, mode, userAnswers)
@@ -91,7 +91,7 @@ class CheckYourAnswersController @Inject()(
         nextPage <- navigator.nextPage(CheckYourAnswersPage, NormalMode, request.userAnswers, isReturn(request))
       } yield Redirect(nextPage)
   }
-
+  
   def buildYourDetailsRows(userAnswers: UserAnswers)(implicit messages: Messages): Seq[SummaryListRow] = {
     val addressRow = userAnswers.get(ConfirmAddressPage)
       .map(_ => ConfirmAddressSummary.row(userAnswers))
