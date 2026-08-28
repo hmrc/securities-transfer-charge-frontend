@@ -29,6 +29,7 @@ import uk.gov.hmrc.securitiestransferchargefrontend.models.{Mode, UserAnswers}
 import uk.gov.hmrc.securitiestransferchargefrontend.navigation.*
 import uk.gov.hmrc.securitiestransferchargefrontend.pages.Page
 import uk.gov.hmrc.securitiestransferchargefrontend.pages.sh03.*
+import uk.gov.hmrc.securitiestransferchargefrontend.pages.sh03.shared.CheckYourAnswersPage
 import uk.gov.hmrc.securitiestransferchargefrontend.services.AnswerPersistenceService
 
 import javax.inject.Inject
@@ -56,8 +57,8 @@ class Sh03OrgNavigator @Inject()(
   def errorPage(forPage: Page): Call = forPage match {
     case _ => defaultPage
   }
-
-  val checkRouteMap: Page => UserAnswers => Call = _ => _ => routes.CheckYourAnswersController.onPageLoad()
+  
+  val checkRouteMap: Page => UserAnswers => Call = _ => _ => sh03OrgSingleRoutes.CheckYourAnswersController.onPageLoad()
 
   def restore(submissionId: SubmissionId, userId: UserId)(implicit request: Request[?]): Future[UserAnswers] = {
     implicit val hc: HeaderCarrier = HeaderCarrierConverter.fromRequestAndSession(request, request.session)
@@ -81,11 +82,12 @@ class Sh03OrgNavigator @Inject()(
         .addMapping(MinimumAmountPaidPage, sh03OrgSingleRoutes.MinimumAmountPaidController.onPageLoad)
         .addMapping(ChargingPointPage, sh03OrgSingleRoutes.ChargingPointController.onPageLoad)
         .addMapping(RoleAtPurchasingCompanyPage, sh03OrgSingleRoutes.RoleAtPurchasingCompanyController.onPageLoad)
+        .addMappingNoCheck(CheckYourAnswersPage, sh03OrgSingleRoutes.CheckYourAnswersController.onPageLoad)
         .build
 
     override protected def pageHasValidDataAtPath(userAnswers: UserAnswers, page: GettablePage[_]): Boolean = page match {
       case DetailsOfThisSharePurchasePage if userAnswers.get(ConnectedPersonsPage).contains(true) =>
-        userAnswers.get(DetailsOfThisSharePurchasePage).map(_.marketValue).isDefined
+        userAnswers.get(DetailsOfThisSharePurchasePage).exists(_.marketValue.isDefined)
       case _ => super.pageHasValidDataAtPath(userAnswers, page)
     }
 

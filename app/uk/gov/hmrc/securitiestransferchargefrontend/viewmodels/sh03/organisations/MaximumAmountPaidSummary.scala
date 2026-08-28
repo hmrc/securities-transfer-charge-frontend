@@ -18,6 +18,7 @@ package uk.gov.hmrc.securitiestransferchargefrontend.viewmodels.sh03.organisatio
 
 import play.api.i18n.Messages
 import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.SummaryListRow
+import uk.gov.hmrc.securitiestransferchargefrontend.config.CurrencyFormatter.currencyFormat
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.sh03.organisations.single.routes
 import uk.gov.hmrc.securitiestransferchargefrontend.models.{CheckMode, UserAnswers}
 import uk.gov.hmrc.securitiestransferchargefrontend.pages.sh03.MaximumAmountPaidPage
@@ -32,7 +33,7 @@ object MaximumAmountPaidSummary  {
 
         SummaryListRowViewModel(
           key     = "org.sh03.maximumAmountPaid.checkYourAnswersLabel",
-          value   = ValueViewModel(answer.toString),
+          value   = ValueViewModel(currencyFormat(answer)),
           actions = Seq(
             ActionItemViewModel("site.change", routes.MaximumAmountPaidController.onPageLoad(CheckMode).url)
               .withVisuallyHiddenText(messages("org.sh03.maximumAmountPaid.change.hidden"))

@@ -52,6 +52,7 @@ object CheckYourAnswersViewModel {
 
     // Declaration section
     val declarationHeading = "checkYourAnswers.declaration.heading"
+    val declarationOrgConfirm = "sh03.org.checkYourAnswers.declaration.body"
     val declarationConfirm = "sh03.checkYourAnswers.declaration.body"
     val declarationBullet1 = "checkYourAnswers.declaration.bullet1"
     val declarationBullet2 = "checkYourAnswers.declaration.bullet2"
@@ -70,6 +71,22 @@ object CheckYourAnswersViewModel {
     val sections = Seq(
       SummarySection(MessageKeys.yourDetailsHeading, yourDetails),
       SummarySection(MessageKeys.buyerDetailsHeading, buyerDetails),
+      SummarySection(MessageKeys.transferDetailsHeading, transferDetails)
+    )
+
+    CheckYourAnswersViewModel(sections, declarationDetails, taxDueFormatted, paymentDueDateFormatted)
+  }
+
+  def fromOrganisationSummaryLists(
+                                    yourDetails: SummaryList,
+                                    transferDetails: SummaryList,
+                                    declarationDetails: SummaryList,
+                                    taxDueFormatted: Option[String],
+                                    paymentDueDateFormatted: Option[String]
+                                  ): CheckYourAnswersViewModel = {
+
+    val sections = Seq(
+      SummarySection(MessageKeys.yourDetailsHeading, yourDetails),
       SummarySection(MessageKeys.transferDetailsHeading, transferDetails)
     )
 

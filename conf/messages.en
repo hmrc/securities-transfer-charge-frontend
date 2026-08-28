@@ -101,7 +101,7 @@ checkYourAnswers.taxDue.body = We have calculated the tax due based on the infor
 checkYourAnswers.paymentDueBy = Payment due by:
 checkYourAnswers.declaration.heading = Declaration
 checkYourAnswers.declaration.body = By submitting this form I confirm that the details I am providing are correct to the best of my knowledge.
-
+sh03.org.checkYourAnswers.declaration.body = By submitting this form I confirm that to the best of my knowledge, the details I am providing are correct.
 sh03.checkYourAnswers.declaration.body = By submitting this form I confirm that:
 checkYourAnswers.declaration.bullet1 = to the best of my knowledge, the details I am providing are correct
 checkYourAnswers.declaration.bullet2 = I am authorised by the buyer to submit details on their behalf
@@ -649,7 +649,6 @@ org.detailsOfThisTransfer.error.amountPaid.invalidNumeric = The amount the busin
 org.detailsOfThisTransfer.error.amountPaid.nonNumeric = The amount the business paid for the shares must be a number and can include up to two decimal places, like £30 or £28.60
 org.detailsOfThisTransfer.error.amountPaid.negative = The amount the business paid for the shares must be 0 or more
 org.detailsOfThisTransfer.error.amountPaid.aboveMaximum = The amount the business paid for the shares must be £999,999,999 or below
-
 org.detailsOfThisTransfer.error.marketValue.required = Enter the market value of the shares the business is buying in pounds
 org.detailsOfThisTransfer.error.marketValue.invalidNumeric = The market value of the shares must be a number and can include up to two decimal places, like £30 or £28.60
 org.detailsOfThisTransfer.error.marketValue.nonNumeric = The market value of the shares must be a number and can include up to two decimal places, like £30 or £28.60
@@ -1105,9 +1104,9 @@ org.sh03.shareBuyback.error.required = Select a way to tell us about this share 
 
 org.sh03.whatReliefAreYouApplyingFor.title = Enter the relief the business is applying for
 org.sh03.whatReliefAreYouApplyingFor.heading = Enter the relief the business is applying for
-org.sh03.whatReliefAreYouApplyingFor.checkYourAnswersLabel = Enter the relief the business is applying for
+org.sh03.whatReliefAreYouApplyingFor.checkYourAnswersLabel = Type of relief
 org.sh03.whatReliefAreYouApplyingFor.error.required = Start typing the name of the relief and select from the list
-org.sh03.whatReliefAreYouApplyingFor.change.hidden = Change the relief are you applying for
+org.sh03.whatReliefAreYouApplyingFor.change.hidden = Change the relief the business is applying for
 org.sh03.whatReliefAreYouApplyingFor.p = Start typing the name of the relief and select from the list. See a
 org.sh03.whatReliefAreYouApplyingFor.details.content.link.text = full list of reliefs
 
@@ -1125,21 +1124,24 @@ org.sh03.companyDetails.isPlc.label = Is the purchasing company a Public Limited
 org.sh03.companyDetails.isPlc.error.required = Select yes if the purchasing company is a Public Limited Company (PLC)
 org.sh03.companyDetails.checkYourAnswersLabel = What is the company registration number (CRN)?
 org.sh03.companyDetails.change.hidden = Change company registration number (CRN)
+org.sh03.companyDetails.companyName.change.hidden = Change company name
+org.sh03.companyDetails.crn.change.hidden = Change company number
+org.sh03.companyDetails.isPlc.change.hidden = Change if the company is a Public Limited Company (PLC)
 
 org.sh03.treasuryShares.title = Do these shares also qualify as treasury shares?
 org.sh03.treasuryShares.heading = Do these shares also qualify as treasury shares?
 org.sh03.treasuryShares.checkYourAnswersLabel = Do these shares also qualify as treasury shares?
-org.sh03.treasuryShares.change.hidden = Change do these shares also qualify as treasury shares?
+org.sh03.treasuryShares.change.hidden = Change if these shares also qualify as treasury shares
 org.sh03.treasuryShares.error.required = Select yes if these shares also qualify as treasury shares
 
 org.sh03.connectedPersons.title = Connected persons
 org.sh03.connectedPersons.heading = Connected persons
 org.sh03.connectedPersons.legend = Are the business and the seller connected persons?
-org.sh03.connectedPersons.checkYourAnswersLabel = Are the business and the seller connected persons?
+org.sh03.connectedPersons.checkYourAnswersLabel = Are the business and seller connected persons?
 org.sh03.connectedPersons.error.required = Select yes if the business and the seller are connected persons
 org.sh03.connectedPersons.p = We need to know if the business and the seller of these shares are considered ‘connected persons’ according to
 org.sh03.connectedPersons.content.link.text = section 1122 of the Corporation Tax Act 2010
-org.sh03.connectedPersons.change.hidden = Change connected persons
+org.sh03.connectedPersons.change.hidden = Change if the business and seller are connected persons
 
 org.sh03.chargingPoint.title = Charging point
 org.sh03.chargingPoint.heading = Charging point
@@ -1157,7 +1159,7 @@ org.sh03.chargingPoint.error.required.two = The charging point for this share bu
 org.sh03.chargingPoint.error.required = The charging point for this share buyback must include a {0}
 org.sh03.chargingPoint.error.invalid = The charging point for this share buyback must be a real date
 org.sh03.chargingPoint.error.futureDate = The charging point for this share buyback must be today’s date, or a date in the past
-org.sh03.chargingPoint.change.hidden = Change the charging point
+org.sh03.chargingPoint.change.hidden = Change charging point
 
 org.sh03.detailsOfSharePurchase.title = What are the details of this share purchase?
 org.sh03.detailsOfSharePurchase.heading = What are the details of this share purchase?
@@ -1165,6 +1167,7 @@ org.sh03.detailsOfSharePurchase.numberOfShares = Number of shares
 org.sh03.detailsOfSharePurchase.typeOfShares = Type or class of shares
 org.sh03.detailsOfSharePurchase.amountPaid = Amount paid for the shares in pounds
 org.sh03.detailsOfSharePurchase.marketValue = Market value of the shares in pounds
+org.sh03.detailsOfSharePurchase.checkYourAnswersLabel.marketValue = Market value of the shares
 org.sh03.detailsOfSharePurchase.error.numberOfShares.required = Enter the number of shares the business is purchasing
 org.sh03.detailsOfSharePurchase.error.numberOfShares.nonNumeric = The amount of shares must be a number
 org.sh03.detailsOfSharePurchase.error.numberOfShares.wholeNumber = The number of shares must be a whole number between 1 and 999,999,999
@@ -1182,6 +1185,10 @@ org.sh03.detailsOfSharePurchase.error.marketValue.invalidNumeric = The market va
 org.sh03.detailsOfSharePurchase.error.marketValue.nonNumeric = The market value of the shares must be a number and can include up to two decimal places, like £30 or £28.60
 org.sh03.detailsOfSharePurchase.error.marketValue.aboveMaximum = The market value of the shares must be £999,999,999 or below
 org.sh03.detailsOfSharePurchase.error.marketValue.belowMinimum = The market value of the shares must be £0.01 or more
+org.sh03.detailsOfThisTransfer.numberOfShares.change.hidden = Change number of shares
+org.sh03.detailsOfThisTransfer.typeOfShares.change.hidden = Change type or class of shares
+org.sh03.detailsOfThisTransfer.amountPaid.change.hidden = Change amount paid for the shares
+org.sh03.detailsOfThisTransfer.marketValue.change.hidden = 	Change market value of the shares
 
 
 org.sh03.roleAtPurchasingCompany.title = What is your role within the purchasing company?
@@ -1197,7 +1204,8 @@ org.sh03.roleAtPurchasingCompany.ukSocietas = I’m acting on behalf of a UK Soc
 org.sh03.roleAtPurchasingCompany.uksOrgan.label = Which UKS organ are you a member of?
 org.sh03.roleAtPurchasingCompany.notProvided = None of these
 org.sh03.roleAtPurchasingCompany.checkYourAnswersLabel = What is your role within the purchasing company?
-org.sh03.roleAtPurchasingCompany.change.hidden = Change what is your role within the purchasing company?
+org.sh03.roleAtPurchasingCompany.change.hidden = Change your role within the purchasing company
+org.sh03.roleAtPurchasingCompany.uksOrgan.change.hidden = Change which UKS organ you are a member of
 
 org.sh03.roleAtPurchasingCompany.error.required = Select your role within the purchasing company, or none of these
 org.sh03.roleAtPurchasingCompany.uksOrgan.error.required = Enter the UKS organ you are a member of
@@ -1206,8 +1214,8 @@ org.sh03.roleAtPurchasingCompany.uksOrgan.error.length = The UKS organ you are a
 
 org.sh03.minimumAmountPaid.title = What is the minimum amount paid for the shares, in pounds?
 org.sh03.minimumAmountPaid.heading = What is the minimum amount paid for the shares, in pounds?
-org.sh03.minimumAmountPaid.checkYourAnswersLabel = What is the minimum amount paid for the shares, in pounds?
-org.sh03.minimumAmountPaid.change.hidden = What is the minimum amount paid for the shares, in pounds?
+org.sh03.minimumAmountPaid.checkYourAnswersLabel = Minimum amount paid for the shares
+org.sh03.minimumAmountPaid.change.hidden = Change the minimum amount paid for the shares
 org.sh03.minimumAmountPaid.error.required = Enter the minimum amount paid for the shares
 org.sh03.minimumAmountPaid.error.invalidNumeric = The minimum amount paid for the shares must be a number and can include up to two decimal places, like £30 or £28.60
 org.sh03.minimumAmountPaid.error.nonNumeric = The minimum amount paid for the shares must be a number and can include up to two decimal places, like £30 or £28.60
@@ -1217,7 +1225,7 @@ org.sh03.minimumAmountPaid.error.aboveMaximum = The minimum amount paid for the 
 
 org.sh03.maximumAmountPaid.title = What is the maximum amount paid for the shares, in pounds?
 org.sh03.maximumAmountPaid.heading = What is the maximum amount paid for the shares, in pounds?
-org.sh03.maximumAmountPaid.checkYourAnswersLabel = What is the maximum amount paid for the shares, in pounds?
+org.sh03.maximumAmountPaid.checkYourAnswersLabel = Maximum amount paid for the shares
 org.sh03.maximumAmountPaid.error.required = Enter the maximum amount paid for the shares
 org.sh03.maximumAmountPaid.error.invalidNumeric = The maximum amount paid for the shares must be a number and can include up to two decimal places, like £30 or £28.60
 org.sh03.maximumAmountPaid.error.negative = The maximum amount paid for the shares must be £0.01 or more
@@ -1241,7 +1249,7 @@ org.sh03.applyingForRelief.title = Is the business applying for a relief?
 org.sh03.applyingForRelief.heading = Is the business applying for a relief?
 org.sh03.applyingForRelief.checkYourAnswersLabel = Is the business applying for a relief?
 org.sh03.applyingForRelief.error.required = Select yes if the business is applying for a relief
-org.sh03.applyingForRelief.change.hidden = Change applying for a relief
+org.sh03.applyingForRelief.change.hidden = Change if the business is applying for a relief
 org.sh03.applyingForRelief.p = See a
 org.sh03.applyingForRelief.details.content.link.text = full list of reliefs
 
