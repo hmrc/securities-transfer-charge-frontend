@@ -18,25 +18,32 @@ package uk.gov.hmrc.securitiestransferchargefrontend.viewmodels.sh03.organisatio
 
 import play.api.i18n.Messages
 import play.twirl.api.HtmlFormat
+import uk.gov.hmrc.govukfrontend.views.viewmodels.content.HtmlContent
 import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.SummaryListRow
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.sh03.organisations.single.routes
 import uk.gov.hmrc.securitiestransferchargefrontend.models.{CheckMode, UserAnswers}
-import uk.gov.hmrc.securitiestransferchargefrontend.pages.sh03.WhatReliefAreYouApplyingForPage
+import uk.gov.hmrc.securitiestransferchargefrontend.pages.sh03.ReasonForPurchasePage
 import uk.gov.hmrc.securitiestransferchargefrontend.viewmodels.govuk.summarylist.*
 import uk.gov.hmrc.securitiestransferchargefrontend.viewmodels.implicits.*
 
-object WhatReliefAreYouApplyingForSummary  {
+object ReasonForPurchaseSummary  {
 
   def row(answers: UserAnswers)(implicit messages: Messages): Option[SummaryListRow] =
-    answers.get(WhatReliefAreYouApplyingForPage).map {
+    answers.get(ReasonForPurchasePage).map {
       answer =>
 
+        val value = ValueViewModel(
+          HtmlContent(
+            HtmlFormat.escape(messages(s"reasonForPurchase.$answer"))
+          )
+        )
+
         SummaryListRowViewModel(
-          key     = "org.sh03.whatReliefAreYouApplyingFor.checkYourAnswersLabel",
-          value   = ValueViewModel(HtmlFormat.escape(answer).toString),
+          key     = "org.sh03.reasonForPurchase.checkYourAnswersLabel",
+          value   = value,
           actions = Seq(
-            ActionItemViewModel("site.change", routes.WhatReliefAreYouApplyingForController.onPageLoad(CheckMode).url)
-              .withVisuallyHiddenText(messages("org.sh03.whatReliefAreYouApplyingFor.change.hidden"))
+            ActionItemViewModel("site.change", routes.ReasonForPurchaseController.onPageLoad(CheckMode).url)
+              .withVisuallyHiddenText(messages("org.sh03.reasonForPurchase.change.hidden"))
           )
         )
     }

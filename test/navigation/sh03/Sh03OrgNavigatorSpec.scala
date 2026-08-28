@@ -26,7 +26,6 @@ import uk.gov.hmrc.securitiestransferchargefrontend.config.FrontendAppConfig
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.sh03.organisations.routes as sh03OrgRoutes
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.sh03.organisations.single.routes as sh03OrgSingleRoutes
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.sh03.shared.routes as sharedRoutes
-import uk.gov.hmrc.securitiestransferchargefrontend.controllers.sh03.shared.single.routes as sh03CyaRoutes
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.sh03.organisations.bulk.routes as sh03OrgBulkRoutes
 import uk.gov.hmrc.securitiestransferchargefrontend.models.sh03.HowToNotifyAboutShareBuyback
 import uk.gov.hmrc.securitiestransferchargefrontend.models.sh03.shared.*
@@ -45,7 +44,7 @@ class Sh03OrgNavigatorSpec extends SpecBase with ScalaFutures {
   private val mockConfig: FrontendAppConfig = mock[FrontendAppConfig]
   when(mockConfig.firstChargingPoint).thenReturn(LocalDate.of(2026, 1, 1))
 
-  lazy val cyaPage: Call = sh03CyaRoutes.CheckYourAnswersController.onPageLoad()
+  lazy val cyaPage: Call = sh03OrgSingleRoutes.CheckYourAnswersController.onPageLoad()
   val navigator = new Sh03OrgNavigator(StubAnswerPersistenceService(), mockConfig)
 
   private val companyDetails = CompanyDetails(
@@ -332,6 +331,60 @@ class Sh03OrgNavigatorSpec extends SpecBase with ScalaFutures {
     "must go from the RoleAtPurchasingCompanyPage to ChargingPointPage" in {
       val result = navigator.previousPage(RoleAtPurchasingCompanyPage, NormalMode, emptyUserAnswers)
       result mustBe sh03OrgSingleRoutes.ChargingPointController.onPageLoad(NormalMode)
+    }
+  }
+
+  "UserAnswersValidator" - {
+
+    "must return Right(true) for a complete and valid set of user answers" in {
+      val answers = emptyUserAnswers
+        .set(CompanyDetailsPage, companyDetails).get
+        .set(ReasonForPurchasePage, ReasonForPurchase.ForCancellation).get
+        .set(TreasurySharesPage, true).get
+        .set(ConnectedPersonsPage, true).get
+        .set(ApplyingForReliefPage, false).get
+        .set(DetailsOfThisSharePurchasePage, purchaseDetails).get
+        .set(MaximumAmountPaidPage, BigDecimal(350)).get
+        .set(MinimumAmountPaidPage, BigDecimal(100)).get
+        .set(ChargingPointPage, LocalDate.now()).get
+        .set(RoleAtPurchasingCompanyPage, RoleAtPurchasingCompany(role = "Director", uksOrgan = None)).get
+
+      val result = navigator.userAnswersValidator.validate(answers)(fakeRequest).futureValue
+      result mustBe Right(true)
+    }
+
+    "must return Left(Call) to DetailsOfThisSharePurchasePage when ConnectedPersons is true but marketValue is None" in {
+      val answers = emptyUserAnswers
+        .set(CompanyDetailsPage, companyDetails).get
+        .set(ReasonForPurchasePage, ReasonForPurchase.ForCancellation).get
+        .set(TreasurySharesPage, true).get
+        .set(ConnectedPersonsPage, true).get
+        .set(ApplyingForReliefPage, false).get
+        .set(DetailsOfThisSharePurchasePage, purchaseDetails.copy(marketValue = None)).get
+        .set(MaximumAmountPaidPage, BigDecimal(350)).get
+        .set(MinimumAmountPaidPage, BigDecimal(100)).get
+        .set(ChargingPointPage, LocalDate.now()).get
+        .set(RoleAtPurchasingCompanyPage, RoleAtPurchasingCompany(role = "Director", uksOrgan = None)).get
+
+      val result = navigator.userAnswersValidator.validate(answers)(fakeRequest).futureValue
+      result mustBe Left(sh03OrgSingleRoutes.DetailsOfThisSharePurchaseController.onPageLoad(CheckMode))
+    }
+
+    "must return Right(true) when ConnectedPersons is false and marketValue is None" in {
+      val answers = emptyUserAnswers
+        .set(CompanyDetailsPage, companyDetails).get
+        .set(ReasonForPurchasePage, ReasonForPurchase.ForCancellation).get
+        .set(TreasurySharesPage, true).get
+        .set(ConnectedPersonsPage, false).get
+        .set(ApplyingForReliefPage, false).get
+        .set(DetailsOfThisSharePurchasePage, purchaseDetails.copy(marketValue = None)).get
+        .set(MaximumAmountPaidPage, BigDecimal(350)).get
+        .set(MinimumAmountPaidPage, BigDecimal(100)).get
+        .set(ChargingPointPage, LocalDate.now()).get
+        .set(RoleAtPurchasingCompanyPage, RoleAtPurchasingCompany(role = "Director", uksOrgan = None)).get
+
+      val result = navigator.userAnswersValidator.validate(answers)(fakeRequest).futureValue
+      result mustBe Right(true)
     }
   }
 }
