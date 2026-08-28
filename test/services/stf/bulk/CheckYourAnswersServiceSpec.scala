@@ -65,8 +65,8 @@ class CheckYourAnswersServiceSpec extends SpecBase with FileUploadFixtures {
       when(taxDueCalculationService.calculateTaxDue(row2))
         .thenReturn(Some(BigDecimal("20000.00")))
 
-      when(formattingService.formatTaxDue(BigDecimal("30000.00")))
-        .thenReturn("£30000.00")
+      when(taxDueCalculationService.formatCurrency(BigDecimal("30000.00")))
+        .thenReturn("£30,000.00")
 
       when(formattingService.formatPaymentDueDate(any[LocalDate])(any()))
         .thenReturn("3 March 2026")
@@ -76,7 +76,7 @@ class CheckYourAnswersServiceSpec extends SpecBase with FileUploadFixtures {
       result shouldBe CheckYourAnswersViewModel(
         fileName = "test.csv",
         numberOfTransfers = 2,
-        taxDue = "£30000.00",
+        taxDue = "£30,000.00",
         paymentDueBy = "3 March 2026",
         transfers = Seq(
           Transfer(
@@ -135,7 +135,7 @@ class CheckYourAnswersServiceSpec extends SpecBase with FileUploadFixtures {
       when(taxDueCalculationService.calculateTaxDue(row2))
         .thenReturn(Some(BigDecimal("25.75")))
 
-      when(formattingService.formatTaxDue(BigDecimal("38.25")))
+      when(taxDueCalculationService.formatCurrency(BigDecimal("38.25")))
         .thenReturn("£38.25")
 
       when(formattingService.formatPaymentDueDate(LocalDate.of(2026, 1, 31)))

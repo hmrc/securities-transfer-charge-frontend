@@ -20,6 +20,7 @@ import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.{Card, SummaryList
 import uk.gov.hmrc.securitiestransferchargefrontend.viewmodels.stf.fileupload.{FileNameSummary, NumberOfFilesSummary}
 import play.api.i18n.Messages
 import uk.gov.hmrc.govukfrontend.views.Aliases.{CardTitle, Text}
+import uk.gov.hmrc.securitiestransferchargefrontend.utils.CommonHelpers
 
 
 case class CheckYourAnswersViewModel(fileName: String, numberOfTransfers: Int, taxDue: String, paymentDueBy: String, transfers: Seq[Transfer]) {
@@ -27,7 +28,7 @@ case class CheckYourAnswersViewModel(fileName: String, numberOfTransfers: Int, t
   def fileDetailsSummaryRows(implicit messages: Messages): Seq[SummaryListRow] =
     Seq(
       FileNameSummary.row(fileName),
-      NumberOfFilesSummary.row(numberOfTransfers.toString)
+      NumberOfFilesSummary.row(CommonHelpers.formatWithCommas(numberOfTransfers))
     )
 
   def fileDetailsCard(implicit messages: Messages): Card = Card(

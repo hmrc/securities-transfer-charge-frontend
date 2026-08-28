@@ -29,6 +29,7 @@ import uk.gov.hmrc.securitiestransferchargefrontend.controllers.sh03.agents.bulk
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.sh03.organisations.bulk.routes as sh03OrgBulkRoutes
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.sh03.shared.bulk.routes as sh03CyaRoutes
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.individuals.bulk.routes as stfBulkIndRoutes
+import uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.organisations.bulk.routes as stfBulkOrgRoutes
 import uk.gov.hmrc.securitiestransferchargefrontend.models.{JourneyType, NormalMode}
 import uk.gov.hmrc.securitiestransferchargefrontend.models.stf.upscan.{FileUpload, UpscanJourneyStatus}
 import uk.gov.hmrc.securitiestransferchargefrontend.repositories.UpscanJourneyRepository
@@ -136,12 +137,16 @@ class FileProcessingController @Inject()(
         (request.affinityGroup, journeyType) match {
           case (AffinityGroup.Agent, JourneyType.STF) => Future.successful(Redirect(stfBulkRoutes.AgentReferenceController.onPageLoad(NormalMode, reference)))
 
+          case (AffinityGroup.Individual, JourneyType.STF) => Future.successful(Redirect(stfBulkIndRoutes.CheckYourAnswersController.onPageLoad(reference)))
+          
+          case (_, JourneyType.STF) => Future.successful(Redirect(stfBulkOrgRoutes.CheckYourAnswersController.onPageLoad(reference)))
+
+
           case (AffinityGroup.Agent, JourneyType.SH03) => Future.successful(Redirect(sh03BulkRoutes.RoleAtPurchasingCompanyController.onPageLoad(NormalMode)))
 
           case (AffinityGroup.Organisation, JourneyType.SH03) => Future.successful(Redirect(sh03OrgBulkRoutes.RoleAtPurchasingCompanyController.onPageLoad(NormalMode)))
 
           case (_, JourneyType.SH03) => Future.successful(Redirect(sh03CyaRoutes.CheckYourAnswersController.onPageLoad()))
-          case (_, JourneyType.STF) => Future.successful(Redirect(stfBulkIndRoutes.CheckYourAnswersController.onPageLoad(reference)))
         }
     }
   }

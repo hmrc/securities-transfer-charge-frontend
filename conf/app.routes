@@ -17,6 +17,10 @@ GET        /stf/bulk/check-your-answers                 uk.gov.hmrc.securitiestr
 GET        /stf/bulk/check-your-answers/:reference      uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.individuals.bulk.CheckYourAnswersController.onPageLoad(reference: String)
 POST       /stf/bulk/check-your-answers                 uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.individuals.bulk.CheckYourAnswersController.onSubmit()
 
+GET        /stf/org/bulk/check-your-answers/:reference      uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.organisations.bulk.CheckYourAnswersController.onPageLoad(reference: String)
+POST       /stf/org/bulk/check-your-answers                 uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.organisations.bulk.CheckYourAnswersController.onSubmit()
+
+
 GET        /stf/check-your-answers                      uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.individuals.single.CheckYourAnswersController.onPageLoad()
 POST       /stf/check-your-answers                      uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.individuals.single.CheckYourAnswersController.onSubmit()
 
