@@ -1,0 +1,134 @@
+@*
+ * Copyright 2026 HM Revenue & Customs
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *@
+
+@import uk.gov.hmrc.govukfrontend.views.html.components._
+@import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist._
+@import uk.gov.hmrc.govukfrontend.views.viewmodels.table._
+@import uk.gov.hmrc.securitiestransferchargefrontend.viewmodels.stf.fileupload.CheckYourAnswersViewModel
+@import uk.gov.hmrc.securitiestransferchargefrontend.viewmodels.stf.fileupload.TransferTableViewModel
+@import uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.shared.routes as sharedRoutes
+@import uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.organisations.bulk.routes
+
+@this(
+    layout: uk.gov.hmrc.securitiestransferchargefrontend.views.html.templates.Layout,
+    govukSummaryList: GovukSummaryList,
+    govukTable: GovukTable,
+    govukButton: GovukButton,
+    formHelper: FormWithCSRF
+)
+
+@(viewModel: CheckYourAnswersViewModel, backLinkCall: Call)(implicit request: Request[_],messages: Messages)
+
+@layout(pageTitle = titleNoForm(messages("checkYourAnswers.title"),Some(messages("sectionTitle.stf"))),backLinkUrl = Some(backLinkCall.url)) {
+
+    <h1 class="govuk-heading-l govuk-!-margin-bottom-7">
+        @messages("checkYourAnswers.heading")
+    </h1>
+
+    <h2 class="govuk-heading-m">
+        @messages("checkYourAnswers.bulk.fileDetails.heading")
+    </h2>
+
+    @govukSummaryList(
+        SummaryList(
+            rows = viewModel.fileDetailsSummaryRows,
+            card = Some(viewModel.fileDetailsCard)
+        )
+    )
+
+    <div class="tax-card govuk-!-margin-top-6">
+
+        <h2 class="govuk-heading-m">
+            @messages( "checkYourAnswers.bulk.taxDue.heading", viewModel.taxDue )
+        </h2>
+
+        <p class="govuk-body">
+            @messages("checkYourAnswers.bulk.taxDue.body.p1")
+        </p>
+
+        <p class="govuk-body">
+            @messages("checkYourAnswers.bulk.taxDue.body.p2")
+            <strong>@viewModel.paymentDueBy</strong>
+        </p>
+
+        @govukTable(
+            Table(
+                head = Some(
+                    Seq(
+                        HeadCell(
+                            content = Text(
+                                messages(
+                                    "checkYourAnswers.bulk.taxDue.section.seller.heading"
+                                )
+                            )
+                        ),
+                        HeadCell(
+                            content = Text(
+                                messages(
+                                    "checkYourAnswers.bulk.taxDue.section.securities.heading"
+                                )
+                            )
+                        ),
+                        HeadCell(
+                            content = Text(
+                                messages(
+                                    "checkYourAnswers.bulk.taxDue.section.consideration.heading"
+                                )
+                            ),
+                            classes = "govuk-table__header--numeric"
+                        ),
+                        HeadCell(
+                            content = Text(
+                                messages(
+                                    "checkYourAnswers.bulk.taxDue.section.taxDue.heading"
+                                )
+                            ),
+                            classes = "govuk-table__header--numeric"
+                        )
+                    )
+                ),
+                rows = TransferTableViewModel.rows(
+                    viewModel.transfers
+                )
+            )
+        )
+
+    </div>
+
+    <h2 class="govuk-heading-m govuk-!-margin-top-5">
+        @messages("checkYourAnswers.bulk.declaration.heading")
+    </h2>
+
+    <p class="govuk-body">
+        @messages("checkYourAnswers.bulk.declaration.body")
+    </p>
+
+    <div class="govuk-button-group">
+
+        @formHelper(
+            action = routes.CheckYourAnswersController.onSubmit()
+        ) {
+            @govukButton(
+                ButtonViewModel(
+                    messages("checkYourAnswers.acceptAndSend")
+                )
+            )
+        <a class="govuk-link govuk-!-margin-top-2" href="@sharedRoutes.SubmissionsDashboardController.onPageLoad().url" style="margin-left: -11px">
+            @messages("checkYourAnswers.returnToDashboard")
+        </a>
+        }
+    </div>
+}

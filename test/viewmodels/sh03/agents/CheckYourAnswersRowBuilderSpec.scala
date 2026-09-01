@@ -19,6 +19,7 @@ package viewmodels.sh03.agents
 import base.SpecBase
 import play.api.i18n.Messages
 import play.api.test.Helpers.stubMessages
+import uk.gov.hmrc.govukfrontend.views.Aliases.Text
 import uk.gov.hmrc.securitiestransferchargefrontend.models.sh03.shared.{CompanyDetails, DetailsOfThisSharePurchase, ReasonForPurchase, RoleAtPurchasingCompany}
 import uk.gov.hmrc.securitiestransferchargefrontend.models.shared.AgentReference
 import uk.gov.hmrc.securitiestransferchargefrontend.pages.sh03.*
@@ -33,8 +34,13 @@ class CheckYourAnswersRowBuilderSpec extends SpecBase {
   "CheckYourAnswersRowBuilder" - {
 
     "buildYourDetailsRows" - {
-      "must return an empty sequence when no Agent Reference is present" in {
-        CheckYourAnswersRowBuilder.buildYourDetailsRows(emptyUserAnswers) mustBe Seq.empty
+
+      "must render Not provided when no Agent Reference is present" in {
+        val answers = emptyUserAnswers.set(AgentReferencePage, AgentReference(None)).success.value
+
+        val rows = CheckYourAnswersRowBuilder.buildYourDetailsRows(answers)
+
+        rows.map(_.value.content) must contain(Text("site.notProvided"))
       }
 
       "must return rows when Agent Reference is present" in {

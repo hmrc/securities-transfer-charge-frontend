@@ -50,4 +50,8 @@ object CommonHelpers {
       case AffinityGroup.Organisation => "/securities-transfer-charge/assets/Org_Securities_Transfer_Charge_SH03_template_v1.xlsx"
       case AffinityGroup.Agent => "/securities-transfer-charge/assets/Bulk_SH03_template_v1.xlsx"
     }
+
+  def formatWithCommas(n: Int): String = {
+    "%,d".format(n)
+  }    
 }

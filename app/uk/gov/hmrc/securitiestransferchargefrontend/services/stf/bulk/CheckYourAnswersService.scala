@@ -57,7 +57,7 @@ class CheckYourAnswersService @Inject()(
     CheckYourAnswersViewModel(
       fileName = parsedStcRowsDocument.fileName,
       numberOfTransfers = transfers.size,
-      taxDue = formattingService.formatTaxDue(totalTaxDue),
+      taxDue = taxDueCalculationService.formatCurrency(totalTaxDue),
       paymentDueBy = paymentDueBy,
       transfers = transfers
     )

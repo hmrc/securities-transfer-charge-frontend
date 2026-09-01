@@ -188,7 +188,7 @@ nameOfSeller.title = What’s the seller’s name?
 nameOfSeller.heading = What’s the seller’s name?
 nameOfSeller.checkYourAnswersLabel = Name
 nameOfSeller.error.required = Enter the seller’s full name
-nameOfSeller.error.length = Seller’s name must be 35 characters or less
+nameOfSeller.error.length = Seller’s name must be 40 characters or less
 nameOfSeller.change.hidden = Change seller’s name
 nameOfSeller.hint = This can be a business, person or another entity.
 
@@ -574,7 +574,7 @@ agentReference.error.length = Your reference must be 255 characters or fewer
 agentReference.change.hidden = Change your reference
 
 nameOfBuyer.error.required = Enter the buyer’s name
-nameOfBuyer.error.length = Buyer’s name must be 35 characters or fewer
+nameOfBuyer.error.length = Buyer’s name must be 40 characters or fewer
 
 agent.checkYourAnswers.buyerAddress = Address
 agent.checkYourAnswers.buyerAddress.change.hidden = Change buyer’s address
