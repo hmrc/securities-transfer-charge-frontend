@@ -26,10 +26,10 @@
       "showConfirmChangeText": false
     },
     "manualAddressEntryConfig": {
-      "line1MaxLength": 255,
-      "line2MaxLength": 255,
-      "line3MaxLength": 255,
-      "townMaxLength": 255,
+      "line1MaxLength": 100,
+      "line2MaxLength": 40,
+      "line3MaxLength": 40,
+      "townMaxLength": 40,
       "mandatoryFields": {
         "addressLine1": true,
         "addressLine2": false,

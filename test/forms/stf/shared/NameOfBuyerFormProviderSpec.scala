@@ -24,7 +24,7 @@ class NameOfBuyerFormProviderSpec extends StringFieldBehaviours {
 
   val requiredKey = "nameOfBuyer.error.required"
   val lengthKey = "nameOfBuyer.error.length"
-  val maxLength = 35
+  val maxLength = 40
 
   val form = new NameOfBuyerFormProvider()()
 
