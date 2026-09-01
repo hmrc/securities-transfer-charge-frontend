@@ -25,10 +25,13 @@ import uk.gov.hmrc.securitiestransferchargefrontend.pages.sh03.AgentReferencePag
 import uk.gov.hmrc.securitiestransferchargefrontend.viewmodels.govuk.summarylist.*
 import uk.gov.hmrc.securitiestransferchargefrontend.viewmodels.implicits.*
 
-object AgentReferenceSummary  {
+object AgentReferenceSummary {
 
   def row(answers: UserAnswers)(implicit messages: Messages): Option[SummaryListRow] = {
-    val value = answers.get(AgentReferencePage).flatMap(_.agentReference).getOrElse(messages("site.notProvided"))
+
+    val value = answers.get(AgentReferencePage)
+      .flatMap(_.agentReference)
+      .getOrElse(messages("site.notProvided"))
 
     Some(SummaryListRowViewModel(
       key = "agentReference.checkYourAnswersLabel",
