@@ -27,18 +27,17 @@ import uk.gov.hmrc.securitiestransferchargefrontend.viewmodels.implicits.*
 
 object AgentReferenceSummary  {
 
-  def row(answers: UserAnswers)(implicit messages: Messages): Option[SummaryListRow] =
-    answers.get(AgentReferencePage).flatMap { answer =>
-      answer.agentReference.map { value =>
+  def row(answers: UserAnswers)(implicit messages: Messages): Option[SummaryListRow] = {
+    val value = answers.get(AgentReferencePage).flatMap(_.agentReference).getOrElse(messages("site.notProvided"))
 
-        SummaryListRowViewModel(
-          key = "agentReference.checkYourAnswersLabel",
-          value = ValueViewModel(HtmlFormat.escape(value).toString),
-          actions = Seq(
-            ActionItemViewModel("site.change", routes.AgentReferenceController.onPageLoad(CheckMode).url)
-              .withVisuallyHiddenText(messages("agentReference.change.hidden"))
-          )
-        )
-      }
-    }
+    Some(SummaryListRowViewModel(
+      key = "agentReference.checkYourAnswersLabel",
+      value = ValueViewModel(HtmlFormat.escape(value).toString),
+      actions = Seq(
+        ActionItemViewModel("site.change", routes.AgentReferenceController.onPageLoad(CheckMode).url)
+          .withVisuallyHiddenText(messages("agentReference.change.hidden"))
+      )
+    )
+    )
+  }
 }

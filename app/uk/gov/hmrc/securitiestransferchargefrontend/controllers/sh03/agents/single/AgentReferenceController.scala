@@ -70,7 +70,7 @@ class AgentReferenceController @Inject()(
           value =>
             for {
               submissionId <- idClient.nextSubmissionId()
-              emptyAnswers = UserAnswers.empty(userId)(group)(submissionId)
+              emptyAnswers = request.userAnswers.getOrElse(UserAnswers.empty(userId)(group)(submissionId))
               updatedAnswers <- Future.fromTry(emptyAnswers.set(AgentReferencePage, value))
               nextPage       <- navigator.nextPage(AgentReferencePage, mode, updatedAnswers, isReturn(request))
             } yield Redirect(nextPage)
