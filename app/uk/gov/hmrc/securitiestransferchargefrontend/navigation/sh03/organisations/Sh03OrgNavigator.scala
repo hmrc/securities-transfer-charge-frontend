@@ -23,12 +23,14 @@ import uk.gov.hmrc.play.http.HeaderCarrierConverter
 import uk.gov.hmrc.securitiestransferchargefrontend.config.FrontendAppConfig
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.routes
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.sh03.organisations.single.routes as sh03OrgSingleRoutes
+import uk.gov.hmrc.securitiestransferchargefrontend.controllers.sh03.organisations.bulk.routes as sh03OrgBulkRoutes
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.shared.routes as sharedRoutes
 import uk.gov.hmrc.securitiestransferchargefrontend.domain.{SubmissionId, UserId}
 import uk.gov.hmrc.securitiestransferchargefrontend.models.{Mode, UserAnswers}
 import uk.gov.hmrc.securitiestransferchargefrontend.navigation.*
 import uk.gov.hmrc.securitiestransferchargefrontend.pages.Page
 import uk.gov.hmrc.securitiestransferchargefrontend.pages.sh03.*
+import uk.gov.hmrc.securitiestransferchargefrontend.pages.sh03.bulk.{BulkCompanyDetailsPage, BulkRoleAtPurchasingCompanyPage}
 import uk.gov.hmrc.securitiestransferchargefrontend.pages.sh03.shared.CheckYourAnswersPage
 import uk.gov.hmrc.securitiestransferchargefrontend.services.AnswerPersistenceService
 
@@ -83,6 +85,8 @@ class Sh03OrgNavigator @Inject()(
         .addMapping(ChargingPointPage, sh03OrgSingleRoutes.ChargingPointController.onPageLoad)
         .addMapping(RoleAtPurchasingCompanyPage, sh03OrgSingleRoutes.RoleAtPurchasingCompanyController.onPageLoad)
         .addMappingNoCheck(CheckYourAnswersPage, sh03OrgSingleRoutes.CheckYourAnswersController.onPageLoad)
+        .addMapping(BulkCompanyDetailsPage, sh03OrgBulkRoutes.CompanyDetailsController.onPageLoad)
+        .addMapping(BulkRoleAtPurchasingCompanyPage, sh03OrgBulkRoutes.RoleAtPurchasingCompanyController.onPageLoad)
         .build
 
     override protected def pageHasValidDataAtPath(userAnswers: UserAnswers, page: GettablePage[_]): Boolean = page match {
