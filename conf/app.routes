@@ -454,8 +454,8 @@ POST       /sh03/agent/bulk/add-reference                       uk.gov.hmrc.secu
 
 GET        /sh03/agent/bulk/company-details                       uk.gov.hmrc.securitiestransferchargefrontend.controllers.sh03.agents.bulk.CompanyDetailsController.onPageLoad(mode: Mode = NormalMode)
 POST       /sh03/agent/bulk/company-details                       uk.gov.hmrc.securitiestransferchargefrontend.controllers.sh03.agents.bulk.CompanyDetailsController.onSubmit(mode: Mode = NormalMode)
-GET        /sh03/agent/bulk/company-details                       uk.gov.hmrc.securitiestransferchargefrontend.controllers.sh03.agents.bulk.CompanyDetailsController.onPageLoad(mode: Mode = CheckMode)
-POST       /sh03/agent/bulk/company-details                       uk.gov.hmrc.securitiestransferchargefrontend.controllers.sh03.agents.bulk.CompanyDetailsController.onSubmit(mode: Mode = CheckMode)
+GET        /sh03/agent/bulk/change/company-details                       uk.gov.hmrc.securitiestransferchargefrontend.controllers.sh03.agents.bulk.CompanyDetailsController.onPageLoad(mode: Mode = CheckMode)
+POST       /sh03/agent/bulk/change/company-details                       uk.gov.hmrc.securitiestransferchargefrontend.controllers.sh03.agents.bulk.CompanyDetailsController.onSubmit(mode: Mode = CheckMode)
 
 GET        /sh03/agent/bulk/template                       uk.gov.hmrc.securitiestransferchargefrontend.controllers.sh03.agents.bulk.TemplateInstructionsController.onPageLoad()
 
@@ -471,8 +471,8 @@ GET        /sh03/bulk/check-your-answers                             uk.gov.hmrc
 
 GET        /sh03/org/bulk/company-details                       uk.gov.hmrc.securitiestransferchargefrontend.controllers.sh03.organisations.bulk.CompanyDetailsController.onPageLoad(mode: Mode = NormalMode)
 POST       /sh03/org/bulk/company-details                       uk.gov.hmrc.securitiestransferchargefrontend.controllers.sh03.organisations.bulk.CompanyDetailsController.onSubmit(mode: Mode = NormalMode)
-GET        /sh03/org/bulk/company-details                       uk.gov.hmrc.securitiestransferchargefrontend.controllers.sh03.organisations.bulk.CompanyDetailsController.onPageLoad(mode: Mode = CheckMode)
-POST       /sh03/org/bulk/company-details                       uk.gov.hmrc.securitiestransferchargefrontend.controllers.sh03.organisations.bulk.CompanyDetailsController.onSubmit(mode: Mode = CheckMode)
+GET        /sh03/org/bulk/change/company-details                       uk.gov.hmrc.securitiestransferchargefrontend.controllers.sh03.organisations.bulk.CompanyDetailsController.onPageLoad(mode: Mode = CheckMode)
+POST       /sh03/org/bulk/change/company-details                       uk.gov.hmrc.securitiestransferchargefrontend.controllers.sh03.organisations.bulk.CompanyDetailsController.onSubmit(mode: Mode = CheckMode)
 
 GET        /sh03/org/bulk/template                       uk.gov.hmrc.securitiestransferchargefrontend.controllers.sh03.organisations.bulk.TemplateInstructionsController.onPageLoad()
 
