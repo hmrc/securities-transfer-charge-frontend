@@ -94,16 +94,7 @@ class SubmissionsDashboardController @Inject()(
             individualsNavigator.nextPage(SubmissionsDashboardPage, NormalMode, emptyAnswers)
         }
       } yield {
-        auditService.audit(
-          AuditModel(
-            StartSubmission,
-            innerRequest.subscriptionId,
-            innerRequest.affinityGroup,
-            innerRequest.credentialId,
-            Some(submissionId),
-            AuditType.Stf
-          )
-        )
+        auditService.audit(AuditModel(StartSubmission, innerRequest.subscriptionId, innerRequest.affinityGroup, innerRequest.credentialId, Some(submissionId), AuditType.Stf))
         Redirect(call)
       }
   }

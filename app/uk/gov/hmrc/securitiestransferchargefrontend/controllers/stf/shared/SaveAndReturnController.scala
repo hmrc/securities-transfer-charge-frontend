@@ -44,16 +44,7 @@ class SaveAndReturnController @Inject()( override val messagesApi: MessagesApi,
         userAnswers <- navigator.restore(SubmissionId(submissionId), userId)
         nextPage     = userAnswers.nextPage.getOrElse(navigator.errorPage(SaveAndReturnPage))
       } yield  {
-        auditService.audit(
-          AuditModel(
-            ContinueSubmission,
-            request.subscriptionId,
-            request.affinityGroup,
-            request.credentialId,
-            Some(SubmissionId(submissionId)),
-            AuditType.Stf
-          )
-        )
+        auditService.audit(AuditModel(ContinueSubmission, request.subscriptionId, request.affinityGroup, request.credentialId, Some(SubmissionId(submissionId)), AuditType.Stf))
         Redirect(nextPage)
       }
     }
