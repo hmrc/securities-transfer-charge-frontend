@@ -69,8 +69,9 @@ class AgentReferenceController @Inject()(
 
           value =>
             for {
-              submissionId <- idClient.nextSubmissionId()
-              emptyAnswers = request.userAnswers.getOrElse(UserAnswers.empty(userId)(group)(submissionId))
+              emptyAnswers <- request.userAnswers.fold {
+                idClient.nextSubmissionId().map(submissionId => UserAnswers.empty(userId)(group)(submissionId))
+              } (Future.successful)
               updatedAnswers <- Future.fromTry(emptyAnswers.set(AgentReferencePage, value))
               nextPage       <- navigator.nextPage(AgentReferencePage, mode, updatedAnswers, isReturn(request))
             } yield Redirect(nextPage)
