@@ -16,13 +16,13 @@
 
 package models.audit
 
-import base.Fixtures.{testAuditType, testCredentialId, testInternalId, testSubmissionId}
+import base.Fixtures.{testAuditType, testCredentialId, testSubmissionId, testSubscriptionId}
 import org.scalatest.freespec.AnyFreeSpec
 import org.scalatest.matchers.must.Matchers
 import play.api.libs.json.Json
 import uk.gov.hmrc.auth.core.AffinityGroup.{Agent, Individual, Organisation}
-import uk.gov.hmrc.securitiestransferchargefrontend.models.audit.{AuditModel, JourneyStatus}
 import uk.gov.hmrc.securitiestransferchargefrontend.domain.CredentialId
+import uk.gov.hmrc.securitiestransferchargefrontend.models.audit.{AuditModel, JourneyStatus}
 
 class AuditModelSpec extends AnyFreeSpec with Matchers {
 
@@ -42,7 +42,7 @@ class AuditModelSpec extends AnyFreeSpec with Matchers {
 
           val expectedJson = Json.obj(
             "journeyStatus"   -> journeyStatus.toString,
-            "internalId"    -> testInternalId,
+            "subscriptionId"    -> testSubscriptionId,
             "affinityGroup" -> affinityGroup.toString,
             "credentialId"  -> testCredentialId,
             "submissionId"  -> testSubmissionId
@@ -50,7 +50,7 @@ class AuditModelSpec extends AnyFreeSpec with Matchers {
 
           val result = AuditModel.build(
             journeyStatus = journeyStatus,
-            internalId = testInternalId,
+            subscriptionId = testSubscriptionId,
             affinityGroup = affinityGroup,
             credentialId = testCredentialId,
             submissionId = testSubmissionId
@@ -70,7 +70,7 @@ class AuditModelSpec extends AnyFreeSpec with Matchers {
 
           val result = AuditModel(
             journeyStatus = journeyStatus,
-            internalId = testInternalId,
+            subscriptionId = testSubscriptionId,
             affinityGroup = affinityGroup,
             credentialId = testCredentialId,
             submissionId = testSubmissionId
@@ -78,7 +78,7 @@ class AuditModelSpec extends AnyFreeSpec with Matchers {
 
           result.detail mustBe Json.obj(
             "journeyStatus"   -> journeyStatus.toString,
-            "internalId"    -> testInternalId,
+            "subscriptionId"    -> testSubscriptionId,
             "affinityGroup" -> affinityGroup.toString,
             "credentialId"  -> testCredentialId,
             "submissionId"  -> testSubmissionId
