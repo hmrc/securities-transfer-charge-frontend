@@ -164,5 +164,9 @@ class ForwardRoutes(answerPersistenceService: AnswerPersistenceService,
       } else {
         goTo(cyaPage, Some(userAnswers))
       }
+
+    case BulkCompanyDetailsPage | BulkRoleAtPurchasingCompanyPage => userAnswers =>
+      goTo(sh03BulkCyaRoutes.CheckYourAnswersController.onPageLoad(), Some(userAnswers))
+
     case _ => userAnswers => goTo(cyaPage, Some(userAnswers))
   }

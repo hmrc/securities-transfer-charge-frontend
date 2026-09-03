@@ -27,6 +27,7 @@ import uk.gov.hmrc.securitiestransferchargefrontend.controllers.sh03.organisatio
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.sh03.organisations.single.routes as sh03OrgSingleRoutes
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.sh03.shared.routes as sharedRoutes
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.sh03.organisations.bulk.routes as sh03OrgBulkRoutes
+import uk.gov.hmrc.securitiestransferchargefrontend.controllers.sh03.shared.bulk.routes as sh03BulkCyaRoutes
 import uk.gov.hmrc.securitiestransferchargefrontend.models.sh03.HowToNotifyAboutShareBuyback
 import uk.gov.hmrc.securitiestransferchargefrontend.models.sh03.shared.*
 import uk.gov.hmrc.securitiestransferchargefrontend.models.{CheckMode, NormalMode, UserAnswers}
@@ -246,6 +247,20 @@ class Sh03OrgNavigatorSpec extends SpecBase with ScalaFutures {
       val result = navigator.nextPage(UnknownPage, CheckMode, UserAnswers(testUserId, testGroupIdentifier, submissionId))(fakeRequest)
       whenReady(result) { res =>
         res mustBe cyaPage
+      }
+    }
+
+    "must go from BulkCompanyDetailsPage to the Bulk Check Your Answers page" in {
+      val result = navigator.nextPage(BulkCompanyDetailsPage, CheckMode, emptyUserAnswers)(fakeRequest)
+      whenReady(result) { res =>
+        res mustBe sh03BulkCyaRoutes.CheckYourAnswersController.onPageLoad()
+      }
+    }
+
+    "must go from BulkRoleAtPurchasingCompanyPage to the Bulk Check Your Answers page" in {
+      val result = navigator.nextPage(BulkRoleAtPurchasingCompanyPage, CheckMode, emptyUserAnswers)(fakeRequest)
+      whenReady(result) { res =>
+        res mustBe sh03BulkCyaRoutes.CheckYourAnswersController.onPageLoad()
       }
     }
   }

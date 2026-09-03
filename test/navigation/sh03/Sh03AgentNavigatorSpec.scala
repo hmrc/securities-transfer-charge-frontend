@@ -25,6 +25,8 @@ import uk.gov.hmrc.securitiestransferchargefrontend.config.FrontendAppConfig
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.sh03.agents.routes as sh03AgentRoutes
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.sh03.agents.single.routes as sh03AgentSingleRoutes
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.sh03.shared.routes as sharedRoutes
+import uk.gov.hmrc.securitiestransferchargefrontend.controllers.sh03.shared.bulk.routes as sh03BulkCyaRoutes
+import uk.gov.hmrc.securitiestransferchargefrontend.pages.sh03.bulk.*
 import uk.gov.hmrc.securitiestransferchargefrontend.models.sh03.HowToNotifyAboutShareBuyback
 import uk.gov.hmrc.securitiestransferchargefrontend.models.sh03.shared.*
 import uk.gov.hmrc.securitiestransferchargefrontend.models.shared.AgentReference
@@ -235,6 +237,27 @@ class Sh03AgentNavigatorSpec extends SpecBase with ScalaFutures {
       val result = navigator.nextPage(UnknownPage, CheckMode, UserAnswers(testUserId, testGroupIdentifier, submissionId))(fakeRequest)
       whenReady(result) { res =>
         res mustBe cyaPage
+      }
+    }
+
+    "must go from BulkAgentReferencePage to the Bulk Check Your Answers page" in {
+      val result = navigator.nextPage(BulkAgentReferencePage, CheckMode, emptyUserAnswers)(fakeRequest)
+      whenReady(result) { res =>
+        res mustBe sh03BulkCyaRoutes.CheckYourAnswersController.onPageLoad()
+      }
+    }
+
+    "must go from BulkCompanyDetailsPage to the Bulk Check Your Answers page" in {
+      val result = navigator.nextPage(BulkCompanyDetailsPage, CheckMode, emptyUserAnswers)(fakeRequest)
+      whenReady(result) { res =>
+        res mustBe sh03BulkCyaRoutes.CheckYourAnswersController.onPageLoad()
+      }
+    }
+
+    "must go from BulkRoleAtPurchasingCompanyPage to the Bulk Check Your Answers page" in {
+      val result = navigator.nextPage(BulkRoleAtPurchasingCompanyPage, CheckMode, emptyUserAnswers)(fakeRequest)
+      whenReady(result) { res =>
+        res mustBe sh03BulkCyaRoutes.CheckYourAnswersController.onPageLoad()
       }
     }
   }
