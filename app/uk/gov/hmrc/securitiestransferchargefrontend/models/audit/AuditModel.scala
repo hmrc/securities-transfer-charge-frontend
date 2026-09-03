@@ -18,11 +18,11 @@ package uk.gov.hmrc.securitiestransferchargefrontend.models.audit
 
 import play.api.libs.json.{JsObject, Json}
 import uk.gov.hmrc.auth.core.AffinityGroup
-import uk.gov.hmrc.securitiestransferchargefrontend.domain.{CredentialId, SubmissionId, UserId}
+import uk.gov.hmrc.securitiestransferchargefrontend.domain.{CredentialId, SubmissionId, SubscriptionId}
 
 case class AuditModel(
                        journeyStatus: JourneyStatus,
-                       internalId: UserId,
+                       subscriptionId: SubscriptionId,
                        affinityGroup: AffinityGroup,
                        credentialId: CredentialId,
                        submissionId: SubmissionId,
@@ -32,7 +32,7 @@ case class AuditModel(
 
   override val detail: JsObject = Json.obj(
     "journeyStatus" -> journeyStatus.toString,
-    "internalId" -> internalId,
+    "subscriptionId" -> subscriptionId,
     "affinityGroup" -> affinityGroup,
     "credentialId" -> credentialId,
     "submissionId" -> submissionId
@@ -43,9 +43,9 @@ object AuditModel {
 
   def build(
              journeyStatus: JourneyStatus,
-             internalId: UserId,
+             subscriptionId: SubscriptionId,
              affinityGroup: AffinityGroup,
              credentialId: CredentialId,
              submissionId: SubmissionId
-           ): AuditModel = AuditModel(journeyStatus, internalId, affinityGroup, credentialId, submissionId)
+           ): AuditModel = AuditModel(journeyStatus, subscriptionId, affinityGroup, credentialId, submissionId)
 }
