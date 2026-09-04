@@ -70,6 +70,7 @@ class Module extends AbstractModule {
     bind(classOf[RegistrationClient]).to(classOf[RegistrationClientImpl]).asEagerSingleton()
     bind(classOf[AnswerPersistenceService]).to(classOf[AnswerPersistenceServiceImpl])
     bind(classOf[StcUpscanProcessingService]).to(classOf[StcUpscanProcessingServiceImpl])
+    bind(classOf[EtmpSubmissionService]).to(classOf[EtmpSubmissionServiceImpl])
     bind(classOf[Navigator])
       .annotatedWith(Names.named("organisations"))
       .to(classOf[StfOrgNavigator])

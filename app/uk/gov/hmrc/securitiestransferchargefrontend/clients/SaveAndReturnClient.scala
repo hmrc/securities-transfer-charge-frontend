@@ -37,6 +37,7 @@ trait SaveAndReturnClient:
   def retrieve(submissionId: SubmissionId)(implicit hc: HeaderCarrier): Future[UserAnswers]
   def listByUser(userId: UserId)(implicit hc: HeaderCarrier): Future[List[SubmissionId]]
   def listByGroup(groupIdentifier: GroupIdentifier)(implicit hc: HeaderCarrier): Future[List[SubmissionId]]
+  def deleteDraft(submissionId: SubmissionId)(implicit hc: HeaderCarrier): Future[Unit]
 
 
 class SaveAndReturnClientImpl @Inject(http: HttpClientV2, config: FrontendAppConfig)(implicit ec: ExecutionContext) extends SaveAndReturnClient with Logging {
@@ -55,7 +56,7 @@ class SaveAndReturnClientImpl @Inject(http: HttpClientV2, config: FrontendAppCon
         case otherResponse =>
           logger.error(s"Failed to save UserAnswers for userId=${userAnswers.userId}. Received status ${otherResponse.status}")
           throw new RuntimeException(s"Failed to save UserAnswers. Status: ${otherResponse.status}")
-        }
+      }
       .andThen {
         case Failure(e) =>
           logger.error(s"Failed to save UserAnswers for userId=${userAnswers.userId}, submissionId=${userAnswers.submissionId}", e)
@@ -95,4 +96,9 @@ class SaveAndReturnClientImpl @Inject(http: HttpClientV2, config: FrontendAppCon
       }
   }
 
-}
+  override def deleteDraft(submissionId: SubmissionId)(implicit hc: HeaderCarrier): Future[Unit] =
+    http
+      .delete(url"$userAnswersPath/${submissionId.value}")
+      .execute[HttpResponse]
+      .map(_ => ())
+  }

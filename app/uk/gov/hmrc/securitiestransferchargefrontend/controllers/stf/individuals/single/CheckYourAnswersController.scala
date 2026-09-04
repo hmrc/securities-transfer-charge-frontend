@@ -19,15 +19,16 @@ package uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.individuals
 import com.google.inject.Inject
 import play.api.i18n.{I18nSupport, Lang, Messages, MessagesApi}
 import play.api.mvc.{Action, AnyContent, Call, MessagesControllerComponents}
+import play.twirl.api.HtmlFormat
 import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.SummaryListRow
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.actions.*
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.actions.requests.StcDataRequest
-import uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.shared.SaveAndReturnButton.isReturn
 import uk.gov.hmrc.securitiestransferchargefrontend.models.{Mode, NormalMode, UserAnswers}
 import uk.gov.hmrc.securitiestransferchargefrontend.navigation.Navigator
 import uk.gov.hmrc.securitiestransferchargefrontend.pages.stf.shared.*
 import uk.gov.hmrc.securitiestransferchargefrontend.pages.stf.single.*
+import uk.gov.hmrc.securitiestransferchargefrontend.services.TransactionSubmissionService
 import uk.gov.hmrc.securitiestransferchargefrontend.services.stf.TaxDueCalculationService
 import uk.gov.hmrc.securitiestransferchargefrontend.services.stf.shared.FormattingService
 import uk.gov.hmrc.securitiestransferchargefrontend.viewmodels.govuk.summarylist.*
@@ -36,7 +37,7 @@ import uk.gov.hmrc.securitiestransferchargefrontend.viewmodels.stf.shared.single
 import uk.gov.hmrc.securitiestransferchargefrontend.views.html.stf.shared.CheckYourAnswersView
 
 import javax.inject.Named
-import scala.concurrent.ExecutionContext
+import scala.concurrent.{ExecutionContext, Future}
 
 class CheckYourAnswersController @Inject()(
                                             override val messagesApi: MessagesApi,
@@ -47,11 +48,12 @@ class CheckYourAnswersController @Inject()(
                                             val controllerComponents: MessagesControllerComponents,
                                             view: CheckYourAnswersView,
                                             taxDueCalculationService: TaxDueCalculationService,
-                                            formattingService: FormattingService
+                                            formattingService: FormattingService,
+                                            transactionSubmissionService: TransactionSubmissionService
                                           )(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport {
 
   lazy val backLinkCall: Mode => UserAnswers => Call = mode => userAnswers => navigator.previousPage(CheckYourAnswersPage, mode, userAnswers)
-
+  
   def onPageLoad(): Action[AnyContent] = (stcAuthEnrolled andThen getData andThen requireData).async {
     implicit request =>
       implicit val messages: Messages = messagesApi.preferred(request)
@@ -62,6 +64,7 @@ class CheckYourAnswersController @Inject()(
         case Right(true) => buildCheckYourAnswersPage(request.userAnswers)
         case Right(false) => Redirect(navigator.errorPage(CheckYourAnswersPage))
       }
+      
   }
 
   private def buildCheckYourAnswersPage(userAnswers: UserAnswers)(implicit messages: Messages, lang: Lang, request: StcDataRequest[AnyContent]): play.api.mvc.Result = {
@@ -82,16 +85,25 @@ class CheckYourAnswersController @Inject()(
       taxDueFormatted = taxDueFormatted,
       paymentDueDateFormatted = paymentDueDateFormatted
     )
-    Ok(view(viewModel, backLinkCall(NormalMode)(request.userAnswers), routes.CheckYourAnswersController.onSubmit()))
+    
+    val html: HtmlFormat.Appendable = view(viewModel, backLinkCall(NormalMode)(request.userAnswers), routes.CheckYourAnswersController.onSubmit())
+    transactionSubmissionService.storeSubmissionData(html)
+    Ok(html)
   }
-
-  def onSubmit(): Action[AnyContent] = (stcAuthEnrolled andThen getData andThen requireData).async {
-    implicit request =>
-      for {
-        nextPage <- navigator.nextPage(CheckYourAnswersPage, NormalMode, request.userAnswers, isReturn(request))
-      } yield Redirect(nextPage)
+  
+  def onSubmit(): Action[AnyContent] = (stcAuthEnrolled andThen getData andThen requireData).async { implicit request =>
+    transactionSubmissionService
+      .submitSingleStf
+      .flatMap(nextUrl)
+      .map(Redirect)
   }
-
+  
+  private def nextUrl(success: Boolean)(implicit request: StcDataRequest[?]): Future[Call] =
+    if success then navigator.nextPage(CheckYourAnswersPage, NormalMode, TransactionSubmissionService.clearedUserAnswers(request))
+    else Future.successful(navigator.errorPage(CheckYourAnswersPage))
+  
+  
+  
   def buildYourDetailsRows(userAnswers: UserAnswers)(implicit messages: Messages): Seq[SummaryListRow] = {
     val addressRow = userAnswers.get(ConfirmAddressPage)
       .map(_ => ConfirmAddressSummary.row(userAnswers))
