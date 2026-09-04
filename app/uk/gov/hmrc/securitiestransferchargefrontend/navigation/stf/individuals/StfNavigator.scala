@@ -54,6 +54,8 @@ class StfNavigator @Inject()(appConfig: FrontendAppConfig,
     backwardsRoutes.predecessorRoutes(page, mode)
   
   def errorPage(forPage: Page): Call = forPage match {
+    // TODO: The CYA error page needs updating to be the submission failure page once it is created.
+    case CheckYourAnswersPage => routes.JourneyRecoveryController.onPageLoad() 
     case _ => routes.JourneyRecoveryController.onPageLoad()
   }
 
