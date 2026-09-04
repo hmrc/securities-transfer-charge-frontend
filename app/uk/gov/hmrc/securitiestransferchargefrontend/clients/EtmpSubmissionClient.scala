@@ -33,7 +33,7 @@ import uk.gov.hmrc.http.HttpResponse
 import uk.gov.hmrc.http.HttpReads.Implicits._
 
 trait EtmpSubmissionClient:
-  def singleStfSubmission(payload: SubmissionBatchPayload)(implicit hc: HeaderCarrier): Future[StcTransactionCreateResponse]
+  def submitSingleStf(payload: SubmissionBatchPayload)(implicit hc: HeaderCarrier): Future[StcTransactionCreateResponse]
 
 class EtmpSubmissionClientImpl @Inject()(
   http: HttpClientV2,
@@ -48,7 +48,7 @@ class EtmpSubmissionClientImpl @Inject()(
   private val logInfoAndFailParsing = (s: String) => logInfoAndFail(new SubmissionResponseParsingException(s))
   private val logInfoAndFailNon201 = (s: String) => logInfoAndFail(new SubmissionResponseException(s))
   
-  def singleStfSubmission(payload: SubmissionBatchPayload)(implicit hc: HeaderCarrier): Future[StcTransactionCreateResponse] = {
+  def submitSingleStf(payload: SubmissionBatchPayload)(implicit hc: HeaderCarrier): Future[StcTransactionCreateResponse] = {
     http.post(url"${appConfig.submissionsServiceUrl}")
       .withBody(Json.toJson(payload))
       .execute[HttpResponse]

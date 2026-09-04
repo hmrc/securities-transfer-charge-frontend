@@ -23,7 +23,7 @@ import uk.gov.hmrc.securitiestransferchargefrontend.domain.SubmissionId
 import uk.gov.hmrc.securitiestransferchargefrontend.models.UserAnswers
 import uk.gov.hmrc.securitiestransferchargefrontend.models.shared.AgentReference
 import uk.gov.hmrc.securitiestransferchargefrontend.models.submission.*
-import uk.gov.hmrc.securitiestransferchargefrontend.models.submission.DeclarationRole.Director
+import uk.gov.hmrc.securitiestransferchargefrontend.pages.sh03.RoleAtPurchasingCompanyPage
 import uk.gov.hmrc.securitiestransferchargefrontend.pages.stf.shared.AgentReferencePage
 
 import java.time.LocalDate
@@ -34,7 +34,12 @@ import scala.concurrent.{ExecutionContext, Future}
 
 type ChargeReference = String
 
-trait SubmissionCreateResponse
+trait SubmissionCreateResponse:
+  def fold[A](onFailure: => A)(onSuccess: SubmissionCreateResponseSuccess => A): A =
+    this match {
+      case SubmissionCreateResponseFailure => onFailure
+      case success: SubmissionCreateResponseSuccess => onSuccess(success)
+    }
 
 final case class SubmissionCreateResponseSuccess(
   submissionId: SubmissionId,
@@ -64,7 +69,8 @@ class EtmpSubmissionServiceImpl @Inject() (etmpSubmissionsClient: EtmpSubmission
     if charges.length != processed.charges.length then
       logger.warn(s"${userAnswers.submissionId}: Non-success charges in successful ETMP response")
       return SubmissionCreateResponseFailure
-
+    end if
+    
     SubmissionCreateResponseSuccess(
       submissionId     = userAnswers.submissionId,
       chargeReferences = charges.map(_.chargeReference),
@@ -83,10 +89,10 @@ class EtmpSubmissionServiceImpl @Inject() (etmpSubmissionsClient: EtmpSubmission
   }
 
   // ToDo: We do not currently have the information to create a delaration.
-  private val createDeclaration: UserAnswers => SingleTransferDeclaration = _ =>
+  private val createDeclaration: UserAnswers => SingleTransferDeclaration = userAnswers =>
     SingleTransferDeclaration(
-      Some(Director),
-      None,
+      userAnswers.get(RoleAtPurchasingCompanyPage).map(_.role).flatMap(DeclarationRole.fromString),
+      userAnswers.get(RoleAtPurchasingCompanyPage).flatMap(_.uksOrgan),
       "John Bull",
       "10 High Street",
       Some("Bolton"),
@@ -105,7 +111,7 @@ class EtmpSubmissionServiceImpl @Inject() (etmpSubmissionsClient: EtmpSubmission
       val etmpPayload = SubmissionBatchPayload(declaration, List(stfReq))
 
       etmpSubmissionsClient
-        .singleStfSubmission(etmpPayload)
+        .submitSingleStf(etmpPayload)
         .map(toSubmissionCreateResponse(userAnswers))
     }.getOrElse(submissionFailure)
   }

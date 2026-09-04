@@ -29,10 +29,13 @@ enum DeclarationRole(val code: String):
   case UkSocietas extends DeclarationRole("8")
 
 object DeclarationRole:
+  
+  val fromString: String => Option[DeclarationRole] = s => DeclarationRole.values.find(_.toString.equalsIgnoreCase(s))
+  
   given Format[DeclarationRole] = Format(
     Reads {
       case JsString(s) =>
-        DeclarationRole.values.find(_.code == s)
+        fromString(s)
           .map(JsSuccess(_))
           .getOrElse(JsError(s"Invalid DeclarationRole value [$s]. Expected one of: 1..8"))
       case other => JsError(s"Expected a JSON string for DeclarationRole, got: $other")
