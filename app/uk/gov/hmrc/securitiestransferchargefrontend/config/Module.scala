@@ -20,7 +20,7 @@ import com.google.inject.AbstractModule
 import com.google.inject.name.Names
 import play.api.http.HttpErrorHandler
 import uk.gov.hmrc.securitiestransferchargefrontend.clients.registration.{RegistrationClient, RegistrationClientImpl}
-import uk.gov.hmrc.securitiestransferchargefrontend.clients.{SaveAndReturnClient, SaveAndReturnClientImpl, SubmissionIdClient, SubmissionIdClientImpl}
+import uk.gov.hmrc.securitiestransferchargefrontend.clients.{EtmpSubmissionClient, EtmpSubmissionClientImpl, SaveAndReturnClient, SaveAndReturnClientImpl, SubmissionIdClient, SubmissionIdClientImpl}
 import uk.gov.hmrc.securitiestransferchargefrontend.connectors.*
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.actions.*
 import uk.gov.hmrc.securitiestransferchargefrontend.handlers.ErrorHandler
@@ -30,7 +30,7 @@ import uk.gov.hmrc.securitiestransferchargefrontend.navigation.stf.agents.StfAge
 import uk.gov.hmrc.securitiestransferchargefrontend.navigation.stf.individuals.StfNavigator
 import uk.gov.hmrc.securitiestransferchargefrontend.navigation.stf.organisations.StfOrgNavigator
 import uk.gov.hmrc.securitiestransferchargefrontend.navigation.{Navigator, PersistentNavigator}
-import uk.gov.hmrc.securitiestransferchargefrontend.repositories.{ChecksumRepository, ChecksumRepositoryImpl, SessionRepository, SessionRepositoryImpl, SubscriptionDataRepository, SubscriptionDataRepositoryImpl, UpscanJourneyRepository, UpscanJourneyRepositoryImpl, ParsedStcRowsRepository, ParsedStcRowsRepositoryImpl, ValidationErrorRepository, ValidationErrorRepositoryImpl}
+import uk.gov.hmrc.securitiestransferchargefrontend.repositories.{ChecksumRepository, ChecksumRepositoryImpl, ParsedStcRowsRepository, ParsedStcRowsRepositoryImpl, SessionRepository, SessionRepositoryImpl, SubscriptionDataRepository, SubscriptionDataRepositoryImpl, TransactionResponseRepository, TransactionResponseRepositoryImpl, UpscanJourneyRepository, UpscanJourneyRepositoryImpl, ValidationErrorRepository, ValidationErrorRepositoryImpl}
 import uk.gov.hmrc.securitiestransferchargefrontend.services.*
 import uk.gov.hmrc.securitiestransferchargefrontend.services.fileupload.*
 import uk.gov.hmrc.securitiestransferchargefrontend.services.fileupload.processing.{DefaultFileProcessingRefreshCounterFactory, FileProcessingRefreshCounterFactory}
@@ -71,6 +71,10 @@ class Module extends AbstractModule {
     bind(classOf[AnswerPersistenceService]).to(classOf[AnswerPersistenceServiceImpl])
     bind(classOf[StcUpscanProcessingService]).to(classOf[StcUpscanProcessingServiceImpl])
     bind(classOf[EtmpSubmissionService]).to(classOf[EtmpSubmissionServiceImpl])
+    bind(classOf[TransactionSubmissionService]).to(classOf[TransactionSubmissionServiceImpl])
+    bind(classOf[TransactionResponseRepository]).to(classOf[TransactionResponseRepositoryImpl])
+    bind(classOf[EtmpSubmissionClient]).to(classOf[EtmpSubmissionClientImpl])
+
     bind(classOf[Navigator])
       .annotatedWith(Names.named("organisations"))
       .to(classOf[StfOrgNavigator])

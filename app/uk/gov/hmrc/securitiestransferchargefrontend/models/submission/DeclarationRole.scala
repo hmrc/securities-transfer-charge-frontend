@@ -35,7 +35,7 @@ object DeclarationRole:
   given Format[DeclarationRole] = Format(
     Reads {
       case JsString(s) =>
-        fromString(s)
+        DeclarationRole.values.find(_.code == s)
           .map(JsSuccess(_))
           .getOrElse(JsError(s"Invalid DeclarationRole value [$s]. Expected one of: 1..8"))
       case other => JsError(s"Expected a JSON string for DeclarationRole, got: $other")
