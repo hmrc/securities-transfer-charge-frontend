@@ -26,7 +26,7 @@ import uk.gov.hmrc.securitiestransferchargefrontend.clients.{SaveAndReturnClient
 import uk.gov.hmrc.securitiestransferchargefrontend.config.FrontendAppConfig
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.actions.{StcAuthEnrolledAction, StcDataRetrievalAction}
 import uk.gov.hmrc.securitiestransferchargefrontend.domain.{GroupIdentifier, SubmissionId, UserId}
-import uk.gov.hmrc.securitiestransferchargefrontend.models.audit.AuditModel
+import uk.gov.hmrc.securitiestransferchargefrontend.models.audit.{AuditModel, AuditType}
 import uk.gov.hmrc.securitiestransferchargefrontend.models.audit.JourneyStatus.StartSubmission
 import uk.gov.hmrc.securitiestransferchargefrontend.models.{NormalMode, UserAnswers}
 import uk.gov.hmrc.securitiestransferchargefrontend.navigation.Navigator
@@ -94,7 +94,7 @@ class SubmissionsDashboardController @Inject()(
             individualsNavigator.nextPage(SubmissionsDashboardPage, NormalMode, emptyAnswers)
         }
       } yield {
-        auditService.audit(AuditModel(StartSubmission, innerRequest.subscriptionId, innerRequest.affinityGroup, innerRequest.credentialId, submissionId))
+        auditService.audit(AuditModel(StartSubmission, innerRequest.subscriptionId, innerRequest.affinityGroup, innerRequest.credentialId, Some(submissionId), AuditType.Stf))
         Redirect(call)
       }
   }
