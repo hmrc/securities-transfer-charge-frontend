@@ -16,7 +16,7 @@
 
 package base
 
-import base.Fixtures.{testAuditType, testInternalId}
+import base.Fixtures.{testAuditType, testSubscriptionId}
 import org.mockito.ArgumentCaptor
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.{times, verify}
@@ -47,7 +47,7 @@ trait AuditTestSupport {
 
     auditCaptor.getValue.detail mustBe Json.obj(
       "journeyStatus" -> journeyStatus.toString,
-      "internalId" -> testInternalId,
+      "subscriptionId" -> testSubscriptionId,
       "affinityGroup" -> affinityGroup.toString,
       "credentialId" -> credentialId,
       "submissionId" -> submissionId,

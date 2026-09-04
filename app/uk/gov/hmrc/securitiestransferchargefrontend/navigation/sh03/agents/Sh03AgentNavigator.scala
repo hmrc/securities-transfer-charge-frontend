@@ -23,6 +23,7 @@ import uk.gov.hmrc.play.http.HeaderCarrierConverter
 import uk.gov.hmrc.securitiestransferchargefrontend.config.FrontendAppConfig
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.routes
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.sh03.agents.single.routes as sh03AgentSingleRoutes
+import uk.gov.hmrc.securitiestransferchargefrontend.controllers.sh03.agents.bulk.routes as sh03AgentBulkRoutes
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.shared.routes as sharedRoutes
 import uk.gov.hmrc.securitiestransferchargefrontend.domain.{SubmissionId, UserId}
 import uk.gov.hmrc.securitiestransferchargefrontend.models.{Mode, UserAnswers}
@@ -30,6 +31,7 @@ import uk.gov.hmrc.securitiestransferchargefrontend.navigation.sh03.agents
 import uk.gov.hmrc.securitiestransferchargefrontend.navigation.*
 import uk.gov.hmrc.securitiestransferchargefrontend.pages.*
 import uk.gov.hmrc.securitiestransferchargefrontend.pages.sh03.*
+import uk.gov.hmrc.securitiestransferchargefrontend.pages.sh03.bulk.{BulkAgentReferencePage, BulkCompanyDetailsPage, BulkRoleAtPurchasingCompanyPage}
 import uk.gov.hmrc.securitiestransferchargefrontend.pages.sh03.shared.CheckYourAnswersPage
 import uk.gov.hmrc.securitiestransferchargefrontend.services.AnswerPersistenceService
 
@@ -83,6 +85,9 @@ class Sh03AgentNavigator @Inject()(answerPersistenceService: AnswerPersistenceSe
         .addMapping(ChargingPointPage, sh03AgentSingleRoutes.ChargingPointController.onPageLoad)
         .addMapping(RoleAtPurchasingCompanyPage, sh03AgentSingleRoutes.RoleAtPurchasingCompanyController.onPageLoad)
         .addMappingNoCheck(CheckYourAnswersPage, sh03AgentSingleRoutes.CheckYourAnswersController.onPageLoad)
+        .addMapping(BulkAgentReferencePage, sh03AgentBulkRoutes.AgentReferenceController.onPageLoad)
+        .addMapping(BulkCompanyDetailsPage, sh03AgentBulkRoutes.CompanyDetailsController.onPageLoad)
+        .addMapping(BulkRoleAtPurchasingCompanyPage, sh03AgentBulkRoutes.RoleAtPurchasingCompanyController.onPageLoad)
         .build
 
     override protected def pageHasValidDataAtPath(userAnswers: UserAnswers, page: GettablePage[_]): Boolean = page match {

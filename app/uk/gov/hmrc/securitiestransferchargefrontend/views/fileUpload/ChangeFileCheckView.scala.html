@@ -1,4 +1,4 @@
-/*
+@*
  * Copyright 2026 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -12,20 +12,22 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- */
+ *@
 
-package uk.gov.hmrc.securitiestransferchargefrontend.forms.stf.shared
+@import uk.gov.hmrc.securitiestransferchargefrontend.controllers.routes.IndexController
+@import uk.gov.hmrc.securitiestransferchargefrontend.views.html.templates
 
-import play.api.data.Form
-import uk.gov.hmrc.securitiestransferchargefrontend.forms.mappings.Mappings
+@this(
+        layout: templates.Layout,
+        govukButton: GovukButton
+)
 
-import javax.inject.Inject
+@()(implicit request: Request[_], messages: Messages)
 
-class NameOfSellerFormProvider @Inject() extends Mappings {
+@layout(pageTitle = titleNoForm(messages("fileUpload.changeFile.title"))) {
 
-  def apply(): Form[String] =
-    Form(
-      "value" -> text("nameOfSeller.error.required")
-        .verifying(maxLength(40, "nameOfSeller.error.length"))
-    )
+    <h1 class="govuk-heading-xl">@messages("fileUpload.changeFile.heading")</h1>
+
+    <p class="govuk-body">@messages("fileUpload.changeFile.guidance")</p>
+
 }

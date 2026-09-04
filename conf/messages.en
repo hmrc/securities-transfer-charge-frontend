@@ -101,7 +101,7 @@ checkYourAnswers.taxDue.body = We have calculated the tax due based on the infor
 checkYourAnswers.paymentDueBy = Payment due by:
 checkYourAnswers.declaration.heading = Declaration
 checkYourAnswers.declaration.body = By submitting this form I confirm that the details I am providing are correct to the best of my knowledge.
-sh03.org.checkYourAnswers.declaration.body = By submitting this form I confirm that to the best of my knowledge, the details I am providing are correct.
+sh03.org.checkYourAnswers.declaration.body = By submitting this form I confirm that the details I am providing are correct to the best of my knowledge.
 sh03.checkYourAnswers.declaration.body = By submitting this form I confirm that:
 checkYourAnswers.declaration.bullet1 = to the best of my knowledge, the details I am providing are correct
 checkYourAnswers.declaration.bullet2 = I am authorised by the buyer to submit details on their behalf
@@ -188,7 +188,7 @@ nameOfSeller.title = What’s the seller’s name?
 nameOfSeller.heading = What’s the seller’s name?
 nameOfSeller.checkYourAnswersLabel = Name
 nameOfSeller.error.required = Enter the seller’s full name
-nameOfSeller.error.length = Seller’s name must be 35 characters or less
+nameOfSeller.error.length = Seller’s name must be 40 characters or less
 nameOfSeller.change.hidden = Change seller’s name
 nameOfSeller.hint = This can be a business, person or another entity.
 
@@ -542,6 +542,10 @@ fileUpload.redirectError.EntityTooLarge = The selected file must be smaller than
 fileUpload.redirectError.generic = The selected file could not be uploaded – try again
 fileUpload.redirectError.InvalidArgument = The selected file must be a .csv or a .xlsx
 
+fileUpload.changeFile.title = Are you sure you want to change the uploaded file?
+fileUpload.changeFile.heading = Are you sure you want to change the uploaded file?
+fileUpload.changeFile.guidance = [Add content to explain the file change will delete the already uploaded file.]
+
 org.templateInstructions.title = How to use the template
 org.templateInstructions.heading = How to use the template
 org.templateInstructions.p1 = Use the template to tell us about more than one securities transfer at a time.
@@ -574,7 +578,7 @@ agentReference.error.length = Your reference must be 255 characters or fewer
 agentReference.change.hidden = Change your reference
 
 nameOfBuyer.error.required = Enter the buyer’s name
-nameOfBuyer.error.length = Buyer’s name must be 35 characters or fewer
+nameOfBuyer.error.length = Buyer’s name must be 40 characters or fewer
 
 agent.checkYourAnswers.buyerAddress = Address
 agent.checkYourAnswers.buyerAddress.change.hidden = Change buyer’s address

@@ -14,18 +14,23 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.securitiestransferchargefrontend.forms.stf.shared
+package uk.gov.hmrc.securitiestransferchargefrontend.models.audit
 
-import play.api.data.Form
-import uk.gov.hmrc.securitiestransferchargefrontend.forms.mappings.Mappings
+sealed trait AuditType {
+  def value: String
+}
 
-import javax.inject.Inject
+object AuditType {
+  case object Stf extends AuditType {
+    override val value: String = "StockTransferFormStatus"
+  }
 
-class NameOfSellerFormProvider @Inject() extends Mappings {
+  case object Sh03 extends AuditType {
+    override val value: String = "NotifyPurchaseOfOwnSharesStatus"
+  }
 
-  def apply(): Form[String] =
-    Form(
-      "value" -> text("nameOfSeller.error.required")
-        .verifying(maxLength(40, "nameOfSeller.error.length"))
-    )
+  case object UpscanValidation extends AuditType {
+    override val value: String = "UpscanValidation"
+  }
+
 }
