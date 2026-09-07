@@ -16,7 +16,7 @@
 
 package controllers.fileUpload
 
-import base.SpecBase
+import base.{AuditTestSupport, SpecBase}
 import org.mockito.ArgumentMatchers.{any, eq as eqTo}
 import org.mockito.Mockito.*
 import org.scalatestplus.mockito.MockitoSugar
@@ -28,16 +28,17 @@ import uk.gov.hmrc.auth.core.AffinityGroup
 import uk.gov.hmrc.securitiestransferchargefrontend.config.FrontendAppConfig
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.fileUpload.routes
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.routes.JourneyRecoveryController
-import uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.agents.bulk.routes as stfBulkRoutes
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.sh03.agents.bulk.routes as sh03BulkRoutes
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.sh03.organisations.bulk.routes as sh03OrgBulkRoutes
+import uk.gov.hmrc.securitiestransferchargefrontend.controllers.sh03.shared.bulk.routes as sh03CyaRoutes
+import uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.agents.bulk.routes as stfBulkRoutes
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.individuals.bulk.routes as individualBulkRoutes
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.organisations.bulk.routes as orgBulkRoutes
-import uk.gov.hmrc.securitiestransferchargefrontend.controllers.sh03.shared.bulk.routes as sh03CyaRoutes
 import uk.gov.hmrc.securitiestransferchargefrontend.models.stf.upscan.UpscanCallbackRequest.UploadDetails
-import uk.gov.hmrc.securitiestransferchargefrontend.models.{JourneyType, NormalMode}
 import uk.gov.hmrc.securitiestransferchargefrontend.models.stf.upscan.{FileUpload, UpscanJourneyStatus}
+import uk.gov.hmrc.securitiestransferchargefrontend.models.{JourneyType, NormalMode}
 import uk.gov.hmrc.securitiestransferchargefrontend.repositories.UpscanJourneyRepository
+import uk.gov.hmrc.securitiestransferchargefrontend.services.AuditService
 import uk.gov.hmrc.securitiestransferchargefrontend.services.fileupload.processing.{FileProcessingRefreshCounter, FileProcessingRefreshCounterFactory, ProcessingService}
 import uk.gov.hmrc.securitiestransferchargefrontend.views.html.fileUpload.FileProcessingView
 
@@ -50,22 +51,25 @@ class MockFileProcessingRefreshCounterFactory(counter: FileProcessingRefreshCoun
   override def apply(request: Request[?]): FileProcessingRefreshCounter = counter
 }
 
-class FileProcessingControllerSpec extends SpecBase with MockitoSugar {
+class FileProcessingControllerSpec extends SpecBase with MockitoSugar with AuditTestSupport {
 
   private val reference = "ref"
+  private val mockAuditService = mock[AuditService]
 
   private def buildApp(
                         counter: FileProcessingRefreshCounter,
                         repository: UpscanJourneyRepository,
                         service: ProcessingService,
-                        affinityGroup: AffinityGroup = AffinityGroup.Individual
+                        affinityGroup: AffinityGroup = AffinityGroup.Individual,
+                        auditService: AuditService = mockAuditService
                       ) =
     applicationBuilder(userAnswers = Some(emptyUserAnswers), affinityGroup)
       .overrides(
         bind[FileProcessingRefreshCounterFactory]
           .toInstance(new MockFileProcessingRefreshCounterFactory(counter)),
         bind[UpscanJourneyRepository].toInstance(repository),
-        bind[ProcessingService].toInstance(service)
+        bind[ProcessingService].toInstance(service),
+        bind[AuditService].toInstance(auditService)
       )
       .build()
 
@@ -147,8 +151,16 @@ class FileProcessingControllerSpec extends SpecBase with MockitoSugar {
           val counter = mockCounter()
           val repository = mock[UpscanJourneyRepository]
           val service = mock[ProcessingService]
+          val auditService = mock[AuditService]
 
           val upload = fakeUpload(UpscanJourneyStatus.Ready)
+            .copy(uploadDetails = Some(UploadDetails(
+              uploadTimestamp = Instant.now(),
+              checksum = "test-checksum",
+              fileMimeType = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+              fileName = "test-file.xlsx",
+              size = 1024
+            )))
 
           when(repository.find(reference))
             .thenReturn(Future.successful(Some(upload)))
@@ -156,7 +168,7 @@ class FileProcessingControllerSpec extends SpecBase with MockitoSugar {
           when(service.processReadyUpload(any(), any(), any(), any())(any(), any(), any()))
             .thenReturn(Future.successful(()))
 
-          val app = buildApp(counter, repository, service)
+          val app = buildApp(counter, repository, service, AffinityGroup.Individual, auditService)
 
           running(app) {
 
@@ -169,6 +181,13 @@ class FileProcessingControllerSpec extends SpecBase with MockitoSugar {
               .processReadyUpload(eqTo(reference), eqTo(upload), any[String], eqTo(journeyType))(any(), any(), any())
 
             verify(counter).withIncrementedCounter(any[Result])
+
+            verifyUpscanAudit(
+              auditService,
+              expectedStatus = "Success",
+              expectedReference = reference,
+              expectedFileName = Some("test-file.xlsx")
+            )
           }
         }
 
@@ -274,7 +293,7 @@ class FileProcessingControllerSpec extends SpecBase with MockitoSugar {
 
             status(result) mustEqual SEE_OTHER
             redirectLocation(result).value mustEqual
-              routes.UploadedFileErrorController.onPageLoad(reference,journeyType).url
+              routes.UploadedFileErrorController.onPageLoad(reference, journeyType).url
           }
         }
 
@@ -367,14 +386,25 @@ class FileProcessingControllerSpec extends SpecBase with MockitoSugar {
           val counter = mockCounter()
           val repository = mock[UpscanJourneyRepository]
           val service = mock[ProcessingService]
+          val auditService = mock[AuditService]
 
           val upload = fakeUpload(UpscanJourneyStatus.Failed)
-            .copy(failureReason = Some("QUARANTINE"),message = Some("EncryptedDoc"))
+            .copy(
+              failureReason = Some("QUARANTINE"),
+              message = Some("EncryptedDoc"),
+              uploadDetails = Some(UploadDetails(
+                uploadTimestamp = Instant.now(),
+                checksum = "test-checksum",
+                fileMimeType = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+                fileName = "encrypted-file.xlsx",
+                size = 1024
+              ))
+            )
 
           when(repository.find(reference))
             .thenReturn(Future.successful(Some(upload)))
 
-          val app = buildApp(counter, repository, service)
+          val app = buildApp(counter, repository, service, AffinityGroup.Individual, auditService)
 
           running(app) {
 
@@ -383,6 +413,14 @@ class FileProcessingControllerSpec extends SpecBase with MockitoSugar {
             status(result) mustEqual SEE_OTHER
             redirectLocation(result).value mustEqual
               routes.EncryptedFileErrorController.onPageLoad(journeyType).url
+
+            verifyUpscanAudit(
+              auditService,
+              expectedStatus = "Failure",
+              expectedReference = reference,
+              expectedFailureReason = Some("QUARANTINE"),
+              expectedFailureMessage = Some("EncryptedDoc")
+            )
           }
         }
 
@@ -391,14 +429,25 @@ class FileProcessingControllerSpec extends SpecBase with MockitoSugar {
           val counter = mockCounter()
           val repository = mock[UpscanJourneyRepository]
           val service = mock[ProcessingService]
+          val auditService = mock[AuditService]
 
           val upload = fakeUpload(UpscanJourneyStatus.Failed)
-            .copy(failureReason = Some("QUARANTINE"),message = Some("virus"))
+            .copy(
+              failureReason = Some("QUARANTINE"),
+              message = Some("virus"),
+              uploadDetails = Some(UploadDetails(
+                uploadTimestamp = Instant.now(),
+                checksum = "test-checksum",
+                fileMimeType = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+                fileName = "virus-file.xlsx",
+                size = 1024
+              ))
+            )
 
           when(repository.find(reference))
             .thenReturn(Future.successful(Some(upload)))
 
-          val app = buildApp(counter, repository, service)
+          val app = buildApp(counter, repository, service, AffinityGroup.Individual, auditService)
 
           running(app) {
 
@@ -407,6 +456,14 @@ class FileProcessingControllerSpec extends SpecBase with MockitoSugar {
             status(result) mustEqual SEE_OTHER
             redirectLocation(result).value mustEqual
               routes.BulkUploadVirusErrorController.onPageLoad(journeyType).url
+
+            verifyUpscanAudit(
+              auditService,
+              expectedStatus = "Failure",
+              expectedReference = reference,
+              expectedFailureReason = Some("QUARANTINE"),
+              expectedFailureMessage = Some("virus")
+            )
           }
         }
 
@@ -414,7 +471,7 @@ class FileProcessingControllerSpec extends SpecBase with MockitoSugar {
           AffinityGroup.Individual,
           AffinityGroup.Organisation,
           AffinityGroup.Agent
-        ).foreach {affinityGroup =>
+        ).foreach { affinityGroup =>
           s"must redirect for a successful upload and validation for $affinityGroup" in {
 
             val counter = mockCounter()
@@ -474,12 +531,22 @@ class FileProcessingControllerSpec extends SpecBase with MockitoSugar {
           val counter = mockCounter()
           val repository = mock[UpscanJourneyRepository]
           val service = mock[ProcessingService]
+          val auditService = mock[AuditService]
 
-          val upload = fakeUpload(UpscanJourneyStatus.Failed).copy(failureReason = Some("REJECTED"), message = Some("mime type"))
+          val upload = fakeUpload(UpscanJourneyStatus.Failed).copy(
+            failureReason = Some("REJECTED"),
+            message = Some("mime type"),
+            uploadDetails = Some(UploadDetails(
+              uploadTimestamp = Instant.now(),
+              checksum = "test-checksum",
+              fileMimeType = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+              fileName = "invalid-type.xlsx",
+              size = 1024
+            )))
 
           when(repository.find(reference)).thenReturn(Future.successful(Some(upload)))
 
-          val app = buildApp(counter, repository, service)
+          val app = buildApp(counter, repository, service, AffinityGroup.Individual, auditService)
 
           running(app) {
 
@@ -487,6 +554,14 @@ class FileProcessingControllerSpec extends SpecBase with MockitoSugar {
 
             status(result) mustEqual SEE_OTHER
             redirectLocation(result).value mustEqual routes.FileTypeErrorController.onPageLoad(journeyType).url
+
+            verifyUpscanAudit(
+              auditService,
+              expectedStatus = "Failure",
+              expectedReference = reference,
+              expectedFailureReason = Some("REJECTED"),
+              expectedFailureMessage = Some("mime type")
+            )
           }
         }
 
@@ -504,7 +579,7 @@ class FileProcessingControllerSpec extends SpecBase with MockitoSugar {
               checksum = "checksum",
               fileMimeType = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
               fileName = "zeroBytes.xlxs",
-              size = 0)),journeyType = journeyType)
+              size = 0)), journeyType = journeyType)
 
           when(repository.find(reference)).thenReturn(Future.successful(Some(upload)))
 
