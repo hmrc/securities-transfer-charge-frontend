@@ -88,7 +88,7 @@ class EtmpSubmissionServiceImpl @Inject() (etmpSubmissionsClient: EtmpSubmission
     case c: StcChargeSuccess => LocalDate.parse(c.chargeDueDate, formatter)
   }
 
-  // ToDo: We do not currently have the information to create a delaration.
+  // ToDo: We do not currently have the information to create a declaration.
   private val createDeclaration: UserAnswers => SingleTransferDeclaration = userAnswers =>
     SingleTransferDeclaration(
       userAnswers.get(RoleAtPurchasingCompanyPage).map(_.role).flatMap(DeclarationRole.fromString),
@@ -111,7 +111,7 @@ class EtmpSubmissionServiceImpl @Inject() (etmpSubmissionsClient: EtmpSubmission
       val etmpPayload = SubmissionBatchPayload(declaration, List(stfReq))
 
       etmpSubmissionsClient
-        .submitSingleStf(etmpPayload)
+        .submitSingleStf(userAnswers.submissionId, etmpPayload)
         .map(toSubmissionCreateResponse(userAnswers))
     }.getOrElse(submissionFailure)
   }

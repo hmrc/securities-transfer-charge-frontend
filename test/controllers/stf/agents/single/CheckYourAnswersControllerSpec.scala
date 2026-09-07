@@ -18,10 +18,12 @@ package controllers.stf.agents.single
 
 import base.SpecBase
 import base.stubs.StubPersistentNavigator
+import clients.StubEtmpSubmissionClient
 import com.google.inject.name.Names
 import play.api.inject.bind
 import play.api.test.FakeRequest
 import play.api.test.Helpers.*
+import uk.gov.hmrc.securitiestransferchargefrontend.clients.EtmpSubmissionClient
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.agents.single.routes
 import uk.gov.hmrc.securitiestransferchargefrontend.models.CheckMode
 import uk.gov.hmrc.securitiestransferchargefrontend.models.stf.*
@@ -89,11 +91,13 @@ class CheckYourAnswersControllerSpec extends SpecBase {
 
     "must redirect to next page for a POST" in {
       val stubNavigator = new StubPersistentNavigator(testNextPage, completeUserAnswers, "stf", "")
+      val stubEtmpSubmissionClient = new StubEtmpSubmissionClient()
       
       val application = applicationBuilder(userAnswers = Some(completeUserAnswers))
         .overrides(
           bind[Navigator].qualifiedWith(Names.named("agents")).toInstance(stubNavigator),
-          bind[PersistentNavigator].qualifiedWith(Names.named("agents")).toInstance(stubNavigator)
+          bind[PersistentNavigator].qualifiedWith(Names.named("agents")).toInstance(stubNavigator),
+          bind[EtmpSubmissionClient].toInstance(stubEtmpSubmissionClient)
         )
         .build()
 

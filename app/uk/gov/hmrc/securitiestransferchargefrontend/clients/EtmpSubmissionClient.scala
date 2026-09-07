@@ -28,12 +28,12 @@ import uk.gov.hmrc.securitiestransferchargefrontend.utils.CommonHelpers
 
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
-
 import uk.gov.hmrc.http.HttpResponse
-import uk.gov.hmrc.http.HttpReads.Implicits._
+import uk.gov.hmrc.http.HttpReads.Implicits.*
+import uk.gov.hmrc.securitiestransferchargefrontend.domain.SubmissionId
 
 trait EtmpSubmissionClient:
-  def submitSingleStf(payload: SubmissionBatchPayload)(implicit hc: HeaderCarrier): Future[StcTransactionCreateResponse]
+  def submitSingleStf(submissionId: SubmissionId, payload: SubmissionBatchPayload)(implicit hc: HeaderCarrier): Future[StcTransactionCreateResponse]
 
 class EtmpSubmissionClientImpl @Inject()(
   http: HttpClientV2,
@@ -48,8 +48,8 @@ class EtmpSubmissionClientImpl @Inject()(
   private val logInfoAndFailParsing = (s: String) => logInfoAndFail(new SubmissionResponseParsingException(s))
   private val logInfoAndFailNon201 = (s: String) => logInfoAndFail(new SubmissionResponseException(s))
   
-  def submitSingleStf(payload: SubmissionBatchPayload)(implicit hc: HeaderCarrier): Future[StcTransactionCreateResponse] = {
-    http.post(url"${appConfig.submissionsServiceUrl}")
+  def submitSingleStf(submissionId: SubmissionId, payload: SubmissionBatchPayload)(implicit hc: HeaderCarrier): Future[StcTransactionCreateResponse] = {
+    http.post(url"${appConfig.submissionsServiceUrl}/${submissionId.value}")
       .withBody(Json.toJson(payload))
       .execute[HttpResponse]
       .flatMap {
@@ -61,4 +61,3 @@ class EtmpSubmissionClientImpl @Inject()(
         case otherResponse => logInfoAndFailNon201(s"Received $otherResponse when submitting to ETMP")
       }
     }
-
