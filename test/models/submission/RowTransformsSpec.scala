@@ -86,7 +86,7 @@ class RowTransformsSpec extends AnyWordSpec with Matchers {
         transactionDetails = SingleTransferTransactionDetails(
           transactionType = TransferType.STF,
           reasonForPurchase = None,
-          descriptionOfSecurity = "Ordinary Shares",
+          typeOfSecurity = "Ordinary Shares",
           numberOfShares = 1000,
           nominalValue = None,
           marketValue = Some(BigDecimal("6000")),
@@ -139,7 +139,7 @@ class RowTransformsSpec extends AnyWordSpec with Matchers {
         transactionDetails = SingleTransferTransactionDetails(
           transactionType = TransferType.SH03,
           reasonForPurchase = Some(ReasonForPurchase.Both),
-          descriptionOfSecurity = "Ordinary",
+          typeOfSecurity = "Ordinary",
           numberOfShares = 1000,
           nominalValue = None,
           marketValue = Some(BigDecimal("6000")),

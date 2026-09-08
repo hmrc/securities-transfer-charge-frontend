@@ -78,7 +78,7 @@ object RowTransforms {
       transactionDetails = SingleTransferTransactionDetails(
         transactionType = TransferType.STF,
         reasonForPurchase = None, // SH03 only
-        descriptionOfSecurity = getDescriptionOfSecurity,
+        typeOfSecurity = getDescriptionOfSecurity,
         numberOfShares = required(row.securitiesQuantity, "securitiesQuantity", row.rowNumber).toInt,
         nominalValue = None, // SH03 only
         marketValue = marketValue.map(s=> BigDecimal(s)),
@@ -174,7 +174,7 @@ object RowTransforms {
         reasonForPurchase = row.sharePurchaseReason.map { reason =>
           reasonForPurchaseFrom(reason, required(row.purchaseForCancellation, "purchaseForCancellation", row.rowNumber))
         },
-        descriptionOfSecurity = shareType,
+        typeOfSecurity = shareType,
         numberOfShares = required(row.securitiesQuantity, "securitiesQuantity", row.rowNumber).toInt,
         nominalValue = None,
         marketValue = marketValue.map(s => BigDecimal(s)),

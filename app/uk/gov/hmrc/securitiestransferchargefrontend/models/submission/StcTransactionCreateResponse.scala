@@ -87,4 +87,13 @@ object StcTransactionCreateResponse:
   given Reads[StcTransactionCreateBusinessErrorBody] = Json.reads[StcTransactionCreateBusinessErrorBody]
   given Reads[StcTransactionCreateBusinessError] = Json.reads[StcTransactionCreateBusinessError]
 
-  given Reads[StcTransactionCreateResponse] = Json.reads[StcTransactionCreateResponse]
+  given Reads[StcTransactionCreateResponse] = Reads { json =>
+    (json \ "success", json \ "error", json \ "errors") match
+      case (JsDefined(_), _, _) =>
+        summon[Reads[StcTransactionCreateProcessed]].reads(json)
+      case (_, JsDefined(_), _) =>
+        summon[Reads[StcTransactionCreateBadRequest]].reads(json)
+      case (_, _, JsDefined(_)) =>
+        summon[Reads[StcTransactionCreateBusinessError]].reads(json)
+      case _ => JsError("Cannot deserialise JSON into StcTransactionCreateResponse")
+  }

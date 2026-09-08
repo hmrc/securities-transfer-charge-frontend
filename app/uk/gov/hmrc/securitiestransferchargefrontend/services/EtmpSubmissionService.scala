@@ -19,7 +19,7 @@ package uk.gov.hmrc.securitiestransferchargefrontend.services
 import play.api.Logging
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.securitiestransferchargefrontend.clients.EtmpSubmissionClient
-import uk.gov.hmrc.securitiestransferchargefrontend.domain.SubmissionId
+import uk.gov.hmrc.securitiestransferchargefrontend.domain.{SubmissionId, SubscriptionId}
 import uk.gov.hmrc.securitiestransferchargefrontend.models.UserAnswers
 import uk.gov.hmrc.securitiestransferchargefrontend.models.shared.AgentReference
 import uk.gov.hmrc.securitiestransferchargefrontend.models.submission.*
@@ -53,7 +53,7 @@ case object SubmissionCreateResponseFailure extends SubmissionCreateResponse
 val submissionFailure = Future.successful(SubmissionCreateResponseFailure)
 
 trait EtmpSubmissionService:
-  def submitSingleStf(userAnswers: UserAnswers, affinityData: AffinityData)(implicit hc: HeaderCarrier): Future[SubmissionCreateResponse]
+  def submitSingleStf(subscriptionId: SubscriptionId, userAnswers: UserAnswers, affinityData: AffinityData)(implicit hc: HeaderCarrier): Future[SubmissionCreateResponse]
 
 class EtmpSubmissionServiceImpl @Inject() (etmpSubmissionsClient: EtmpSubmissionClient)(implicit ec: ExecutionContext) extends EtmpSubmissionService with Logging:
 
@@ -104,14 +104,14 @@ class EtmpSubmissionServiceImpl @Inject() (etmpSubmissionsClient: EtmpSubmission
       true
     )
 
-  def submitSingleStf(userAnswers: UserAnswers, affinityData: AffinityData)(implicit hc: HeaderCarrier): Future[SubmissionCreateResponse] = {
+  def submitSingleStf(subscriptionId: SubscriptionId, userAnswers: UserAnswers, affinityData: AffinityData)(implicit hc: HeaderCarrier): Future[SubmissionCreateResponse] = {
     userAnswers.get(StfTransaction).map { stfSingleReq =>
       val stfReq = UserAnswersTransforms.toStfRequest(stfSingleReq, affinityData)
       val declaration = createDeclaration(userAnswers)
       val etmpPayload = SubmissionBatchPayload(declaration, List(stfReq))
 
       etmpSubmissionsClient
-        .submitSingleStf(userAnswers.submissionId, etmpPayload)
+        .submitSingleStf(subscriptionId, userAnswers.submissionId, etmpPayload)
         .map(toSubmissionCreateResponse(userAnswers))
     }.getOrElse(submissionFailure)
   }

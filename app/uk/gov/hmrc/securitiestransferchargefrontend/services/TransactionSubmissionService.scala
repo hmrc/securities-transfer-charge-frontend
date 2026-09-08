@@ -64,7 +64,7 @@ final class TransactionSubmissionServiceImpl @Inject() (
     implicit val hc: HeaderCarrier = HeaderCarrierConverter.fromRequestAndSession(request, request.session)
     lazy val submissionId = request.userAnswers.submissionId
     etmpSubmissionService
-      .submitSingleStf(request.userAnswers, getIndividualAffinityData)
+      .submitSingleStf(request.request.subscriptionId, request.userAnswers, getIndividualAffinityData)
       .map {
         _.fold(false) { stfResponse =>
           transactionResponseRepository.store(submissionId, stfResponse)

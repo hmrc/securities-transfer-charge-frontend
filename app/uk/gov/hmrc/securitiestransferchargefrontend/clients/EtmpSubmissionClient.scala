@@ -30,10 +30,17 @@ import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 import uk.gov.hmrc.http.HttpResponse
 import uk.gov.hmrc.http.HttpReads.Implicits.*
-import uk.gov.hmrc.securitiestransferchargefrontend.domain.SubmissionId
+import uk.gov.hmrc.securitiestransferchargefrontend.domain.{SubmissionId, SubscriptionId}
+import uk.gov.hmrc.securitiestransferchargefrontend.models.Headers
+
+import java.util.UUID
 
 trait EtmpSubmissionClient:
-  def submitSingleStf(submissionId: SubmissionId, payload: SubmissionBatchPayload)(implicit hc: HeaderCarrier): Future[StcTransactionCreateResponse]
+  def submitSingleStf(
+    subscriptionId: SubscriptionId,
+    submissionId: SubmissionId,
+    payload: SubmissionBatchPayload
+  )(implicit hc: HeaderCarrier): Future[StcTransactionCreateResponse]
 
 class EtmpSubmissionClientImpl @Inject()(
   http: HttpClientV2,
@@ -48,9 +55,13 @@ class EtmpSubmissionClientImpl @Inject()(
   private val logInfoAndFailParsing = (s: String) => logInfoAndFail(new SubmissionResponseParsingException(s))
   private val logInfoAndFailNon201 = (s: String) => logInfoAndFail(new SubmissionResponseException(s))
   
-  def submitSingleStf(submissionId: SubmissionId, payload: SubmissionBatchPayload)(implicit hc: HeaderCarrier): Future[StcTransactionCreateResponse] = {
-    http.post(url"${appConfig.submissionsServiceUrl}/${submissionId.value}")
+  def submitSingleStf(subscriptionId: SubscriptionId, submissionId: SubmissionId, payload: SubmissionBatchPayload)(implicit hc: HeaderCarrier): Future[StcTransactionCreateResponse] = {
+    http.post(url"${appConfig.submissionsServiceUrl}/submission/${submissionId.value}")
       .withBody(Json.toJson(payload))
+      .setHeader(
+        (Headers.CorrelationId, UUID.randomUUID().toString),
+        (Headers.SubscriptionId, subscriptionId.value)
+      )
       .execute[HttpResponse]
       .flatMap {
         case response if response.status == CREATED =>
@@ -61,3 +72,4 @@ class EtmpSubmissionClientImpl @Inject()(
         case otherResponse => logInfoAndFailNon201(s"Received $otherResponse when submitting to ETMP")
       }
     }
+

@@ -62,7 +62,7 @@ object UserAnswersTransforms {
       transactionDetails = SingleTransferTransactionDetails(
         transactionType = STF,
         reasonForPurchase = None,
-        descriptionOfSecurity = getDescriptionOfShares(stfTransaction),
+        typeOfSecurity = getDescriptionOfShares(stfTransaction),
         numberOfShares = getNumberOfShares(stfTransaction), //Need to capture the quantity if the user answer No to purchasing shares
         nominalValue = None,
         marketValue = stfTransaction.totalMarketValue,
@@ -143,7 +143,7 @@ object UserAnswersTransforms {
       transactionDetails = SingleTransferTransactionDetails(
         transactionType = SH03,
         reasonForPurchase = Some(getReasonForPurchase(sh03Transaction.reasonForPurchase, sh03Transaction.treasuryShares)),
-        descriptionOfSecurity = sh03Transaction.detailsOfThisSharePurchase.typeOfShares,
+        typeOfSecurity = sh03Transaction.detailsOfThisSharePurchase.typeOfShares,
         numberOfShares = sh03Transaction.detailsOfThisSharePurchase.numberOfShares,
         nominalValue = None, // TODO we might need to capture this for sh03
         marketValue = sh03Transaction.detailsOfThisSharePurchase.marketValue,
