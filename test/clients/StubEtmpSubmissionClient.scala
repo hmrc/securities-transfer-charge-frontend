@@ -18,13 +18,13 @@ package clients
 
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.securitiestransferchargefrontend.clients.EtmpSubmissionClient
-import uk.gov.hmrc.securitiestransferchargefrontend.domain.SubmissionId
+import uk.gov.hmrc.securitiestransferchargefrontend.domain.{SubmissionId, SubscriptionId}
 import uk.gov.hmrc.securitiestransferchargefrontend.models.submission.{StcCharge, StcChargeSuccess, StcTransactionCreateProcessed, StcTransactionCreateProcessedBody, StcTransactionCreateResponse, SubmissionBatchPayload}
 
 import scala.concurrent.Future
 
 class StubEtmpSubmissionClient extends EtmpSubmissionClient:
-  override def submitSingleStf(submissionId: SubmissionId, payload: SubmissionBatchPayload)(implicit hc: HeaderCarrier): Future[StcTransactionCreateResponse] =
+  override def submitSingleStf(subscriptionId: SubscriptionId, submissionId: SubmissionId, payload: SubmissionBatchPayload)(implicit hc: HeaderCarrier): Future[StcTransactionCreateResponse] =
     Future.successful(
       StcTransactionCreateProcessed(
         StcTransactionCreateProcessedBody(
