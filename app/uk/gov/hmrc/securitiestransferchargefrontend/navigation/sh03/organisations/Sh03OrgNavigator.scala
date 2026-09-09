@@ -36,6 +36,7 @@ import uk.gov.hmrc.securitiestransferchargefrontend.services.AnswerPersistenceSe
 
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
+import scala.util.Try
 
 @Singleton
 class Sh03OrgNavigator @Inject()(
@@ -59,8 +60,16 @@ class Sh03OrgNavigator @Inject()(
   def errorPage(forPage: Page): Call = forPage match {
     case _ => defaultPage
   }
-  
-  val checkRouteMap: Page => UserAnswers => Call = _ => _ => sh03OrgSingleRoutes.CheckYourAnswersController.onPageLoad()
+
+  val checkRouteMap: Page => UserAnswers => Call = page => userAnswers => page match {
+    case BulkCompanyDetailsPage | BulkRoleAtPurchasingCompanyPage =>
+      Try(userAnswers.getFileUploadReference()).toOption match {
+        case Some(reference) => sh03OrgBulkRoutes.CheckYourAnswersController.onPageLoad(reference)
+        case None => routes.JourneyRecoveryController.onPageLoad()
+      }
+    case _ =>
+      sh03OrgSingleRoutes.CheckYourAnswersController.onPageLoad()
+  }
 
   def restore(submissionId: SubmissionId, userId: UserId)(implicit request: Request[?]): Future[UserAnswers] = {
     implicit val hc: HeaderCarrier = HeaderCarrierConverter.fromRequestAndSession(request, request.session)

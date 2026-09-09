@@ -27,7 +27,8 @@ import uk.gov.hmrc.securitiestransferchargefrontend.controllers.sh03.organisatio
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.sh03.organisations.single.routes as sh03OrgSingleRoutes
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.sh03.shared.routes as sharedRoutes
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.sh03.organisations.bulk.routes as sh03OrgBulkRoutes
-import uk.gov.hmrc.securitiestransferchargefrontend.controllers.sh03.shared.bulk.routes as sh03BulkCyaRoutes
+import uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.shared.routes as stfSharedRoutes
+import uk.gov.hmrc.securitiestransferchargefrontend.controllers.routes as commonRoutes
 import uk.gov.hmrc.securitiestransferchargefrontend.models.sh03.HowToNotifyAboutShareBuyback
 import uk.gov.hmrc.securitiestransferchargefrontend.models.sh03.shared.*
 import uk.gov.hmrc.securitiestransferchargefrontend.models.{CheckMode, NormalMode, UserAnswers}
@@ -36,7 +37,7 @@ import uk.gov.hmrc.securitiestransferchargefrontend.pages.Page
 import uk.gov.hmrc.securitiestransferchargefrontend.pages.sh03.*
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.fileUpload.routes as fileUploadRoutes
 import uk.gov.hmrc.securitiestransferchargefrontend.models.JourneyType.SH03
-import uk.gov.hmrc.securitiestransferchargefrontend.pages.sh03.bulk.{BulkCompanyDetailsPage, BulkRoleAtPurchasingCompanyPage, CannotSubmitFormErrorPage}
+import uk.gov.hmrc.securitiestransferchargefrontend.pages.sh03.bulk.{BulkCheckYourAnswersPage, BulkCompanyDetailsPage, BulkRoleAtPurchasingCompanyPage, CannotSubmitFormErrorPage}
 import uk.gov.hmrc.securitiestransferchargefrontend.pages.sh03.shared.CheckYourAnswersPage
 
 import java.time.LocalDate
@@ -80,11 +81,19 @@ class Sh03OrgNavigatorSpec extends SpecBase with ScalaFutures {
         }
       }
 
-      "must go from HowToNotifyAboutShareBuybackPage to CompanyDetailsPage" in {
+      "must go from HowToNotifyAboutShareBuybackPage to CompanyDetailsPage when OneAtATime is selected" in {
         val answers = emptyUserAnswers.set(HowToNotifyAboutShareBuybackPage, HowToNotifyAboutShareBuyback.OneAtATime).get
         val result = navigator.nextPage(HowToNotifyAboutShareBuybackPage, NormalMode, answers)(fakeRequest)
         whenReady(result) { res =>
           res mustBe sh03OrgSingleRoutes.CompanyDetailsController.onPageLoad(NormalMode)
+        }
+      }
+
+      "must go from HowToNotifyAboutShareBuybackPage to Bulk CompanyDetailsPage when MoreThanOneAtATime is selected" in {
+        val answers = emptyUserAnswers.set(HowToNotifyAboutShareBuybackPage, HowToNotifyAboutShareBuyback.MoreThanOneAtATime).get
+        val result = navigator.nextPage(HowToNotifyAboutShareBuybackPage, NormalMode, answers)(fakeRequest)
+        whenReady(result) { res =>
+          res mustBe sh03OrgBulkRoutes.CompanyDetailsController.onPageLoad(NormalMode)
         }
       }
 
@@ -206,11 +215,44 @@ class Sh03OrgNavigatorSpec extends SpecBase with ScalaFutures {
         }
       }
 
-      "must go from RoleAtPurchasingCompanyPage to CannotSubmitFormErrorPage when a selects None of these (unsupportedRole)" in {
+      "must go from RoleAtPurchasingCompanyPage to CannotSubmitFormErrorPage when a user selects None of these (unsupportedRole)" in {
         val answers = emptyUserAnswers.set(RoleAtPurchasingCompanyPage, RoleAtPurchasingCompany(role = "unsupportedRole", uksOrgan = None)).get
         val result = navigator.nextPage(RoleAtPurchasingCompanyPage, NormalMode, answers)(fakeRequest)
         whenReady(result) { res =>
           res mustBe sh03OrgSingleRoutes.CannotSubmitFormErrorController.onPageLoad()
+        }
+      }
+
+      "must go from CheckYourAnswersPage to ConfirmationPage" in {
+        val result = navigator.nextPage(CheckYourAnswersPage, NormalMode, emptyUserAnswers)(fakeRequest)
+        whenReady(result) { res =>
+          res mustBe stfSharedRoutes.ConfirmationController.onPageLoad()
+        }
+      }
+
+      "must go from BulkRoleAtPurchasingCompanyPage to CannotSubmitFormErrorPage when user selects None of these (unsupportedRole)" in {
+        val answers = emptyUserAnswers.set(BulkRoleAtPurchasingCompanyPage, RoleAtPurchasingCompany(role = "unsupportedRole", uksOrgan = None)).get
+        val result = navigator.nextPage(BulkRoleAtPurchasingCompanyPage, NormalMode, answers)(fakeRequest)
+        whenReady(result) { res =>
+          res mustBe sh03OrgBulkRoutes.CannotSubmitFormErrorController.onPageLoad()
+        }
+      }
+
+      "must go from BulkRoleAtPurchasingCompanyPage to CheckYourAnswersPage when a supported role is selected and file reference exists" in {
+        val answers = emptyUserAnswers
+          .set(BulkRoleAtPurchasingCompanyPage, RoleAtPurchasingCompany(role = "Director", uksOrgan = None)).get
+          .setFileUploadReference("test-ref")
+
+        val result = navigator.nextPage(BulkRoleAtPurchasingCompanyPage, NormalMode, answers)(fakeRequest)
+        whenReady(result) { res =>
+          res mustBe sh03OrgBulkRoutes.CheckYourAnswersController.onPageLoad("test-ref")
+        }
+      }
+
+      "must go from BulkCheckYourAnswersPage to ConfirmationPage" in {
+        val result = navigator.nextPage(BulkCheckYourAnswersPage, NormalMode, emptyUserAnswers)(fakeRequest)
+        whenReady(result) { res =>
+          res mustBe stfSharedRoutes.ConfirmationController.onPageLoad()
         }
       }
 
@@ -250,18 +292,39 @@ class Sh03OrgNavigatorSpec extends SpecBase with ScalaFutures {
       }
     }
 
-    "must go from BulkCompanyDetailsPage to the Bulk Check Your Answers page" in {
-      val result = navigator.nextPage(BulkCompanyDetailsPage, CheckMode, emptyUserAnswers)(fakeRequest)
+    "must go from BulkCompanyDetailsPage to the Bulk Check Your Answers page when file reference exists" in {
+      val answers = emptyUserAnswers.setFileUploadReference("test-ref")
+      val result = navigator.nextPage(BulkCompanyDetailsPage, CheckMode, answers)(fakeRequest)
       whenReady(result) { res =>
-        res mustBe sh03BulkCyaRoutes.CheckYourAnswersController.onPageLoad()
+        res mustBe sh03OrgBulkRoutes.CheckYourAnswersController.onPageLoad("test-ref")
       }
     }
 
-    "must go from BulkRoleAtPurchasingCompanyPage to the Bulk Check Your Answers page" in {
+    "must go from BulkCompanyDetailsPage to Journey Recovery when file reference is missing" in {
+      val result = navigator.nextPage(BulkCompanyDetailsPage, CheckMode, emptyUserAnswers)(fakeRequest)
+      whenReady(result) { res =>
+        res mustBe commonRoutes.JourneyRecoveryController.onPageLoad()
+      }
+    }
+
+    "must go from BulkRoleAtPurchasingCompanyPage to the Bulk Check Your Answers page when file reference exists" in {
+      val answers = emptyUserAnswers.setFileUploadReference("test-ref")
+      val result = navigator.nextPage(BulkRoleAtPurchasingCompanyPage, CheckMode, answers)(fakeRequest)
+      whenReady(result) { res =>
+        res mustBe sh03OrgBulkRoutes.CheckYourAnswersController.onPageLoad("test-ref")
+      }
+    }
+
+    "must go from BulkRoleAtPurchasingCompanyPage to Journey Recovery when file reference is missing" in {
       val result = navigator.nextPage(BulkRoleAtPurchasingCompanyPage, CheckMode, emptyUserAnswers)(fakeRequest)
       whenReady(result) { res =>
-        res mustBe sh03BulkCyaRoutes.CheckYourAnswersController.onPageLoad()
+        res mustBe commonRoutes.JourneyRecoveryController.onPageLoad()
       }
+    }
+
+    "must go from BulkCompanyDetailsPage to defaultPage when file reference is missing" in {
+      val result = navigator.previousPage(BulkCompanyDetailsPage, CheckMode, emptyUserAnswers)
+      result mustBe navigator.defaultPage
     }
   }
 
@@ -352,6 +415,11 @@ class Sh03OrgNavigatorSpec extends SpecBase with ScalaFutures {
     "must go from the RoleAtPurchasingCompanyPage to ChargingPointPage" in {
       val result = navigator.previousPage(RoleAtPurchasingCompanyPage, NormalMode, emptyUserAnswers)
       result mustBe sh03OrgSingleRoutes.ChargingPointController.onPageLoad(NormalMode)
+    }
+
+    "must go from the BulkCheckYourAnswersPage to BulkRoleAtPurchasingCompanyPage" in {
+      val result = navigator.previousPage(BulkCheckYourAnswersPage, NormalMode, emptyUserAnswers)
+      result mustBe sh03OrgBulkRoutes.RoleAtPurchasingCompanyController.onPageLoad(NormalMode)
     }
   }
 

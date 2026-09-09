@@ -17,19 +17,21 @@
 package uk.gov.hmrc.securitiestransferchargefrontend.navigation.sh03.organisations
 
 import play.api.mvc.Call
+import uk.gov.hmrc.securitiestransferchargefrontend.controllers.fileUpload.routes as fileUploadRoutes
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.sh03.organisations.routes as sh03OrgRoutes
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.sh03.organisations.single.routes as sh03OrgSingleRoutes
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.sh03.shared.routes as sharedRoutes
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.sh03.organisations.bulk.routes as sh03OrgBulkRoutes
-import uk.gov.hmrc.securitiestransferchargefrontend.controllers.fileUpload.routes
+import uk.gov.hmrc.securitiestransferchargefrontend.models.JourneyType.SH03
 import uk.gov.hmrc.securitiestransferchargefrontend.models.sh03.shared.ReasonForPurchase
 import uk.gov.hmrc.securitiestransferchargefrontend.models.{CheckMode, Mode, NormalMode, UserAnswers}
 import uk.gov.hmrc.securitiestransferchargefrontend.navigation.NavigationHelper
 import uk.gov.hmrc.securitiestransferchargefrontend.pages.*
 import uk.gov.hmrc.securitiestransferchargefrontend.pages.sh03.*
-import uk.gov.hmrc.securitiestransferchargefrontend.pages.sh03.bulk.{BulkCompanyDetailsPage, BulkRoleAtPurchasingCompanyPage, CannotSubmitFormErrorPage}
-import uk.gov.hmrc.securitiestransferchargefrontend.models.JourneyType.SH03
+import uk.gov.hmrc.securitiestransferchargefrontend.pages.sh03.bulk.{BulkCheckYourAnswersPage, BulkCompanyDetailsPage, BulkRoleAtPurchasingCompanyPage, CannotSubmitFormErrorPage}
 import uk.gov.hmrc.securitiestransferchargefrontend.pages.sh03.shared.CheckYourAnswersPage
+
+import scala.util.Try
 
 class BackwardsRoutes(defaultPage: Call):
 
@@ -76,17 +78,28 @@ class BackwardsRoutes(defaultPage: Call):
             sh03OrgSingleRoutes.MinimumAmountPaidController.onPageLoad(NormalMode)
           else
             sh03OrgSingleRoutes.DetailsOfThisSharePurchaseController.onPageLoad(NormalMode)
-
         }
       }
     case RoleAtPurchasingCompanyPage => _ => sh03OrgSingleRoutes.ChargingPointController.onPageLoad(NormalMode)
     case CheckYourAnswersPage => _ => sh03OrgSingleRoutes.RoleAtPurchasingCompanyController.onPageLoad(NormalMode)
+
     case BulkCompanyDetailsPage => _ => sh03OrgRoutes.HowToNotifyAboutShareBuybackController.onPageLoad()
-    case BulkRoleAtPurchasingCompanyPage => _ => routes.FileUploadController.onPageLoad(SH03)
+    case BulkRoleAtPurchasingCompanyPage => _ => fileUploadRoutes.FileUploadController.onPageLoad(SH03)
     case CannotSubmitFormErrorPage => _ => sh03OrgBulkRoutes.RoleAtPurchasingCompanyController.onPageLoad(NormalMode)
+    case BulkCheckYourAnswersPage => _ => sh03OrgBulkRoutes.RoleAtPurchasingCompanyController.onPageLoad(NormalMode)
+
     case _ => _ => defaultPage
   }
 
   private def checkRoutes(page: Page): Option[UserAnswers] => Call = page match {
-    case _ => _ => sh03OrgSingleRoutes.CheckYourAnswersController.onPageLoad()
+    case BulkCompanyDetailsPage | BulkRoleAtPurchasingCompanyPage =>
+      _.fold(defaultPage) { userAnswers =>
+        Try(userAnswers.getFileUploadReference()).toOption match {
+          case Some(reference) => sh03OrgBulkRoutes.CheckYourAnswersController.onPageLoad(reference)
+          case None => defaultPage
+        }
+      }
+
+    case _ =>
+      _ => sh03OrgSingleRoutes.CheckYourAnswersController.onPageLoad()
   }
