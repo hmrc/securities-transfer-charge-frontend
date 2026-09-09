@@ -24,15 +24,17 @@ import uk.gov.hmrc.securitiestransferchargefrontend.config.FrontendAppConfig
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.actions.*
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.fileUpload.routes
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.routes.JourneyRecoveryController
-import uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.agents.bulk.routes as stfBulkRoutes
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.sh03.agents.bulk.routes as sh03BulkRoutes
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.sh03.organisations.bulk.routes as sh03OrgBulkRoutes
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.sh03.shared.bulk.routes as sh03CyaRoutes
+import uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.agents.bulk.routes as stfBulkRoutes
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.individuals.bulk.routes as stfBulkIndRoutes
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.organisations.bulk.routes as stfBulkOrgRoutes
-import uk.gov.hmrc.securitiestransferchargefrontend.models.{JourneyType, NormalMode}
+import uk.gov.hmrc.securitiestransferchargefrontend.models.audit.{AuditType, UpscanValidationAuditModel}
 import uk.gov.hmrc.securitiestransferchargefrontend.models.stf.upscan.{FileUpload, UpscanJourneyStatus}
+import uk.gov.hmrc.securitiestransferchargefrontend.models.{JourneyType, NormalMode}
 import uk.gov.hmrc.securitiestransferchargefrontend.repositories.UpscanJourneyRepository
+import uk.gov.hmrc.securitiestransferchargefrontend.services.AuditService
 import uk.gov.hmrc.securitiestransferchargefrontend.services.fileupload.processing.FileProcessingHelper.*
 import uk.gov.hmrc.securitiestransferchargefrontend.services.fileupload.processing.{FileProcessingRefreshCounter, FileProcessingRefreshCounterFactory, ProcessingService}
 import uk.gov.hmrc.securitiestransferchargefrontend.views.html.fileUpload.{BulkUploadErrorView, FileProcessingView}
@@ -50,7 +52,8 @@ class FileProcessingController @Inject()(
                                           upscanJourneyRepository: UpscanJourneyRepository,
                                           val controllerComponents: MessagesControllerComponents,
                                           appConfig: FrontendAppConfig,
-                                          processingService: ProcessingService
+                                          processingService: ProcessingService,
+                                          auditService: AuditService
                                         )(implicit ec: ExecutionContext)
   extends FrontendBaseController
     with I18nSupport {
@@ -92,6 +95,28 @@ class FileProcessingController @Inject()(
   private def spinnerPage(counter: FileProcessingRefreshCounter)(implicit request: StcAuthorisedRequest[_]) =
     counter.withIncrementedCounter(Ok(spinnerView(refreshInterval)))
 
+  private def auditUpscanSuccess(reference: String, fileUpload: FileUpload)(implicit request: StcAuthorisedRequest[_]): Unit = {
+    auditService.audit(
+      UpscanValidationAuditModel(
+        upscanStatus = "Success",
+        fileReference = reference,
+        fileName = fileUpload.uploadDetails.map(_.fileName),
+        stcAuditType = AuditType.UpscanValidation
+      )
+    )
+  }
+
+  private def auditUpscanFailure(reference: String, fileUpload: FileUpload)(implicit request: StcAuthorisedRequest[_]): Unit = {
+    auditService.audit(
+      UpscanValidationAuditModel(
+        upscanStatus = "Failure",
+        fileReference = reference,
+        failureReason = fileUpload.failureReason,
+        failureMessage = fileUpload.message,
+        stcAuditType = AuditType.UpscanValidation
+      )
+    )
+  }
 
   private def handleStatus(
                             reference: String,
@@ -106,6 +131,7 @@ class FileProcessingController @Inject()(
         Future.successful(Redirect(routes.BulkUploadFileEmptyController.onPageLoad(journeyType)))
 
       case UpscanJourneyStatus.Ready =>
+        auditUpscanSuccess(reference, fileUpload)
         processingService.processReadyUpload(reference, fileUpload, affinityKey, journeyType)
         Future.successful(spinnerPage(counter))
 
@@ -125,13 +151,21 @@ class FileProcessingController @Inject()(
 
       case UpscanJourneyStatus.FileParseError => Future.successful(Redirect(JourneyRecoveryController.onPageLoad()))
 
-      case UpscanJourneyStatus.Failed if isEncryptedFailure(fileUpload) => Future.successful(Redirect(routes.EncryptedFileErrorController.onPageLoad(journeyType)))
+      case UpscanJourneyStatus.Failed if isEncryptedFailure(fileUpload) =>
+        auditUpscanFailure(reference, fileUpload)
+        Future.successful(Redirect(routes.EncryptedFileErrorController.onPageLoad(journeyType)))
 
-      case UpscanJourneyStatus.Failed if isVirusFailure(fileUpload) => Future.successful(Redirect(routes.BulkUploadVirusErrorController.onPageLoad(journeyType)))
+      case UpscanJourneyStatus.Failed if isVirusFailure(fileUpload) =>
+        auditUpscanFailure(reference, fileUpload)
+        Future.successful(Redirect(routes.BulkUploadVirusErrorController.onPageLoad(journeyType)))
 
-      case UpscanJourneyStatus.Failed if isInvalidFileTypeFailure(fileUpload) => Future.successful(Redirect(routes.FileTypeErrorController.onPageLoad(journeyType)))
+      case UpscanJourneyStatus.Failed if isInvalidFileTypeFailure(fileUpload) =>
+        auditUpscanFailure(reference, fileUpload)
+        Future.successful(Redirect(routes.FileTypeErrorController.onPageLoad(journeyType)))
 
-      case UpscanJourneyStatus.Failed => Future.successful(Redirect(routes.BulkUploadErrorController.onPageLoad(journeyType)))
+      case UpscanJourneyStatus.Failed =>
+        auditUpscanFailure(reference, fileUpload)
+        Future.successful(Redirect(routes.BulkUploadErrorController.onPageLoad(journeyType)))
 
       case UpscanJourneyStatus.Completed =>
         (request.affinityGroup, journeyType) match {

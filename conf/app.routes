@@ -13,6 +13,7 @@ GET         /refresh-session                              uk.gov.hmrc.securities
 GET         /there-is-a-problem                           uk.gov.hmrc.securitiestransferchargefrontend.controllers.JourneyRecoveryController.onPageLoad(continueUrl: Option[RedirectUrl] ?= None)
 GET        /check-your-answers                            uk.gov.hmrc.securitiestransferchargefrontend.controllers.CheckYourAnswersController.onPageLoad()
 
+GET        /bulk/change-file                            uk.gov.hmrc.securitiestransferchargefrontend.controllers.ChangeFileCheckController.onPageLoad()
 GET        /stf/bulk/check-your-answers                 uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.shared.bulk.CheckYourAnswersController.onPageLoad()
 GET        /stf/bulk/check-your-answers/:reference      uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.individuals.bulk.CheckYourAnswersController.onPageLoad(reference: String)
 POST       /stf/bulk/check-your-answers                 uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.individuals.bulk.CheckYourAnswersController.onSubmit()

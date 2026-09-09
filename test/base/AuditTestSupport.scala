@@ -16,7 +16,7 @@
 
 package base
 
-import base.Fixtures.{testAuditType, testInternalId}
+import base.Fixtures.{testAuditType, testSubscriptionId}
 import org.mockito.ArgumentCaptor
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.{times, verify}
@@ -24,7 +24,7 @@ import org.scalatest.matchers.must.Matchers.mustBe
 import play.api.libs.json.Json
 import uk.gov.hmrc.auth.core.AffinityGroup
 import uk.gov.hmrc.securitiestransferchargefrontend.domain.{CredentialId, SubmissionId}
-import uk.gov.hmrc.securitiestransferchargefrontend.models.audit.{AuditModel, JourneyStatus}
+import uk.gov.hmrc.securitiestransferchargefrontend.models.audit.{AuditModel, AuditType, JourneyStatus, UpscanValidationAuditModel}
 import uk.gov.hmrc.securitiestransferchargefrontend.services.AuditService
 
 trait AuditTestSupport {
@@ -47,10 +47,30 @@ trait AuditTestSupport {
 
     auditCaptor.getValue.detail mustBe Json.obj(
       "journeyStatus" -> journeyStatus.toString,
-      "internalId" -> testInternalId,
+      "subscriptionId" -> testSubscriptionId,
       "affinityGroup" -> affinityGroup.toString,
       "credentialId" -> credentialId,
       "submissionId" -> submissionId,
     )
+  }
+
+  def verifyUpscanAudit(
+                         auditService: AuditService,
+                         expectedStatus: String,
+                         expectedReference: String,
+                         expectedFileName: Option[String] = None,
+                         expectedFailureReason: Option[String] = None,
+                         expectedFailureMessage: Option[String] = None
+                       ): Unit = {
+    val auditCaptor = ArgumentCaptor.forClass(classOf[UpscanValidationAuditModel])
+    verify(auditService, times(1)).audit(auditCaptor.capture())(any())
+
+    val event = auditCaptor.getValue
+    event.upscanStatus mustBe expectedStatus
+    event.fileReference mustBe expectedReference
+    event.fileName mustBe expectedFileName
+    event.stcAuditType mustBe AuditType.UpscanValidation
+    event.failureReason mustBe expectedFailureReason
+    event.failureMessage mustBe expectedFailureMessage
   }
 }

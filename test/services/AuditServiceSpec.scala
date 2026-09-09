@@ -16,7 +16,7 @@
 
 package services
 
-import base.Fixtures.{testAuditType, testCredentialId, testInternalId, testSubmissionId}
+import base.Fixtures.{testAuditType, testCredentialId, testSubmissionId, testSubscriptionId}
 import org.mockito.ArgumentMatchers.{any, eq as eqTo}
 import org.mockito.Mockito
 import org.mockito.Mockito.{times, verify, when}
@@ -28,6 +28,7 @@ import play.api.libs.json.{JsObject, Json}
 import uk.gov.hmrc.auth.core.AffinityGroup.{Agent, Individual, Organisation}
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.play.audit.http.connector.AuditConnector
+import uk.gov.hmrc.securitiestransferchargefrontend.models.audit.AuditType.Stf
 import uk.gov.hmrc.securitiestransferchargefrontend.models.audit.{AuditModel, JourneyStatus}
 import uk.gov.hmrc.securitiestransferchargefrontend.services.AuditService
 
@@ -63,17 +64,18 @@ class AuditServiceSpec extends AnyFreeSpec with Matchers with MockitoSugar with 
 
           val auditModel = AuditModel.build(
             journeyStatus = journeyStatus,
-            internalId = testInternalId,
+            subscriptionId = testSubscriptionId,
             affinityGroup = affinityGroup,
             credentialId = testCredentialId,
-            submissionId = testSubmissionId
+            submissionId = Some(testSubmissionId),
+            auditType = Stf
           )
 
           service.audit(auditModel)
 
           val expectedJson = Json.obj(
             "journeyStatus" -> journeyStatus.toString,
-            "internalId" -> testInternalId,
+            "subscriptionId" -> testSubscriptionId,
             "affinityGroup" -> affinityGroup.toString,
             "credentialId" -> testCredentialId,
             "submissionId" -> testSubmissionId
@@ -92,10 +94,11 @@ class AuditServiceSpec extends AnyFreeSpec with Matchers with MockitoSugar with 
 
       val auditModel = AuditModel.build(
         journeyStatus = JourneyStatus.ContinueSubmission,
-        internalId = testInternalId,
+        subscriptionId = testSubscriptionId,
         affinityGroup = uk.gov.hmrc.auth.core.AffinityGroup.Individual,
         credentialId = testCredentialId,
-        submissionId = testSubmissionId
+        submissionId = Some(testSubmissionId),
+        auditType = Stf
       )
 
       when(mockAuditConnector

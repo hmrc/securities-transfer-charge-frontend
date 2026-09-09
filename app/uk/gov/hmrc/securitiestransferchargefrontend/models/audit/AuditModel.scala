@@ -18,34 +18,37 @@ package uk.gov.hmrc.securitiestransferchargefrontend.models.audit
 
 import play.api.libs.json.{JsObject, Json}
 import uk.gov.hmrc.auth.core.AffinityGroup
-import uk.gov.hmrc.securitiestransferchargefrontend.domain.{CredentialId, SubmissionId, UserId}
+import uk.gov.hmrc.securitiestransferchargefrontend.domain.{CredentialId, SubmissionId, SubscriptionId}
 
 case class AuditModel(
                        journeyStatus: JourneyStatus,
-                       internalId: UserId,
+                       subscriptionId: SubscriptionId,
                        affinityGroup: AffinityGroup,
                        credentialId: CredentialId,
-                       submissionId: SubmissionId,
+                       submissionId: Option[SubmissionId],
+                       stcAuditType: AuditType
                      ) extends JsonAuditModel {
 
-  override val auditType: String = "StockTransferFormStatus"
+  override val auditType: String = stcAuditType.value
 
   override val detail: JsObject = Json.obj(
     "journeyStatus" -> journeyStatus.toString,
-    "internalId" -> internalId,
+    "subscriptionId" -> subscriptionId,
     "affinityGroup" -> affinityGroup,
-    "credentialId" -> credentialId,
-    "submissionId" -> submissionId
-  )
+    "credentialId" -> credentialId
+  ) ++ submissionId.fold(Json.obj()) { id =>
+    Json.obj("submissionId" -> id)
+  }
 }
 
 object AuditModel {
 
   def build(
              journeyStatus: JourneyStatus,
-             internalId: UserId,
+             subscriptionId: SubscriptionId,
              affinityGroup: AffinityGroup,
              credentialId: CredentialId,
-             submissionId: SubmissionId
-           ): AuditModel = AuditModel(journeyStatus, internalId, affinityGroup, credentialId, submissionId)
+             submissionId: Option[SubmissionId],
+             auditType: AuditType
+           ): AuditModel = AuditModel(journeyStatus, subscriptionId, affinityGroup, credentialId, submissionId, auditType)
 }

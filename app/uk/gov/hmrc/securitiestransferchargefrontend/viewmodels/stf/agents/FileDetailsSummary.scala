@@ -30,7 +30,7 @@ object FileDetailsSummary {
           key = messages("agent.checkYourAnswers.fileDetails.key"),
           value = ValueViewModel(HtmlFormat.escape(fileName).toString),
           actions = Seq(
-            ActionItemViewModel("site.change", routes.JourneyRecoveryController.onPageLoad().url)
+            ActionItemViewModel("site.change", routes.ChangeFileCheckController.onPageLoad().url)
               .withVisuallyHiddenText(messages("agent.checkYourAnswers.changeFile.hidden"))
           )
         )

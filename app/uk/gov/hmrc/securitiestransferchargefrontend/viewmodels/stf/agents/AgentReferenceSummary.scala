@@ -39,7 +39,8 @@ object AgentReferenceSummary {
       actions = Seq(
         ActionItemViewModel("site.change", routes.AgentReferenceController.onPageLoad(CheckMode).url)
           .withVisuallyHiddenText(messages("agentReference.change.hidden"))
+        )
       )
-    ))
+    )
   }
 }
