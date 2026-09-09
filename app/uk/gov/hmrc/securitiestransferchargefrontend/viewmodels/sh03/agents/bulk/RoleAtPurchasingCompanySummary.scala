@@ -17,7 +17,6 @@
 package uk.gov.hmrc.securitiestransferchargefrontend.viewmodels.sh03.agents.bulk
 
 import play.api.i18n.Messages
-import play.twirl.api.HtmlFormat
 import uk.gov.hmrc.govukfrontend.views.viewmodels.content.HtmlContent
 import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.SummaryListRow
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.sh03.agents.bulk.routes
@@ -30,20 +29,15 @@ object RoleAtPurchasingCompanySummary {
 
   def row(answers: UserAnswers)(implicit messages: Messages): Option[SummaryListRow] =
     answers.get(RoleAtPurchasingCompanyPage).map { answer =>
-      
+      val fileUploadRef = answers.getFileUploadReference()
       val roleText = messages(s"agent.sh03.roleAtPurchasingCompany.${answer.role}")
-      
-      val valueHtml = answer.uksOrgan match {
-        case Some(organ) => s"${HtmlFormat.escape(roleText).toString}<br>${HtmlFormat.escape(organ).toString}"
-        case None        => HtmlFormat.escape(roleText).toString
-      }
 
       SummaryListRowViewModel(
         key = "agent.sh03.roleAtPurchasingCompany.checkYourAnswersLabel",
-        value = ValueViewModel(HtmlContent(valueHtml)),
+        value = ValueViewModel(HtmlContent(roleText)),
         actions = Seq(
-          ActionItemViewModel("site.change", routes.RoleAtPurchasingCompanyController.onPageLoad(CheckMode).url)
-            .withVisuallyHiddenText(messages("agent.sh03.roleAtPurchasingCompany.change.hidden"))
+          ActionItemViewModel("site.change", routes.RoleAtPurchasingCompanyController.onPageLoad(CheckMode, fileUploadRef).url)
+            .withVisuallyHiddenText(messages("agent.sh03.bulk.roleAtPurchasingCompany.change.hidden"))
         )
       )
     }

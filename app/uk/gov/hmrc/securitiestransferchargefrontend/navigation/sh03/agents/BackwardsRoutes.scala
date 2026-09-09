@@ -81,10 +81,14 @@ class BackwardsRoutes(defaultPage: Call):
     case BulkAgentReferencePage => _ => sh03AgentRoutes.HowToNotifyAboutShareBuybackController.onPageLoad()
     case BulkCompanyDetailsPage => _ => sh03AgentBulkRoutes.AgentReferenceController.onPageLoad(NormalMode)
     case BulkRoleAtPurchasingCompanyPage => _ => routes.FileUploadController.onPageLoad(SH03)
-    case CannotSubmitFormErrorPage => _ => sh03AgentBulkRoutes.RoleAtPurchasingCompanyController.onPageLoad(NormalMode)
+    case CannotSubmitFormErrorPage | BulkCheckYourAnswersPage => _.fold(defaultPage) { userAnswers =>
+      val fileUploadRef = getFileUploadRef(userAnswers)
+      sh03AgentBulkRoutes.RoleAtPurchasingCompanyController.onPageLoad(NormalMode, fileUploadRef)
+    }
     case _ => _ => defaultPage
   }
   
   private def checkRoutes(page: Page): Option[UserAnswers] => Call = page match {
+    case BulkRoleAtPurchasingCompanyPage | BulkAgentReferencePage | BulkCompanyDetailsPage => _ => sh03AgentBulkRoutes.CheckYourAnswersController.onPageLoad()
     case _ => _ => sh03AgentSingleRoutes.CheckYourAnswersController.onPageLoad()
   }

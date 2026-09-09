@@ -128,7 +128,8 @@ class UserAnswersValidatorSpec extends AnyFreeSpec with Matchers with ScalaFutur
           override protected val startPage: GettablePage[?] = TestStartPage
           override protected lazy val pageCallMap: PageCallBiMap = new PageCallBiMapImpl(
             Map(TestStartPage -> startPageCall, TestPage1 -> page1Call, TestPage2 -> page2Call, TestCyaPage -> cyaPageCall),
-            Map(startPageCall -> TestStartPage, page1Call -> TestPage1, page2Call -> TestPage2, cyaPageCall -> TestCyaPage)
+            Map(startPageCall -> TestStartPage, page1Call -> TestPage1, page2Call -> TestPage2, cyaPageCall -> TestCyaPage),
+            Map(TestStartPage -> (_ => startPageCall), TestPage1 -> (_ => page1Call), TestPage2 -> (_ => page2Call), TestCyaPage -> (_ => cyaPageCall))
           )
         }
 
@@ -153,7 +154,8 @@ class UserAnswersValidatorSpec extends AnyFreeSpec with Matchers with ScalaFutur
           override protected val startPage: GettablePage[?] = TestStartPage
           override protected lazy val pageCallMap: PageCallBiMap = new PageCallBiMapImpl(
             Map(TestStartPage -> startPageCall, TestPage1 -> page1Call, TestPage2 -> page2Call, TestCyaPage -> cyaPageCall),
-            Map(startPageCall -> TestStartPage, page1Call -> TestPage1, page2Call -> TestPage2, cyaPageCall -> TestCyaPage)
+            Map(startPageCall -> TestStartPage, page1Call -> TestPage1, page2Call -> TestPage2, cyaPageCall -> TestCyaPage),
+            Map(TestStartPage -> (_ => startPageCall), TestPage1 -> (_ => page1Call), TestPage2 -> (_ => page2Call), TestCyaPage -> (_ => cyaPageCall))
           )
         }
 
@@ -178,7 +180,8 @@ class UserAnswersValidatorSpec extends AnyFreeSpec with Matchers with ScalaFutur
           override protected val startPage: GettablePage[?] = TestStartPage
           override protected lazy val pageCallMap: PageCallBiMap = new PageCallBiMapImpl(
             Map(TestStartPage -> startPageCall, TestPage1 -> page1Call, TestPage2 -> page2Call, TestPage3 -> page3Call, TestCyaPage -> cyaPageCall),
-            Map(startPageCall -> TestStartPage, page1Call -> TestPage1, page2Call -> TestPage2, page3Call -> TestPage3, cyaPageCall -> TestCyaPage)
+            Map(startPageCall -> TestStartPage, page1Call -> TestPage1, page2Call -> TestPage2, page3Call -> TestPage3, cyaPageCall -> TestCyaPage),
+            Map(TestStartPage -> (_ => startPageCall), TestPage1 -> (_ => page1Call), TestPage2 -> (_ => page2Call), TestPage3 -> (_ => page3Call), TestCyaPage -> (_ => cyaPageCall))
           )
         }
 
@@ -201,7 +204,8 @@ class UserAnswersValidatorSpec extends AnyFreeSpec with Matchers with ScalaFutur
           override protected val startPage: GettablePage[?] = TestStartPage
           override protected lazy val pageCallMap: PageCallBiMap = new PageCallBiMapImpl(
             Map(TestStartPage -> startPageCall, TestPage1 -> page1Call, TestErrorPage -> errorPageCall),
-            Map(startPageCall -> TestStartPage, page1Call -> TestPage1, errorPageCall -> TestErrorPage)
+            Map(startPageCall -> TestStartPage, page1Call -> TestPage1, errorPageCall -> TestErrorPage),
+            Map(TestStartPage -> (_ => startPageCall), TestPage1 -> (_ => page1Call), TestErrorPage -> (_ => errorPageCall))
           )
         }
 
@@ -223,7 +227,9 @@ class UserAnswersValidatorSpec extends AnyFreeSpec with Matchers with ScalaFutur
           override protected val startPage: GettablePage[?] = TestStartPage
           override protected lazy val pageCallMap: PageCallBiMap = new PageCallBiMapImpl(
             Map(TestStartPage -> startPageCall, TestPage1 -> page1Call),
-            Map(startPageCall -> TestStartPage, page1Call -> TestPage1)
+            Map(startPageCall -> TestStartPage, page1Call -> TestPage1),
+            Map(TestStartPage -> (_ => startPageCall), TestPage1 -> (_ => page1Call))
+            
           )
         }
 
@@ -245,7 +251,8 @@ class UserAnswersValidatorSpec extends AnyFreeSpec with Matchers with ScalaFutur
           override protected val startPage: GettablePage[?] = TestStartPage
           override protected lazy val pageCallMap: PageCallBiMap = new PageCallBiMapImpl(
             Map(TestStartPage -> startPageCall, TestPage1 -> page1Call, TestPage2 -> page2Call, TestCyaPage -> cyaPageCall),
-            Map(startPageCall -> TestStartPage, page1Call -> TestPage1, page2Call -> TestPage2, cyaPageCall -> TestCyaPage)
+            Map(startPageCall -> TestStartPage, page1Call -> TestPage1, page2Call -> TestPage2, cyaPageCall -> TestCyaPage),
+            Map(TestStartPage -> (_ => startPageCall), TestPage1 -> (_ => page1Call), TestPage2 -> (_ => page2Call), TestCyaPage -> (_ => cyaPageCall))
           )
         }
 
@@ -269,7 +276,8 @@ class UserAnswersValidatorSpec extends AnyFreeSpec with Matchers with ScalaFutur
           override protected val startPage: GettablePage[?] = TestStartPage
           override protected lazy val pageCallMap: PageCallBiMap = new PageCallBiMapImpl(
             Map(TestStartPage -> startPageCall),
-            Map(startPageCall -> TestStartPage)
+            Map(startPageCall -> TestStartPage),
+            Map(TestStartPage -> (_ => startPageCall))
             // unknownCall is not in the map
           )
         }

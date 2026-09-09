@@ -24,11 +24,13 @@ import org.scalatestplus.mockito.MockitoSugar.mock
 import uk.gov.hmrc.securitiestransferchargefrontend.config.FrontendAppConfig
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.sh03.agents.routes as sh03AgentRoutes
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.sh03.agents.single.routes as sh03AgentSingleRoutes
+import uk.gov.hmrc.securitiestransferchargefrontend.controllers.sh03.agents.bulk.routes as sh03AgentBulkRoutes
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.sh03.shared.routes as sharedRoutes
-import uk.gov.hmrc.securitiestransferchargefrontend.controllers.sh03.shared.bulk.routes as sh03BulkCyaRoutes
+import uk.gov.hmrc.securitiestransferchargefrontend.controllers.fileUpload.routes as fileUploadRoutes
 import uk.gov.hmrc.securitiestransferchargefrontend.pages.sh03.bulk.*
 import uk.gov.hmrc.securitiestransferchargefrontend.models.sh03.HowToNotifyAboutShareBuyback
 import uk.gov.hmrc.securitiestransferchargefrontend.models.sh03.shared.*
+import uk.gov.hmrc.securitiestransferchargefrontend.models.sh03.bulk.CompanyDetails as AgentBulkCompanyDetails
 import uk.gov.hmrc.securitiestransferchargefrontend.models.shared.AgentReference
 import uk.gov.hmrc.securitiestransferchargefrontend.models.{CheckMode, NormalMode, UserAnswers}
 import uk.gov.hmrc.securitiestransferchargefrontend.navigation.sh03.agents.Sh03AgentNavigator
@@ -36,6 +38,7 @@ import uk.gov.hmrc.securitiestransferchargefrontend.pages.Page
 import uk.gov.hmrc.securitiestransferchargefrontend.pages.sh03.*
 import uk.gov.hmrc.securitiestransferchargefrontend.pages.sh03.shared.CheckYourAnswersPage
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.shared.routes as stfSharedRoutes
+import uk.gov.hmrc.securitiestransferchargefrontend.models.JourneyType.SH03
 
 import java.time.LocalDate
 
@@ -45,12 +48,18 @@ class Sh03AgentNavigatorSpec extends SpecBase with ScalaFutures {
   when(mockConfig.firstChargingPoint).thenReturn(LocalDate.of(2026, 1, 1))
 
   private lazy val cyaPage = sh03AgentSingleRoutes.CheckYourAnswersController.onPageLoad()
+  private lazy val agentBulkCyaPage = sh03AgentBulkRoutes.CheckYourAnswersController.onPageLoad()
   val navigator = new Sh03AgentNavigator(StubAnswerPersistenceService(), mockConfig)
 
   private val companyDetails = CompanyDetails(
     companyName = "Company1",
     companyRegistrationNumber = "12345678",
     isPlc = true)
+
+  private val agentBulkCompanyDetails = AgentBulkCompanyDetails(
+    companyName = "Company2",
+    companyRegistrationNumber = "12345678"
+  )
 
   private val purchaseDetails = DetailsOfThisSharePurchase(
     numberOfShares = 1,
@@ -83,6 +92,14 @@ class Sh03AgentNavigatorSpec extends SpecBase with ScalaFutures {
         val result = navigator.nextPage(HowToNotifyAboutShareBuybackPage, NormalMode, answers)(fakeRequest)
         whenReady(result) { res =>
           res mustBe sh03AgentSingleRoutes.AgentReferenceController.onPageLoad(NormalMode)
+        }
+      }
+
+      "must go from the HowToNotifyAboutShareBuybackPage to BulkAgentReferencePage when one at a time is selected" in {
+        val answers = emptyUserAnswers.set(HowToNotifyAboutShareBuybackPage, HowToNotifyAboutShareBuyback.MoreThanOneAtATime).get
+        val result = navigator.nextPage(HowToNotifyAboutShareBuybackPage, NormalMode, answers)(fakeRequest)
+        whenReady(result) { res =>
+          res mustBe sh03AgentBulkRoutes.AgentReferenceController.onPageLoad(NormalMode)
         }
       }
 
@@ -226,6 +243,45 @@ class Sh03AgentNavigatorSpec extends SpecBase with ScalaFutures {
           res mustBe stfSharedRoutes.ConfirmationController.onPageLoad()
         }
       }
+
+      "must go from BulkCheckYourAnswersPage to ConfirmationController" in {
+        val result = navigator.nextPage(BulkCheckYourAnswersPage, NormalMode, emptyUserAnswers)(fakeRequest)
+        whenReady(result) { res =>
+          res mustBe stfSharedRoutes.ConfirmationController.onPageLoad()
+        }
+      }
+
+      "must go from BulkAgentReferencePage to the Company Details page" in {
+        val answers = emptyUserAnswers.set(BulkAgentReferencePage, AgentReference(Some("HMRC"))).get
+        val result = navigator.nextPage(BulkAgentReferencePage, NormalMode, answers)(fakeRequest)
+        whenReady(result) { res =>
+          res mustBe sh03AgentBulkRoutes.CompanyDetailsController.onPageLoad(NormalMode)
+        }
+      }
+
+      "must go from BulkCompanyDetailsPage to the Template Instructions page" in {
+        val answers = emptyUserAnswers.set(BulkCompanyDetailsPage, agentBulkCompanyDetails).get
+        val result = navigator.nextPage(BulkCompanyDetailsPage, NormalMode, answers)(fakeRequest)
+        whenReady(result) { res =>
+          res mustBe sh03AgentBulkRoutes.TemplateInstructionsController.onPageLoad()
+        }
+      }
+
+      "must go from BulkRoleAtPurchasingCompanyPage to the check your answers page when a supported role is provided" in {
+        val answers = emptyUserAnswers.set(BulkRoleAtPurchasingCompanyPage, RoleAtPurchasingCompany(role = "Director", uksOrgan = None)).get
+        val result = navigator.nextPage(BulkRoleAtPurchasingCompanyPage, NormalMode, answers)(fakeRequest)
+        whenReady(result) { res =>
+          res mustBe agentBulkCyaPage
+        }
+      }
+
+      "must go from BulkRoleAtPurchasingCompanyPage to CannotSubmitFormErrorPage when an unsupportedRole is selected" in {
+        val answers = emptyUserAnswers.set(BulkRoleAtPurchasingCompanyPage, RoleAtPurchasingCompany(role = "unsupportedRole", uksOrgan = None)).get
+        val result = navigator.nextPage(BulkRoleAtPurchasingCompanyPage, NormalMode, answers)(fakeRequest)
+        whenReady(result) { res =>
+          res mustBe sh03AgentBulkRoutes.CannotSubmitFormErrorController.onPageLoad()
+        }
+      }
     }
   }
 
@@ -243,23 +299,56 @@ class Sh03AgentNavigatorSpec extends SpecBase with ScalaFutures {
     "must go from BulkAgentReferencePage to the Bulk Check Your Answers page" in {
       val result = navigator.nextPage(BulkAgentReferencePage, CheckMode, emptyUserAnswers)(fakeRequest)
       whenReady(result) { res =>
-        res mustBe sh03BulkCyaRoutes.CheckYourAnswersController.onPageLoad()
+        res mustBe agentBulkCyaPage
       }
     }
 
     "must go from BulkCompanyDetailsPage to the Bulk Check Your Answers page" in {
       val result = navigator.nextPage(BulkCompanyDetailsPage, CheckMode, emptyUserAnswers)(fakeRequest)
       whenReady(result) { res =>
-        res mustBe sh03BulkCyaRoutes.CheckYourAnswersController.onPageLoad()
+        res mustBe agentBulkCyaPage
       }
     }
 
     "must go from BulkRoleAtPurchasingCompanyPage to the Bulk Check Your Answers page" in {
       val result = navigator.nextPage(BulkRoleAtPurchasingCompanyPage, CheckMode, emptyUserAnswers)(fakeRequest)
       whenReady(result) { res =>
-        res mustBe sh03BulkCyaRoutes.CheckYourAnswersController.onPageLoad()
+        res mustBe agentBulkCyaPage
       }
     }
+
+    "must go from ReasonForPurchasePage to the TreasurySharesPage when reason is cancellation and no answer has been provided on the TreasurySharesPage" in {
+      val answers = emptyUserAnswers.set(ReasonForPurchasePage, ReasonForPurchase.ForCancellation).get
+      val result = navigator.nextPage(ReasonForPurchasePage, CheckMode, answers)(fakeRequest)
+      whenReady(result) { res =>
+        res mustBe sh03AgentSingleRoutes.TreasurySharesController.onPageLoad(CheckMode)
+      }
+    }
+
+    "must go from ReasonForPurchasePage to the Check Your Answers page when reason is cancellation and an answer has been provided on the TreasurySharesPage" in {
+      val answers = emptyUserAnswers.set(ReasonForPurchasePage, ReasonForPurchase.ForCancellation).get.set(TreasurySharesPage, true).get
+      val result = navigator.nextPage(ReasonForPurchasePage, CheckMode, answers)(fakeRequest)
+      whenReady(result) { res =>
+        res mustBe cyaPage
+      }
+    }
+
+    "must go from ApplyingForReliefPage to the Check Your Answers page when answer is false" in {
+      val answers = emptyUserAnswers.set(ApplyingForReliefPage, false).get
+      val result = navigator.nextPage(ApplyingForReliefPage, CheckMode, answers)(fakeRequest)
+      whenReady(result) { res =>
+        res mustBe cyaPage
+      }
+    }
+
+    "must go from ApplyingForReliefPage to the WhatReliefAreYouApplyingForPage when answer is true and no answer has been provided on the WhatReliefAreYouApplyingForPage" in {
+      val answers = emptyUserAnswers.set(ApplyingForReliefPage, true).get
+      val result = navigator.nextPage(ApplyingForReliefPage, CheckMode, answers)(fakeRequest)
+      whenReady(result) { res =>
+        res mustBe sh03AgentSingleRoutes.WhatReliefAreYouApplyingForController.onPageLoad(CheckMode)
+      }
+    }
+
   }
 
   "in Previous Pages" - {
@@ -354,6 +443,47 @@ class Sh03AgentNavigatorSpec extends SpecBase with ScalaFutures {
     "must go from the RoleAtPurchasingCompanyPage to ChargingPointPage" in {
       val result = navigator.previousPage(RoleAtPurchasingCompanyPage, NormalMode, emptyUserAnswers)
       result mustBe sh03AgentSingleRoutes.ChargingPointController.onPageLoad(NormalMode)
+    }
+
+    "must go from the CheckYourAnswersPage to RoleAtPurchasingCompanyPage" in {
+      val result = navigator.previousPage(CheckYourAnswersPage, NormalMode, emptyUserAnswers)
+      result mustBe sh03AgentSingleRoutes.RoleAtPurchasingCompanyController.onPageLoad(NormalMode)
+    }
+
+    "must go from the BulkCheckYourAnswersPage to BulkRoleAtPurchasingCompanyPage" in {
+      val answers = emptyUserAnswers.setFileUploadReference("ref")
+      val result = navigator.previousPage(BulkCheckYourAnswersPage, NormalMode, answers)
+      result mustBe sh03AgentBulkRoutes.RoleAtPurchasingCompanyController.onPageLoad(NormalMode, "ref")
+    }
+
+    "must go from the BulkRoleAtPurchasingCompanyPage to File upload page" in {
+      val result = navigator.previousPage(BulkRoleAtPurchasingCompanyPage, NormalMode, emptyUserAnswers)
+      result mustBe fileUploadRoutes.FileUploadController.onPageLoad(SH03)
+    }
+
+    "must go from the BulkCompanyDetailsPage to BulkAgentRefernceControllerPage" in {
+      val result = navigator.previousPage(BulkCompanyDetailsPage, NormalMode, emptyUserAnswers)
+      result mustBe sh03AgentBulkRoutes.AgentReferenceController.onPageLoad(NormalMode)
+    }
+
+    "must go from the BulkAgentReferencePage to HowToNotifyAboutShareBuyBackPage" in {
+      val result = navigator.previousPage(BulkAgentReferencePage, NormalMode, emptyUserAnswers)
+      result mustBe sh03AgentRoutes.HowToNotifyAboutShareBuybackController.onPageLoad()
+    }
+
+    "must go from the BulkRoleAtPurchasingCompanyPage to BulkCheckYourAnswersPage in CheckMode" in {
+      val result = navigator.previousPage(BulkRoleAtPurchasingCompanyPage, CheckMode, emptyUserAnswers)
+      result mustBe sh03AgentBulkRoutes.CheckYourAnswersController.onPageLoad()
+    }
+
+    "must go from the BulkAgentReferencePage to BulkCheckYourAnswersPage in CheckMode" in {
+      val result = navigator.previousPage(BulkAgentReferencePage, CheckMode, emptyUserAnswers)
+      result mustBe sh03AgentBulkRoutes.CheckYourAnswersController.onPageLoad()
+    }
+
+    "must go from the BulkCompanyDetailsPage to BulkCheckYourAnswersPage in CheckMode" in {
+      val result = navigator.previousPage(BulkCompanyDetailsPage, CheckMode, emptyUserAnswers)
+      result mustBe sh03AgentBulkRoutes.CheckYourAnswersController.onPageLoad()
     }
   }
 }

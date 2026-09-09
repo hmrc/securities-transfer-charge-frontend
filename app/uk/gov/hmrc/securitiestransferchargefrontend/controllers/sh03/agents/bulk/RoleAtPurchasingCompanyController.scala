@@ -26,6 +26,7 @@ import uk.gov.hmrc.securitiestransferchargefrontend.forms.sh03.shared.RoleAtPurc
 import uk.gov.hmrc.securitiestransferchargefrontend.models.{Mode, UserAnswers}
 import uk.gov.hmrc.securitiestransferchargefrontend.navigation.Navigator
 import uk.gov.hmrc.securitiestransferchargefrontend.pages.sh03.bulk.BulkRoleAtPurchasingCompanyPage
+import uk.gov.hmrc.securitiestransferchargefrontend.services.AnswerPersistenceService
 import uk.gov.hmrc.securitiestransferchargefrontend.views.html.sh03.agents.bulk.RoleAtPurchasingCompanyView
 
 import javax.inject.{Inject, Named}
@@ -39,7 +40,8 @@ class RoleAtPurchasingCompanyController @Inject()(
                                                    requireData: StcDataRequiredAction,
                                                    formProvider: RoleAtPurchasingCompanyFormProvider,
                                                    val controllerComponents: MessagesControllerComponents,
-                                                   view: RoleAtPurchasingCompanyView
+                                                   view: RoleAtPurchasingCompanyView,
+                                                   answerPersistenceService: AnswerPersistenceService
                                                  )(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport {
 
   private def form(implicit request: StcDataRequest[_]) =
@@ -48,15 +50,19 @@ class RoleAtPurchasingCompanyController @Inject()(
   lazy val backLinkCall: Mode => UserAnswers => Call =
     mode => userAnswers => navigator.previousPage(BulkRoleAtPurchasingCompanyPage, mode, userAnswers)
 
-  def onPageLoad(mode: Mode): Action[AnyContent] = (stcAuthEnrolled andThen getData andThen requireData) {
+  def onPageLoad(mode: Mode, fileUploadReference: String): Action[AnyContent] = (stcAuthEnrolled andThen getData andThen requireData).async {
     implicit request =>
 
-      val preparedForm = request.userAnswers.get(BulkRoleAtPurchasingCompanyPage) match {
-        case None => form
-        case Some(value) => form.fill(value)
-      }
+      val updatedAnswers = request.userAnswers.setFileUploadReference(fileUploadReference)
 
-      Ok(view(preparedForm, mode, backLinkCall(mode)(request.userAnswers)))
+      answerPersistenceService.save(updatedAnswers).map { _ =>
+        val preparedForm = request.userAnswers.get(BulkRoleAtPurchasingCompanyPage) match {
+          case None => form
+          case Some(value) => form.fill(value)
+        }
+
+        Ok(view(preparedForm, mode, backLinkCall(mode)(request.userAnswers)))
+      }
   }
 
   def onSubmit(mode: Mode): Action[AnyContent] = (stcAuthEnrolled andThen getData andThen requireData).async {
@@ -65,11 +71,15 @@ class RoleAtPurchasingCompanyController @Inject()(
         formWithErrors =>
           Future.successful(BadRequest(view(formWithErrors, mode, backLinkCall(mode)(request.userAnswers)))),
 
-        value =>
+        value => {
+          val valueToSave =
+            if (value.role != "ukSocietas") value.copy(uksOrgan = None) else value
+
           for {
-            updatedAnswers <- Future.fromTry(request.userAnswers.set(BulkRoleAtPurchasingCompanyPage, value))
+            updatedAnswers <- Future.fromTry(request.userAnswers.set(BulkRoleAtPurchasingCompanyPage, valueToSave))
             nextPage <- navigator.nextPage(BulkRoleAtPurchasingCompanyPage, mode, updatedAnswers, isReturn(request))
           } yield Redirect(nextPage)
+        }
       )
   }
 }

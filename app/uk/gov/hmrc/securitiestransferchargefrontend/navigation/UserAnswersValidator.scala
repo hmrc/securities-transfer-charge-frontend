@@ -45,7 +45,7 @@ abstract class UserAnswersValidator(navigator: Navigator)(implicit ec: Execution
     else if (isErrorPage(page))
       Future.successful(Right(false))
     else if (!pageHasValidDataAtPath(userAnswers, page))
-      Future.successful(Left(callForPage(page)))
+      Future.successful(Left(callForPage(userAnswers, page)))
     else {
       navigator.nextPage(page, NormalMode, userAnswers).flatMap { nextCall =>
         val nextPage: GettablePage[?] = callToPage(nextCall)
@@ -65,7 +65,10 @@ abstract class UserAnswersValidator(navigator: Navigator)(implicit ec: Execution
   private def callToPage(call: Call): GettablePage[?] =
     pageCallMap.getPageFor(call).getOrElse(recoveryPage)
 
-  private def callForPage(page: GettablePage[?]): Call =
+  private def callForPage(userAnswers: UserAnswers, page: GettablePage[?]): Call =
+    pageCallMap
+      .getCallForWithUserAnswers(page, userAnswers)
+      .orElse(pageCallMap.getCallFor(page))
     pageCallMap.getCallFor(page).getOrElse(navigator.errorPage(page))
 
   private def isCyaPage(page: GettablePage[?]): Boolean =

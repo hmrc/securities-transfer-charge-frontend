@@ -32,7 +32,8 @@ import uk.gov.hmrc.securitiestransferchargefrontend.views.html.sh03.agents.bulk.
 
 class RoleAtPurchasingCompanyControllerSpec extends SpecBase {
 
-  lazy val roleAtPurchasingCompanyRoute: String = routes.RoleAtPurchasingCompanyController.onPageLoad(NormalMode).url
+  lazy val reference = "ref"
+  lazy val roleAtPurchasingCompanyRoute: String = routes.RoleAtPurchasingCompanyController.onPageLoad(NormalMode, reference).url
 
   val formProvider = new RoleAtPurchasingCompanyFormProvider()
   val form: Form[RoleAtPurchasingCompany] = formProvider(affinityGroupKeyAgent)
