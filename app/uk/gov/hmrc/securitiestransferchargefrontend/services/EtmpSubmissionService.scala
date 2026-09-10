@@ -48,6 +48,14 @@ final case class SubmissionCreateResponseSuccess(
   paymentDueBy: LocalDate,
   agentReference: Option[String]) extends SubmissionCreateResponse
 
+final case class SubmissionCreateResponsePartialFailure(
+  submissionId: SubmissionId,
+  successfulChargeReferences: Seq[ChargeReference],
+  failedRecords: Seq[Int],
+  taxDue: BigDecimal,
+  paymentDueBy: LocalDate,
+  agentReference: Option[String]) extends SubmissionCreateResponse
+
 case object SubmissionCreateResponseFailure extends SubmissionCreateResponse
 
 val submissionFailure = Future.successful(SubmissionCreateResponseFailure)
@@ -65,19 +73,30 @@ class EtmpSubmissionServiceImpl @Inject() (etmpSubmissionsClient: EtmpSubmission
   }
 
   private def toSubmissionCreateResponseSuccess(userAnswers: UserAnswers, processed: StcTransactionCreateProcessedBody): SubmissionCreateResponse = {
-    val charges = processed.charges.collect(getStcChargeSuccess)
-    if charges.length != processed.charges.length then
-      logger.warn(s"${userAnswers.submissionId}: Non-success charges in successful ETMP response")
+    val charges   = processed.charges
+    val successes = charges.collect(getStcChargeSuccess)
+    val failures  = charges.collect(getStcChargeFailure)
+
+    lazy val failedRecords = failures.map(_.recordId)
+
+    if successes.isEmpty then
       return SubmissionCreateResponseFailure
     end if
-    
-    SubmissionCreateResponseSuccess(
-      submissionId     = userAnswers.submissionId,
-      chargeReferences = charges.map(_.chargeReference),
-      taxDue           = charges.map(_.chargeAmount).sum,
-      paymentDueBy     = charges.collect(getDueBy).min.plusDays(30),
-      agentReference   = userAnswers.get(AgentReferencePage).flatMap(_.agentReference)
-    )
+
+    val submissionId     = userAnswers.submissionId
+    val chargeReferences = successes.map(_.chargeReference)
+    val taxDue           = successes.map(_.chargeAmount).sum
+    val paymentDueBy     = successes.collect(getDueBy).min
+    val agentReference   = userAnswers.get(AgentReferencePage).flatMap(_.agentReference)
+
+    if failures.isEmpty then
+      SubmissionCreateResponseSuccess(submissionId, chargeReferences, taxDue, paymentDueBy, agentReference)
+    else
+      SubmissionCreateResponsePartialFailure(submissionId, chargeReferences, failedRecords, taxDue, paymentDueBy, agentReference)
+  }
+
+  private val getStcChargeFailure: PartialFunction[StcCharge, StcChargeFailure] = {
+    case c: StcChargeFailure => c
   }
 
   private val getStcChargeSuccess: PartialFunction[StcCharge, StcChargeSuccess] = {
@@ -110,8 +129,9 @@ class EtmpSubmissionServiceImpl @Inject() (etmpSubmissionsClient: EtmpSubmission
       val declaration = createDeclaration(userAnswers)
       val etmpPayload = SubmissionBatchPayload(declaration, List(stfReq))
 
-      etmpSubmissionsClient
+      val x = etmpSubmissionsClient
         .submitSingleStf(subscriptionId, userAnswers.submissionId, etmpPayload)
-        .map(toSubmissionCreateResponse(userAnswers))
+
+        x.map(toSubmissionCreateResponse(userAnswers))
     }.getOrElse(submissionFailure)
   }
