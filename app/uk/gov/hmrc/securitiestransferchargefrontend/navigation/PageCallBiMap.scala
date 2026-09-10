@@ -17,7 +17,7 @@
 package uk.gov.hmrc.securitiestransferchargefrontend.navigation
 
 import play.api.mvc.Call
-import uk.gov.hmrc.securitiestransferchargefrontend.models.{CheckMode, Mode, NormalMode, UserAnswers}
+import uk.gov.hmrc.securitiestransferchargefrontend.models.{CheckMode, Mode, NormalMode}
 import uk.gov.hmrc.securitiestransferchargefrontend.pages.Page
 import uk.gov.hmrc.securitiestransferchargefrontend.queries.Gettable
 
@@ -26,30 +26,22 @@ import scala.collection.mutable
 type GettablePage = Page & Gettable[?]
 type CallCreator  = Mode => Call
 type UnitCreator  = ()   => Call
-type UserAnswersCallCreator = (Mode, UserAnswers) => Call
 
 trait PageCallBiMap:
   def getCallFor(page: GettablePage): Option[Call]
-  def getCallForWithUserAnswers(page: GettablePage, userAnswers: UserAnswers): Option[Call]
   def getPageFor(call: Call): Option[GettablePage]
 
 final class PageCallBiMapImpl(
                                pageCallMap: collection.Map[GettablePage, Call],
-                               callPageMap: collection.Map[Call, GettablePage],
-                               userAnswersPageCallMap: collection.Map[GettablePage, UserAnswers => Call]
+                               callPageMap: collection.Map[Call, GettablePage]
                              ) extends PageCallBiMap {
   override def getCallFor(page: GettablePage): Option[Call] = pageCallMap.get(page)
-  override def getCallForWithUserAnswers(
-                                          page: GettablePage,
-                                          userAnswers: UserAnswers
-                                        ): Option[Call] = userAnswersPageCallMap.get(page).map(_(userAnswers))
   override def getPageFor(call: Call): Option[GettablePage] = callPageMap.get(call)
 }
 
 final class PageCallBiMapBuilder {
   private val pageCallMap: mutable.Map[GettablePage, Call] = mutable.Map.empty
   private val callPageMap: mutable.Map[Call, GettablePage] = mutable.Map.empty
-  private val userAnswersPageCallMap: mutable.Map[GettablePage, UserAnswers => Call] = mutable.Map.empty
 
   def addMapping(page: GettablePage, callCreator: CallCreator): PageCallBiMapBuilder = {
     pageCallMap += page -> callCreator(CheckMode)
@@ -61,17 +53,12 @@ final class PageCallBiMapBuilder {
     callPageMap += callCreator() -> page
     this
   }
-
-  def addMappingWithUserAnswers(page: GettablePage, callCreator: UserAnswersCallCreator): PageCallBiMapBuilder = {
-    userAnswersPageCallMap += page -> (userAnswers => callCreator(CheckMode, userAnswers))
-    this
-  }
+  
 
   def build: PageCallBiMap = 
     new PageCallBiMapImpl(
       pageCallMap.toMap, 
-      callPageMap.toMap,
-      userAnswersPageCallMap.toMap
+      callPageMap.toMap
     )
 }
 

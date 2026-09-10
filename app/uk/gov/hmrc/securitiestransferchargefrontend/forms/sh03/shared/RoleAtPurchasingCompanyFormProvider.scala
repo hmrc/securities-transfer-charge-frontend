@@ -38,7 +38,7 @@ class RoleAtPurchasingCompanyFormProvider @Inject() {
           case Some(str) => Right(Some(str))
         }
       } else {
-        Right(uksOrgan)
+        Right(None)
       }
     }
 

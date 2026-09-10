@@ -17,28 +17,41 @@
 package uk.gov.hmrc.securitiestransferchargefrontend.viewmodels.sh03.agents.bulk
 
 import play.api.i18n.Messages
+import play.twirl.api.HtmlFormat
 import uk.gov.hmrc.govukfrontend.views.viewmodels.content.HtmlContent
 import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.SummaryListRow
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.sh03.agents.bulk.routes
 import uk.gov.hmrc.securitiestransferchargefrontend.models.{CheckMode, UserAnswers}
-import uk.gov.hmrc.securitiestransferchargefrontend.pages.sh03.RoleAtPurchasingCompanyPage
+import uk.gov.hmrc.securitiestransferchargefrontend.pages.sh03.bulk.BulkRoleAtPurchasingCompanyPage
 import uk.gov.hmrc.securitiestransferchargefrontend.viewmodels.govuk.summarylist.*
 import uk.gov.hmrc.securitiestransferchargefrontend.viewmodels.implicits.*
 
 object RoleAtPurchasingCompanySummary {
 
-  def row(answers: UserAnswers)(implicit messages: Messages): Option[SummaryListRow] =
-    answers.get(RoleAtPurchasingCompanyPage).map { answer =>
-      val fileUploadRef = answers.getFileUploadReference()
+  def rows(answers: UserAnswers)(implicit messages: Messages): Seq[SummaryListRow] = {
+    answers.get(BulkRoleAtPurchasingCompanyPage).toSeq.flatMap { answer =>
       val roleText = messages(s"agent.sh03.roleAtPurchasingCompany.${answer.role}")
 
-      SummaryListRowViewModel(
+      val roleRow = SummaryListRowViewModel(
         key = "agent.sh03.roleAtPurchasingCompany.checkYourAnswersLabel",
-        value = ValueViewModel(HtmlContent(roleText)),
+        value = ValueViewModel(HtmlFormat.escape(roleText).toString),
         actions = Seq(
-          ActionItemViewModel("site.change", routes.RoleAtPurchasingCompanyController.onPageLoad(CheckMode, fileUploadRef).url)
+          ActionItemViewModel("site.change", routes.RoleAtPurchasingCompanyController.onPageLoad(CheckMode).url)
             .withVisuallyHiddenText(messages("agent.sh03.bulk.roleAtPurchasingCompany.change.hidden"))
         )
       )
+      
+      val uksOrganRow = answer.uksOrgan.map { organ =>
+        SummaryListRowViewModel(
+          key = "agent.sh03.roleAtPurchasingCompany.uksOrgan.label",
+          value = ValueViewModel(HtmlContent(organ)),
+          actions = Seq(
+            ActionItemViewModel("site.change", routes.RoleAtPurchasingCompanyController.onPageLoad(CheckMode).url)
+              .withVisuallyHiddenText(messages("agent.sh03.roleAtPurchasingCompany.uksOrgan.hidden"))
+          )
+        )
+      }
+      Seq(roleRow) ++ uksOrganRow
     }
+  }
 }

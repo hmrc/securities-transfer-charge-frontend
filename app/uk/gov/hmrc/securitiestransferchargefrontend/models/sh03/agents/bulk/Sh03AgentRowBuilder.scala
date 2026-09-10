@@ -49,9 +49,6 @@ object Sh03AgentRowBuilder  {
   }
   
   def buildDeclarationRows(userAnswers: UserAnswers)(implicit messages: Messages): Seq[SummaryListRow] = {
-    Seq(RoleAtPurchasingCompanySummary.row(userAnswers),
-      UksOrganSummary.row(userAnswers)
-      
-    ).flatten
+    Seq(RoleAtPurchasingCompanySummary.rows(userAnswers)).flatten
   }
 }

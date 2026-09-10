@@ -451,9 +451,8 @@ class Sh03AgentNavigatorSpec extends SpecBase with ScalaFutures {
     }
 
     "must go from the BulkCheckYourAnswersPage to BulkRoleAtPurchasingCompanyPage" in {
-      val answers = emptyUserAnswers.setFileUploadReference("ref")
-      val result = navigator.previousPage(BulkCheckYourAnswersPage, NormalMode, answers)
-      result mustBe sh03AgentBulkRoutes.RoleAtPurchasingCompanyController.onPageLoad(NormalMode, "ref")
+      val result = navigator.previousPage(BulkCheckYourAnswersPage, NormalMode, emptyUserAnswers)
+      result mustBe sh03AgentBulkRoutes.RoleAtPurchasingCompanyController.onPageLoad(NormalMode)
     }
 
     "must go from the BulkRoleAtPurchasingCompanyPage to File upload page" in {
@@ -461,7 +460,7 @@ class Sh03AgentNavigatorSpec extends SpecBase with ScalaFutures {
       result mustBe fileUploadRoutes.FileUploadController.onPageLoad(SH03)
     }
 
-    "must go from the BulkCompanyDetailsPage to BulkAgentRefernceControllerPage" in {
+    "must go from the BulkCompanyDetailsPage to BulkAgentReferenceControllerPage" in {
       val result = navigator.previousPage(BulkCompanyDetailsPage, NormalMode, emptyUserAnswers)
       result mustBe sh03AgentBulkRoutes.AgentReferenceController.onPageLoad(NormalMode)
     }

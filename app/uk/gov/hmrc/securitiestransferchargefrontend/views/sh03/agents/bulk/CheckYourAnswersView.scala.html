@@ -34,7 +34,7 @@
 
 @(viewModel: CheckYourAnswersViewModel, backLinkCall: Call)(implicit request: Request[_], messages: Messages)
 
-@layout(pageTitle = titleNoForm(messages("checkYourAnswers.title"), Some(messages("sectionTitle.stf"))), backLinkUrl = Some(backLinkCall.url),
+@layout(pageTitle = titleNoForm(messages("checkYourAnswers.title"), Some(messages("sectionTitle.sh03"))), backLinkUrl = Some(backLinkCall.url),
     additionalScripts = Some(
         HtmlFormat.raw(
             s"""<script ${CSPNonce.attr} src="${routes.Assets.versioned("javascripts/print.js").url}"></script>"""
@@ -57,10 +57,10 @@
      </p>
      @govukTable(Table(
       head = Some(Seq(
-        HeadCell(content = Text(messages("Amount")), format = Some("numeric")),
-        HeadCell(content = Text(messages("For"))),
-        HeadCell(content = Text(messages("Consideration")), format = Some("numeric")),
-        HeadCell(content = Text(messages("Tax due")), format = Some("numeric"))
+        HeadCell(content = Text(messages("checkYourAnswers.sh03.bulk.taxDue.section.amount.heading")), format = Some("numeric")),
+        HeadCell(content = Text(messages("checkYourAnswers.sh03.bulk.taxDue.section.for.heading"))),
+        HeadCell(content = Text(messages("checkYourAnswers.sh03.bulk.taxDue.section.consideration.heading")), format = Some("numeric")),
+        HeadCell(content = Text(messages("checkYourAnswers.sh03.bulk.taxDue.section.taxDue.heading")), format = Some("numeric"))
       )),
       rows = viewModel.transferRows.getOrElse(Seq.empty).map { row =>
         Seq(

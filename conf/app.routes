@@ -462,9 +462,9 @@ POST       /sh03/agent/bulk/change/company-details                       uk.gov.
 
 GET        /sh03/agent/bulk/template                       uk.gov.hmrc.securitiestransferchargefrontend.controllers.sh03.agents.bulk.TemplateInstructionsController.onPageLoad()
 
-GET        /sh03/agent/bulk/role-purchasing-company                 uk.gov.hmrc.securitiestransferchargefrontend.controllers.sh03.agents.bulk.RoleAtPurchasingCompanyController.onPageLoad(mode: Mode = NormalMode, reference: String)
+GET        /sh03/agent/bulk/role-purchasing-company                 uk.gov.hmrc.securitiestransferchargefrontend.controllers.sh03.agents.bulk.RoleAtPurchasingCompanyController.onPageLoad(mode: Mode = NormalMode, reference: Option[String] ?=None)
 POST       /sh03/agent/bulk/role-purchasing-company                 uk.gov.hmrc.securitiestransferchargefrontend.controllers.sh03.agents.bulk.RoleAtPurchasingCompanyController.onSubmit(mode: Mode = NormalMode)
-GET        /sh03/agent/bulk/change/role-purchasing-company          uk.gov.hmrc.securitiestransferchargefrontend.controllers.sh03.agents.bulk.RoleAtPurchasingCompanyController.onPageLoad(mode: Mode = CheckMode, reference: String)
+GET        /sh03/agent/bulk/change/role-purchasing-company          uk.gov.hmrc.securitiestransferchargefrontend.controllers.sh03.agents.bulk.RoleAtPurchasingCompanyController.onPageLoad(mode: Mode = CheckMode, reference: Option[String] ?=None)
 POST       /sh03/agent/bulk/change/role-purchasing-company          uk.gov.hmrc.securitiestransferchargefrontend.controllers.sh03.agents.bulk.RoleAtPurchasingCompanyController.onSubmit(mode: Mode = CheckMode)
 
 GET        /sh03/agent/bulk/cannot-submit-form                       uk.gov.hmrc.securitiestransferchargefrontend.controllers.sh03.agents.bulk.CannotSubmitFormErrorController.onPageLoad()

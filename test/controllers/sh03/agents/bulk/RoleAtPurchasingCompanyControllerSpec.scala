@@ -17,6 +17,9 @@
 package controllers.sh03.agents.bulk
 
 import base.SpecBase
+import org.mockito.ArgumentMatchers.any
+import org.mockito.Mockito.when
+import org.scalatestplus.mockito.MockitoSugar.mock
 import play.api.data.Form
 import play.api.inject.bind
 import play.api.test.FakeRequest
@@ -28,30 +31,38 @@ import uk.gov.hmrc.securitiestransferchargefrontend.models.NormalMode
 import uk.gov.hmrc.securitiestransferchargefrontend.models.sh03.shared.RoleAtPurchasingCompany
 import uk.gov.hmrc.securitiestransferchargefrontend.navigation.Navigator
 import uk.gov.hmrc.securitiestransferchargefrontend.pages.sh03.bulk.BulkRoleAtPurchasingCompanyPage
+import uk.gov.hmrc.securitiestransferchargefrontend.services.AnswerPersistenceService
 import uk.gov.hmrc.securitiestransferchargefrontend.views.html.sh03.agents.bulk.RoleAtPurchasingCompanyView
+
+import scala.concurrent.Future
 
 class RoleAtPurchasingCompanyControllerSpec extends SpecBase {
 
   lazy val reference = "ref"
-  lazy val roleAtPurchasingCompanyRoute: String = routes.RoleAtPurchasingCompanyController.onPageLoad(NormalMode, reference).url
+  lazy val roleAtPurchasingCompanyRoute: String = routes.RoleAtPurchasingCompanyController.onPageLoad(NormalMode, None).url
+  lazy val getRequestWithRef: String = routes.RoleAtPurchasingCompanyController.onPageLoad(NormalMode, Some(reference)).url
 
   val formProvider = new RoleAtPurchasingCompanyFormProvider()
   val form: Form[RoleAtPurchasingCompany] = formProvider(affinityGroupKeyAgent)
+  val mockAnswerPersistenceService: AnswerPersistenceService = mock[AnswerPersistenceService]
 
   val validData: RoleAtPurchasingCompany = RoleAtPurchasingCompany("director", None)
   val validUkSocietasData: RoleAtPurchasingCompany = RoleAtPurchasingCompany("ukSocietas", Some("Management Board"))
 
   "RoleAtPurchasingCompany Controller" - {
 
-    "must return OK and the correct view for a GET" in {
+    "must return OK and the correct view for a GET when fileUploadReference is present in the query string" in {
+
+      when(mockAnswerPersistenceService.save(any())(any())).thenReturn(Future.successful(()))
 
       val application = applicationBuilder(userAnswers = Some(emptyUserAnswers), affinityGroup = agentAffinity)
-        .overrides(bind[Navigator].qualifiedWith("agentsSh03").toInstance(getNavigator))
+        .overrides(
+          bind[Navigator].qualifiedWith("agentsSh03").toInstance(getNavigator),
+          bind[AnswerPersistenceService].toInstance(mockAnswerPersistenceService))
         .build()
 
       running(application) {
-        val request = FakeRequest(GET, roleAtPurchasingCompanyRoute)
-
+        val request = FakeRequest(GET, getRequestWithRef)
         val result = route(application, request).value
 
         val view = application.injector.instanceOf[RoleAtPurchasingCompanyView]
@@ -63,14 +74,17 @@ class RoleAtPurchasingCompanyControllerSpec extends SpecBase {
 
     "must populate the view correctly on a GET when the question has previously been answered (Standard Role)" in {
 
+      when(mockAnswerPersistenceService.save(any())(any())).thenReturn(Future.successful(()))
       val userAnswers = emptyUserAnswers.set(BulkRoleAtPurchasingCompanyPage, validData).success.value
 
       val application = applicationBuilder(userAnswers = Some(userAnswers), affinityGroup = agentAffinity)
-        .overrides(bind[Navigator].qualifiedWith("agentsSh03").toInstance(getNavigator))
+        .overrides(
+          bind[Navigator].qualifiedWith("agentsSh03").toInstance(getNavigator),
+          bind[AnswerPersistenceService].toInstance(mockAnswerPersistenceService))
         .build()
 
       running(application) {
-        val request = FakeRequest(GET, roleAtPurchasingCompanyRoute)
+        val request = FakeRequest(GET, getRequestWithRef)
 
         val view = application.injector.instanceOf[RoleAtPurchasingCompanyView]
 
@@ -83,14 +97,17 @@ class RoleAtPurchasingCompanyControllerSpec extends SpecBase {
 
     "must populate the view correctly on a GET when the question has previously been answered (UK Societas)" in {
 
+      when(mockAnswerPersistenceService.save(any())(any())).thenReturn(Future.successful(()))
       val userAnswers = emptyUserAnswers.set(BulkRoleAtPurchasingCompanyPage, validUkSocietasData).success.value
 
       val application = applicationBuilder(userAnswers = Some(userAnswers), affinityGroup = agentAffinity)
-        .overrides(bind[Navigator].qualifiedWith("agentsSh03").toInstance(getNavigator))
+        .overrides(
+          bind[Navigator].qualifiedWith("agentsSh03").toInstance(getNavigator),
+          bind[AnswerPersistenceService].toInstance(mockAnswerPersistenceService))
         .build()
 
       running(application) {
-        val request = FakeRequest(GET, roleAtPurchasingCompanyRoute)
+        val request = FakeRequest(GET, getRequestWithRef)
 
         val view = application.injector.instanceOf[RoleAtPurchasingCompanyView]
 
@@ -102,9 +119,13 @@ class RoleAtPurchasingCompanyControllerSpec extends SpecBase {
     }
 
     "must redirect to the next page when valid standard data is submitted" in {
-
-      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers), affinityGroup = agentAffinity)
-        .overrides(bind[Navigator].qualifiedWith("agentsSh03").toInstance(getNavigator))
+      
+      when(mockAnswerPersistenceService.save(any())(any())).thenReturn(Future.successful(()))
+      val userAnswersWithRef = emptyUserAnswers.setFileUploadReference(reference)
+      val application = applicationBuilder(userAnswers = Some(userAnswersWithRef), affinityGroup = agentAffinity)
+        .overrides(
+          bind[Navigator].qualifiedWith("agentsSh03").toInstance(getNavigator),
+          bind[AnswerPersistenceService].toInstance(mockAnswerPersistenceService))
         .build()
 
       running(application) {
@@ -121,8 +142,12 @@ class RoleAtPurchasingCompanyControllerSpec extends SpecBase {
 
     "must redirect to the next page when valid UK Societas data is submitted" in {
 
-      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers), affinityGroup = agentAffinity)
-        .overrides(bind[Navigator].qualifiedWith("agentsSh03").toInstance(getNavigator))
+      when(mockAnswerPersistenceService.save(any())(any())).thenReturn(Future.successful(()))
+      val userAnswersWithRef = emptyUserAnswers.setFileUploadReference(reference)
+      val application = applicationBuilder(userAnswers = Some(userAnswersWithRef), affinityGroup = agentAffinity)
+        .overrides(
+          bind[Navigator].qualifiedWith("agentsSh03").toInstance(getNavigator),
+          bind[AnswerPersistenceService].toInstance(mockAnswerPersistenceService))
         .build()
 
       running(application) {
@@ -139,7 +164,8 @@ class RoleAtPurchasingCompanyControllerSpec extends SpecBase {
 
     "must return a Bad Request and errors when invalid data is submitted (missing role)" in {
 
-      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers), affinityGroup = agentAffinity)
+      val userAnswersWithRef = emptyUserAnswers.setFileUploadReference(reference)
+      val application = applicationBuilder(userAnswers = Some(userAnswersWithRef), affinityGroup = agentAffinity)
         .overrides(bind[Navigator].qualifiedWith("agentsSh03").toInstance(getNavigator))
         .build()
 
@@ -161,7 +187,8 @@ class RoleAtPurchasingCompanyControllerSpec extends SpecBase {
 
     "must return a Bad Request and errors when invalid data is submitted (UK Societas missing organ name)" in {
 
-      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers), affinityGroup = agentAffinity)
+      val userAnswersWithRef = emptyUserAnswers.setFileUploadReference(reference)
+      val application = applicationBuilder(userAnswers = Some(userAnswersWithRef), affinityGroup = agentAffinity)
         .overrides(bind[Navigator].qualifiedWith("agentsSh03").toInstance(getNavigator))
         .build()
 
@@ -210,5 +237,36 @@ class RoleAtPurchasingCompanyControllerSpec extends SpecBase {
         redirectLocation(result).value mustEqual JourneyRecoveryController.onPageLoad().url
       }
     }
+
+    "must redirect to Journey Recovery for a GET if fileUploadReference is missing from both the query string and UserAnswers" in {
+
+      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers), affinityGroup = agentAffinity).build()
+
+      running(application) {
+        val request = FakeRequest(GET, roleAtPurchasingCompanyRoute)
+
+        val result = route(application, request).value
+
+        status(result) mustEqual SEE_OTHER
+        redirectLocation(result).value mustEqual JourneyRecoveryController.onPageLoad().url
+      }
+    }
+
+    "must redirect to Journey Recovery for a POST if fileUploadReference is missing from UserAnswers" in {
+
+      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers), affinityGroup = agentAffinity).build()
+
+      running(application) {
+        val request =
+          FakeRequest(POST, roleAtPurchasingCompanyRoute)
+            .withFormUrlEncodedBody(("role", "director"))
+
+        val result = route(application, request).value
+
+        status(result) mustEqual SEE_OTHER
+        redirectLocation(result).value mustEqual JourneyRecoveryController.onPageLoad().url
+      }
+    }
+    
   }
 }

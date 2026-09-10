@@ -19,6 +19,7 @@ package uk.gov.hmrc.securitiestransferchargefrontend.controllers.sh03.agents.bul
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, Call, MessagesControllerComponents}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
+import uk.gov.hmrc.securitiestransferchargefrontend.controllers.routes.JourneyRecoveryController
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.actions.*
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.actions.requests.StcDataRequest
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.shared.SaveAndReturnButton.isReturn
@@ -31,6 +32,7 @@ import uk.gov.hmrc.securitiestransferchargefrontend.views.html.sh03.agents.bulk.
 
 import javax.inject.{Inject, Named}
 import scala.concurrent.{ExecutionContext, Future}
+import scala.util.Try
 
 class RoleAtPurchasingCompanyController @Inject()(
                                                    override val messagesApi: MessagesApi,
@@ -50,18 +52,23 @@ class RoleAtPurchasingCompanyController @Inject()(
   lazy val backLinkCall: Mode => UserAnswers => Call =
     mode => userAnswers => navigator.previousPage(BulkRoleAtPurchasingCompanyPage, mode, userAnswers)
 
-  def onPageLoad(mode: Mode, fileUploadReference: String): Action[AnyContent] = (stcAuthEnrolled andThen getData andThen requireData).async {
+  def onPageLoad(mode: Mode, fileUploadReference: Option[String] = None): Action[AnyContent] = (stcAuthEnrolled andThen getData andThen requireData).async {
     implicit request =>
 
-      val updatedAnswers = request.userAnswers.setFileUploadReference(fileUploadReference)
-
-      answerPersistenceService.save(updatedAnswers).map { _ =>
-        val preparedForm = request.userAnswers.get(BulkRoleAtPurchasingCompanyPage) match {
-          case None => form
-          case Some(value) => form.fill(value)
-        }
-
-        Ok(view(preparedForm, mode, backLinkCall(mode)(request.userAnswers)))
+      val preparedForm = request.userAnswers.get(BulkRoleAtPurchasingCompanyPage) match {
+        case None => form
+        case Some(value) => form.fill(value)
+      }
+      
+      val referenceOpt = fileUploadReference.orElse(Try(request.userAnswers.getFileUploadReference()).toOption)
+      
+      referenceOpt match {
+        case Some(ref) =>
+          val updatedAnswers = request.userAnswers.setFileUploadReference(ref)
+          answerPersistenceService.save(updatedAnswers).map { _ =>
+            Ok(view(preparedForm, mode, backLinkCall(mode)(updatedAnswers)))
+          }
+        case None => Future.successful(Redirect(JourneyRecoveryController.onPageLoad()))
       }
   }
 
@@ -72,13 +79,17 @@ class RoleAtPurchasingCompanyController @Inject()(
           Future.successful(BadRequest(view(formWithErrors, mode, backLinkCall(mode)(request.userAnswers)))),
 
         value => {
-          val valueToSave =
-            if (value.role != "ukSocietas") value.copy(uksOrgan = None) else value
+          Try(request.userAnswers.getFileUploadReference()).toOption match {
+            case Some(_) =>
+              for {
+                updatedAnswers <- Future.fromTry(request.userAnswers.set(BulkRoleAtPurchasingCompanyPage, value))
+                _ <- answerPersistenceService.save(updatedAnswers)
+                nextPage <- navigator.nextPage(BulkRoleAtPurchasingCompanyPage, mode, updatedAnswers, isReturn(request))
+              } yield Redirect(nextPage)
 
-          for {
-            updatedAnswers <- Future.fromTry(request.userAnswers.set(BulkRoleAtPurchasingCompanyPage, valueToSave))
-            nextPage <- navigator.nextPage(BulkRoleAtPurchasingCompanyPage, mode, updatedAnswers, isReturn(request))
-          } yield Redirect(nextPage)
+            case None =>
+              Future.successful(Redirect(JourneyRecoveryController.onPageLoad()))
+          }
         }
       )
   }
