@@ -172,13 +172,16 @@ class FileProcessingController @Inject()(
           case (AffinityGroup.Agent, JourneyType.STF) => Future.successful(Redirect(stfBulkRoutes.AgentReferenceController.onPageLoad(NormalMode, reference)))
 
           case (AffinityGroup.Individual, JourneyType.STF) => Future.successful(Redirect(stfBulkIndRoutes.CheckYourAnswersController.onPageLoad(reference)))
-          
+
           case (_, JourneyType.STF) => Future.successful(Redirect(stfBulkOrgRoutes.CheckYourAnswersController.onPageLoad(reference)))
 
 
           case (AffinityGroup.Agent, JourneyType.SH03) => Future.successful(Redirect(sh03BulkRoutes.RoleAtPurchasingCompanyController.onPageLoad(NormalMode)))
 
-          case (AffinityGroup.Organisation, JourneyType.SH03) => Future.successful(Redirect(sh03OrgBulkRoutes.RoleAtPurchasingCompanyController.onPageLoad(NormalMode)))
+          case (AffinityGroup.Organisation, JourneyType.SH03) =>
+            Future.successful(
+              Redirect(sh03OrgBulkRoutes.RoleAtPurchasingCompanyController.onPageLoad(NormalMode, Some(reference)))
+            )
 
           case (_, JourneyType.SH03) => Future.successful(Redirect(sh03CyaRoutes.CheckYourAnswersController.onPageLoad()))
         }

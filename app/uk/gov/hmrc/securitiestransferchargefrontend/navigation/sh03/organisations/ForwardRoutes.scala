@@ -21,7 +21,6 @@ import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.securitiestransferchargefrontend.config.FrontendAppConfig
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.sh03.organisations.single.routes as sh03OrgSingleRoutes
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.sh03.organisations.bulk.routes as sh03OrgBulkRoutes
-import uk.gov.hmrc.securitiestransferchargefrontend.controllers.sh03.shared.bulk.routes as sh03BulkCyaRoutes
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.shared.routes as stfSharedRoutes
 import uk.gov.hmrc.securitiestransferchargefrontend.models.sh03.HowToNotifyAboutShareBuyback.{MoreThanOneAtATime, OneAtATime}
 import uk.gov.hmrc.securitiestransferchargefrontend.models.sh03.shared.{ReasonForPurchase, RoleAtPurchasingCompany}
@@ -29,11 +28,12 @@ import uk.gov.hmrc.securitiestransferchargefrontend.models.{CheckMode, Mode, Nor
 import uk.gov.hmrc.securitiestransferchargefrontend.navigation.PersistentNavigationHelper
 import uk.gov.hmrc.securitiestransferchargefrontend.pages.Page
 import uk.gov.hmrc.securitiestransferchargefrontend.pages.sh03.*
-import uk.gov.hmrc.securitiestransferchargefrontend.pages.sh03.bulk.{BulkCompanyDetailsPage, BulkRoleAtPurchasingCompanyPage}
+import uk.gov.hmrc.securitiestransferchargefrontend.pages.sh03.bulk.{BulkCompanyDetailsPage, BulkRoleAtPurchasingCompanyPage, BulkCheckYourAnswersPage}
 import uk.gov.hmrc.securitiestransferchargefrontend.pages.sh03.shared.CheckYourAnswersPage
 import uk.gov.hmrc.securitiestransferchargefrontend.services.AnswerPersistenceService
 
 import scala.concurrent.{ExecutionContext, Future}
+import scala.util.Try
 
 class ForwardRoutes(answerPersistenceService: AnswerPersistenceService,
                     defaultPage: Call,
@@ -47,18 +47,18 @@ class ForwardRoutes(answerPersistenceService: AnswerPersistenceService,
 
   private val firstDate = appConfig.firstChargingPoint
   private lazy val cyaPage = sh03OrgSingleRoutes.CheckYourAnswersController.onPageLoad()
-  
+
   def forwardRoutes(page: Page, mode: Mode)(implicit hc: HeaderCarrier): UserAnswers => Future[Call] = mode match {
     case NormalMode => normalRoutes(page)
     case CheckMode => checkRoutes(page)
   }
-  
+
   private def normalRoutes(page: Page)(implicit hc: HeaderCarrier): UserAnswers => Future[Call] = page match {
 
     case HowToNotifyAboutShareBuybackPage => userAnswers => {
       dataDependent(HowToNotifyAboutShareBuybackPage, userAnswers) {
         case OneAtATime => sh03OrgSingleRoutes.CompanyDetailsController.onPageLoad(NormalMode)
-        case MoreThanOneAtATime => sh03OrgBulkRoutes.CompanyDetailsController.onPageLoad(NormalMode) 
+        case MoreThanOneAtATime => sh03OrgBulkRoutes.CompanyDetailsController.onPageLoad(NormalMode)
       }
     }
 
@@ -121,14 +121,21 @@ class ForwardRoutes(answerPersistenceService: AnswerPersistenceService,
     case BulkRoleAtPurchasingCompanyPage => userAnswers =>
       dataDependent(BulkRoleAtPurchasingCompanyPage, userAnswers) {
         roleAtPurchasingCompany =>
-          if (roleAtPurchasingCompany.role == RoleAtPurchasingCompany.unsupportedRole)
+          if (roleAtPurchasingCompany.role == RoleAtPurchasingCompany.unsupportedRole) {
             sh03OrgBulkRoutes.CannotSubmitFormErrorController.onPageLoad()
-          else sh03BulkCyaRoutes.CheckYourAnswersController.onPageLoad()
+          } else {
+            Try(userAnswers.getFileUploadReference()).toOption match {
+              case Some(reference) => sh03OrgBulkRoutes.CheckYourAnswersController.onPageLoad(reference)
+              case None => uk.gov.hmrc.securitiestransferchargefrontend.controllers.routes.JourneyRecoveryController.onPageLoad()
+            }
+          }
       }
-    
+
+    case BulkCheckYourAnswersPage => _ => Future.successful(stfSharedRoutes.ConfirmationController.onPageLoad())
+
     case _ => _ => Future.successful(defaultPage)
   }
-  
+
   def checkRoutes(page: Page)(implicit hc: HeaderCarrier): UserAnswers => Future[Call] = page match {
     case ReasonForPurchasePage => userAnswers =>
       if (userAnswers.get(ReasonForPurchasePage).contains(ReasonForPurchase.ForCancellation) && userAnswers.get(TreasurySharesPage).isEmpty) {
@@ -166,7 +173,10 @@ class ForwardRoutes(answerPersistenceService: AnswerPersistenceService,
       }
 
     case BulkCompanyDetailsPage | BulkRoleAtPurchasingCompanyPage => userAnswers =>
-      goTo(sh03BulkCyaRoutes.CheckYourAnswersController.onPageLoad(), Some(userAnswers))
+      Try(userAnswers.getFileUploadReference()).toOption match {
+        case Some(reference) => goTo(sh03OrgBulkRoutes.CheckYourAnswersController.onPageLoad(reference), Some(userAnswers))
+        case None => goTo(uk.gov.hmrc.securitiestransferchargefrontend.controllers.routes.JourneyRecoveryController.onPageLoad(), Some(userAnswers))
+      }
 
     case _ => userAnswers => goTo(cyaPage, Some(userAnswers))
   }
