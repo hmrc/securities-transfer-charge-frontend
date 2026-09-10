@@ -25,7 +25,7 @@ import uk.gov.hmrc.securitiestransferchargefrontend.controllers.routes
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.shared.SaveAndReturnButton.isReturn
 import uk.gov.hmrc.securitiestransferchargefrontend.models.{Mode, NormalMode, UserAnswers}
 import uk.gov.hmrc.securitiestransferchargefrontend.navigation.Navigator
-import uk.gov.hmrc.securitiestransferchargefrontend.pages.sh03.shared.CheckYourAnswersPage
+import uk.gov.hmrc.securitiestransferchargefrontend.pages.sh03.bulk.BulkCheckYourAnswersPage
 import uk.gov.hmrc.securitiestransferchargefrontend.repositories.ParsedStcRowsRepository
 import uk.gov.hmrc.securitiestransferchargefrontend.services.sh03.organisations.bulk.CheckYourAnswersService
 import uk.gov.hmrc.securitiestransferchargefrontend.views.html.sh03.organisations.bulk.CheckYourAnswersView
@@ -45,7 +45,7 @@ class CheckYourAnswersController @Inject()(
                                             parsedStcRowsRepository: ParsedStcRowsRepository
                                           )(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport {
 
-  lazy val backLinkCall: Mode => Option[UserAnswers] => Call = mode => _ => navigator.previousPage(CheckYourAnswersPage, mode, None)
+  lazy val backLinkCall: Mode => Option[UserAnswers] => Call = mode => _ => navigator.previousPage(BulkCheckYourAnswersPage, mode, None)
 
   def onPageLoad(reference: String): Action[AnyContent] = (stcAuthEnrolled andThen getData andThen requireData).async { implicit request =>
     implicit val messages: Messages = messagesApi.preferred(request)
@@ -54,7 +54,7 @@ class CheckYourAnswersController @Inject()(
     parsedStcRowsRepository.findDocumentByReference(reference).map {
       case Some(parsedStcRowsDocument) =>
         val viewModel = checkYourAnswersService.buildViewModel(parsedStcRowsDocument, request.userAnswers)
-        
+
         Ok(view(viewModel, backLinkCall(NormalMode)(Some(request.userAnswers))))
 
       case None =>
@@ -64,7 +64,7 @@ class CheckYourAnswersController @Inject()(
   def onSubmit(): Action[AnyContent] = (stcAuthEnrolled andThen getData andThen requireData).async {
     implicit request =>
       for {
-        nextPage <- navigator.nextPage(CheckYourAnswersPage, NormalMode, request.userAnswers, isReturn(request))
+        nextPage <- navigator.nextPage(BulkCheckYourAnswersPage, NormalMode, request.userAnswers, isReturn(request))
       } yield Redirect(nextPage)
   }
 }
