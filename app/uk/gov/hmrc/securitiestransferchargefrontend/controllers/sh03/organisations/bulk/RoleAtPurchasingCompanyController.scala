@@ -52,21 +52,18 @@ class RoleAtPurchasingCompanyController @Inject()(
   lazy val backLinkCall: Mode => UserAnswers => Call =
     mode => userAnswers => navigator.previousPage(BulkRoleAtPurchasingCompanyPage, mode, userAnswers)
 
-  private def getReference(implicit request: StcDataRequest[_]): Option[String] = {
-    request.session.get("fileUploadReference")
-      .orElse(Try(request.userAnswers.getFileUploadReference()).toOption)
-  }
-
-  def onPageLoad(mode: Mode): Action[AnyContent] = (stcAuthEnrolled andThen getData andThen requireData).async {
+  def onPageLoad(mode: Mode, reference: Option[String] = None): Action[AnyContent] = (stcAuthEnrolled andThen getData andThen requireData).async {
     implicit request =>
       val preparedForm = request.userAnswers.get(BulkRoleAtPurchasingCompanyPage) match {
         case None => form
         case Some(value) => form.fill(value)
       }
+      
+      val referenceOpt = reference.orElse(Try(request.userAnswers.getFileUploadReference()).toOption)
 
-      getReference match {
-        case Some(reference) =>
-          val updatedAnswers = request.userAnswers.setFileUploadReference(reference)
+      referenceOpt match {
+        case Some(ref) =>
+          val updatedAnswers = request.userAnswers.setFileUploadReference(ref)
           answerPersistenceService.save(updatedAnswers).map { _ =>
             Ok(view(preparedForm, mode, backLinkCall(mode)(updatedAnswers)))
           }
@@ -83,14 +80,13 @@ class RoleAtPurchasingCompanyController @Inject()(
           Future.successful(BadRequest(view(formWithErrors, mode, backLinkCall(mode)(request.userAnswers)))),
 
         value =>
-          getReference match {
-            case Some(reference) =>
+          Try(request.userAnswers.getFileUploadReference()).toOption match {
+            case Some(_) =>
               for {
                 updatedAnswers <- Future.fromTry(request.userAnswers.set(BulkRoleAtPurchasingCompanyPage, value))
-                withRefAnswers = updatedAnswers.setFileUploadReference(reference)
-                _              <- answerPersistenceService.save(withRefAnswers)
-                nextPage       <- navigator.nextPage(BulkRoleAtPurchasingCompanyPage, mode, withRefAnswers, isReturn(request))
-              } yield Redirect(nextPage).addingToSession("fileUploadReference" -> reference)
+                _              <- answerPersistenceService.save(updatedAnswers)
+                nextPage       <- navigator.nextPage(BulkRoleAtPurchasingCompanyPage, mode, updatedAnswers, isReturn(request))
+              } yield Redirect(nextPage)
 
             case None =>
               Future.successful(Redirect(JourneyRecoveryController.onPageLoad()))

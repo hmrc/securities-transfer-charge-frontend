@@ -180,8 +180,7 @@ class FileProcessingController @Inject()(
 
           case (AffinityGroup.Organisation, JourneyType.SH03) =>
             Future.successful(
-              Redirect(sh03OrgBulkRoutes.RoleAtPurchasingCompanyController.onPageLoad(NormalMode))
-                .addingToSession("fileUploadReference" -> reference)
+              Redirect(sh03OrgBulkRoutes.RoleAtPurchasingCompanyController.onPageLoad(NormalMode, Some(reference)))
             )
 
           case (_, JourneyType.SH03) => Future.successful(Redirect(sh03CyaRoutes.CheckYourAnswersController.onPageLoad()))

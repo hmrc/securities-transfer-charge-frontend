@@ -95,7 +95,7 @@ class Sh03OrgNavigator @Inject()(
         .addMapping(RoleAtPurchasingCompanyPage, sh03OrgSingleRoutes.RoleAtPurchasingCompanyController.onPageLoad)
         .addMappingNoCheck(CheckYourAnswersPage, sh03OrgSingleRoutes.CheckYourAnswersController.onPageLoad)
         .addMapping(BulkCompanyDetailsPage, sh03OrgBulkRoutes.CompanyDetailsController.onPageLoad)
-        .addMapping(BulkRoleAtPurchasingCompanyPage, sh03OrgBulkRoutes.RoleAtPurchasingCompanyController.onPageLoad)
+        .addMapping(BulkRoleAtPurchasingCompanyPage, mode => sh03OrgBulkRoutes.RoleAtPurchasingCompanyController.onPageLoad(mode, None))
         .build
 
     override protected def pageHasValidDataAtPath(userAnswers: UserAnswers, page: GettablePage[_]): Boolean = page match {

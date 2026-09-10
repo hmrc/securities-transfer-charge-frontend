@@ -38,7 +38,7 @@ import scala.concurrent.Future
 
 class RoleAtPurchasingCompanyControllerSpec extends SpecBase with MockitoSugar {
 
-  lazy val roleAtPurchasingCompanyRoute: String = routes.RoleAtPurchasingCompanyController.onPageLoad(NormalMode).url
+  lazy val roleAtPurchasingCompanyRoute: String = routes.RoleAtPurchasingCompanyController.onPageLoad(NormalMode, None).url
 
   val formProvider = new RoleAtPurchasingCompanyFormProvider()
   val form: Form[RoleAtPurchasingCompany] = formProvider(affinityGroupKeyOrg)
@@ -50,7 +50,7 @@ class RoleAtPurchasingCompanyControllerSpec extends SpecBase with MockitoSugar {
 
   "RoleAtPurchasingCompany Controller" - {
 
-    "must return OK and the correct view for a GET when fileUploadReference is present in session" in {
+    "must return OK and the correct view for a GET when fileUploadReference is present in the query string" in {
 
       val mockAnswerPersistenceService = mock[AnswerPersistenceService]
       when(mockAnswerPersistenceService.save(any())(any())).thenReturn(Future.successful(()))
@@ -63,8 +63,8 @@ class RoleAtPurchasingCompanyControllerSpec extends SpecBase with MockitoSugar {
         .build()
 
       running(application) {
-        val request = FakeRequest(GET, roleAtPurchasingCompanyRoute)
-          .withSession("fileUploadReference" -> testReference)
+        val getRequestWithRef = routes.RoleAtPurchasingCompanyController.onPageLoad(NormalMode, Some(testReference)).url
+        val request = FakeRequest(GET, getRequestWithRef)
 
         val result = route(application, request).value
 
@@ -90,8 +90,8 @@ class RoleAtPurchasingCompanyControllerSpec extends SpecBase with MockitoSugar {
         .build()
 
       running(application) {
-        val request = FakeRequest(GET, roleAtPurchasingCompanyRoute)
-          .withSession("fileUploadReference" -> testReference)
+        val getRequestWithRef = routes.RoleAtPurchasingCompanyController.onPageLoad(NormalMode, Some(testReference)).url
+        val request = FakeRequest(GET, getRequestWithRef)
 
         val view = application.injector.instanceOf[RoleAtPurchasingCompanyView]
 
@@ -117,8 +117,8 @@ class RoleAtPurchasingCompanyControllerSpec extends SpecBase with MockitoSugar {
         .build()
 
       running(application) {
-        val request = FakeRequest(GET, roleAtPurchasingCompanyRoute)
-          .withSession("fileUploadReference" -> testReference)
+        val getRequestWithRef = routes.RoleAtPurchasingCompanyController.onPageLoad(NormalMode, Some(testReference)).url
+        val request = FakeRequest(GET, getRequestWithRef)
 
         val view = application.injector.instanceOf[RoleAtPurchasingCompanyView]
 
@@ -134,7 +134,9 @@ class RoleAtPurchasingCompanyControllerSpec extends SpecBase with MockitoSugar {
       val mockAnswerPersistenceService = mock[AnswerPersistenceService]
       when(mockAnswerPersistenceService.save(any())(any())).thenReturn(Future.successful(()))
 
-      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers), affinityGroup = orgAffinity)
+      val userAnswersWithRef = emptyUserAnswers.setFileUploadReference(testReference)
+
+      val application = applicationBuilder(userAnswers = Some(userAnswersWithRef), affinityGroup = orgAffinity)
         .overrides(
           bind[Navigator].qualifiedWith("orgSh03").toInstance(getNavigator),
           bind[AnswerPersistenceService].toInstance(mockAnswerPersistenceService)
@@ -144,7 +146,6 @@ class RoleAtPurchasingCompanyControllerSpec extends SpecBase with MockitoSugar {
       running(application) {
         val request =
           FakeRequest(POST, roleAtPurchasingCompanyRoute)
-            .withSession("fileUploadReference" -> testReference)
             .withFormUrlEncodedBody(("role", "director"))
 
         val result = route(application, request).value
@@ -159,7 +160,9 @@ class RoleAtPurchasingCompanyControllerSpec extends SpecBase with MockitoSugar {
       val mockAnswerPersistenceService = mock[AnswerPersistenceService]
       when(mockAnswerPersistenceService.save(any())(any())).thenReturn(Future.successful(()))
 
-      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers), affinityGroup = orgAffinity)
+      val userAnswersWithRef = emptyUserAnswers.setFileUploadReference(testReference)
+
+      val application = applicationBuilder(userAnswers = Some(userAnswersWithRef), affinityGroup = orgAffinity)
         .overrides(
           bind[Navigator].qualifiedWith("orgSh03").toInstance(getNavigator),
           bind[AnswerPersistenceService].toInstance(mockAnswerPersistenceService)
@@ -169,7 +172,6 @@ class RoleAtPurchasingCompanyControllerSpec extends SpecBase with MockitoSugar {
       running(application) {
         val request =
           FakeRequest(POST, roleAtPurchasingCompanyRoute)
-            .withSession("fileUploadReference" -> testReference)
             .withFormUrlEncodedBody(("role", "ukSocietas"), ("uksOrgan", "Management Board"))
 
         val result = route(application, request).value
@@ -181,14 +183,15 @@ class RoleAtPurchasingCompanyControllerSpec extends SpecBase with MockitoSugar {
 
     "must return a Bad Request and errors when invalid data is submitted (missing role)" in {
 
-      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers), affinityGroup = orgAffinity)
+      val userAnswersWithRef = emptyUserAnswers.setFileUploadReference(testReference)
+
+      val application = applicationBuilder(userAnswers = Some(userAnswersWithRef), affinityGroup = orgAffinity)
         .overrides(bind[Navigator].qualifiedWith("orgSh03").toInstance(getNavigator))
         .build()
 
       running(application) {
         val request =
           FakeRequest(POST, roleAtPurchasingCompanyRoute)
-            .withSession("fileUploadReference" -> testReference)
             .withFormUrlEncodedBody(("role", ""))
 
         val boundForm = form.bind(Map("role" -> ""))
@@ -204,14 +207,15 @@ class RoleAtPurchasingCompanyControllerSpec extends SpecBase with MockitoSugar {
 
     "must return a Bad Request and errors when invalid data is submitted (UK Societas missing organ name)" in {
 
-      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers), affinityGroup = orgAffinity)
+      val userAnswersWithRef = emptyUserAnswers.setFileUploadReference(testReference)
+
+      val application = applicationBuilder(userAnswers = Some(userAnswersWithRef), affinityGroup = orgAffinity)
         .overrides(bind[Navigator].qualifiedWith("orgSh03").toInstance(getNavigator))
         .build()
 
       running(application) {
         val request =
           FakeRequest(POST, roleAtPurchasingCompanyRoute)
-            .withSession("fileUploadReference" -> testReference)
             .withFormUrlEncodedBody(("role", "ukSocietas"), ("uksOrgan", ""))
 
         val boundForm = form.bind(Map("role" -> "ukSocietas", "uksOrgan" -> ""))
@@ -254,7 +258,7 @@ class RoleAtPurchasingCompanyControllerSpec extends SpecBase with MockitoSugar {
       }
     }
 
-    "must redirect to Journey Recovery for a GET if fileUploadReference is missing from both Session and UserAnswers" in {
+    "must redirect to Journey Recovery for a GET if fileUploadReference is missing from both the query string and UserAnswers" in {
 
       val application = applicationBuilder(userAnswers = Some(emptyUserAnswers), affinityGroup = orgAffinity).build()
 
@@ -268,7 +272,7 @@ class RoleAtPurchasingCompanyControllerSpec extends SpecBase with MockitoSugar {
       }
     }
 
-    "must redirect to Journey Recovery for a POST if fileUploadReference is missing from both Session and UserAnswers" in {
+    "must redirect to Journey Recovery for a POST if fileUploadReference is missing from UserAnswers" in {
 
       val application = applicationBuilder(userAnswers = Some(emptyUserAnswers), affinityGroup = orgAffinity).build()
 
