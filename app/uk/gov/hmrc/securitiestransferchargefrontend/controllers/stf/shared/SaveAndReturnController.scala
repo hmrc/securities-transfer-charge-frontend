@@ -21,7 +21,7 @@ import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.actions.StcAuthEnrolledAction
 import uk.gov.hmrc.securitiestransferchargefrontend.domain.{SubmissionId, UserId}
-import uk.gov.hmrc.securitiestransferchargefrontend.models.audit.AuditModel
+import uk.gov.hmrc.securitiestransferchargefrontend.models.audit.{AuditModel, AuditType}
 import uk.gov.hmrc.securitiestransferchargefrontend.models.audit.JourneyStatus.ContinueSubmission
 import uk.gov.hmrc.securitiestransferchargefrontend.navigation.PersistentNavigator
 import uk.gov.hmrc.securitiestransferchargefrontend.pages.stf.shared.SaveAndReturnPage
@@ -44,7 +44,7 @@ class SaveAndReturnController @Inject()( override val messagesApi: MessagesApi,
         userAnswers <- navigator.restore(SubmissionId(submissionId), userId)
         nextPage     = userAnswers.nextPage.getOrElse(navigator.errorPage(SaveAndReturnPage))
       } yield  {
-        auditService.audit(AuditModel(ContinueSubmission, request.subscriptionId, request.affinityGroup, request.credentialId, SubmissionId(submissionId)))
+        auditService.audit(AuditModel(ContinueSubmission, request.subscriptionId, request.affinityGroup, request.credentialId, Some(SubmissionId(submissionId)), AuditType.Stf))
         Redirect(nextPage)
       }
     }

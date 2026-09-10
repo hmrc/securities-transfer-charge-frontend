@@ -25,18 +25,20 @@ case class AuditModel(
                        subscriptionId: SubscriptionId,
                        affinityGroup: AffinityGroup,
                        credentialId: CredentialId,
-                       submissionId: SubmissionId,
+                       submissionId: Option[SubmissionId],
+                       stcAuditType: AuditType
                      ) extends JsonAuditModel {
 
-  override val auditType: String = "StockTransferFormStatus"
+  override val auditType: String = stcAuditType.value
 
   override val detail: JsObject = Json.obj(
     "journeyStatus" -> journeyStatus.toString,
     "subscriptionId" -> subscriptionId,
     "affinityGroup" -> affinityGroup,
-    "credentialId" -> credentialId,
-    "submissionId" -> submissionId
-  )
+    "credentialId" -> credentialId
+  ) ++ submissionId.fold(Json.obj()) { id =>
+    Json.obj("submissionId" -> id)
+  }
 }
 
 object AuditModel {
@@ -46,6 +48,7 @@ object AuditModel {
              subscriptionId: SubscriptionId,
              affinityGroup: AffinityGroup,
              credentialId: CredentialId,
-             submissionId: SubmissionId
-           ): AuditModel = AuditModel(journeyStatus, subscriptionId, affinityGroup, credentialId, submissionId)
+             submissionId: Option[SubmissionId],
+             auditType: AuditType
+           ): AuditModel = AuditModel(journeyStatus, subscriptionId, affinityGroup, credentialId, submissionId, auditType)
 }

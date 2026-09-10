@@ -28,6 +28,7 @@ import play.api.libs.json.{JsObject, Json}
 import uk.gov.hmrc.auth.core.AffinityGroup.{Agent, Individual, Organisation}
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.play.audit.http.connector.AuditConnector
+import uk.gov.hmrc.securitiestransferchargefrontend.models.audit.AuditType.Stf
 import uk.gov.hmrc.securitiestransferchargefrontend.models.audit.{AuditModel, JourneyStatus}
 import uk.gov.hmrc.securitiestransferchargefrontend.services.AuditService
 
@@ -66,7 +67,8 @@ class AuditServiceSpec extends AnyFreeSpec with Matchers with MockitoSugar with 
             subscriptionId = testSubscriptionId,
             affinityGroup = affinityGroup,
             credentialId = testCredentialId,
-            submissionId = testSubmissionId
+            submissionId = Some(testSubmissionId),
+            auditType = Stf
           )
 
           service.audit(auditModel)
@@ -95,7 +97,8 @@ class AuditServiceSpec extends AnyFreeSpec with Matchers with MockitoSugar with 
         subscriptionId = testSubscriptionId,
         affinityGroup = uk.gov.hmrc.auth.core.AffinityGroup.Individual,
         credentialId = testCredentialId,
-        submissionId = testSubmissionId
+        submissionId = Some(testSubmissionId),
+        auditType = Stf
       )
 
       when(mockAuditConnector
