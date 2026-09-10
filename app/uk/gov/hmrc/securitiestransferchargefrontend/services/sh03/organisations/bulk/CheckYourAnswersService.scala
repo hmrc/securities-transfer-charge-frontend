@@ -39,10 +39,6 @@ class CheckYourAnswersService @Inject()(
 
         val amountOfShares = row.securitiesQuantity.getOrElse("0")
 
-        val shareType = row.typeOfShares
-          .orElse(row.whatTypeOfSecurities)
-          .getOrElse("")
-
         val isCancellation = row.purchaseForCancellation.getOrElse(true)
 
         val amountPaidStr = row.amountPaidForSecurities
@@ -56,7 +52,6 @@ class CheckYourAnswersService @Inject()(
 
         Sh03Transfer(
           amountOfShares = formatAmountOfShares(amountOfShares),
-          shareType      = shareType,
           reasonFor      = if (isCancellation) "Cancellation" else "Treasury",
           consideration  = consideration,
           taxDue         = taxDue

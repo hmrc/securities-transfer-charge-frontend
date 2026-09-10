@@ -89,14 +89,12 @@ class CheckYourAnswersServiceSpec extends SpecBase with FileUploadFixtures {
         transfers = Seq(
           Sh03Transfer(
             amountOfShares = "10,000",
-            shareType = "Ordinary",
             reasonFor = "Cancellation",
             consideration = BigDecimal("15000.00"),
             taxDue = BigDecimal("75.00")
           ),
           Sh03Transfer(
             amountOfShares = "5,000",
-            shareType = "Preference",
             reasonFor = "Treasury",
             consideration = BigDecimal("25000.00"),
             taxDue = BigDecimal("125.00")

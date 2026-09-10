@@ -43,4 +43,4 @@ case class CheckYourAnswersViewModel(
   )
 }
 
-case class Sh03Transfer(amountOfShares: String, shareType: String, reasonFor: String, consideration: BigDecimal, taxDue: BigDecimal)
+case class Sh03Transfer(amountOfShares: String, reasonFor: String, consideration: BigDecimal, taxDue: BigDecimal)

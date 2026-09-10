@@ -45,7 +45,7 @@ class CheckYourAnswersController @Inject()(
                                             parsedStcRowsRepository: ParsedStcRowsRepository
                                           )(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport {
 
-  lazy val backLinkCall: Mode => Option[UserAnswers] => Call = mode => _ => navigator.previousPage(BulkCheckYourAnswersPage, mode, None)
+  lazy val backLinkCall: Mode => Option[UserAnswers] => Call = mode => userAnswers => navigator.previousPage(BulkCheckYourAnswersPage, mode, userAnswers)
 
   def onPageLoad(reference: String): Action[AnyContent] = (stcAuthEnrolled andThen getData andThen requireData).async { implicit request =>
     implicit val messages: Messages = messagesApi.preferred(request)

@@ -42,14 +42,12 @@ class CheckYourAnswersViewSpec extends ViewBaseSpec {
   private val transfers = Seq(
     Sh03Transfer(
       amountOfShares = "10,000",
-      shareType = "Ordinary",
       reasonFor = "Cancellation",
       consideration = BigDecimal("10000.00"),
       taxDue = BigDecimal("50.00")
     ),
     Sh03Transfer(
       amountOfShares = "20,000",
-      shareType = "Preference",
       reasonFor = "Treasury",
       consideration = BigDecimal("20000.00"),
       taxDue = BigDecimal("100.00")

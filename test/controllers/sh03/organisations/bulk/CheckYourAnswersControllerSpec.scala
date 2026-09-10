@@ -62,7 +62,6 @@ class CheckYourAnswersControllerSpec extends SpecBase with MockitoSugar with Fil
         transfers = Seq(
           Sh03Transfer(
             amountOfShares = "10,000",
-            shareType = "Ordinary",
             reasonFor = "Cancellation",
             consideration = BigDecimal(10000),
             taxDue = BigDecimal(100)
