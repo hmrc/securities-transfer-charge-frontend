@@ -30,10 +30,11 @@ import uk.gov.hmrc.securitiestransferchargefrontend.navigation.stf.agents.StfAge
 import uk.gov.hmrc.securitiestransferchargefrontend.navigation.stf.individuals.StfNavigator
 import uk.gov.hmrc.securitiestransferchargefrontend.navigation.stf.organisations.StfOrgNavigator
 import uk.gov.hmrc.securitiestransferchargefrontend.navigation.{Navigator, PersistentNavigator}
-import uk.gov.hmrc.securitiestransferchargefrontend.repositories.{ChecksumRepository, ChecksumRepositoryImpl, ParsedStcRowsRepository, ParsedStcRowsRepositoryImpl, SessionRepository, SessionRepositoryImpl, SubscriptionDataRepository, SubscriptionDataRepositoryImpl, TransactionResponseRepository, TransactionResponseRepositoryImpl, UpscanJourneyRepository, UpscanJourneyRepositoryImpl, ValidationErrorRepository, ValidationErrorRepositoryImpl}
+import uk.gov.hmrc.securitiestransferchargefrontend.repositories.{ChecksumRepository, ChecksumRepositoryImpl, CyaHtmlRepository, CyaHtmlRepositoryImpl, ParsedStcRowsRepository, ParsedStcRowsRepositoryImpl, SessionRepository, SessionRepositoryImpl, SubscriptionDataRepository, SubscriptionDataRepositoryImpl, TransactionResponseRepository, TransactionResponseRepositoryImpl, UpscanJourneyRepository, UpscanJourneyRepositoryImpl, ValidationErrorRepository, ValidationErrorRepositoryImpl}
 import uk.gov.hmrc.securitiestransferchargefrontend.services.*
 import uk.gov.hmrc.securitiestransferchargefrontend.services.fileupload.*
 import uk.gov.hmrc.securitiestransferchargefrontend.services.fileupload.processing.{DefaultFileProcessingRefreshCounterFactory, FileProcessingRefreshCounterFactory}
+import uk.gov.hmrc.securitiestransferchargefrontend.utils.{HeaderCarrierCreator, HeaderCarrierCreatorImpl}
 
 import java.time.{Clock, ZoneOffset}
 
@@ -74,7 +75,9 @@ class Module extends AbstractModule {
     bind(classOf[TransactionSubmissionService]).to(classOf[TransactionSubmissionServiceImpl])
     bind(classOf[TransactionResponseRepository]).to(classOf[TransactionResponseRepositoryImpl])
     bind(classOf[EtmpSubmissionClient]).to(classOf[EtmpSubmissionClientImpl])
-
+    bind(classOf[HeaderCarrierCreator]).to(classOf[HeaderCarrierCreatorImpl])
+    bind(classOf[CyaHtmlRepository]).to(classOf[CyaHtmlRepositoryImpl])
+    
     bind(classOf[Navigator])
       .annotatedWith(Names.named("organisations"))
       .to(classOf[StfOrgNavigator])

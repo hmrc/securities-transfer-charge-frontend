@@ -18,14 +18,15 @@ package uk.gov.hmrc.securitiestransferchargefrontend.services
 
 import play.twirl.api.HtmlFormat
 import uk.gov.hmrc.http.HeaderCarrier
-import uk.gov.hmrc.play.http.HeaderCarrierConverter
 import uk.gov.hmrc.securitiestransferchargefrontend.clients.SaveAndReturnClient
+import uk.gov.hmrc.securitiestransferchargefrontend.clients.registration.NrsClient
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.actions.requests.StcDataRequest
 import uk.gov.hmrc.securitiestransferchargefrontend.domain.SubmissionId
 import uk.gov.hmrc.securitiestransferchargefrontend.models.UserAnswers
 import uk.gov.hmrc.securitiestransferchargefrontend.models.stf.Address
 import uk.gov.hmrc.securitiestransferchargefrontend.models.submission.{AffinityData, Individual}
-import uk.gov.hmrc.securitiestransferchargefrontend.repositories.TransactionResponseRepository
+import uk.gov.hmrc.securitiestransferchargefrontend.repositories.{CyaHtmlRepository, TransactionResponseRepository}
+import uk.gov.hmrc.securitiestransferchargefrontend.utils.HeaderCarrierCreator
 
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
@@ -35,8 +36,11 @@ trait TransactionSubmissionService:
   def submitSingleStf(implicit request: StcDataRequest[?]): Future[Boolean]
   
 final class TransactionSubmissionServiceImpl @Inject() (
+  headerCarrierCreator: HeaderCarrierCreator,
   etmpSubmissionService: EtmpSubmissionService,
   saveAndReturnClient: SaveAndReturnClient,
+  nrsClient: NrsClient,
+  cyaHtmlRepository: CyaHtmlRepository,
   transactionResponseRepository: TransactionResponseRepository)(implicit ec: ExecutionContext) extends TransactionSubmissionService {
 
   // TODO: Some of this should come from new screens not yet developed.
@@ -61,24 +65,28 @@ final class TransactionSubmissionServiceImpl @Inject() (
   }
 
   def submitSingleStf(implicit request: StcDataRequest[?]): Future[Boolean] = {
-    implicit val hc: HeaderCarrier = HeaderCarrierConverter.fromRequestAndSession(request, request.session)
+    implicit val hc: HeaderCarrier = headerCarrierCreator.create(request)
     lazy val submissionId = request.userAnswers.submissionId
     etmpSubmissionService
       .submitSingleStf(request.request.subscriptionId, request.userAnswers, getIndividualAffinityData)
       .map {
-        _.fold(false) { stfResponse =>
+        case stfResponse: SubmissionCreateResponseSuccess =>
           transactionResponseRepository.store(submissionId, stfResponse)
           saveAndReturnClient.deleteDraft(submissionId)
           sendSubmissionDataToNRS(submissionId)
           true
-        }
+
+        case _ => false
       }
-  }
+    }
   
-  // TODO: Needs to be implemented as part of the NRS ticket.
-  def sendSubmissionDataToNRS(submissionId: SubmissionId): Future[Unit] = {
-    transactionResponseRepository.retrieve(submissionId)
-    Future.failed(new NotImplementedError())
+  // TODO: Needs to be properly implemented as part of the NRS ticket - metadata??
+  private def sendSubmissionDataToNRS(submissionId: SubmissionId): Future[Unit] = {
+    cyaHtmlRepository
+      .retrieve(submissionId)
+      .map { html =>
+        nrsClient.postHtmlPayload(html)
+      }
   }
 }
 
@@ -87,4 +95,3 @@ object TransactionSubmissionService:
     val currentUserAnswers = req.userAnswers
     UserAnswers.empty(currentUserAnswers.userId)(currentUserAnswers.groupIdentifier)(currentUserAnswers.submissionId)
   }
-    
