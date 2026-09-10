@@ -20,7 +20,7 @@ import play.api.mvc.{Request, WrappedRequest}
 import uk.gov.hmrc.auth.core.AffinityGroup
 import uk.gov.hmrc.securitiestransferchargefrontend.domain.{CredentialId, SubscriptionId}
 
-final case class StcAuthorisedRequest[A](
+case class StcAuthorisedRequest[A](
                                           request: Request[A],
                                           internalId: String,
                                           groupIdentifier: String,

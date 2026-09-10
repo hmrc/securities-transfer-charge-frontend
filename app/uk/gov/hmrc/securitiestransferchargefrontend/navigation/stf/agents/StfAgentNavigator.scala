@@ -56,6 +56,8 @@ class StfAgentNavigator @Inject()(appConfig: FrontendAppConfig,
     backwardsRoutes.predecessorRoutes(page, mode)
 
   def errorPage(forPage: Page): Call = forPage match {
+    // TODO: The CYA error page needs updating to be the submission failure page once it is created.
+    case CheckYourAnswersPage => routes.JourneyRecoveryController.onPageLoad()
     case _ => defaultPage
   }
 
@@ -71,9 +73,7 @@ class StfAgentNavigator @Inject()(appConfig: FrontendAppConfig,
   }
 
   private def routeForShares(userAnswers: UserAnswers): Call = {
-    val hasMarketValue = userAnswers.get(DetailsOfThisTransferPage)
-      .exists(_.marketValue.isDefined)
-
+    val hasMarketValue = userAnswers.get(DetailsOfThisTransferPage).exists(_.marketValue.isDefined)
     if (hasMarketValue) {
       checkYourAnswersRoute
     } else {

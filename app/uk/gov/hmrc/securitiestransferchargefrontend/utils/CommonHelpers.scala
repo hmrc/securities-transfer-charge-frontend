@@ -27,10 +27,13 @@ import scala.concurrent.{ExecutionContext, Future}
 
 object CommonHelpers {
 
-  def logInfoAndFail[A, E <: Throwable](logger: Logger): E => Future[A] = e => {
-    logger.info(e.getMessage)
+  private def logAndFail[A, E <: Throwable](isInfo: Boolean)(logger: Logger): E => Future[A] = e => {
+    if isInfo then logger.info(e.getMessage) else logger.warn(e.getMessage)
     Future.failed(e)
   }
+  
+  def logInfoAndFail[A, E <: Throwable](logger: Logger): E => Future[A] = logAndFail(true)(logger)
+  def logWarnAndFail[A, E <: Throwable](logger: Logger): E => Future[A] = logAndFail(false)(logger)
 
   implicit class FutureOptionOps[A](fo: Future[Option[A]]) {
     def getOrFail(ex: => Throwable)(implicit ec: ExecutionContext): Future[A] =

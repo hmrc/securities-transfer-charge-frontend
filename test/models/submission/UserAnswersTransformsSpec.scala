@@ -129,7 +129,7 @@ class UserAnswersTransformsSpec extends SpecBase {
       val result =
         UserAnswersTransforms.toStfRequest(baseStfTransaction, individualAffinityData)
 
-      result.transactionDetails.descriptionOfSecurity mustBe
+      result.transactionDetails.typeOfSecurity mustBe
         baseStfTransaction.detailsOfThisTransfer.get.typeOfShares
     }
 
@@ -139,7 +139,7 @@ class UserAnswersTransformsSpec extends SpecBase {
 
       val result = UserAnswersTransforms.toStfRequest(transaction, individualAffinityData)
 
-      result.transactionDetails.descriptionOfSecurity mustBe baseStfTransaction.otherSecuritiesType.get
+      result.transactionDetails.typeOfSecurity mustBe baseStfTransaction.otherSecuritiesType.get
       result.transactionDetails.numberOfShares mustBe 1
     }
 
