@@ -19,7 +19,7 @@ package uk.gov.hmrc.securitiestransferchargefrontend.config
 import com.google.inject.AbstractModule
 import com.google.inject.name.Names
 import play.api.http.HttpErrorHandler
-import uk.gov.hmrc.securitiestransferchargefrontend.clients.registration.{RegistrationClient, RegistrationClientImpl}
+import uk.gov.hmrc.securitiestransferchargefrontend.clients.registration.{NrsClient, NrsClientImpl, RegistrationClient, RegistrationClientImpl}
 import uk.gov.hmrc.securitiestransferchargefrontend.clients.{EtmpSubmissionClient, EtmpSubmissionClientImpl, SaveAndReturnClient, SaveAndReturnClientImpl, SubmissionIdClient, SubmissionIdClientImpl}
 import uk.gov.hmrc.securitiestransferchargefrontend.connectors.*
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.actions.*
@@ -77,6 +77,7 @@ class Module extends AbstractModule {
     bind(classOf[EtmpSubmissionClient]).to(classOf[EtmpSubmissionClientImpl])
     bind(classOf[HeaderCarrierCreator]).to(classOf[HeaderCarrierCreatorImpl])
     bind(classOf[CyaHtmlRepository]).to(classOf[CyaHtmlRepositoryImpl])
+    bind(classOf[NrsClient]).to(classOf[NrsClientImpl])
     
     bind(classOf[Navigator])
       .annotatedWith(Names.named("organisations"))
