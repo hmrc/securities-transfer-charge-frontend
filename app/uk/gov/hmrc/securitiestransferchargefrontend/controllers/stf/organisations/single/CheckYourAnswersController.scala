@@ -27,7 +27,7 @@ import uk.gov.hmrc.securitiestransferchargefrontend.models.{Mode, NormalMode, Us
 import uk.gov.hmrc.securitiestransferchargefrontend.navigation.Navigator
 import uk.gov.hmrc.securitiestransferchargefrontend.pages.stf.shared.*
 import uk.gov.hmrc.securitiestransferchargefrontend.pages.stf.single.*
-import uk.gov.hmrc.securitiestransferchargefrontend.repositories.CyaHtmlRepository
+import uk.gov.hmrc.securitiestransferchargefrontend.repositories.{CyaHtmlData, CyaHtmlRepository}
 import uk.gov.hmrc.securitiestransferchargefrontend.services.TransactionSubmissionService
 import uk.gov.hmrc.securitiestransferchargefrontend.services.stf.TaxDueCalculationService
 import uk.gov.hmrc.securitiestransferchargefrontend.services.stf.shared.FormattingService
@@ -86,7 +86,13 @@ class CheckYourAnswersController @Inject()(
       paymentDueDateFormatted = paymentDueDateFormatted
     )
     val html = view(viewModel, backLinkCall(NormalMode)(request.userAnswers), routes.CheckYourAnswersController.onSubmit())
-    cyaHtmlRepository.store(request.userAnswers.submissionId, html)
+    cyaHtmlRepository
+      .store(
+        CyaHtmlData(
+          submissionId = userAnswers.submissionId,
+          html = html
+        )
+      )
     Ok(html)
   }
 

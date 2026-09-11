@@ -16,7 +16,6 @@
 
 package uk.gov.hmrc.securitiestransferchargefrontend.services
 
-import play.twirl.api.HtmlFormat
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.securitiestransferchargefrontend.clients.SaveAndReturnClient
 import uk.gov.hmrc.securitiestransferchargefrontend.clients.registration.NrsClient
@@ -32,7 +31,6 @@ import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 
 trait TransactionSubmissionService:
-  def storeSubmissionData(html: HtmlFormat.Appendable)(implicit request: StcDataRequest[?]): Future[Unit]
   def submitSingleStf(implicit request: StcDataRequest[?]): Future[Boolean]
   
 final class TransactionSubmissionServiceImpl @Inject() (
@@ -56,13 +54,8 @@ final class TransactionSubmissionServiceImpl @Inject() (
       ),
       phone = "01234 567890",
       email = "jsmith@foo.com",
-      nino = "NX787356B" // Can come from subscription
+      nino = "NX787356B"
     )
-    
-  def storeSubmissionData(html: HtmlFormat.Appendable)(implicit request: StcDataRequest[?]): Future[Unit] = {
-    // TODO: NRS ticket - need to store this in a repository
-    Future.successful(())
-  }
 
   def submitSingleStf(implicit request: StcDataRequest[?]): Future[Boolean] = {
     implicit val hc: HeaderCarrier = headerCarrierCreator.create(request)
@@ -80,12 +73,11 @@ final class TransactionSubmissionServiceImpl @Inject() (
       }
     }
   
-  // TODO: Needs to be properly implemented as part of the NRS ticket - metadata??
   private def sendSubmissionDataToNRS(submissionId: SubmissionId): Future[Unit] = {
     cyaHtmlRepository
       .retrieve(submissionId)
-      .map { html =>
-        nrsClient.postHtmlPayload(html)
+      .collect { case Some(data) =>
+        nrsClient.postHtmlPayload(data.html)
       }
   }
 }
