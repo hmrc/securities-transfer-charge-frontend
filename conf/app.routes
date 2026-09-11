@@ -492,7 +492,7 @@ GET        /sh03/org/bulk/cannot-submit-form                       uk.gov.hmrc.s
 GET        /sh03/org/check-answers                                  uk.gov.hmrc.securitiestransferchargefrontend.controllers.sh03.organisations.single.CheckYourAnswersController.onPageLoad()
 POST       /sh03/org/check-answers                                  uk.gov.hmrc.securitiestransferchargefrontend.controllers.sh03.organisations.single.CheckYourAnswersController.onSubmit()
 
-GET        /sh03/org/bulk/check-answers/:reference           uk.gov.hmrc.securitiestransferchargefrontend.controllers.sh03.organisations.bulk.CheckYourAnswersController.onPageLoad(reference: String)
-POST       /sh03/org/bulk/check-answers           uk.gov.hmrc.securitiestransferchargefrontend.controllers.sh03.organisations.bulk.CheckYourAnswersController.onSubmit()
+GET        /sh03/org/bulk/check-your-answers/:reference           uk.gov.hmrc.securitiestransferchargefrontend.controllers.sh03.organisations.bulk.CheckYourAnswersController.onPageLoad(reference: String)
+POST       /sh03/org/bulk/check-your-answers                      uk.gov.hmrc.securitiestransferchargefrontend.controllers.sh03.organisations.bulk.CheckYourAnswersController.onSubmit()
 
 GET        /file-not-saved                             uk.gov.hmrc.securitiestransferchargefrontend.controllers.sh03.shared.bulk.YourFileWillNotBeSavedController.onPageLoad()
