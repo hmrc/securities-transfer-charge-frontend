@@ -57,6 +57,7 @@ val submissionFailure = Future.successful(SubmissionCreateResponseFailure)
 
 trait EtmpSubmissionService:
   def submitSingleStf(subscriptionId: SubscriptionId, userAnswers: UserAnswers, affinityData: AffinityData)(implicit hc: HeaderCarrier): Future[SubmissionCreateResponse]
+  def submitSingleSh03(subscriptionId: SubscriptionId, userAnswers: UserAnswers, affinityData: AffinityData)(implicit hc: HeaderCarrier): Future[SubmissionCreateResponse]
 
 class EtmpSubmissionServiceImpl @Inject() (etmpSubmissionsClient: EtmpSubmissionClient)(implicit ec: ExecutionContext) extends EtmpSubmissionService with Logging:
 
@@ -123,10 +124,20 @@ class EtmpSubmissionServiceImpl @Inject() (etmpSubmissionsClient: EtmpSubmission
       val stfReq = UserAnswersTransforms.toStfRequest(stfSingleReq, affinityData)
       val declaration = createDeclaration(userAnswers)
       val etmpPayload = SubmissionBatchPayload(declaration, List(stfReq))
-
-      val x = etmpSubmissionsClient
-        .submitSingleStf(subscriptionId, userAnswers.submissionId, etmpPayload)
-
-        x.map(toSubmissionCreateResponse(userAnswers))
+      submitSingleTransfer(subscriptionId, userAnswers, etmpPayload)
     }.getOrElse(submissionFailure)
   }
+
+  def submitSingleSh03(subscriptionId: SubscriptionId, userAnswers: UserAnswers, affinityData: AffinityData)(implicit hc: HeaderCarrier): Future[SubmissionCreateResponse] = {
+    userAnswers.get(Sh03Transaction).map { sh03SingleReq =>
+      val stfReq = UserAnswersTransforms.toSh03Request(sh03SingleReq, affinityData)
+      val declaration = createDeclaration(userAnswers)
+      val etmpPayload = SubmissionBatchPayload(declaration, List(stfReq))
+      submitSingleTransfer(subscriptionId, userAnswers, etmpPayload)
+    }.getOrElse(submissionFailure)
+  }
+
+  private def submitSingleTransfer(subscriptionId: SubscriptionId, userAnswers: UserAnswers, etmpPayload: SubmissionBatchPayload)(implicit hc: HeaderCarrier): Future[SubmissionCreateResponse] =
+    etmpSubmissionsClient
+      .submitSingleTransfer(subscriptionId, userAnswers.submissionId, etmpPayload)
+      .map(toSubmissionCreateResponse(userAnswers))

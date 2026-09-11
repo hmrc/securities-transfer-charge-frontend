@@ -95,7 +95,7 @@ final case class SingleTransferOtherBuyerName(
 
 final case class SingleTransferAgentDetails(
   name: String,
-  addr1: String,
+  addr1: Option[String],
   addr2: Option[String],
   addr3: Option[String],
   addr4: Option[String],
