@@ -26,6 +26,7 @@ import uk.gov.hmrc.securitiestransferchargefrontend.models.stf.cya.StfAgentRowBu
 import uk.gov.hmrc.securitiestransferchargefrontend.models.{Mode, NormalMode, UserAnswers}
 import uk.gov.hmrc.securitiestransferchargefrontend.navigation.Navigator
 import uk.gov.hmrc.securitiestransferchargefrontend.pages.stf.shared.*
+import uk.gov.hmrc.securitiestransferchargefrontend.repositories.CyaHtmlRepository
 import uk.gov.hmrc.securitiestransferchargefrontend.services.TransactionSubmissionService
 import uk.gov.hmrc.securitiestransferchargefrontend.services.stf.TaxDueCalculationService
 import uk.gov.hmrc.securitiestransferchargefrontend.services.stf.shared.FormattingService
@@ -46,7 +47,8 @@ class CheckYourAnswersController @Inject()(
                                             view: CheckYourAnswersView,
                                             taxDueCalculationService: TaxDueCalculationService,
                                             formattingService: FormattingService,
-                                            transactionSubmissionService: TransactionSubmissionService
+                                            transactionSubmissionService: TransactionSubmissionService,
+                                            cyaHtmlRepository: CyaHtmlRepository
                                           )(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport {
 
   lazy val backLinkCall: Mode => UserAnswers => Call = mode => userAnswers => navigator.previousPage(CheckYourAnswersPage, mode, userAnswers)
@@ -85,7 +87,9 @@ class CheckYourAnswersController @Inject()(
       taxDueFormatted = taxDueFormatted,
       paymentDueDateFormatted = paymentDueDateFormatted
     )
-    Ok(view(viewModel, backLinkCall(NormalMode)(request.userAnswers)))
+    val html = view(viewModel, backLinkCall(NormalMode)(request.userAnswers))
+    cyaHtmlRepository.store(request.userAnswers.submissionId, html)
+    Ok(html)
   }
 
   def onSubmit(): Action[AnyContent] = (stcAuthEnrolled andThen getData andThen requireData).async { implicit request =>

@@ -27,6 +27,7 @@ import uk.gov.hmrc.securitiestransferchargefrontend.models.{Mode, NormalMode, Us
 import uk.gov.hmrc.securitiestransferchargefrontend.navigation.Navigator
 import uk.gov.hmrc.securitiestransferchargefrontend.pages.stf.shared.*
 import uk.gov.hmrc.securitiestransferchargefrontend.pages.stf.single.*
+import uk.gov.hmrc.securitiestransferchargefrontend.repositories.CyaHtmlRepository
 import uk.gov.hmrc.securitiestransferchargefrontend.services.TransactionSubmissionService
 import uk.gov.hmrc.securitiestransferchargefrontend.services.stf.TaxDueCalculationService
 import uk.gov.hmrc.securitiestransferchargefrontend.services.stf.shared.FormattingService
@@ -48,7 +49,8 @@ class CheckYourAnswersController @Inject()(
                                             view: CheckYourAnswersView,
                                             taxDueCalculationService: TaxDueCalculationService,
                                             formattingService: FormattingService,
-                                            transactionSubmissionService: TransactionSubmissionService
+                                            transactionSubmissionService: TransactionSubmissionService,
+                                            cyaHtmlRepository: CyaHtmlRepository
                                           )(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport {
 
   lazy val backLinkCall: Mode => UserAnswers => Call = mode => userAnswers => navigator.previousPage(CheckYourAnswersPage, mode, userAnswers)
@@ -83,7 +85,9 @@ class CheckYourAnswersController @Inject()(
       taxDueFormatted = taxDueFormatted,
       paymentDueDateFormatted = paymentDueDateFormatted
     )
-    Ok(view(viewModel, backLinkCall(NormalMode)(request.userAnswers), routes.CheckYourAnswersController.onSubmit()))
+    val html = view(viewModel, backLinkCall(NormalMode)(request.userAnswers), routes.CheckYourAnswersController.onSubmit())
+    cyaHtmlRepository.store(request.userAnswers.submissionId, html)
+    Ok(html)
   }
 
   def onSubmit(): Action[AnyContent] = (stcAuthEnrolled andThen getData andThen requireData).async { implicit request =>
