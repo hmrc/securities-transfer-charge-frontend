@@ -22,11 +22,11 @@ import play.api.mvc.{Action, AnyContent, Call, MessagesControllerComponents}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.actions.*
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.actions.requests.StcDataRequest
-import uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.shared.SaveAndReturnButton.isReturn
 import uk.gov.hmrc.securitiestransferchargefrontend.models.stf.cya.StfAgentRowBuilder
 import uk.gov.hmrc.securitiestransferchargefrontend.models.{Mode, NormalMode, UserAnswers}
 import uk.gov.hmrc.securitiestransferchargefrontend.navigation.Navigator
 import uk.gov.hmrc.securitiestransferchargefrontend.pages.stf.shared.*
+import uk.gov.hmrc.securitiestransferchargefrontend.services.TransactionSubmissionService
 import uk.gov.hmrc.securitiestransferchargefrontend.services.stf.TaxDueCalculationService
 import uk.gov.hmrc.securitiestransferchargefrontend.services.stf.shared.FormattingService
 import uk.gov.hmrc.securitiestransferchargefrontend.viewmodels.govuk.summarylist.*
@@ -34,7 +34,7 @@ import uk.gov.hmrc.securitiestransferchargefrontend.viewmodels.stf.shared.single
 import uk.gov.hmrc.securitiestransferchargefrontend.views.html.stf.agents.single.CheckYourAnswersView
 
 import javax.inject.Named
-import scala.concurrent.ExecutionContext
+import scala.concurrent.{ExecutionContext, Future}
 
 class CheckYourAnswersController @Inject()(
                                             override val messagesApi: MessagesApi,
@@ -45,7 +45,8 @@ class CheckYourAnswersController @Inject()(
                                             val controllerComponents: MessagesControllerComponents,
                                             view: CheckYourAnswersView,
                                             taxDueCalculationService: TaxDueCalculationService,
-                                            formattingService: FormattingService
+                                            formattingService: FormattingService,
+                                            transactionSubmissionService: TransactionSubmissionService
                                           )(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport {
 
   lazy val backLinkCall: Mode => UserAnswers => Call = mode => userAnswers => navigator.previousPage(CheckYourAnswersPage, mode, userAnswers)
@@ -87,10 +88,15 @@ class CheckYourAnswersController @Inject()(
     Ok(view(viewModel, backLinkCall(NormalMode)(request.userAnswers)))
   }
 
-  def onSubmit(): Action[AnyContent] = (stcAuthEnrolled andThen getData andThen requireData).async {
-    implicit request =>
-      for {
-        nextPage <- navigator.nextPage(CheckYourAnswersPage, NormalMode, request.userAnswers, isReturn(request))
-      } yield Redirect(nextPage)
+  def onSubmit(): Action[AnyContent] = (stcAuthEnrolled andThen getData andThen requireData).async { implicit request =>
+    transactionSubmissionService
+      .submitSingleStf
+      .flatMap(nextUrl)
+      .map(Redirect)
   }
+
+  private def nextUrl(success: Boolean)(implicit request: StcDataRequest[?]): Future[Call] =
+    if success then navigator.nextPage(CheckYourAnswersPage, NormalMode, TransactionSubmissionService.clearedUserAnswers(request))
+    else Future.successful(navigator.errorPage(CheckYourAnswersPage))
+  
 }

@@ -77,6 +77,8 @@ case class UserAnswers(userId: UserId,
         page.cleanup(None, updatedAnswers)
     }
   }
+  
+  def clear: UserAnswers = this.copy(data = Json.obj())
 }
 
 object UserAnswers {

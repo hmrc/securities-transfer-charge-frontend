@@ -119,6 +119,14 @@ class FrontendAppConfig @Inject() (configuration: Configuration, servicesConfig:
     if (configuration.get[Boolean]("microservice.save-and-return-uses-user-id-only"))
       SaveAndReturnRetrievalType.UserOnly else SaveAndReturnRetrievalType.UserAndGroup
 
+  /*
+   * Submissions service
+   */
+  val submissionsService = configuration.get[Service]("microservice.services.securities-transfer-charge-submissions") 
+  val submissionsServiceBaseUrl = submissionsService.baseUrl
+  val submissionsServiceBasePath = configuration.get[String]("microservice.services.securities-transfer-charge-submissions.path")
+  val submissionsServiceUrl = s"$submissionsServiceBaseUrl$submissionsServiceBasePath"
+  
   lazy val connectedPersonsInformationUrl: String = configuration.get[String]("urls.external.connectedPersonsInformation")
   val stfBaseUrl: String = servicesConfig.baseUrl("securities-transfer-charge-frontend")
 

@@ -36,7 +36,7 @@ import uk.gov.hmrc.securitiestransferchargefrontend.clients.SaveAndReturnClient
 import uk.gov.hmrc.securitiestransferchargefrontend.clients.registration.Subscription
 import uk.gov.hmrc.securitiestransferchargefrontend.connectors.AlfAddressConnector
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.actions.*
-import uk.gov.hmrc.securitiestransferchargefrontend.domain.{GroupIdentifier, SubmissionId, UserId}
+import uk.gov.hmrc.securitiestransferchargefrontend.domain.{GroupIdentifier, SubmissionId, SubscriptionId, UserId}
 import uk.gov.hmrc.securitiestransferchargefrontend.models.requests.DataRequest
 import uk.gov.hmrc.securitiestransferchargefrontend.models.shared.AgentReference
 import uk.gov.hmrc.securitiestransferchargefrontend.models.stf.*
@@ -64,6 +64,7 @@ trait SpecBase
   val testGroupIdentifier: GroupIdentifier = GroupIdentifier("group-123")
   val sessionId = "sessionId1234"
   val submissionId: SubmissionId = SubmissionId("STC-123456789")
+  val subscriptionId: SubscriptionId = SubscriptionId("STT66637383")
   val userId = "internalId"
   val affinityGroupKeyInd = "individual"
   val affinityGroupKeyOrg = "org"

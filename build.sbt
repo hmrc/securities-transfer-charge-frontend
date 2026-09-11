@@ -65,7 +65,6 @@ lazy val microservice = (project in file("."))
       "-Wconf:src=views/.*:silent"
     ),
     libraryDependencies ++= AppDependencies(),
-    dependencyOverrides ++= AppDependencies.overrides,
     retrieveManaged := true,
     pipelineStages := Seq(digest),
     Assets / pipelineStages := Seq(concat)

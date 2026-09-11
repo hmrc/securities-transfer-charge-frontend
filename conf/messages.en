@@ -1132,7 +1132,7 @@ org.sh03.companyDetails.isPlc.error.required = Select yes if the purchasing comp
 org.sh03.companyDetails.checkYourAnswersLabel = What is the company registration number (CRN)?
 org.sh03.companyDetails.change.hidden = Change company registration number (CRN)
 org.sh03.companyDetails.companyName.change.hidden = Change company name
-org.sh03.companyDetails.crn.change.hidden = Change company number
+org.sh03.companyDetails.crn.change.hidden = Change company registration number (CRN)
 org.sh03.companyDetails.isPlc.change.hidden = Change if the company is a Public Limited Company (PLC)
 
 org.sh03.treasuryShares.title = Do these shares also qualify as treasury shares?
@@ -1303,10 +1303,14 @@ org.sh03.templateInstructions.step3 = Upload the file on the next page as a .csv
 org.sh03.templateInstructions.p2 = Remember, do not edit the first three rows, or change the order of the columns.
 org.sh03.templateInstructions.p3 = Once you have uploaded and submitted the file it will show in your recent submissions, you can then pay the tax due.
 
+
 checkYourAnswers.sh03.bulk.taxDue.section.amount.heading = Amount
 checkYourAnswers.sh03.bulk.taxDue.section.for.heading = For
 checkYourAnswers.sh03.bulk.taxDue.section.consideration.heading = Consideration
 checkYourAnswers.sh03.bulk.taxDue.section.taxDue.heading = Tax due
+
+yourFileWillNotBeSaved.title = Your file will not be saved
+yourFileWillNotBeSaved.heading = Your file will not be saved
 
 fileUpload.saveAndReturn.title = Your uploaded file will not be saved
 fileUpload.saveAndReturn.heading = Your uploaded file will not be saved

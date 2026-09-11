@@ -1,0 +1,132 @@
+/*
+ * Copyright 2026 HM Revenue & Customs
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+package uk.gov.hmrc.securitiestransferchargefrontend.services
+
+import play.api.Logging
+import uk.gov.hmrc.http.HeaderCarrier
+import uk.gov.hmrc.securitiestransferchargefrontend.clients.EtmpSubmissionClient
+import uk.gov.hmrc.securitiestransferchargefrontend.domain.{SubmissionId, SubscriptionId}
+import uk.gov.hmrc.securitiestransferchargefrontend.models.UserAnswers
+import uk.gov.hmrc.securitiestransferchargefrontend.models.shared.AgentReference
+import uk.gov.hmrc.securitiestransferchargefrontend.models.submission.*
+import uk.gov.hmrc.securitiestransferchargefrontend.pages.sh03.RoleAtPurchasingCompanyPage
+import uk.gov.hmrc.securitiestransferchargefrontend.pages.stf.shared.AgentReferencePage
+
+import java.time.LocalDate
+import java.time.format.DateTimeFormatter
+import java.util.Locale
+import javax.inject.Inject
+import scala.concurrent.{ExecutionContext, Future}
+
+type ChargeReference = String
+
+trait SubmissionCreateResponse
+
+final case class SubmissionCreateResponseSuccess(
+  submissionId: SubmissionId,
+  chargeReferences: Seq[ChargeReference],
+  taxDue: BigDecimal,
+  paymentDueBy: LocalDate,
+  agentReference: Option[String]) extends SubmissionCreateResponse
+
+final case class SubmissionCreateResponsePartialFailure(
+  submissionId: SubmissionId,
+  successfulChargeReferences: Seq[ChargeReference],
+  failedRecords: Seq[Int],
+  taxDue: BigDecimal,
+  paymentDueBy: LocalDate,
+  agentReference: Option[String]) extends SubmissionCreateResponse
+
+case object SubmissionCreateResponseFailure extends SubmissionCreateResponse
+
+val submissionFailure = Future.successful(SubmissionCreateResponseFailure)
+
+trait EtmpSubmissionService:
+  def submitSingleStf(subscriptionId: SubscriptionId, userAnswers: UserAnswers, affinityData: AffinityData)(implicit hc: HeaderCarrier): Future[SubmissionCreateResponse]
+
+class EtmpSubmissionServiceImpl @Inject() (etmpSubmissionsClient: EtmpSubmissionClient)(implicit ec: ExecutionContext) extends EtmpSubmissionService with Logging:
+
+  private val formatter  = DateTimeFormatter.ofPattern("yyyy-MM-dd", Locale.UK)
+
+  private val toSubmissionCreateResponse: UserAnswers => StcTransactionCreateResponse => SubmissionCreateResponse = userAnswers => {
+    case StcTransactionCreateProcessed(body) => toSubmissionCreateResponseSuccess(userAnswers, body)
+    case _                                   => SubmissionCreateResponseFailure
+  }
+
+  private def toSubmissionCreateResponseSuccess(userAnswers: UserAnswers, processed: StcTransactionCreateProcessedBody): SubmissionCreateResponse = {
+    val charges   = processed.charges
+    val successes = charges.collect(getStcChargeSuccess)
+    val failures  = charges.collect(getStcChargeFailure)
+
+    lazy val failedRecords = failures.map(_.recordId)
+
+    if successes.isEmpty then
+      return SubmissionCreateResponseFailure
+    end if
+
+    val submissionId     = userAnswers.submissionId
+    val chargeReferences = successes.map(_.chargeReference)
+    val taxDue           = successes.map(_.chargeAmount).sum
+    val paymentDueBy     = successes.collect(getDueBy).min
+    val agentReference   = userAnswers.get(AgentReferencePage).flatMap(_.agentReference)
+
+    if failures.isEmpty then
+      SubmissionCreateResponseSuccess(submissionId, chargeReferences, taxDue, paymentDueBy, agentReference)
+    else
+      SubmissionCreateResponsePartialFailure(submissionId, chargeReferences, failedRecords, taxDue, paymentDueBy, agentReference)
+  }
+
+  private val getStcChargeFailure: PartialFunction[StcCharge, StcChargeFailure] = {
+    case c: StcChargeFailure => c
+  }
+
+  private val getStcChargeSuccess: PartialFunction[StcCharge, StcChargeSuccess] = {
+    case c: StcChargeSuccess => c
+  }
+
+  private val getDueBy: PartialFunction[StcCharge, LocalDate] = {
+    case c: StcChargeSuccess => LocalDate.parse(c.chargeDueDate, formatter)
+  }
+
+  // ToDo: We do not currently have the information to create a declaration.
+  private val createDeclaration: UserAnswers => SingleTransferDeclaration = userAnswers =>
+    SingleTransferDeclaration(
+      userAnswers.get(RoleAtPurchasingCompanyPage).map(_.role).flatMap(DeclarationRole.fromString),
+      userAnswers.get(RoleAtPurchasingCompanyPage).flatMap(_.uksOrgan),
+      "John Bull",
+      "10 High Street",
+      Some("Bolton"),
+      None,
+      None,
+      "BL2 5TT",
+      "UK",
+      None,
+      true
+    )
+
+  def submitSingleStf(subscriptionId: SubscriptionId, userAnswers: UserAnswers, affinityData: AffinityData)(implicit hc: HeaderCarrier): Future[SubmissionCreateResponse] = {
+    userAnswers.get(StfTransaction).map { stfSingleReq =>
+      val stfReq = UserAnswersTransforms.toStfRequest(stfSingleReq, affinityData)
+      val declaration = createDeclaration(userAnswers)
+      val etmpPayload = SubmissionBatchPayload(declaration, List(stfReq))
+
+      val x = etmpSubmissionsClient
+        .submitSingleStf(subscriptionId, userAnswers.submissionId, etmpPayload)
+
+        x.map(toSubmissionCreateResponse(userAnswers))
+    }.getOrElse(submissionFailure)
+  }

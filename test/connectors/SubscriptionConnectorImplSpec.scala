@@ -44,7 +44,6 @@ class SubscriptionConnectorImplSpec
 
   private val mockRegistrationClient = mock[RegistrationClient]
   private val mockSubscriptionRepo = mock[SubscriptionDataRepository]
-  val subscriptionId: SubscriptionId = SubscriptionId("STC123")
 
   private val connector = new SubscriptionConnectorImpl(
     mockRegistrationClient,

@@ -29,6 +29,9 @@ enum DeclarationRole(val code: String):
   case UkSocietas extends DeclarationRole("8")
 
 object DeclarationRole:
+  
+  val fromString: String => Option[DeclarationRole] = s => DeclarationRole.values.find(_.toString.equalsIgnoreCase(s))
+  
   given Format[DeclarationRole] = Format(
     Reads {
       case JsString(s) =>

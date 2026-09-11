@@ -34,22 +34,22 @@ final case class SingleTransferRequest(
 )
 
 final case class SingleTransferTransactionDetails(
-  transactionType: TransferType,
-  reasonForPurchase: Option[ReasonForPurchase],
-  descriptionOfSecurity: String,
-  numberOfShares: Int,
-  nominalValue: Option[BigDecimal],
-  marketValue: Option[BigDecimal],
-  qualifyAsTreasuryShares: Option[Boolean],
-  maxPricePaid: Option[BigDecimal],
-  minPricePaid: Option[BigDecimal],
-  originalChargingPoint: LocalDate,
-  considerationActual: BigDecimal,
-  isConnectedPartiesTransactions: Boolean,
-  companyName: String,
-  companyRegistrationNumber: Option[String],
-  reliefClaimedName: Option[String],
-  reliefPercentage: Option[Int]
+   transactionType: TransferType,
+   reasonForPurchase: Option[ReasonForPurchase],
+   typeOfSecurity: String,
+   numberOfShares: Int,
+   nominalValue: Option[BigDecimal],
+   marketValue: Option[BigDecimal],
+   qualifyAsTreasuryShares: Option[Boolean],
+   maxPricePaid: Option[BigDecimal],
+   minPricePaid: Option[BigDecimal],
+   originalChargingPoint: LocalDate,
+   considerationActual: BigDecimal,
+   isConnectedPartiesTransactions: Boolean,
+   companyName: String,
+   companyRegistrationNumber: Option[String],
+   reliefClaimedName: Option[String],
+   reliefPercentage: Option[Int]
 )
 
 final case class SingleTransferContingentDetails(
