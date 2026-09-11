@@ -17,19 +17,26 @@
 package controllers.sh03.agents.single
 
 import base.SpecBase
+import base.stubs.StubPersistentNavigator
+import clients.StubEtmpSubmissionClient
 import com.google.inject.name.Names
 import play.api.inject.bind
 import play.api.libs.json.JsPath
 import play.api.mvc.{Call, Request}
 import play.api.test.FakeRequest
 import play.api.test.Helpers.*
+import uk.gov.hmrc.securitiestransferchargefrontend.clients.EtmpSubmissionClient
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.sh03.agents.single.routes
+import uk.gov.hmrc.securitiestransferchargefrontend.models.sh03.HowToNotifyAboutShareBuyback
+import uk.gov.hmrc.securitiestransferchargefrontend.models.sh03.shared.{CompanyDetails, DetailsOfThisSharePurchase, ReasonForPurchase, RoleAtPurchasingCompany}
+import uk.gov.hmrc.securitiestransferchargefrontend.models.shared.AgentReference
 import uk.gov.hmrc.securitiestransferchargefrontend.models.{Mode, UserAnswers}
 import uk.gov.hmrc.securitiestransferchargefrontend.navigation.{Navigator, PageCallBiMap, PageCallBiMapBuilder, UserAnswersValidator}
+import uk.gov.hmrc.securitiestransferchargefrontend.pages.sh03.*
 import uk.gov.hmrc.securitiestransferchargefrontend.pages.{CyaPage, ErrorPage, Page}
-import uk.gov.hmrc.securitiestransferchargefrontend.pages.sh03.AgentReferencePage
 import uk.gov.hmrc.securitiestransferchargefrontend.queries.Gettable
 
+import java.time.LocalDate
 import scala.concurrent.Future
 
 class CheckYourAnswersControllerSpec extends SpecBase {
@@ -128,10 +135,25 @@ class CheckYourAnswersControllerSpec extends SpecBase {
 
     "onSubmit" - {
 
+      val completeUserAnswers =
+        emptyUserAnswers
+          .set(HowToNotifyAboutShareBuybackPage,HowToNotifyAboutShareBuyback.OneAtATime).success.value
+          .set(AgentReferencePage, AgentReference(Some("Ref-1234"))).success.value
+          .set(CompanyDetailsPage, CompanyDetails("Company 1","12345678",false)).success.value
+          .set(ReasonForPurchasePage,ReasonForPurchase.ForCancellation).success.value
+          .set(ConnectedPersonsPage,false).success.value
+          .set(ApplyingForReliefPage,false).success.value
+          .set(DetailsOfThisSharePurchasePage,DetailsOfThisSharePurchase(50,"Ordinary", BigDecimal(40),None)).success.value
+          .set(ChargingPointPage,LocalDate.now()).success.value
+          .set(RoleAtPurchasingCompanyPage,RoleAtPurchasingCompany("Administrator",None)).success.value
+
       "must redirect to the next page" in {
-        val application = applicationBuilder(userAnswers = Some(emptyUserAnswers))
+        val stubNavigator = new StubPersistentNavigator(testNextPage, completeUserAnswers, "sh03", "")
+        val stubEtmpSubmissionClient = new StubEtmpSubmissionClient()
+        val application = applicationBuilder(userAnswers = Some(completeUserAnswers))
           .overrides(
-            bind[Navigator].qualifiedWith(Names.named("agentsSh03")).toInstance(fakeNavigatorWithValidatorOutcome(Right(true)))
+            bind[Navigator].qualifiedWith(Names.named("agentsSh03")).toInstance(stubNavigator),
+            bind[EtmpSubmissionClient].toInstance(stubEtmpSubmissionClient)
           )
           .build()
 

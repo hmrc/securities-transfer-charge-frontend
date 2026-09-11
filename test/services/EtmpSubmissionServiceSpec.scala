@@ -16,7 +16,7 @@
 
 package services
 
-import base.SpecBase
+import base.{Fixtures, SpecBase}
 import clients.FakeEtmpSubmissionClient
 import org.mockito.Mockito.*
 import org.scalacheck.Gen
@@ -25,19 +25,22 @@ import org.scalatest.freespec.AnyFreeSpec
 import org.scalatest.matchers.must.Matchers
 import org.scalatestplus.mockito.MockitoSugar
 import uk.gov.hmrc.securitiestransferchargefrontend.models.UserAnswers
+import uk.gov.hmrc.securitiestransferchargefrontend.models.sh03.HowToNotifyAboutShareBuyback
+import uk.gov.hmrc.securitiestransferchargefrontend.models.sh03.shared.{ReasonForPurchase, RoleAtPurchasingCompany}
 import uk.gov.hmrc.securitiestransferchargefrontend.models.stf.HowToNotifyAboutSecuritiesTransfer.OneAtATime
 import uk.gov.hmrc.securitiestransferchargefrontend.models.stf.*
 import uk.gov.hmrc.securitiestransferchargefrontend.models.submission.*
 import uk.gov.hmrc.securitiestransferchargefrontend.pages.sh03.RoleAtPurchasingCompanyPage
 import uk.gov.hmrc.securitiestransferchargefrontend.services.*
 import uk.gov.hmrc.securitiestransferchargefrontend.pages.stf.shared.AgentReferencePage
+
 import java.time.LocalDate
 
 class EtmpSubmissionServiceSpec extends AnyFreeSpec with Matchers with SpecBase with ScalaFutures with MockitoSugar {
 
   private val mockUserAnswers = mock[UserAnswers]
 
-  private val tx = StfTransaction(
+  private val stfTransaction = StfTransaction(
     howToNotifyAboutSecuritiesTransfer = OneAtATime,
     agentReference = None,
     confirmedAddress = Some(ConfirmableAddress(List("123 Main Street", "London"), "SW1A 1AA", Some(Country("United Kingdom", "GB")))),
@@ -63,7 +66,24 @@ class EtmpSubmissionServiceSpec extends AnyFreeSpec with Matchers with SpecBase 
     totalMarketValue = None
   )
 
-  when(mockUserAnswers.get(StfTransaction)).thenReturn(Some(tx))
+  private val sh03Transaction  = Sh03Transaction(
+    howToNotifyAboutShareBuyback = Some(HowToNotifyAboutShareBuyback.OneAtATime),
+    agentReference = None,
+    companyDetails = Fixtures.sh03CompanyDetails,
+    reasonForPurchase = ReasonForPurchase.ForCancellation,
+    treasuryShares = None,
+    connectedPersons = false,
+    applyingForRelief = false,
+    whatReliefAreYouApplyingFor = None,
+    detailsOfThisSharePurchase = Fixtures.sh03DetailsOfThisSharePurchase,
+    maximumAmountPaid = Some(BigDecimal(1500)),
+    minimumAmountPaid = Some(BigDecimal(1000)),
+    chargingPoint = LocalDate.now(),
+    roleAtPurchasingCompany = RoleAtPurchasingCompany("Administrator",None)
+  )
+
+  when(mockUserAnswers.get(StfTransaction)).thenReturn(Some(stfTransaction))
+  when(mockUserAnswers.get(Sh03Transaction)).thenReturn(Some(sh03Transaction))
   when(mockUserAnswers.get(RoleAtPurchasingCompanyPage)).thenReturn(None)
   when(mockUserAnswers.get(AgentReferencePage)).thenReturn(None)
   when(mockUserAnswers.submissionId).thenReturn(submissionId)
@@ -160,6 +180,36 @@ class EtmpSubmissionServiceSpec extends AnyFreeSpec with Matchers with SpecBase 
       val fakeClient = FakeEtmpSubmissionClient(resp)
       val service = new EtmpSubmissionServiceImpl(fakeClient)
       val result = service.submitSingleStf(subscriptionId, mockUserAnswers, affinityData)
+      whenReady(result) { r =>
+        r mustBe SubmissionCreateResponseFailure
+      }
+    }
+
+    "return success if ETMP returns only successful responses (SH03)" in {
+      val resp = successfulChargesResponseGen.sample.get
+      val fakeClient = FakeEtmpSubmissionClient(resp)
+      val service = new EtmpSubmissionServiceImpl(fakeClient)
+      val result = service.submitSingleSh03(subscriptionId, mockUserAnswers, affinityData)
+      whenReady(result) { r =>
+        r mustBe a[SubmissionCreateResponseSuccess]
+      }
+    }
+
+    "return partial success if ETMP returns a mix of successful and unsuccessful responses (SH03)" in {
+      val resp = mixedChargesResponseGen.sample.get
+      val fakeClient = FakeEtmpSubmissionClient(resp)
+      val service = new EtmpSubmissionServiceImpl(fakeClient)
+      val result = service.submitSingleSh03(subscriptionId, mockUserAnswers, affinityData)
+      whenReady(result) { r =>
+        r mustBe a[SubmissionCreateResponsePartialFailure]
+      }
+    }
+
+    "return failure if ETMP returns only unsuccessful responses (SH03)" in {
+      val resp = failedChargesResponseGen.sample.get
+      val fakeClient = FakeEtmpSubmissionClient(resp)
+      val service = new EtmpSubmissionServiceImpl(fakeClient)
+      val result = service.submitSingleSh03(subscriptionId, mockUserAnswers, affinityData)
       whenReady(result) { r =>
         r mustBe SubmissionCreateResponseFailure
       }

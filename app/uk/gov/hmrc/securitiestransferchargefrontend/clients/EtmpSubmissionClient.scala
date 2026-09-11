@@ -36,7 +36,7 @@ import uk.gov.hmrc.securitiestransferchargefrontend.models.Headers
 import java.util.UUID
 
 trait EtmpSubmissionClient:
-  def submitSingleStf(
+  def submitSingleTransfer(
     subscriptionId: SubscriptionId,
     submissionId: SubmissionId,
     payload: SubmissionBatchPayload
@@ -55,7 +55,7 @@ class EtmpSubmissionClientImpl @Inject()(
   private val logInfoAndFailParsing = (s: String) => logInfoAndFail(new SubmissionResponseParsingException(s))
   private val logInfoAndFailNon201 = (s: String) => logInfoAndFail(new SubmissionResponseException(s))
   
-  def submitSingleStf(subscriptionId: SubscriptionId, submissionId: SubmissionId, payload: SubmissionBatchPayload)(implicit hc: HeaderCarrier): Future[StcTransactionCreateResponse] = {
+  def submitSingleTransfer(subscriptionId: SubscriptionId, submissionId: SubmissionId, payload: SubmissionBatchPayload)(implicit hc: HeaderCarrier): Future[StcTransactionCreateResponse] = {
     http.post(url"${appConfig.submissionsServiceUrl}/submission/${submissionId.value}")
       .withBody(Json.toJson(payload))
       .setHeader(
