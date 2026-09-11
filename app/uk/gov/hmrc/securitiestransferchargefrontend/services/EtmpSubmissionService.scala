@@ -130,9 +130,9 @@ class EtmpSubmissionServiceImpl @Inject() (etmpSubmissionsClient: EtmpSubmission
 
   def submitSingleSh03(subscriptionId: SubscriptionId, userAnswers: UserAnswers, affinityData: AffinityData)(implicit hc: HeaderCarrier): Future[SubmissionCreateResponse] = {
     userAnswers.get(Sh03Transaction).map { sh03SingleReq =>
-      val stfReq = UserAnswersTransforms.toSh03Request(sh03SingleReq, affinityData)
+      val sh03Req = UserAnswersTransforms.toSh03Request(sh03SingleReq, affinityData)
       val declaration = createDeclaration(userAnswers)
-      val etmpPayload = SubmissionBatchPayload(declaration, List(stfReq))
+      val etmpPayload = SubmissionBatchPayload(declaration, List(sh03Req))
       submitSingleTransfer(subscriptionId, userAnswers, etmpPayload)
     }.getOrElse(submissionFailure)
   }

@@ -119,8 +119,8 @@ final class TransactionSubmissionServiceImpl @Inject()(
     etmpSubmissionService
       .submitSingleSh03(request.request.subscriptionId, request.userAnswers, getAffinityData(request.request.affinityGroup))
       .map {
-        case stfResponse: SubmissionCreateResponseSuccess =>
-          transactionResponseRepository.store(submissionId, stfResponse)
+        case sh03Response: SubmissionCreateResponseSuccess =>
+          transactionResponseRepository.store(submissionId, sh03Response)
           saveAndReturnClient.deleteDraft(submissionId)
           sendSubmissionDataToNRS(submissionId)
           true
