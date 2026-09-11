@@ -17,8 +17,7 @@
 package uk.gov.hmrc.securitiestransferchargefrontend.viewmodels.sh03.agents.bulk
 
 import play.api.i18n.Messages
-import play.twirl.api.{Html, HtmlFormat}
-import uk.gov.hmrc.govukfrontend.views.viewmodels.content.HtmlContent
+import play.twirl.api.HtmlFormat
 import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.SummaryListRow
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.sh03.agents.bulk.routes
 import uk.gov.hmrc.securitiestransferchargefrontend.models.{CheckMode, UserAnswers}
@@ -28,24 +27,28 @@ import uk.gov.hmrc.securitiestransferchargefrontend.viewmodels.implicits.*
 
 object CompanyDetailsSummary {
 
-  def row(answers: UserAnswers)(implicit messages: Messages): Option[SummaryListRow] =
-    answers.get(BulkCompanyDetailsPage).map {
-      companyDetails =>
-
-        val value = Html(
-          s"""
-             |${HtmlFormat.escape(companyDetails.companyName).body}<br/>
-             |${HtmlFormat.escape(companyDetails.companyRegistrationNumber).body}<br/>
-             |""".stripMargin
-        )
-
-        SummaryListRowViewModel(
+  def rows(answers: UserAnswers)(implicit messages: Messages): Seq[SummaryListRow] = {
+    answers.get(BulkCompanyDetailsPage).toSeq.flatMap { companyDetails =>
+      
+      val companyNameRow = SummaryListRowViewModel(
           key = "agent.sh03.companyDetails.checkYourAnswersLabel",
-          value = ValueViewModel(HtmlContent(value)),
+          value = ValueViewModel(HtmlFormat.escape(companyDetails.companyName).toString),
           actions = Seq(
             ActionItemViewModel("site.change", routes.CompanyDetailsController.onPageLoad(CheckMode).url)
-              .withVisuallyHiddenText(messages("agent.sh03.companyDetails.change.hidden"))
+              .withVisuallyHiddenText(messages("agent.sh03.companyName.change.hidden"))
           )
         )
+      
+      val crnRow = SummaryListRowViewModel(
+        key = "agent.sh03.companyDetails.crn.label",
+        value = ValueViewModel(HtmlFormat.escape(companyDetails.companyRegistrationNumber).toString),
+        actions = Seq(
+          ActionItemViewModel("site.change", routes.CompanyDetailsController.onPageLoad(CheckMode).url)
+            .withVisuallyHiddenText(messages("agent.sh03.companyDetails.crn.change.hidden"))
+        )
+      )
+      Seq(companyNameRow, crnRow)
+      
     }
+  }
 }

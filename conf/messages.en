@@ -1039,9 +1039,12 @@ agent.sh03.roleAtPurchasingCompany.receiverManager = Receiver manager
 agent.sh03.roleAtPurchasingCompany.cicManager = CIC manager
 agent.sh03.roleAtPurchasingCompany.ukSocietas = Someone acting on behalf of a UK Societas (UKS)
 agent.sh03.roleAtPurchasingCompany.uksOrgan.label = Which UKS organ are they a member of?
+agent.sh03.roleAtPurchasingCompany.uksOrgan.hidden = Change which UKS organ they are a member of
 agent.sh03.roleAtPurchasingCompany.notProvided = The information was not provided by someone in one of these roles
 agent.sh03.roleAtPurchasingCompany.checkYourAnswersLabel = Who at the purchasing company provided the details of this share buyback?
 agent.sh03.roleAtPurchasingCompany.change.hidden = Change who at the purchasing company provided the details of this share buyback
+
+agent.sh03.bulk.roleAtPurchasingCompany.change.hidden = Change who provided the details of this share buyback
 
 agent.sh03.roleAtPurchasingCompany.error.required = Select the person’s role within the company who provided information about the share buyback
 agent.sh03.roleAtPurchasingCompany.uksOrgan.error.required = Enter the UKS organ they are a member of
@@ -1308,3 +1311,8 @@ checkYourAnswers.sh03.bulk.taxDue.section.taxDue.heading = Tax due
 
 yourFileWillNotBeSaved.title = Your file will not be saved
 yourFileWillNotBeSaved.heading = Your file will not be saved
+
+fileUpload.saveAndReturn.title = Your uploaded file will not be saved
+fileUpload.saveAndReturn.heading = Your uploaded file will not be saved
+fileUpload.saveAndReturn.guidance1 = The file you have uploaded will not be saved if you return to the dashboard.
+fileUpload.saveAndReturn.guidance2 = All other answers will be saved [add additional guidance here]

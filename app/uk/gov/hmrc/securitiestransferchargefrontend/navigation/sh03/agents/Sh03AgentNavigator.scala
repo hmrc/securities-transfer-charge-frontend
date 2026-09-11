@@ -31,7 +31,7 @@ import uk.gov.hmrc.securitiestransferchargefrontend.navigation.sh03.agents
 import uk.gov.hmrc.securitiestransferchargefrontend.navigation.*
 import uk.gov.hmrc.securitiestransferchargefrontend.pages.*
 import uk.gov.hmrc.securitiestransferchargefrontend.pages.sh03.*
-import uk.gov.hmrc.securitiestransferchargefrontend.pages.sh03.bulk.{BulkAgentReferencePage, BulkCompanyDetailsPage, BulkRoleAtPurchasingCompanyPage}
+import uk.gov.hmrc.securitiestransferchargefrontend.pages.sh03.bulk.{BulkAgentReferencePage, BulkCheckYourAnswersPage, BulkCompanyDetailsPage, BulkRoleAtPurchasingCompanyPage}
 import uk.gov.hmrc.securitiestransferchargefrontend.pages.sh03.shared.CheckYourAnswersPage
 import uk.gov.hmrc.securitiestransferchargefrontend.services.AnswerPersistenceService
 
@@ -87,7 +87,8 @@ class Sh03AgentNavigator @Inject()(answerPersistenceService: AnswerPersistenceSe
         .addMappingNoCheck(CheckYourAnswersPage, sh03AgentSingleRoutes.CheckYourAnswersController.onPageLoad)
         .addMapping(BulkAgentReferencePage, sh03AgentBulkRoutes.AgentReferenceController.onPageLoad)
         .addMapping(BulkCompanyDetailsPage, sh03AgentBulkRoutes.CompanyDetailsController.onPageLoad)
-        .addMapping(BulkRoleAtPurchasingCompanyPage, sh03AgentBulkRoutes.RoleAtPurchasingCompanyController.onPageLoad)
+        .addMapping(BulkRoleAtPurchasingCompanyPage, mode => sh03AgentBulkRoutes.RoleAtPurchasingCompanyController.onPageLoad(mode, None))
+        .addMappingNoCheck(BulkCheckYourAnswersPage, sh03AgentBulkRoutes.CheckYourAnswersController.onPageLoad)
         .build
 
     override protected def pageHasValidDataAtPath(userAnswers: UserAnswers, page: GettablePage[_]): Boolean = page match {
