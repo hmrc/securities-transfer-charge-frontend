@@ -34,7 +34,7 @@ class UserAnswersTransformsSpec extends SpecBase {
   private val baseStfTransaction = StfTransaction(howToNotifyAboutSecuritiesTransfer = HowToNotifyAboutSecuritiesTransfer.OneAtATime,
     agentReference = Some(agentReference),
     confirmedAddress = Some(confirmableAddress),
-    nameofBuyer = Some("buyer 1"),
+    nameOfBuyer = Some("buyer 1"),
     buyerAddress = Some(fakeAlfConfirmedAddress),
     nameOfSeller = "seller 1",
     sellerAddress = fakeAlfConfirmedAddress,
@@ -97,7 +97,7 @@ class UserAnswersTransformsSpec extends SpecBase {
       val result =
         UserAnswersTransforms.toStfRequest(baseStfTransaction, agentAffinityData)
 
-      result.mainBuyerDetails.buyerName mustBe baseStfTransaction.nameofBuyer.get
+      result.mainBuyerDetails.buyerName mustBe baseStfTransaction.nameOfBuyer.get
       result.agentDetails mustBe defined
     }
 
@@ -157,7 +157,7 @@ class UserAnswersTransformsSpec extends SpecBase {
 
     "throw when buyer name is missing for an Agent" in {
       val transaction =
-        baseStfTransaction.copy(nameofBuyer = None)
+        baseStfTransaction.copy(nameOfBuyer = None)
 
       intercept[IllegalArgumentException] {
         UserAnswersTransforms.toStfRequest(transaction, agentAffinityData)
