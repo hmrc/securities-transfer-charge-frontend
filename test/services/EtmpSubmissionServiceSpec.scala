@@ -44,7 +44,7 @@ class EtmpSubmissionServiceSpec extends AnyFreeSpec with Matchers with SpecBase 
     howToNotifyAboutSecuritiesTransfer = OneAtATime,
     agentReference = None,
     confirmedAddress = Some(ConfirmableAddress(List("123 Main Street", "London"), "SW1A 1AA", Some(Country("United Kingdom", "GB")))),
-    nameofBuyer = Some("John Smith"),
+    nameOfBuyer = Some("John Smith"),
     buyerAddress = Some(AlfConfirmedAddress("audit-ref-123", Some("id-123"), AlfAddress(List("123 Main Street", "London"), "SW1A 1AA", Country("United Kingdom", "GB")))),
     nameOfSeller = "Helen Jones",
     sellerAddress = AlfConfirmedAddress("audit-ref-456", Some("id-456"), AlfAddress(List("456 High Street", "Manchester"), "M1 1AA", Country("United Kingdom", "GB"))),

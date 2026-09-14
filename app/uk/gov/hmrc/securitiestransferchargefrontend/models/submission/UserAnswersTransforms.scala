@@ -49,7 +49,7 @@ object UserAnswersTransforms {
     val buyerEmail: String = affinityData match
       case Individual(_, _, _, email, _) => email
       case Organisation(_, _, _, email, _) => email
-      case Agent(_, _, _, _) => ??? // ToDo: We currently do not capture the buyer's email for agents. We need to capture this info.
+      case Agent(_, _, _, _) => "foo@email.com" // ToDo: We currently do not capture the buyer's email for agents. We need to capture this info.
 
     val uniqueId: AffinityData => Option[String] = {
       case Individual(_, _, _, _, nino) => Some(nino)
@@ -222,7 +222,7 @@ object UserAnswersTransforms {
 
 
   private def getBuyerName(transaction: StfTransaction): String =
-    transaction.nameofBuyer.getOrElse(throw new IllegalArgumentException("Buyer name is missing"))
+    transaction.nameOfBuyer.getOrElse(throw new IllegalArgumentException("Buyer name is missing"))
 
   private def getTaxRate(rate: TaxRate): BuyerTaxRate =
     rate match {
