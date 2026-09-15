@@ -1,5 +1,5 @@
 /*
- * Copyright 2026 HM Revenue & Customs
+ * Copyright 2024 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,12 +14,22 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.securitiestransferchargefrontend.controllers.actions.requests
+package uk.gov.hmrc.securitiestransferchargefrontend.models.nrs
 
-import play.api.mvc.WrappedRequest
-import uk.gov.hmrc.securitiestransferchargefrontend.models.UserAnswers
+import play.api.libs.json.{Json, OFormat}
 
-case class StcOptionalDataRequest[A](
-                                      request: StcAuthorisedRequest[A],
-                                      userAnswers: Option[UserAnswers]
-                                    ) extends WrappedRequest[A](request)
+case class NrsMetadata(
+  businessId: String,
+  notableEvent: String,
+  payloadContentType: String,
+  payloadSha256Checksum: String,
+  userSubmissionTimestamp: String,
+  identityData: IdentityData,
+  userAuthToken: String,
+  headerData: Map[String, String],
+  searchKeys: Map[String, String]
+)
+
+object NrsMetadata {
+  implicit val format: OFormat[NrsMetadata] = Json.format[NrsMetadata]
+}

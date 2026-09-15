@@ -32,8 +32,7 @@ import play.api.mvc.{AnyContent, RequestHeader, Session}
 import play.twirl.api.HtmlFormat
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.securitiestransferchargefrontend.clients.registration.NrsClient
-import uk.gov.hmrc.securitiestransferchargefrontend.controllers.actions.StcAuthorisedRequest
-import uk.gov.hmrc.securitiestransferchargefrontend.controllers.actions.requests.StcDataRequest
+import uk.gov.hmrc.securitiestransferchargefrontend.controllers.actions.requests.{StcAuthorisedRequest, StcDataRequest}
 import uk.gov.hmrc.securitiestransferchargefrontend.models.UserAnswers
 import uk.gov.hmrc.securitiestransferchargefrontend.models.submission.AffinityData
 import uk.gov.hmrc.securitiestransferchargefrontend.utils.HeaderCarrierCreator

@@ -77,7 +77,7 @@ final class TransactionSubmissionServiceImpl @Inject() (
     cyaHtmlRepository
       .retrieve(submissionId)
       .collect { case Some(data) =>
-        nrsClient.postHtmlPayload(data.html)
+        nrsClient.postHtmlPayload(data.html.toString)
       }
   }
 }

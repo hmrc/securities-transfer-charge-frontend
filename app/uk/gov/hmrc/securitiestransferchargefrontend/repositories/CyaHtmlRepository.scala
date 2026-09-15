@@ -87,5 +87,3 @@ object CyaHtmlData:
     }
   
   given OFormat[CyaHtmlData] = Json.format[CyaHtmlData]
-
-

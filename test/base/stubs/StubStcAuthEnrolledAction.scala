@@ -19,7 +19,8 @@ package base.stubs
 import base.Fixtures.*
 import play.api.mvc.*
 import uk.gov.hmrc.auth.core.AffinityGroup
-import uk.gov.hmrc.securitiestransferchargefrontend.controllers.actions.{StcAuthEnrolledAction, StcAuthorisedRequest}
+import uk.gov.hmrc.securitiestransferchargefrontend.controllers.actions.StcAuthEnrolledAction
+import uk.gov.hmrc.securitiestransferchargefrontend.controllers.actions.requests.StcAuthorisedRequest
 
 import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
