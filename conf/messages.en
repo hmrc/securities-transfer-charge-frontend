@@ -587,7 +587,7 @@ agent.checkYourAnswers.sellerAddress = Address
 agent.checkYourAnswers.sellerAddress.change.hidden = Change seller’s address
 
 agent.checkYourAnswers.fileDetails.heading = File details
-agent.checkYourAnswers.fileDetails.key = File
+agent.checkYourAnswers.fileDetails.fileName.key = File name
 agent.checkYourAnswers.changeFile.hidden = Change file
 
 agent.checkYourAnswers.numberOfRows.key = Number of transfers (rows) found
