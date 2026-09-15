@@ -27,6 +27,7 @@ import play.api.test.Helpers.*
 import uk.gov.hmrc.securitiestransferchargefrontend.clients.SubmissionIdClient
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.sh03.organisations.routes as orgRoutes
 import uk.gov.hmrc.securitiestransferchargefrontend.forms.sh03.shared.HowToNotifyAboutShareBuybackFormProvider
+import uk.gov.hmrc.securitiestransferchargefrontend.models.JourneyType.SH03
 import uk.gov.hmrc.securitiestransferchargefrontend.models.sh03.HowToNotifyAboutShareBuyback
 import uk.gov.hmrc.securitiestransferchargefrontend.models.{NormalMode, UserAnswers}
 import uk.gov.hmrc.securitiestransferchargefrontend.navigation.Navigator
@@ -70,7 +71,7 @@ class HowToNotifyAboutShareBuybackControllerSpec extends SpecBase with MockitoSu
       when(mockIdClient.nextSubmissionId()(any()))
         .thenReturn(Future.successful(submissionId))
 
-      val userAnswers = UserAnswers(testUserId, testGroupIdentifier, submissionId)
+      val userAnswers = UserAnswers(testUserId, testGroupIdentifier, submissionId,SH03)
         .set(HowToNotifyAboutShareBuybackPage, HowToNotifyAboutShareBuyback.values.head).success.value
 
       val application = applicationBuilder(userAnswers = Some(userAnswers), affinityGroup = orgAffinity)
@@ -100,7 +101,7 @@ class HowToNotifyAboutShareBuybackControllerSpec extends SpecBase with MockitoSu
       when(mockIdClient.nextSubmissionId()(any()))
         .thenReturn(Future.successful(submissionId))
 
-      val userAnswers = UserAnswers(testUserId, testGroupIdentifier, submissionId)
+      val userAnswers = UserAnswers(testUserId, testGroupIdentifier, submissionId,SH03)
         .set(HowToNotifyAboutShareBuybackPage, HowToNotifyAboutShareBuyback.values.last).success.value
 
       val application = applicationBuilder(userAnswers = Some(userAnswers), affinityGroup = orgAffinity)
@@ -146,7 +147,7 @@ class HowToNotifyAboutShareBuybackControllerSpec extends SpecBase with MockitoSu
 
     "must populate the view correctly on a GET when the question has previously been answered" in {
 
-      val userAnswers = UserAnswers(testUserId, testGroupIdentifier, submissionId).set(HowToNotifyAboutShareBuybackPage, HowToNotifyAboutShareBuyback.values.head).success.value
+      val userAnswers = UserAnswers(testUserId, testGroupIdentifier, submissionId,SH03).set(HowToNotifyAboutShareBuybackPage, HowToNotifyAboutShareBuyback.values.head).success.value
       val application = applicationBuilder(userAnswers = Some(userAnswers), affinityGroup = orgAffinity)
         .overrides(bind[Navigator].qualifiedWith("orgSh03").toInstance(getNavigator))
         .build()

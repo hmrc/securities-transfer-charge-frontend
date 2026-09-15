@@ -21,6 +21,7 @@ import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.actions.StcAuthEnrolledAction
 import uk.gov.hmrc.securitiestransferchargefrontend.domain.{SubmissionId, UserId}
+import uk.gov.hmrc.securitiestransferchargefrontend.models.JourneyType.{SH03, STF}
 import uk.gov.hmrc.securitiestransferchargefrontend.models.audit.{AuditModel, AuditType}
 import uk.gov.hmrc.securitiestransferchargefrontend.models.audit.JourneyStatus.ContinueSubmission
 import uk.gov.hmrc.securitiestransferchargefrontend.navigation.PersistentNavigator
@@ -30,21 +31,26 @@ import uk.gov.hmrc.securitiestransferchargefrontend.services.AuditService
 import javax.inject.{Inject, Named}
 import scala.concurrent.ExecutionContext
 
-class SaveAndReturnController @Inject()( override val messagesApi: MessagesApi,
-                                         val controllerComponents: MessagesControllerComponents,
-                                         stcAuthEnrolled: StcAuthEnrolledAction,
-                                         @Named("individuals") navigator: PersistentNavigator,
-                                         auditService: AuditService)
-                                       ( implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport:
+class SaveAndReturnController @Inject()(override val messagesApi: MessagesApi,
+                                        val controllerComponents: MessagesControllerComponents,
+                                        stcAuthEnrolled: StcAuthEnrolledAction,
+                                        @Named("individuals") navigator: PersistentNavigator,
+                                        auditService: AuditService)
+                                       (implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport:
 
   def restore(submissionId: String): Action[AnyContent] =
     stcAuthEnrolled.async { implicit request =>
       val userId = UserId(request.internalId)
       for {
         userAnswers <- navigator.restore(SubmissionId(submissionId), userId)
-        nextPage     = userAnswers.nextPage.getOrElse(navigator.errorPage(SaveAndReturnPage))
-      } yield  {
-        auditService.audit(AuditModel(ContinueSubmission, request.subscriptionId, request.affinityGroup, request.credentialId, Some(SubmissionId(submissionId)), AuditType.Stf))
+        nextPage = userAnswers.nextPage.getOrElse(navigator.errorPage(SaveAndReturnPage))
+      } yield {
+        val auditType = userAnswers.journeyType match {
+          case STF => AuditType.Stf
+          case SH03 => AuditType.Sh03
+          
+        }
+        auditService.audit(AuditModel(ContinueSubmission, request.subscriptionId, request.affinityGroup, request.credentialId, Some(SubmissionId(submissionId)), auditType))
         Redirect(nextPage)
       }
     }
