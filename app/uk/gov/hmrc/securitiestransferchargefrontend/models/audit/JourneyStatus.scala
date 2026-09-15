@@ -25,6 +25,8 @@ object JourneyStatus {
 
   case object StartSubmission extends WithName("Start") with JourneyStatus
   case object ContinueSubmission extends WithName("Continue") with JourneyStatus
+  case object SubmissionFailure extends WithName("SubmitFailure") with JourneyStatus
+  case object SubmissionSuccess extends WithName("SubmitSuccess") with JourneyStatus
 
   val values: Seq[JourneyStatus] = Seq(StartSubmission, ContinueSubmission)
 
@@ -33,6 +35,8 @@ object JourneyStatus {
   implicit def reads: Reads[JourneyStatus] = Reads[JourneyStatus] {
     case JsString(StartSubmission.toString) => JsSuccess(StartSubmission)
     case JsString(ContinueSubmission.toString) => JsSuccess(ContinueSubmission)
+    case JsString(SubmissionFailure.toString) => JsSuccess(SubmissionFailure)
+    case JsString(SubmissionSuccess.toString) => JsSuccess(SubmissionSuccess)
     case _ => JsError("error.invalid")
   }
 

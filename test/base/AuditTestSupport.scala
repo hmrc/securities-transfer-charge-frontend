@@ -16,14 +16,13 @@
 
 package base
 
-import base.Fixtures.{testAuditType, testSubscriptionId}
 import org.mockito.ArgumentCaptor
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.{times, verify}
 import org.scalatest.matchers.must.Matchers.mustBe
 import play.api.libs.json.Json
 import uk.gov.hmrc.auth.core.AffinityGroup
-import uk.gov.hmrc.securitiestransferchargefrontend.domain.{CredentialId, SubmissionId}
+import uk.gov.hmrc.securitiestransferchargefrontend.domain.{CredentialId, SubmissionId, SubscriptionId}
 import uk.gov.hmrc.securitiestransferchargefrontend.models.audit.{AuditModel, AuditType, JourneyStatus, UpscanValidationAuditModel}
 import uk.gov.hmrc.securitiestransferchargefrontend.services.AuditService
 
@@ -33,8 +32,10 @@ trait AuditTestSupport {
                    auditService: AuditService,
                    journeyStatus: JourneyStatus,
                    affinityGroup: AffinityGroup,
+                   subscriptionId:SubscriptionId,
                    credentialId: CredentialId,
                    submissionId: SubmissionId,
+                   auditType:AuditType,
                  ): Unit = {
 
     val auditCaptor = ArgumentCaptor.forClass(classOf[AuditModel])
@@ -43,11 +44,11 @@ trait AuditTestSupport {
 
     val event = auditCaptor.getValue
 
-    event.auditType mustBe testAuditType
+    event.auditType mustBe auditType.value
 
     auditCaptor.getValue.detail mustBe Json.obj(
       "journeyStatus" -> journeyStatus.toString,
-      "subscriptionId" -> testSubscriptionId,
+      "subscriptionId" -> subscriptionId,
       "affinityGroup" -> affinityGroup.toString,
       "credentialId" -> credentialId,
       "submissionId" -> submissionId,

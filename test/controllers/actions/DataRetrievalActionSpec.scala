@@ -21,6 +21,7 @@ import org.mockito.Mockito.*
 import org.scalatestplus.mockito.MockitoSugar
 import play.api.test.FakeRequest
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.actions.DataRetrievalActionImpl
+import uk.gov.hmrc.securitiestransferchargefrontend.models.JourneyType.STF
 import uk.gov.hmrc.securitiestransferchargefrontend.models.UserAnswers
 import uk.gov.hmrc.securitiestransferchargefrontend.models.requests.{IdentifierRequest, OptionalDataRequest}
 import uk.gov.hmrc.securitiestransferchargefrontend.repositories.SessionRepository
@@ -55,7 +56,7 @@ class DataRetrievalActionSpec extends SpecBase with MockitoSugar {
       "must build a userAnswers object and add it to the request" in {
 
         val sessionRepository = mock[SessionRepository]
-        when(sessionRepository.get(testUserId)) thenReturn Future(Some(UserAnswers(testUserId, testGroupIdentifier, submissionId)))
+        when(sessionRepository.get(testUserId)) thenReturn Future(Some(UserAnswers(testUserId, testGroupIdentifier, submissionId,STF)))
         val action = new Harness(sessionRepository)
 
         val result = action.callTransform(new IdentifierRequest(FakeRequest(), testUserId.value)).futureValue

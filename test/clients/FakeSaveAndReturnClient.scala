@@ -19,6 +19,7 @@ package clients
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.securitiestransferchargefrontend.clients.SaveAndReturnClient
 import uk.gov.hmrc.securitiestransferchargefrontend.domain.{GroupIdentifier, SubmissionId, UserId}
+import uk.gov.hmrc.securitiestransferchargefrontend.models.JourneyType.STF
 import uk.gov.hmrc.securitiestransferchargefrontend.models.UserAnswers
 
 import scala.concurrent.Future
@@ -27,7 +28,7 @@ class FakeSaveAndReturnClient extends SaveAndReturnClient:
   private val stubUserId: UserId = UserId("bob123")
   private val stubSubmissionId: SubmissionId = SubmissionId.apply("STC-000000001")
   private val stubGroupIdentifier: GroupIdentifier = GroupIdentifier.apply("group-001")
-  private val stubUserAnswers: UserAnswers = UserAnswers(stubUserId, stubGroupIdentifier, stubSubmissionId)
+  private val stubUserAnswers: UserAnswers = UserAnswers(stubUserId, stubGroupIdentifier, stubSubmissionId,STF)
 
   override def save(userAnswers: UserAnswers)(implicit hc: HeaderCarrier): Future[Unit] = Future.successful(())
 

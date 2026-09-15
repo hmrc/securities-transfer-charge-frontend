@@ -23,7 +23,7 @@ import play.api.libs.json.{JsString, Json}
 import play.api.mvc.{Call, Request}
 import play.api.test.FakeRequest
 import uk.gov.hmrc.securitiestransferchargefrontend.domain.{GroupIdentifier, SubmissionId, UserId}
-import uk.gov.hmrc.securitiestransferchargefrontend.models.{Mode, UserAnswers}
+import uk.gov.hmrc.securitiestransferchargefrontend.models.{JourneyType, Mode, UserAnswers}
 import uk.gov.hmrc.securitiestransferchargefrontend.navigation.*
 import uk.gov.hmrc.securitiestransferchargefrontend.pages.{CyaPage, ErrorPage, Page, QuestionPage}
 import uk.gov.hmrc.securitiestransferchargefrontend.queries.Gettable
@@ -108,6 +108,7 @@ class UserAnswersValidatorSpec extends AnyFreeSpec with Matchers with ScalaFutur
       UserId("test-user-id"),
       GroupIdentifier("test-group-id"),
       SubmissionId("test-submission-id"),
+      JourneyType.STF,
       None,
       None,
       jsonData

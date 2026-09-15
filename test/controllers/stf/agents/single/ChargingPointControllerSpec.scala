@@ -31,6 +31,7 @@ import uk.gov.hmrc.securitiestransferchargefrontend.navigation.Navigator
 import uk.gov.hmrc.securitiestransferchargefrontend.pages.stf.single.ChargingPointPage
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.agents.single.routes as agentSingleRoutes
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.routes
+import uk.gov.hmrc.securitiestransferchargefrontend.models.JourneyType.STF
 import uk.gov.hmrc.securitiestransferchargefrontend.repositories.SessionRepository
 import uk.gov.hmrc.securitiestransferchargefrontend.views.html.stf.agents.single.ChargingPointView
 
@@ -48,7 +49,7 @@ class ChargingPointControllerSpec extends SpecBase with MockitoSugar {
 
   lazy val chargingPointRoute: String = agentSingleRoutes.ChargingPointController.onPageLoad(NormalMode).url
 
-  override val emptyUserAnswers = UserAnswers(testUserId, testGroupIdentifier, submissionId)
+  override val emptyUserAnswers: UserAnswers = UserAnswers(testUserId, testGroupIdentifier, submissionId,STF)
 
   def getRequest(): FakeRequest[AnyContentAsEmpty.type] =
     FakeRequest(GET, chargingPointRoute)
@@ -81,7 +82,7 @@ class ChargingPointControllerSpec extends SpecBase with MockitoSugar {
 
     "must populate the view correctly on a GET when the question has previously been answered" in {
 
-      val userAnswers = UserAnswers(testUserId, testGroupIdentifier, submissionId).set(ChargingPointPage, validAnswer).success.value
+      val userAnswers = UserAnswers(testUserId, testGroupIdentifier, submissionId,STF).set(ChargingPointPage, validAnswer).success.value
 
       val application = applicationBuilder(userAnswers = Some(userAnswers), affinityGroup = agentAffinity)
         .overrides(bind[Navigator].qualifiedWith("agents").toInstance(getNavigator))

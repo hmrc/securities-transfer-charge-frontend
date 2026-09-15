@@ -30,6 +30,7 @@ import uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.agents.bulk.
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.agents.routes as agentRoutes
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.agents.single.routes as agentSingleRoutes
 import uk.gov.hmrc.securitiestransferchargefrontend.forms.stf.agents.HowToNotifyAboutSecuritiesTransferFormProvider
+import uk.gov.hmrc.securitiestransferchargefrontend.models.JourneyType.STF
 import uk.gov.hmrc.securitiestransferchargefrontend.models.stf.HowToNotifyAboutSecuritiesTransfer
 import uk.gov.hmrc.securitiestransferchargefrontend.models.{NormalMode, UserAnswers}
 import uk.gov.hmrc.securitiestransferchargefrontend.navigation.Navigator
@@ -67,7 +68,7 @@ class HowToNotifyAboutSecuritiesTransferControllerSpec extends SpecBase {
 
     "must populate the view correctly on a GET when the question has previously been answered" in {
 
-      val userAnswers = UserAnswers(testUserId, testGroupIdentifier, submissionId).set(HowToNotifyAboutSecuritiesTransferPage, HowToNotifyAboutSecuritiesTransfer.values.head).success.value
+      val userAnswers = UserAnswers(testUserId, testGroupIdentifier, submissionId,STF).set(HowToNotifyAboutSecuritiesTransferPage, HowToNotifyAboutSecuritiesTransfer.values.head).success.value
       val application = applicationBuilder(userAnswers = Some(userAnswers))
         .overrides(bind[Navigator].qualifiedWith("agents").toInstance(getNavigator))
         .build()

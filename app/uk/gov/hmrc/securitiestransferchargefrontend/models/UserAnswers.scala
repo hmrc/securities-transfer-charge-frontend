@@ -29,6 +29,7 @@ import scala.util.{Failure, Success, Try}
 case class UserAnswers(userId: UserId,
                        groupIdentifier: GroupIdentifier,
                        submissionId: SubmissionId,
+                       journeyType: JourneyType,
                        fileUploadReference: Option[String] = None,
                        nextPage: Option[Call] = None,
                        data: JsObject = Json.obj(),
@@ -53,13 +54,13 @@ case class UserAnswers(userId: UserId,
 
     updatedData.flatMap {
       d =>
-        val updatedAnswers = copy (data = d)
+        val updatedAnswers = copy(data = d)
         page.cleanup(Some(value), updatedAnswers)
     }
   }
-  
+
   def setFileUploadReference(reference: String): UserAnswers = this.copy(fileUploadReference = Some(reference))
-  
+
   def getFileUploadReference(): String = this.fileUploadReference.getOrElse(throw new IllegalStateException("fileUploadReference missing "))
 
   def remove[A](page: Settable[A]): Try[UserAnswers] = {
@@ -82,10 +83,12 @@ case class UserAnswers(userId: UserId,
 }
 
 object UserAnswers {
-  import play.api.libs.functional.syntax.*
 
-  val empty: UserId => GroupIdentifier => SubmissionId => UserAnswers =
-    userId => groupIdentifier => submissionId => UserAnswers(userId, groupIdentifier, submissionId)
+  import play.api.libs.functional.syntax.*
+  
+  val empty: UserId => GroupIdentifier => SubmissionId => JourneyType => UserAnswers =
+    userId => groupIdentifier => submissionId => journeyType =>
+      UserAnswers(userId = userId, groupIdentifier = groupIdentifier, submissionId = submissionId, journeyType = journeyType)  
 
   implicit val callFormat: Format[Call] = new Format[Call] {
 
@@ -111,24 +114,26 @@ object UserAnswers {
   }
 
   val reads: Reads[UserAnswers] = (
-      (__ \ "_id").read[UserId] and
+    (__ \ "_id").read[UserId] and
       (__ \ "groupIdentifier").read[GroupIdentifier] and
       (__ \ "submissionId").read[SubmissionId] and
+      (__ \ "journeyType").read[JourneyType] and
       (__ \ "fileUploadReference").readNullable[String] and
       (__ \ "nextPage").readNullable[Call] and
       (__ \ "data").read[JsObject] and
       (__ \ "lastUpdated").read(MongoJavatimeFormats.instantFormat)
-    ) (UserAnswers.apply _)
+    )(UserAnswers.apply _)
 
   val writes: OWrites[UserAnswers] = (
     (__ \ "_id").write[UserId] and
       (__ \ "groupIdentifier").write[GroupIdentifier] and
       (__ \ "submissionId").write[SubmissionId] and
+      (__ \ "journeyType").write[JourneyType] and
       (__ \ "fileUploadReference").writeNullable[String] and
       (__ \ "nextPage").writeNullable[Call] and
       (__ \ "data").write[JsObject] and
       (__ \ "lastUpdated").write(MongoJavatimeFormats.instantFormat)
-    ) (ua => (ua.userId, ua.groupIdentifier, ua.submissionId, ua.fileUploadReference, ua.nextPage, ua.data, ua.lastUpdated))
+    )(ua => (ua.userId, ua.groupIdentifier, ua.submissionId, ua.journeyType,ua.fileUploadReference, ua.nextPage, ua.data, ua.lastUpdated))
 
   implicit val format: OFormat[UserAnswers] = OFormat(reads, writes)
 }
