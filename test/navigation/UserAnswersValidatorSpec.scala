@@ -224,6 +224,7 @@ class UserAnswersValidatorSpec extends AnyFreeSpec with Matchers with ScalaFutur
           override protected lazy val pageCallMap: PageCallBiMap = new PageCallBiMapImpl(
             Map(TestStartPage -> startPageCall, TestPage1 -> page1Call),
             Map(startPageCall -> TestStartPage, page1Call -> TestPage1)
+            
           )
         }
 

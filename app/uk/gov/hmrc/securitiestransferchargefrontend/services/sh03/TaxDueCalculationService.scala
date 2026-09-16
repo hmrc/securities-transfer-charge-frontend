@@ -17,8 +17,10 @@
 package uk.gov.hmrc.securitiestransferchargefrontend.services.sh03
 
 import uk.gov.hmrc.securitiestransferchargefrontend.config.FrontendAppConfig
+import uk.gov.hmrc.securitiestransferchargefrontend.models.stf.fileupload.ParsedStcRow
 import uk.gov.hmrc.securitiestransferchargefrontend.models.{ReliefsDataSource, UserAnswers}
 import uk.gov.hmrc.securitiestransferchargefrontend.pages.sh03.{ApplyingForReliefPage, ChargingPointPage, DetailsOfThisSharePurchasePage, WhatReliefAreYouApplyingForPage}
+import uk.gov.hmrc.securitiestransferchargefrontend.viewmodels.sh03.agents.bulk.TransferRow
 
 import java.time.LocalDate
 import javax.inject.{Inject, Singleton}
@@ -31,6 +33,17 @@ class TaxDueCalculationService @Inject()(
                                         ) {
   
   private val taxRate = appConfig.taxRateSH03
+
+  def buildTransferRows(rows: Seq[ParsedStcRow]): Seq[TransferRow] = {
+    rows.map { row =>
+      TransferRow(
+        amount = BigDecimal(row.securitiesQuantity.getOrElse(throw new IllegalStateException(s"securitiesQuantity missing on row ${row.rowNumber}"))),
+        reason = row.sharePurchaseReason.getOrElse(throw new IllegalStateException(s"sharePurchaseReason missing on row ${row.rowNumber}")).capitalize,
+        consideration = BigDecimal(row.amountPaidForSecurities.getOrElse(throw new IllegalStateException(s"amountPaidForSecurities missing on row ${row.rowNumber}"))),
+        taxDue = calculateTaxDueForRow(row).getOrElse(throw new IllegalStateException(s"Unable to calculate tax due for row ${row.rowNumber}"))
+      )
+    }
+  }
 
   def calculateTaxDue(userAnswers: UserAnswers): BigDecimal = {
     val amountPaidValue = getAmountPaid(userAnswers)
@@ -65,4 +78,45 @@ class TaxDueCalculationService @Inject()(
   def calculatePaymentDueDate(userAnswers: UserAnswers): Option[LocalDate] = {
     userAnswers.get(ChargingPointPage).map(_.plusDays(30))
   }
+
+  def calculateTaxDueForRow(row: ParsedStcRow): Option[BigDecimal] = {
+    for {
+      amountPaid <- row.amountPaidForSecurities.map(BigDecimal(_))
+      marketValue = row.totalMarketValue.map(BigDecimal(_)).getOrElse(BigDecimal(0.00))
+    } yield {
+      val higherValue = amountPaid.max(marketValue)
+      val taxBeforeRelief = higherValue * taxRate
+      val reliefPercentage = getReliefPercentageForRow(row).getOrElse(BigDecimal(0))
+      val reliefAmount = taxBeforeRelief * reliefPercentage
+      val taxAfterRelief = (taxBeforeRelief - reliefAmount).max(BigDecimal(0))
+
+      taxAfterRelief.setScale(2, RoundingMode.HALF_UP)
+    }
+  }
+
+  def formatCurrency(amount: BigDecimal): String = {
+    f"£$amount%,.2f"
+  }
+  
+  def formatDate(date: LocalDate): String = {
+    val day = date.getDayOfMonth
+    val month = date.getMonth.toString.toLowerCase.capitalize
+    val year = date.getYear
+    s"$day $month $year"
+  }
+
+  private def getReliefPercentageForRow(row: ParsedStcRow): Option[BigDecimal] = {
+    for {
+      applyingForRelief <- row.applyingForRelief
+      if applyingForRelief
+      reliefName <- row.whatReliefAreYouApplyingFor
+      reliefData <- reliefsDataSource.reliefs.find(_.name == reliefName)
+    } yield BigDecimal(reliefData.rate) / 100
+  }
+
+  def calculatePaymentDueDate(rows: Seq[ParsedStcRow]): LocalDate = {
+    val chargingDates: Seq[LocalDate] = rows.flatMap(_.chargingPoint.toOption)
+    chargingDates.min.plusDays(30)
+  }
+
 }

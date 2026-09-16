@@ -27,7 +27,7 @@ case class StfTransaction(
                            howToNotifyAboutSecuritiesTransfer: HowToNotifyAboutSecuritiesTransfer,
                            agentReference: Option[AgentReference],
                            confirmedAddress: Option[ConfirmableAddress],
-                           nameofBuyer: Option[String],
+                           nameOfBuyer: Option[String],
                            buyerAddress: Option[AlfConfirmedAddress],
                            nameOfSeller: String,
                            sellerAddress: AlfConfirmedAddress,

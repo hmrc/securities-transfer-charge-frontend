@@ -18,29 +18,55 @@ package uk.gov.hmrc.securitiestransferchargefrontend.controllers.sh03.agents.bul
 
 import com.google.inject.Inject
 import play.api.i18n.{I18nSupport, MessagesApi}
-import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
+import play.api.mvc.{Action, AnyContent, Call, MessagesControllerComponents}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
+import uk.gov.hmrc.securitiestransferchargefrontend.controllers.routes.JourneyRecoveryController
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.actions.*
-import uk.gov.hmrc.securitiestransferchargefrontend.viewmodels.govuk.summarylist.*
-import uk.gov.hmrc.securitiestransferchargefrontend.views.html.CheckYourAnswersView
+import uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.shared.SaveAndReturnButton.isReturn
+import uk.gov.hmrc.securitiestransferchargefrontend.models.{Mode, NormalMode, UserAnswers}
+import uk.gov.hmrc.securitiestransferchargefrontend.navigation.Navigator
+import uk.gov.hmrc.securitiestransferchargefrontend.pages.sh03.bulk.BulkCheckYourAnswersPage
+import uk.gov.hmrc.securitiestransferchargefrontend.repositories.ParsedStcRowsRepository
+import uk.gov.hmrc.securitiestransferchargefrontend.services.sh03.agents.bulk.CheckYourAnswersService
+import uk.gov.hmrc.securitiestransferchargefrontend.views.html.sh03.agents.bulk.CheckYourAnswersView
+
+import javax.inject.Named
+import scala.concurrent.ExecutionContext
 
 
 class CheckYourAnswersController @Inject()(
                                             override val messagesApi: MessagesApi,
+                                            @Named("agentsSh03") navigator: Navigator,
                                             stcAuthEnrolled: StcAuthEnrolledAction,
                                             getData: StcDataRetrievalAction,
                                             requireData: StcDataRequiredAction,
                                             val controllerComponents: MessagesControllerComponents,
-                                            view: CheckYourAnswersView
-                                          ) extends FrontendBaseController with I18nSupport {
-
-  def onPageLoad(): Action[AnyContent] =  (stcAuthEnrolled andThen getData andThen requireData) {
+                                            view: CheckYourAnswersView,
+                                            parsedStcRowsRepository: ParsedStcRowsRepository,
+                                            checkYourAnswersService: CheckYourAnswersService
+                                          )(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport {
+  
+  lazy val backLinkCall: Mode => UserAnswers => Call = mode => userAnswers => navigator.previousPage(BulkCheckYourAnswersPage, mode, userAnswers)
+  
+  def onPageLoad(): Action[AnyContent] = (stcAuthEnrolled andThen getData andThen requireData).async {
     implicit request =>
-
-      val list = SummaryListViewModel(
-        rows = Seq.empty
-      )
-
-      Ok(view(list))
+      val fileUploadRef = request.userAnswers.getFileUploadReference()
+      parsedStcRowsRepository.findDocumentByReference(fileUploadRef).map {
+        case Some(doc) => {
+          val viewModel = checkYourAnswersService.buildViewModel(request.userAnswers, doc)
+          Ok(view(viewModel, backLinkCall(NormalMode)(request.userAnswers)))
+        }
+        case _ => {
+          Redirect(JourneyRecoveryController.onPageLoad())
+        }
+      }
   }
+
+  def onSubmit(): Action[AnyContent] = (stcAuthEnrolled andThen getData andThen requireData).async {
+    implicit request =>
+      for {
+        nextPage <- navigator.nextPage(BulkCheckYourAnswersPage, NormalMode, request.userAnswers, isReturn(request))
+      } yield Redirect(nextPage)
+  }
+
 }

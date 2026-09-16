@@ -31,7 +31,10 @@ trait PageCallBiMap:
   def getCallFor(page: GettablePage): Option[Call]
   def getPageFor(call: Call): Option[GettablePage]
 
-final class PageCallBiMapImpl(pageCallMap: collection.Map[GettablePage, Call], callPageMap: collection.Map[Call, GettablePage]) extends PageCallBiMap {
+final class PageCallBiMapImpl(
+                               pageCallMap: collection.Map[GettablePage, Call],
+                               callPageMap: collection.Map[Call, GettablePage]
+                             ) extends PageCallBiMap {
   override def getCallFor(page: GettablePage): Option[Call] = pageCallMap.get(page)
   override def getPageFor(call: Call): Option[GettablePage] = callPageMap.get(call)
 }
@@ -50,7 +53,12 @@ final class PageCallBiMapBuilder {
     callPageMap += callCreator() -> page
     this
   }
+  
 
-  def build: PageCallBiMap = new PageCallBiMapImpl(pageCallMap.toMap, callPageMap.toMap)
+  def build: PageCallBiMap = 
+    new PageCallBiMapImpl(
+      pageCallMap.toMap, 
+      callPageMap.toMap
+    )
 }
 

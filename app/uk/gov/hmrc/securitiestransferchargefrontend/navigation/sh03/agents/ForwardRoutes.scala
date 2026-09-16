@@ -21,7 +21,6 @@ import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.securitiestransferchargefrontend.config.FrontendAppConfig
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.sh03.agents.bulk.routes as sh03AgentBulkRoutes
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.sh03.agents.single.routes as sh03AgentSingleRoutes
-import uk.gov.hmrc.securitiestransferchargefrontend.controllers.sh03.shared.bulk.routes as sh03BulkCyaRoutes
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.shared.routes as stfSharedRoutes
 import uk.gov.hmrc.securitiestransferchargefrontend.models.sh03.HowToNotifyAboutShareBuyback.{MoreThanOneAtATime, OneAtATime}
 import uk.gov.hmrc.securitiestransferchargefrontend.models.sh03.shared.{ReasonForPurchase, RoleAtPurchasingCompany}
@@ -128,8 +127,10 @@ class ForwardRoutes(answerPersistenceService: AnswerPersistenceService,
         roleAtPurchasingCompany =>
           if (roleAtPurchasingCompany.role == RoleAtPurchasingCompany.unsupportedRole)
             sh03AgentBulkRoutes.CannotSubmitFormErrorController.onPageLoad()
-          else sh03BulkCyaRoutes.CheckYourAnswersController.onPageLoad()
+          else 
+            sh03AgentBulkRoutes.CheckYourAnswersController.onPageLoad()
       }
+    case BulkCheckYourAnswersPage => _ => Future.successful(stfSharedRoutes.ConfirmationController.onPageLoad())
 
     case _ => _ => Future.successful(defaultPage)
   }
@@ -172,7 +173,7 @@ class ForwardRoutes(answerPersistenceService: AnswerPersistenceService,
       }
 
     case BulkAgentReferencePage | BulkCompanyDetailsPage | BulkRoleAtPurchasingCompanyPage => userAnswers =>
-      goTo(sh03BulkCyaRoutes.CheckYourAnswersController.onPageLoad(), Some(userAnswers))
-
+      goTo(sh03AgentBulkRoutes.CheckYourAnswersController.onPageLoad(), Some(userAnswers))
+    
     case _ => userAnswers => goTo(cyaPage, Some(userAnswers))
   }

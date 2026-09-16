@@ -62,7 +62,7 @@ object RowTransforms {
     val agentDetails: PartialFunction[AffinityData, SingleTransferAgentDetails] =
       case Agent(name, address, phone, email) => SingleTransferAgentDetails(
         name = name,
-        addr1 = address.addressLine1,
+        addr1 = Some(address.addressLine1),
         addr2 = address.addressLine2,
         addr3 = address.addressLine3,
         addr4 = None,
@@ -156,7 +156,7 @@ object RowTransforms {
     val agentDetails: PartialFunction[AffinityData, SingleTransferAgentDetails] =
       case Agent(name, address, phone, email) => SingleTransferAgentDetails(
         name = name,
-        addr1 = address.addressLine1,
+        addr1 = Some(address.addressLine1),
         addr2 = address.addressLine2,
         addr3 = address.addressLine3,
         addr4 = None,

@@ -24,7 +24,7 @@ import uk.gov.hmrc.securitiestransferchargefrontend.models.submission.{StcCharge
 import scala.concurrent.Future
 
 class StubEtmpSubmissionClient extends EtmpSubmissionClient:
-  override def submitSingleStf(subscriptionId: SubscriptionId, submissionId: SubmissionId, payload: SubmissionBatchPayload)(implicit hc: HeaderCarrier): Future[StcTransactionCreateResponse] =
+  override def submitSingleTransfer(subscriptionId: SubscriptionId, submissionId: SubmissionId, payload: SubmissionBatchPayload)(implicit hc: HeaderCarrier): Future[StcTransactionCreateResponse] =
     Future.successful(
       StcTransactionCreateProcessed(
         StcTransactionCreateProcessedBody(

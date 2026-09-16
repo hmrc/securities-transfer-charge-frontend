@@ -19,28 +19,15 @@ package uk.gov.hmrc.securitiestransferchargefrontend.viewmodels.sh03.agents.bulk
 import play.api.i18n.Messages
 import play.twirl.api.HtmlFormat
 import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.SummaryListRow
-import uk.gov.hmrc.securitiestransferchargefrontend.controllers.sh03.agents.bulk.routes
-import uk.gov.hmrc.securitiestransferchargefrontend.models.{CheckMode, UserAnswers}
-import uk.gov.hmrc.securitiestransferchargefrontend.pages.sh03.bulk.BulkAgentReferencePage
 import uk.gov.hmrc.securitiestransferchargefrontend.viewmodels.govuk.summarylist.*
 import uk.gov.hmrc.securitiestransferchargefrontend.viewmodels.implicits.*
 
-object AgentReferenceSummary  {
+object NumberOfRowsSummary {
 
-  def row(answers: UserAnswers)(implicit messages: Messages): SummaryListRow =
-
-    val value = answers.get(BulkAgentReferencePage)
-      .flatMap(_.agentReference)
-      .getOrElse(messages("site.notProvided"))
-
-      SummaryListRowViewModel(
-        key = "agentReference.checkYourAnswersLabel",
-        value = ValueViewModel(HtmlFormat.escape(value).toString),
-        actions = Seq(
-          ActionItemViewModel("site.change", routes.AgentReferenceController.onPageLoad(CheckMode).url)
-            .withVisuallyHiddenText(messages("agentReference.change.hidden"))
+  def row(numOfRows: String)(implicit messages: Messages): Option[SummaryListRow] =
+        Some(SummaryListRowViewModel(
+          key = messages("agent.checkYourAnswers.numberOfRows.key"),
+          value = ValueViewModel(HtmlFormat.escape(numOfRows).toString)
         )
-      )
+        )
 }
-    
-

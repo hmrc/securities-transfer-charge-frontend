@@ -16,6 +16,12 @@
 
 package uk.gov.hmrc.securitiestransferchargefrontend.pages.sh03.bulk
 
-import uk.gov.hmrc.securitiestransferchargefrontend.pages.Page
+import play.api.libs.json.JsPath
+import uk.gov.hmrc.securitiestransferchargefrontend.pages.CyaPage
+import uk.gov.hmrc.securitiestransferchargefrontend.queries.Gettable
 
-case object BulkCheckYourAnswersPage extends Page
+case object BulkCheckYourAnswersPage extends CyaPage with Gettable[Nothing] {
+  override def path: JsPath = JsPath \ toString
+
+  override def toString: String = "checkYourAnswers"
+}
