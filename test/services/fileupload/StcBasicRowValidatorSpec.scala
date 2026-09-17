@@ -410,14 +410,6 @@ class StcBasicRowValidatorSpec extends SpecBase {
         result.exists(e => e.fieldName == "sharePurchaseReason" && e.message == messages("sharePurchaseReason.invalid")) mustBe true
       }
 
-      "return purchase for cancellation missing error" in {
-        val result = validator.validate(
-          validRow.copy(purchaseForCancellation = None),
-          StcTemplate.SH03, "agent", JourneyType.SH03
-        )
-        result.exists(e => e.fieldName == "purchasedForCancellation" && e.message == messages("purchasedForCancellation.invalid")) mustBe true
-      }
-
       "Min Share Price" - {
         "allow empty minSharePrice (optional for non-PLCs)" in {
           val result = validator.validate(

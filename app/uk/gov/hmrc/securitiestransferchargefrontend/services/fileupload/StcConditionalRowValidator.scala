@@ -80,8 +80,31 @@ class StcConditionalRowValidator @Inject()(
                     affinityKey: String,
                     journeyType: JourneyType
                   )(implicit cols: ColumnIndexBuilder): Seq[StcRowValidationError] =
-    validateReliefType(row, affinityKey) ++ 
-      validateTotalMarketValue(row, affinityKey, journeyType)
+    validateReliefType(row, affinityKey) ++
+      validateTotalMarketValue(row, affinityKey, journeyType) ++
+      validatePurchasedForCancellation(row)
+
+  private def validatePurchasedForCancellation(
+                                                row: ParsedStcRow
+                                              )(implicit cols: ColumnIndexBuilder): Seq[StcRowValidationError] = {
+
+    val isCancellation = row.sharePurchaseReason.exists(_.trim.equalsIgnoreCase("cancellation"))
+
+    (isCancellation, row.purchaseForCancellation) match {
+
+      case (true, None) =>
+        Seq(
+          support.error(
+            row.rowNumber,
+            "purchasedForCancellation",
+            messages("purchasedForCancellation.invalid")
+          )
+        )
+
+      case _ =>
+        Seq.empty
+    }
+  }
 
   private def validateReliefType(
                                   row: ParsedStcRow,
