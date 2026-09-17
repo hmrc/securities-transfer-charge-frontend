@@ -16,32 +16,86 @@
 
 package uk.gov.hmrc.securitiestransferchargefrontend.services
 
+import org.apache.commons.codec.digest.DigestUtils.sha256Hex
+import play.api.http.MimeTypes
+import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.securitiestransferchargefrontend.clients.registration.NrsClient
+import uk.gov.hmrc.securitiestransferchargefrontend.config.FrontendAppConfig
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.actions.requests.StcDataRequest
-import uk.gov.hmrc.securitiestransferchargefrontend.models.stf.fileupload.UploadedFile
+import uk.gov.hmrc.securitiestransferchargefrontend.models.nrs.{NrsMetadata, NrsSingleSubmissionRequest}
+import uk.gov.hmrc.securitiestransferchargefrontend.models.submission.*
 import uk.gov.hmrc.securitiestransferchargefrontend.repositories.CyaHtmlData
+import uk.gov.hmrc.securitiestransferchargefrontend.utils.CommonHelpers.authToken
 
-import java.nio.charset.StandardCharsets
+import java.time.LocalDate
+import java.time.format.DateTimeFormatter
 import javax.inject.Inject
+import scala.collection.mutable.ListBuffer
 import scala.concurrent.Future
 
 
 trait NrsService:
-  def singleSubmissionNotableEvent(cyaHtml: CyaHtmlData)(implicit request: StcDataRequest[?]): Future[Unit]
-  def bulkSubmissionNotableEvent(uploadedFile: UploadedFile)(implicit request: StcDataRequest[?]): Future[Unit]
+  def singleSubmissionNotableEvent(cyaHtml     : CyaHtmlData,
+                                   affinityData: AffinityData,
+                                   utrn        : String
+                                  )(using
+                                    request    : StcDataRequest[?],
+                                    hc         : HeaderCarrier): Future[Unit]
 
 class NrsServiceImpl @Inject()(
-  nrsClient: NrsClient
+  nrsClient: NrsClient,
+  config: FrontendAppConfig
 ) extends NrsService {
-
-  def singleSubmissionNotableEvent(cyaHtml: CyaHtmlData)(implicit request: StcDataRequest[?]): Future[Unit] = {
-    nrsClient.postHtmlPayload(cyaHtml.html.toString)
-  }
-
-  def bulkSubmissionNotableEvent(uploadedFile: UploadedFile)(implicit request: StcDataRequest[?]): Future[Unit] = {
-    nrsClient.postXslxPayload(
-      new String(uploadedFile.inputStream.readAllBytes(), StandardCharsets.UTF_8)
+  
+  override def singleSubmissionNotableEvent(
+    cyaHtml     : CyaHtmlData,
+    affinityData: AffinityData,
+    utrn        : String
+  )(using
+    request     : StcDataRequest[?],
+    hc          : HeaderCarrier): Future[Unit] = {
+    
+    val htmlPayload = cyaHtml.html.toString
+    val nrsRequest = NrsSingleSubmissionRequest(
+      payload  = htmlPayload,
+      metadata = NrsMetadata(
+        businessId              = config.nrsBusinessId,
+        notableEvent            = config.nrsNotableEventSingleSubmission,
+        payloadContentType      = MimeTypes.HTML,
+        payloadSha256Checksum   = sha256Hex(htmlPayload),
+        userSubmissionTimestamp = LocalDate.now().format(DateTimeFormatter.ISO_DATE_TIME),
+        identityData            = request.request.identityData,
+        userAuthToken           = authToken(hc),
+        headerData              = request.headers.toSimpleMap,
+        searchKeys              = searchKeys(request, affinityData, utrn)
+      )
     )
+    
+    nrsClient.postSinglePayload(nrsRequest)
   }
+  
+  val taxIdentifier: PartialFunction[AffinityData, (String, String)] = {
+    case i: Individual   => "NINO" -> i.nino
+    case o: Organisation => "UTR"  -> o.utr
+  }
+  
+  val agentTaxIdentifier: StcDataRequest[?] => Option[(String, String)] = req => {
+    req
+      .request
+      .maybeArn
+      .map(arn => "ARN" -> arn)
+  }
+  
+  def searchKeys(request: StcDataRequest[?], affinityData: AffinityData, utrn: String): Map[String, String] = {
+    val pairs = ListBuffer.empty[(String, String)]
+    pairs.addOne("submissionId" -> request.userAnswers.submissionId.value)
+    pairs.addOne("transferRef"  -> utrn)
+    
+    val taxId = taxIdentifier.lift(affinityData).orElse(agentTaxIdentifier(request))
+    taxId.foreach(pair => pairs.addOne(pair))
+    
+    pairs.toMap
+  }
+  
   
 }

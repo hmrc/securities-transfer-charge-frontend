@@ -72,6 +72,17 @@ final class StcAuthEnrolledActionImpl @Inject()(
       Retrievals.groupIdentifier and
       Retrievals.allEnrolments
   
+  private val getArn: AffinityGroup => Enrolments => Option[String] = {
+    case AffinityGroup.Agent => es => getArnFromEnrolments(es)
+    case _                   => _  => None
+  }
+
+  private val getArnFromEnrolments: Enrolments => Option[String] = es =>
+    es
+      .getEnrolment("HMRC-AS-AGENT")
+      .flatMap(_.getIdentifier("AgentReferenceNumber"))
+      .map(_.value)
+  
   override def invokeBlock[A](
                                request: Request[A],
                                block: StcAuthorisedRequest[A] => Future[Result]
@@ -93,13 +104,13 @@ final class StcAuthEnrolledActionImpl @Inject()(
         )
         val maybeRequest =
           for {
-            internalId <- retrievalFilter.isPresent(maybeInternalId)
+            internalId      <- retrievalFilter.isPresent(maybeInternalId)
             groupIdentifier <- retrievalFilter.isPresent(maybeGroupIdentifier)
-            affinityGroup <- retrievalFilter.isPresent(maybeAffinityGroup)
-            _ <- retrievalFilter.enrolledForStc(enrolments)
-            subscriptionId <- retrievalFilter.subscriptionIdPresent(enrolments)
+            affinityGroup   <- retrievalFilter.isPresent(maybeAffinityGroup)
+            _               <- retrievalFilter.enrolledForStc(enrolments)
+            subscriptionId  <- retrievalFilter.subscriptionIdPresent(enrolments)
             rawCredentialId <- retrievalFilter.providerIdPresentFilter(maybeCredentials)
-            credentialId = CredentialId(rawCredentialId)
+            credentialId    =  CredentialId(rawCredentialId)
           } yield StcAuthorisedRequest(
             request,
             internalId,
@@ -107,7 +118,8 @@ final class StcAuthEnrolledActionImpl @Inject()(
             affinityGroup,
             subscriptionId,
             credentialId,
-            identityData
+            identityData,
+            getArn(affinityGroup)(enrolments)
           )
 
         maybeRequest.fold(identity, block)

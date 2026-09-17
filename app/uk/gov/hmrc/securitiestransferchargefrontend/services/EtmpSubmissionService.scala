@@ -38,6 +38,7 @@ trait SubmissionCreateResponse
 
 final case class SubmissionCreateResponseSuccess(
   submissionId: SubmissionId,
+  utrn: String,
   chargeReferences: Seq[ChargeReference],
   taxDue: BigDecimal,
   paymentDueBy: LocalDate,
@@ -80,13 +81,14 @@ class EtmpSubmissionServiceImpl @Inject() (etmpSubmissionsClient: EtmpSubmission
     end if
 
     val submissionId     = userAnswers.submissionId
+    val utrn             = successes.head.utrn
     val chargeReferences = successes.map(_.chargeReference)
     val taxDue           = successes.map(_.chargeAmount).sum
     val paymentDueBy     = successes.collect(getDueBy).min
     val agentReference   = userAnswers.get(AgentReferencePage).flatMap(_.agentReference)
 
     if failures.isEmpty then
-      SubmissionCreateResponseSuccess(submissionId, chargeReferences, taxDue, paymentDueBy, agentReference)
+      SubmissionCreateResponseSuccess(submissionId, utrn, chargeReferences, taxDue, paymentDueBy, agentReference)
     else
       SubmissionCreateResponsePartialFailure(submissionId, chargeReferences, failedRecords, taxDue, paymentDueBy, agentReference)
   }

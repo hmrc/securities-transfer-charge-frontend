@@ -30,6 +30,5 @@ case class NrsMetadata(
   searchKeys: Map[String, String]
 )
 
-object NrsMetadata {
-  implicit val format: OFormat[NrsMetadata] = Json.format[NrsMetadata]
-}
+object NrsMetadata:
+  given OFormat[NrsMetadata] = Json.format[NrsMetadata]

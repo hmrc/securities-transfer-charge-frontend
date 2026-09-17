@@ -28,7 +28,8 @@ case class StcAuthorisedRequest[A](
                                           affinityGroup: AffinityGroup,
                                           subscriptionId: SubscriptionId,
                                           credentialId: CredentialId,
-                                          identityData: IdentityData
+                                          identityData: IdentityData,
+                                          maybeArn: Option[String]
                                         ) extends WrappedRequest[A](request) {
   lazy val affinityGroupKey: String =
     affinityGroup match {

@@ -46,6 +46,12 @@ class FrontendAppConfig @Inject() (configuration: Configuration, servicesConfig:
   val signOutUrl: String       = configuration.get[String]("urls.signOut")
   val continueUrlBase: String = configuration.get[String]("urls.continue-url-base")
   
+  // NRS
+  val nrsBusinessId = configuration.get[String]("nrs.business-id")
+  val nrsNotableEventSingleSubmission = configuration.get[String]("nrs.notable-events.single-submission")
+  val nrsNotableEventBulkSubmission = configuration.get[String]("nrs.notable-events.bulk-submission")
+  val nrsNotableEventSingleAmendment = configuration.get[String]("nrs.notable-events.single-amendment")
+  
   // Address Lookup
   private val addressLookupBaseUrl: String =
     servicesConfig.baseUrl("address-lookup-frontend")
