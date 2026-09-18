@@ -14,11 +14,12 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.securitiestransferchargefrontend.controllers.actions
+package uk.gov.hmrc.securitiestransferchargefrontend.controllers.actions.requests
 
 import play.api.mvc.{Request, WrappedRequest}
 import uk.gov.hmrc.auth.core.AffinityGroup
 import uk.gov.hmrc.securitiestransferchargefrontend.domain.{CredentialId, SubscriptionId}
+import uk.gov.hmrc.securitiestransferchargefrontend.models.nrs.IdentityData
 
 case class StcAuthorisedRequest[A](
                                           request: Request[A],
@@ -26,7 +27,9 @@ case class StcAuthorisedRequest[A](
                                           groupIdentifier: String,
                                           affinityGroup: AffinityGroup,
                                           subscriptionId: SubscriptionId,
-                                          credentialId: CredentialId
+                                          credentialId: CredentialId,
+                                          identityData: IdentityData,
+                                          maybeArn: Option[String]
                                         ) extends WrappedRequest[A](request) {
   lazy val affinityGroupKey: String =
     affinityGroup match {
