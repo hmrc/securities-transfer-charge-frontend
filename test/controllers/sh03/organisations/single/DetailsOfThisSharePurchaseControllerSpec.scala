@@ -25,6 +25,7 @@ import play.api.test.Helpers.*
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.routes
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.sh03.organisations.single.routes as orgSingleRoutes
 import uk.gov.hmrc.securitiestransferchargefrontend.forms.sh03.shared.DetailsOfThisSharePurchaseFormProvider
+import uk.gov.hmrc.securitiestransferchargefrontend.models.JourneyType.SH03
 import uk.gov.hmrc.securitiestransferchargefrontend.models.sh03.shared.DetailsOfThisSharePurchase
 import uk.gov.hmrc.securitiestransferchargefrontend.models.{NormalMode, UserAnswers}
 import uk.gov.hmrc.securitiestransferchargefrontend.navigation.Navigator
@@ -45,7 +46,7 @@ class DetailsOfThisSharePurchaseControllerSpec extends SpecBase with MockitoSuga
     amountPaid = BigDecimal(100),
     marketValue = Some(BigDecimal(10000)))
 
-  val userAnswers: UserAnswers = UserAnswers(testUserId, testGroupIdentifier, submissionId)
+  val userAnswers: UserAnswers = UserAnswers(testUserId, testGroupIdentifier, submissionId,SH03)
 
   "DetailsOfThisSharePurchase Controller" - {
 

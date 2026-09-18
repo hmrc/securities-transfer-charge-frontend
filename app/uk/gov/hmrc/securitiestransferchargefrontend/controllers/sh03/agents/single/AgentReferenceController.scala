@@ -26,7 +26,7 @@ import uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.shared.SaveA
 import uk.gov.hmrc.securitiestransferchargefrontend.domain.{GroupIdentifier, UserId}
 import uk.gov.hmrc.securitiestransferchargefrontend.forms.shared.AgentReferenceFormProvider
 import uk.gov.hmrc.securitiestransferchargefrontend.models.shared.AgentReference
-import uk.gov.hmrc.securitiestransferchargefrontend.models.{Mode, UserAnswers}
+import uk.gov.hmrc.securitiestransferchargefrontend.models.{JourneyType, Mode, UserAnswers}
 import uk.gov.hmrc.securitiestransferchargefrontend.navigation.Navigator
 import uk.gov.hmrc.securitiestransferchargefrontend.pages.sh03.AgentReferencePage
 import uk.gov.hmrc.securitiestransferchargefrontend.views.html.sh03.agents.single.AgentReferenceView
@@ -70,7 +70,7 @@ class AgentReferenceController @Inject()(
           value =>
             for {
               answers <- request.userAnswers.fold {
-                idClient.nextSubmissionId().map(submissionId => UserAnswers.empty(userId)(group)(submissionId))
+                idClient.nextSubmissionId().map(submissionId => UserAnswers.empty(userId)(group)(submissionId)(JourneyType.SH03))
               } (Future.successful)
               updatedAnswers <- Future.fromTry(answers.set(AgentReferencePage, value))
               nextPage       <- navigator.nextPage(AgentReferencePage, mode, updatedAnswers, isReturn(request))

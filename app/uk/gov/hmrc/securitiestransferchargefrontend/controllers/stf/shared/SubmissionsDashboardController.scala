@@ -25,15 +25,15 @@ import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import uk.gov.hmrc.securitiestransferchargefrontend.clients.{SaveAndReturnClient, SubmissionIdClient}
 import uk.gov.hmrc.securitiestransferchargefrontend.config.FrontendAppConfig
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.actions.{StcAuthEnrolledAction, StcDataRetrievalAction}
+import uk.gov.hmrc.securitiestransferchargefrontend.controllers.sh03.shared.routes as sh03SharedRoutes
 import uk.gov.hmrc.securitiestransferchargefrontend.domain.{GroupIdentifier, SubmissionId, UserId}
-import uk.gov.hmrc.securitiestransferchargefrontend.models.audit.{AuditModel, AuditType}
 import uk.gov.hmrc.securitiestransferchargefrontend.models.audit.JourneyStatus.StartSubmission
-import uk.gov.hmrc.securitiestransferchargefrontend.models.{NormalMode, UserAnswers}
+import uk.gov.hmrc.securitiestransferchargefrontend.models.audit.{AuditModel, AuditType}
+import uk.gov.hmrc.securitiestransferchargefrontend.models.{JourneyType, NormalMode, UserAnswers}
 import uk.gov.hmrc.securitiestransferchargefrontend.navigation.Navigator
 import uk.gov.hmrc.securitiestransferchargefrontend.pages.stf.shared.SubmissionsDashboardPage
 import uk.gov.hmrc.securitiestransferchargefrontend.services.AuditService
 import uk.gov.hmrc.securitiestransferchargefrontend.views.html.stf.shared.SubmissionsDashboardView
-import uk.gov.hmrc.securitiestransferchargefrontend.controllers.sh03.shared.routes as sh03SharedRoutes
 
 import javax.inject.{Inject, Named}
 import scala.concurrent.{ExecutionContext, Future}
@@ -50,7 +50,8 @@ class SubmissionsDashboardController @Inject()(
                                                 @Named("individuals") individualsNavigator: Navigator,
                                                 @Named("organisations") orgNavigator: Navigator,
                                                 @Named("agents") agentNavigator: Navigator,
-                                                auditService: AuditService)
+                                                auditService: AuditService
+                                               )
                                               (implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport with Logging {
 
   def onPageLoad(): Action[AnyContent] =
@@ -65,9 +66,9 @@ class SubmissionsDashboardController @Inject()(
 
 
   private def listSubmissionIds(userId: UserId, groupIdentifier: GroupIdentifier)(implicit headerCarrier: HeaderCarrier): Future[List[SubmissionId]] = {
-    import appConfig.SaveAndReturnRetrievalType._
+    import appConfig.SaveAndReturnRetrievalType.*
     appConfig.saveAndReturnRetrieval match {
-      case UserOnly     => saveAndReturnClient.listByUser(userId)
+      case UserOnly => saveAndReturnClient.listByUser(userId)
       case UserAndGroup => saveAndReturnClient.listByGroup(groupIdentifier)
     }
   }
@@ -81,7 +82,7 @@ class SubmissionsDashboardController @Inject()(
 
       for {
         submissionId <- idClient.nextSubmissionId()
-        emptyAnswers = UserAnswers.empty(userId)(group)(submissionId)
+        emptyAnswers = UserAnswers.empty(userId)(group)(submissionId)(JourneyType.STF)
 
         call <- innerRequest.affinityGroup match {
           case AffinityGroup.Organisation =>

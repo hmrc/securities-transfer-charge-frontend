@@ -46,7 +46,7 @@ class CheckYourAnswersServiceSpec extends SpecBase with FileUploadFixtures {
     chargingPoint = chargingPoint,
     securitiesQuantity = Some("10000"),
     typeOfShares = Some("Ordinary"),
-    purchaseForCancellation = Some(true),
+    sharePurchaseReason = Some("cancellation"),
     amountPaidForSecurities = Some("15000.00")
   )
 
@@ -55,14 +55,14 @@ class CheckYourAnswersServiceSpec extends SpecBase with FileUploadFixtures {
     securitiesQuantity = Some("5000"),
     whatTypeOfSecurities = Some("Preference"),
     typeOfShares = None,
-    purchaseForCancellation = Some(false),
+    sharePurchaseReason = Some("treasury"),
     amountPaidForSecurities = None,
     totalMarketValue = Some("25000.00")
   )
 
   "CheckYourAnswersService.buildViewModel" - {
 
-    "build the view model with the expected transfer details and fallbacks" in {
+    "build the view model with the expected transfer details based on sharePurchaseReason" in {
 
       val document = ParsedStcRowsDocument(_id = "SomeRef", fileName = "test.csv", rows = Seq(row1, row2))
 
@@ -123,7 +123,7 @@ class CheckYourAnswersServiceSpec extends SpecBase with FileUploadFixtures {
 
       when(formattingService.formatPaymentDueDate(eqTo(LocalDate.of(2026, 1, 31)))(any()))
         .thenReturn("31 January 2026")
-      
+
       val result = service.buildViewModel(document, emptyUserAnswers)(lang, messages(applicationBuilder().build()))
 
       result.paymentDueBy shouldBe "31 January 2026"

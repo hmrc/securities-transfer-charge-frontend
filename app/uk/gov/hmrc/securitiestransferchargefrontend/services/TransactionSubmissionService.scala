@@ -22,6 +22,9 @@ import uk.gov.hmrc.securitiestransferchargefrontend.clients.SaveAndReturnClient
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.actions.requests.StcDataRequest
 import uk.gov.hmrc.securitiestransferchargefrontend.domain.SubmissionId
 import uk.gov.hmrc.securitiestransferchargefrontend.models.UserAnswers
+import uk.gov.hmrc.securitiestransferchargefrontend.models.audit.AuditModel
+import uk.gov.hmrc.securitiestransferchargefrontend.models.audit.AuditType.Sh03
+import uk.gov.hmrc.securitiestransferchargefrontend.models.audit.JourneyStatus.{SubmissionFailure, SubmissionSuccess}
 import uk.gov.hmrc.securitiestransferchargefrontend.models.stf.Address
 import uk.gov.hmrc.securitiestransferchargefrontend.models.submission.{AffinityData, Agent, Individual, Organisation}
 import uk.gov.hmrc.securitiestransferchargefrontend.repositories.{CyaHtmlRepository, TransactionResponseRepository}
@@ -40,7 +43,8 @@ final class TransactionSubmissionServiceImpl @Inject()(
                                                         saveAndReturnClient: SaveAndReturnClient,
                                                         nrsService: NrsService,
                                                         cyaHtmlRepository: CyaHtmlRepository,
-                                                        transactionResponseRepository: TransactionResponseRepository)(implicit ec: ExecutionContext) extends TransactionSubmissionService {
+                                                        transactionResponseRepository: TransactionResponseRepository,
+                                                        auditService: AuditService)(implicit ec: ExecutionContext) extends TransactionSubmissionService {
 
   // TODO: Some of this should come from new screens not yet developed.
   private val getIndividualAffinityData: AffinityData =
@@ -91,7 +95,7 @@ final class TransactionSubmissionServiceImpl @Inject()(
     implicit val hc: HeaderCarrier = headerCarrierCreator.create(request)
     lazy val submissionId = request.userAnswers.submissionId
     val affinityData = getAffinityData(request.request.affinityGroup)
-    
+
     etmpSubmissionService
       .submitSingleStf(request.request.subscriptionId, request.userAnswers, getAffinityData(request.request.affinityGroup))
       .map {
@@ -109,17 +113,23 @@ final class TransactionSubmissionServiceImpl @Inject()(
     given hc: HeaderCarrier = headerCarrierCreator.create(request)
     lazy val submissionId = request.userAnswers.submissionId
     val affinityData = getAffinityData(request.request.affinityGroup)
-    
+    val innerRequest = request.request
+    lazy val subscriptionId = innerRequest.subscriptionId
+    lazy val affinityGroup = innerRequest.affinityGroup
+    lazy val credentialId = innerRequest.credentialId
     etmpSubmissionService
-      .submitSingleSh03(request.request.subscriptionId, request.userAnswers, affinityData)
+      .submitSingleSh03(subscriptionId, request.userAnswers, getAffinityData(affinityGroup))
       .map {
         case sh03Response: SubmissionCreateResponseSuccess =>
           transactionResponseRepository.store(submissionId, sh03Response)
+          auditService.audit(AuditModel(SubmissionSuccess,subscriptionId,affinityGroup,credentialId,Some(submissionId),Sh03))
           saveAndReturnClient.deleteDraft(submissionId)
           sendSingleSubmissionDataToNRS(submissionId, affinityData, sh03Response.utrn)
           true
 
-        case _ => false
+        case _ =>
+          auditService.audit(AuditModel(SubmissionFailure, innerRequest.subscriptionId, innerRequest.affinityGroup, innerRequest.credentialId, Some(request.userAnswers.submissionId), Sh03))
+          false
       }
   }
 
@@ -149,5 +159,5 @@ final class TransactionSubmissionServiceImpl @Inject()(
 object TransactionSubmissionService:
   val clearedUserAnswers: StcDataRequest[?] => UserAnswers = { req =>
     val currentUserAnswers = req.userAnswers
-    UserAnswers.empty(currentUserAnswers.userId)(currentUserAnswers.groupIdentifier)(currentUserAnswers.submissionId)
+    UserAnswers.empty(currentUserAnswers.userId)(currentUserAnswers.groupIdentifier)(currentUserAnswers.submissionId)(currentUserAnswers.journeyType)
   }

@@ -39,20 +39,23 @@ class CheckYourAnswersService @Inject()(
 
         val amountOfShares = row.securitiesQuantity.getOrElse("0")
 
-        val isCancellation = row.purchaseForCancellation.getOrElse(true)
-
         val amountPaidStr = row.amountPaidForSecurities
           .orElse(row.totalMarketValue)
           .orElse(row.maxSharePrice)
           .getOrElse("0")
 
         val consideration = Try(BigDecimal(amountPaidStr)).getOrElse(BigDecimal(0))
-        
+
         val taxDue = taxDueCalculationService.calculateTaxDue(row)
+        
+        val reasonFor = row.sharePurchaseReason.map(_.trim.toLowerCase) match {
+          case Some("treasury") => "Treasury"
+          case _                => "Cancellation"
+        }
 
         Sh03Transfer(
           amountOfShares = formatAmountOfShares(amountOfShares),
-          reasonFor      = if (isCancellation) "Cancellation" else "Treasury",
+          reasonFor      = reasonFor,
           consideration  = consideration,
           taxDue         = taxDue
         )
