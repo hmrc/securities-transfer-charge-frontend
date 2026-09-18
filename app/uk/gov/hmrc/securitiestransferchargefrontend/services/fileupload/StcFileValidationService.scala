@@ -28,11 +28,14 @@ class StcFileValidationService @Inject()(
                                           stcRowValidationService: StcRowValidationService
                                         ) {
 
-  def validateStream(rowStream: Iterator[ParsedRow], headers: Seq[String], affinityKey: String, journeyType: JourneyType): Either[FileParseError, StcFileValidationResponse] = {
-    stcRowValidationService.validateStream(rowStream, headers, affinityKey, journeyType, config.maxErrorsAllowed, config.maxRows).map { rows =>
-      StcFileValidationResponse(
-        rows = rows,
-        maxErrorsAllowed = config.maxErrorsAllowed
+  def validateStream(rowStream: Iterator[ParsedRow], headers: Seq[String], affinityKey: String, journeyType: JourneyType): Either[(FileParseError, Long), (StcFileValidationResponse, Long)] = {
+    stcRowValidationService.validateStream(rowStream, headers, affinityKey, journeyType, config.maxErrorsAllowed, config.maxRows).map { (rows, validationTime) =>
+      (
+        StcFileValidationResponse(
+          rows = rows, 
+          maxErrorsAllowed = config.maxErrorsAllowed
+        ),
+        validationTime
       )
     }
   }

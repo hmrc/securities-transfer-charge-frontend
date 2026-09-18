@@ -31,15 +31,17 @@ class StcUploadParsingService @Inject()(
                                          fileParsingService: FileParsingService
                                        ) extends Logging {
 
+  private val noProcessingTime = 0L
+  
   def withVerifiedTemplateStream[A](
                                      uploadedFile: UploadedFile,
                                      affinityKey: String,
                                      journeyType: JourneyType
-                                   )(block: (Seq[String], Iterator[ParsedRow]) => Either[FileParseError, A]): Either[FileParseError, A] = {
-
+                                   )(block: (Seq[String], Iterator[ParsedRow]) => Either[(FileParseError, Long), A]): Either[(FileParseError, Long), A] = {
+    
     fileUploadConfig.template(affinityKey, journeyType) match {
       case None =>
-        Left(FileParseError.InvalidTemplate)
+        Left(FileParseError.InvalidTemplate, noProcessingTime)
 
       case Some(templateDef) =>
         fileParsingService.withParsedStream(uploadedFile, templateDef.expectedColumns) { (headers, lazyRowIterator) =>
@@ -57,12 +59,12 @@ class StcUploadParsingService @Inject()(
                  |Template signature mismatch for uploaded file ${uploadedFile.fileName}.
                  |Expected: ${templateDef.signature}, Actual: $actualHash
                 """.stripMargin)
-            Left(FileParseError.InvalidTemplate)
+            Left((FileParseError.InvalidTemplate, noProcessingTime))
           } else {
             val dataStream = lazyRowIterator.filterNot(_.isCompletelyEmpty)
 
             if (!dataStream.hasNext) {
-              Left(FileParseError.EmptyFile)
+              Left((FileParseError.EmptyFile, noProcessingTime))
             } else {
               block(headers, dataStream)
             }

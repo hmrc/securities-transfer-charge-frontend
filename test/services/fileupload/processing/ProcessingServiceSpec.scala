@@ -36,6 +36,7 @@ import uk.gov.hmrc.securitiestransferchargefrontend.models.stf.fileupload.{FileP
 import uk.gov.hmrc.securitiestransferchargefrontend.models.stf.upscan.UpscanJourneyStatus.*
 import uk.gov.hmrc.securitiestransferchargefrontend.models.stf.upscan.{FileUpload, UpscanJourneyStatus}
 import uk.gov.hmrc.securitiestransferchargefrontend.repositories.{ParsedStcRowsRepository, UpscanJourneyRepository, ValidationErrorRepository}
+import uk.gov.hmrc.securitiestransferchargefrontend.services.AuditService
 import uk.gov.hmrc.securitiestransferchargefrontend.services.fileupload.StcUpscanProcessingService
 import uk.gov.hmrc.securitiestransferchargefrontend.services.fileupload.processing.ProcessingService
 
@@ -59,7 +60,9 @@ class ProcessingServiceSpec extends SpecBase with MockitoSugar with BeforeAndAft
 
   private val mockParsedStcRowsRepository = mock[ParsedStcRowsRepository]
 
-  private val service = new ProcessingService(mockUpscanProcessingService, mockValidationErrorRepository, mockUpscanJourneyRepository, mockSubscriptionConnector, mockParsedStcRowsRepository)
+  private val mockAuditService = mock[AuditService]
+
+  private val service = new ProcessingService(mockUpscanProcessingService, mockValidationErrorRepository, mockUpscanJourneyRepository, mockSubscriptionConnector, mockParsedStcRowsRepository, mockAuditService)
 
   private val reference = "reference"
   private val affinityKey = "affinity-key"
@@ -76,17 +79,26 @@ class ProcessingServiceSpec extends SpecBase with MockitoSugar with BeforeAndAft
       )
     ).thenReturn(Future.unit)
 
+  implicit val request: StcAuthorisedRequest[AnyContentAsEmpty.type] =
+    StcAuthorisedRequest(
+      FakeRequest(),
+      internalId = testUserId.value,
+      groupIdentifier = testGroupIdentifier.value,
+      affinityGroup = individualAffinity,
+      subscriptionId = SubscriptionId("STC-GFGF"),
+      credentialId = CredentialId("some id")
+    )
+
   "processReadyUpload" - {
 
     "must mark upload as Processing before processing begins" in {
-
       stubStatusUpdates()
 
       when(
         mockUpscanProcessingService.process(any[FileUpload], any[String], any[JourneyType])(any)
       ).thenReturn(
         Future.successful(
-          Left(FileParseError.EmptyFile)
+          Left((FileParseError.EmptyFile, 0L))
         )
       )
 
@@ -98,7 +110,7 @@ class ProcessingServiceSpec extends SpecBase with MockitoSugar with BeforeAndAft
             fileUpload,
             affinityKey,
             STF
-          )(any(), any())
+          )
         )
 
         verify(mockUpscanJourneyRepository)
@@ -114,7 +126,7 @@ class ProcessingServiceSpec extends SpecBase with MockitoSugar with BeforeAndAft
         mockUpscanProcessingService.process(any[FileUpload], any[String], any[JourneyType])(any())
       ).thenReturn(
         Future.successful(
-          Left(FileParseError.RowLimitExceeded(100, 10))
+          Left((FileParseError.RowLimitExceeded(100, 10), 0L))
         )
       )
 
@@ -126,7 +138,7 @@ class ProcessingServiceSpec extends SpecBase with MockitoSugar with BeforeAndAft
             fileUpload,
             affinityKey,
             STF
-          )(any(), any())
+          )
         )
 
         verify(mockUpscanJourneyRepository)
@@ -142,7 +154,7 @@ class ProcessingServiceSpec extends SpecBase with MockitoSugar with BeforeAndAft
         mockUpscanProcessingService.process(any[FileUpload], any[String], any[JourneyType])(any())
       ).thenReturn(
         Future.successful(
-          Left(FileParseError.EmptyFile)
+          Left((FileParseError.EmptyFile, 0L))
         )
       )
 
@@ -154,7 +166,7 @@ class ProcessingServiceSpec extends SpecBase with MockitoSugar with BeforeAndAft
             fileUpload,
             affinityKey,
             STF
-          )(any(), any())
+          )
         )
 
         verify(mockUpscanJourneyRepository)
@@ -170,7 +182,7 @@ class ProcessingServiceSpec extends SpecBase with MockitoSugar with BeforeAndAft
         mockUpscanProcessingService.process(any[FileUpload], any[String], any[JourneyType])(any())
       ).thenReturn(
         Future.successful(
-          Left(FileParseError.InvalidTemplate)
+          Left((FileParseError.InvalidTemplate, 0L))
         )
       )
 
@@ -182,7 +194,7 @@ class ProcessingServiceSpec extends SpecBase with MockitoSugar with BeforeAndAft
             fileUpload,
             affinityKey,
             STF
-          )(any(), any())
+          )
         )
 
         verify(mockUpscanJourneyRepository)
@@ -198,7 +210,7 @@ class ProcessingServiceSpec extends SpecBase with MockitoSugar with BeforeAndAft
         mockUpscanProcessingService.process(any[FileUpload], any[String], any[JourneyType])(any())
       ).thenReturn(
         Future.successful(
-          Left(FileParseError.MissingWorksheet("test"))
+          Left((FileParseError.MissingWorksheet("test"), 0L))
         )
       )
 
@@ -210,7 +222,7 @@ class ProcessingServiceSpec extends SpecBase with MockitoSugar with BeforeAndAft
             fileUpload,
             affinityKey,
             STF
-          )(any(), any())
+          )
         )
 
         verify(mockUpscanJourneyRepository)
@@ -228,7 +240,7 @@ class ProcessingServiceSpec extends SpecBase with MockitoSugar with BeforeAndAft
         mockUpscanProcessingService.process(any[FileUpload], any[String], any[JourneyType])(any())
       ).thenReturn(
         Future.successful(
-          Right(validationResponse)
+          Right((validationResponse, 0L))
         )
       )
 
@@ -240,7 +252,7 @@ class ProcessingServiceSpec extends SpecBase with MockitoSugar with BeforeAndAft
             fileUpload,
             affinityKey,
             STF
-          )(any(), any())
+          )
         )
 
         verify(mockUpscanJourneyRepository)
@@ -265,7 +277,7 @@ class ProcessingServiceSpec extends SpecBase with MockitoSugar with BeforeAndAft
         mockUpscanProcessingService.process(any[FileUpload], any[String], any[JourneyType])(any())
       ).thenReturn(
         Future.successful(
-          Right(validationResponse)
+          Right((validationResponse, 0L))
         )
       )
 
@@ -277,7 +289,7 @@ class ProcessingServiceSpec extends SpecBase with MockitoSugar with BeforeAndAft
             fileUpload,
             affinityKey,
             STF
-          )(any(), any())
+          )
         )
 
         verify(mockValidationErrorRepository)
@@ -289,18 +301,6 @@ class ProcessingServiceSpec extends SpecBase with MockitoSugar with BeforeAndAft
     }
 
     "must store subscription and mark upload Completed when validation succeeds" in {
-
-      implicit val request: StcAuthorisedRequest[AnyContentAsEmpty.type] =
-        StcAuthorisedRequest(
-          FakeRequest(),
-          internalId = testUserId.value,
-          groupIdentifier = testGroupIdentifier.value,
-          affinityGroup = individualAffinity,
-          subscriptionId = SubscriptionId("STC-GFGF"),
-          credentialId = CredentialId("some id")
-        )
-
-      implicit val hc: HeaderCarrier = HeaderCarrier()
 
       stubStatusUpdates()
 
@@ -329,7 +329,7 @@ class ProcessingServiceSpec extends SpecBase with MockitoSugar with BeforeAndAft
         )(any())
       ).thenReturn(
         Future.successful(
-          Right(validationResponse)
+          Right((validationResponse, 0L))
         )
       )
 
@@ -376,7 +376,7 @@ class ProcessingServiceSpec extends SpecBase with MockitoSugar with BeforeAndAft
             fileUpload,
             affinityKey,
             STF
-          )(any(), any())
+          )
         )
 
         verify(mockUpscanJourneyRepository)
@@ -392,7 +392,7 @@ class ProcessingServiceSpec extends SpecBase with MockitoSugar with BeforeAndAft
         mockUpscanProcessingService.process(any[FileUpload], any[String], any[JourneyType])(any())
       ).thenReturn(
         Future.successful(
-          Left(FileParseError.EmptyFile)
+          Left((FileParseError.EmptyFile, 0L))
         )
       )
 
@@ -404,7 +404,7 @@ class ProcessingServiceSpec extends SpecBase with MockitoSugar with BeforeAndAft
             fileUpload,
             affinityKey,
             STF
-          )(any(), any())
+          )
         )
 
         val inOrderVerifier = mockitoInOrder(mockUpscanJourneyRepository)
