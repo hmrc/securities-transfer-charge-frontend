@@ -15,20 +15,100 @@
  *@
 
 @import uk.gov.hmrc.securitiestransferchargefrontend.config.FrontendAppConfig
+@import uk.gov.hmrc.securitiestransferchargefrontend.models.ConfirmationViewModel
+@import uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.shared.routes
 @import uk.gov.hmrc.govukfrontend.views.html.components._
 
 @this(
     layout: uk.gov.hmrc.securitiestransferchargefrontend.views.html.templates.Layout,
-    govukPanel : GovukPanel,
-    govukButton: GovukButton
+    govukButton: GovukButton,
+    govukNotificationBanner: GovukNotificationBanner,
+    govukTable : GovukTable,
+    formHelper: FormWithCSRF
 )
 
-@()(implicit request: Request[_], messages: Messages, config: FrontendAppConfig)
+@(viewModel: ConfirmationViewModel)(implicit request: Request[_], messages: Messages, config: FrontendAppConfig)
 
 @layout(pageTitle = titleNoForm(messages("confirmation.title")), showBackLink = false) {
 
-    @govukPanel(Panel(
-        title = Text(messages("confirmation.heading")),
-        content = HtmlContent(messages("confirmation.subheading"))
+    @govukNotificationBanner(NotificationBanner(title = HtmlContent(messages("confirmation.banner.title")), content = HtmlContent(messages("confirmation.banner.p1", viewModel.paymentDueBy) + messages("confirmation.banner.p2")), classes="govuk-notification-banner__heading govuk-!-margin-bottom-8"))
+
+    <h1 class="govuk-heading-l govuk-!-margin-bottom-7">
+        @messages("confirmation.heading.nextSteps")
+    </h1>
+
+    <h1 class="govuk-heading-m">
+        @messages("confirmation.heading.transferReference")
+    </h1>
+
+    <p class="govuk-body govuk-!-margin-bottom-7">
+        @messages("confirmation.heading.transferReference.p1") <a class="govuk-link" rel="noreferrer noopener" target="_blank" href="@routes.SubmissionsDashboardController.onPageLoad().url">@messages("confirmation.heading.transferReference.link")</a> @messages("confirmation.heading.transferReference.p2")
+    </p>
+
+    <h1 class="govuk-heading-m">
+        @messages("confirmation.heading.deadline")
+    </h1>
+
+    <p class="govuk-body">
+        @messages("confirmation.heading.deadline.p1")
+    </p>
+
+    @govukTable(Table(
+        rows = Seq(
+            Seq(
+                TableRow(
+                    content = Text(messages("confirmation.table.heading.submissionId")),
+                    classes = "govuk-table__header",
+                    attributes = Map("scope" -> "row")
+                ),
+                TableRow(
+                    content = Text(viewModel.submissionId),
+                    classes = "govuk-table__cell"
+                )
+            )
+        ) ++ (if(viewModel.isAgent) Seq(
+            Seq(
+                TableRow(
+                    content = Text(messages("confirmation.table.heading.reference")),
+                    classes = "govuk-table__header",
+                    attributes = Map("scope" -> "row")
+                ),
+                TableRow(
+                    content = Text(viewModel.reference.filter(_.nonEmpty).getOrElse(messages("site.notProvided"))),
+                    classes = "govuk-table__cell"
+                )
+            )
+        ) else Seq.empty) ++ Seq(
+            Seq(
+                TableRow(
+                    content = Text(messages("confirmation.table.heading.taxDue")),
+                    classes = "govuk-table__header",
+                    attributes = Map("scope" -> "row")
+                ),
+                TableRow(
+                    content = Text(viewModel.taxDue),
+                    classes = "govuk-table__cell"
+                )
+            )
+        ),
+        head = None,
+        caption = Some(messages("confirmation.table.caption")),
+        captionClasses = "govuk-table__caption govuk-visually-hidden",
+        firstCellIsHeader = true
     ))
+
+    @formHelper(action = routes.PaySubmissionController.onPageLoad()) {
+        <div class="govuk-button-group">
+
+            @govukButton(
+                ButtonViewModel(messages("confirmation.button.pay"))
+            )
+
+            <a class="govuk-link" href="@routes.SubmissionsDashboardController.onPageLoad().url">
+            @messages("return-to-dashboard.link")
+            </a>
+
+        </div>
+    }
+
 }

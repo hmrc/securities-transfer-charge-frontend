@@ -16,21 +16,87 @@
 
 package uk.gov.hmrc.securitiestransferchargefrontend.repositories
 
+import org.mongodb.scala.bson.conversions.Bson
+import org.mongodb.scala.model.*
+import play.api.libs.json.{Format, Json, OFormat}
+import uk.gov.hmrc.mongo.MongoComponent
+import uk.gov.hmrc.mongo.play.json.PlayMongoRepository
+import uk.gov.hmrc.mongo.play.json.formats.MongoJavatimeFormats
+import uk.gov.hmrc.securitiestransferchargefrontend.config.FrontendAppConfig
 import uk.gov.hmrc.securitiestransferchargefrontend.domain.SubmissionId
+import uk.gov.hmrc.securitiestransferchargefrontend.domain.SubmissionId.{submissionIdReads, submissionIdWrites}
 import uk.gov.hmrc.securitiestransferchargefrontend.services.SubmissionCreateResponseSuccess
 
-import javax.inject.Inject
-import scala.concurrent.Future
+import java.time.{Clock, Instant}
+import java.util.concurrent.TimeUnit
+import javax.inject.{Inject, Singleton}
+import scala.concurrent.{ExecutionContext, Future}
+
+case class TransactionResponseData(
+                                    submissionId: SubmissionId,
+                                    responseDetails: SubmissionCreateResponseSuccess,
+                                    lastUpdated: Instant = Instant.now
+                                  )
+
+object TransactionResponseData {
+
+  implicit val submissionCreateResponseSuccessFormat: OFormat[SubmissionCreateResponseSuccess] = Json.format[SubmissionCreateResponseSuccess]
+
+  implicit val format: OFormat[TransactionResponseData] = Json.format[TransactionResponseData]
+}
 
 trait TransactionResponseRepository:
   def store(key: SubmissionId, value: SubmissionCreateResponseSuccess): Future[Unit]
+
   def retrieve(key: SubmissionId): Future[SubmissionCreateResponseSuccess]
-  
-// TODO: This needs to be implemented as part of the first NRS ticket.  
-final class TransactionResponseRepositoryImpl @Inject() extends TransactionResponseRepository {
 
-  def store(key: SubmissionId, value: SubmissionCreateResponseSuccess): Future[Unit] = Future.failed(new NotImplementedError())
+@Singleton
+final class TransactionResponseRepositoryImpl @Inject()(
+                                                         mongoComponent: MongoComponent,
+                                                         appConfig: FrontendAppConfig,
+                                                         clock: Clock
+                                                       )(implicit ec: ExecutionContext)
+  extends PlayMongoRepository[TransactionResponseData](
+    collectionName = "transaction-response-data",
+    mongoComponent = mongoComponent,
+    domainFormat = TransactionResponseData.format,
+    indexes = Seq(
+      IndexModel(
+        Indexes.ascending("lastUpdated"),
+        IndexOptions()
+          .name("lastUpdatedIdx")
+          .expireAfter(appConfig.cacheTtl, TimeUnit.SECONDS)
+      )
+    )
+  ) with TransactionResponseRepository {
 
-  def retrieve(key: SubmissionId): Future[SubmissionCreateResponseSuccess] = Future.failed(new NotImplementedError())
+  implicit val instantFormat: Format[Instant] = MongoJavatimeFormats.instantFormat
 
+  private def byId(submissionId: SubmissionId): Bson = Filters.equal("_id", submissionId)
+
+  override def store(key: SubmissionId, value: SubmissionCreateResponseSuccess): Future[Unit] = {
+    val data = TransactionResponseData(
+      submissionId = key,
+      responseDetails = value,
+      lastUpdated = Instant.now(clock)
+    )
+
+    collection
+      .replaceOne(
+        filter = byId(key),
+        replacement = data,
+        options = ReplaceOptions().upsert(true)
+      )
+      .toFuture()
+      .map(_ => ())
+  }
+
+  override def retrieve(key: SubmissionId): Future[SubmissionCreateResponseSuccess] =
+    collection
+      .find(byId(key))
+      .headOption()
+      .map {
+        case Some(data) => data.responseDetails
+        case None => throw new NoSuchElementException(s"No transaction response found for submission ID: $key")
+      }
 }
