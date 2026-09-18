@@ -46,7 +46,7 @@ class NrsServiceImpl @Inject()(
   nrsClient: NrsClient,
   config: FrontendAppConfig
 ) extends NrsService {
-  
+
   override def singleSubmissionNotableEvent(
     cyaHtml     : CyaHtmlData,
     affinityData: AffinityData,
@@ -54,7 +54,7 @@ class NrsServiceImpl @Inject()(
   )(using
     request     : StcDataRequest[?],
     hc          : HeaderCarrier): Future[Unit] = {
-    
+
     val htmlPayload = cyaHtml.html.toString
     val nrsRequest = NrsSingleSubmissionRequest(
       payload  = htmlPayload,
@@ -70,32 +70,40 @@ class NrsServiceImpl @Inject()(
         searchKeys              = searchKeys(request, affinityData, utrn)
       )
     )
-    
+
     nrsClient.postSinglePayload(nrsRequest)
   }
-  
-  val taxIdentifier: PartialFunction[AffinityData, (String, String)] = {
-    case i: Individual   => "NINO" -> i.nino
-    case o: Organisation => "UTR"  -> o.utr
+
+  private val taxIdentifier: PartialFunction[AffinityData, (String, String)] = {
+    case i: Individual   => NrsSearchKeys.Nino -> i.nino
+    case o: Organisation => NrsSearchKeys.Utr  -> o.utr
   }
-  
-  val agentTaxIdentifier: StcDataRequest[?] => Option[(String, String)] = req => {
+
+  private val agentTaxIdentifier: StcDataRequest[?] => Option[(String, String)] = req => {
     req
       .request
       .maybeArn
-      .map(arn => "ARN" -> arn)
+      .map(arn => NrsSearchKeys.Arn -> arn)
   }
-  
-  def searchKeys(request: StcDataRequest[?], affinityData: AffinityData, utrn: String): Map[String, String] = {
+
+  private def searchKeys(request: StcDataRequest[?], affinityData: AffinityData, utrn: String): Map[String, String] = {
     val pairs = ListBuffer.empty[(String, String)]
-    pairs.addOne("submissionId" -> request.userAnswers.submissionId.value)
-    pairs.addOne("transferRef"  -> utrn)
-    
+    pairs.addOne(NrsSearchKeys.SubscriptionId -> request.request.subscriptionId.value)
+    pairs.addOne(NrsSearchKeys.SubmissionId -> request.userAnswers.submissionId.value)
+    pairs.addOne(NrsSearchKeys.Utrn -> utrn)
+
     val taxId = taxIdentifier.lift(affinityData).orElse(agentTaxIdentifier(request))
     taxId.foreach(pair => pairs.addOne(pair))
-    
+
     pairs.toMap
   }
-  
-  
+
 }
+
+object NrsSearchKeys:
+  val SubscriptionId = "sttId"
+  val Nino = "NINO"
+  val Utr = "UTR"
+  val Arn = "ARN"
+  val SubmissionId = "submissionId"
+  val Utrn = "transferRef"
