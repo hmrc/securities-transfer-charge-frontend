@@ -16,7 +16,7 @@
 
 package controllers.stf.shared
 
-import base.Fixtures.{testCredentialId, testSubmissionId}
+import base.Fixtures.{testCredentialId, testSubmissionId, testSubscriptionId}
 import base.{AuditTestSupport, SpecBase}
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.{verify, when}
@@ -29,6 +29,7 @@ import uk.gov.hmrc.securitiestransferchargefrontend.clients.{SaveAndReturnClient
 import uk.gov.hmrc.securitiestransferchargefrontend.config.FrontendAppConfig
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.shared.routes
 import uk.gov.hmrc.securitiestransferchargefrontend.domain.{GroupIdentifier, SubmissionId, UserId}
+import uk.gov.hmrc.securitiestransferchargefrontend.models.audit.AuditType.Stf
 import uk.gov.hmrc.securitiestransferchargefrontend.models.audit.JourneyStatus.StartSubmission
 import uk.gov.hmrc.securitiestransferchargefrontend.navigation.Navigator
 import uk.gov.hmrc.securitiestransferchargefrontend.services.AuditService
@@ -171,7 +172,7 @@ class SubmissionsDashboardControllerSpec extends SpecBase with MockitoSugar with
 
             verify(mockIdClient).nextSubmissionId()(any())
 
-            verifyAudit(mockAuditService, StartSubmission, affinityGroup, testCredentialId, testSubmissionId)
+            verifyAudit(mockAuditService, StartSubmission, affinityGroup, testSubscriptionId,testCredentialId,testSubmissionId,Stf)
           }
         }
       }

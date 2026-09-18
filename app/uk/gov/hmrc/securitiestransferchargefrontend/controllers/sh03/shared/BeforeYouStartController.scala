@@ -25,8 +25,12 @@ import uk.gov.hmrc.securitiestransferchargefrontend.controllers.sh03.organisatio
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.routes
 import uk.gov.hmrc.securitiestransferchargefrontend.views.html.sh03.shared.BeforeYouStartView
 import uk.gov.hmrc.auth.core.AffinityGroup
-import scala.concurrent.Future
+import uk.gov.hmrc.securitiestransferchargefrontend.models.audit.AuditModel
+import uk.gov.hmrc.securitiestransferchargefrontend.models.audit.AuditType.Sh03
+import uk.gov.hmrc.securitiestransferchargefrontend.models.audit.JourneyStatus.StartSubmission
+import uk.gov.hmrc.securitiestransferchargefrontend.services.AuditService
 
+import scala.concurrent.Future
 import javax.inject.Inject
 
 class BeforeYouStartController @Inject()(
@@ -34,7 +38,8 @@ class BeforeYouStartController @Inject()(
                                           stcAuthEnrolled: StcAuthEnrolledAction,
                                           getData: StcDataRetrievalAction,
                                           val controllerComponents: MessagesControllerComponents,
-                                          view: BeforeYouStartView
+                                          view: BeforeYouStartView,
+                                          auditService: AuditService
                                         ) extends FrontendBaseController with I18nSupport {
 
   def onPageLoad(): Action[AnyContent] = stcAuthEnrolled {
@@ -53,6 +58,7 @@ class BeforeYouStartController @Inject()(
       case _ =>
         routes.JourneyRecoveryController.onPageLoad()
     }
+    auditService.audit(AuditModel(StartSubmission,innerRequest.subscriptionId,innerRequest.affinityGroup,innerRequest.credentialId,None,Sh03))
     Future.successful(Redirect(call))
   }
 }

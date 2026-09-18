@@ -22,12 +22,13 @@ import org.mockito.Mockito.when
 import org.scalatestplus.mockito.MockitoSugar
 import play.api.i18n.Messages
 import play.api.inject.bind
-import play.api.mvc.{AnyContentAsEmpty, AnyContentAsFormUrlEncoded, Call}
+import play.api.mvc.{AnyContentAsEmpty, AnyContentAsFormUrlEncoded}
 import play.api.test.FakeRequest
 import play.api.test.Helpers.*
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.routes
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.organisations.single.routes as orgSingleRoutes
 import uk.gov.hmrc.securitiestransferchargefrontend.forms.stf.organisations.ChargingPointFormProvider
+import uk.gov.hmrc.securitiestransferchargefrontend.models.JourneyType.STF
 import uk.gov.hmrc.securitiestransferchargefrontend.models.{NormalMode, UserAnswers}
 import uk.gov.hmrc.securitiestransferchargefrontend.navigation.Navigator
 import uk.gov.hmrc.securitiestransferchargefrontend.pages.stf.single.ChargingPointPage
@@ -43,13 +44,11 @@ class ChargingPointControllerSpec extends SpecBase with MockitoSugar {
 
   private val formProvider = new ChargingPointFormProvider()
   private def form = formProvider()
-
-  def onwardRoute = Call("GET", "/foo")
-
+  
   val validAnswer: LocalDate = LocalDate.now(ZoneOffset.UTC)
 
   lazy val chargingPointRoute: String = orgSingleRoutes.ChargingPointController.onPageLoad(NormalMode).url
-  override val emptyUserAnswers = UserAnswers(testUserId, testGroupIdentifier, submissionId)
+  override val emptyUserAnswers: UserAnswers = UserAnswers(testUserId, testGroupIdentifier, submissionId,STF)
 
 
   def getRequest(): FakeRequest[AnyContentAsEmpty.type] =
@@ -82,7 +81,7 @@ class ChargingPointControllerSpec extends SpecBase with MockitoSugar {
 
     "must populate the view correctly on a GET when the question has previously been answered" in {
 
-      val userAnswers = UserAnswers(testUserId, testGroupIdentifier, submissionId).set(ChargingPointPage, validAnswer).success.value
+      val userAnswers = UserAnswers(testUserId, testGroupIdentifier, submissionId,STF).set(ChargingPointPage, validAnswer).success.value
 
       val application = applicationBuilder(userAnswers = Some(userAnswers), affinityGroup = orgAffinity)
         .overrides(bind[Navigator].qualifiedWith("organisations").toInstance(getNavigator))
