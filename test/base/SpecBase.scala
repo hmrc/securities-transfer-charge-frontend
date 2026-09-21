@@ -37,6 +37,7 @@ import uk.gov.hmrc.securitiestransferchargefrontend.clients.registration.Subscri
 import uk.gov.hmrc.securitiestransferchargefrontend.connectors.AlfAddressConnector
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.actions.*
 import uk.gov.hmrc.securitiestransferchargefrontend.domain.{GroupIdentifier, SubmissionId, SubscriptionId, UserId}
+import uk.gov.hmrc.securitiestransferchargefrontend.models.JourneyType.STF
 import uk.gov.hmrc.securitiestransferchargefrontend.models.requests.DataRequest
 import uk.gov.hmrc.securitiestransferchargefrontend.models.shared.AgentReference
 import uk.gov.hmrc.securitiestransferchargefrontend.models.stf.*
@@ -85,11 +86,11 @@ trait SpecBase
     emailAddress = "some@email.com"
   )
 
-  def emptyUserAnswers: UserAnswers = UserAnswers.empty(testUserId)(testGroupIdentifier)(submissionId)
+  def emptyUserAnswers: UserAnswers = UserAnswers.empty(testUserId)(testGroupIdentifier)(submissionId)(STF)
 
   val testBackLinkRoute: Call = Call("GET", "/back-link")
-  val testNextPage = Call("GET", "/next-page")
-  val testErrorPage = Call("GET", "/error-page")
+  val testNextPage: Call = Call("GET", "/next-page")
+  val testErrorPage: Call = Call("GET", "/error-page")
 
   def getNavigator: Navigator = new Navigator {
     override def nextPage(page: Page, mode: Mode, userAnswers: UserAnswers, isReturn: Boolean = false)(implicit request: Request[_]): Future[Call] = Future.successful(testNextPage)

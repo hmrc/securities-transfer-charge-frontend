@@ -16,7 +16,7 @@
 
 package controllers.stf.shared
 
-import base.Fixtures.{testCredentialId, testInternalId, testSubmissionId}
+import base.Fixtures.{testCredentialId, testInternalId, testSubmissionId, testSubscriptionId}
 import base.stubs.{AgentStubStcAuthEnrolledAction, OrganisationStubStcAuthEnrolledAction, StubStcAuthEnrolledAction}
 import base.{AuditTestSupport, SpecBase}
 import org.mockito.ArgumentMatchers.{any, eq as eqTo}
@@ -31,7 +31,9 @@ import play.api.test.FakeRequest
 import uk.gov.hmrc.auth.core.AffinityGroup
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.shared.SaveAndReturnController
 import uk.gov.hmrc.securitiestransferchargefrontend.domain.{SubmissionId, UserId}
+import uk.gov.hmrc.securitiestransferchargefrontend.models.JourneyType.STF
 import uk.gov.hmrc.securitiestransferchargefrontend.models.UserAnswers
+import uk.gov.hmrc.securitiestransferchargefrontend.models.audit.AuditType
 import uk.gov.hmrc.securitiestransferchargefrontend.models.audit.JourneyStatus.ContinueSubmission
 import uk.gov.hmrc.securitiestransferchargefrontend.navigation.PersistentNavigator
 import uk.gov.hmrc.securitiestransferchargefrontend.pages.stf.shared.SaveAndReturnPage
@@ -43,7 +45,7 @@ class SaveAndReturnControllerSpec extends SpecBase with MockitoSugar with ScalaF
 
   implicit val testRequest: FakeRequest[AnyContentAsEmpty.type] = fakeRequest
 
-  private val testUserAnswers = UserAnswers(testInternalId, testGroupIdentifier, testSubmissionId)
+  private val testUserAnswers = UserAnswers(testInternalId, testGroupIdentifier, testSubmissionId,STF)
   private val testCall = Call("GET", "/test-page")
   private val mockMessagesApi = mock[MessagesApi]
   private val mockControllerComponents = mock[MessagesControllerComponents]
@@ -119,8 +121,10 @@ class SaveAndReturnControllerSpec extends SpecBase with MockitoSugar with ScalaF
               mockAuditService,
               ContinueSubmission,
               affinityGroup,
+              testSubscriptionId,
               testCredentialId,
-              testSubmissionId
+              testSubmissionId,
+              AuditType.Stf
             )
           }
         }

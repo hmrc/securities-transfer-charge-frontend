@@ -18,13 +18,14 @@ package controllers.stf.individuals.single
 
 import base.SpecBase
 import org.scalatestplus.mockito.MockitoSugar
+import play.api.data.Form
 import play.api.inject.bind
-import play.api.mvc.Call
 import play.api.test.FakeRequest
 import play.api.test.Helpers.*
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.routes
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.individuals.single.routes as individualRoutes
 import uk.gov.hmrc.securitiestransferchargefrontend.forms.stf.individuals.AmountPaidForSecuritiesFormProvider
+import uk.gov.hmrc.securitiestransferchargefrontend.models.JourneyType.STF
 import uk.gov.hmrc.securitiestransferchargefrontend.models.{NormalMode, UserAnswers}
 import uk.gov.hmrc.securitiestransferchargefrontend.navigation.Navigator
 import uk.gov.hmrc.securitiestransferchargefrontend.pages.stf.single.AmountPaidForSecuritiesPage
@@ -33,10 +34,8 @@ import uk.gov.hmrc.securitiestransferchargefrontend.views.html.stf.individuals.s
 class AmountPaidForSecuritiesControllerSpec extends SpecBase with MockitoSugar {
 
   val formProvider = new AmountPaidForSecuritiesFormProvider()
-  val form = formProvider()
-
-  def onwardRoute = Call("GET", "/foo")
-
+  val form: Form[BigDecimal] = formProvider()
+  
   val validAnswer = 100
 
   lazy val amountPaidForSecuritiesRoute: String = individualRoutes.AmountPaidForSecuritiesController.onPageLoad(NormalMode).url
@@ -63,7 +62,7 @@ class AmountPaidForSecuritiesControllerSpec extends SpecBase with MockitoSugar {
 
     "must populate the view correctly on a GET when the question has previously been answered" in {
 
-      val userAnswers = UserAnswers(testUserId, testGroupIdentifier, submissionId).set(AmountPaidForSecuritiesPage, validAnswer).success.value
+      val userAnswers = UserAnswers(testUserId, testGroupIdentifier, submissionId,STF).set(AmountPaidForSecuritiesPage, validAnswer).success.value
 
       val application = applicationBuilder(userAnswers = Some(userAnswers))
         .overrides(bind[Navigator].qualifiedWith("individuals").toInstance(getNavigator))

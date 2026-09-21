@@ -25,6 +25,7 @@ import uk.gov.hmrc.auth.core.retrieve.Retrieval
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.securitiestransferchargefrontend.connectors.AlfAddressConnector
 import uk.gov.hmrc.securitiestransferchargefrontend.domain.{CredentialId, GroupIdentifier, SubmissionId, SubscriptionId, UserId}
+import uk.gov.hmrc.securitiestransferchargefrontend.models.JourneyType.STF
 import uk.gov.hmrc.securitiestransferchargefrontend.models.stf.{Address, AlfAddress, AlfConfirmedAddress, ConfirmableAddress, Country, DetailsOfThisTransfer, SecuritiesTarget, UploadedFileError}
 import uk.gov.hmrc.securitiestransferchargefrontend.models.UserAnswers
 import uk.gov.hmrc.securitiestransferchargefrontend.models.sh03.shared.{CompanyDetails, DetailsOfThisSharePurchase}
@@ -43,7 +44,7 @@ object Fixtures {
   val testCredentialId: CredentialId = CredentialId("5534386044069226")
   val testAuditType = "StockTransferFormStatus"
   val testSubmissionId: SubmissionId = SubmissionId("STC-424242424")
-  val testUserAnswers: UserAnswers = UserAnswers.empty(testInternalId)(testGroupIdentifier)(testSubmissionId)
+  val testUserAnswers: UserAnswers = UserAnswers.empty(testInternalId)(testGroupIdentifier)(testSubmissionId)(STF)
   val affinityGroupIndividual: AffinityGroup.Individual.type = AffinityGroup.Individual
 
 
@@ -69,7 +70,7 @@ object Fixtures {
   val individualAffinity: AffinityGroup = AffinityGroup.Individual
   val organisationAffinity: AffinityGroup = AffinityGroup.Organisation
 
-  val emptyUserAnswers: UserAnswers = UserAnswers.empty(testInternalId)(testGroupIdentifier)(testSubmissionId)
+  val emptyUserAnswers: UserAnswers = UserAnswers.empty(testInternalId)(testGroupIdentifier)(testSubmissionId)(STF)
 
   val fakeAlfAddress: AlfAddress = AlfAddress(
     List("1 high street", "bobbins on sea"), "ZZ1 1ZZ", Country("GB", "United Kingdom")

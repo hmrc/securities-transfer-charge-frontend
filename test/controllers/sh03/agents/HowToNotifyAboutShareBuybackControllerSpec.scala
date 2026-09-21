@@ -29,6 +29,7 @@ import uk.gov.hmrc.securitiestransferchargefrontend.controllers.sh03.agents.rout
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.sh03.agents.single.routes as singleRoute
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.sh03.agents.bulk.routes as bulkRoute
 import uk.gov.hmrc.securitiestransferchargefrontend.forms.sh03.shared.HowToNotifyAboutShareBuybackFormProvider
+import uk.gov.hmrc.securitiestransferchargefrontend.models.JourneyType.SH03
 import uk.gov.hmrc.securitiestransferchargefrontend.models.sh03.HowToNotifyAboutShareBuyback
 import uk.gov.hmrc.securitiestransferchargefrontend.models.{NormalMode, UserAnswers}
 import uk.gov.hmrc.securitiestransferchargefrontend.navigation.Navigator
@@ -72,7 +73,7 @@ class HowToNotifyAboutShareBuybackControllerSpec extends SpecBase with MockitoSu
       when(mockIdClient.nextSubmissionId()(any()))
         .thenReturn(Future.successful(submissionId))
 
-      val userAnswers = UserAnswers(testUserId, testGroupIdentifier, submissionId)
+      val userAnswers = UserAnswers(testUserId, testGroupIdentifier, submissionId,SH03)
         .set(HowToNotifyAboutShareBuybackPage, HowToNotifyAboutShareBuyback.values.head).success.value
 
       val application = applicationBuilder(userAnswers = Some(userAnswers), affinityGroup = agentAffinity)
@@ -102,7 +103,7 @@ class HowToNotifyAboutShareBuybackControllerSpec extends SpecBase with MockitoSu
       when(mockIdClient.nextSubmissionId()(any()))
         .thenReturn(Future.successful(submissionId))
 
-      val userAnswers = UserAnswers(testUserId, testGroupIdentifier, submissionId)
+      val userAnswers = UserAnswers(testUserId, testGroupIdentifier, submissionId,SH03)
         .set(HowToNotifyAboutShareBuybackPage, HowToNotifyAboutShareBuyback.values.last).success.value
 
       val application = applicationBuilder(userAnswers = Some(userAnswers), affinityGroup = agentAffinity)

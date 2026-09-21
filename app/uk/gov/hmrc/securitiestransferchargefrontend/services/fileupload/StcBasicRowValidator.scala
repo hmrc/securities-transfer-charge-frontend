@@ -85,7 +85,6 @@ class StcBasicRowValidator @Inject()(
       validateMaxSharePrice(row) ++
       validateMinSharePrice(row) ++
       validateSharePurchaseReason(row) ++
-      validatePurchasedForCancellation(row) ++
       validateConnectedPersons(row, affinityKey) ++
       validateApplyingForRelief(row, affinityKey)
 
@@ -519,26 +518,6 @@ class StcBasicRowValidator @Inject()(
             )
           )
       }
-    }
-  }
-
-  private def validatePurchasedForCancellation(
-                                                row: ParsedStcRow
-                                              )(implicit cols: ColumnIndexBuilder): Seq[StcRowValidationError] = {
-
-    row.purchaseForCancellation match {
-
-      case Some(_) =>
-        Seq.empty
-
-      case None =>
-        Seq(
-          support.error(
-            row.rowNumber,
-            "purchasedForCancellation",
-            messages("purchasedForCancellation.invalid")
-          )
-        )
     }
   }
 

@@ -25,6 +25,7 @@ import play.api.test.Helpers.*
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.routes
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.individuals.single.routes as individualRoutes
 import uk.gov.hmrc.securitiestransferchargefrontend.forms.stf.shared.DetailsOfThisTransferFormProvider
+import uk.gov.hmrc.securitiestransferchargefrontend.models.JourneyType.STF
 import uk.gov.hmrc.securitiestransferchargefrontend.models.stf.DetailsOfThisTransfer
 import uk.gov.hmrc.securitiestransferchargefrontend.models.{NormalMode, UserAnswers}
 import uk.gov.hmrc.securitiestransferchargefrontend.navigation.Navigator
@@ -45,7 +46,7 @@ class DetailsOfThisTransferControllerSpec extends SpecBase with MockitoSugar {
     amountPaid = BigDecimal(100),
     marketValue = Some(BigDecimal(10000)))
 
-  val userAnswers: UserAnswers = UserAnswers(testUserId, testGroupIdentifier, submissionId)
+  val userAnswers: UserAnswers = UserAnswers(testUserId, testGroupIdentifier, submissionId,STF)
 
   "DetailsOfThisTransfer Controller" - {
 
