@@ -1323,3 +1323,16 @@ fileUpload.saveAndReturn.title = Your uploaded file will not be saved
 fileUpload.saveAndReturn.heading = Your uploaded file will not be saved
 fileUpload.saveAndReturn.guidance1 = The file you have uploaded will not be saved if you return to the dashboard.
 fileUpload.saveAndReturn.guidance2 = All other answers will be saved [add additional guidance here]
+
+dashboard.title = Dashboard
+dashboard.caption = Dashboard
+dashboard.create-submission.heading = Create a submission
+dashboard.create-submission.stf = Tell us about a securities transfer (STF)
+dashboard.submissions.heading = Submissions
+dashboard.submissions.view-all-recent = View all recent submissions
+dashboard.submissions.overdue = You have <b>{0}</b> overdue submissions.
+dashboard.submissions.view-overdue = View overdue submissions
+dashboard.submissions.ready-to-pay = You have <b>{0}</b> submissions that are ready to pay.
+dashboard.submissions.view-ready-to-pay = View ready to pay submissions
+dashboard.submissions.drafts = You have <b>{0}</b> draft submissions.
+dashboard.submissions.view-drafts = View draft submissions

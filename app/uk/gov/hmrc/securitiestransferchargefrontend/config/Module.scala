@@ -20,7 +20,7 @@ import com.google.inject.AbstractModule
 import com.google.inject.name.Names
 import play.api.http.HttpErrorHandler
 import uk.gov.hmrc.securitiestransferchargefrontend.clients.registration.{NrsClient, NrsClientImpl, RegistrationClient, RegistrationClientImpl}
-import uk.gov.hmrc.securitiestransferchargefrontend.clients.{EtmpSubmissionClient, EtmpSubmissionClientImpl, SaveAndReturnClient, SaveAndReturnClientImpl, SubmissionIdClient, SubmissionIdClientImpl}
+import uk.gov.hmrc.securitiestransferchargefrontend.clients.{DashboardClient, DashboardClientImpl, EtmpSubmissionClient, EtmpSubmissionClientImpl, SaveAndReturnClient, SaveAndReturnClientImpl, SubmissionIdClient, SubmissionIdClientImpl}
 import uk.gov.hmrc.securitiestransferchargefrontend.connectors.*
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.actions.*
 import uk.gov.hmrc.securitiestransferchargefrontend.handlers.ErrorHandler
@@ -55,6 +55,7 @@ class Module extends AbstractModule {
     bind(classOf[StcAuthEnrolledAction]).to(classOf[StcAuthEnrolledActionImpl]).asEagerSingleton()
     bind(classOf[StcDataRetrievalAction]).to(classOf[StcDataRetrievalActionImpl])
     bind(classOf[StcDataRequiredAction]).to(classOf[StcDataRequiredActionImpl])
+    bind(classOf[StcIndividualAuthEnrolledAction]).to(classOf[StcIndividualAuthEnrolledActionImpl])
     bind(classOf[SessionRepository]).to(classOf[SessionRepositoryImpl])
     bind(classOf[SubmissionIdClient]).to(classOf[SubmissionIdClientImpl])
     bind(classOf[SaveAndReturnClient]).to(classOf[SaveAndReturnClientImpl])
@@ -113,5 +114,7 @@ class Module extends AbstractModule {
       .to(classOf[ValidationErrorRepositoryImpl])
     bind(classOf[ParsedStcRowsRepository])
       .to(classOf[ParsedStcRowsRepositoryImpl])
+    bind(classOf[DashboardClient])
+      .to(classOf[DashboardClientImpl])
   }
 }
