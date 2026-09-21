@@ -42,6 +42,9 @@ object ConfirmationViewModel {
   private val formatter = new DecimalFormat("#,##0.##", symbols)
   formatter.setRoundingMode(RoundingMode.DOWN)
 
+  private val formatterWithTwoDecimals = new DecimalFormat("#,##0.00", symbols)
+  formatterWithTwoDecimals.setRoundingMode(RoundingMode.DOWN)
+
   def apply(
              submissionId: SubmissionId,
              paymentDueBy: LocalDate,
@@ -51,11 +54,21 @@ object ConfirmationViewModel {
            )(implicit messages: Messages): ConfirmationViewModel = {
 
     val truncatedTaxDue = taxDue.setScale(2, BigDecimal.RoundingMode.DOWN)
+
+    val formattedTaxDue =
+      if (truncatedTaxDue.remainder(BigDecimal(1)) == BigDecimal(0)) {
+        formatter.format(truncatedTaxDue)
+      } else if (taxDue.scale >= 2) {
+        formatterWithTwoDecimals.format(truncatedTaxDue)
+      } else {
+        formatter.format(truncatedTaxDue)
+      }
+
     new ConfirmationViewModel(
       submissionId = submissionId.value,
       paymentDueBy = DateTimeFormats.formatDate(paymentDueBy)(messages.lang),
       reference = reference,
-      taxDue = s"£${formatter.format(truncatedTaxDue)}",
+      taxDue = s"£$formattedTaxDue",
       isAgent = isAgent
     )
   }

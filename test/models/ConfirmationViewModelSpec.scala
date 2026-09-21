@@ -43,7 +43,7 @@ class ConfirmationViewModelSpec extends SpecBase {
       )
 
       viewModel.submissionId mustEqual submissionId.value
-      viewModel.taxDue must include("1,000.5")
+      viewModel.taxDue must include("1,000.50")
       viewModel.isAgent mustEqual false
       viewModel.reference mustBe None
     }
@@ -77,7 +77,7 @@ class ConfirmationViewModelSpec extends SpecBase {
       )
 
       viewModel.taxDue must include("£")
-      viewModel.taxDue must include("1,000.5")
+      viewModel.taxDue must include("1,000.50")
     }
 
     "must format tax due correctly" - {
