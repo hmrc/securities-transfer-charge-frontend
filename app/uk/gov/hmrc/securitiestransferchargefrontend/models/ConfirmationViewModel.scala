@@ -58,10 +58,8 @@ object ConfirmationViewModel {
     val formattedTaxDue =
       if (truncatedTaxDue.remainder(BigDecimal(1)) == BigDecimal(0)) {
         formatter.format(truncatedTaxDue)
-      } else if (taxDue.scale >= 2) {
-        formatterWithTwoDecimals.format(truncatedTaxDue)
       } else {
-        formatter.format(truncatedTaxDue)
+        formatterWithTwoDecimals.format(truncatedTaxDue)
       }
 
     new ConfirmationViewModel(

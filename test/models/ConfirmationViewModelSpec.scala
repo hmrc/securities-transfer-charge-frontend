@@ -156,7 +156,7 @@ class ConfirmationViewModelSpec extends SpecBase {
           taxDue = BigDecimal("1234.5"),
           isAgent = false
         )
-        result.taxDue mustBe "£1,234.5"
+        result.taxDue mustBe "£1,234.50"
       }
 
       "must handle small amounts with pence" in {
