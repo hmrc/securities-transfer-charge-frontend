@@ -1295,6 +1295,7 @@ org.sh03.templateInstructions.p2 = Remember, do not edit the first three rows, o
 org.sh03.templateInstructions.p3 = Once you have uploaded and submitted the file it will show in your recent submissions, you can then pay the tax due.
 
 confirmation.banner.title = Important
+confirmation.title = Submission confirmation
 confirmation.banner.p1 = Payment due by: {0} <br><br>
 confirmation.banner.p2 = Your transfers have been submitted and are being processed but you still need to pay.
 confirmation.heading.nextSteps = Next steps
