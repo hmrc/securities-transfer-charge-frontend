@@ -78,6 +78,7 @@ class Module extends AbstractModule {
     bind(classOf[HeaderCarrierCreator]).to(classOf[HeaderCarrierCreatorImpl])
     bind(classOf[CyaHtmlRepository]).to(classOf[CyaHtmlRepositoryImpl])
     bind(classOf[NrsClient]).to(classOf[NrsClientImpl])
+    bind(classOf[NrsService]).to(classOf[NrsServiceImpl])
     
     bind(classOf[Navigator])
       .annotatedWith(Names.named("organisations"))

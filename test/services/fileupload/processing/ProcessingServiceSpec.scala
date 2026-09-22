@@ -16,7 +16,7 @@
 
 package services.fileupload.processing
 
-import base.{FileUploadFixtures, SpecBase}
+import base.{FileUploadFixtures, Fixtures, SpecBase}
 import org.mockito.ArgumentMatchers
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.{inOrder as mockitoInOrder, *}
@@ -297,7 +297,9 @@ class ProcessingServiceSpec extends SpecBase with MockitoSugar with BeforeAndAft
           groupIdentifier = testGroupIdentifier.value,
           affinityGroup = individualAffinity,
           subscriptionId = SubscriptionId("STC-GFGF"),
-          credentialId = CredentialId("some id")
+          credentialId = CredentialId("some id"),
+          identityData = Fixtures.testIdentityData,
+          maybeArn = None
         )
 
       implicit val hc: HeaderCarrier = HeaderCarrier()

@@ -50,7 +50,9 @@ class StubStcAuthEnrolledAction @Inject() (
         testGroupIdentifier.value,
         affinityGroup,
         testSubscriptionId,
-        testCredentialId
+        testCredentialId,
+        testIdentityData,
+        None
       )
     )
 }

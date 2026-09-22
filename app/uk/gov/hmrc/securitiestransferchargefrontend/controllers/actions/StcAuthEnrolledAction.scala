@@ -104,8 +104,8 @@ final class StcAuthEnrolledActionImpl @Inject()(
         )
         val maybeRequest =
           for {
-            internalId      <- retrievalFilter.isPresent(maybeInternalId)
             groupIdentifier <- retrievalFilter.isPresent(maybeGroupIdentifier)
+            internalId      <- retrievalFilter.isPresent(maybeInternalId)
             affinityGroup   <- retrievalFilter.isPresent(maybeAffinityGroup)
             _               <- retrievalFilter.enrolledForStc(enrolments)
             subscriptionId  <- retrievalFilter.subscriptionIdPresent(enrolments)

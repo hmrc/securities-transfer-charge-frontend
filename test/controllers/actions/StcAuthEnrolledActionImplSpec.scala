@@ -23,21 +23,45 @@ import play.api.mvc.*
 import play.api.test.Helpers.*
 import play.api.test.{FakeRequest, Helpers}
 import uk.gov.hmrc.auth.core.*
-import uk.gov.hmrc.auth.core.retrieve.{Credentials, ~}
+import uk.gov.hmrc.auth.core.retrieve.*
 import uk.gov.hmrc.securitiestransferchargefrontend.config.FrontendAppConfig
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.actions.filters.RetrievalFilter
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.actions.{StcAuthEnrolledAction, StcAuthEnrolledActionImpl}
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.{Redirects, routes}
 
+import java.time.{Instant, LocalDate}
 import scala.concurrent.Future
 
 class StcAuthEnrolledActionImplSpec extends SpecBase {
 
   type RetrievalType =
-    Option[String] ~ Option[String] ~ Enrolments ~ Option[AffinityGroup] ~ Option[Credentials]
+    Option[String] ~ Option[String] ~ Option[String] ~ Option[Credentials] ~ ConfidenceLevel ~ Option[String] ~ Option[String] ~ Option[LocalDate] ~ Option[String] ~ AgentInformation ~ Option[String] ~ Option[CredentialRole] ~ Option[MdtpInformation] ~ Option[ItmpName] ~ Option[LocalDate] ~ Option[ItmpAddress] ~ Option[AffinityGroup] ~ Option[String] ~ LoginTimes ~ Option[String] ~ Enrolments
+
 
   private val enrolmentKey = "HMRC-STC-ORG"
   private val identifierKey = "STCID"
+
+  //Retrievals.internalId and
+    val externalId: Option[String] = Fixtures.testExternalId
+    val agentCode: Option[String] = None
+  //Retrievals.credentials and
+  val confidenceLevel: ConfidenceLevel = ConfidenceLevel.L500
+    val nino: Option[String] = None
+    val saUtr: Option[String] = None
+    val dateOfBirth: Option[LocalDate] = None
+    val email: Option[String] = None
+    val agentInformation = AgentInformation(None, None, None)
+    //Retrievals.groupIdentifier and
+    val credentialRole: Option[CredentialRole] = None
+    val mdtpInformation: Option[MdtpInformation] = None
+    val itmpName: Option[ItmpName] = None
+    val itmpDateOfBirth: Option[LocalDate] = None
+    val itmpAddress: Option[ItmpAddress] = None
+    //Retrievals.affinityGroup and
+    val credentialStrength: Option[String] = None
+    val loginTimes = LoginTimes(Instant.now(), None)
+    //val groupIdentifier: Option[String] = None
+    //Retrievals.allEnrolments
 
   def buildRetrieval(
                       maybeInternalId: Option[String] = Some(Fixtures.testInternalId.value),
@@ -46,7 +70,46 @@ class StcAuthEnrolledActionImplSpec extends SpecBase {
                       maybeAffinityGroup: Option[AffinityGroup] = Some(AffinityGroup.Organisation),
                       maybeCredentials: Option[Credentials] = Some(Credentials(Fixtures.testCredentialId.value, "providerType"))
                     ): RetrievalType =
-    new~(new~(new~(new~(maybeInternalId, maybeGroupIdentifier), enrolments), maybeAffinityGroup), maybeCredentials)
+
+    new~(
+      new~(
+        new~(
+          new~(
+            new~(
+              new~(
+                new~(
+                  new~(
+                    new~(
+                      new~(
+                        new~(
+                          new~(
+                            new~(
+                              new~(
+                                new~(
+                                  new~(
+                                    new~(
+                                      new~(
+                                        new~(
+                                          new~(maybeInternalId, externalId),
+                                          agentCode),
+                                        maybeCredentials),
+                                      confidenceLevel),
+                                    nino),
+                                  saUtr),
+                                dateOfBirth),
+                              email),
+                            agentInformation),
+                          maybeGroupIdentifier),
+                        credentialRole),
+                      mdtpInformation),
+                    itmpName),
+                  itmpDateOfBirth),
+                itmpAddress),
+              maybeAffinityGroup),
+            credentialStrength),
+          loginTimes),
+        maybeGroupIdentifier),
+      enrolments)
 
   def testSetup(
                  application: Application,
@@ -103,6 +166,7 @@ class StcAuthEnrolledActionImplSpec extends SpecBase {
           })
 
         status(result) mustBe OK
+
       }
     }
 

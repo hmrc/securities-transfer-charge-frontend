@@ -16,6 +16,7 @@
 
 package uk.gov.hmrc.securitiestransferchargefrontend.services
 
+import play.api.Logging
 import uk.gov.hmrc.auth.core.AffinityGroup
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.securitiestransferchargefrontend.clients.SaveAndReturnClient
@@ -44,7 +45,7 @@ final class TransactionSubmissionServiceImpl @Inject()(
                                                         nrsService: NrsService,
                                                         cyaHtmlRepository: CyaHtmlRepository,
                                                         transactionResponseRepository: TransactionResponseRepository,
-                                                        auditService: AuditService)(implicit ec: ExecutionContext) extends TransactionSubmissionService {
+                                                        auditService: AuditService)(implicit ec: ExecutionContext) extends TransactionSubmissionService with Logging {
 
   // TODO: Some of this should come from new screens not yet developed.
   private val getIndividualAffinityData: AffinityData =
@@ -94,7 +95,6 @@ final class TransactionSubmissionServiceImpl @Inject()(
   def submitSingleStf(using request: StcDataRequest[?]): Future[Boolean] = {
     implicit val hc: HeaderCarrier = headerCarrierCreator.create(request)
     lazy val submissionId = request.userAnswers.submissionId
-    val affinityData = getAffinityData(request.request.affinityGroup)
 
     etmpSubmissionService
       .submitSingleStf(request.request.subscriptionId, request.userAnswers, getAffinityData(request.request.affinityGroup))
@@ -102,7 +102,7 @@ final class TransactionSubmissionServiceImpl @Inject()(
         case stfResponse: SubmissionCreateResponseSuccess =>
           transactionResponseRepository.store(submissionId, stfResponse)
           saveAndReturnClient.deleteDraft(submissionId)
-          sendSingleSubmissionDataToNRS(submissionId, affinityData, stfResponse.utrn)
+          sendSingleSubmissionDataToNRS(submissionId, stfResponse.utrn)
           true
 
         case _ => false
@@ -112,7 +112,6 @@ final class TransactionSubmissionServiceImpl @Inject()(
   def submitSingleSh03(using request: StcDataRequest[?]): Future[Boolean] = {
     given hc: HeaderCarrier = headerCarrierCreator.create(request)
     lazy val submissionId = request.userAnswers.submissionId
-    val affinityData = getAffinityData(request.request.affinityGroup)
     val innerRequest = request.request
     lazy val subscriptionId = innerRequest.subscriptionId
     lazy val affinityGroup = innerRequest.affinityGroup
@@ -124,7 +123,7 @@ final class TransactionSubmissionServiceImpl @Inject()(
           transactionResponseRepository.store(submissionId, sh03Response)
           auditService.audit(AuditModel(SubmissionSuccess,subscriptionId,affinityGroup,credentialId,Some(submissionId),Sh03))
           saveAndReturnClient.deleteDraft(submissionId)
-          sendSingleSubmissionDataToNRS(submissionId, affinityData, sh03Response.utrn)
+          sendSingleSubmissionDataToNRS(submissionId, sh03Response.utrn)
           true
 
         case _ =>
@@ -134,16 +133,16 @@ final class TransactionSubmissionServiceImpl @Inject()(
   }
 
   private def sendSingleSubmissionDataToNRS( submissionId: SubmissionId,
-                                             affinityData: AffinityData,
                                              utrn: String
                                            )(
-                                             using
+                                             implicit
                                              request: StcDataRequest[?],
                                              hc: HeaderCarrier): Future[Unit] = {
     cyaHtmlRepository
       .retrieve(submissionId)
-      .collect { case Some(data) =>
-        nrsService.singleSubmissionNotableEvent(data, affinityData, utrn)
+      .collect {
+        case Some(data) =>
+          nrsService.singleSubmissionNotableEvent(data, utrn)
       }
   }
 

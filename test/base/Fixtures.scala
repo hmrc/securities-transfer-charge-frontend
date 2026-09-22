@@ -21,17 +21,19 @@ import play.api.mvc.{AnyContentAsEmpty, Result}
 import play.api.test.FakeRequest
 import uk.gov.hmrc.auth.core.*
 import uk.gov.hmrc.auth.core.authorise.Predicate
-import uk.gov.hmrc.auth.core.retrieve.Retrieval
+import uk.gov.hmrc.auth.core.retrieve.{Credentials, Name, Retrieval}
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.securitiestransferchargefrontend.connectors.AlfAddressConnector
 import uk.gov.hmrc.securitiestransferchargefrontend.domain.{CredentialId, GroupIdentifier, SubmissionId, SubscriptionId, UserId}
 import uk.gov.hmrc.securitiestransferchargefrontend.models.JourneyType.STF
 import uk.gov.hmrc.securitiestransferchargefrontend.models.stf.{Address, AlfAddress, AlfConfirmedAddress, ConfirmableAddress, Country, DetailsOfThisTransfer, SecuritiesTarget, UploadedFileError}
 import uk.gov.hmrc.securitiestransferchargefrontend.models.UserAnswers
+import uk.gov.hmrc.securitiestransferchargefrontend.models.nrs.IdentityData
 import uk.gov.hmrc.securitiestransferchargefrontend.models.sh03.shared.{CompanyDetails, DetailsOfThisSharePurchase}
 import uk.gov.hmrc.securitiestransferchargefrontend.models.shared.AgentReference
 import uk.gov.hmrc.securitiestransferchargefrontend.models.submission.{Agent, Individual, Organisation}
 
+import java.time.LocalDate
 import scala.concurrent.{ExecutionContext, Future}
 
 object Fixtures {
@@ -46,7 +48,33 @@ object Fixtures {
   val testSubmissionId: SubmissionId = SubmissionId("STC-424242424")
   val testUserAnswers: UserAnswers = UserAnswers.empty(testInternalId)(testGroupIdentifier)(testSubmissionId)(STF)
   val affinityGroupIndividual: AffinityGroup.Individual.type = AffinityGroup.Individual
-
+  val testNino = "NX762551B"
+  val testUtr = "123-456-789"
+  val testArn = "ARN890901"
+  val testExternalId = Some("ext-456")
+  
+  val testIdentityData = IdentityData(
+    internalId = Some("int-123"),
+    externalId = testExternalId,
+    agentCode = None,
+    credentials = Some(Credentials("id", "type")),
+    confidenceLevel = 250,
+    nino = Some(testNino),
+    saUtr = None,
+    name = Some(Name(Some("Bob"), Some("Collins"))),
+    dateOfBirth = Some(LocalDate.parse("1980-08-10")),
+    email = Some("bob.collins@foo.bar"),
+    agentInformation = None,
+    groupIdentifier = Some("my-fancy-group"),
+    credentialRole = Some("admin"),
+    mdtpInformation = None,
+    itmpName = None,
+    itmpDateOfBirth = None,
+    itmpAddress = None,
+    affinityGroup = Some("individual"),
+    credentialStrength = None,
+    loginTimes = None
+  )
 
   implicit val hc: HeaderCarrier = HeaderCarrier()
 
