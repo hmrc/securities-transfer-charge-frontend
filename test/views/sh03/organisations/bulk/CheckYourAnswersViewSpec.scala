@@ -133,7 +133,7 @@ class CheckYourAnswersViewSpec extends ViewBaseSpec {
     }
 
     "should display the tax due heading in the tax card" in {
-      view().select(".tax-card h1").text() mustBe ExpectedContent.taxDueHeading
+      view().select(".tax-card h2").text() mustBe ExpectedContent.taxDueHeading
     }
 
     "should display the first tax due paragraph" in {
