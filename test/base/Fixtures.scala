@@ -46,6 +46,7 @@ object Fixtures {
   val testSubmissionId: SubmissionId = SubmissionId("STC-424242424")
   val testUserAnswers: UserAnswers = UserAnswers.empty(testInternalId)(testGroupIdentifier)(testSubmissionId)(STF)
   val affinityGroupIndividual: AffinityGroup.Individual.type = AffinityGroup.Individual
+  val testName = "Test Name"
 
 
   implicit val hc: HeaderCarrier = HeaderCarrier()

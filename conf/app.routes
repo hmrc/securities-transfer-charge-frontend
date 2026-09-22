@@ -495,3 +495,6 @@ GET        /sh03/org/bulk/check-your-answers/:reference           uk.gov.hmrc.se
 POST       /sh03/org/bulk/check-your-answers                      uk.gov.hmrc.securitiestransferchargefrontend.controllers.sh03.organisations.bulk.CheckYourAnswersController.onSubmit()
 
 GET        /file-not-saved                             uk.gov.hmrc.securitiestransferchargefrontend.controllers.sh03.shared.bulk.YourFileWillNotBeSavedController.onPageLoad()
+
+GET        /dashboard                                   uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.individuals.DashboardController.onPageLoad()
+

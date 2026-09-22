@@ -1,0 +1,35 @@
+.design-system-card-group {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem;
+    padding-bottom: 40px;
+}
+
+.design-system-card {
+    background-color: #f7f7f7;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    overflow: hidden;
+    transition: transform 0.3s, box-shadow 0.3s;
+    border: 1px solid #b1b4b6;
+    text-decoration: none;
+    color: inherit;
+    flex: 1;
+    min-width: 0;
+
+    &__image {
+        width: 100%;
+        height: 200px;
+        object-fit: cover;
+    }
+
+    &__content {
+        padding: 1rem;
+    }
+}
+
+.design-system-card--highlight {
+    border: 4px solid #ffdd00 !important;
+    border-top: 8px solid #1d70b8;
+    background-color: #f3f2f1 !important;
+    box-shadow: none !important;
+}
