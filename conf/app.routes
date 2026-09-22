@@ -27,13 +27,10 @@ POST       /stf/org/bulk/check-your-answers                 uk.gov.hmrc.securiti
 GET        /stf/check-your-answers                      uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.individuals.single.CheckYourAnswersController.onPageLoad()
 POST       /stf/check-your-answers                      uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.individuals.single.CheckYourAnswersController.onSubmit()
 
-GET        /stf/confirmation                            uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.shared.ConfirmationController.onPageLoad()
+GET        /stf/submission-confirmation                 uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.shared.ConfirmationController.onPageLoad()
 
 GET        /stf/org/check-answers                  uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.organisations.single.CheckYourAnswersController.onPageLoad()
 POST       /stf/org/check-answers                  uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.organisations.single.CheckYourAnswersController.onSubmit()
-
-GET        /stf/org/confirmation                        uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.shared.ConfirmationController.onPageLoad()
-
 
 GET        /stf/account/sign-out-survey                   uk.gov.hmrc.securitiestransferchargefrontend.controllers.auth.AuthController.signOut()
 GET        /stf/account/sign-out                          uk.gov.hmrc.securitiestransferchargefrontend.controllers.auth.AuthController.signOutNoSurvey()
@@ -492,7 +489,12 @@ GET        /sh03/org/bulk/cannot-submit-form                       uk.gov.hmrc.s
 GET        /sh03/org/check-answers                                  uk.gov.hmrc.securitiestransferchargefrontend.controllers.sh03.organisations.single.CheckYourAnswersController.onPageLoad()
 POST       /sh03/org/check-answers                                  uk.gov.hmrc.securitiestransferchargefrontend.controllers.sh03.organisations.single.CheckYourAnswersController.onSubmit()
 
+GET        /pay-submission                         uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.shared.PaySubmissionController.onPageLoad()
+
 GET        /sh03/org/bulk/check-your-answers/:reference           uk.gov.hmrc.securitiestransferchargefrontend.controllers.sh03.organisations.bulk.CheckYourAnswersController.onPageLoad(reference: String)
 POST       /sh03/org/bulk/check-your-answers                      uk.gov.hmrc.securitiestransferchargefrontend.controllers.sh03.organisations.bulk.CheckYourAnswersController.onSubmit()
 
 GET        /file-not-saved                             uk.gov.hmrc.securitiestransferchargefrontend.controllers.sh03.shared.bulk.YourFileWillNotBeSavedController.onPageLoad()
+
+GET        /dashboard                                   uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.individuals.DashboardController.onPageLoad()
+

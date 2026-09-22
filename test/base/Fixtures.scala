@@ -52,7 +52,8 @@ object Fixtures {
   val testUtr = "123-456-789"
   val testArn = "ARN890901"
   val testExternalId = Some("ext-456")
-  
+  val testName = "Test Name"
+
   val testIdentityData = IdentityData(
     internalId = Some("int-123"),
     externalId = testExternalId,

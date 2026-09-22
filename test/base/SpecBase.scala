@@ -137,7 +137,8 @@ trait SpecBase
         bind[DataRetrievalAction].toInstance(new FakeDataRetrievalAction(userAnswers)),
         bind[SaveAndReturnClient].toInstance(saveAndReturnClient),
         bind[AlfAddressConnector].to[FakeAlfConnector],
-        bind[SessionRepository].toInstance(sessionRepository)
+        bind[SessionRepository].toInstance(sessionRepository),
+        bind[StcIndividualAuthEnrolledAction].to[StubStcIndividualEnrolledAction]
       )
 
   // Helper methods for creating common UserAnswers scenarios for STF

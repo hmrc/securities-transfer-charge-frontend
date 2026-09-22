@@ -133,7 +133,13 @@ class FrontendAppConfig @Inject() (configuration: Configuration, servicesConfig:
   val submissionsServiceBaseUrl = submissionsService.baseUrl
   val submissionsServiceBasePath = configuration.get[String]("microservice.services.securities-transfer-charge-submissions.path")
   val submissionsServiceUrl = s"$submissionsServiceBaseUrl$submissionsServiceBasePath"
-  
+
+  val dashboardService: Service = configuration.get[Service]("microservice.services.securities-transfer-charge-search")
+  val dashboardServiceBaseUrl: String = dashboardService.baseUrl
+  val dashboardServiceBasePath: String = configuration.get[String]("microservice.services.securities-transfer-charge-search.path")
+  val dashboardServiceUrl = s"$dashboardServiceBaseUrl$dashboardServiceBasePath"
+
+
   lazy val connectedPersonsInformationUrl: String = configuration.get[String]("urls.external.connectedPersonsInformation")
   val stfBaseUrl: String = servicesConfig.baseUrl("securities-transfer-charge-frontend")
 
