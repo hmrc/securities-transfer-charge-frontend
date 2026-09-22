@@ -125,6 +125,42 @@ class UserAnswersTransformsSpec extends SpecBase {
       result.mainBuyerDetails.addr1 mustBe buyerAddress.address.lines.head
     }
 
+    "truncate postcodes to 10 characters if they exceed the limit" in {
+      val longPostcodeConfirmed = confirmableAddress.copy(postcode = "1234567890123")
+      val longPostcodeSeller = fakeAlfConfirmedAddress.copy(
+        address = fakeAlfConfirmedAddress.address.copy(postcode = "1234567890123")
+      )
+
+      val transaction = baseStfTransaction.copy(
+        confirmedAddress = Some(longPostcodeConfirmed),
+        sellerAddress = longPostcodeSeller
+      )
+
+      val result = UserAnswersTransforms.toStfRequest(transaction, individualAffinityData)
+
+      result.mainBuyerDetails.postcode mustBe "1234567890"
+      result.mainBuyerDetails.postcode.length mustBe 10
+      result.mainSellerDetails.get.postcode mustBe "1234567890"
+      result.mainSellerDetails.get.postcode.length mustBe 10
+    }
+
+    "leave postcodes unchanged if they are 10 characters or fewer" in {
+      val normalPostcodeConfirmed = confirmableAddress.copy(postcode = "SW1A 1AA")
+      val normalPostcodeSeller = fakeAlfConfirmedAddress.copy(
+        address = fakeAlfConfirmedAddress.address.copy(postcode = "SW1A 1AA")
+      )
+
+      val transaction = baseStfTransaction.copy(
+        confirmedAddress = Some(normalPostcodeConfirmed),
+        sellerAddress = normalPostcodeSeller
+      )
+
+      val result = UserAnswersTransforms.toStfRequest(transaction, individualAffinityData)
+
+      result.mainBuyerDetails.postcode mustBe "SW1A 1AA"
+      result.mainSellerDetails.get.postcode mustBe "SW1A 1AA"
+    }
+
     "derive the descriptionOfSecurity from detailsOfThisTransfer" in {
       val result =
         UserAnswersTransforms.toStfRequest(baseStfTransaction, individualAffinityData)
