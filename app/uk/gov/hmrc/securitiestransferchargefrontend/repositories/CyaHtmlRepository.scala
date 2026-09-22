@@ -26,7 +26,7 @@ import uk.gov.hmrc.securitiestransferchargefrontend.domain.SubmissionId
 
 import java.time.Instant
 import java.util.concurrent.TimeUnit
-import javax.inject.Inject
+import javax.inject.*
 import scala.concurrent.{ExecutionContext, Future}
 
 final case class CyaHtmlData(submissionId: SubmissionId, html: HtmlFormat.Appendable, uploadedAt: Instant = Instant.now())
@@ -35,6 +35,7 @@ trait CyaHtmlRepository:
   def store(data: CyaHtmlData): Future[Unit]
   def retrieve(key: SubmissionId): Future[Option[CyaHtmlData]]
 
+@Singleton
 final class CyaHtmlRepositoryImpl @Inject() (
   mongoComponent: MongoComponent,
   appConfig: FrontendAppConfig)(

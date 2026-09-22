@@ -41,27 +41,21 @@ class StcAuthEnrolledActionImplSpec extends SpecBase {
   private val enrolmentKey = "HMRC-STC-ORG"
   private val identifierKey = "STCID"
 
-  //Retrievals.internalId and
-    val externalId: Option[String] = Fixtures.testExternalId
-    val agentCode: Option[String] = None
-  //Retrievals.credentials and
+  val externalId: Option[String] = Fixtures.testExternalId
+  val agentCode: Option[String] = None
   val confidenceLevel: ConfidenceLevel = ConfidenceLevel.L500
-    val nino: Option[String] = None
-    val saUtr: Option[String] = None
-    val dateOfBirth: Option[LocalDate] = None
-    val email: Option[String] = None
-    val agentInformation = AgentInformation(None, None, None)
-    //Retrievals.groupIdentifier and
-    val credentialRole: Option[CredentialRole] = None
-    val mdtpInformation: Option[MdtpInformation] = None
-    val itmpName: Option[ItmpName] = None
-    val itmpDateOfBirth: Option[LocalDate] = None
-    val itmpAddress: Option[ItmpAddress] = None
-    //Retrievals.affinityGroup and
-    val credentialStrength: Option[String] = None
-    val loginTimes = LoginTimes(Instant.now(), None)
-    //val groupIdentifier: Option[String] = None
-    //Retrievals.allEnrolments
+  val nino: Option[String] = None
+  val saUtr: Option[String] = None
+  val dateOfBirth: Option[LocalDate] = None
+  val email: Option[String] = None
+  val agentInformation = AgentInformation(None, None, None)
+  val credentialRole: Option[CredentialRole] = None
+  val mdtpInformation: Option[MdtpInformation] = None
+  val itmpName: Option[ItmpName] = None
+  val itmpDateOfBirth: Option[LocalDate] = None
+  val itmpAddress: Option[ItmpAddress] = None
+  val credentialStrength: Option[String] = None
+  val loginTimes = LoginTimes(Instant.now(), None)
 
   def buildRetrieval(
                       maybeInternalId: Option[String] = Some(Fixtures.testInternalId.value),
