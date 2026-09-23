@@ -241,10 +241,8 @@ object UserAnswersTransforms {
 
       case (ReasonForPurchase.ToPlaceIntoTreasury, _) => etmpReasonForPurchase.PurchasedToPlaceIntoTreasury
     }
-    
+
   private def truncatePostcode(postcode: String): String = {
-    if (postcode.length > 10) {
       postcode.take(10)
-    } else postcode
   }
 }
