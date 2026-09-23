@@ -25,6 +25,7 @@ import play.api.test.Helpers.*
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.routes
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.sh03.agents.single.routes as agentSh03SingleRoutes
 import uk.gov.hmrc.securitiestransferchargefrontend.forms.sh03.shared.ApplyingForReliefFormProvider
+import uk.gov.hmrc.securitiestransferchargefrontend.models.JourneyType.SH03
 import uk.gov.hmrc.securitiestransferchargefrontend.models.{NormalMode, UserAnswers}
 import uk.gov.hmrc.securitiestransferchargefrontend.navigation.Navigator
 import uk.gov.hmrc.securitiestransferchargefrontend.pages.sh03.ApplyingForReliefPage
@@ -59,7 +60,7 @@ class ApplyingForReliefControllerSpec extends SpecBase with MockitoSugar {
 
     "must populate the view correctly on a GET when the question has previously been answered" in {
 
-      val userAnswers = UserAnswers(testUserId, testGroupIdentifier, submissionId).set(ApplyingForReliefPage, true).success.value
+      val userAnswers = UserAnswers(testUserId, testGroupIdentifier, submissionId,SH03).set(ApplyingForReliefPage, true).success.value
 
       val application = applicationBuilder(userAnswers = Some(userAnswers), affinityGroup = agentAffinity)
         .overrides(bind[Navigator].qualifiedWith("agentsSh03").toInstance(getNavigator))

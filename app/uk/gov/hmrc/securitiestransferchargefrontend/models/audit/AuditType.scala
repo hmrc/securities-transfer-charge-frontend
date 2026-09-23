@@ -26,7 +26,7 @@ object AuditType {
   }
 
   case object Sh03 extends AuditType {
-    override val value: String = "NotifyPurchaseOfOwnSharesStatus"
+    override val value: String = "PurchaseOfOwnSharesStatus"
   }
 
   case object UpscanValidation extends AuditType {

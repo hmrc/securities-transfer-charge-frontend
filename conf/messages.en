@@ -46,15 +46,6 @@ sectionTitle.sh03 = Share buyback (SH03)
 checkYourAnswers.title = Check your answers
 checkYourAnswers.heading = Check your answers
 
-confirmation.title = Submission complete
-confirmation.heading = Submission complete
-confirmation.subheading = Your reference number
-
-confirmation.title = Submission complete
-confirmation.heading = Submission complete
-confirmation.whatHappensNext = What happens next
-confirmation.guidance = We have received your securities transfer details. You will receive a confirmation email shortly.
-
 checkYourAnswers.yourDetails.heading = Your details
 checkYourAnswers.sellerDetails.heading = Seller details
 checkYourAnswers.buyerDetails.heading = Buyer details
@@ -587,7 +578,7 @@ agent.checkYourAnswers.sellerAddress = Address
 agent.checkYourAnswers.sellerAddress.change.hidden = Change seller’s address
 
 agent.checkYourAnswers.fileDetails.heading = File details
-agent.checkYourAnswers.fileDetails.key = File
+agent.checkYourAnswers.fileDetails.fileName.key = File name
 agent.checkYourAnswers.changeFile.hidden = Change file
 
 agent.checkYourAnswers.numberOfRows.key = Number of transfers (rows) found
@@ -1303,6 +1294,23 @@ org.sh03.templateInstructions.step3 = Upload the file on the next page as a .csv
 org.sh03.templateInstructions.p2 = Remember, do not edit the first three rows, or change the order of the columns.
 org.sh03.templateInstructions.p3 = Once you have uploaded and submitted the file it will show in your recent submissions, you can then pay the tax due.
 
+confirmation.banner.title = Important
+confirmation.title = Submission confirmation
+confirmation.banner.p1 = Payment due by: {0} <br><br>
+confirmation.banner.p2 = Your transfers have been submitted and are being processed but you still need to pay.
+confirmation.heading.nextSteps = Next steps
+confirmation.heading.transferReference = Share the transfer references
+confirmation.heading.transferReference.p1 = A transfer reference has been created for each transfer, you can see them in
+confirmation.heading.transferReference.p2 = Use these references to confirm that HMRC has been notified about your transfers.
+confirmation.heading.transferReference.link = your submission (opens in new tab).
+confirmation.heading.deadline = Pay the tax due by the deadline
+confirmation.heading.deadline.p1 = Do not use any of the reference numbers on this page as your payment reference, this will delay your payment being processed.
+confirmation.table.caption = Submission details
+confirmation.table.heading.submissionId = Submission ID
+confirmation.table.heading.reference = Your reference
+confirmation.table.heading.taxDue = Tax due
+confirmation.button.pay = Pay for this submission
+
 
 checkYourAnswers.sh03.bulk.taxDue.section.amount.heading = Amount
 checkYourAnswers.sh03.bulk.taxDue.section.for.heading = For
@@ -1316,3 +1324,16 @@ fileUpload.saveAndReturn.title = Your uploaded file will not be saved
 fileUpload.saveAndReturn.heading = Your uploaded file will not be saved
 fileUpload.saveAndReturn.guidance1 = The file you have uploaded will not be saved if you return to the dashboard.
 fileUpload.saveAndReturn.guidance2 = All other answers will be saved [add additional guidance here]
+
+dashboard.title = Dashboard
+dashboard.caption = Dashboard
+dashboard.create-submission.heading = Create a submission
+dashboard.create-submission.stf = Tell us about a securities transfer (STF)
+dashboard.submissions.heading = Submissions
+dashboard.submissions.view-all-recent = View all recent submissions
+dashboard.submissions.overdue = You have <b>{0}</b> overdue submissions.
+dashboard.submissions.view-overdue = View overdue submissions
+dashboard.submissions.ready-to-pay = You have <b>{0}</b> submissions that are ready to pay.
+dashboard.submissions.view-ready-to-pay = View ready to pay submissions
+dashboard.submissions.drafts = You have <b>{0}</b> draft submissions.
+dashboard.submissions.view-drafts = View draft submissions

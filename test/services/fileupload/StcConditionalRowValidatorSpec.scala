@@ -588,5 +588,27 @@ class StcConditionalRowValidatorSpec extends SpecBase {
 
       result.exists(_.fieldName == "totalMarketValue") mustBe true
     }
+
+    "require purchasedForCancellation when sharePurchaseReason is cancellation" in {
+      val result = validator.validate(
+        validParsedRow.copy(
+          sharePurchaseReason = Some("cancellation"),
+          purchaseForCancellation = None
+        ), StcTemplate.SH03, affinityGroupKeyOrg, SH03
+      )
+
+      result.exists(_.fieldName == "purchasedForCancellation") mustBe true
+    }
+
+    "not require purchasedForCancellation when sharePurchaseReason is treasury" in {
+      val result = validator.validate(
+        validParsedRow.copy(
+          sharePurchaseReason = Some("treasury"),
+          purchaseForCancellation = None
+        ), StcTemplate.SH03, affinityGroupKeyOrg, SH03
+      )
+
+      result.exists(_.fieldName == "purchasedForCancellation") mustBe false
+    }
   }
 }

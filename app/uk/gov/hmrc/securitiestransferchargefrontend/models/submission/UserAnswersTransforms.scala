@@ -28,7 +28,7 @@ object UserAnswersTransforms {
     val agentDetails: PartialFunction[AffinityData, SingleTransferAgentDetails] =
       case Agent(name, address, phone, email) => SingleTransferAgentDetails(
         name = name,
-        addr1 = address.addressLine1,
+        addr1 = Some(address.addressLine1),
         addr2 = address.addressLine2,
         addr3 = address.addressLine3,
         addr4 = None,
@@ -49,7 +49,7 @@ object UserAnswersTransforms {
     val buyerEmail: String = affinityData match
       case Individual(_, _, _, email, _) => email
       case Organisation(_, _, _, email, _) => email
-      case Agent(_, _, _, _) => ??? // ToDo: We currently do not capture the buyer's email for agents. We need to capture this info.
+      case Agent(_, _, _, _) => "foo@email.com" // ToDo: We currently do not capture the buyer's email for agents. We need to capture this info.
 
     val uniqueId: AffinityData => Option[String] = {
       case Individual(_, _, _, _, nino) => Some(nino)
@@ -105,10 +105,16 @@ object UserAnswersTransforms {
 
   def toSh03Request(sh03Transaction: Sh03Transaction, affinityData: AffinityData): SingleTransferRequest = {
 
+    val address = Address(addressLine1 = "1 Street",
+      addressLine2 = None,
+      addressLine3 = None,
+      postcode = "ZZ1 1ZZ",
+      countryCode = "GB")
+
     val agentDetails: PartialFunction[AffinityData, SingleTransferAgentDetails] =
       case Agent(name, address, phone, email) => SingleTransferAgentDetails(
         name = name,
-        addr1 = address.addressLine1,
+        addr1 = Some(address.addressLine1),
         addr2 = address.addressLine2,
         addr3 = address.addressLine3,
         addr4 = None,
@@ -121,16 +127,16 @@ object UserAnswersTransforms {
 
     val buyerName: String = affinityData match
       case Organisation(name, _, _, _, _) => name // is this the Org name or the contact name from their Subscription
-      case _ => ??? // TODO we need to capture the buyer name for agents
+      case _ => "Buyer 1" // TODO we need to capture the buyer name for agents
 
     val buyerAddress: Address = affinityData match {
       case Organisation(_, address, _, _, _) => address
-      case _ => ??? // TODO we need to capture the buyer address for agents
+      case _ => address// TODO we need to capture the buyer address for agents
     }
 
     val buyerEmail: String = affinityData match
       case Organisation(_, _, _, email, _) => email
-      case _ => ??? // TODO we need to capture the buyer email for agents
+      case _ => "foo@email.com" // TODO we need to capture the buyer email for agents
 
     val uniqueId: AffinityData => Option[String] = {
       case Individual(_, _, _, _, nino) => Some(nino)
@@ -216,7 +222,7 @@ object UserAnswersTransforms {
 
 
   private def getBuyerName(transaction: StfTransaction): String =
-    transaction.nameofBuyer.getOrElse(throw new IllegalArgumentException("Buyer name is missing"))
+    transaction.nameOfBuyer.getOrElse(throw new IllegalArgumentException("Buyer name is missing"))
 
   private def getTaxRate(rate: TaxRate): BuyerTaxRate =
     rate match {

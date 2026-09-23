@@ -31,11 +31,11 @@ object CompanyDetailsSummary {
     answers.get(BulkCompanyDetailsPage).toSeq.flatMap { companyDetails =>
       
       val companyNameRow = SummaryListRowViewModel(
-          key = "agent.sh03.companyDetails.checkYourAnswersLabel",
+          key = "agent.sh03.companyDetails.companyName.label",
           value = ValueViewModel(HtmlFormat.escape(companyDetails.companyName).toString),
           actions = Seq(
             ActionItemViewModel("site.change", routes.CompanyDetailsController.onPageLoad(CheckMode).url)
-              .withVisuallyHiddenText(messages("agent.sh03.companyName.change.hidden"))
+              .withVisuallyHiddenText(messages("agent.sh03.companyDetails.companyName.change.hidden"))
           )
         )
       

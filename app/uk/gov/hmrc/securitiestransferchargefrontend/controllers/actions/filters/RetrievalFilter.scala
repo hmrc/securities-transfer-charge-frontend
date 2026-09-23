@@ -18,7 +18,7 @@ package uk.gov.hmrc.securitiestransferchargefrontend.controllers.actions.filters
 
 import play.api.mvc.Result
 import uk.gov.hmrc.auth.core.Enrolments
-import uk.gov.hmrc.auth.core.retrieve.Credentials
+import uk.gov.hmrc.auth.core.retrieve.{Credentials, ItmpName}
 import uk.gov.hmrc.securitiestransferchargefrontend.config.FrontendAppConfig
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.Redirects
 import uk.gov.hmrc.securitiestransferchargefrontend.domain.SubscriptionId
@@ -40,6 +40,10 @@ class RetrievalFilter @Inject()(
   def isPresent[A]: RetrievalFilterFunction[Option[A], A] =
     case Some(a) => Right(a)
     case None => Left(redirectToUnauthorisedF)
+
+  val namePresentFilter: RetrievalFilterFunction[Option[ItmpName], String] =
+    case Some(ItmpName(Some(fn), _, Some(ln))) => Right(s"$fn $ln")
+    case _ => Right("Securities Transfer Tax")
 
   val enrolledForStc: RetrievalFilterFunction[Enrolments, Unit] = enrolments =>
     enrolments

@@ -14,16 +14,6 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.securitiestransferchargefrontend.models.sh03
+package uk.gov.hmrc.securitiestransferchargefrontend.viewmodels.dashboard.individual
 
-import play.api.libs.json.{Json, OFormat}
-
-case class CompanyDetails(
-  companyName: String,
-  companyRegistrationNumber: String,
-  isPlc: Boolean
-)
-
-object CompanyDetails {
-  implicit val format: OFormat[CompanyDetails] = Json.format[CompanyDetails]
-}
+case class SubmissionsViewModel(overdueCount:Int, readyToPayCount:Int, draftCount:Int)

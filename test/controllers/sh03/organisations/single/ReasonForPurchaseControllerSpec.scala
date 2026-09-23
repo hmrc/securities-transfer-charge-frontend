@@ -25,6 +25,7 @@ import play.api.test.Helpers.*
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.routes.JourneyRecoveryController
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.sh03.organisations.single.routes
 import uk.gov.hmrc.securitiestransferchargefrontend.forms.sh03.shared.ReasonForPurchaseFormProvider
+import uk.gov.hmrc.securitiestransferchargefrontend.models.JourneyType.SH03
 import uk.gov.hmrc.securitiestransferchargefrontend.models.sh03.shared.ReasonForPurchase
 import uk.gov.hmrc.securitiestransferchargefrontend.models.{NormalMode, UserAnswers}
 import uk.gov.hmrc.securitiestransferchargefrontend.navigation.Navigator
@@ -60,7 +61,7 @@ class ReasonForPurchaseControllerSpec extends SpecBase with MockitoSugar {
 
     "must populate the view correctly on a GET when the question has previously been answered" in {
 
-      val userAnswers = UserAnswers(testUserId, testGroupIdentifier, submissionId).set(ReasonForPurchasePage, ReasonForPurchase.values.head).success.value
+      val userAnswers = UserAnswers(testUserId, testGroupIdentifier, submissionId,SH03).set(ReasonForPurchasePage, ReasonForPurchase.values.head).success.value
 
       val application = applicationBuilder(userAnswers = Some(userAnswers), affinityGroup = orgAffinity)
         .overrides(bind[Navigator].qualifiedWith("orgSh03").toInstance(getNavigator))
