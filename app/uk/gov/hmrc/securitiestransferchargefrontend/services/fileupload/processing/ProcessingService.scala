@@ -21,7 +21,7 @@ import uk.gov.hmrc.securitiestransferchargefrontend.connectors.{SubscriptionConn
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.actions.StcAuthorisedRequest
 import uk.gov.hmrc.securitiestransferchargefrontend.models.JourneyType
 import uk.gov.hmrc.securitiestransferchargefrontend.models.audit.BulkUploadProcessedAuditModel
-import uk.gov.hmrc.securitiestransferchargefrontend.models.stf.fileupload.FileParseError
+import uk.gov.hmrc.securitiestransferchargefrontend.models.stf.fileupload.{FileParseError, StcFileValidationResponse}
 import uk.gov.hmrc.securitiestransferchargefrontend.models.stf.upscan.{FileUpload, UpscanJourneyStatus}
 import uk.gov.hmrc.securitiestransferchargefrontend.models.stf.upscan.UpscanJourneyStatus.{Completed, EmptyFile, FormatingErrors, InvalidTemplate, Processing, RowLimitExceeded, TooManyErrors, UpscanDownloadError}
 import uk.gov.hmrc.securitiestransferchargefrontend.repositories.{ParsedStcRowsRepository, UpscanJourneyRepository, ValidationErrorRepository}
@@ -49,7 +49,7 @@ class ProcessingService @Inject()(
                         )(implicit request: StcAuthorisedRequest[_], hc: HeaderCarrier, ec: ExecutionContext): Future[Unit] =
 
     val fileName = fileUpload.uploadDetails.map(_.fileName).getOrElse("")
-    val fileType = fileUpload.uploadDetails.flatMap(_.fileMimeType.split("/").lastOption).getOrElse("")
+    val fileType = fileUpload.uploadDetails.map(_.fileMimeType).getOrElse("")
     val fileSize = fileUpload.uploadDetails.map(_.size.toString).getOrElse("")
 
     def auditBulkUploadFailure(fileValidationTime: Long, errorType: String, volume: String): BulkUploadProcessedAuditModel =
@@ -61,7 +61,7 @@ class ProcessingService @Inject()(
     def buildBulkUploadAuditModel(status: String, fileValidationTime: Long, errorType: Option[String] = None, volume: Option[String] = None, numberOfEntries: Option[Int] = None): BulkUploadProcessedAuditModel =
       BulkUploadProcessedAuditModel(
         uploadJourney = journeyType.toString.toUpperCase,
-        affinityGroup = affinityKey,
+        affinityGroup = request.affinityGroup,
         subscriptionId = request.subscriptionId,
         credentialId = request.credentialId,
         fileType = fileType,
@@ -102,7 +102,7 @@ class ProcessingService @Inject()(
         case Right((validationResponse, validationTime)) if validationResponse.hasBlockingErrors =>
           val numOfBlockingErrors = validationResponse.blockingErrors.size
           val errorType = numOfBlockingErrors match {
-            case 1 => validationResponse.blockingErrors.head.message //TODO: need to retrieve the error type differently.
+            case 1 => constructErrorTypeString(validationResponse)
             case _ => "multiple"
           }
 
@@ -123,4 +123,12 @@ class ProcessingService @Inject()(
           upscanJourneyRepository.updateStatus(reference, UpscanDownloadError)
       }
     }
+
+  private def constructErrorTypeString(validationResponse: StcFileValidationResponse): String = {
+    val fieldName = validationResponse.blockingErrors.head.fieldName
+    val message = validationResponse.blockingErrors.head.message
+
+    s"$fieldName - $message"
+  }
+
   }

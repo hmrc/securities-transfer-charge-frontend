@@ -17,11 +17,12 @@
 package uk.gov.hmrc.securitiestransferchargefrontend.models.audit
 
 import play.api.libs.json.{JsObject, Json}
+import uk.gov.hmrc.auth.core.AffinityGroup
 import uk.gov.hmrc.securitiestransferchargefrontend.domain.{CredentialId, SubscriptionId}
 
 case class BulkUploadProcessedAuditModel(
                                           uploadJourney : String,
-                                          affinityGroup : String,
+                                          affinityGroup : AffinityGroup,
                                           subscriptionId : SubscriptionId,
                                           credentialId : CredentialId,
                                           fileType : String,

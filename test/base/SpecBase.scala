@@ -41,14 +41,17 @@ import uk.gov.hmrc.securitiestransferchargefrontend.models.JourneyType.STF
 import uk.gov.hmrc.securitiestransferchargefrontend.models.requests.DataRequest
 import uk.gov.hmrc.securitiestransferchargefrontend.models.shared.AgentReference
 import uk.gov.hmrc.securitiestransferchargefrontend.models.stf.*
+import uk.gov.hmrc.securitiestransferchargefrontend.models.stf.fileupload.{ParsedStcRow, ParsedValue, StcFileValidationResponse, StcRowValidationError, ValidatedStcRow}
+import uk.gov.hmrc.securitiestransferchargefrontend.models.stf.upscan.UpscanCallbackRequest
 import uk.gov.hmrc.securitiestransferchargefrontend.models.{Mode, UserAnswers}
 import uk.gov.hmrc.securitiestransferchargefrontend.navigation.{Navigator, UserAnswersValidator}
 import uk.gov.hmrc.securitiestransferchargefrontend.pages.Page
 import uk.gov.hmrc.securitiestransferchargefrontend.pages.stf.shared.AgentReferencePage
 import uk.gov.hmrc.securitiestransferchargefrontend.pages.stf.single.*
 import uk.gov.hmrc.securitiestransferchargefrontend.repositories.SessionRepository
+import uk.gov.hmrc.securitiestransferchargefrontend.services.fileupload.StcUploadColumn
 
-import java.time.LocalDate
+import java.time.{Instant, LocalDate}
 import scala.concurrent.{ExecutionContext, Future}
 
 trait SpecBase
@@ -87,6 +90,112 @@ trait SpecBase
   )
 
   def emptyUserAnswers: UserAnswers = UserAnswers.empty(testUserId)(testGroupIdentifier)(submissionId)(STF)
+  
+  val validationResponse = StcFileValidationResponse(
+    rows = Seq(
+      ValidatedStcRow(
+        parsedRow = ParsedStcRow(
+          rowNumber = 4,
+          buyerName = Some("Bob buyer"),
+          buyerAddressInUK = Some(true),
+          buyerAddressLine1 = Some("1 Seller Street"),
+          buyerAddressLine2 = Some("Seller District"),
+          buyerAddressLine3 = Some("Seller City"),
+          buyerAddressLine4 = None,
+          buyerPostcode = Some("AA1 1AA"),
+          buyerCountry = Some("United Kingdom"),
+          sellerName = Some("Seller 1"),
+          sellerAddressInUK = None,
+          sellerAddressLine1 = None,
+          sellerAddressLine2 = None,
+          sellerAddressLine3 = None,
+          sellerAddressLine4 = None,
+          sellerPostcode = None,
+          sellerCountry = None,
+          connectedPersons = None,
+          applyingForRelief = None,
+          whatReliefAreYouApplyingFor = None,
+          securitiesTarget = None,
+          companyRegistrationNumber = None,
+          chargingPoint = ParsedValue.Missing,
+          taxRate = None,
+          whatTypeOfSecurities = None,
+          typeOfShares = None,
+          securitiesQuantity = None,
+          amountPaidForSecurities = None,
+          totalMarketValue = None,
+          minSharePrice = None,
+          maxSharePrice = None,
+          sharePurchaseReason = None,
+          purchaseForCancellation = None
+        ),
+        validationErrors = Seq.empty
+      )
+    ),
+    maxErrorsAllowed = 25
+  )
+
+  val validationResponseWithErrors = StcFileValidationResponse(
+    rows = Seq(
+      ValidatedStcRow(
+        parsedRow = ParsedStcRow(
+          rowNumber = 4,
+          buyerName = Some("Bob buyer"),
+          buyerAddressInUK = Some(true),
+          buyerAddressLine1 = Some("1 Seller Street"),
+          buyerAddressLine2 = Some("Seller District"),
+          buyerAddressLine3 = Some("Seller City"),
+          buyerAddressLine4 = None,
+          buyerPostcode = Some("AA1 1AA"),
+          buyerCountry = Some("United Kingdom"),
+          sellerName = Some("Seller 1"),
+          sellerAddressInUK = None,
+          sellerAddressLine1 = None,
+          sellerAddressLine2 = None,
+          sellerAddressLine3 = None,
+          sellerAddressLine4 = None,
+          sellerPostcode = None,
+          sellerCountry = None,
+          connectedPersons = None,
+          applyingForRelief = None,
+          whatReliefAreYouApplyingFor = None,
+          securitiesTarget = None,
+          companyRegistrationNumber = None,
+          chargingPoint = ParsedValue.Missing,
+          taxRate = None,
+          whatTypeOfSecurities = None,
+          typeOfShares = None,
+          securitiesQuantity = None,
+          amountPaidForSecurities = None,
+          totalMarketValue = None,
+          minSharePrice = None,
+          maxSharePrice = None,
+          sharePurchaseReason = None,
+          purchaseForCancellation = None
+        ),
+        validationErrors = Seq(
+          StcRowValidationError(
+            rowNumber = 4,
+            fieldName = "sellerName",
+            columnIndex = StcUploadColumn.sellerName,
+            message = "sellerName is required",
+            blocking = true
+          )
+        )
+      )
+    ),
+    maxErrorsAllowed = 25
+  )
+
+  val validationTime = 50L
+  
+  val uploadDetails = UpscanCallbackRequest.UploadDetails(
+    uploadTimestamp = Instant.parse("2026-03-24T10:15:30Z"),
+    checksum = "abc123",
+    fileMimeType = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    fileName = "bulk-upload.xlsx",
+    size = 1234L
+  )
 
   val testBackLinkRoute: Call = Call("GET", "/back-link")
   val testNextPage: Call = Call("GET", "/next-page")

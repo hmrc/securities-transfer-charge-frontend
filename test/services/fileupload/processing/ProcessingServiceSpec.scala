@@ -16,7 +16,7 @@
 
 package services.fileupload.processing
 
-import base.{FileUploadFixtures, SpecBase}
+import base.{AuditTestSupport, FileUploadFixtures, SpecBase}
 import org.mockito.ArgumentMatchers
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.{inOrder as mockitoInOrder, *}
@@ -32,7 +32,8 @@ import uk.gov.hmrc.securitiestransferchargefrontend.controllers.actions.StcAutho
 import uk.gov.hmrc.securitiestransferchargefrontend.domain.{CredentialId, SubscriptionId}
 import uk.gov.hmrc.securitiestransferchargefrontend.models.JourneyType.STF
 import uk.gov.hmrc.securitiestransferchargefrontend.models.JourneyType
-import uk.gov.hmrc.securitiestransferchargefrontend.models.stf.fileupload.{FileParseError, ParsedStcRow}
+import uk.gov.hmrc.securitiestransferchargefrontend.models.audit.AuditType.BulkUploadProcessed
+import uk.gov.hmrc.securitiestransferchargefrontend.models.stf.fileupload.{FileParseError, ParsedStcRow, StcRowValidationError}
 import uk.gov.hmrc.securitiestransferchargefrontend.models.stf.upscan.UpscanJourneyStatus.*
 import uk.gov.hmrc.securitiestransferchargefrontend.models.stf.upscan.{FileUpload, UpscanJourneyStatus}
 import uk.gov.hmrc.securitiestransferchargefrontend.repositories.{ParsedStcRowsRepository, UpscanJourneyRepository, ValidationErrorRepository}
@@ -42,12 +43,12 @@ import uk.gov.hmrc.securitiestransferchargefrontend.services.fileupload.processi
 
 import scala.concurrent.Future
 
-class ProcessingServiceSpec extends SpecBase with MockitoSugar with BeforeAndAfterEach with FileUploadFixtures {
+class ProcessingServiceSpec extends SpecBase with MockitoSugar with BeforeAndAfterEach with FileUploadFixtures with AuditTestSupport {
 
   override def beforeEach(): Unit = {
     super.beforeEach()
 
-    reset(mockUpscanProcessingService, mockValidationErrorRepository, mockUpscanJourneyRepository, mockSubscriptionConnector)
+    reset(mockUpscanProcessingService, mockValidationErrorRepository, mockUpscanJourneyRepository, mockSubscriptionConnector, mockAuditService)
   }
 
   private val mockUpscanProcessingService = mock[StcUpscanProcessingService]
@@ -67,7 +68,8 @@ class ProcessingServiceSpec extends SpecBase with MockitoSugar with BeforeAndAft
   private val reference = "reference"
   private val affinityKey = "affinity-key"
 
-  private val fileUpload = FileUpload(reference = reference, status = UpscanJourneyStatus.Ready, journeyType = STF)
+
+  private val fileUpload = FileUpload(reference = reference, status = UpscanJourneyStatus.Ready, journeyType = STF, uploadDetails = Some(uploadDetails))
 
   def fakeApplication(): Application = applicationBuilder(userAnswers = Some(emptyUserAnswers)).build()
 
@@ -414,6 +416,167 @@ class ProcessingServiceSpec extends SpecBase with MockitoSugar with BeforeAndAft
 
         inOrderVerifier.verify(mockUpscanJourneyRepository)
           .updateStatus(reference, EmptyFile)
+      }
+    }
+
+    "must send a bulk upload success audit event if upload succeeds without errors" in {
+      stubStatusUpdates()
+
+      when(
+        mockUpscanProcessingService.process(any[FileUpload], any[String], any[JourneyType])(any())
+      ).thenReturn(
+        Future.successful(
+          Right((validationResponse, validationTime))
+        )
+      )
+      when(mockParsedStcRowsRepository.save(any[String], any[Seq[ParsedStcRow]], any[String]))
+        .thenReturn(Future.successful(()))
+
+      when(mockSubscriptionConnector.getAndStoreSubscription(any[SubscriptionId])(any()))
+        .thenReturn(Future.successful((subscription)))
+
+      running(fakeApplication()) {
+
+        val outcome = service.processReadyUpload(reference, fileUpload, affinityKey, STF)
+
+        whenReady(outcome) { _ =>
+          verifyBulkUploadAudit(
+            auditService = mockAuditService,
+            uploadJourney = "STF",
+            affinityGroup = request.affinityGroup,
+            subscriptionId = request.subscriptionId,
+            credentialId = request.credentialId,
+            fileType = fileUpload.uploadDetails.map(_.fileMimeType).getOrElse(""),
+            fileUploadStatus = "Success",
+            fileSize = fileUpload.uploadDetails.map(_.size.toString).getOrElse(""),
+            fileValidationTime = validationTime,
+            fileName = fileUpload.uploadDetails.map(_.fileName).getOrElse(""),
+            fileReference = fileUpload.reference,
+            numberOfEntries = Some(validationResponse.rows.size),
+            errorType = None,
+            volume = None,
+            stcAuditType = BulkUploadProcessed
+          )
+        }
+      }
+    }
+
+    "must send a bulk upload failure audit event when a file parse error occurs" in {
+      stubStatusUpdates()
+
+      when(
+        mockUpscanProcessingService.process(any[FileUpload], any[String], any[JourneyType])(any())
+      ).thenReturn(
+        Future.successful(
+          Left((FileParseError.RowLimitExceeded(actual = 15000, max = 10000), 0L))
+        )
+      )
+
+      running(fakeApplication()) {
+
+        val outcome = service.processReadyUpload(reference, fileUpload, affinityKey, STF)
+
+        whenReady(outcome) { _ =>
+          verifyBulkUploadAudit(
+            auditService = mockAuditService,
+            uploadJourney = "STF",
+            affinityGroup = request.affinityGroup,
+            subscriptionId = request.subscriptionId,
+            credentialId = request.credentialId,
+            fileType = fileUpload.uploadDetails.map(_.fileMimeType).getOrElse(""),
+            fileUploadStatus = "Failure",
+            fileSize = fileUpload.uploadDetails.map(_.size.toString).getOrElse(""),
+            fileValidationTime = 0L,
+            fileName = fileUpload.uploadDetails.map(_.fileName).getOrElse(""),
+            fileReference = fileUpload.reference,
+            numberOfEntries = None,
+            errorType = Some("rowLimitExceeded"),
+            volume = Some("15000"),
+            stcAuditType = BulkUploadProcessed
+          )
+        }
+      }
+    }
+
+    "must send a bulk upload failure audit event when validation response contains errors" in {
+      stubStatusUpdates()
+
+      val validationResponse = validationResponseWithErrors(withBlockingErrors(1))
+
+      when(
+        mockUpscanProcessingService.process(any[FileUpload], any[String], any[JourneyType])(any())
+      ).thenReturn(
+        Future.successful(
+          Right((validationResponse, validationTime))
+        )
+      )
+      when(mockValidationErrorRepository.save(any[String], any[Seq[StcRowValidationError]]))
+        .thenReturn(Future.successful(()))
+
+      running(fakeApplication()) {
+
+        val outcome = service.processReadyUpload(reference, fileUpload, affinityKey, STF)
+
+        whenReady(outcome) { _ =>
+          verifyBulkUploadAudit(
+            auditService = mockAuditService,
+            uploadJourney = "STF",
+            affinityGroup = request.affinityGroup,
+            subscriptionId = request.subscriptionId,
+            credentialId = request.credentialId,
+            fileType = fileUpload.uploadDetails.map(_.fileMimeType).getOrElse(""),
+            fileUploadStatus = "Failure",
+            fileSize = fileUpload.uploadDetails.map(_.size.toString).getOrElse(""),
+            fileValidationTime = validationTime,
+            fileName = fileUpload.uploadDetails.map(_.fileName).getOrElse(""),
+            fileReference = fileUpload.reference,
+            numberOfEntries = None,
+            errorType = Some("sellerName - Error 1"),
+            volume = Some("1"),
+            stcAuditType = BulkUploadProcessed
+          )
+        }
+      }
+    }
+
+    "must send a bulk upload failure audit event with errorType 'multiple' and volume as 'morethan25' when validation response contains more than 25 errors" in {
+      stubStatusUpdates()
+
+      val validationResponse = validationResponseWithErrors(withBlockingErrors(26))
+
+      when(
+        mockUpscanProcessingService.process(any[FileUpload], any[String], any[JourneyType])(any())
+      ).thenReturn(
+        Future.successful(
+          Right((validationResponse, validationTime))
+        )
+      )
+      when(mockValidationErrorRepository.save(any[String], any[Seq[StcRowValidationError]]))
+        .thenReturn(Future.successful(()))
+
+      running(fakeApplication()) {
+
+        val outcome = service.processReadyUpload(reference, fileUpload, affinityKey, STF)
+
+        whenReady(outcome) { _ =>
+          verifyBulkUploadAudit(
+            auditService = mockAuditService,
+            uploadJourney = "STF",
+            affinityGroup = request.affinityGroup,
+            subscriptionId = request.subscriptionId,
+            credentialId = request.credentialId,
+            fileType = fileUpload.uploadDetails.map(_.fileMimeType).getOrElse(""),
+            fileUploadStatus = "Failure",
+            fileSize = fileUpload.uploadDetails.map(_.size.toString).getOrElse(""),
+            fileValidationTime = validationTime,
+            fileName = fileUpload.uploadDetails.map(_.fileName).getOrElse(""),
+            fileReference = fileUpload.reference,
+            numberOfEntries = None,
+            errorType = Some("multiple"),
+            volume = Some("moreThan25"),
+            stcAuditType = BulkUploadProcessed
+          )
+        }
       }
     }
   }

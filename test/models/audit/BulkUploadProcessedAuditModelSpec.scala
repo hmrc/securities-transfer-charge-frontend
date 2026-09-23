@@ -16,7 +16,7 @@
 
 package models.audit
 
-import base.Fixtures.testCredentialId
+import base.Fixtures.{organisationAffinity, testCredentialId}
 import base.SpecBase
 import org.scalatest.freespec.AnyFreeSpec
 import org.scalatest.matchers.must.Matchers
@@ -46,7 +46,7 @@ class BulkUploadProcessedAuditModelSpec extends AnyFreeSpec with Matchers with S
     "must have the correct audit type" in {
       val model = BulkUploadProcessedAuditModel(
         uploadJourney = "STF",
-        affinityGroup = "agent",
+        affinityGroup = agentAffinity,
         subscriptionId = subscriptionId,
         credentialId = testCredentialId,
         fileType = "xlsx",
@@ -66,7 +66,7 @@ class BulkUploadProcessedAuditModelSpec extends AnyFreeSpec with Matchers with S
       "must serialize to JSON correctly with fileName" in {
         val model = BulkUploadProcessedAuditModel(
           uploadJourney = "STF",
-          affinityGroup = "agent",
+          affinityGroup = agentAffinity,
           subscriptionId = subscriptionId,
           credentialId = testCredentialId,
           fileType = "xlsx",
@@ -81,7 +81,7 @@ class BulkUploadProcessedAuditModelSpec extends AnyFreeSpec with Matchers with S
 
         val expectedJson = Json.obj(
           "uploadJourney" -> "STF",
-          "affinityGroup" -> "agent",
+          "affinityGroup" -> agentAffinity,
           "subscriptionId" -> subscriptionId,
           "credentialId" -> testCredentialId,
           "fileType" -> "xlsx",
@@ -99,7 +99,7 @@ class BulkUploadProcessedAuditModelSpec extends AnyFreeSpec with Matchers with S
       "must include fileName in JSON output" in {
         val model = BulkUploadProcessedAuditModel(
           uploadJourney = "STF",
-          affinityGroup = "agent",
+          affinityGroup = agentAffinity,
           subscriptionId = subscriptionId,
           credentialId = testCredentialId,
           fileType = "xlsx",
@@ -126,7 +126,7 @@ class BulkUploadProcessedAuditModelSpec extends AnyFreeSpec with Matchers with S
       "must serialize to JSON correctly without fileName" in {
         val model = BulkUploadProcessedAuditModel(
           uploadJourney = "SH03",
-          affinityGroup = "organisation",
+          affinityGroup = organisationAffinity,
           subscriptionId = subscriptionId,
           credentialId = testCredentialId,
           fileType = "xlsx",
@@ -141,7 +141,7 @@ class BulkUploadProcessedAuditModelSpec extends AnyFreeSpec with Matchers with S
 
         val expectedJson = Json.obj(
           "uploadJourney" -> "SH03",
-          "affinityGroup" -> "organisation",
+          "affinityGroup" -> organisationAffinity,
           "subscriptionId" -> subscriptionId,
           "credentialId" -> testCredentialId,
           "fileType" -> "xlsx",
