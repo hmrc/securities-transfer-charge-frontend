@@ -49,7 +49,7 @@ class ProcessingService @Inject()(
                         )(implicit request: StcAuthorisedRequest[_], hc: HeaderCarrier, ec: ExecutionContext): Future[Unit] =
 
     val fileName = fileUpload.uploadDetails.map(_.fileName).getOrElse("")
-    val fileType = fileUpload.uploadDetails.map(_.fileMimeType).getOrElse("")
+    val fileType = getFileType(fileUpload)
     val fileSize = fileUpload.uploadDetails.map(_.size.toString).getOrElse("")
 
     def auditBulkUploadFailure(fileValidationTime: Long, errorType: String, volume: String): BulkUploadProcessedAuditModel =
@@ -129,6 +129,14 @@ class ProcessingService @Inject()(
     val message = validationResponse.blockingErrors.head.message
 
     s"$fieldName - $message"
+  }
+
+  private def getFileType(fileUpload: FileUpload): String = {
+    fileUpload.uploadDetails.map(_.fileMimeType).get match {
+      case "text/csv" => "csv"
+      case "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" => "excel"
+      case _ => ""
+    }
   }
 
   }

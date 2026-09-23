@@ -119,23 +119,45 @@ class BulkUploadProcessedAuditModelSpec extends AnyFreeSpec with Matchers with S
           "fileSize", "fileValidationTime", "fileName", "fileReference", "numberOfEntries")
         (json \ "fileName").as[String] mustBe fileName
       }
-    }
 
-    "for failure cases" - {
-
-      "must serialize to JSON correctly without fileName" in {
+      "must handle different file names correctly" in {
+        val specialFileName = "test file with spaces & special chars.xlsx"
         val model = BulkUploadProcessedAuditModel(
           uploadJourney = "SH03",
           affinityGroup = organisationAffinity,
           subscriptionId = subscriptionId,
           credentialId = testCredentialId,
-          fileType = "xlsx",
+          fileType = "excel",
+          fileUploadStatus = "Success",
+          fileSize = uploadDetails.size.toString,
+          fileValidationTime = 24L,
+          fileName = specialFileName,
+          fileReference = fileReference,
+          numberOfEntries = Some(100),
+          stcAuditType = AuditType.BulkUploadProcessed
+        )
+
+        val json = model.detail.as[JsObject]
+        (json \ "fileName").as[String] mustBe specialFileName
+      }
+    }
+
+    "for failure cases" - {
+
+      "must serialize to JSON correctly with errorType" in {
+        val model = BulkUploadProcessedAuditModel(
+          uploadJourney = "SH03",
+          affinityGroup = organisationAffinity,
+          subscriptionId = subscriptionId,
+          credentialId = testCredentialId,
+          fileType = "excel",
           fileUploadStatus = "Failure",
           fileSize = uploadDetails.size.toString,
           fileValidationTime = 0L,
           fileName = fileName,
           fileReference = fileReference,
-          numberOfEntries = Some(84),
+          errorType = Some("sellerName - Enter the seller's name"),
+          volume = Some("1"),
           stcAuditType = AuditType.BulkUploadProcessed
         )
 
@@ -144,157 +166,53 @@ class BulkUploadProcessedAuditModelSpec extends AnyFreeSpec with Matchers with S
           "affinityGroup" -> organisationAffinity,
           "subscriptionId" -> subscriptionId,
           "credentialId" -> testCredentialId,
-          "fileType" -> "xlsx",
+          "fileType" -> "excel",
           "fileUploadStatus" -> "Failure",
           "fileSize" -> "1234",
           "fileValidationTime" -> 0,
           "fileName" -> fileName,
           "fileReference" -> fileReference,
-          "numberOfEntries" -> 84
+          "errorType" -> "sellerName - Enter the seller's name",
+          "volume" -> "1"
         )
 
         model.detail mustBe expectedJson
       }
 
-//            "must not include volume field when it is None" in {
-//              val model = BulkUploadProcessedAuditModel(
-//                upscanStatus = "FAILED",
-//                fileReference = fileReference,
-//                failureReason = Some(failureReason),
-//                failureMessage = Some(failureMessage),
-//                stcAuditType = AuditType.UpscanValidation
-//              )
-//
-//              val json = model.detail.as[JsObject]
-//
-//              json.keys must not contain "fileName"
-//            }
-      //
-      //      "must serialize to JSON correctly with failure reason only (no fileName)" in {
-      //        val model = BulkUploadProcessedAuditModel(
-      //          upscanStatus = "FAILED",
-      //          fileReference = fileReference,
-      //          failureReason = Some(failureReason),
-      //          failureMessage = None,
-      //          stcAuditType = AuditType.UpscanValidation
-      //        )
-      //
-      //        val expectedJson = Json.obj(
-      //          "upscanStatus" -> "FAILED",
-      //          "fileReference" -> fileReference,
-      //          "failureReason" -> failureReason
-      //        )
-      //
-      //        model.detail mustBe expectedJson
-      //      }
-      //
-      //      "must serialize to JSON correctly with failure message only (no fileName)" in {
-      //        val model = BulkUploadProcessedAuditModel(
-      //          upscanStatus = "FAILED",
-      //          fileReference = fileReference,
-      //          failureReason = None,
-      //          failureMessage = Some(failureMessage),
-      //          stcAuditType = AuditType.UpscanValidation
-      //        )
-      //
-      //        val expectedJson = Json.obj(
-      //          "upscanStatus" -> "FAILED",
-      //          "fileReference" -> fileReference,
-      //          "failureMessage" -> failureMessage
-      //        )
-      //
-      //        model.detail mustBe expectedJson
-      //      }
-      //
-      //      "must include failureReason field when it is defined" in {
-      //        val model = BulkUploadProcessedAuditModel(
-      //          upscanStatus = "FAILED",
-      //          fileReference = fileReference,
-      //          failureReason = Some(failureReason),
-      //          failureMessage = None,
-      //          stcAuditType = AuditType.UpscanValidation
-      //        )
-      //
-      //        val json = model.detail.as[JsObject]
-      //
-      //        json.keys must contain("failureReason")
-      //        (json \ "failureReason").as[String] mustBe failureReason
-      //      }
-      //
-      //      "must include failureMessage field when it is defined" in {
-      //        val model = BulkUploadProcessedAuditModel(
-      //          upscanStatus = "FAILED",
-      //          fileReference = fileReference,
-      //          failureReason = None,
-      //          failureMessage = Some(failureMessage),
-      //          stcAuditType = AuditType.UpscanValidation
-      //        )
-      //
-      //        val json = model.detail.as[JsObject]
-      //
-      //        json.keys must contain("failureMessage")
-      //        (json \ "failureMessage").as[String] mustBe failureMessage
-      //      }
-      //    }
-      //
-      //    "must handle different upscan statuses correctly" in {
-      //      val statuses = Seq("READY", "FAILED", "PROCESSING", "UPLOADED")
-      //
-      //      statuses.foreach { status =>
-      //        val model = BulkUploadProcessedAuditModel(
-      //          upscanStatus = status,
-      //          fileReference = fileReference,
-      //          fileName = Some(fileName),
-      //          failureReason = None,
-      //          failureMessage = None,
-      //          stcAuditType = AuditType.UpscanValidation
-      //        )
-      //
-      //        val json = model.detail.as[JsObject]
-      //        (json \ "upscanStatus").as[String] mustBe status
-      //      }
-      //    }
-      //
-      //    "must handle different file names correctly" in {
-      //      val specialFileName = "test file with spaces & special chars.xlsx"
-      //      val model = BulkUploadProcessedAuditModel(
-      //        upscanStatus = "READY",
-      //        fileReference = fileReference,
-      //        fileName = Some(specialFileName),
-      //        failureReason = None,
-      //        failureMessage = None,
-      //        stcAuditType = AuditType.UpscanValidation
-      //      )
-      //
-      //      val json = model.detail.as[JsObject]
-      //      (json \ "fileName").as[String] mustBe specialFileName
-      //    }
-      //
-      //    "must work with Stf audit type" in {
-      //      val model = BulkUploadProcessedAuditModel(
-      //        upscanStatus = "READY",
-      //        fileReference = fileReference,
-      //        fileName = Some(fileName),
-      //        failureReason = None,
-      //        failureMessage = None,
-      //        stcAuditType = AuditType.Stf
-      //      )
-      //
-      //      model.auditType mustBe AuditType.Stf.value
-      //    }
-      //
-      //    "must work with Sh03 audit type" in {
-      //      val model = BulkUploadProcessedAuditModel(
-      //        upscanStatus = "READY",
-      //        fileReference = fileReference,
-      //        fileName = Some(fileName),
-      //        failureReason = None,
-      //        failureMessage = None,
-      //        stcAuditType = AuditType.Sh03
-      //      )
-      //
-      //      model.auditType mustBe AuditType.Sh03.value
-      //    }
+      "must serialize to JSON correctly with multiple in errorType and volume as moreThan25" in {
+        val model = BulkUploadProcessedAuditModel(
+          uploadJourney = "SH03",
+          affinityGroup = organisationAffinity,
+          subscriptionId = subscriptionId,
+          credentialId = testCredentialId,
+          fileType = "excel",
+          fileUploadStatus = "Failure",
+          fileSize = uploadDetails.size.toString,
+          fileValidationTime = 0L,
+          fileName = fileName,
+          fileReference = fileReference,
+          errorType = Some("multiple"),
+          volume = Some("moreThan25"),
+          stcAuditType = AuditType.BulkUploadProcessed
+        )
+
+        val expectedJson = Json.obj(
+          "uploadJourney" -> "SH03",
+          "affinityGroup" -> organisationAffinity,
+          "subscriptionId" -> subscriptionId,
+          "credentialId" -> testCredentialId,
+          "fileType" -> "excel",
+          "fileUploadStatus" -> "Failure",
+          "fileSize" -> "1234",
+          "fileValidationTime" -> 0,
+          "fileName" -> fileName,
+          "fileReference" -> fileReference,
+          "errorType" -> "multiple",
+          "volume" -> "moreThan25"
+        )
+
+        model.detail mustBe expectedJson
+      }
     }
   }
 }

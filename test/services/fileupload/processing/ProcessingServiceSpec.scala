@@ -68,8 +68,15 @@ class ProcessingServiceSpec extends SpecBase with MockitoSugar with BeforeAndAft
   private val reference = "reference"
   private val affinityKey = "affinity-key"
 
+  private val fileUpload = readyFileUpload(reference = reference)
 
-  private val fileUpload = FileUpload(reference = reference, status = UpscanJourneyStatus.Ready, journeyType = STF, uploadDetails = Some(uploadDetails))
+  private def getFileType(fileUpload: FileUpload): String = {
+    fileUpload.uploadDetails.map(_.fileMimeType).get match {
+      case "text/csv" => "csv"
+      case "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" => "excel"
+      case _ => ""
+    }
+  }
 
   def fakeApplication(): Application = applicationBuilder(userAnswers = Some(emptyUserAnswers)).build()
 
@@ -426,7 +433,7 @@ class ProcessingServiceSpec extends SpecBase with MockitoSugar with BeforeAndAft
         mockUpscanProcessingService.process(any[FileUpload], any[String], any[JourneyType])(any())
       ).thenReturn(
         Future.successful(
-          Right((validationResponse, validationTime))
+          Right((successfulValidationResponse, validationTime))
         )
       )
       when(mockParsedStcRowsRepository.save(any[String], any[Seq[ParsedStcRow]], any[String]))
@@ -446,13 +453,13 @@ class ProcessingServiceSpec extends SpecBase with MockitoSugar with BeforeAndAft
             affinityGroup = request.affinityGroup,
             subscriptionId = request.subscriptionId,
             credentialId = request.credentialId,
-            fileType = fileUpload.uploadDetails.map(_.fileMimeType).getOrElse(""),
+            fileType = getFileType(fileUpload),
             fileUploadStatus = "Success",
             fileSize = fileUpload.uploadDetails.map(_.size.toString).getOrElse(""),
             fileValidationTime = validationTime,
             fileName = fileUpload.uploadDetails.map(_.fileName).getOrElse(""),
             fileReference = fileUpload.reference,
-            numberOfEntries = Some(validationResponse.rows.size),
+            numberOfEntries = Some(successfulValidationResponse.rows.size),
             errorType = None,
             volume = None,
             stcAuditType = BulkUploadProcessed
@@ -483,7 +490,7 @@ class ProcessingServiceSpec extends SpecBase with MockitoSugar with BeforeAndAft
             affinityGroup = request.affinityGroup,
             subscriptionId = request.subscriptionId,
             credentialId = request.credentialId,
-            fileType = fileUpload.uploadDetails.map(_.fileMimeType).getOrElse(""),
+            fileType = getFileType(fileUpload),
             fileUploadStatus = "Failure",
             fileSize = fileUpload.uploadDetails.map(_.size.toString).getOrElse(""),
             fileValidationTime = 0L,
@@ -524,7 +531,7 @@ class ProcessingServiceSpec extends SpecBase with MockitoSugar with BeforeAndAft
             affinityGroup = request.affinityGroup,
             subscriptionId = request.subscriptionId,
             credentialId = request.credentialId,
-            fileType = fileUpload.uploadDetails.map(_.fileMimeType).getOrElse(""),
+            fileType = getFileType(fileUpload),
             fileUploadStatus = "Failure",
             fileSize = fileUpload.uploadDetails.map(_.size.toString).getOrElse(""),
             fileValidationTime = validationTime,
@@ -565,7 +572,7 @@ class ProcessingServiceSpec extends SpecBase with MockitoSugar with BeforeAndAft
             affinityGroup = request.affinityGroup,
             subscriptionId = request.subscriptionId,
             credentialId = request.credentialId,
-            fileType = fileUpload.uploadDetails.map(_.fileMimeType).getOrElse(""),
+            fileType = getFileType(fileUpload),
             fileUploadStatus = "Failure",
             fileSize = fileUpload.uploadDetails.map(_.size.toString).getOrElse(""),
             fileValidationTime = validationTime,
