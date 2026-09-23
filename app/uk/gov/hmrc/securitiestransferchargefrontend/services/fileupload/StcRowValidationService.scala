@@ -84,6 +84,6 @@ class StcRowValidationService @Inject()(
 }
 
 case class Processor(startTime: Long = 0L, processingTime: Long = 0L) {
-  def start(): Processor = copy(startTime = System.nanoTime())
-  def stop(): Processor = copy(processingTime = System.nanoTime() - startTime)
+  def start(): Processor = copy(startTime = System.currentTimeMillis())
+  def stop(): Processor = copy(processingTime = System.currentTimeMillis() - startTime)
 }
