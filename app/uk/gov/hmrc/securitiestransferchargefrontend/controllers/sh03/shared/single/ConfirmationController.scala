@@ -14,15 +14,15 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.shared
+package uk.gov.hmrc.securitiestransferchargefrontend.controllers.sh03.shared.single
 
 import play.api.i18n.I18nSupport
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import uk.gov.hmrc.securitiestransferchargefrontend.config.FrontendAppConfig
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.actions.{StcAuthEnrolledAction, StcDataRetrievalAction}
-import uk.gov.hmrc.securitiestransferchargefrontend.models.ConfirmationViewModel
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.routes
+import uk.gov.hmrc.securitiestransferchargefrontend.models.ConfirmationViewModel
 import uk.gov.hmrc.securitiestransferchargefrontend.repositories.{SessionRepository, TransactionResponseRepository}
 import uk.gov.hmrc.securitiestransferchargefrontend.views.html.stf.individuals.single.ConfirmationView
 
@@ -46,6 +46,7 @@ class ConfirmationController @Inject()(
       throw new IllegalStateException("Submission ID not found in UserAnswers")
     )
     sessionRepository.clear(request.userAnswers.get.userId)
+
 
     transactionResponseRepository.retrieve(submissionId).map { responseDetails =>
       val viewModel = ConfirmationViewModel(
