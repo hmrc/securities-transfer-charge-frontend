@@ -55,17 +55,19 @@ class NrsServiceImpl @Inject()(
     hc          : HeaderCarrier): Future[Unit] = {
 
     val htmlPayload = cyaHtml.html.toString
+    val checksum = sha256Hex(htmlPayload)
     val encodedPayload: String = Base64.getEncoder.encodeToString(htmlPayload.getBytes(StandardCharsets.UTF_8))
+
     val nrsRequest = NrsSingleSubmissionRequest(
-      payload  = htmlPayload,
-      metadata = createMetadata(encodedPayload, config.nrsNotableEventSingleSubmission, request, hc, utrn)
+      payload  = encodedPayload,
+      metadata = createMetadata(checksum, config.nrsNotableEventSingleSubmission, request, hc, utrn)
     )
 
     nrsClient.postSinglePayload(nrsRequest)
   }
 
   private[services] def createMetadata(
-    encodedHtmlPayload : String,
+    checksum    : String,
     notableEvent: String,
     request     : StcDataRequest[?],
     hc          : HeaderCarrier,
@@ -75,7 +77,7 @@ class NrsServiceImpl @Inject()(
       businessId              = config.nrsBusinessId,
       notableEvent            = notableEvent,
       payloadContentType      = MimeTypes.HTML,
-      payloadSha256Checksum   = sha256Hex(encodedHtmlPayload),
+      payloadSha256Checksum   = checksum,
       userSubmissionTimestamp = LocalDate.now().format(DateTimeFormatter.ISO_DATE_TIME),
       identityData            = request.request.identityData,
       userAuthToken           = authToken(hc),
