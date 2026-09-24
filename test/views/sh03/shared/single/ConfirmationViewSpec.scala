@@ -120,7 +120,6 @@ class ConfirmationViewSpec extends ViewBaseSpec {
     }
 
     "should have a table with your reference heading for agent affinity" in {
-      println(view(agentViewModel).html())
       val rowHeadings = view(agentViewModel).select(".govuk-table__header").asScala.map(_.text())
       rowHeadings must contain(ExpectedContent.tableYourReferenceHeading)
     }
