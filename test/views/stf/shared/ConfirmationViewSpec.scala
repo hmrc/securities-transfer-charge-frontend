@@ -100,7 +100,7 @@ class ConfirmationViewSpec extends ViewBaseSpec {
       "have the transfer reference heading" in {
         confirmationView
           .select("h2")
-          .get(0)
+          .get(1)
           .text() mustBe ExpectedContent.transferReferenceHeading
       }
 
@@ -122,7 +122,7 @@ class ConfirmationViewSpec extends ViewBaseSpec {
       "have the deadline heading" in {
         confirmationView
           .select("h2")
-          .get(1)
+          .get(2)
           .text() mustBe ExpectedContent.deadlineHeading
       }
 

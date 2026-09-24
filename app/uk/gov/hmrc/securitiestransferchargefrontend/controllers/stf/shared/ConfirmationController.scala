@@ -22,7 +22,7 @@ import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.actions.{StcAuthEnrolledAction, StcDataRetrievalAction}
 import uk.gov.hmrc.securitiestransferchargefrontend.models.ConfirmationViewModel
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.routes
-import uk.gov.hmrc.securitiestransferchargefrontend.repositories.TransactionResponseRepository
+import uk.gov.hmrc.securitiestransferchargefrontend.repositories.{SessionRepository, TransactionResponseRepository}
 import uk.gov.hmrc.securitiestransferchargefrontend.views.html.stf.shared.ConfirmationView
 
 import javax.inject.Inject
@@ -33,6 +33,7 @@ class ConfirmationController @Inject()(
                                         stcAuthEnrolled: StcAuthEnrolledAction,
                                         getData: StcDataRetrievalAction,
                                         transactionResponseRepository: TransactionResponseRepository,
+                                        sessionRepository: SessionRepository,
                                         view: ConfirmationView
                                       )(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport {
 
@@ -42,6 +43,8 @@ class ConfirmationController @Inject()(
     val submissionId = request.userAnswers.map(_.submissionId).getOrElse(
       throw new IllegalStateException("Submission ID not found in UserAnswers")
     )
+
+    sessionRepository.clear(request.userAnswers.get.userId)
 
     transactionResponseRepository.retrieve(submissionId).map { responseDetails =>
       val viewModel = ConfirmationViewModel(
