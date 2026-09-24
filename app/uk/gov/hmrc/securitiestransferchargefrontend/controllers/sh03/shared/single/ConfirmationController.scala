@@ -19,7 +19,6 @@ package uk.gov.hmrc.securitiestransferchargefrontend.controllers.sh03.shared.sin
 import play.api.i18n.I18nSupport
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
-import uk.gov.hmrc.securitiestransferchargefrontend.config.FrontendAppConfig
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.actions.{StcAuthEnrolledAction, StcDataRetrievalAction}
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.routes
 import uk.gov.hmrc.securitiestransferchargefrontend.models.ConfirmationViewModel
@@ -35,8 +34,7 @@ class ConfirmationController @Inject()(
                                         getData: StcDataRetrievalAction,
                                         sessionRepository: SessionRepository,
                                         transactionResponseRepository: TransactionResponseRepository,
-                                        view: ConfirmationView,
-                                        config: FrontendAppConfig
+                                        view: ConfirmationView
                                       )(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport {
 
   def onPageLoad(): Action[AnyContent] = (stcAuthEnrolled andThen getData).async {implicit request =>
