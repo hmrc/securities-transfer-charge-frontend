@@ -35,17 +35,20 @@ class StcRowValidationService @Inject()(
                       journeyType: JourneyType,
                       maxErrorsAllowed: Int,
                       maxRows: Int
-                    ): Either[FileParseError, Seq[ValidatedStcRow]] = {
+                    ): Either[(FileParseError, Long), (Seq[ValidatedStcRow], Long)] = {
 
     implicit val columnIndex: ColumnIndexBuilder = new ColumnIndexBuilder(headers)
     val mapper = new StcRowMapper(columnIndex)
+
+    val startedProcessor = Processor().start()
 
     val resolvedTemplate = (journeyType, affinityKey.toLowerCase) match {
       case (JourneyType.STF, "agent") => Right(StcTemplate.STFAgent)
       case (JourneyType.STF, _) => Right(StcTemplate.STF)
       case (JourneyType.SH03, _) => Right(StcTemplate.SH03)
-      case _ => Left(FileParseError.InvalidTemplate)
+      case _ => Left(FileParseError.InvalidTemplate, startedProcessor.stop().processingTime)
     }
+    
 
     resolvedTemplate.flatMap { template =>
       @tailrec
@@ -53,12 +56,14 @@ class StcRowValidationService @Inject()(
                        accumulated: List[ValidatedStcRow],
                        blockingErrorCount: Int,
                        processedRowCount: Int
-                     ): Either[FileParseError, Seq[ValidatedStcRow]] = {
+                     ): Either[(FileParseError, Long), (Seq[ValidatedStcRow], Long)] = {
 
         if (processedRowCount > maxRows) {
-          Left(FileParseError.RowLimitExceeded(processedRowCount, maxRows))
+          val elapsedTime = startedProcessor.stop().processingTime
+          Left(FileParseError.RowLimitExceeded(processedRowCount, maxRows), elapsedTime)
         } else if (blockingErrorCount > maxErrorsAllowed || !rowStream.hasNext) {
-          Right(accumulated.reverse)
+          val elapsedTime = startedProcessor.stop().processingTime
+          Right(accumulated.reverse, elapsedTime)
         } else {
           val parsedRow = mapper.map(rowStream.next())
 
@@ -76,4 +81,9 @@ class StcRowValidationService @Inject()(
       processRows(Nil, 0, 0)
     }
   }
+}
+
+case class Processor(startTime: Long = 0L, processingTime: Long = 0L) {
+  def start(): Processor = copy(startTime = System.currentTimeMillis())
+  def stop(): Processor = copy(processingTime = System.currentTimeMillis() - startTime)
 }

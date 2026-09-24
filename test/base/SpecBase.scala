@@ -88,6 +88,8 @@ trait SpecBase
 
   def emptyUserAnswers: UserAnswers = UserAnswers.empty(testUserId)(testGroupIdentifier)(submissionId)(STF)
 
+  val validationTime = 50L
+
   val testBackLinkRoute: Call = Call("GET", "/back-link")
   val testNextPage: Call = Call("GET", "/next-page")
   val testErrorPage: Call = Call("GET", "/error-page")
