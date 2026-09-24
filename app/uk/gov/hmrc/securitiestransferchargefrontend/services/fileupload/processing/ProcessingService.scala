@@ -80,7 +80,10 @@ class ProcessingService @Inject()(
       stcUpscanProcessingService.process(fileUpload, affinityKey, journeyType).flatMap {
 
         case Left((FileParseError.RowLimitExceeded(actual, max), validationTime)) =>
-          auditService.audit(auditBulkUploadFailure(fileValidationTime = validationTime, errorType = "rowLimitExceeded", volume = actual.toString))
+          auditService.audit(auditBulkUploadFailure(
+            fileValidationTime = validationTime,
+            errorType = s"rowLimitExceeded - $actual total rows, but only $max allowed",
+            volume = "0"))
           upscanJourneyRepository.updateStatus(reference, RowLimitExceeded)
 
         case Left((FileParseError.EmptyFile, validationTime)) =>

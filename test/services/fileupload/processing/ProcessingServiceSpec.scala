@@ -497,8 +497,8 @@ class ProcessingServiceSpec extends SpecBase with MockitoSugar with BeforeAndAft
             fileName = fileUpload.uploadDetails.map(_.fileName).getOrElse(""),
             fileReference = fileUpload.reference,
             numberOfEntries = None,
-            errorType = Some("rowLimitExceeded"),
-            volume = Some("15000"),
+            errorType = Some("rowLimitExceeded - 15000 total rows, but only 10000 allowed"),
+            volume = Some("0"),
             stcAuditType = BulkUploadProcessed
           )
         }
