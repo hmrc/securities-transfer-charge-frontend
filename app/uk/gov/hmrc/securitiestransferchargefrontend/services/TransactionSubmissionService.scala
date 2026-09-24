@@ -110,10 +110,13 @@ final class TransactionSubmissionServiceImpl @Inject()(
         case stfResponse: SubmissionCreateResponseSuccess =>
           transactionResponseRepository.store(submissionId, stfResponse)
           saveAndReturnClient.deleteDraft(submissionId)
-          sendSubmissionDataToNRS(submissionId)
           true
 
         case _ => false
+      }
+      .flatMap { b =>
+        if b then sendSubmissionDataToNRS(submissionId)
+        Future.successful(b)
       }
   }
 
@@ -128,15 +131,18 @@ final class TransactionSubmissionServiceImpl @Inject()(
       .submitSingleSh03(subscriptionId, request.userAnswers, getAffinityData(affinityGroup))
       .map {
         case sh03Response: SubmissionCreateResponseSuccess =>
+          auditService.audit(AuditModel(SubmissionSuccess, subscriptionId, affinityGroup, credentialId, Some(submissionId), Sh03))
           transactionResponseRepository.store(submissionId, sh03Response)
-          auditService.audit(AuditModel(SubmissionSuccess,subscriptionId,affinityGroup,credentialId,Some(submissionId),Sh03))
           saveAndReturnClient.deleteDraft(submissionId)
-          sendSubmissionDataToNRS(submissionId)
           true
 
         case _ =>
           auditService.audit(AuditModel(SubmissionFailure, innerRequest.subscriptionId, innerRequest.affinityGroup, innerRequest.credentialId, Some(request.userAnswers.submissionId), Sh03))
           false
+      }
+      .flatMap { b =>
+        if b then sendSubmissionDataToNRS(submissionId)
+        Future.successful(b)
       }
   }
 
