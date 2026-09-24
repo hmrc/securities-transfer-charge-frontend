@@ -14,17 +14,16 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.shared
+package uk.gov.hmrc.securitiestransferchargefrontend.controllers.sh03.shared.single
 
 import play.api.i18n.I18nSupport
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
-import uk.gov.hmrc.securitiestransferchargefrontend.config.FrontendAppConfig
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.actions.{StcAuthEnrolledAction, StcDataRetrievalAction}
-import uk.gov.hmrc.securitiestransferchargefrontend.models.ConfirmationViewModel
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.routes
+import uk.gov.hmrc.securitiestransferchargefrontend.models.ConfirmationViewModel
 import uk.gov.hmrc.securitiestransferchargefrontend.repositories.{SessionRepository, TransactionResponseRepository}
-import uk.gov.hmrc.securitiestransferchargefrontend.views.html.stf.individuals.single.ConfirmationView
+import uk.gov.hmrc.securitiestransferchargefrontend.views.html.sh03.shared.single.ConfirmationView
 
 import javax.inject.Inject
 import scala.concurrent.ExecutionContext
@@ -35,8 +34,7 @@ class ConfirmationController @Inject()(
                                         getData: StcDataRetrievalAction,
                                         sessionRepository: SessionRepository,
                                         transactionResponseRepository: TransactionResponseRepository,
-                                        view: ConfirmationView,
-                                        config: FrontendAppConfig
+                                        view: ConfirmationView
                                       )(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport {
 
   def onPageLoad(): Action[AnyContent] = (stcAuthEnrolled andThen getData).async {implicit request =>
@@ -47,6 +45,7 @@ class ConfirmationController @Inject()(
     )
     sessionRepository.clear(request.userAnswers.get.userId)
 
+
     transactionResponseRepository.retrieve(submissionId).map { responseDetails =>
       val viewModel = ConfirmationViewModel(
         submissionId = submissionId,
@@ -56,7 +55,7 @@ class ConfirmationController @Inject()(
         isAgent = isAgent
       )(messagesApi.preferred(request))
       
-      Ok(view(viewModel)(request, messagesApi.preferred(request), config))
+      Ok(view(viewModel)(request, messagesApi.preferred(request)))
     }.recover {
       case _: NoSuchElementException =>
         Redirect(routes.JourneyRecoveryController.onPageLoad())
