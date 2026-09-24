@@ -24,7 +24,7 @@ import uk.gov.hmrc.securitiestransferchargefrontend.controllers.actions.{StcAuth
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.routes
 import uk.gov.hmrc.securitiestransferchargefrontend.models.ConfirmationViewModel
 import uk.gov.hmrc.securitiestransferchargefrontend.repositories.{SessionRepository, TransactionResponseRepository}
-import uk.gov.hmrc.securitiestransferchargefrontend.views.html.stf.individuals.single.ConfirmationView
+import uk.gov.hmrc.securitiestransferchargefrontend.views.html.sh03.shared.single.ConfirmationView
 
 import javax.inject.Inject
 import scala.concurrent.ExecutionContext
@@ -57,7 +57,7 @@ class ConfirmationController @Inject()(
         isAgent = isAgent
       )(messagesApi.preferred(request))
       
-      Ok(view(viewModel)(request, messagesApi.preferred(request), config))
+      Ok(view(viewModel)(request, messagesApi.preferred(request)))
     }.recover {
       case _: NoSuchElementException =>
         Redirect(routes.JourneyRecoveryController.onPageLoad())
