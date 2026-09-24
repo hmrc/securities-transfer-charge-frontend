@@ -16,11 +16,13 @@
 
 package uk.gov.hmrc.securitiestransferchargefrontend.services
 
-import uk.gov.hmrc.securitiestransferchargefrontend.domain.SubscriptionId
+import uk.gov.hmrc.http.HeaderCarrier
+import uk.gov.hmrc.securitiestransferchargefrontend.domain.{GroupIdentifier, SubscriptionId, UserId}
 import uk.gov.hmrc.securitiestransferchargefrontend.services.SubmissionStatus.{Draft, Overdue}
 
 import java.time.LocalDate
 import javax.inject.Inject
+import scala.concurrent.Future
 
 enum SubmissionStatus:
   case Draft, Processing, ReadyToPay, Paid, Overdue, PartialFailure, Failed
@@ -32,26 +34,30 @@ enum SubmissionStatus:
 
 
 final case class SubmissionSummary(
-  submissionId: String,
-  paymentDueBy: String,
-  status: SubmissionStatus,
-  sortDate: LocalDate
-)
+                                    submissionId: String,
+                                    paymentDueBy: String,
+                                    status: SubmissionStatus,
+                                    sortDate: LocalDate
+                                  )
 
 final case class DashboardCounts(
-  drafts: Int,
-  readyToPay: Int,
-  overdue: Int
-)
+                                  drafts: Int,
+                                  readyToPay: Int,
+                                  overdue: Int
+                                )
 
 trait DashboardService:
-  def getCounts(subscriptionId: SubscriptionId): DashboardCounts
-  def getDrafts(subscriptionId: SubscriptionId): Seq[SubmissionSummary]
-  def getReadyToPay(subscriptionId: SubscriptionId): Seq[SubmissionSummary]
-  def getOverdue(subscriptionId: SubscriptionId): Seq[SubmissionSummary]
-  def getRecent(subscriptionId: SubscriptionId): Seq[SubmissionSummary]
+  def getCounts(userId: UserId, groupId: GroupIdentifier, subscriptionId: SubscriptionId)(implicit hc: HeaderCarrier): Future[DashboardCounts]
+  def getDrafts(userId: UserId, groupId: GroupIdentifier)(implicit hc: HeaderCarrier): Future[Seq[SubmissionSummary]]
+  def getReadyToPay(subscriptionId: SubscriptionId)(implicit hc: HeaderCarrier): Future[Seq[SubmissionSummary]]
+  def getOverdue(subscriptionId: SubscriptionId)(implicit hc: HeaderCarrier): Future[Seq[SubmissionSummary]]
+  def getRecent(subscriptionId: SubscriptionId)(implicit hc: HeaderCarrier): Future[Seq[SubmissionSummary]]
 
-final class DashboardServiceImpl @Inject()() extends DashboardService:
+final class DashboardServiceImpl @Inject()(
+
+                                          ) extends DashboardService {
+
+
   private val sorted = (summaries: Seq[SubmissionSummary]) =>
     summaries.sortBy(_.sortDate)(Ordering[LocalDate].reverse)
 
@@ -100,21 +106,30 @@ final class DashboardServiceImpl @Inject()() extends DashboardService:
     )
   )
 
-  override def getCounts(subscriptionId: SubscriptionId): DashboardCounts =
-    DashboardCounts(
-      drafts = 1,
-      readyToPay = 2,
-      overdue = 3
+
+  override def getCounts(userId: UserId, groupId: GroupIdentifier, subscriptionId: SubscriptionId)(implicit hc: HeaderCarrier): Future[DashboardCounts] =
+    Future.successful(
+      DashboardCounts(
+        drafts = 1,
+        readyToPay = 2,
+        overdue = 3
+      )
     )
 
-  override def getDrafts(subscriptionId: SubscriptionId): Seq[SubmissionSummary] =
-    sorted(drafts)
+  override def getDrafts(userId: UserId, groupId: GroupIdentifier)(implicit hc: HeaderCarrier): Future[Seq[SubmissionSummary]] = {
+    Future.successful(sorted(drafts))
+  }
 
-  override def getReadyToPay(subscriptionId: SubscriptionId): Seq[SubmissionSummary] =
-    sorted(readyToPay)
+  override def getReadyToPay(subscriptionId: SubscriptionId)(implicit hc: HeaderCarrier): Future[Seq[SubmissionSummary]] = {
+    Future.successful(sorted(readyToPay))
+  }
 
-  override def getOverdue(subscriptionId: SubscriptionId): Seq[SubmissionSummary] =
-    sorted(overdue)
+  override def getOverdue(subscriptionId: SubscriptionId)(implicit hc: HeaderCarrier): Future[Seq[SubmissionSummary]] = {
+    Future.successful(sorted(overdue))
+  }
 
-  override def getRecent(subscriptionId: SubscriptionId): Seq[SubmissionSummary] =
-    sorted(readyToPay ++ overdue ++ drafts)
+  override def getRecent(subscriptionId: SubscriptionId)(implicit hc: HeaderCarrier): Future[Seq[SubmissionSummary]]= {
+    Future.successful(sorted(readyToPay ++ overdue ++ drafts))
+  }
+
+}
