@@ -41,7 +41,7 @@ class CsvFileParserSpec extends AnyWordSpec with Matchers with EitherValues {
   private def blankCells(fromIndex: Int): Seq[ParsedCell] =
     (fromIndex until maxColumns).map(index => ParsedCell(index, ""))
 
-  private def parseFully(csv: String): Either[FileParseError, (Seq[String], Seq[ParsedRow])] =
+  private def parseFully(csv: String): Either[(FileParseError, Long), (Seq[String], Seq[ParsedRow])] =
     parser.withParsedStream(uploadedFile(csv), maxColumns) { (headers, rowStream) =>
       Right((headers, rowStream.toList))
     }

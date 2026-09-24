@@ -32,7 +32,7 @@ object UserAnswersTransforms {
         addr2 = address.addressLine2,
         addr3 = address.addressLine3,
         addr4 = None,
-        postcode = address.postcode,
+        postcode = truncatePostcode(address.postcode),
         country = address.countryCode,
         phone = phone,
         email = email,
@@ -84,7 +84,7 @@ object UserAnswersTransforms {
         addr2 = stfTransaction.sellerAddress.address.lines.lift(1),
         addr3 = stfTransaction.sellerAddress.address.lines.lift(2),
         addr4 = stfTransaction.sellerAddress.address.lines.lift(3),
-        postcode = stfTransaction.sellerAddress.address.postcode,
+        postcode = truncatePostcode(stfTransaction.sellerAddress.address.postcode),
         country = stfTransaction.sellerAddress.address.country.name)),
       otherSellers = None,
       mainBuyerDetails = SingleTransferBuyerDetails(buyerName = buyerName,
@@ -92,7 +92,7 @@ object UserAnswersTransforms {
         addr2 = buyerAddress.lines.lift(1),
         addr3 = buyerAddress.lines.lift(2),
         addr4 = buyerAddress.lines.lift(3),
-        postcode = buyerAddress.postcode,
+        postcode = truncatePostcode(buyerAddress.postcode),
         country = buyerAddress.country.name,
         email = buyerEmail,
         uniqueId = uniqueId(affinityData),
@@ -241,4 +241,8 @@ object UserAnswersTransforms {
 
       case (ReasonForPurchase.ToPlaceIntoTreasury, _) => etmpReasonForPurchase.PurchasedToPlaceIntoTreasury
     }
+
+  private def truncatePostcode(postcode: String): String = {
+      postcode.take(10)
+  }
 }

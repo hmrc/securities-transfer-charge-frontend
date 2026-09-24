@@ -16,7 +16,6 @@
 
 package uk.gov.hmrc.securitiestransferchargefrontend.services
 
-import play.api.Logging
 import uk.gov.hmrc.auth.core.AffinityGroup
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.securitiestransferchargefrontend.clients.SaveAndReturnClient
@@ -38,6 +37,7 @@ trait TransactionSubmissionService:
   def submitSingleStf(implicit request: StcDataRequest[?]): Future[Boolean]
   def submitSingleSh03(implicit request: StcDataRequest[?]): Future[Boolean]
 
+
 final class TransactionSubmissionServiceImpl @Inject()(
                                                         headerCarrierCreator: HeaderCarrierCreator,
                                                         etmpSubmissionService: EtmpSubmissionService,
@@ -45,7 +45,7 @@ final class TransactionSubmissionServiceImpl @Inject()(
                                                         nrsService: NrsService,
                                                         cyaHtmlRepository: CyaHtmlRepository,
                                                         transactionResponseRepository: TransactionResponseRepository,
-                                                        auditService: AuditService)(implicit ec: ExecutionContext) extends TransactionSubmissionService with Logging {
+                                                        auditService: AuditService)(implicit ec: ExecutionContext) extends TransactionSubmissionService {
 
   // TODO: Some of this should come from new screens not yet developed.
   private val getIndividualAffinityData: AffinityData =
@@ -102,10 +102,15 @@ final class TransactionSubmissionServiceImpl @Inject()(
         case stfResponse: SubmissionCreateResponseSuccess =>
           transactionResponseRepository.store(submissionId, stfResponse)
           saveAndReturnClient.deleteDraft(submissionId)
-          sendSingleSubmissionDataToNRS(submissionId, stfResponse.utrn)
-          true
+          Some(stfResponse.utrn)
 
-        case _ => false
+        case _ => None
+      }
+      .flatMap { maybeUtrn =>
+        maybeUtrn.foreach(utrn => sendSingleSubmissionDataToNRS(submissionId, utrn))
+        Future {
+          if maybeUtrn.isDefined then true else false
+        }
       }
     }
 
@@ -120,15 +125,20 @@ final class TransactionSubmissionServiceImpl @Inject()(
       .submitSingleSh03(subscriptionId, request.userAnswers, getAffinityData(affinityGroup))
       .map {
         case sh03Response: SubmissionCreateResponseSuccess =>
+          auditService.audit(AuditModel(SubmissionSuccess, subscriptionId, affinityGroup, credentialId, Some(submissionId), Sh03))
           transactionResponseRepository.store(submissionId, sh03Response)
-          auditService.audit(AuditModel(SubmissionSuccess,subscriptionId,affinityGroup,credentialId,Some(submissionId),Sh03))
           saveAndReturnClient.deleteDraft(submissionId)
-          sendSingleSubmissionDataToNRS(submissionId, sh03Response.utrn)
-          true
+          Some(sh03Response.utrn)
 
         case _ =>
           auditService.audit(AuditModel(SubmissionFailure, innerRequest.subscriptionId, innerRequest.affinityGroup, innerRequest.credentialId, Some(request.userAnswers.submissionId), Sh03))
-          false
+          None
+      }
+      .flatMap { maybeUtrn =>
+        maybeUtrn.foreach(utrn => sendSingleSubmissionDataToNRS(submissionId, utrn))
+        Future {
+          if maybeUtrn.isDefined then true else false
+        }
       }
   }
 

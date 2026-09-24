@@ -23,7 +23,7 @@ import org.scalatest.matchers.must.Matchers.mustBe
 import play.api.libs.json.Json
 import uk.gov.hmrc.auth.core.AffinityGroup
 import uk.gov.hmrc.securitiestransferchargefrontend.domain.{CredentialId, SubmissionId, SubscriptionId}
-import uk.gov.hmrc.securitiestransferchargefrontend.models.audit.{AuditModel, AuditType, JourneyStatus, UpscanValidationAuditModel}
+import uk.gov.hmrc.securitiestransferchargefrontend.models.audit.{AuditModel, AuditType, BulkUploadProcessedAuditModel, JourneyStatus, UpscanValidationAuditModel}
 import uk.gov.hmrc.securitiestransferchargefrontend.services.AuditService
 
 trait AuditTestSupport {
@@ -73,5 +73,49 @@ trait AuditTestSupport {
     event.stcAuditType mustBe AuditType.UpscanValidation
     event.failureReason mustBe expectedFailureReason
     event.failureMessage mustBe expectedFailureMessage
+  }
+
+  def verifyBulkUploadAudit(
+                         auditService: AuditService,
+                         uploadJourney: String,
+                         affinityGroup: AffinityGroup,
+                         subscriptionId: SubscriptionId,
+                         credentialId: CredentialId,
+                         fileType : String,
+                         fileUploadStatus : String,
+                         fileSize : String,
+                         fileValidationTime: Long,
+                         fileName : String,
+                         fileReference : String,
+                         numberOfEntries : Option[Int] = None,
+                         errorType : Option[String] = None,
+                         volume : Option[String] = None,
+                         stcAuditType: AuditType
+                       ): Unit = {
+    val auditCaptor = ArgumentCaptor.forClass(classOf[BulkUploadProcessedAuditModel])
+    verify(auditService, times(1)).audit(auditCaptor.capture())(any())
+
+    val event = auditCaptor.getValue
+
+    event.auditType mustBe stcAuditType.value
+
+    val baseDetail = Json.obj(
+      "uploadJourney"      -> uploadJourney,
+      "affinityGroup"      -> affinityGroup.toString,
+      "subscriptionId"     -> subscriptionId,
+      "credentialId"       -> credentialId,
+      "fileType"           -> fileType,
+      "fileUploadStatus"   -> fileUploadStatus,
+      "fileSize"           -> fileSize,
+      "fileValidationTime" -> fileValidationTime,
+      "fileName"           -> fileName,
+      "fileReference"      -> fileReference
+    )
+
+    val withNumberOfEntries = numberOfEntries.fold(baseDetail)(n => baseDetail ++ Json.obj("numberOfEntries" -> n))
+    val withErrorType = errorType.fold(withNumberOfEntries)(e => withNumberOfEntries ++ Json.obj("errorType" -> e))
+    val expectedDetail = volume.fold(withErrorType)(v => withErrorType ++ Json.obj("volume" -> v))
+
+    event.detail mustBe expectedDetail
   }
 }
