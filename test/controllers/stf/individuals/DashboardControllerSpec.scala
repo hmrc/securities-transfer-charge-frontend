@@ -36,15 +36,22 @@ class DashboardControllerSpec extends SpecBase with MockitoSugar {
   lazy val dashboardRoute: String = individualRoutes.DashboardController.onPageLoad().url
 
   val mockDashboardClient: DashboardClient = mock[DashboardClient]
+
   "Dashboard Controller" - {
 
     "must return OK and the correct view for a GET" in {
 
       when(mockDashboardClient.getReadyToPayTransactionsCount(any())(any[HeaderCarrier])).thenReturn(Future.successful(5))
       when(mockDashboardClient.getOverdueTransactionsCount(any())(any[HeaderCarrier])).thenReturn(Future.successful(10))
+      when(mockDashboardClient.getRecentTransactionsCount(any(), any())(any[HeaderCarrier])).thenReturn(Future.successful(2))
 
       val displayName = "Test Name"
-      val submissionsViewModel = SubmissionsViewModel(overdueCount = 10, readyToPayCount = 5, draftCount = 1)
+      val submissionsViewModel = SubmissionsViewModel(
+        overdueCount = 10,
+        readyToPayCount = 5,
+        draftCount = 1,
+        recentCount = 2
+      )
 
       val application = applicationBuilder(userAnswers = Some(emptyUserAnswers), affinityGroup = individualAffinity)
         .overrides(inject.bind[DashboardClient].toInstance(mockDashboardClient))
@@ -61,6 +68,5 @@ class DashboardControllerSpec extends SpecBase with MockitoSugar {
         contentAsString(result) mustEqual view(submissionsViewModel, displayName)(request, messages(application)).toString
       }
     }
-
   }
 }

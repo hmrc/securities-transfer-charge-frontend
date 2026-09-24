@@ -64,7 +64,7 @@
                         </h2>
 
                         <p class="govuk-body">
-                            <a class="govuk-link" href="#">
+                            <a class="govuk-link" href="@if(submissions.hasNoSubmissions){@stfRoutes.RecentSubmissionsController.onPageLoad().url}else{#}">
                                 @messages("dashboard.submissions.view-all-recent")
                             </a>
                         </p>

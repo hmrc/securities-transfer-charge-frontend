@@ -21,6 +21,7 @@ import org.jsoup.nodes.Document
 import play.api.Application
 import uk.gov.hmrc.securitiestransferchargefrontend.viewmodels.dashboard.individual.SubmissionsViewModel
 import uk.gov.hmrc.securitiestransferchargefrontend.views.html.stf.individuals.DashboardView
+import uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.individuals.routes as stfRoutes
 import views.ViewBaseSpec
 
 class DashboardViewSpec extends ViewBaseSpec {
@@ -50,12 +51,13 @@ class DashboardViewSpec extends ViewBaseSpec {
 
   "The DashboardView" - {
 
-    "when rendered with submission counts" - {
+    "when rendered with submission counts greater than zero" - {
 
       val submissions = SubmissionsViewModel(
         overdueCount = 2,
         readyToPayCount = 3,
-        draftCount = 4
+        draftCount = 4,
+        recentCount = 1
       )
 
       val doc = view(submissions)
@@ -92,6 +94,10 @@ class DashboardViewSpec extends ViewBaseSpec {
           ExpectedContent.viewAllRecent
       }
 
+      "route the view all recent submissions link to '#' when counts exist" in {
+        doc.select(".design-system-card").get(1).select("a").get(0).attr("href") mustBe "#"
+      }
+
       "show the overdue count" in {
         doc.text() must include("You have 2 overdue submissions.")
       }
@@ -122,10 +128,15 @@ class DashboardViewSpec extends ViewBaseSpec {
       val submissions = SubmissionsViewModel(
         overdueCount = 0,
         readyToPayCount = 0,
-        draftCount = 0
+        draftCount = 0,
+        recentCount = 0
       )
 
       val doc = view(submissions)
+
+      "route the view all recent submissions link to the empty recent submissions page" in {
+        doc.select(".design-system-card").get(1).select("a").get(0).attr("href") mustBe stfRoutes.RecentSubmissionsController.onPageLoad().url
+      }
 
       "show the overdue count" in {
         doc.text() must include("You have 0 overdue submissions.")

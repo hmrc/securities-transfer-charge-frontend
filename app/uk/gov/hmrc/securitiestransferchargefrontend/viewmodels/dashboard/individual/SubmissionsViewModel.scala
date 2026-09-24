@@ -16,4 +16,13 @@
 
 package uk.gov.hmrc.securitiestransferchargefrontend.viewmodels.dashboard.individual
 
-case class SubmissionsViewModel(overdueCount:Int, readyToPayCount:Int, draftCount:Int)
+case class SubmissionsViewModel(
+                                 overdueCount: Int,
+                                 readyToPayCount: Int,
+                                 draftCount: Int,
+                                 recentCount: Int
+                               ) {
+
+  val hasNoSubmissions: Boolean =
+    overdueCount == 0 && readyToPayCount == 0 && draftCount == 0 && recentCount == 0
+}

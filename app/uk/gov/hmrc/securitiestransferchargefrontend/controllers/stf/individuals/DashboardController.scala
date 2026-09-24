@@ -25,6 +25,7 @@ import uk.gov.hmrc.securitiestransferchargefrontend.domain.UserId
 import uk.gov.hmrc.securitiestransferchargefrontend.viewmodels.dashboard.individual.SubmissionsViewModel
 import uk.gov.hmrc.securitiestransferchargefrontend.views.html.stf.individuals.DashboardView
 
+import java.time.LocalDate
 import javax.inject.Inject
 import scala.concurrent.ExecutionContext
 
@@ -43,15 +44,21 @@ class DashboardController @Inject()(
     val userId = UserId(request.internalId)
     val displayName = request.name
 
+    val fromDate = LocalDate.now().minusMonths(18)
+    val toDate = LocalDate.now()
+    val dateRange = s"$fromDate-$toDate"
+
     for {
       overdue <- dashboardClient.getOverdueTransactionsCount(subscriptionId)
       readyToPay <- dashboardClient.getReadyToPayTransactionsCount(subscriptionId)
       drafts <- saveAndReturnClient.listByUser(userId).map(_.size)
+      recent <- dashboardClient.getRecentTransactionsCount(subscriptionId, dateRange)
     } yield {
       val viewModel = SubmissionsViewModel(
         overdueCount = overdue,
         readyToPayCount = readyToPay,
-        draftCount = drafts
+        draftCount = drafts,
+        recentCount = recent
       )
       Ok(view(viewModel,displayName))
     }
