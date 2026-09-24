@@ -31,7 +31,8 @@ import java.time.format.DateTimeFormatter
 import javax.inject.Inject
 import scala.collection.mutable.ListBuffer
 import scala.concurrent.Future
-
+import java.util.Base64
+import java.nio.charset.StandardCharsets
 
 trait NrsService:
   def singleSubmissionNotableEvent(
@@ -54,31 +55,34 @@ class NrsServiceImpl @Inject()(
     hc          : HeaderCarrier): Future[Unit] = {
 
     val htmlPayload = cyaHtml.html.toString
+    val encodedPayload: String = Base64.getEncoder.encodeToString(htmlPayload.getBytes(StandardCharsets.UTF_8))
     val nrsRequest = NrsSingleSubmissionRequest(
       payload  = htmlPayload,
-      metadata = createMetadata(htmlPayload, request, hc, utrn)
+      metadata = createMetadata(encodedPayload, config.nrsNotableEventSingleSubmission, request, hc, utrn)
     )
 
     nrsClient.postSinglePayload(nrsRequest)
   }
 
   private[services] def createMetadata(
-    htmlPayload : String,
+    encodedHtmlPayload : String,
+    notableEvent: String,
     request     : StcDataRequest[?],
     hc          : HeaderCarrier,
     utrn        : String
-  ) =
+  ) = {
     NrsMetadata(
       businessId              = config.nrsBusinessId,
-      notableEvent            = config.nrsNotableEventSingleSubmission,
+      notableEvent            = notableEvent,
       payloadContentType      = MimeTypes.HTML,
-      payloadSha256Checksum   = sha256Hex(htmlPayload),
+      payloadSha256Checksum   = sha256Hex(encodedHtmlPayload),
       userSubmissionTimestamp = LocalDate.now().format(DateTimeFormatter.ISO_DATE_TIME),
       identityData            = request.request.identityData,
       userAuthToken           = authToken(hc),
       headerData              = request.headers.toSimpleMap,
       searchKeys              = searchKeys(request, request.request.identityData, utrn)
     )
+  }
 
   private val taxIdentifier: PartialFunction[IdentityData, (String, String)] = {
     Function.unlift { (data: IdentityData) =>
