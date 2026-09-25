@@ -28,10 +28,11 @@ import scala.concurrent.{ExecutionContext, Future}
 
 trait DashboardClient:
   def getReadyToPayTransactionsCount(subscriptionId: SubscriptionId)(implicit hc: HeaderCarrier): Future[Int]
+
   def getOverdueTransactionsCount(subscriptionId: SubscriptionId)(implicit hc: HeaderCarrier): Future[Int]
-  def getRecentTransactionsCount(subscriptionId: SubscriptionId, dateRange: String)(implicit hc: HeaderCarrier): Future[Int]
 
 class DashboardClientImpl @Inject()(http: HttpClientV2, appConfig: FrontendAppConfig)(implicit ec: ExecutionContext) extends DashboardClient:
+
 
   override def getReadyToPayTransactionsCount(subscriptionId: SubscriptionId)(implicit hc: HeaderCarrier): Future[Int] =
     http.get(url"${appConfig.dashboardServiceUrl}/dashboard/ready-to-pay/count/${subscriptionId.value}")
@@ -41,7 +42,3 @@ class DashboardClientImpl @Inject()(http: HttpClientV2, appConfig: FrontendAppCo
     http.get(url"${appConfig.dashboardServiceUrl}/dashboard/overdue/count/${subscriptionId.value}")
       .execute[Int]
 
-  override def getRecentTransactionsCount(subscriptionId: SubscriptionId, dateRange: String)(implicit hc: HeaderCarrier): Future[Int] =
-    http.get(url"${appConfig.dashboardServiceUrl}/dashboard/recent-transactions/${subscriptionId.value}?dateRange=$dateRange")
-      .execute[JsValue]
-      .map(json => (json \ "success" \ "transactionsCount").as[Int])

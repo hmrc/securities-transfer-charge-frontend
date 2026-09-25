@@ -19,13 +19,12 @@ package uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.individuals
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
-import uk.gov.hmrc.securitiestransferchargefrontend.clients.{DashboardClient, SaveAndReturnClient}
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.actions.*
-import uk.gov.hmrc.securitiestransferchargefrontend.domain.UserId
+import uk.gov.hmrc.securitiestransferchargefrontend.domain.{GroupIdentifier, UserId}
+import uk.gov.hmrc.securitiestransferchargefrontend.services.DashboardService
 import uk.gov.hmrc.securitiestransferchargefrontend.viewmodels.dashboard.individual.SubmissionsViewModel
 import uk.gov.hmrc.securitiestransferchargefrontend.views.html.stf.individuals.DashboardView
 
-import java.time.LocalDate
 import javax.inject.Inject
 import scala.concurrent.ExecutionContext
 
@@ -33,34 +32,22 @@ class DashboardController @Inject()(
                                      override val messagesApi: MessagesApi,
                                      enrolledIndividual: StcIndividualAuthEnrolledAction,
                                      val controllerComponents: MessagesControllerComponents,
-                                     dashboardClient: DashboardClient,
-                                     saveAndReturnClient: SaveAndReturnClient,
+                                     dashboardService: DashboardService,
                                      view: DashboardView
                                    )(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport {
 
-
   def onPageLoad(): Action[AnyContent] = enrolledIndividual.async { implicit request =>
     val subscriptionId = request.subscriptionId
-    val userId = UserId(request.internalId)
-    val displayName = request.name
-
-    val fromDate = LocalDate.now().minusMonths(18)
-    val toDate = LocalDate.now()
-    val dateRange = s"$fromDate-$toDate"
+    val userId         = UserId(request.internalId)
+    val groupId        = GroupIdentifier(request.groupIdentifier)
+    val displayName    = request.name
 
     for {
-      overdue <- dashboardClient.getOverdueTransactionsCount(subscriptionId)
-      readyToPay <- dashboardClient.getReadyToPayTransactionsCount(subscriptionId)
-      drafts <- saveAndReturnClient.listByUser(userId).map(_.size)
-      recent <- dashboardClient.getRecentTransactionsCount(subscriptionId, dateRange)
+      counts <- dashboardService.getCounts(userId, groupId, subscriptionId)
+      recent <- dashboardService.getRecent(subscriptionId)
     } yield {
-      val viewModel = SubmissionsViewModel(
-        overdueCount = overdue,
-        readyToPayCount = readyToPay,
-        draftCount = drafts,
-        recentCount = recent
-      )
-      Ok(view(viewModel,displayName))
+      val viewModel = SubmissionsViewModel.fromCounts(counts, recent.size)
+      Ok(view(viewModel, displayName))
     }
   }
 }

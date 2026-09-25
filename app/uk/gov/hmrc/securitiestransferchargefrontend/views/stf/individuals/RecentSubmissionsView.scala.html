@@ -27,7 +27,7 @@
 @()(implicit request: Request[_], messages: Messages)
 
 @layout(
-    pageTitle = titleNoForm(messages("recentSubmissions.title")),
+    pageTitle = s"${messages("recentSubmissions.title")} - ${messages("reportAndPay.title")} - ${messages("site.govuk")}",
     showBackLink = false
 ) {
 

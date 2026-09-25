@@ -35,7 +35,7 @@ class RecentSubmissionsViewSpec extends ViewBaseSpec {
   )
 
   object ExpectedContent {
-    val title: String = messages("recentSubmissions.title")
+    val title: String = s"${messages("recentSubmissions.title")} - ${messages("reportAndPay.title")} - ${messages("site.govuk")}"
     val heading: String = messages("recentSubmissions.heading")
     val h2: String = messages("recentSubmissions.no-recent.h2")
     val p: String = messages("recentSubmissions.no-recent.p")
@@ -49,7 +49,7 @@ class RecentSubmissionsViewSpec extends ViewBaseSpec {
     val doc = view()
 
     "have the correct title" in {
-      doc.title() must include(ExpectedContent.title)
+      doc.title() mustBe ExpectedContent.title
     }
 
     "have the correct heading" in {
