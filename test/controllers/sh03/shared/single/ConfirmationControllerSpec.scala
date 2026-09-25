@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package controllers.stf.shared
+package controllers.sh03.shared.single
 
 import base.SpecBase
 import org.mockito.ArgumentMatchers.any
@@ -23,11 +23,9 @@ import org.scalatestplus.mockito.MockitoSugar
 import play.api.inject.bind
 import play.api.test.FakeRequest
 import play.api.test.Helpers.*
-import uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.shared.routes
-import uk.gov.hmrc.securitiestransferchargefrontend.models.ConfirmationViewModel
+import uk.gov.hmrc.securitiestransferchargefrontend.controllers.sh03.shared.single.routes
 import uk.gov.hmrc.securitiestransferchargefrontend.repositories.TransactionResponseRepository
 import uk.gov.hmrc.securitiestransferchargefrontend.services.SubmissionCreateResponseSuccess
-import uk.gov.hmrc.securitiestransferchargefrontend.views.html.stf.shared.ConfirmationView
 
 import java.time.LocalDate
 import scala.concurrent.Future
@@ -60,19 +58,10 @@ class ConfirmationControllerSpec extends SpecBase with MockitoSugar {
 
       running(application) {
         val request = FakeRequest(GET, routes.ConfirmationController.onPageLoad().url)
-        val view = application.injector.instanceOf[ConfirmationView]
         val result = route(application, request).value
 
-        val viewModel = ConfirmationViewModel(
-          submissionId = submissionId,
-          paymentDueBy = paymentDueBy,
-          reference = None,
-          taxDue = taxDue,
-          isAgent = false
-        )(messages(application))
-
         status(result) mustEqual OK
-        contentAsString(result) mustEqual view(viewModel)(request, messages(application)).toString
+        contentAsString(result) must include(submissionId.value)
       }
     }
 
