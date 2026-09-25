@@ -41,6 +41,7 @@ class ConfirmationControllerSpec extends SpecBase with MockitoSugar {
       val taxDue = BigDecimal("1000.50")
       val responseSuccess = SubmissionCreateResponseSuccess(
         submissionId = submissionId,
+        utrn = testUtrn,
         chargeReferences = Seq("CHARGE-REF-001"),
         taxDue = taxDue,
         paymentDueBy = paymentDueBy,
