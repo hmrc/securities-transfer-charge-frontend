@@ -21,19 +21,14 @@ import uk.gov.hmrc.securitiestransferchargefrontend.services.DashboardCounts
 case class SubmissionsViewModel(
                                  overdueCount: Int,
                                  readyToPayCount: Int,
-                                 draftCount: Int,
-                                 recentCount: Int = 0
-                               ) {
-  val hasNoSubmissions: Boolean =
-    overdueCount == 0 && readyToPayCount == 0 && draftCount == 0 && recentCount == 0
-}
+                                 draftCount: Int
+                               )
 
 object SubmissionsViewModel {
-  def fromCounts(counts: DashboardCounts, recentCount: Int): SubmissionsViewModel =
+  def fromCounts(counts: DashboardCounts): SubmissionsViewModel =
     SubmissionsViewModel(
       overdueCount = counts.overdue,
       readyToPayCount = counts.readyToPay,
-      draftCount = counts.drafts,
-      recentCount = recentCount
+      draftCount = counts.drafts
     )
 }

@@ -42,11 +42,8 @@ class DashboardController @Inject()(
     val groupId        = GroupIdentifier(request.groupIdentifier)
     val displayName    = request.name
 
-    for {
-      counts <- dashboardService.getCounts(userId, groupId, subscriptionId)
-      recent <- dashboardService.getRecent(subscriptionId)
-    } yield {
-      val viewModel = SubmissionsViewModel.fromCounts(counts, recent.size)
+    dashboardService.getCounts(userId, groupId, subscriptionId).map { counts =>
+      val viewModel = SubmissionsViewModel.fromCounts(counts)
       Ok(view(viewModel, displayName))
     }
   }

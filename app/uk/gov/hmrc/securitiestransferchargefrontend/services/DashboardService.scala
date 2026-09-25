@@ -106,7 +106,6 @@ final class DashboardServiceImpl @Inject()(
     )
   )
 
-
   override def getCounts(userId: UserId, groupId: GroupIdentifier, subscriptionId: SubscriptionId)(implicit hc: HeaderCarrier): Future[DashboardCounts] =
     if (subscriptionId.value.toLowerCase.contains("empty")) {
       Future.successful(DashboardCounts(drafts = 0, readyToPay = 0, overdue = 0))
@@ -120,17 +119,14 @@ final class DashboardServiceImpl @Inject()(
       )
     }
 
-  override def getDrafts(userId: UserId, groupId: GroupIdentifier)(implicit hc: HeaderCarrier): Future[Seq[SubmissionSummary]] = {
+  override def getDrafts(userId: UserId, groupId: GroupIdentifier)(implicit hc: HeaderCarrier): Future[Seq[SubmissionSummary]] =
     Future.successful(sorted(drafts))
-  }
 
-  override def getReadyToPay(subscriptionId: SubscriptionId)(implicit hc: HeaderCarrier): Future[Seq[SubmissionSummary]] = {
+  override def getReadyToPay(subscriptionId: SubscriptionId)(implicit hc: HeaderCarrier): Future[Seq[SubmissionSummary]] =
     Future.successful(sorted(readyToPay))
-  }
 
-  override def getOverdue(subscriptionId: SubscriptionId)(implicit hc: HeaderCarrier): Future[Seq[SubmissionSummary]] = {
+  override def getOverdue(subscriptionId: SubscriptionId)(implicit hc: HeaderCarrier): Future[Seq[SubmissionSummary]] =
     Future.successful(sorted(overdue))
-  }
 
   override def getRecent(subscriptionId: SubscriptionId)(implicit hc: HeaderCarrier): Future[Seq[SubmissionSummary]] =
     if (subscriptionId.value.toLowerCase.contains("empty")) {
@@ -138,5 +134,4 @@ final class DashboardServiceImpl @Inject()(
     } else {
       Future.successful(sorted(readyToPay ++ overdue ++ drafts))
     }
-
 }
