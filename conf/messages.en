@@ -1338,3 +1338,6 @@ dashboard.submissions.ready-to-pay = You have <b>{0}</b> submissions that are re
 dashboard.submissions.view-ready-to-pay = View ready to pay submissions
 dashboard.submissions.drafts = You have <b>{0}</b> draft submissions.
 dashboard.submissions.view-drafts = View draft submissions
+dashboard.tell-us = Tell us about a:
+dashboard.stf = securities transfer (STF)
+dashboard.sh03 = share buyback (SH03)

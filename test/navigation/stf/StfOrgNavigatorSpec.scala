@@ -27,7 +27,7 @@ import uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.organisation
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.organisations.routes as orgRoutes
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.organisations.single.routes as orgSingleRoutes
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.organisations.single.routes as stfSingleCyaRoutes
-import uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.shared.routes as sharedRoutes
+import uk.gov.hmrc.securitiestransferchargefrontend.controllers.dashboard.routes as dashboardroutes
 import uk.gov.hmrc.securitiestransferchargefrontend.models.*
 import uk.gov.hmrc.securitiestransferchargefrontend.models.JourneyType.STF
 import uk.gov.hmrc.securitiestransferchargefrontend.models.stf.*
@@ -345,7 +345,7 @@ class StfOrgNavigatorSpec extends SpecBase with ScalaFutures {
 
       "must go from the HowToNotifyAboutSecuritiesTransferPage to SubmissionsDashboard" in {
         val result = navigator.previousPage(HowToNotifyAboutSecuritiesTransferPage, NormalMode, emptyUserAnswers)
-        result mustBe sharedRoutes.SubmissionsDashboardController.onPageLoad()
+        result mustBe dashboardroutes.DashboardController.onPageLoad()
       }
     }
 

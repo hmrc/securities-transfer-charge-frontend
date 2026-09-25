@@ -17,12 +17,13 @@
 @import uk.gov.hmrc.securitiestransferchargefrontend.views.html.templates
 @import uk.gov.hmrc.hmrcfrontend.views.viewmodels.hmrcstandardpage.TemplateOverrides
 @import uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.individuals.routes as stfRoutes
+@import uk.gov.hmrc.securitiestransferchargefrontend.controllers.dashboard.routes as dashboardRoutes
 @import uk.gov.hmrc.securitiestransferchargefrontend.models.NormalMode
-@import uk.gov.hmrc.securitiestransferchargefrontend.viewmodels.dashboard.individual.SubmissionsViewModel
+@import uk.gov.hmrc.securitiestransferchargefrontend.viewmodels.dashboard.SubmissionsViewModel
 
 @this(layout: templates.Layout)
 
-@(submissions: SubmissionsViewModel, displayName:String )(implicit request: Request[_], messages: Messages)
+@(submissions: SubmissionsViewModel, displayName: String, isIndividual: Boolean)(implicit request: Request[_], messages: Messages)
 
 @layout(pageTitle = titleNoForm(messages("dashboard.title")),mainContentLayout = Some(TemplateOverrides.noMainContentLayout),showBackLink = false) {
 
@@ -46,12 +47,35 @@
                             @messages("dashboard.create-submission.heading")
                         </h2>
 
-                        <p class="govuk-body">
-                            <a class="govuk-link"
-                               href="@stfRoutes.HowToNotifyAboutSecuritiesTransferController.onPageLoad().url">
-                                @messages("dashboard.create-submission.stf")
-                            </a>
-                        </p>
+                        @if(isIndividual) {
+
+                            <p class="govuk-body">
+                                <a class="govuk-link"
+                                   href="@dashboardRoutes.StartSubmissionController.startStf().url">
+                                    @messages("dashboard.create-submission.stf")
+                                </a>
+                            </p>
+
+                        } else {
+
+                            <p class="govuk-body">
+                                @messages("dashboard.tell-us")
+                            </p>
+
+                            <ul class="govuk-list govuk-list--bullet govuk-!-margin-left-4">
+                                <li>
+                                    <a class="govuk-link" href="@dashboardRoutes.StartSubmissionController.startStf().url">
+                                        @messages("dashboard.stf")
+                                    </a>
+                                </li>
+                                <br>
+                                <li>
+                                    <a class="govuk-link" href="@dashboardRoutes.StartSubmissionController.startSh03().url">
+                                        @messages("dashboard.sh03")
+                                    </a>
+                                </li>
+                            </ul>
+                        }
 
                     </div>
                 </div>
@@ -70,7 +94,9 @@
                         </p>
 
                         <p class="govuk-body">
-                            @Html(messages("dashboard.submissions.overdue", submissions.overdueCount)) <br>
+                            @Html(messages("dashboard.submissions.overdue", submissions.overdueCount ))
+                            <br>
+
                             @if(submissions.overdueCount > 0) {
                                 <a class="govuk-link" href="#">
                                     @messages("dashboard.submissions.view-overdue")
@@ -79,7 +105,9 @@
                         </p>
 
                         <p class="govuk-body">
-                            @Html(messages("dashboard.submissions.ready-to-pay", submissions.readyToPayCount)) <br>
+                            @Html(messages("dashboard.submissions.ready-to-pay", submissions.readyToPayCount))
+                            <br>
+
                             @if(submissions.readyToPayCount > 0) {
                                 <a class="govuk-link" href="#">
                                     @messages("dashboard.submissions.view-ready-to-pay")
@@ -88,7 +116,9 @@
                         </p>
 
                         <p class="govuk-body">
-                            @Html(messages("dashboard.submissions.drafts", submissions.draftCount)) <br>
+                            @Html(messages("dashboard.submissions.drafts", submissions.draftCount))
+                            <br>
+
                             @if(submissions.draftCount > 0) {
                                 <a class="govuk-link" href="#">
                                     @messages("dashboard.submissions.view-drafts")

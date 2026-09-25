@@ -21,7 +21,7 @@ import play.api.mvc.{AnyContentAsEmpty, Result}
 import play.api.test.FakeRequest
 import uk.gov.hmrc.auth.core.*
 import uk.gov.hmrc.auth.core.authorise.Predicate
-import uk.gov.hmrc.auth.core.retrieve.{Credentials, Name, Retrieval}
+import uk.gov.hmrc.auth.core.retrieve.{AgentInformation, Credentials, ItmpName, Name, Retrieval}
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.securitiestransferchargefrontend.connectors.AlfAddressConnector
 import uk.gov.hmrc.securitiestransferchargefrontend.domain.{CredentialId, GroupIdentifier, SubmissionId, SubscriptionId, UserId}
@@ -54,7 +54,7 @@ object Fixtures {
   val testExternalId = Some("ext-456")
   val testName = "Test Name"
 
-  val testIdentityData = IdentityData(
+  val testIdentityData: IdentityData = IdentityData(
     internalId = Some("int-123"),
     externalId = testExternalId,
     agentCode = None,
@@ -65,11 +65,11 @@ object Fixtures {
     name = Some(Name(Some("Bob"), Some("Collins"))),
     dateOfBirth = Some(LocalDate.parse("1980-08-10")),
     email = Some("bob.collins@foo.bar"),
-    agentInformation = None,
+    agentInformation = Some(AgentInformation(None,None,Some("Agent Name"))),
     groupIdentifier = Some("my-fancy-group"),
     credentialRole = Some("admin"),
     mdtpInformation = None,
-    itmpName = None,
+    itmpName = Some(ItmpName(Some("First"),None,Some("Last"))),
     itmpDateOfBirth = None,
     itmpAddress = None,
     affinityGroup = Some("individual"),
