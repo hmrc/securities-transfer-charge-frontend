@@ -1302,6 +1302,7 @@ confirmation.heading.nextSteps = Next steps
 confirmation.heading.transferReference = Share the transfer references
 confirmation.heading.transferReference.p1 = A transfer reference has been created for each transfer, you can see them in
 confirmation.heading.transferReference.p2 = Use these references to confirm that HMRC has been notified about your transfers.
+confirmation.heading.shareBuyBack.p2 = Use these references to confirm that HMRC has been notified about this share buyback.
 confirmation.heading.transferReference.link = your submission (opens in new tab).
 confirmation.heading.deadline = Pay the tax due by the deadline
 confirmation.heading.deadline.p1 = Do not use any of the reference numbers on this page as your payment reference, this will delay your payment being processed.
