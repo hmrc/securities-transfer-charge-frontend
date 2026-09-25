@@ -28,9 +28,10 @@ import uk.gov.hmrc.http.{HeaderCarrier, HttpResponse}
 import uk.gov.hmrc.securitiestransferchargefrontend.clients.SaveAndReturnClientImpl
 import uk.gov.hmrc.securitiestransferchargefrontend.config.FrontendAppConfig
 import uk.gov.hmrc.securitiestransferchargefrontend.domain.{SubmissionId, UserId}
-import uk.gov.hmrc.securitiestransferchargefrontend.models.UserAnswers
+import uk.gov.hmrc.securitiestransferchargefrontend.models.{JourneyType, UserAnswers, UserAnswersSummary}
 
 import java.net.URL
+import java.time.Instant
 import scala.concurrent.Future
 
 
@@ -116,17 +117,20 @@ class SaveAndReturnClientImplSpec extends SpecBase {
     "list" - {
       "return a list of submission on successful call" in new TestSetup {
 
-        val submissionIds: List[SubmissionId] =
-          List(SubmissionId("sub-01"), SubmissionId("sub-02"), SubmissionId("sub-01"))
-
-
+        val summaries: List[UserAnswersSummary] =
+          List(
+            UserAnswersSummary(SubmissionId("123"), JourneyType.STF, Instant.now()),
+            UserAnswersSummary(SubmissionId("345"), JourneyType.SH03, Instant.now().minusSeconds(120))
+          )
+        
         when(mockRequestBuilder.execute[List[SubmissionId]](any(), any()))
-          .thenReturn(Future.successful(submissionIds))
+          .thenReturn(Future.successful(summaries))
+        
+        val result = client.listByUser(testUserId)
 
-
-        val result: List[SubmissionId] = client.listByUser(testUserId).futureValue
-
-        result mustBe submissionIds
+        whenReady(result) { r =>
+          r mustBe summaries
+        }
       }
 
       "fail the future and log an error when the HTTP call fails" in new TestSetup {
@@ -135,7 +139,7 @@ class SaveAndReturnClientImplSpec extends SpecBase {
         when(mockRequestBuilder.execute[List[SubmissionId]](any(), any()))
           .thenReturn(Future.failed(exception))
 
-        val result: Future[List[SubmissionId]] = client.listByUser(testUserId)
+        val result: Future[List[UserAnswersSummary]] = client.listByUser(testUserId)
 
         result.failed.futureValue mustBe exception
       }

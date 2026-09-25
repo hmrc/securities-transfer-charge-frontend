@@ -26,10 +26,10 @@ import uk.gov.hmrc.securitiestransferchargefrontend.clients.{SaveAndReturnClient
 import uk.gov.hmrc.securitiestransferchargefrontend.config.FrontendAppConfig
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.actions.{StcAuthEnrolledAction, StcDataRetrievalAction}
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.sh03.shared.routes as sh03SharedRoutes
-import uk.gov.hmrc.securitiestransferchargefrontend.domain.{GroupIdentifier, SubmissionId, UserId}
+import uk.gov.hmrc.securitiestransferchargefrontend.domain.{GroupIdentifier, UserId}
 import uk.gov.hmrc.securitiestransferchargefrontend.models.audit.JourneyStatus.StartSubmission
 import uk.gov.hmrc.securitiestransferchargefrontend.models.audit.{AuditModel, AuditType}
-import uk.gov.hmrc.securitiestransferchargefrontend.models.{JourneyType, NormalMode, UserAnswers}
+import uk.gov.hmrc.securitiestransferchargefrontend.models.{JourneyType, NormalMode, UserAnswers, UserAnswersSummary}
 import uk.gov.hmrc.securitiestransferchargefrontend.navigation.Navigator
 import uk.gov.hmrc.securitiestransferchargefrontend.pages.stf.shared.SubmissionsDashboardPage
 import uk.gov.hmrc.securitiestransferchargefrontend.services.AuditService
@@ -59,13 +59,12 @@ class SubmissionsDashboardController @Inject()(
 
       val userId = UserId(request.request.internalId)
       val groupIdentifier = GroupIdentifier(request.request.groupIdentifier)
-      listSubmissionIds(userId, groupIdentifier).map { submissionIds =>
-        Ok(view(submissionIds))
+      getDraftSummaries(userId, groupIdentifier).map { summaries =>
+        Ok(view(summaries.map(_.submissionId)))
       }
     }
-
-
-  private def listSubmissionIds(userId: UserId, groupIdentifier: GroupIdentifier)(implicit headerCarrier: HeaderCarrier): Future[List[SubmissionId]] = {
+  
+  private def getDraftSummaries(userId: UserId, groupIdentifier: GroupIdentifier)(implicit headerCarrier: HeaderCarrier): Future[List[UserAnswersSummary]] = {
     import appConfig.SaveAndReturnRetrievalType.*
     appConfig.saveAndReturnRetrieval match {
       case UserOnly => saveAndReturnClient.listByUser(userId)

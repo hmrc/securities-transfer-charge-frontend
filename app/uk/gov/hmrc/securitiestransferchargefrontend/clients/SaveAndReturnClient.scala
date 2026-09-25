@@ -25,7 +25,7 @@ import uk.gov.hmrc.http.client.HttpClientV2
 import uk.gov.hmrc.http.{HeaderCarrier, HttpResponse, StringContextOps}
 import uk.gov.hmrc.securitiestransferchargefrontend.config.FrontendAppConfig
 import uk.gov.hmrc.securitiestransferchargefrontend.domain.{GroupIdentifier, SubmissionId, UserId}
-import uk.gov.hmrc.securitiestransferchargefrontend.models.UserAnswers
+import uk.gov.hmrc.securitiestransferchargefrontend.models.{UserAnswers, UserAnswersSummary}
 
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
@@ -35,8 +35,8 @@ import scala.util.Failure
 trait SaveAndReturnClient:
   def save(userAnswers: UserAnswers)(implicit hc: HeaderCarrier): Future[Unit]
   def retrieve(submissionId: SubmissionId)(implicit hc: HeaderCarrier): Future[UserAnswers]
-  def listByUser(userId: UserId)(implicit hc: HeaderCarrier): Future[List[SubmissionId]]
-  def listByGroup(groupIdentifier: GroupIdentifier)(implicit hc: HeaderCarrier): Future[List[SubmissionId]]
+  def listByUser(userId: UserId)(implicit hc: HeaderCarrier): Future[List[UserAnswersSummary]]
+  def listByGroup(groupIdentifier: GroupIdentifier)(implicit hc: HeaderCarrier): Future[List[UserAnswersSummary]]
   def deleteDraft(submissionId: SubmissionId)(implicit hc: HeaderCarrier): Future[Unit]
 
 
@@ -74,25 +74,25 @@ class SaveAndReturnClientImpl @Inject(http: HttpClientV2, config: FrontendAppCon
       }
   }
 
-  override def listByGroup(groupIdentifier: GroupIdentifier)(implicit hc: HeaderCarrier): Future[List[SubmissionId]] = {
+  override def listByGroup(groupIdentifier: GroupIdentifier)(implicit hc: HeaderCarrier): Future[List[UserAnswersSummary]] = {
 
     http
       .get(url"$userAnswersPath/search/by-group?groupId=$groupIdentifier")
-      .execute[List[SubmissionId]]
+      .execute[List[UserAnswersSummary]]
       .andThen {
         case Failure(e) =>
-          logger.error(s"Failed to retrieve submissionIds for groupIdentifier=$groupIdentifier", e)
+          logger.error(s"Failed to retrieve summaries for groupIdentifier=$groupIdentifier", e)
       }
   }
 
-  override def listByUser(userId: UserId)(implicit hc: HeaderCarrier): Future[List[SubmissionId]] = {
+  override def listByUser(userId: UserId)(implicit hc: HeaderCarrier): Future[List[UserAnswersSummary]] = {
 
     http
       .get(url"$userAnswersPath/search/by-user?userId=$userId")
-      .execute[List[SubmissionId]]
+      .execute[List[UserAnswersSummary]]
       .andThen {
         case Failure(e) =>
-          logger.error(s"Failed to retrieve submissionIds for userId=$userId", e)
+          logger.error(s"Failed to retrieve summaries for userId=$userId", e)
       }
   }
 
