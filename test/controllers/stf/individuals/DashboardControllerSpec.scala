@@ -24,8 +24,8 @@ import play.api.inject
 import play.api.test.FakeRequest
 import play.api.test.Helpers.*
 import uk.gov.hmrc.http.HeaderCarrier
-import uk.gov.hmrc.securitiestransferchargefrontend.clients.DashboardClient
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.individuals.routes as individualRoutes
+import uk.gov.hmrc.securitiestransferchargefrontend.services.{DashboardCounts, DashboardService}
 import uk.gov.hmrc.securitiestransferchargefrontend.viewmodels.dashboard.individual.SubmissionsViewModel
 import uk.gov.hmrc.securitiestransferchargefrontend.views.html.stf.individuals.DashboardView
 
@@ -35,19 +35,26 @@ class DashboardControllerSpec extends SpecBase with MockitoSugar {
 
   lazy val dashboardRoute: String = individualRoutes.DashboardController.onPageLoad().url
 
-  val mockDashboardClient: DashboardClient = mock[DashboardClient]
+  val mockDashboardService: DashboardService = mock[DashboardService]
+
   "Dashboard Controller" - {
 
     "must return OK and the correct view for a GET" in {
 
-      when(mockDashboardClient.getReadyToPayTransactionsCount(any())(any[HeaderCarrier])).thenReturn(Future.successful(5))
-      when(mockDashboardClient.getOverdueTransactionsCount(any())(any[HeaderCarrier])).thenReturn(Future.successful(10))
+      val counts = DashboardCounts(drafts = 1, readyToPay = 5, overdue = 10)
+
+      when(mockDashboardService.getCounts(any(), any(), any())(any[HeaderCarrier]))
+        .thenReturn(Future.successful(counts))
 
       val displayName = "Test Name"
-      val submissionsViewModel = SubmissionsViewModel(overdueCount = 10, readyToPayCount = 5, draftCount = 1)
+      val submissionsViewModel = SubmissionsViewModel(
+        overdueCount = 10,
+        readyToPayCount = 5,
+        draftCount = 1
+      )
 
       val application = applicationBuilder(userAnswers = Some(emptyUserAnswers), affinityGroup = individualAffinity)
-        .overrides(inject.bind[DashboardClient].toInstance(mockDashboardClient))
+        .overrides(inject.bind[DashboardService].toInstance(mockDashboardService))
         .build()
 
       running(application) {
@@ -61,6 +68,5 @@ class DashboardControllerSpec extends SpecBase with MockitoSugar {
         contentAsString(result) mustEqual view(submissionsViewModel, displayName)(request, messages(application)).toString
       }
     }
-
   }
 }

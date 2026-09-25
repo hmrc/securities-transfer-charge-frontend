@@ -22,9 +22,9 @@
 
 @this(layout: templates.Layout)
 
-@(submissions: SubmissionsViewModel, displayName:String )(implicit request: Request[_], messages: Messages)
+@(submissions: SubmissionsViewModel, displayName: String)(implicit request: Request[_], messages: Messages)
 
-@layout(pageTitle = titleNoForm(messages("dashboard.title")),mainContentLayout = Some(TemplateOverrides.noMainContentLayout),showBackLink = false) {
+@layout(pageTitle = titleNoForm(messages("dashboard.title")), mainContentLayout = Some(TemplateOverrides.noMainContentLayout), showBackLink = false) {
 
     <span class="govuk-caption-l">
         @messages("dashboard.caption")
@@ -64,7 +64,7 @@
                         </h2>
 
                         <p class="govuk-body">
-                            <a class="govuk-link" href="#">
+                            <a class="govuk-link" href="@stfRoutes.RecentSubmissionsController.onPageLoad().url">
                                 @messages("dashboard.submissions.view-all-recent")
                             </a>
                         </p>

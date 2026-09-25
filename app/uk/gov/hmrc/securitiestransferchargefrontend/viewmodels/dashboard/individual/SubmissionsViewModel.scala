@@ -16,4 +16,19 @@
 
 package uk.gov.hmrc.securitiestransferchargefrontend.viewmodels.dashboard.individual
 
-case class SubmissionsViewModel(overdueCount:Int, readyToPayCount:Int, draftCount:Int)
+import uk.gov.hmrc.securitiestransferchargefrontend.services.DashboardCounts
+
+case class SubmissionsViewModel(
+                                 overdueCount: Int,
+                                 readyToPayCount: Int,
+                                 draftCount: Int
+                               )
+
+object SubmissionsViewModel {
+  def fromCounts(counts: DashboardCounts): SubmissionsViewModel =
+    SubmissionsViewModel(
+      overdueCount = counts.overdue,
+      readyToPayCount = counts.readyToPay,
+      draftCount = counts.drafts
+    )
+}

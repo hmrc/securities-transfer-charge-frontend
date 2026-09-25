@@ -500,3 +500,4 @@ GET        /file-not-saved                             uk.gov.hmrc.securitiestra
 
 GET        /dashboard                                   uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.individuals.DashboardController.onPageLoad()
 
+GET        /recent-submissions                          uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.individuals.RecentSubmissionsController.onPageLoad()

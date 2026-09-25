@@ -19,6 +19,7 @@ package views.stf.individuals
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
 import play.api.Application
+import uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.individuals.routes as stfRoutes
 import uk.gov.hmrc.securitiestransferchargefrontend.viewmodels.dashboard.individual.SubmissionsViewModel
 import uk.gov.hmrc.securitiestransferchargefrontend.views.html.stf.individuals.DashboardView
 import views.ViewBaseSpec
@@ -88,8 +89,9 @@ class DashboardViewSpec extends ViewBaseSpec {
       }
 
       "have the view all recent submissions link" in {
-        doc.select(".design-system-card").get(1).select("a").get(0).text() mustBe
-          ExpectedContent.viewAllRecent
+        val link = doc.select(".design-system-card").get(1).select("a").get(0)
+        link.text() mustBe ExpectedContent.viewAllRecent
+        link.attr("href") mustBe stfRoutes.RecentSubmissionsController.onPageLoad().url
       }
 
       "show the overdue count" in {

@@ -1337,3 +1337,15 @@ dashboard.submissions.ready-to-pay = You have <b>{0}</b> submissions that are re
 dashboard.submissions.view-ready-to-pay = View ready to pay submissions
 dashboard.submissions.drafts = You have <b>{0}</b> draft submissions.
 dashboard.submissions.view-drafts = View draft submissions
+
+
+recentSubmissions.title = Recent submissions
+recentSubmissions.heading = Submissions
+recentSubmissions.no-recent.h2 = You have no recent submissions
+recentSubmissions.no-recent.p = Once you have made a submission, or created a draft, it will appear here.
+recentSubmissions.button.stf = Tell us about a securities transfer (STF)
+
+breadcrumbs.dashboard = Dashboard
+breadcrumbs.submissions = Submissions
+
+reportAndPay.title = Report and pay for a securities transfer
