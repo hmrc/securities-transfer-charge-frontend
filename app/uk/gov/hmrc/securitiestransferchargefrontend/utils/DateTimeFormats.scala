@@ -18,12 +18,14 @@ package uk.gov.hmrc.securitiestransferchargefrontend.utils
 
 import play.api.i18n.Lang
 
-import java.time.LocalDate
+import java.time.{LocalDate, ZoneId}
 import java.time.format.DateTimeFormatter
 import java.util.Locale
 
 object DateTimeFormats {
 
+  val ukZoneId: ZoneId = ZoneId.of("Europe/London")
+  
   private val dateTimeFormatter = DateTimeFormatter.ofPattern("d MMMM yyyy")
 
   private val localisedDateTimeFormatters = Map(

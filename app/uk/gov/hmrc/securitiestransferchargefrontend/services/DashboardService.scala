@@ -17,12 +17,15 @@
 package uk.gov.hmrc.securitiestransferchargefrontend.services
 
 import uk.gov.hmrc.http.HeaderCarrier
+import uk.gov.hmrc.securitiestransferchargefrontend.clients.SaveAndReturnClient
 import uk.gov.hmrc.securitiestransferchargefrontend.domain.{GroupIdentifier, SubscriptionId, UserId}
+import uk.gov.hmrc.securitiestransferchargefrontend.models.UserAnswersSummary
 import uk.gov.hmrc.securitiestransferchargefrontend.services.SubmissionStatus.{Draft, Overdue}
+import uk.gov.hmrc.securitiestransferchargefrontend.utils.DateTimeFormats
 
 import java.time.LocalDate
 import javax.inject.Inject
-import scala.concurrent.Future
+import scala.concurrent.{ExecutionContext, Future}
 
 enum SubmissionStatus:
   case Draft, Processing, ReadyToPay, Paid, Overdue, PartialFailure, Failed
@@ -51,11 +54,13 @@ trait DashboardService:
   def getDrafts(userId: UserId, groupId: GroupIdentifier)(implicit hc: HeaderCarrier): Future[Seq[SubmissionSummary]]
   def getReadyToPay(subscriptionId: SubscriptionId)(implicit hc: HeaderCarrier): Future[Seq[SubmissionSummary]]
   def getOverdue(subscriptionId: SubscriptionId)(implicit hc: HeaderCarrier): Future[Seq[SubmissionSummary]]
-  def getRecent(subscriptionId: SubscriptionId)(implicit hc: HeaderCarrier): Future[Seq[SubmissionSummary]]
+  def getRecent(userId: UserId, groupId: GroupIdentifier, subscriptionId: SubscriptionId)(implicit hc: HeaderCarrier): Future[Seq[SubmissionSummary]]
 
 final class DashboardServiceImpl @Inject()(
-
-                                          ) extends DashboardService {
+  saveAndReturnClient: SaveAndReturnClient
+)(using
+  ec: ExecutionContext                                   
+) extends DashboardService {
 
 
   private val sorted = (summaries: Seq[SubmissionSummary]) =>
@@ -97,15 +102,13 @@ final class DashboardServiceImpl @Inject()(
     )
   )
 
-  private val drafts: Seq[SubmissionSummary] = List(
+  private val toSubmissionSummary: UserAnswersSummary => SubmissionSummary = uas =>
     SubmissionSummary(
-      submissionId = "STC-00000219",
-      paymentDueBy = "N/A",
+      submissionId = uas.submissionId.value,
+      paymentDueBy = "N/A", 
       status = Draft,
-      sortDate = LocalDate.parse("2026-10-19")
+      sortDate = LocalDate.ofInstant(uas.lastUpdated, DateTimeFormats.ukZoneId)
     )
-  )
-
 
   override def getCounts(userId: UserId, groupId: GroupIdentifier, subscriptionId: SubscriptionId)(implicit hc: HeaderCarrier): Future[DashboardCounts] =
     Future.successful(
@@ -117,7 +120,11 @@ final class DashboardServiceImpl @Inject()(
     )
 
   override def getDrafts(userId: UserId, groupId: GroupIdentifier)(implicit hc: HeaderCarrier): Future[Seq[SubmissionSummary]] = {
-    Future.successful(sorted(drafts))
+    saveAndReturnClient
+      .getDraftSummaries(userId, groupId)
+      .map { summaries =>
+        summaries.map(toSubmissionSummary)
+      }
   }
 
   override def getReadyToPay(subscriptionId: SubscriptionId)(implicit hc: HeaderCarrier): Future[Seq[SubmissionSummary]] = {
@@ -128,8 +135,9 @@ final class DashboardServiceImpl @Inject()(
     Future.successful(sorted(overdue))
   }
 
-  override def getRecent(subscriptionId: SubscriptionId)(implicit hc: HeaderCarrier): Future[Seq[SubmissionSummary]]= {
-    Future.successful(sorted(readyToPay ++ overdue ++ drafts))
-  }
+  override def getRecent(userId: UserId, groupId: GroupIdentifier, subscriptionId: SubscriptionId)(implicit hc: HeaderCarrier): Future[Seq[SubmissionSummary]]= for {
+    drafts <- getDrafts(userId, groupId)
+    others <- Future.successful(readyToPay ++ overdue)
+  } yield sorted(drafts ++ others)
 
 }

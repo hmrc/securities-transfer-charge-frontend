@@ -24,6 +24,7 @@ import uk.gov.hmrc.http.HttpReads.Implicits.*
 import uk.gov.hmrc.http.client.HttpClientV2
 import uk.gov.hmrc.http.{HeaderCarrier, HttpResponse, StringContextOps}
 import uk.gov.hmrc.securitiestransferchargefrontend.config.FrontendAppConfig
+import uk.gov.hmrc.securitiestransferchargefrontend.config.SaveAndReturnRetrievalType.{UserAndGroup, UserOnly}
 import uk.gov.hmrc.securitiestransferchargefrontend.domain.{GroupIdentifier, SubmissionId, UserId}
 import uk.gov.hmrc.securitiestransferchargefrontend.models.{UserAnswers, UserAnswersSummary}
 
@@ -35,12 +36,16 @@ import scala.util.Failure
 trait SaveAndReturnClient:
   def save(userAnswers: UserAnswers)(implicit hc: HeaderCarrier): Future[Unit]
   def retrieve(submissionId: SubmissionId)(implicit hc: HeaderCarrier): Future[UserAnswers]
-  def listByUser(userId: UserId)(implicit hc: HeaderCarrier): Future[List[UserAnswersSummary]]
-  def listByGroup(groupIdentifier: GroupIdentifier)(implicit hc: HeaderCarrier): Future[List[UserAnswersSummary]]
+  def getDraftSummaries(userId: UserId, groupIdentifier: GroupIdentifier)(implicit headerCarrier: HeaderCarrier): Future[List[UserAnswersSummary]]
   def deleteDraft(submissionId: SubmissionId)(implicit hc: HeaderCarrier): Future[Unit]
 
 
-class SaveAndReturnClientImpl @Inject(http: HttpClientV2, config: FrontendAppConfig)(implicit ec: ExecutionContext) extends SaveAndReturnClient with Logging {
+class SaveAndReturnClientImpl @Inject(
+  http: HttpClientV2,
+  config: FrontendAppConfig
+)(using
+  ec: ExecutionContext
+) extends SaveAndReturnClient with Logging {
 
   private val baseUrl = config.saveAndReturnUrl
   private val userAnswersPath = s"$baseUrl/user-answers"
@@ -74,7 +79,7 @@ class SaveAndReturnClientImpl @Inject(http: HttpClientV2, config: FrontendAppCon
       }
   }
 
-  override def listByGroup(groupIdentifier: GroupIdentifier)(implicit hc: HeaderCarrier): Future[List[UserAnswersSummary]] = {
+  private def listByGroup(groupIdentifier: GroupIdentifier)(implicit hc: HeaderCarrier): Future[List[UserAnswersSummary]] = {
 
     http
       .get(url"$userAnswersPath/search/by-group?groupId=$groupIdentifier")
@@ -85,7 +90,7 @@ class SaveAndReturnClientImpl @Inject(http: HttpClientV2, config: FrontendAppCon
       }
   }
 
-  override def listByUser(userId: UserId)(implicit hc: HeaderCarrier): Future[List[UserAnswersSummary]] = {
+  private def listByUser(userId: UserId)(implicit hc: HeaderCarrier): Future[List[UserAnswersSummary]] = {
 
     http
       .get(url"$userAnswersPath/search/by-user?userId=$userId")
@@ -101,4 +106,12 @@ class SaveAndReturnClientImpl @Inject(http: HttpClientV2, config: FrontendAppCon
       .delete(url"$userAnswersPath/${submissionId.value}")
       .execute[HttpResponse]
       .map(_ => ())
+
+  override def getDraftSummaries(userId: UserId, groupIdentifier: GroupIdentifier)(implicit headerCarrier: HeaderCarrier): Future[List[UserAnswersSummary]] = {
+    config.saveAndReturnRetrieval match {
+      case UserOnly => listByUser(userId)
+      case UserAndGroup => listByGroup(groupIdentifier)
+    }
   }
+
+}

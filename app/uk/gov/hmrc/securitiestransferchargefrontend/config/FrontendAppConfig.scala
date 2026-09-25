@@ -24,6 +24,10 @@ import uk.gov.hmrc.play.bootstrap.config.ServicesConfig
 
 import java.time.LocalDate
 
+enum SaveAndReturnRetrievalType {
+  case UserOnly, UserAndGroup
+}
+
 @Singleton
 class FrontendAppConfig @Inject() (configuration: Configuration, servicesConfig: ServicesConfig) {
 
@@ -110,10 +114,6 @@ class FrontendAppConfig @Inject() (configuration: Configuration, servicesConfig:
 
   lazy val saveAndReturnUrl: String =
     s"$saveAndReturnBaseUrl$saveAndReturnBasePath"
-
-  enum SaveAndReturnRetrievalType {
-    case UserOnly, UserAndGroup
-  }
 
   val saveAndReturnRetrieval: SaveAndReturnRetrievalType =
     if (configuration.get[Boolean]("microservice.save-and-return-uses-user-id-only"))

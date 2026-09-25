@@ -36,12 +36,9 @@ class FakeSaveAndReturnClient extends SaveAndReturnClient:
 
   override def retrieve(submissionId: SubmissionId)(implicit hc: HeaderCarrier): Future[UserAnswers] = Future.successful(stubUserAnswers)
 
-  override def listByUser(userId: UserId)(implicit hc: HeaderCarrier): Future[List[UserAnswersSummary]] = Future.successful(List(stubSummary))
-
-  override def listByGroup(groupIdentifier: GroupIdentifier)(implicit hc: HeaderCarrier): Future[List[UserAnswersSummary]] = Future.successful(List(stubSummary))
+  override def getDraftSummaries(userId: UserId, groupIdentifier: GroupIdentifier)(implicit headerCarrier: HeaderCarrier): Future[List[UserAnswersSummary]] = Future.successful(List(stubSummary))
 
   override def deleteDraft(submissionId: SubmissionId)(implicit hc: HeaderCarrier): Future[Unit] = Future.successful(())
 
 object FakeSaveAndReturnClient:
   def apply(): SaveAndReturnClient = new FakeSaveAndReturnClient
-

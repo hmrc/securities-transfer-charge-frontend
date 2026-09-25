@@ -21,7 +21,7 @@ import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import uk.gov.hmrc.securitiestransferchargefrontend.clients.{DashboardClient, SaveAndReturnClient}
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.actions.*
-import uk.gov.hmrc.securitiestransferchargefrontend.domain.UserId
+import uk.gov.hmrc.securitiestransferchargefrontend.domain.{GroupIdentifier, UserId}
 import uk.gov.hmrc.securitiestransferchargefrontend.viewmodels.dashboard.individual.SubmissionsViewModel
 import uk.gov.hmrc.securitiestransferchargefrontend.views.html.stf.individuals.DashboardView
 
@@ -41,12 +41,13 @@ class DashboardController @Inject()(
   def onPageLoad(): Action[AnyContent] = enrolledIndividual.async { implicit request =>
     val subscriptionId = request.subscriptionId
     val userId = UserId(request.internalId)
+    val groupId = GroupIdentifier(request.groupIdentifier)
     val displayName = request.name
 
     for {
       overdue <- dashboardClient.getOverdueTransactionsCount(subscriptionId)
       readyToPay <- dashboardClient.getReadyToPayTransactionsCount(subscriptionId)
-      drafts <- saveAndReturnClient.listByUser(userId).map(_.size)
+      drafts <- saveAndReturnClient.getDraftSummaries(userId, groupId).map(_.size)
     } yield {
       val viewModel = SubmissionsViewModel(
         overdueCount = overdue,

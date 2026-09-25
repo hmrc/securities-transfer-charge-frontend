@@ -26,8 +26,8 @@ import uk.gov.hmrc.http.HttpReads.Implicits.*
 import uk.gov.hmrc.http.client.{HttpClientV2, RequestBuilder}
 import uk.gov.hmrc.http.{HeaderCarrier, HttpResponse}
 import uk.gov.hmrc.securitiestransferchargefrontend.clients.SaveAndReturnClientImpl
-import uk.gov.hmrc.securitiestransferchargefrontend.config.FrontendAppConfig
-import uk.gov.hmrc.securitiestransferchargefrontend.domain.{SubmissionId, UserId}
+import uk.gov.hmrc.securitiestransferchargefrontend.config.{FrontendAppConfig, SaveAndReturnRetrievalType}
+import uk.gov.hmrc.securitiestransferchargefrontend.domain.{GroupIdentifier, SubmissionId, UserId}
 import uk.gov.hmrc.securitiestransferchargefrontend.models.{JourneyType, UserAnswers, UserAnswersSummary}
 
 import java.net.URL
@@ -37,20 +37,25 @@ import scala.concurrent.Future
 
 class SaveAndReturnClientImplSpec extends SpecBase {
 
-
   trait TestSetup {
 
     val mockHttp: HttpClientV2 = mock[HttpClientV2]
     val mockConfig: FrontendAppConfig = mock[FrontendAppConfig]
+
     val mockRequestBuilder: RequestBuilder = mock[RequestBuilder]
 
     val baseUrl = "http://localhost:1201/securities-transfer-charge-save-and-return"
 
-    when(mockConfig.saveAndReturnUrl).thenReturn(baseUrl)
+    when(mockConfig.saveAndReturnUrl)
+      .thenReturn(baseUrl)
+    
+    when(mockConfig.saveAndReturnRetrieval)
+      .thenReturn(SaveAndReturnRetrievalType.UserAndGroup)
 
     val client = new SaveAndReturnClientImpl(mockHttp, mockConfig)
 
     val testUserId: UserId = Fixtures.testInternalId
+    val testGroupId: GroupIdentifier = Fixtures.testGroupIdentifier
     val testSubmissionId: SubmissionId = Fixtures.testSubmissionId
     val testUserAnswers: UserAnswers = Fixtures.emptyUserAnswers
 
@@ -115,18 +120,18 @@ class SaveAndReturnClientImplSpec extends SpecBase {
     }
 
     "list" - {
-      "return a list of submission on successful call" in new TestSetup {
+      "return a list of summaries on successful call" in new TestSetup {
 
         val summaries: List[UserAnswersSummary] =
           List(
             UserAnswersSummary(SubmissionId("123"), JourneyType.STF, Instant.now()),
             UserAnswersSummary(SubmissionId("345"), JourneyType.SH03, Instant.now().minusSeconds(120))
           )
-        
+
         when(mockRequestBuilder.execute[List[SubmissionId]](any(), any()))
           .thenReturn(Future.successful(summaries))
-        
-        val result = client.listByUser(testUserId)
+
+        val result = client.getDraftSummaries(testUserId, testGroupId)
 
         whenReady(result) { r =>
           r mustBe summaries
@@ -139,7 +144,7 @@ class SaveAndReturnClientImplSpec extends SpecBase {
         when(mockRequestBuilder.execute[List[SubmissionId]](any(), any()))
           .thenReturn(Future.failed(exception))
 
-        val result: Future[List[UserAnswersSummary]] = client.listByUser(testUserId)
+        val result = client.getDraftSummaries(testUserId, testGroupId)
 
         result.failed.futureValue mustBe exception
       }
