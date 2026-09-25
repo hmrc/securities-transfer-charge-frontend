@@ -61,11 +61,13 @@ trait SpecBase
 
   implicit val ec: ExecutionContext = ExecutionContext.global
   implicit val hc: HeaderCarrier = HeaderCarrier()
+
   val testUserId: UserId = UserId("id")
   val testGroupIdentifier: GroupIdentifier = GroupIdentifier("group-123")
   val sessionId = "sessionId1234"
   val submissionId: SubmissionId = SubmissionId("STC-123456789")
   val subscriptionId: SubscriptionId = SubscriptionId("STT66637383")
+  val testUtrn: String = "01020304"
   val userId = "internalId"
   val affinityGroupKeyInd = "individual"
   val affinityGroupKeyOrg = "org"

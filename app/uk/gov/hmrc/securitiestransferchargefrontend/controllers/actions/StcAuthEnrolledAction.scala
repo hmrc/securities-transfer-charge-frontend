@@ -26,8 +26,10 @@ import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.play.http.HeaderCarrierConverter
 import uk.gov.hmrc.securitiestransferchargefrontend.config.FrontendAppConfig
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.actions.filters.RetrievalFilter
+import uk.gov.hmrc.securitiestransferchargefrontend.controllers.actions.requests.StcAuthorisedRequest
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.{Redirects, routes}
 import uk.gov.hmrc.securitiestransferchargefrontend.domain.CredentialId
+import uk.gov.hmrc.securitiestransferchargefrontend.models.nrs.IdentityData
 
 import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
@@ -49,11 +51,38 @@ final class StcAuthEnrolledActionImpl @Inject()(
 
   private val retrievals =
     Retrievals.internalId and
+      Retrievals.externalId and
+      Retrievals.agentCode and
+      Retrievals.credentials and
+      Retrievals.confidenceLevel and
+      Retrievals.nino and
+      Retrievals.saUtr and
+      Retrievals.dateOfBirth and
+      Retrievals.email and
+      Retrievals.agentInformation and
       Retrievals.groupIdentifier and
-      Retrievals.allEnrolments and
+      Retrievals.credentialRole and
+      Retrievals.mdtpInformation and
+      Retrievals.itmpName and
+      Retrievals.itmpDateOfBirth and
+      Retrievals.itmpAddress and
       Retrievals.affinityGroup and
-      Retrievals.credentials
+      Retrievals.credentialStrength and
+      Retrievals.loginTimes and
+      Retrievals.groupIdentifier and
+      Retrievals.allEnrolments
+  
+  private val getArn: AffinityGroup => Enrolments => Option[String] = {
+    case AffinityGroup.Agent => es => getArnFromEnrolments(es)
+    case _                   => _  => None
+  }
 
+  private val getArnFromEnrolments: Enrolments => Option[String] = es =>
+    es
+      .getEnrolment("HMRC-AS-AGENT")
+      .flatMap(_.getIdentifier("AgentReferenceNumber"))
+      .map(_.value)
+  
   override def invokeBlock[A](
                                request: Request[A],
                                block: StcAuthorisedRequest[A] => Future[Result]
@@ -63,24 +92,34 @@ final class StcAuthEnrolledActionImpl @Inject()(
       HeaderCarrierConverter.fromRequestAndSession(request, request.session)
 
     authorised().retrieve(retrievals) {
-      case maybeInternalId ~ maybeGroupIdentifier ~ enrolments ~ maybeAffinityGroup ~ maybeCredentials =>
+      case maybeInternalId ~ maybeExternalId ~ maybeAgentCode ~ maybeCredentials ~ cl ~ maybeNino ~ maybeUtr ~ 
+        maybeDoB ~ maybeEmail ~ agentInfo ~ maybeGroupId ~ maybeCredentialRole ~ maybeMdtpInfo ~ maybeItmpName ~
+        maybeItmpDoB ~ maybeItmpAddress ~ maybeAffinityGroup ~ maybeCredentialStrength ~ loginTimes ~ 
+        maybeGroupIdentifier ~ enrolments =>
 
+        val identityData = IdentityData(
+          maybeInternalId, maybeExternalId, maybeAgentCode, maybeCredentials, cl.level, maybeNino, maybeUtr, None,
+            maybeDoB, maybeEmail, Some(agentInfo), maybeGroupId, maybeCredentialRole.map(_.toString), maybeMdtpInfo, maybeItmpName,
+            maybeItmpDoB, maybeItmpAddress, maybeAffinityGroup.map(_.toString), maybeCredentialStrength, Some(loginTimes)
+        )
         val maybeRequest =
           for {
-            internalId <- retrievalFilter.isPresent(maybeInternalId)
             groupIdentifier <- retrievalFilter.isPresent(maybeGroupIdentifier)
-            affinityGroup <- retrievalFilter.isPresent(maybeAffinityGroup)
-            _ <- retrievalFilter.enrolledForStc(enrolments)
-            subscriptionId <- retrievalFilter.subscriptionIdPresent(enrolments)
+            internalId      <- retrievalFilter.isPresent(maybeInternalId)
+            affinityGroup   <- retrievalFilter.isPresent(maybeAffinityGroup)
+            _               <- retrievalFilter.enrolledForStc(enrolments)
+            subscriptionId  <- retrievalFilter.subscriptionIdPresent(enrolments)
             rawCredentialId <- retrievalFilter.providerIdPresentFilter(maybeCredentials)
-            credentialId = CredentialId(rawCredentialId)
+            credentialId    =  CredentialId(rawCredentialId)
           } yield StcAuthorisedRequest(
             request,
             internalId,
             groupIdentifier,
             affinityGroup,
             subscriptionId,
-            credentialId
+            credentialId,
+            identityData,
+            getArn(affinityGroup)(enrolments)
           )
 
         maybeRequest.fold(identity, block)
