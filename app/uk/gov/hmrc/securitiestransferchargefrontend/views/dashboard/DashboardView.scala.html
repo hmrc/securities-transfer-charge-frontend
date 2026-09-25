@@ -94,10 +94,7 @@
                         </p>
 
                         <p class="govuk-body">
-                            @Html(messages(
-                                "dashboard.submissions.overdue",
-                                submissions.overdueCount
-                            ))
+                            @Html(messages("dashboard.submissions.overdue", submissions.overdueCount ))
                             <br>
 
                             @if(submissions.overdueCount > 0) {
@@ -108,10 +105,7 @@
                         </p>
 
                         <p class="govuk-body">
-                            @Html(messages(
-                                "dashboard.submissions.ready-to-pay",
-                                submissions.readyToPayCount
-                            ))
+                            @Html(messages("dashboard.submissions.ready-to-pay", submissions.readyToPayCount))
                             <br>
 
                             @if(submissions.readyToPayCount > 0) {
@@ -122,10 +116,7 @@
                         </p>
 
                         <p class="govuk-body">
-                            @Html(messages(
-                                "dashboard.submissions.drafts",
-                                submissions.draftCount
-                            ))
+                            @Html(messages("dashboard.submissions.drafts", submissions.draftCount))
                             <br>
 
                             @if(submissions.draftCount > 0) {
