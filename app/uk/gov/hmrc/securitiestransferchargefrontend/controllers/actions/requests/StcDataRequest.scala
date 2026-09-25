@@ -17,7 +17,6 @@
 package uk.gov.hmrc.securitiestransferchargefrontend.controllers.actions.requests
 
 import play.api.mvc.WrappedRequest
-import uk.gov.hmrc.securitiestransferchargefrontend.controllers.actions.StcAuthorisedRequest
 import uk.gov.hmrc.securitiestransferchargefrontend.models.UserAnswers
 
 case class StcDataRequest[A](

@@ -16,7 +16,7 @@
 
 package services.fileupload.processing
 
-import base.{AuditTestSupport, FileUploadFixtures, SpecBase}
+import base.{AuditTestSupport, FileUploadFixtures, Fixtures, SpecBase}
 import org.mockito.ArgumentMatchers
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.{inOrder as mockitoInOrder, *}
@@ -28,7 +28,7 @@ import play.api.test.FakeRequest
 import play.api.test.Helpers.{await, defaultAwaitTimeout, running}
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.securitiestransferchargefrontend.connectors.{SubscriptionConnector, UpscanDownloadException}
-import uk.gov.hmrc.securitiestransferchargefrontend.controllers.actions.StcAuthorisedRequest
+import uk.gov.hmrc.securitiestransferchargefrontend.controllers.actions.requests.StcAuthorisedRequest
 import uk.gov.hmrc.securitiestransferchargefrontend.domain.{CredentialId, SubscriptionId}
 import uk.gov.hmrc.securitiestransferchargefrontend.models.JourneyType.STF
 import uk.gov.hmrc.securitiestransferchargefrontend.models.JourneyType
@@ -95,7 +95,9 @@ class ProcessingServiceSpec extends SpecBase with MockitoSugar with BeforeAndAft
       groupIdentifier = testGroupIdentifier.value,
       affinityGroup = individualAffinity,
       subscriptionId = SubscriptionId("STC-GFGF"),
-      credentialId = CredentialId("some id")
+      credentialId = CredentialId("some id"),
+      identityData = Fixtures.testIdentityData,
+      maybeArn = None
     )
 
   "processReadyUpload" - {
@@ -310,6 +312,20 @@ class ProcessingServiceSpec extends SpecBase with MockitoSugar with BeforeAndAft
     }
 
     "must store subscription and mark upload Completed when validation succeeds" in {
+
+      implicit val request: StcAuthorisedRequest[AnyContentAsEmpty.type] =
+        StcAuthorisedRequest(
+          FakeRequest(),
+          internalId = testUserId.value,
+          groupIdentifier = testGroupIdentifier.value,
+          affinityGroup = individualAffinity,
+          subscriptionId = SubscriptionId("STC-GFGF"),
+          credentialId = CredentialId("some id"),
+          identityData = Fixtures.testIdentityData,
+          maybeArn = None
+        )
+
+      implicit val hc: HeaderCarrier = HeaderCarrier()
 
       stubStatusUpdates()
 
