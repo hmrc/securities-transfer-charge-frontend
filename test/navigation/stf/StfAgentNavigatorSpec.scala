@@ -27,7 +27,7 @@ import uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.agents.route
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.agents.single.routes as agentSingleRoutes
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.agents.bulk.routes as agentBulkRoutes
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.fileUpload.routes as bulkSharedRoutes
-import uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.shared.routes as sharedRoutes
+import uk.gov.hmrc.securitiestransferchargefrontend.controllers.dashboard.routes as dashboardroutes
 import uk.gov.hmrc.securitiestransferchargefrontend.models.JourneyType.STF
 import uk.gov.hmrc.securitiestransferchargefrontend.models.shared.AgentReference
 import uk.gov.hmrc.securitiestransferchargefrontend.models.stf.*
@@ -308,7 +308,7 @@ class StfAgentNavigatorSpec extends SpecBase with ScalaFutures {
 
       "must go from the HowToNotifyAboutSecuritiesTransferPage to SubmissionsDashboard" in {
         val result = navigator.previousPage(HowToNotifyAboutSecuritiesTransferPage, NormalMode, emptyUserAnswers)
-        result mustBe sharedRoutes.SubmissionsDashboardController.onPageLoad()
+        result mustBe dashboardroutes.DashboardController.onPageLoad()
       }
 
       "must go from the AgentReferencePage to HowToNotifyAboutSecuritiesTransferPage if it is in single journey" in {

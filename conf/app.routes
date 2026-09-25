@@ -498,5 +498,8 @@ POST       /sh03/org/bulk/check-your-answers                      uk.gov.hmrc.se
 
 GET        /file-not-saved                             uk.gov.hmrc.securitiestransferchargefrontend.controllers.sh03.shared.bulk.YourFileWillNotBeSavedController.onPageLoad()
 
-GET        /dashboard                                   uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.individuals.DashboardController.onPageLoad()
+GET        /dashboard                                   uk.gov.hmrc.securitiestransferchargefrontend.controllers.dashboard.DashboardController.onPageLoad()
+
+GET       /dashboard/start-stf                          uk.gov.hmrc.securitiestransferchargefrontend.controllers.dashboard.StartSubmissionController.startStf()
+GET       /dashboard/start-sh03                         uk.gov.hmrc.securitiestransferchargefrontend.controllers.dashboard.StartSubmissionController.startSh03()
 

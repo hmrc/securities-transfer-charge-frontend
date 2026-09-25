@@ -14,6 +14,6 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.securitiestransferchargefrontend.viewmodels.dashboard.individual
+package uk.gov.hmrc.securitiestransferchargefrontend.viewmodels.dashboard
 
-case class SubmissionsViewModel(overdueCount:Int, readyToPayCount:Int, draftCount:Int)
+case class SubmissionsViewModel(overdueCount: Int, readyToPayCount: Int, draftCount: Int)
