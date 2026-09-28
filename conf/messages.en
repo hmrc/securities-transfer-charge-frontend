@@ -1341,3 +1341,15 @@ dashboard.submissions.view-drafts = View draft submissions
 dashboard.tell-us = Tell us about a:
 dashboard.stf = securities transfer (STF)
 dashboard.sh03 = share buyback (SH03)
+
+
+recentSubmissions.title = Recent submissions
+recentSubmissions.heading = Submissions
+recentSubmissions.no-recent.h2 = You have no recent submissions
+recentSubmissions.no-recent.p = Once you have made a submission, or created a draft, it will appear here.
+recentSubmissions.button.stf = Tell us about a securities transfer (STF)
+
+breadcrumbs.dashboard = Dashboard
+breadcrumbs.submissions = Submissions
+
+reportAndPay.title = Report and pay for a securities transfer

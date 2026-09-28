@@ -503,3 +503,4 @@ GET        /dashboard                                   uk.gov.hmrc.securitiestr
 GET       /dashboard/start-stf                          uk.gov.hmrc.securitiestransferchargefrontend.controllers.dashboard.StartSubmissionController.startStf()
 GET       /dashboard/start-sh03                         uk.gov.hmrc.securitiestransferchargefrontend.controllers.dashboard.StartSubmissionController.startSh03()
 
+GET        /recent-submissions                          uk.gov.hmrc.securitiestransferchargefrontend.controllers.dashboard.RecentSubmissionsController.onPageLoad()
