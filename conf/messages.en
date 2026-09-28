@@ -1342,7 +1342,6 @@ dashboard.tell-us = Tell us about a:
 dashboard.stf = securities transfer (STF)
 dashboard.sh03 = share buyback (SH03)
 
-dashboard.breadcrumb = Dashboard
 
 submissions.title = Submissions
 submissions.caption = Submissions
@@ -1358,7 +1357,6 @@ submissions.noRecentSubmissions = You have no submissions from the last 18 month
 submissions.noDraftSubmissions = You have no draft submissions.
 submissions.noReadyToPaySubmissions = You have no ready to pay submissions.
 submissions.noOverdueSubmissions = You have no overdue submissions.
-submissions.breadcrumb = Submissions
 
 recentSubmissions.title = Recent submissions
 recentSubmissions.heading = Submissions

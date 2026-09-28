@@ -42,8 +42,8 @@ class SubmissionsViewSpec extends ViewBaseSpec {
     val title: String = messages("submissions.title")
     val caption: String = messages("submissions.caption")
     
-    val dashboardBreadcrumb: String = messages("dashboard.breadcrumb")
-    val submissionsBreadcrumb: String = messages("submissions.breadcrumb")
+    val dashboardBreadcrumb: String = messages("breadcrumbs.dashboard")
+    val submissionsBreadcrumb: String = messages("breadcrumbs.submissions")
 
     val recentHeading: String = messages("submissions.recentSubmissions.panel.heading")
     val draftsHeading: String = messages("submissions.drafts.panel.heading")

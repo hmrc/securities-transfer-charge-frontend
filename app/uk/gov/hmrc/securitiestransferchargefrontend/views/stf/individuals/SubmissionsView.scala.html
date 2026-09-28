@@ -32,8 +32,8 @@ govukBreadcrumbs: GovukBreadcrumbs
 
 @govukBreadcrumbs(
     Breadcrumbs(items = Seq(
-        BreadcrumbsItem(content = Text(messages("dashboard.breadcrumb")), href = Some(routes.SubmissionsDashboardController.onPageLoad().url)),
-        BreadcrumbsItem(content = Text(messages("submissions.breadcrumb")))
+        BreadcrumbsItem(content = Text(messages("breadcrumbs.dashboard")), href = Some(routes.SubmissionsDashboardController.onPageLoad().url)),
+        BreadcrumbsItem(content = Text(messages("breadcrumbs.submissions")))
         )
     )
 )
