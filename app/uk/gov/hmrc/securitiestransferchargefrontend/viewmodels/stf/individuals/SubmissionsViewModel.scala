@@ -16,15 +16,15 @@
 
 package uk.gov.hmrc.securitiestransferchargefrontend.viewmodels.stf.individuals
 
+import play.api.i18n.Messages
 import uk.gov.hmrc.govukfrontend.views.viewmodels.content.HtmlContent
 import uk.gov.hmrc.govukfrontend.views.viewmodels.tabs.{TabItem, TabPanel, Tabs}
-import uk.gov.hmrc.securitiestransferchargefrontend.services.DashboardCounts
 
-case class SubmissionsViewModel(tabs: Tabs, overdueCount: Int, readyToPayCount: Int, draftCount: Int)
+case class SubmissionsViewModel(tabs: Tabs)
 
 object SubmissionsViewModel {
 
-  private def buildPanelContent(heading: String, count: Int = 0, emptyText: String, table: String): TabPanel = {
+  private def buildPanelContent(heading: String, count: Int, emptyText: String, table: String): TabPanel = {
     val body = if (count == 0) s"""<p class="govuk-body">$emptyText</p>""" else table
 
     TabPanel(content = HtmlContent(s"""<h2 class="govuk-heading-m">$heading</h2>$body"""))
@@ -40,36 +40,49 @@ object SubmissionsViewModel {
   private def labelWithTag(text: String, count: Int, tagClass: String): String =
     s"""$text <strong class="govuk-tag govuk-!-margin-left-1 $tagClass">$count</strong>"""
 
-  private def buildTabs(counts: DashboardCounts): Tabs = {
+  private def buildTabs()(implicit messages: Messages): Tabs = {
 
     val recentSubmissionsTab = TabItem(
-      id = Some("recent-submissions"),
-      label = "Recent submissions",
-      panel = buildPanelContent(heading = "Recent submissions", emptyText = "You have no submissions from the last 18 months.", table = recentSubmissionsTable))
+      id = Some(messages("submissions.recentSubmissions.tabId")),
+      label = messages("submissions.recentSubmissions.panel.heading"),
+      panel = buildPanelContent(
+        heading = messages("submissions.recentSubmissions.panel.heading"),
+        count = 0,
+        emptyText = messages("submissions.noRecentSubmissions"),
+        table = recentSubmissionsTable))
 
     val draftSubmissionsTab = TabItem(
-      id = Some("drafts"),
-      label = labelWithTag("Drafts", counts.drafts, "govuk-tag--grey"),
-      panel = buildPanelContent(heading = "Drafts", count = counts.drafts, emptyText = "You have no draft submissions.", table = draftsTable))
+      id = Some(messages("submissions.drafts.tabId")),
+      label = labelWithTag(messages("submissions.drafts.panel.heading"), 0, "govuk-tag--grey"),
+      panel = buildPanelContent(
+        heading = messages("submissions.drafts.panel.heading"), 
+        count = 0, 
+        emptyText = messages("submissions.noDraftSubmissions"), 
+        table = draftsTable))
 
     val readyToPaySubmissionsTab = TabItem(
-      id = Some("ready-to-pay"),
-      label = labelWithTag("Ready to pay", counts.readyToPay, "govuk-tag--blue"),
-      panel = buildPanelContent(heading = "Ready to pay", count = counts.readyToPay, emptyText = "You have no ready to pay submissions.", table = readyToPayTable))
+      id = Some(messages("submissions.readyToPay.tabId")),
+      label = labelWithTag(messages("submissions.readyToPay.panel.heading"), 0, "govuk-tag--blue"),
+      panel = buildPanelContent(
+        heading = messages("submissions.readyToPay.panel.heading"), 
+        count = 0, 
+        emptyText = messages("submissions.noReadyToPaySubmissions"), 
+        table = readyToPayTable))
 
     val overdueSubmissionsTab = TabItem(
-      id = Some("overdue"),
-      label = labelWithTag("Overdue", counts.overdue, "govuk-tag--red"),
-      panel = buildPanelContent(heading = "Overdue", count = counts.overdue, emptyText = "You have no overdue submissions.", table = overdueTable))
+      id = Some(messages("submissions.overdue.tabId")),
+      label = labelWithTag(messages("submissions.overdue.panel.heading"), 0, "govuk-tag--red"),
+      panel = buildPanelContent(
+        heading = messages("submissions.overdue.panel.heading"), 
+        count = 0, 
+        emptyText = messages("submissions.noOverdueSubmissions"), 
+        table = overdueTable))
 
     Tabs(items = Seq(recentSubmissionsTab, draftSubmissionsTab, readyToPaySubmissionsTab, overdueSubmissionsTab))
   }
-
-  def fromCounts(counts: DashboardCounts): SubmissionsViewModel =
-    SubmissionsViewModel(
-      tabs = buildTabs(counts),
-      overdueCount = counts.overdue,
-      readyToPayCount = counts.readyToPay,
-      draftCount = counts.drafts
-    )
+  
+  // TODO: replace with a factory that take submissions retrieved from ETMP and save and return  
+  def empty()(implicit messages: Messages): SubmissionsViewModel = {
+    SubmissionsViewModel(tabs = buildTabs())
+  }
 }

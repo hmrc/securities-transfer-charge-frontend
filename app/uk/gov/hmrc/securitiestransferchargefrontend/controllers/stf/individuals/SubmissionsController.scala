@@ -19,10 +19,7 @@ package uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.individuals
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
-//import uk.gov.hmrc.securitiestransferchargefrontend.clients.{DashboardClient, SaveAndReturnClient}
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.actions.*
-//import uk.gov.hmrc.securitiestransferchargefrontend.domain.UserId
-import uk.gov.hmrc.securitiestransferchargefrontend.services.DashboardCounts
 import uk.gov.hmrc.securitiestransferchargefrontend.viewmodels.stf.individuals.SubmissionsViewModel
 import uk.gov.hmrc.securitiestransferchargefrontend.views.html.stf.individuals.SubmissionsView
 
@@ -33,23 +30,13 @@ class SubmissionsController @Inject()(
                                      override val messagesApi: MessagesApi,
                                      enrolledIndividual: StcIndividualAuthEnrolledAction,
                                      val controllerComponents: MessagesControllerComponents,
-//                                     dashboardClient: DashboardClient,
-//                                     saveAndReturnClient: SaveAndReturnClient,
                                      view: SubmissionsView
                                    ) extends FrontendBaseController with I18nSupport {
 
 
   def onPageLoad(): Action[AnyContent] = enrolledIndividual.async { implicit request =>
-//    val subscriptionId = request.subscriptionId
-//    val userId = UserId(request.internalId)
-    val displayName = request.name
-
-    val overdue = 0
-    val readyToPay = 0
-    val drafts = 0
     
-    val counts = DashboardCounts(overdue = overdue, readyToPay = readyToPay, drafts = drafts)
-    val viewModel = SubmissionsViewModel.fromCounts(counts)
-    Future.successful(Ok(view(viewModel, displayName)))
+      val viewModel = SubmissionsViewModel.empty()
+      Future.successful(Ok(view(viewModel)))
     }
   }

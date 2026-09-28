@@ -15,23 +15,31 @@
  *@
 
 @import uk.gov.hmrc.securitiestransferchargefrontend.views.html.templates
+@import uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.shared.routes
 @import uk.gov.hmrc.hmrcfrontend.views.viewmodels.hmrcstandardpage.TemplateOverrides
 @import uk.gov.hmrc.securitiestransferchargefrontend.viewmodels.stf.individuals.SubmissionsViewModel
+@import uk.gov.hmrc.govukfrontend.views.viewmodels.breadcrumbs.{Breadcrumbs, BreadcrumbsItem}
+@import uk.gov.hmrc.govukfrontend.views.viewmodels.content.Text
 
 @this(
-layout: templates.Layout
+layout: templates.Layout,
+govukBreadcrumbs: GovukBreadcrumbs
 )
 
-@(submissions: SubmissionsViewModel, displayName: String)(implicit request: Request[_], messages: Messages)
+@(submissions: SubmissionsViewModel)(implicit request: Request[_], messages: Messages)
 
-@layout(pageTitle = titleNoForm(messages("dashboard.title")), mainContentLayout = Some(TemplateOverrides.noMainContentLayout), showBackLink = false) {
+@layout(pageTitle = titleNoForm(messages("submissions.title")), mainContentLayout = Some(TemplateOverrides.noMainContentLayout), showBackLink = false) {
 
-<span class="govuk-caption-l">
-        @messages("dashboard.caption")
-    </span>
+@govukBreadcrumbs(
+    Breadcrumbs(items = Seq(
+        BreadcrumbsItem(content = Text(messages("dashboard.breadcrumb")), href = Some(routes.SubmissionsDashboardController.onPageLoad().url)),
+        BreadcrumbsItem(content = Text(messages("submissions.breadcrumb")))
+        )
+    )
+)
 
 <h1 class="govuk-heading-l">
-    @displayName
+    @messages("submissions.caption")
 </h1>
 
 <div class="govuk-grid-row">
