@@ -120,12 +120,15 @@ class DashboardViewSpec extends ViewBaseSpec {
       }
 
       "have the view all recent submissions link" in {
-        doc
-          .select(".design-system-card")
-          .get(1)
-          .select("a")
-          .get(0)
-          .text() mustBe ExpectedContent.viewAllRecent
+        val link =
+          doc
+            .select(".design-system-card")
+            .get(1)
+            .select("a")
+            .get(0)
+
+        link.text() mustBe ExpectedContent.viewAllRecent
+        link.attr("href") mustBe routes.RecentSubmissionsController.onPageLoad().url
       }
 
       "show the overdue count" in {
