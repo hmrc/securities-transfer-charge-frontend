@@ -20,7 +20,7 @@ import play.api.mvc.Call
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.fileUpload.routes as bulkRoutes
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.organisations.routes as orgRoutes
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.organisations.single.routes as orgSingleRoutes
-import uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.shared.routes as sharedRoutes
+import uk.gov.hmrc.securitiestransferchargefrontend.controllers.dashboard.routes as dashboardRoutes
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.organisations.single.routes as stfSingleCyaRoutes
 import uk.gov.hmrc.securitiestransferchargefrontend.models.JourneyType.STF
 import uk.gov.hmrc.securitiestransferchargefrontend.models.{CheckMode, Mode, NormalMode, UserAnswers}
@@ -43,7 +43,7 @@ class BackwardsRoutes(defaultPage: Call):
   
   def normalRoutes(page: Page): Option[UserAnswers] => Call = page match {
 
-    case HowToNotifyAboutSecuritiesTransferPage => _ => sharedRoutes.SubmissionsDashboardController.onPageLoad()
+    case HowToNotifyAboutSecuritiesTransferPage => _ => dashboardRoutes.DashboardController.onPageLoad()
     case ConfirmAddressPage => _ => orgRoutes.HowToNotifyAboutSecuritiesTransferController.onPageLoad()
     case StfBuyersAddressPage => _ => orgRoutes.HowToNotifyAboutSecuritiesTransferController.onPageLoad()
     case NameOfSellerPage => _ => orgSingleRoutes.ConfirmAddressController.onPageLoad()

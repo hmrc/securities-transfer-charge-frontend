@@ -65,7 +65,7 @@ class ConfirmationViewSpec extends ViewBaseSpec {
 
     val transferReferenceHeading: String = messages("confirmation.heading.transferReference")
     val transferReferenceP1: String = messages("confirmation.heading.transferReference.p1")
-    val transferReferenceP2: String = messages("confirmation.heading.transferReference.p2")
+    val transferReferenceP2: String = messages("confirmation.heading.shareBuyBack.p2")
     val transferReferenceLink: String = messages("confirmation.heading.transferReference.link")
 
     val deadlineHeading: String = messages("confirmation.heading.deadline")
