@@ -20,7 +20,7 @@ import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
 import play.api.Application
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.sh03.shared.routes as sh03SharedRoutes
-import uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.shared.routes
+import uk.gov.hmrc.securitiestransferchargefrontend.controllers.dashboard.routes as dashboardroutes
 import uk.gov.hmrc.securitiestransferchargefrontend.views.html.sh03.shared.BeforeYouStartView
 import views.ViewBaseSpec
 
@@ -82,7 +82,7 @@ class BeforeYouStartViewSpec extends ViewBaseSpec {
         val link = beforeYouStartView.select(".govuk-button-group a.govuk-link").first()
 
         link.text() mustBe ExpectedContent.returnToDashboard
-        link.attr("href") mustBe routes.SubmissionsDashboardController.onPageLoad().url
+        link.attr("href") mustBe dashboardroutes.DashboardController.onPageLoad().url
       }
     }
   }

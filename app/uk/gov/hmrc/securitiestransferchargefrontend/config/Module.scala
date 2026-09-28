@@ -117,5 +117,7 @@ class Module extends AbstractModule {
       .to(classOf[ParsedStcRowsRepositoryImpl])
     bind(classOf[DashboardClient])
       .to(classOf[DashboardClientImpl])
+    bind(classOf[DashboardService])
+      .to(classOf[DashboardServiceImpl])
   }
 }
