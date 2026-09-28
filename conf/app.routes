@@ -16,6 +16,8 @@ GET        /check-your-answers                            uk.gov.hmrc.securities
 GET        /bulk/change-file                                uk.gov.hmrc.securitiestransferchargefrontend.controllers.ChangeFileCheckController.onPageLoad()
 GET        /bulk/file-not-saved                             uk.gov.hmrc.securitiestransferchargefrontend.controllers.YourFileWillNotBeSavedController.onPageLoad()
 
+GET        /stf/submissions                                 uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.individuals.SubmissionsController.onPageLoad()
+
 GET        /stf/bulk/check-your-answers                 uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.shared.bulk.CheckYourAnswersController.onPageLoad()
 GET        /stf/bulk/check-your-answers/:reference      uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.individuals.bulk.CheckYourAnswersController.onPageLoad(reference: String)
 POST       /stf/bulk/check-your-answers                 uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.individuals.bulk.CheckYourAnswersController.onSubmit()
