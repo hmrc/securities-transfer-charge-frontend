@@ -32,13 +32,14 @@ import scala.jdk.CollectionConverters.*
 class ExcelFileParser @Inject()(config: FileUploadConfig, appConfig: FrontendAppConfig) extends FileParser {
 
   private val dateFormatter = DateTimeFormatter.ISO_LOCAL_DATE
+  private val noProcessingTime = 0L
 
   private def isEmptyRow(row: Row): Boolean =
     row.cellIterator().asScala.forall { cell =>
       extractCellValue(cell).isEmpty
     }
 
-  override def withParsedStream[A](file: UploadedFile, expectedColumns: Int)(block: (Seq[String], Iterator[ParsedRow]) => Either[FileParseError, A]): Either[FileParseError, A] = {
+  override def withParsedStream[A](file: UploadedFile, expectedColumns: Int)(block: (Seq[String], Iterator[ParsedRow]) => Either[(FileParseError, Long), A]): Either[(FileParseError, Long), A] = {
     try {
       val workbook: Workbook = StreamingReader.builder()
         .rowCacheSize(appConfig.rowCacheSize)
@@ -51,12 +52,12 @@ class ExcelFileParser @Inject()(config: FileUploadConfig, appConfig: FrontendApp
           .toRight(MissingWorksheet(config.expectedWorksheetName))
 
         sheet match {
-          case Left(error) => Left(error)
+          case Left(error) => Left(error, noProcessingTime)
           case Right(worksheet) =>
             val rowIterator = worksheet.iterator().asScala.filterNot(isEmptyRow)
 
             if (!rowIterator.hasNext) {
-              Left(EmptyFile)
+              Left(EmptyFile, noProcessingTime)
             } else {
               val headerRow = rowIterator.next()
               val headers = (0 until expectedColumns).map { i =>
@@ -81,7 +82,7 @@ class ExcelFileParser @Inject()(config: FileUploadConfig, appConfig: FrontendApp
         file.inputStream.close()
       }
     } catch {
-      case _: Exception => Left(InvalidXlsx(s"Unable to parse file ${file.fileName}"))
+      case _: Exception => Left((InvalidXlsx(s"Unable to parse file ${file.fileName}"), noProcessingTime))
     }
   }
 

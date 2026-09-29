@@ -28,6 +28,7 @@ import uk.gov.hmrc.securitiestransferchargefrontend.controllers.sh03.organisatio
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.sh03.shared.routes as sharedRoutes
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.sh03.organisations.bulk.routes as sh03OrgBulkRoutes
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.shared.routes as stfSharedRoutes
+import uk.gov.hmrc.securitiestransferchargefrontend.controllers.sh03.shared.single.routes as sh03SharedSingleRoutes
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.routes as commonRoutes
 import uk.gov.hmrc.securitiestransferchargefrontend.models.sh03.HowToNotifyAboutShareBuyback
 import uk.gov.hmrc.securitiestransferchargefrontend.models.sh03.shared.*
@@ -226,7 +227,7 @@ class Sh03OrgNavigatorSpec extends SpecBase with ScalaFutures {
       "must go from CheckYourAnswersPage to ConfirmationPage" in {
         val result = navigator.nextPage(CheckYourAnswersPage, NormalMode, emptyUserAnswers)(fakeRequest)
         whenReady(result) { res =>
-          res mustBe stfSharedRoutes.ConfirmationController.onPageLoad()
+          res mustBe sh03SharedSingleRoutes.ConfirmationController.onPageLoad()
         }
       }
 

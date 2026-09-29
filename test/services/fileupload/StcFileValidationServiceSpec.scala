@@ -138,12 +138,12 @@ class StcFileValidationServiceSpec extends SpecBase {
         stcRowValidationService.validateStream(
           any(), eqTo(headers), eqTo(affinityGroupKeyInd), eqTo(STF), eqTo(25), eqTo(10000)
         )
-      ).thenReturn(Right(Seq(validatedRow1, validatedRow2)))
+      ).thenReturn(Right(Seq(validatedRow1, validatedRow2), 0L))
 
       val result = service.validateStream(rowStream, headers, affinityGroupKeyInd, STF)
 
       result.isRight mustBe true
-      val response = result.toOption.get
+      val response = result.toOption.get._1
 
       response.rows mustBe Seq(validatedRow1, validatedRow2)
       response.maxErrorsAllowed mustBe 25

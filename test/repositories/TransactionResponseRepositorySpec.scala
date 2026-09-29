@@ -56,6 +56,7 @@ class TransactionResponseRepositorySpec extends SpecBase with BeforeAndAfterEach
                                    )(submissionId: SubmissionId): SubmissionCreateResponseSuccess =
     SubmissionCreateResponseSuccess(
       submissionId = submissionId,
+      utrn = testUtrn,
       chargeReferences = chargeReferences,
       taxDue = taxDue,
       paymentDueBy = paymentDueBy,

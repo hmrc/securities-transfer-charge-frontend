@@ -1,5 +1,5 @@
 /*
- * Copyright 2026 HM Revenue & Customs
+ * Copyright 2024 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,6 +14,21 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.securitiestransferchargefrontend.viewmodels.dashboard.individual
+package uk.gov.hmrc.securitiestransferchargefrontend.models.nrs
 
-case class SubmissionsViewModel(overdueCount:Int, readyToPayCount:Int, draftCount:Int)
+import play.api.libs.json.{Json, OFormat}
+
+case class NrsMetadata(
+  businessId: String,
+  notableEvent: String,
+  payloadContentType: String,
+  payloadSha256Checksum: String,
+  userSubmissionTimestamp: String,
+  identityData: IdentityData,
+  userAuthToken: String,
+  headerData: Map[String, String],
+  searchKeys: Map[String, String]
+)
+
+object NrsMetadata:
+  given OFormat[NrsMetadata] = Json.format[NrsMetadata]

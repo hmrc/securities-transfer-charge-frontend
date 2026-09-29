@@ -95,6 +95,7 @@ class StcUploadProcessingServiceSpec extends SpecBase with MockitoSugar {
     ),
     maxErrorsAllowed = 25
   )
+  private val validationTime = 50L
 
   "StcUploadProcessingService.process" - {
 
@@ -108,14 +109,14 @@ class StcUploadProcessingServiceSpec extends SpecBase with MockitoSugar {
           eqTo(STF)
         )(any())
       ).thenAnswer { invocation =>
-        val block = invocation.getArgument(3).asInstanceOf[(Seq[String], Iterator[ParsedRow]) => Either[FileParseError, StcFileValidationResponse]]
+        val block = invocation.getArgument(3).asInstanceOf[(Seq[String], Iterator[ParsedRow]) => Either[(FileParseError, Long), StcFileValidationResponse]]
         block(headers, rowStream)
       }
 
       when(stcFileValidationService.validateStream(rowStream, headers, affinityGroupKeyInd, STF))
-        .thenReturn(Right(validationResponse))
+        .thenReturn(Right((validationResponse, validationTime)))
 
-      service.process(uploadedFile, affinityGroupKeyInd, STF) mustBe Right(validationResponse)
+      service.process(uploadedFile, affinityGroupKeyInd, STF) mustBe Right((validationResponse, validationTime))
     }
 
     "return parse errors without validating" in {
@@ -125,9 +126,9 @@ class StcUploadProcessingServiceSpec extends SpecBase with MockitoSugar {
           eqTo(affinityGroupKeyInd),
           eqTo(STF)
         )(any())
-      ).thenReturn(Left(FileParseError.EmptyFile))
+      ).thenReturn(Left((FileParseError.EmptyFile, 0L)))
 
-      service.process(uploadedFile, affinityGroupKeyInd, STF) mustBe Left(FileParseError.EmptyFile)
+      service.process(uploadedFile, affinityGroupKeyInd, STF) mustBe Left((FileParseError.EmptyFile, 0L))
     }
   }
 }

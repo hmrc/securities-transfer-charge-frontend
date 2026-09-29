@@ -16,7 +16,7 @@
 
 package services
 
-import base.{AuditTestSupport, SpecBase}
+import base.{AuditTestSupport, Fixtures, SpecBase}
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.*
 import org.scalatest.BeforeAndAfterEach
@@ -29,15 +29,13 @@ import play.twirl.api.HtmlFormat
 import uk.gov.hmrc.auth.core.AffinityGroup
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.securitiestransferchargefrontend.clients.SaveAndReturnClient
-import uk.gov.hmrc.securitiestransferchargefrontend.clients.registration.NrsClient
-import uk.gov.hmrc.securitiestransferchargefrontend.controllers.actions.StcAuthorisedRequest
-import uk.gov.hmrc.securitiestransferchargefrontend.controllers.actions.requests.StcDataRequest
+import uk.gov.hmrc.securitiestransferchargefrontend.controllers.actions.requests.{StcAuthorisedRequest, StcDataRequest}
 import uk.gov.hmrc.securitiestransferchargefrontend.domain.{SubmissionId, SubscriptionId}
 import uk.gov.hmrc.securitiestransferchargefrontend.models.UserAnswers
 import uk.gov.hmrc.securitiestransferchargefrontend.models.audit.AuditType
 import uk.gov.hmrc.securitiestransferchargefrontend.models.audit.JourneyStatus.{SubmissionFailure, SubmissionSuccess}
 import uk.gov.hmrc.securitiestransferchargefrontend.models.submission.AffinityData
-import uk.gov.hmrc.securitiestransferchargefrontend.repositories.{CyaHtmlRepository, TransactionResponseRepository}
+import uk.gov.hmrc.securitiestransferchargefrontend.repositories.{CyaHtmlData, CyaHtmlRepository, TransactionResponseRepository}
 import uk.gov.hmrc.securitiestransferchargefrontend.services.*
 import uk.gov.hmrc.securitiestransferchargefrontend.utils.HeaderCarrierCreator
 
@@ -48,11 +46,21 @@ class TransactionSubmissionServiceSpec extends AnyFreeSpec with Matchers with Sp
 
   implicit val dataRequest: StcDataRequest[AnyContent] = mock[StcDataRequest[AnyContent]]
 
-  val mockNrsClient: NrsClient = mock[NrsClient]
-  when(mockNrsClient.postHtmlPayload(any[HtmlFormat.Appendable])).thenReturn(Future.successful(()))
-
+  val mockNrsService: NrsService = mock[NrsService]
+  when(mockNrsService.singleSubmissionNotableEvent(any[CyaHtmlData], any[String])(any[StcDataRequest[?]], any[HeaderCarrier]))
+    .thenReturn(Future.successful(()))
+  
   val mockCyaHtmlRepository: CyaHtmlRepository = mock[CyaHtmlRepository]
-  when(mockCyaHtmlRepository.retrieve(any[SubmissionId])).thenReturn(Future.successful(HtmlFormat.empty))
+  when(mockCyaHtmlRepository.retrieve(any[SubmissionId])).thenReturn(
+    Future.successful(
+      Option(
+        CyaHtmlData(
+          submissionId = Fixtures.testSubmissionId,
+          html = HtmlFormat.empty
+        )
+      )
+    )
+  )
 
   val mockHeaderCarrierCreator: HeaderCarrierCreator = mock[HeaderCarrierCreator]
   when(mockHeaderCarrierCreator.create(any[RequestHeader])).thenReturn(hc)
@@ -72,11 +80,12 @@ class TransactionSubmissionServiceSpec extends AnyFreeSpec with Matchers with Sp
 
 
   val success: SubmissionCreateResponse = SubmissionCreateResponseSuccess(
-    submissionId = submissionId,
-    chargeReferences = List.empty[ChargeReference],
-    taxDue = 123.45,
-    paymentDueBy = LocalDate.now(),
-    agentReference = None
+    submissionId      = submissionId,
+    utrn              = testUtrn,
+    chargeReferences  = List.empty[ChargeReference],
+    taxDue            = 123.45,
+    paymentDueBy      = LocalDate.now(),
+    agentReference    = None
   )
 
   val failure: SubmissionCreateResponse = SubmissionCreateResponseFailure
@@ -91,7 +100,7 @@ class TransactionSubmissionServiceSpec extends AnyFreeSpec with Matchers with Sp
   override def afterEach(): Unit = {
     reset(mockEtmpSubmissionService)
     reset(mockSaveAndReturnClient)
-    reset(mockNrsClient)
+    reset(mockNrsService)
     reset(mockTransactionResponseRepository)
     reset(mockAuditService)
     super.afterEach()
@@ -105,7 +114,7 @@ class TransactionSubmissionServiceSpec extends AnyFreeSpec with Matchers with Sp
       when(mockEtmpSubmissionService.submitSingleStf(any[SubscriptionId], any[UserAnswers], any[AffinityData])(any[HeaderCarrier])).thenReturn(Future.successful(failure))
       when(mockEtmpSubmissionService.submitSingleSh03(any[SubscriptionId], any[UserAnswers], any[AffinityData])(any[HeaderCarrier])).thenReturn(Future.successful(failure))
     end if
-    new TransactionSubmissionServiceImpl(mockHeaderCarrierCreator, mockEtmpSubmissionService, mockSaveAndReturnClient, mockNrsClient, mockCyaHtmlRepository, mockTransactionResponseRepository,mockAuditService)
+    new TransactionSubmissionServiceImpl(mockHeaderCarrierCreator, mockEtmpSubmissionService, mockSaveAndReturnClient, mockNrsService, mockCyaHtmlRepository, mockTransactionResponseRepository,mockAuditService)
   }
 
   "The service should" - {
@@ -121,7 +130,7 @@ class TransactionSubmissionServiceSpec extends AnyFreeSpec with Matchers with Sp
       val service = testSetup(true)
       val outcome = service.submitSingleStf(dataRequest)
       whenReady(outcome) { r =>
-        verify(mockNrsClient, times(1)).postHtmlPayload(any[HtmlFormat.Appendable])
+        verify(mockNrsService, times(1)).singleSubmissionNotableEvent(any[CyaHtmlData], any[String])(any[StcDataRequest[?]], any[HeaderCarrier])
         r mustBe true
       }
     }
@@ -129,7 +138,7 @@ class TransactionSubmissionServiceSpec extends AnyFreeSpec with Matchers with Sp
       val service = testSetup(false)
       val outcome = service.submitSingleStf(dataRequest)
       whenReady(outcome) { r =>
-        verify(mockNrsClient, never).postHtmlPayload(any[HtmlFormat.Appendable])
+        verify(mockNrsService, never).singleSubmissionNotableEvent(any[CyaHtmlData], any[String])(any[StcDataRequest[?]], any[HeaderCarrier])
         r mustBe false
       }
     }
@@ -178,7 +187,7 @@ class TransactionSubmissionServiceSpec extends AnyFreeSpec with Matchers with Sp
       val service = testSetup(true)
       val outcome = service.submitSingleSh03(dataRequest)
       whenReady(outcome) { r =>
-        verify(mockNrsClient, times(1)).postHtmlPayload(any[HtmlFormat.Appendable])
+        verify(mockNrsService, times(1)).singleSubmissionNotableEvent(any[CyaHtmlData], any[String])(any[StcDataRequest[?]], any[HeaderCarrier])
         r mustBe true
       }
     }
@@ -205,7 +214,7 @@ class TransactionSubmissionServiceSpec extends AnyFreeSpec with Matchers with Sp
       val service = testSetup(false)
       val outcome = service.submitSingleSh03(dataRequest)
       whenReady(outcome) { r =>
-        verify(mockNrsClient, never).postHtmlPayload(any[HtmlFormat.Appendable])
+        verify(mockNrsService, never).singleSubmissionNotableEvent(any[CyaHtmlData], any[String])(any[StcDataRequest[?]], any[HeaderCarrier])
         r mustBe false
       }
     }

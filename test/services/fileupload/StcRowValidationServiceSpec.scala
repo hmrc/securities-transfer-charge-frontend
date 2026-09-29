@@ -104,7 +104,7 @@ class StcRowValidationServiceSpec extends SpecBase {
       val result = service.validateStream(Seq(row).iterator, headers, affinityGroupKeyInd, STF, 25, 10000)
 
       result.isRight mustBe true
-      result.toOption.get.head.validationErrors mustBe Seq.empty
+      result.toOption.get._1.head.validationErrors mustBe Seq.empty
     }
 
     "combine basic and conditional validation errors" in {
@@ -133,7 +133,7 @@ class StcRowValidationServiceSpec extends SpecBase {
       val result = service.validateStream(Seq(row).iterator, headers, affinityGroupKeyInd, STF, 25, 10000)
 
       result.isRight mustBe true
-      val errors = result.toOption.get.head.validationErrors.map(_.fieldName)
+      val errors = result.toOption.get._1.head.validationErrors.map(_.fieldName)
 
       errors must contain allOf(
         "sellerName",
@@ -182,7 +182,7 @@ class StcRowValidationServiceSpec extends SpecBase {
       )
 
       result.isRight mustBe true
-      val rows = result.toOption.get
+      val rows = result.toOption.get._1
       rows.size mustBe 2
       rows.map(_.parsedRow.rowNumber) mustBe Seq(4, 5)
     }
@@ -199,8 +199,8 @@ class StcRowValidationServiceSpec extends SpecBase {
         maxErrorsAllowed = 25,
         maxRows = 1
       )
-
-      result mustBe Left(FileParseError.RowLimitExceeded(2, 1))
+      result.isLeft mustBe true
+      result.left.toOption.get._1 mustBe FileParseError.RowLimitExceeded(2, 1)
     }
 
     "successfully resolve the sh03 template type without returning InvalidTemplate" in {
@@ -237,7 +237,7 @@ class StcRowValidationServiceSpec extends SpecBase {
       val result = service.validateStream(Seq(row).iterator, headers, affinityGroupKeyInd, STF, 25, 10000)
 
       result.isRight mustBe true
-      val errors = result.toOption.get.head.validationErrors
+      val errors = result.toOption.get._1.head.validationErrors
 
       errors.size must be > 1
 

@@ -38,6 +38,7 @@ import uk.gov.hmrc.securitiestransferchargefrontend.pages.Page
 import uk.gov.hmrc.securitiestransferchargefrontend.pages.sh03.*
 import uk.gov.hmrc.securitiestransferchargefrontend.pages.sh03.shared.CheckYourAnswersPage
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.shared.routes as stfSharedRoutes
+import uk.gov.hmrc.securitiestransferchargefrontend.controllers.sh03.shared.single.routes as sh03SharedSingleRoutes
 import uk.gov.hmrc.securitiestransferchargefrontend.models.JourneyType.SH03
 
 import java.time.LocalDate
@@ -240,7 +241,7 @@ class Sh03AgentNavigatorSpec extends SpecBase with ScalaFutures {
       "must go from CheckYourAnswersPage to ConfirmationController" in {
         val result = navigator.nextPage(CheckYourAnswersPage, NormalMode, emptyUserAnswers)(fakeRequest)
         whenReady(result) { res =>
-          res mustBe stfSharedRoutes.ConfirmationController.onPageLoad()
+          res mustBe sh03SharedSingleRoutes.ConfirmationController.onPageLoad()
         }
       }
 

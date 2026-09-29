@@ -14,7 +14,6 @@
  * limitations under the License.
  *@
 
-@import uk.gov.hmrc.securitiestransferchargefrontend.config.FrontendAppConfig
 @import uk.gov.hmrc.securitiestransferchargefrontend.models.ConfirmationViewModel
 @import uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.shared.routes
 @import uk.gov.hmrc.govukfrontend.views.html.components._
@@ -27,7 +26,7 @@
     formHelper: FormWithCSRF
 )
 
-@(viewModel: ConfirmationViewModel)(implicit request: Request[_], messages: Messages, config: FrontendAppConfig)
+@(viewModel: ConfirmationViewModel)(implicit request: Request[_], messages: Messages)
 
 @layout(pageTitle = titleNoForm(messages("confirmation.title")), showBackLink = false) {
 

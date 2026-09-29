@@ -29,11 +29,12 @@ import scala.jdk.CollectionConverters.*
 class CsvFileParser extends FileParser {
 
   private val byteOrderMark = "\uFEFF"
+  private val noProcessingTime = 0L
 
   private def isEmptyRecord(record: CSVRecord): Boolean =
     record.iterator().asScala.forall(_.trim.isEmpty)
-
-  override def withParsedStream[A](file: UploadedFile, expectedColumns: Int)(block: (Seq[String], Iterator[ParsedRow]) => Either[FileParseError, A]): Either[FileParseError, A] = {
+  
+  override def withParsedStream[A](file: UploadedFile, expectedColumns: Int)(block: (Seq[String], Iterator[ParsedRow]) => Either[(FileParseError, Long), A]): Either[(FileParseError, Long), A] = {
     try {
       val reader = new InputStreamReader(file.inputStream, StandardCharsets.UTF_8)
       val parser = CSVParser.parse(reader, CSVFormat.DEFAULT)
@@ -42,7 +43,7 @@ class CsvFileParser extends FileParser {
         val rowIterator = parser.iterator().asScala.filterNot(isEmptyRecord)
 
         if (!rowIterator.hasNext) {
-          Left(EmptyFile)
+          Left(EmptyFile, noProcessingTime)
         } else {
           val headerRecord = rowIterator.next()
           val headerValues = headerRecord.iterator().asScala.toSeq
@@ -70,7 +71,7 @@ class CsvFileParser extends FileParser {
         file.inputStream.close()
       }
     } catch {
-      case _: Exception => Left(InvalidCsv(s"Unable to parse file ${file.fileName}"))
+      case _: Exception => Left((InvalidCsv(s"Unable to parse file ${file.fileName}"), noProcessingTime))
     }
   }
 }

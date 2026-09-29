@@ -39,7 +39,7 @@ class FileParsingServiceSpec extends AnyWordSpec with Matchers with EitherValues
     inputStream = new ByteArrayInputStream("header\nvalue".getBytes(StandardCharsets.UTF_8))
   )
 
-  private val dummyBlock: (Seq[String], Iterator[ParsedRow]) => Either[FileParseError, String] =
+  private val dummyBlock: (Seq[String], Iterator[ParsedRow]) => Either[(FileParseError, Long), String] =
     (_, _) => Right("Stream processed successfully")
 
   "withParsedStream" should {
@@ -66,7 +66,7 @@ class FileParsingServiceSpec extends AnyWordSpec with Matchers with EitherValues
 
       when(fileParserSelector.select("text/csv")).thenReturn(Left(UnsupportedMimeType("text/csv")))
 
-      service.withParsedStream(uploadedFile, maxColumns)(dummyBlock).left.value shouldBe UnsupportedMimeType("text/csv")
+      service.withParsedStream(uploadedFile, maxColumns)(dummyBlock).left.value shouldBe (UnsupportedMimeType("text/csv"), 0)
 
       verify(fileParserSelector).select("text/csv")
     }

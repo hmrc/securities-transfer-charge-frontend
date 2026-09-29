@@ -19,7 +19,9 @@ package base
 import uk.gov.hmrc.securitiestransferchargefrontend.models.JourneyType.STF
 import uk.gov.hmrc.securitiestransferchargefrontend.models.stf.fileupload.ParsedValue.Missing
 import uk.gov.hmrc.securitiestransferchargefrontend.models.stf.fileupload.{ParsedStcRow, StcFileValidationResponse, StcRowValidationError, ValidatedStcRow}
-import uk.gov.hmrc.securitiestransferchargefrontend.models.stf.upscan.{FileUpload, UpscanJourneyStatus}
+import uk.gov.hmrc.securitiestransferchargefrontend.models.stf.upscan.{FileUpload, UpscanCallbackRequest, UpscanJourneyStatus}
+
+import java.time.Instant
 
 trait FileUploadFixtures {
 
@@ -30,12 +32,20 @@ trait FileUploadFixtures {
     maxErrorsAllowed = 25
   )
 
+  val uploadDetails = UpscanCallbackRequest.UploadDetails(
+    uploadTimestamp = Instant.parse("2026-03-24T10:15:30Z"),
+    checksum = "abc123",
+    fileMimeType = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    fileName = "bulk-upload.xlsx",
+    size = 1234L
+  )
+
   def readyFileUpload(reference: String = "ref123"): FileUpload =
     FileUpload(
       reference = reference,
       status = UpscanJourneyStatus.Ready,
       downloadUrl = Some("http://download"),
-      uploadDetails = None,
+      uploadDetails = Some(uploadDetails),
       failureReason = None,
       message = None,
       journeyType = STF

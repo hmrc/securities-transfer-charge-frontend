@@ -102,7 +102,7 @@ class StcUpscanProcessingServiceSpec extends SpecBase with EitherValues with Moc
 
       val result = service.process(pdfUpload, affinityGroupKeyInd, STF).futureValue
 
-      result.left.value mustBe parseError
+      result.left.value mustBe (parseError, 0L)
 
       verify(upscanFileDownloadConnector, never()).download(any[String])(any[HeaderCarrier])
       verify(stcUploadProcessingService, never()).process(any[UploadedFile], any[String], any[JourneyType])

@@ -14,47 +14,59 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.individuals
+package uk.gov.hmrc.securitiestransferchargefrontend.controllers.dashboard
 
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
+import uk.gov.hmrc.auth.core.AffinityGroup
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
-import uk.gov.hmrc.securitiestransferchargefrontend.clients.{DashboardClient, SaveAndReturnClient}
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.actions.*
 import uk.gov.hmrc.securitiestransferchargefrontend.domain.{GroupIdentifier, UserId}
-import uk.gov.hmrc.securitiestransferchargefrontend.viewmodels.dashboard.individual.SubmissionsViewModel
-import uk.gov.hmrc.securitiestransferchargefrontend.views.html.stf.individuals.DashboardView
+import uk.gov.hmrc.securitiestransferchargefrontend.models.nrs.IdentityData
+import uk.gov.hmrc.securitiestransferchargefrontend.services.DashboardService
+import uk.gov.hmrc.securitiestransferchargefrontend.viewmodels.dashboard.SubmissionsViewModel
+import uk.gov.hmrc.securitiestransferchargefrontend.views.html.dashboard.DashboardView
 
 import javax.inject.Inject
 import scala.concurrent.ExecutionContext
 
 class DashboardController @Inject()(
                                      override val messagesApi: MessagesApi,
-                                     enrolledIndividual: StcIndividualAuthEnrolledAction,
+                                     stcAuthEnrolled: StcAuthEnrolledAction,
                                      val controllerComponents: MessagesControllerComponents,
-                                     dashboardClient: DashboardClient,
-                                     saveAndReturnClient: SaveAndReturnClient,
+                                     dashboardService: DashboardService,
                                      view: DashboardView
                                    )(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport {
 
 
-  def onPageLoad(): Action[AnyContent] = enrolledIndividual.async { implicit request =>
+  def onPageLoad(): Action[AnyContent] = stcAuthEnrolled.async { implicit request =>
     val subscriptionId = request.subscriptionId
     val userId = UserId(request.internalId)
     val groupId = GroupIdentifier(request.groupIdentifier)
-    val displayName = request.name
-
+    val displayName = getName(request.affinityGroup, request.identityData)
     for {
-      overdue <- dashboardClient.getOverdueTransactionsCount(subscriptionId)
-      readyToPay <- dashboardClient.getReadyToPayTransactionsCount(subscriptionId)
-      drafts <- saveAndReturnClient.getDraftSummaries(userId, groupId).map(_.size)
+      counts <- dashboardService.getCounts(userId, groupId, subscriptionId)
     } yield {
-      val viewModel = SubmissionsViewModel(
-        overdueCount = overdue,
-        readyToPayCount = readyToPay,
-        draftCount = drafts
-      )
-      Ok(view(viewModel,displayName))
+      val viewModel = SubmissionsViewModel(counts.overdue, counts.readyToPay, counts.drafts)
+      Ok(view(viewModel, displayName, request.isIndividual))
+    }
+  }
+
+  private def getName(affinityGroup: AffinityGroup, data: IdentityData): String = {
+    val defaultName = "Securities Transfer Tax"
+
+    affinityGroup match {
+      case AffinityGroup.Individual =>
+        data.itmpName.flatMap { name =>
+            val fullName = s"${name.givenName.getOrElse("")} ${name.familyName.getOrElse("")}".trim
+            Option.when(fullName.nonEmpty)(fullName)
+          }
+          .getOrElse(defaultName)
+
+      case AffinityGroup.Agent =>
+        data.agentInformation.flatMap(_.agentFriendlyName).getOrElse(defaultName)
+
+      case _ => defaultName
     }
   }
 }

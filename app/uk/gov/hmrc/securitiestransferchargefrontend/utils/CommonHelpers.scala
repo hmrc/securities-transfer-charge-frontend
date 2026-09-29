@@ -19,6 +19,7 @@ package uk.gov.hmrc.securitiestransferchargefrontend.utils
 import play.api.Logger
 import play.api.libs.json.Reads
 import uk.gov.hmrc.auth.core.AffinityGroup
+import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.actions.requests.StcDataRequest
 import uk.gov.hmrc.securitiestransferchargefrontend.models.JourneyType
 import uk.gov.hmrc.securitiestransferchargefrontend.pages.stf.single.ConnectedPersonsPage
@@ -60,5 +61,11 @@ object CommonHelpers {
   }
 
   def isInThePast: LocalDate => Boolean = d => d.isBefore(LocalDate.now())
+
+
+  val authToken: HeaderCarrier => String =
+    _.authorization
+      .map(_.value)
+      .getOrElse("")
 
 }

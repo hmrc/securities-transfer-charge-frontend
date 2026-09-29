@@ -18,7 +18,7 @@ package uk.gov.hmrc.securitiestransferchargefrontend.controllers.actions
 
 import com.google.inject.Inject
 import play.api.mvc.ActionTransformer
-import uk.gov.hmrc.securitiestransferchargefrontend.controllers.actions.requests.StcOptionalDataRequest
+import uk.gov.hmrc.securitiestransferchargefrontend.controllers.actions.requests.{StcAuthorisedRequest, StcOptionalDataRequest}
 import uk.gov.hmrc.securitiestransferchargefrontend.domain.UserId
 import uk.gov.hmrc.securitiestransferchargefrontend.repositories.SessionRepository
 

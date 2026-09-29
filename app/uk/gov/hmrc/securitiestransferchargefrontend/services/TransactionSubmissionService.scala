@@ -16,11 +16,9 @@
 
 package uk.gov.hmrc.securitiestransferchargefrontend.services
 
-import play.twirl.api.HtmlFormat
 import uk.gov.hmrc.auth.core.AffinityGroup
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.securitiestransferchargefrontend.clients.SaveAndReturnClient
-import uk.gov.hmrc.securitiestransferchargefrontend.clients.registration.NrsClient
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.actions.requests.StcDataRequest
 import uk.gov.hmrc.securitiestransferchargefrontend.domain.SubmissionId
 import uk.gov.hmrc.securitiestransferchargefrontend.models.UserAnswers
@@ -36,10 +34,7 @@ import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 
 trait TransactionSubmissionService:
-  def storeSubmissionData(html: HtmlFormat.Appendable)(implicit request: StcDataRequest[?]): Future[Unit]
-
   def submitSingleStf(implicit request: StcDataRequest[?]): Future[Boolean]
-
   def submitSingleSh03(implicit request: StcDataRequest[?]): Future[Boolean]
 
 
@@ -47,7 +42,7 @@ final class TransactionSubmissionServiceImpl @Inject()(
                                                         headerCarrierCreator: HeaderCarrierCreator,
                                                         etmpSubmissionService: EtmpSubmissionService,
                                                         saveAndReturnClient: SaveAndReturnClient,
-                                                        nrsClient: NrsClient,
+                                                        nrsService: NrsService,
                                                         cyaHtmlRepository: CyaHtmlRepository,
                                                         transactionResponseRepository: TransactionResponseRepository,
                                                         auditService: AuditService)(implicit ec: ExecutionContext) extends TransactionSubmissionService {
@@ -65,7 +60,7 @@ final class TransactionSubmissionServiceImpl @Inject()(
       ),
       phone = "01234 567890",
       email = "jsmith@foo.com",
-      nino = "NX787356B" // Can come from subscription
+      nino = "NX787356B"
     )
 
   private val getAgentAffinityData: AffinityData =
@@ -81,6 +76,7 @@ final class TransactionSubmissionServiceImpl @Inject()(
       phone = "07777777777",
       email = "someemal@foo.com"
     )
+
   private val getOrganisationAffinityData: AffinityData =
     Organisation(
       name = "Business",
@@ -96,34 +92,32 @@ final class TransactionSubmissionServiceImpl @Inject()(
       utr = "some utr" // retrieve from Auth
     )
 
-  def storeSubmissionData(html: HtmlFormat.Appendable)(implicit request: StcDataRequest[?]): Future[Unit] = {
-    // TODO: NRS ticket - need to store this in a repository
-    Future.successful(())
-  }
-
-  def submitSingleStf(implicit request: StcDataRequest[?]): Future[Boolean] = {
+  def submitSingleStf(using request: StcDataRequest[?]): Future[Boolean] = {
     implicit val hc: HeaderCarrier = headerCarrierCreator.create(request)
     lazy val submissionId = request.userAnswers.submissionId
+
     etmpSubmissionService
       .submitSingleStf(request.request.subscriptionId, request.userAnswers, getAffinityData(request.request.affinityGroup))
       .map {
         case stfResponse: SubmissionCreateResponseSuccess =>
           transactionResponseRepository.store(submissionId, stfResponse)
           saveAndReturnClient.deleteDraft(submissionId)
-          true
+          Some(stfResponse.utrn)
 
-        case _ => false
+        case _ => None
       }
-      .flatMap { b =>
-        if b then sendSubmissionDataToNRS(submissionId)
-        Future.successful(b)
+      .flatMap { maybeUtrn =>
+        maybeUtrn.foreach(utrn => sendSingleSubmissionDataToNRS(submissionId, utrn))
+        Future {
+          if maybeUtrn.isDefined then true else false
+        }
       }
-  }
+    }
 
-  def submitSingleSh03(implicit request: StcDataRequest[?]): Future[Boolean] = {
-    implicit val hc: HeaderCarrier = headerCarrierCreator.create(request)
-    val innerRequest = request.request
+  def submitSingleSh03(using request: StcDataRequest[?]): Future[Boolean] = {
+    given hc: HeaderCarrier = headerCarrierCreator.create(request)
     lazy val submissionId = request.userAnswers.submissionId
+    val innerRequest = request.request
     lazy val subscriptionId = innerRequest.subscriptionId
     lazy val affinityGroup = innerRequest.affinityGroup
     lazy val credentialId = innerRequest.credentialId
@@ -134,31 +128,38 @@ final class TransactionSubmissionServiceImpl @Inject()(
           auditService.audit(AuditModel(SubmissionSuccess, subscriptionId, affinityGroup, credentialId, Some(submissionId), Sh03))
           transactionResponseRepository.store(submissionId, sh03Response)
           saveAndReturnClient.deleteDraft(submissionId)
-          true
+          Some(sh03Response.utrn)
 
         case _ =>
           auditService.audit(AuditModel(SubmissionFailure, innerRequest.subscriptionId, innerRequest.affinityGroup, innerRequest.credentialId, Some(request.userAnswers.submissionId), Sh03))
-          false
+          None
       }
-      .flatMap { b =>
-        if b then sendSubmissionDataToNRS(submissionId)
-        Future.successful(b)
+      .flatMap { maybeUtrn =>
+        maybeUtrn.foreach(utrn => sendSingleSubmissionDataToNRS(submissionId, utrn))
+        Future {
+          if maybeUtrn.isDefined then true else false
+        }
       }
   }
 
-  // TODO: Needs to be properly implemented as part of the NRS ticket - metadata??
-  private def sendSubmissionDataToNRS(submissionId: SubmissionId): Future[Unit] = {
+  private def sendSingleSubmissionDataToNRS( submissionId: SubmissionId,
+                                             utrn: String
+                                           )(
+                                             implicit
+                                             request: StcDataRequest[?],
+                                             hc: HeaderCarrier): Future[Unit] = {
     cyaHtmlRepository
       .retrieve(submissionId)
-      .map { html =>
-        nrsClient.postHtmlPayload(html)
+      .collect {
+        case Some(data) =>
+          nrsService.singleSubmissionNotableEvent(data, utrn)
       }
   }
 
   private def getAffinityData(affinityGroup: AffinityGroup): AffinityData = {
     affinityGroup match {
-      case AffinityGroup.Agent => getAgentAffinityData
-      case AffinityGroup.Individual => getIndividualAffinityData
+      case AffinityGroup.Agent        => getAgentAffinityData
+      case AffinityGroup.Individual   => getIndividualAffinityData
       case AffinityGroup.Organisation => getOrganisationAffinityData
     }
   }

@@ -33,4 +33,9 @@ object AuditType {
     override val value: String = "UpscanValidation"
   }
 
+  case object BulkUploadProcessed extends AuditType {
+    override val value: String = "BulkUploadProcessed"
+  }
+
+
 }

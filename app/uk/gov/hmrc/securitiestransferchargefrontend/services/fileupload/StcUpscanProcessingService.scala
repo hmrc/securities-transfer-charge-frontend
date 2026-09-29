@@ -26,7 +26,7 @@ import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
 
 trait StcUpscanProcessingService {
-  def process(fileUpload: FileUpload, affinityKey: String, journeyType: JourneyType)(implicit hc: HeaderCarrier): Future[Either[FileParseError, StcFileValidationResponse]]
+  def process(fileUpload: FileUpload, affinityKey: String, journeyType: JourneyType)(implicit hc: HeaderCarrier): Future[Either[(FileParseError, Long), (StcFileValidationResponse, Long)]]
 }
 
 @Singleton
@@ -36,7 +36,7 @@ class StcUpscanProcessingServiceImpl @Inject()(
                                                 fileParserSelector: FileParserSelector
                                               )(implicit ec: ExecutionContext) extends StcUpscanProcessingService {
 
-  override def process(fileUpload: FileUpload, affinityKey: String, journeyType: JourneyType)(implicit hc: HeaderCarrier): Future[Either[FileParseError, StcFileValidationResponse]] = {
+  override def process(fileUpload: FileUpload, affinityKey: String, journeyType: JourneyType)(implicit hc: HeaderCarrier): Future[Either[(FileParseError, Long), (StcFileValidationResponse, Long)]] = {
     if (fileUpload.status != UpscanJourneyStatus.Ready) {
       Future.failed(
         new IllegalArgumentException(
@@ -49,7 +49,7 @@ class StcUpscanProcessingServiceImpl @Inject()(
       fileParserSelector.select(mimeType) match {
 
         case Left(error) =>
-          Future.successful(Left(error))
+          Future.successful(Left(error, 0L))
 
         case Right(_) =>
           val downloadUrl = fileUpload.downloadUrl.getOrElse(throw new RuntimeException("Missing download URL from Upscan payload"))

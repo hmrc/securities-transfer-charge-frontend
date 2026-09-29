@@ -16,8 +16,8 @@
 
 package base.stubs
 
-import uk.gov.hmrc.securitiestransferchargefrontend.controllers.actions.requests.StcOptionalDataRequest
-import uk.gov.hmrc.securitiestransferchargefrontend.controllers.actions.{StcAuthorisedRequest, StcDataRetrievalAction}
+import uk.gov.hmrc.securitiestransferchargefrontend.controllers.actions.requests.{StcAuthorisedRequest, StcOptionalDataRequest}
+import uk.gov.hmrc.securitiestransferchargefrontend.controllers.actions.StcDataRetrievalAction
 import uk.gov.hmrc.securitiestransferchargefrontend.models.UserAnswers
 
 import scala.concurrent.{ExecutionContext, Future}

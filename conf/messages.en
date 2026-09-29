@@ -1302,6 +1302,7 @@ confirmation.heading.nextSteps = Next steps
 confirmation.heading.transferReference = Share the transfer references
 confirmation.heading.transferReference.p1 = A transfer reference has been created for each transfer, you can see them in
 confirmation.heading.transferReference.p2 = Use these references to confirm that HMRC has been notified about your transfers.
+confirmation.heading.shareBuyBack.p2 = Use these references to confirm that HMRC has been notified about this share buyback.
 confirmation.heading.transferReference.link = your submission (opens in new tab).
 confirmation.heading.deadline = Pay the tax due by the deadline
 confirmation.heading.deadline.p1 = Do not use any of the reference numbers on this page as your payment reference, this will delay your payment being processed.
@@ -1337,3 +1338,18 @@ dashboard.submissions.ready-to-pay = You have <b>{0}</b> submissions that are re
 dashboard.submissions.view-ready-to-pay = View ready to pay submissions
 dashboard.submissions.drafts = You have <b>{0}</b> draft submissions.
 dashboard.submissions.view-drafts = View draft submissions
+dashboard.tell-us = Tell us about a:
+dashboard.stf = securities transfer (STF)
+dashboard.sh03 = share buyback (SH03)
+
+
+recentSubmissions.title = Recent submissions
+recentSubmissions.heading = Submissions
+recentSubmissions.no-recent.h2 = You have no recent submissions
+recentSubmissions.no-recent.p = Once you have made a submission, or created a draft, it will appear here.
+recentSubmissions.button.stf = Tell us about a securities transfer (STF)
+
+breadcrumbs.dashboard = Dashboard
+breadcrumbs.submissions = Submissions
+
+reportAndPay.title = Report and pay for a securities transfer
