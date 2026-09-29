@@ -17,8 +17,7 @@
 @import uk.gov.hmrc.govukfrontend.views.html.components._
 @import uk.gov.hmrc.securitiestransferchargefrontend.viewmodels.stf.shared.single.CheckYourAnswersViewModel
 @import uk.gov.hmrc.securitiestransferchargefrontend.views.html.components.SaveAndReturnButton
-@import uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.shared.routes
-@import uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.individuals.routes as stfRoutes
+@import uk.gov.hmrc.securitiestransferchargefrontend.controllers.dashboard.routes as dashboardRoutes
 
 @this(
     layout: uk.gov.hmrc.securitiestransferchargefrontend.views.html.templates.Layout,
@@ -64,7 +63,7 @@
             )
         }
 
-        <a class="govuk-link" href="@stfRoutes.SubmissionsController.onPageLoad().url" style="margin-left: -11px">
+        <a class="govuk-link" href="@dashboardRoutes.DashboardController.onPageLoad().url" style="margin-left: -11px">
             @saveAndReturnButton()
         </a>
 

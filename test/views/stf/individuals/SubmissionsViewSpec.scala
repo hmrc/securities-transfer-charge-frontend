@@ -21,7 +21,7 @@ import org.jsoup.nodes.Document
 import play.api.Application
 import uk.gov.hmrc.securitiestransferchargefrontend.viewmodels.stf.individuals.SubmissionsViewModel
 import uk.gov.hmrc.securitiestransferchargefrontend.views.html.stf.individuals.SubmissionsView
-import uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.shared.routes
+import uk.gov.hmrc.securitiestransferchargefrontend.controllers.dashboard.routes
 import views.ViewBaseSpec
 
 import scala.jdk.CollectionConverters._
@@ -87,7 +87,7 @@ class SubmissionsViewSpec extends ViewBaseSpec {
       "have the dashboard breadcrumb as a link" in {
         val link = breadcrumbs.get(0).select("a.govuk-breadcrumbs__link")
         link.text() mustBe ExpectedContent.dashboardBreadcrumb
-        link.attr("href") mustBe routes.SubmissionsDashboardController.onPageLoad().url
+        link.attr("href") mustBe routes.DashboardController.onPageLoad().url
       }
 
       "have the submissions breadcrumb as the current page, without a link" in {

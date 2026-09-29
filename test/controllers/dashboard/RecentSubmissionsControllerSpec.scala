@@ -60,7 +60,7 @@ class RecentSubmissionsControllerSpec extends SpecBase with MockitoSugar {
       }
     }
 
-    "must redirect to the Dashboard when recent submissions exist" in {
+    "must redirect to the Submissions page when recent submissions exist" in {
 
       val recentSummaries = Seq(
         SubmissionSummary("STC-001", "2026-10-10", SubmissionStatus.ReadyToPay, LocalDate.parse("2026-09-10"))
@@ -79,7 +79,7 @@ class RecentSubmissionsControllerSpec extends SpecBase with MockitoSugar {
         val result = route(application, request).value
 
         status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual dashboardRoutes.DashboardController.onPageLoad().url
+        redirectLocation(result).value mustEqual dashboardRoutes.SubmissionsController.onPageLoad().url
       }
     }
   }

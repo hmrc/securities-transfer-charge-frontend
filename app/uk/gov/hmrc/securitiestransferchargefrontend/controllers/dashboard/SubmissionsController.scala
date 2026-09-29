@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.individuals
+package uk.gov.hmrc.securitiestransferchargefrontend.controllers.dashboard
 
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
@@ -35,7 +35,7 @@ class SubmissionsController @Inject()(
 
 
   def onPageLoad(): Action[AnyContent] = enrolledIndividual.async { implicit request =>
-    
+
       val viewModel = SubmissionsViewModel.empty()
       Future.successful(Ok(view(viewModel)))
     }

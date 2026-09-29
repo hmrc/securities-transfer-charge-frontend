@@ -15,7 +15,7 @@
  *@
 
 @import uk.gov.hmrc.securitiestransferchargefrontend.views.html.templates
-@import uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.shared.routes
+@import uk.gov.hmrc.securitiestransferchargefrontend.controllers.dashboard.routes
 @import uk.gov.hmrc.hmrcfrontend.views.viewmodels.hmrcstandardpage.TemplateOverrides
 @import uk.gov.hmrc.securitiestransferchargefrontend.viewmodels.stf.individuals.SubmissionsViewModel
 @import uk.gov.hmrc.govukfrontend.views.viewmodels.breadcrumbs.{Breadcrumbs, BreadcrumbsItem}
@@ -32,7 +32,7 @@ govukBreadcrumbs: GovukBreadcrumbs
 
 @govukBreadcrumbs(
     Breadcrumbs(items = Seq(
-        BreadcrumbsItem(content = Text(messages("breadcrumbs.dashboard")), href = Some(routes.SubmissionsDashboardController.onPageLoad().url)),
+        BreadcrumbsItem(content = Text(messages("breadcrumbs.dashboard")), href = Some(routes.DashboardController.onPageLoad().url)),
         BreadcrumbsItem(content = Text(messages("breadcrumbs.submissions")))
         )
     )
@@ -60,10 +60,9 @@ govukBreadcrumbs: GovukBreadcrumbs
             @submissions.tabs.items.zipWithIndex.map { case (item, index) =>
             <div class="govuk-tabs__panel@if(index != 0){ govuk-tabs__panel--hidden}"
                  id="@item.id.getOrElse(s"tab_$index")">
-            @item.panel.content.asHtml
-        </div>
+                @item.panel.content.asHtml
+            </div>
         }
-    </div>
     </div>
 </div>
 }

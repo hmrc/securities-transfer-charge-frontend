@@ -98,7 +98,7 @@
                             <br>
 
                             @if(submissions.overdueCount > 0) {
-                                <a class="govuk-link" href="#">
+                                <a class="govuk-link" href="@dashboardRoutes.SubmissionsController.onPageLoad().url#overdue">
                                     @messages("dashboard.submissions.view-overdue")
                                 </a>
                             }
@@ -109,7 +109,7 @@
                             <br>
 
                             @if(submissions.readyToPayCount > 0) {
-                                <a class="govuk-link" href="#">
+                                <a class="govuk-link" href="@dashboardRoutes.SubmissionsController.onPageLoad().url#ready-to-pay">
                                     @messages("dashboard.submissions.view-ready-to-pay")
                                 </a>
                             }
@@ -120,7 +120,7 @@
                             <br>
 
                             @if(submissions.draftCount > 0) {
-                                <a class="govuk-link" href="#">
+                                <a class="govuk-link" href="@dashboardRoutes.SubmissionsController.onPageLoad().url#drafts">
                                     @messages("dashboard.submissions.view-drafts")
                                 </a>
                             }
