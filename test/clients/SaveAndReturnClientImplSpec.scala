@@ -28,9 +28,11 @@ import uk.gov.hmrc.http.{HeaderCarrier, HttpResponse}
 import uk.gov.hmrc.securitiestransferchargefrontend.clients.SaveAndReturnClientImpl
 import uk.gov.hmrc.securitiestransferchargefrontend.config.FrontendAppConfig
 import uk.gov.hmrc.securitiestransferchargefrontend.domain.{SubmissionId, UserId}
-import uk.gov.hmrc.securitiestransferchargefrontend.models.UserAnswers
+import uk.gov.hmrc.securitiestransferchargefrontend.models.JourneyType.STF
+import uk.gov.hmrc.securitiestransferchargefrontend.models.{UserAnswers, UserAnswersSummary}
 
 import java.net.URL
+import java.time.Instant
 import scala.concurrent.Future
 
 
@@ -116,17 +118,27 @@ class SaveAndReturnClientImplSpec extends SpecBase {
     "list" - {
       "return a list of submission on successful call" in new TestSetup {
 
-        val submissionIds: List[SubmissionId] =
-          List(SubmissionId("sub-01"), SubmissionId("sub-02"), SubmissionId("sub-01"))
+        val summaries = List(
+          UserAnswersSummary(
+            submissionId = SubmissionId("STC-123456789"),
+            journeyType = STF,
+            lastUpdated = Instant.now()
+          ),
+          UserAnswersSummary(
+            submissionId = SubmissionId("STC-987654321"),
+            journeyType = STF,
+            lastUpdated = Instant.now()
+          )
+        )
 
 
         when(mockRequestBuilder.execute[List[SubmissionId]](any(), any()))
-          .thenReturn(Future.successful(submissionIds))
+          .thenReturn(Future.successful(summaries))
 
 
-        val result: List[SubmissionId] = client.listByUser(testUserId).futureValue
+        val result: Seq[UserAnswersSummary] = client.listByUser(testUserId).futureValue
 
-        result mustBe submissionIds
+        result.map(_.submissionId) mustBe summaries.map(_.submissionId)
       }
 
       "fail the future and log an error when the HTTP call fails" in new TestSetup {
@@ -135,7 +147,7 @@ class SaveAndReturnClientImplSpec extends SpecBase {
         when(mockRequestBuilder.execute[List[SubmissionId]](any(), any()))
           .thenReturn(Future.failed(exception))
 
-        val result: Future[List[SubmissionId]] = client.listByUser(testUserId)
+        val result: Future[List[UserAnswersSummary]] = client.listByUser(testUserId)
 
         result.failed.futureValue mustBe exception
       }

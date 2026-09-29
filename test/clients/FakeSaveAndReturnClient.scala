@@ -20,8 +20,9 @@ import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.securitiestransferchargefrontend.clients.SaveAndReturnClient
 import uk.gov.hmrc.securitiestransferchargefrontend.domain.{GroupIdentifier, SubmissionId, UserId}
 import uk.gov.hmrc.securitiestransferchargefrontend.models.JourneyType.STF
-import uk.gov.hmrc.securitiestransferchargefrontend.models.UserAnswers
+import uk.gov.hmrc.securitiestransferchargefrontend.models.{UserAnswers, UserAnswersSummary}
 
+import java.time.Instant
 import scala.concurrent.Future
 
 class FakeSaveAndReturnClient extends SaveAndReturnClient:
@@ -34,9 +35,25 @@ class FakeSaveAndReturnClient extends SaveAndReturnClient:
 
   override def retrieve(submissionId: SubmissionId)(implicit hc: HeaderCarrier): Future[UserAnswers] = Future.successful(stubUserAnswers)
 
-  override def listByUser(userId: UserId)(implicit hc: HeaderCarrier): Future[List[SubmissionId]] = Future.successful(List(stubSubmissionId))
+  override def listByUser(userId: UserId)(implicit hc: HeaderCarrier): Future[List[UserAnswersSummary]] =
+    Future.successful(
+      List(
+        UserAnswersSummary(
+          submissionId = stubSubmissionId, 
+          journeyType = STF,
+          lastUpdated = Instant.now())
+      )
+    )
 
-  override def listByGroup(groupIdentifier: GroupIdentifier)(implicit hc: HeaderCarrier): Future[List[SubmissionId]] = Future.successful(List(stubSubmissionId))
+  override def listByGroup(groupIdentifier: GroupIdentifier)(implicit hc: HeaderCarrier): Future[List[UserAnswersSummary]] =
+    Future.successful(
+      List(
+        UserAnswersSummary(
+          submissionId = stubSubmissionId,
+          journeyType = STF,
+          lastUpdated = Instant.now())
+      )
+    )
 
   override def deleteDraft(submissionId: SubmissionId)(implicit hc: HeaderCarrier): Future[Unit] = Future.successful(())
 
