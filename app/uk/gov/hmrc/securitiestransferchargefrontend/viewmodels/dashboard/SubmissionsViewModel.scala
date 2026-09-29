@@ -27,7 +27,6 @@ case class SubmissionTab(id: String, label: String, heading: String, emptyText: 
 case class SubmissionsViewModel(tabs: Seq[SubmissionTab])
 
 object SubmissionsViewModel {
-  
 
   private def draftsTable(drafts: Seq[SubmissionSummary])(implicit messages: Messages): Table =
     Table(
@@ -40,23 +39,9 @@ object SubmissionsViewModel {
       ),
       rows = drafts.map { draft =>
         Seq(
-          TableRow(
-            content = Text(draft.submissionId)
-          ),
-          TableRow(
-            content = HtmlContent(
-              s"""
-                 |<strong class="govuk-tag govuk-tag--grey">
-                 |  ${draft.status.toString}
-                 |</strong>
-                 |""".stripMargin
-            )
-          ),
-          TableRow(
-            content = HtmlContent(
-              """<a class="govuk-link" href="#">View</a>"""
-            )
-          )
+          TableRow(content = Text(draft.submissionId)),
+          TableRow(content = HtmlContent(s"""<strong class="govuk-tag govuk-tag--grey"> ${draft.status.toString}</strong>""".stripMargin)),
+          TableRow(content = HtmlContent("""<a class="govuk-link" href="#">View</a>"""))
         )
       }
     )
@@ -65,9 +50,9 @@ object SubmissionsViewModel {
     s"""$text <strong class="govuk-tag govuk-!-margin-left-1 $tagClass">$count</strong>"""
 
   private def buildTabs(drafts: Seq[SubmissionSummary],readyToPay:Seq[SubmissionSummary],overdue:Seq[SubmissionSummary],recent:Seq[SubmissionSummary])(implicit messages: Messages): Seq[SubmissionTab] = {
-    
-    val unsed = readyToPay ++ overdue ++ recent
-    println(unsed)
+
+    val unused = readyToPay ++ overdue ++ recent
+    println(unused)
     val recentSubmissionsTab = SubmissionTab(
         id = messages("submissions.recentSubmissions.tabId"),
         label = messages("submissions.recentSubmissions.panel.heading"),
