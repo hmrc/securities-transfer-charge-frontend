@@ -14,55 +14,74 @@
  * limitations under the License.
  *@
 
-@import uk.gov.hmrc.securitiestransferchargefrontend.views.html.templates
-@import uk.gov.hmrc.securitiestransferchargefrontend.controllers.dashboard.routes
+@import uk.gov.hmrc.govukfrontend.views.html.components._
 @import uk.gov.hmrc.hmrcfrontend.views.viewmodels.hmrcstandardpage.TemplateOverrides
 @import uk.gov.hmrc.securitiestransferchargefrontend.viewmodels.dashboard.SubmissionsViewModel
-@import uk.gov.hmrc.govukfrontend.views.viewmodels.breadcrumbs.{Breadcrumbs, BreadcrumbsItem}
-@import uk.gov.hmrc.govukfrontend.views.viewmodels.content.Text
+@import uk.gov.hmrc.securitiestransferchargefrontend.views.html.templates
+@import uk.gov.hmrc.securitiestransferchargefrontend.controllers.dashboard.routes
+
 
 @this(
-layout: templates.Layout,
-govukBreadcrumbs: GovukBreadcrumbs
+    layout: templates.Layout,
+    govukBreadcrumbs: GovukBreadcrumbs,
+    govukTable: GovukTable
 )
 
 @(submissions: SubmissionsViewModel)(implicit request: Request[_], messages: Messages)
 
-@layout(pageTitle = titleNoForm(messages("submissions.title")), mainContentLayout = Some(TemplateOverrides.noMainContentLayout), showBackLink = false) {
+@layout(pageTitle = titleNoForm(messages("submissions.title")),mainContentLayout = Some(TemplateOverrides.noMainContentLayout),showBackLink = false) {
 
-@govukBreadcrumbs(
-    Breadcrumbs(items = Seq(
-        BreadcrumbsItem(content = Text(messages("breadcrumbs.dashboard")), href = Some(routes.DashboardController.onPageLoad().url)),
-        BreadcrumbsItem(content = Text(messages("breadcrumbs.submissions")))
+    @govukBreadcrumbs(
+        Breadcrumbs(items = Seq(
+                BreadcrumbsItem(content = Text(messages("breadcrumbs.dashboard")), href = Some(routes.DashboardController.onPageLoad().url)),
+                BreadcrumbsItem(content = Text(messages("breadcrumbs.submissions")))
+            )
         )
     )
-)
 
-<h1 class="govuk-heading-l">
-    @messages("submissions.caption")
-</h1>
+    <h1 class="govuk-heading-l">
+        @messages("submissions.caption")
+    </h1>
 
-<div class="govuk-grid-row">
-    <div class="govuk-grid-column-full">
-        <div class="govuk-tabs" data-module="govuk-tabs">
-            <h2 class="govuk-tabs__title">Submissions</h2>
+    <div class="govuk-grid-row">
+        <div class="govuk-grid-column-full">
+            <div class="govuk-tabs" data-module="govuk-tabs">
+                <h2 class="govuk-tabs__title">Submissions</h2>
 
-            <ul class="govuk-tabs__list">
-                @submissions.tabs.items.zipWithIndex.map { case (item, index) =>
-                <li class="govuk-tabs__list-item@if(index == 0){ govuk-tabs__list-item--selected}">
-                    <a class="govuk-tabs__tab" href="#@item.id.getOrElse(s"tab_$index")">
-                    @Html(item.label)
-                    </a>
-                </li>
+                <ul class="govuk-tabs__list">
+                    @submissions.tabs.zipWithIndex.map { case (item, index) =>
+                        <li class="govuk-tabs__list-item@if(index == 0){ govuk-tabs__list-item--selected}">
+                            <a class="govuk-tabs__tab" href="#@item.id">
+                                @Html(item.label)
+                            </a>
+                        </li>
+                    }
+
+                </ul>
+
+                @submissions.tabs.zipWithIndex.map { case (item, index) =>
+
+                    <div class="govuk-tabs__panel@if(index != 0){ govuk-tabs__panel--hidden}" id="@item.id">
+
+                        <h2 class="govuk-heading-m">
+                            @item.heading
+                        </h2>
+
+                        @if(item.count == 0) {
+
+                            <p class="govuk-body">
+                                @item.emptyText
+                            </p>
+
+                        } else {
+
+                            @item.table.map { table =>
+                                @govukTable(table)
+                            }
+                        }
+                    </div>
                 }
-            </ul>
-
-            @submissions.tabs.items.zipWithIndex.map { case (item, index) =>
-            <div class="govuk-tabs__panel@if(index != 0){ govuk-tabs__panel--hidden}"
-                 id="@item.id.getOrElse(s"tab_$index")">
-                @item.panel.content.asHtml
             </div>
-        }
+        </div>
     </div>
-</div>
 }

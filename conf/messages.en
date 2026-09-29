@@ -1368,3 +1368,7 @@ breadcrumbs.dashboard = Dashboard
 breadcrumbs.submissions = Submissions
 
 reportAndPay.title = Report and pay for a securities transfer
+
+submissions.drafts.table.id.heading = Submission ID
+submissions.drafts.table.status.heading = Status
+submissions.drafts.table.action.heading = Action

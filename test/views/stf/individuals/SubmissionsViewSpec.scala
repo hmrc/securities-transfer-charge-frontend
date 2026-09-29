@@ -66,7 +66,7 @@ class SubmissionsViewSpec extends ViewBaseSpec {
 
     "when rendered with no submissions " - {
       
-      val doc = view(SubmissionsViewModel.empty())
+      val doc = view(SubmissionsViewModel.build())
       
       val tabs = doc.select("a.govuk-tabs__tab")
       val panels = doc.select(".govuk-tabs__panel")
