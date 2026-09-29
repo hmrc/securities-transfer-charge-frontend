@@ -17,98 +17,36 @@
 package uk.gov.hmrc.securitiestransferchargefrontend.services
 
 import uk.gov.hmrc.http.HeaderCarrier
-import uk.gov.hmrc.securitiestransferchargefrontend.clients.SaveAndReturnClient
+import uk.gov.hmrc.securitiestransferchargefrontend.clients.{DashboardClient, SaveAndReturnClient}
 import uk.gov.hmrc.securitiestransferchargefrontend.domain.{GroupIdentifier, SubscriptionId, UserId}
 import uk.gov.hmrc.securitiestransferchargefrontend.models.UserAnswersSummary
-import uk.gov.hmrc.securitiestransferchargefrontend.services.SubmissionStatus.{Draft, Overdue}
+import uk.gov.hmrc.securitiestransferchargefrontend.models.search.{DashboardCounts, EtmpChargeDetail, EtmpTransactionSummaryResponse, SubmissionStatus, SubmissionSummary}
+import uk.gov.hmrc.securitiestransferchargefrontend.models.search.EtmpSuccessResponseExtensions.*
+import uk.gov.hmrc.securitiestransferchargefrontend.models.search.SubmissionStatus.{Draft, Overdue, Paid, ReadyToPay}
+import uk.gov.hmrc.securitiestransferchargefrontend.services.DashboardService.draftToSubmissionSummary
 import uk.gov.hmrc.securitiestransferchargefrontend.utils.DateTimeFormats
 
 import java.time.LocalDate
+import java.time.format.DateTimeFormatter
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 
-enum SubmissionStatus:
-  case Draft, Processing, ReadyToPay, Paid, Overdue, PartialFailure, Failed
-  override def toString: String =
-    this match
-      case ReadyToPay     => "Ready to pay"
-      case PartialFailure => "Partial failure"
-      case _              => super.toString
-
-
-final case class SubmissionSummary(
-                                    submissionId: String,
-                                    paymentDueBy: String,
-                                    status: SubmissionStatus,
-                                    sortDate: LocalDate
-                                  )
-
-final case class DashboardCounts(
-                                  drafts: Int,
-                                  readyToPay: Int,
-                                  overdue: Int
-                                )
-
 trait DashboardService:
   def getCounts(userId: UserId, groupId: GroupIdentifier, subscriptionId: SubscriptionId)(implicit hc: HeaderCarrier): Future[DashboardCounts]
+  def getRecent(userId: UserId, groupId: GroupIdentifier, subscriptionId: SubscriptionId)(implicit hc: HeaderCarrier): Future[Seq[SubmissionSummary]]
   def getDrafts(userId: UserId, groupId: GroupIdentifier)(implicit hc: HeaderCarrier): Future[Seq[SubmissionSummary]]
   def getReadyToPay(subscriptionId: SubscriptionId)(implicit hc: HeaderCarrier): Future[Seq[SubmissionSummary]]
   def getOverdue(subscriptionId: SubscriptionId)(implicit hc: HeaderCarrier): Future[Seq[SubmissionSummary]]
-  def getRecent(userId: UserId, groupId: GroupIdentifier, subscriptionId: SubscriptionId)(implicit hc: HeaderCarrier): Future[Seq[SubmissionSummary]]
 
 final class DashboardServiceImpl @Inject()(
-  saveAndReturnClient: SaveAndReturnClient
+  saveAndReturnClient: SaveAndReturnClient,
+  dashboardClient: DashboardClient
 )(using
-  ec: ExecutionContext                                   
+  ec: ExecutionContext
 ) extends DashboardService {
 
-
-  private val sorted = (summaries: Seq[SubmissionSummary]) =>
-    summaries.sortBy(_.sortDate)(Ordering[LocalDate].reverse)
-
-  private val overdue: Seq[SubmissionSummary] = List(
-    SubmissionSummary(
-      submissionId = "STC-00000008",
-      paymentDueBy = "2026-10-10",
-      status = Overdue,
-      sortDate = LocalDate.parse("2026-09-10")
-    ),
-    SubmissionSummary(
-      submissionId = "STC-00000009",
-      paymentDueBy = "2026-10-11",
-      status = Overdue,
-      sortDate = LocalDate.parse("2026-09-11")
-    ),
-    SubmissionSummary(
-      submissionId = "STC-00000012",
-      paymentDueBy = "2026-10-12",
-      status = Overdue,
-      sortDate = LocalDate.parse("2026-09-12")
-    )
-  )
-
-  private val readyToPay: Seq[SubmissionSummary] = List(
-    SubmissionSummary(
-      submissionId = "STC-00000018",
-      paymentDueBy = "2026-10-08",
-      status = Overdue,
-      sortDate = LocalDate.parse("2026-09-08")
-    ),
-    SubmissionSummary(
-      submissionId = "STC-00000019",
-      paymentDueBy = "2026-10-19",
-      status = Overdue,
-      sortDate = LocalDate.parse("2026-09-19")
-    )
-  )
-
-  private val toSubmissionSummary: UserAnswersSummary => SubmissionSummary = uas =>
-    SubmissionSummary(
-      submissionId = uas.submissionId.value,
-      paymentDueBy = "N/A", 
-      status = Draft,
-      sortDate = LocalDate.ofInstant(uas.lastUpdated, DateTimeFormats.ukZoneId)
-    )
+  import DashboardService.*
+  import SubmissionSummary.sorted
 
   override def getCounts(userId: UserId, groupId: GroupIdentifier, subscriptionId: SubscriptionId)(implicit hc: HeaderCarrier): Future[DashboardCounts] =
     Future.successful(
@@ -120,24 +58,66 @@ final class DashboardServiceImpl @Inject()(
     )
 
   override def getDrafts(userId: UserId, groupId: GroupIdentifier)(implicit hc: HeaderCarrier): Future[Seq[SubmissionSummary]] = {
-    saveAndReturnClient
-      .getDraftSummaries(userId, groupId)
-      .map { summaries =>
-        summaries.map(toSubmissionSummary)
-      }
+    for {
+      drafts    <- saveAndReturnClient.getDraftSummaries(userId, groupId)
+      summaries  = drafts.map(draftToSubmissionSummary)
+    } yield sorted(summaries)
   }
 
-  override def getReadyToPay(subscriptionId: SubscriptionId)(implicit hc: HeaderCarrier): Future[Seq[SubmissionSummary]] = {
-    Future.successful(sorted(readyToPay))
-  }
+  override def getReadyToPay(subscriptionId: SubscriptionId)(implicit hc: HeaderCarrier): Future[Seq[SubmissionSummary]] = for {
+    txs <- dashboardClient.getReadyToPayTransactions(subscriptionId)
+    summaries = toSummaryList(txs, Some(ReadyToPay))
+  } yield sorted(summaries)
 
-  override def getOverdue(subscriptionId: SubscriptionId)(implicit hc: HeaderCarrier): Future[Seq[SubmissionSummary]] = {
-    Future.successful(sorted(overdue))
-  }
+  override def getOverdue(subscriptionId: SubscriptionId)(implicit hc: HeaderCarrier): Future[Seq[SubmissionSummary]] = for {
+    txs <- dashboardClient.getOverdueTransactions(subscriptionId)
+    summaries = toSummaryList(txs, Some(Overdue))
+  } yield sorted(summaries)
 
-  override def getRecent(userId: UserId, groupId: GroupIdentifier, subscriptionId: SubscriptionId)(implicit hc: HeaderCarrier): Future[Seq[SubmissionSummary]]= for {
+  override def getRecent(userId: UserId, groupId: GroupIdentifier, subscriptionId: SubscriptionId)(implicit hc: HeaderCarrier): Future[Seq[SubmissionSummary]] = for {
+    recent <- dashboardClient.getRecentTransactions(subscriptionId)
     drafts <- getDrafts(userId, groupId)
-    others <- Future.successful(readyToPay ++ overdue)
-  } yield sorted(drafts ++ others)
+    summaries = toSummaryList(recent)
+  } yield sorted(drafts ++ summaries)
 
 }
+
+object DashboardService:
+
+  private[services] val draftToSubmissionSummary: UserAnswersSummary => SubmissionSummary = uas =>
+    SubmissionSummary(
+      submissionId = uas.submissionId.value,
+      paymentDueBy = None,
+      status = Draft,
+      sortDate = LocalDate.ofInstant(uas.lastUpdated, DateTimeFormats.ukZoneId)
+    )
+
+  private[services] val submissionDueBy: Seq[EtmpChargeDetail] => Option[String] =
+    charges =>
+      charges
+        .map(_.chargeDueDate)
+        .minOption
+        .map(_.format(DateTimeFormatter.ISO_DATE))
+
+
+  private[services] def toSummaryList(txs: EtmpTransactionSummaryResponse, maybeStatus: Option[SubmissionStatus] = None): Seq[SubmissionSummary] = {
+    val submissions =
+      txs
+      .success
+      .toSttSubmissions
+    for {
+      submission <- submissions
+      charges = submission.transfers.flatMap(_.charges)
+    } yield
+        SubmissionSummary(
+          submissionId = submission.submissionId,
+          paymentDueBy = submissionDueBy(charges),
+          status = maybeStatus.getOrElse(getSubmissionStatus(charges)),
+          sortDate = submission.submissionDate
+        )
+  }
+
+  def getSubmissionStatus: Seq[EtmpChargeDetail] => SubmissionStatus = charges =>
+    if charges.exists(_.isOverdue) then Overdue
+    else if charges.exists(_.isUnpaid) then ReadyToPay
+    else Paid
