@@ -39,7 +39,7 @@ class RecentSubmissionsController @Inject()(
       if (recent.isEmpty) {
         Ok(view())
       } else {
-        Redirect(routes.DashboardController.onPageLoad())
+        Redirect(routes.SubmissionsController.onPageLoad())
       }
     }
   }

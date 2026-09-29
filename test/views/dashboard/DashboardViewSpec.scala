@@ -20,7 +20,7 @@ import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
 import play.api.Application
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.dashboard.routes
-import uk.gov.hmrc.securitiestransferchargefrontend.viewmodels.dashboard.SubmissionsViewModel
+import uk.gov.hmrc.securitiestransferchargefrontend.viewmodels.dashboard.DashboardViewModel
 import uk.gov.hmrc.securitiestransferchargefrontend.views.html.dashboard.DashboardView
 import views.ViewBaseSpec
 
@@ -32,7 +32,7 @@ class DashboardViewSpec extends ViewBaseSpec {
 
   private val displayName = "Test Name"
 
-  private def view(submissions: SubmissionsViewModel, isIndividual: Boolean): Document =
+  private def view(submissions: DashboardViewModel, isIndividual: Boolean): Document =
     Jsoup.parse(viewInstance(submissions, displayName, isIndividual)(fakeRequest, messages).body)
 
   object ExpectedContent {
@@ -65,7 +65,7 @@ class DashboardViewSpec extends ViewBaseSpec {
 
     "when rendered for an Individual" - {
 
-      val submissions = SubmissionsViewModel(overdueCount = 2, readyToPayCount = 3, draftCount = 4)
+      val submissions = DashboardViewModel(overdueCount = 2, readyToPayCount = 3, draftCount = 4)
 
       val doc = view(submissions = submissions, isIndividual = true)
 
@@ -158,7 +158,7 @@ class DashboardViewSpec extends ViewBaseSpec {
 
     "when rendered for a non-individual" - {
 
-      val submissions = SubmissionsViewModel(overdueCount = 2, readyToPayCount = 3, draftCount = 4)
+      val submissions = DashboardViewModel(overdueCount = 2, readyToPayCount = 3, draftCount = 4)
 
       val doc = view(submissions = submissions, isIndividual = false)
 
@@ -204,7 +204,7 @@ class DashboardViewSpec extends ViewBaseSpec {
     "when all submission counts are zero" - {
 
       val submissions =
-        SubmissionsViewModel(
+        DashboardViewModel(
           overdueCount = 0,
           readyToPayCount = 0,
           draftCount = 0
