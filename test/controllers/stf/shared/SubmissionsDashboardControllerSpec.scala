@@ -29,12 +29,15 @@ import uk.gov.hmrc.securitiestransferchargefrontend.clients.{SaveAndReturnClient
 import uk.gov.hmrc.securitiestransferchargefrontend.config.FrontendAppConfig
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.shared.routes
 import uk.gov.hmrc.securitiestransferchargefrontend.domain.{GroupIdentifier, SubmissionId, UserId}
+import uk.gov.hmrc.securitiestransferchargefrontend.models.JourneyType.STF
+import uk.gov.hmrc.securitiestransferchargefrontend.models.UserAnswersSummary
 import uk.gov.hmrc.securitiestransferchargefrontend.models.audit.AuditType.Stf
 import uk.gov.hmrc.securitiestransferchargefrontend.models.audit.JourneyStatus.StartSubmission
 import uk.gov.hmrc.securitiestransferchargefrontend.navigation.Navigator
 import uk.gov.hmrc.securitiestransferchargefrontend.services.AuditService
 import uk.gov.hmrc.securitiestransferchargefrontend.views.html.stf.shared.SubmissionsDashboardView
 
+import java.time.Instant
 import scala.concurrent.Future
 
 class SubmissionsDashboardControllerSpec extends SpecBase with MockitoSugar with AuditTestSupport {
@@ -92,16 +95,24 @@ class SubmissionsDashboardControllerSpec extends SpecBase with MockitoSugar with
 
         val mockSaveAndReturnClient = mock[SaveAndReturnClient]
 
-        val submissionIds = List(
-          SubmissionId("STC-123456789"),
-          SubmissionId("STC-987654321")
+        val summaries = List(
+          UserAnswersSummary(
+            submissionId = SubmissionId("STC-123456789"),
+            journeyType = STF,
+            lastUpdated = Instant.now()
+          ),
+          UserAnswersSummary(
+            submissionId = SubmissionId("STC-987654321"),
+            journeyType = STF,
+            lastUpdated = Instant.now()
+          )
         )
 
         when(mockSaveAndReturnClient.listByUser(any[UserId])(any()))
-          .thenReturn(Future.successful(submissionIds))
+          .thenReturn(Future.successful(summaries))
 
         when(mockSaveAndReturnClient.listByGroup(any[GroupIdentifier])(any()))
-          .thenReturn(Future.successful(submissionIds))
+          .thenReturn(Future.successful(summaries))
 
         val application =
           applicationBuilder(
@@ -119,7 +130,7 @@ class SubmissionsDashboardControllerSpec extends SpecBase with MockitoSugar with
           status(result) mustEqual OK
 
           contentAsString(result) mustEqual
-            view(submissionIds)(
+            view(summaries.map(_.submissionId))(
               request,
               messages(application)
             ).toString

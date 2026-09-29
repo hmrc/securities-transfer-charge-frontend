@@ -68,8 +68,8 @@ class SubmissionsDashboardController @Inject()(
   private def listSubmissionIds(userId: UserId, groupIdentifier: GroupIdentifier)(implicit headerCarrier: HeaderCarrier): Future[List[SubmissionId]] = {
     import appConfig.SaveAndReturnRetrievalType.*
     appConfig.saveAndReturnRetrieval match {
-      case UserOnly => saveAndReturnClient.listByUser(userId)
-      case UserAndGroup => saveAndReturnClient.listByGroup(groupIdentifier)
+      case UserOnly => saveAndReturnClient.listByUser(userId).map(_.map(_.submissionId))
+      case UserAndGroup => saveAndReturnClient.listByGroup(groupIdentifier).map(_.map(_.submissionId))
     }
   }
 
