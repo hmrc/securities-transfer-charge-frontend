@@ -19,9 +19,9 @@ package views.stf.individuals
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
 import play.api.Application
-import uk.gov.hmrc.securitiestransferchargefrontend.viewmodels.stf.individuals.SubmissionsViewModel
-import uk.gov.hmrc.securitiestransferchargefrontend.views.html.stf.individuals.SubmissionsView
+import uk.gov.hmrc.securitiestransferchargefrontend.views.html.dashboard.SubmissionsView
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.dashboard.routes
+import uk.gov.hmrc.securitiestransferchargefrontend.viewmodels.dashboard.SubmissionsViewModel
 import views.ViewBaseSpec
 
 import scala.jdk.CollectionConverters._

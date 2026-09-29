@@ -28,7 +28,7 @@ import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.dashboard.routes
 import uk.gov.hmrc.securitiestransferchargefrontend.domain.{GroupIdentifier, SubscriptionId, UserId}
 import uk.gov.hmrc.securitiestransferchargefrontend.services.{DashboardCounts, DashboardService}
-import uk.gov.hmrc.securitiestransferchargefrontend.viewmodels.dashboard.SubmissionsViewModel
+import uk.gov.hmrc.securitiestransferchargefrontend.viewmodels.dashboard.DashboardViewModel
 import uk.gov.hmrc.securitiestransferchargefrontend.views.html.dashboard.DashboardView
 
 import scala.concurrent.Future
@@ -39,7 +39,7 @@ class DashboardControllerSpec extends SpecBase with MockitoSugar {
 
   val mockDashboardService: DashboardService = mock[DashboardService]
 
-  private val submissionsViewModel = SubmissionsViewModel(overdueCount = 10, readyToPayCount = 5, draftCount = 1)
+  private val submissionsViewModel = DashboardViewModel(overdueCount = 10, readyToPayCount = 5, draftCount = 1)
 
   private def mockCounts(): Unit =
     when(

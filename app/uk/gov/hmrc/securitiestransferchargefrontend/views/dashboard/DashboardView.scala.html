@@ -19,11 +19,11 @@
 @import uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.individuals.routes as stfRoutes
 @import uk.gov.hmrc.securitiestransferchargefrontend.controllers.dashboard.routes as dashboardRoutes
 @import uk.gov.hmrc.securitiestransferchargefrontend.models.NormalMode
-@import uk.gov.hmrc.securitiestransferchargefrontend.viewmodels.dashboard.SubmissionsViewModel
+@import uk.gov.hmrc.securitiestransferchargefrontend.viewmodels.dashboard.DashboardViewModel
 
 @this(layout: templates.Layout)
 
-@(submissions: SubmissionsViewModel, displayName: String, isIndividual: Boolean)(implicit request: Request[_], messages: Messages)
+@(submissions: DashboardViewModel, displayName: String, isIndividual: Boolean)(implicit request: Request[_], messages: Messages)
 
 @layout(pageTitle = titleNoForm(messages("dashboard.title")),mainContentLayout = Some(TemplateOverrides.noMainContentLayout),showBackLink = false) {
 

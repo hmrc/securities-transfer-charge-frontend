@@ -20,21 +20,21 @@ import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.actions.*
-import uk.gov.hmrc.securitiestransferchargefrontend.viewmodels.stf.individuals.SubmissionsViewModel
-import uk.gov.hmrc.securitiestransferchargefrontend.views.html.stf.individuals.SubmissionsView
+import uk.gov.hmrc.securitiestransferchargefrontend.viewmodels.dashboard.SubmissionsViewModel
+import uk.gov.hmrc.securitiestransferchargefrontend.views.html.dashboard.SubmissionsView
 
 import javax.inject.Inject
 import scala.concurrent.Future
 
 class SubmissionsController @Inject()(
                                      override val messagesApi: MessagesApi,
-                                     enrolledIndividual: StcIndividualAuthEnrolledAction,
+                                     auth: StcAuthEnrolledAction,
                                      val controllerComponents: MessagesControllerComponents,
                                      view: SubmissionsView
                                    ) extends FrontendBaseController with I18nSupport {
 
 
-  def onPageLoad(): Action[AnyContent] = enrolledIndividual.async { implicit request =>
+  def onPageLoad(): Action[AnyContent] = auth.async { implicit request =>
 
       val viewModel = SubmissionsViewModel.empty()
       Future.successful(Ok(view(viewModel)))

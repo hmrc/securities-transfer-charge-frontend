@@ -24,7 +24,7 @@ import uk.gov.hmrc.securitiestransferchargefrontend.controllers.actions.*
 import uk.gov.hmrc.securitiestransferchargefrontend.domain.{GroupIdentifier, UserId}
 import uk.gov.hmrc.securitiestransferchargefrontend.models.nrs.IdentityData
 import uk.gov.hmrc.securitiestransferchargefrontend.services.DashboardService
-import uk.gov.hmrc.securitiestransferchargefrontend.viewmodels.dashboard.SubmissionsViewModel
+import uk.gov.hmrc.securitiestransferchargefrontend.viewmodels.dashboard.DashboardViewModel
 import uk.gov.hmrc.securitiestransferchargefrontend.views.html.dashboard.DashboardView
 
 import javax.inject.Inject
@@ -47,7 +47,7 @@ class DashboardController @Inject()(
     for {
       counts <- dashboardService.getCounts(userId, groupId, subscriptionId)
     } yield {
-      val viewModel = SubmissionsViewModel(counts.overdue, counts.readyToPay, counts.drafts)
+      val viewModel = DashboardViewModel(counts.overdue, counts.readyToPay, counts.drafts)
       Ok(view(viewModel, displayName, request.isIndividual))
     }
   }
