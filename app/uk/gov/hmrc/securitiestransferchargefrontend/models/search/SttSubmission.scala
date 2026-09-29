@@ -19,17 +19,17 @@ package uk.gov.hmrc.securitiestransferchargefrontend.models.search
 import java.time.LocalDate
 
 final case class SttSubmission(
-  submissionId: String,
-  submissionDate: LocalDate,
-  clientReference: Option[String],
-  declareeName: String,
-  transfers: Seq[SttTransfer]
+  submissionId    : String,
+  submissionDate  : LocalDate,
+  clientReference : Option[String],
+  declareeName    : String,
+  transfers       : Seq[SttTransfer]
 )
 
 final case class SttTransfer(
-  utrn: String,
-  buyerNames: String,
-  sellerNames: Option[String],
-  companyName: String,
-  charges: Seq[EtmpChargeDetail]
+  utrn        : String,
+  buyerNames  : String,
+  sellerNames : Option[String],
+  companyName : String,
+  charges     : Seq[EtmpChargeDetail]
 )

@@ -35,34 +35,34 @@ object EtmpSuccessResponseExtensions:
         .distinct
 
     def toSttSubmissions: Seq[SttSubmission] = for {
-      submissionId <- allSubmissionIds
-      transactions = allTransactionDetails.filter(_.submissionId == submissionId) // >= 1
+      submissionId  <- allSubmissionIds
+      transactions   = allTransactionDetails.filter(_.submissionId == submissionId) // >= 1
       submissionData = transactions.head
     } yield {
       SttSubmission(
-        submissionId = submissionData.submissionId,
-        submissionDate = submissionData.submissionDate,
+        submissionId    = submissionData.submissionId,
+        submissionDate  = submissionData.submissionDate,
         clientReference = submissionData.clientReference,
-        declareeName = submissionData.declareeName,
-        transfers = transactions.map(transfersForSubmission)
+        declareeName    = submissionData.declareeName,
+        transfers       = transactions.map(transfersForSubmission)
       )
     }
 
     private def transfersForSubmission(tx: EtmpTransactionDetail): SttTransfer = {
       val charges = allChargeDetails.filter(_.utrn == tx.utrn)
       SttTransfer(
-        utrn = tx.utrn,
-        buyerNames = tx.buyerNames,
+        utrn        = tx.utrn,
+        buyerNames  = tx.buyerNames,
         sellerNames = tx.sellerNames,
         companyName = tx.companyName,
-        charges = charges
+        charges     = charges
       )
     }
   
   extension (charge: EtmpChargeDetail)
 
     private def hasPendingAmount: EtmpChargeDetail => Boolean = chg => chg.chargeAmountPending > 0
-    
+
     def isPaid: Boolean = charge.chargeAmountPending == 0
-    def isUnpaid: Boolean = hasPendingAmount(charge) && ! isInThePast (charge.chargeDueDate)
+    def isUnpaid: Boolean = hasPendingAmount(charge) && !isInThePast (charge.chargeDueDate)
     def isOverdue: Boolean = hasPendingAmount (charge) && isInThePast (charge.chargeDueDate)

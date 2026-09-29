@@ -48,15 +48,6 @@ final class DashboardServiceImpl @Inject()(
   import DashboardService.*
   import SubmissionSummary.sorted
 
-  override def getCounts(userId: UserId, groupId: GroupIdentifier, subscriptionId: SubscriptionId)(implicit hc: HeaderCarrier): Future[DashboardCounts] =
-    Future.successful(
-      DashboardCounts(
-        drafts = 1,
-        readyToPay = 2,
-        overdue = 3
-      )
-    )
-
   override def getDrafts(userId: UserId, groupId: GroupIdentifier)(implicit hc: HeaderCarrier): Future[Seq[SubmissionSummary]] = {
     for {
       drafts    <- saveAndReturnClient.getDraftSummaries(userId, groupId)
@@ -65,21 +56,30 @@ final class DashboardServiceImpl @Inject()(
   }
 
   override def getReadyToPay(subscriptionId: SubscriptionId)(implicit hc: HeaderCarrier): Future[Seq[SubmissionSummary]] = for {
-    txs <- dashboardClient.getReadyToPayTransactions(subscriptionId)
+    txs      <- dashboardClient.getReadyToPayTransactions(subscriptionId)
     summaries = toSummaryList(txs, Some(ReadyToPay))
   } yield sorted(summaries)
 
   override def getOverdue(subscriptionId: SubscriptionId)(implicit hc: HeaderCarrier): Future[Seq[SubmissionSummary]] = for {
-    txs <- dashboardClient.getOverdueTransactions(subscriptionId)
+    txs      <- dashboardClient.getOverdueTransactions(subscriptionId)
     summaries = toSummaryList(txs, Some(Overdue))
   } yield sorted(summaries)
 
   override def getRecent(userId: UserId, groupId: GroupIdentifier, subscriptionId: SubscriptionId)(implicit hc: HeaderCarrier): Future[Seq[SubmissionSummary]] = for {
-    recent <- dashboardClient.getRecentTransactions(subscriptionId)
-    drafts <- getDrafts(userId, groupId)
+    recent   <- dashboardClient.getRecentTransactions(subscriptionId)
+    drafts   <- getDrafts(userId, groupId)
     summaries = toSummaryList(recent)
   } yield sorted(drafts ++ summaries)
 
+  override def getCounts(userId: UserId, groupId: GroupIdentifier, subscriptionId: SubscriptionId)(implicit hc: HeaderCarrier): Future[DashboardCounts] = for {
+    drafts          <- getDrafts(userId, groupId)
+    overdueCount    <- dashboardClient.getOverdueTransactionsCount(subscriptionId)
+    readyToPayCount <- dashboardClient.getReadyToPayTransactionsCount(subscriptionId)
+  } yield DashboardCounts(
+    drafts     = drafts.length,
+    readyToPay = readyToPayCount,
+    overdue    = overdueCount
+  )
 }
 
 object DashboardService:
