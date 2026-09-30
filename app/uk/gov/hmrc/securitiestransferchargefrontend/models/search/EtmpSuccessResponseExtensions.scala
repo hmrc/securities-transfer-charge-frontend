@@ -19,6 +19,7 @@ package uk.gov.hmrc.securitiestransferchargefrontend.models.search
 import uk.gov.hmrc.securitiestransferchargefrontend.utils.CommonHelpers.isInThePast
 
 object EtmpSuccessResponseExtensions:
+
   extension (resp: EtmpSuccessResponse)
 
     /*

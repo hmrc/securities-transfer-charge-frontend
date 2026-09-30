@@ -38,7 +38,6 @@ trait DashboardClient:
 
 class DashboardClientImpl @Inject()(http: HttpClientV2, appConfig: FrontendAppConfig)(implicit ec: ExecutionContext) extends DashboardClient:
 
-
   override def getReadyToPayTransactionsCount(subscriptionId: SubscriptionId)(implicit hc: HeaderCarrier): Future[Int] =
     http.get(url"${appConfig.dashboardServiceUrl}/dashboard/ready-to-pay/count/${subscriptionId.value}")
       .execute[Int]
@@ -47,9 +46,14 @@ class DashboardClientImpl @Inject()(http: HttpClientV2, appConfig: FrontendAppCo
     http.get(url"${appConfig.dashboardServiceUrl}/dashboard/overdue/count/${subscriptionId.value}")
       .execute[Int]
 
-  override def getRecentTransactions(subscriptionId: SubscriptionId)(implicit hc: HeaderCarrier): Future[EtmpTransactionSummaryResponse] = ???
+  override def getRecentTransactions(subscriptionId: SubscriptionId)(implicit hc: HeaderCarrier): Future[EtmpTransactionSummaryResponse] =
+    http.get(url"${appConfig.dashboardServiceUrl}/dashboard/recent-transactions/${subscriptionId.value}")
+      .execute[EtmpTransactionSummaryResponse]
 
-  override def getReadyToPayTransactions(subscriptionId: SubscriptionId)(implicit hc: HeaderCarrier): Future[EtmpTransactionSummaryResponse] = ???
+  override def getReadyToPayTransactions(subscriptionId: SubscriptionId)(implicit hc: HeaderCarrier): Future[EtmpTransactionSummaryResponse] =
+    http.get(url"${appConfig.dashboardServiceUrl}/dashboard/ready-to-pay/${subscriptionId.value}")
+      .execute[EtmpTransactionSummaryResponse]
 
-  override def getOverdueTransactions(subscriptionId: SubscriptionId)(implicit hc: HeaderCarrier): Future[EtmpTransactionSummaryResponse] = ???
-
+  override def getOverdueTransactions(subscriptionId: SubscriptionId)(implicit hc: HeaderCarrier): Future[EtmpTransactionSummaryResponse] =
+    http.get(url"${appConfig.dashboardServiceUrl}/dashboard/overdue/${subscriptionId.value}")
+      .execute[EtmpTransactionSummaryResponse]

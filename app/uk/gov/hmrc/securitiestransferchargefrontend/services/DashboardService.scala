@@ -48,12 +48,10 @@ final class DashboardServiceImpl @Inject()(
   import DashboardService.*
   import SubmissionSummary.sorted
 
-  override def getDrafts(userId: UserId, groupId: GroupIdentifier)(implicit hc: HeaderCarrier): Future[Seq[SubmissionSummary]] = {
-    for {
-      drafts    <- saveAndReturnClient.getDraftSummaries(userId, groupId)
-      summaries  = drafts.map(draftToSubmissionSummary)
-    } yield sorted(summaries)
-  }
+  override def getDrafts(userId: UserId, groupId: GroupIdentifier)(implicit hc: HeaderCarrier): Future[Seq[SubmissionSummary]] = for {
+    drafts    <- saveAndReturnClient.getDraftSummaries(userId, groupId)
+    summaries  = drafts.map(draftToSubmissionSummary)
+  } yield sorted(summaries)
 
   override def getReadyToPay(subscriptionId: SubscriptionId)(implicit hc: HeaderCarrier): Future[Seq[SubmissionSummary]] = for {
     txs      <- dashboardClient.getReadyToPayTransactions(subscriptionId)
@@ -87,17 +85,16 @@ object DashboardService:
   private[services] val draftToSubmissionSummary: UserAnswersSummary => SubmissionSummary = uas =>
     SubmissionSummary(
       submissionId = uas.submissionId.value,
-      paymentDueBy = None,
+      maybePaymentDueBy = None,
       status = Draft,
       sortDate = LocalDate.ofInstant(uas.lastUpdated, DateTimeFormats.ukZoneId)
     )
 
-  private[services] val submissionDueBy: Seq[EtmpChargeDetail] => Option[String] =
+  private[services] val submissionDueBy: Seq[EtmpChargeDetail] => Option[LocalDate] =
     charges =>
       charges
         .map(_.chargeDueDate)
         .minOption
-        .map(_.format(DateTimeFormatter.ISO_DATE))
 
 
   private[services] def toSummaryList(txs: EtmpTransactionSummaryResponse, maybeStatus: Option[SubmissionStatus] = None): Seq[SubmissionSummary] = {
@@ -111,7 +108,7 @@ object DashboardService:
     } yield
         SubmissionSummary(
           submissionId = submission.submissionId,
-          paymentDueBy = submissionDueBy(charges),
+          maybePaymentDueBy = submissionDueBy(charges).map(_.format(DateTimeFormatter.ISO_DATE)),
           status = maybeStatus.getOrElse(getSubmissionStatus(charges)),
           sortDate = submission.submissionDate
         )

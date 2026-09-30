@@ -29,11 +29,13 @@ import uk.gov.hmrc.securitiestransferchargefrontend.models.JourneyType.STF
 import uk.gov.hmrc.securitiestransferchargefrontend.models.stf.{Address, AlfAddress, AlfConfirmedAddress, ConfirmableAddress, Country, DetailsOfThisTransfer, SecuritiesTarget, UploadedFileError}
 import uk.gov.hmrc.securitiestransferchargefrontend.models.UserAnswers
 import uk.gov.hmrc.securitiestransferchargefrontend.models.nrs.IdentityData
+import uk.gov.hmrc.securitiestransferchargefrontend.models.search.{EtmpChargeDetail, EtmpSuccessResponse, EtmpTransactionDetail}
 import uk.gov.hmrc.securitiestransferchargefrontend.models.sh03.shared.{CompanyDetails, DetailsOfThisSharePurchase}
 import uk.gov.hmrc.securitiestransferchargefrontend.models.shared.AgentReference
 import uk.gov.hmrc.securitiestransferchargefrontend.models.submission.{Agent, Individual, Organisation}
 
 import java.time.LocalDate
+import java.time.format.DateTimeFormatter
 import scala.concurrent.{ExecutionContext, Future}
 
 object Fixtures {
@@ -53,6 +55,7 @@ object Fixtures {
   val testArn = "ARN890901"
   val testExternalId = Some("ext-456")
   val testName = "Test Name"
+  val testUtrn = "10080869"
 
   val testIdentityData: IdentityData = IdentityData(
     internalId = Some("int-123"),
@@ -192,4 +195,50 @@ object Fixtures {
 
     override def initAlfJourneyRequest(configFileLocation: String, returnUrl: String)(implicit hc: HeaderCarrier): Future[Result] = Future.successful(Redirect("/alf"))
   }
+
+  private def past = LocalDate.now().minusDays(10)
+  private def future = LocalDate.now().plusDays(10)
+
+  val buildTaxCharge: (String, Boolean, Boolean) => EtmpChargeDetail = buildCharge("STT", "Securities transfer tax")
+  val buildLateFilingCharge: (String, Boolean, Boolean) => EtmpChargeDetail = buildCharge("LFP", "late filing penalty")
+  val buildLatePaymentCharge: (String, Boolean, Boolean) => EtmpChargeDetail = buildCharge("LPP", "late payment penalty")
+  val buildLatePaymentInterestCharge: (String, Boolean, Boolean) => EtmpChargeDetail = buildCharge("LPI", "late payment interest")
+
+  def buildCharge(chargeType: String, chargeDescription: String)(utrn: String, isLate: Boolean, isPaid: Boolean): EtmpChargeDetail = {
+    val dueDate = if isLate then past else future
+    EtmpChargeDetail(
+      utrn = utrn,
+      chargeTypeDescription = chargeDescription,
+      chargeReference = "Ref123",
+      chargeType = chargeType,
+      chargeAmountTotal = 123.45,
+      chargeDueDate = dueDate,
+      chargeAmountPending = if isPaid then 0 else 123.45
+    )
+  }
+
+  def buildSubmissionDetails(submissionId: SubmissionId, isPast: Boolean, utrn: String): EtmpTransactionDetail =
+    EtmpTransactionDetail(
+      submissionId = submissionId.value,
+      submissionDate = if isPast then past else future,
+      clientReference = None,
+      declareeName = "Joe Bloggs",
+      utrn = utrn,
+      buyerNames = "Paul McLaughlin",
+      sellerNames = Some("Patrick Harris"),
+      companyName = "Boogle"
+    )
+
+  def buildEtmpSuccessResponse(transactionDetails: Seq[EtmpTransactionDetail], chargeDetails: Seq[EtmpChargeDetail]): EtmpSuccessResponse =
+    EtmpSuccessResponse(
+      processingDate = LocalDate.now().format(DateTimeFormatter.ISO_DATE),
+      transactionsCount = transactionDetails.length,
+      message = None,
+      transactionDetails = Some(transactionDetails),
+      charges = Some(chargeDetails)
+    )
+
+  extension (chg: EtmpChargeDetail)
+    def withDueDate: LocalDate => EtmpChargeDetail = due => chg.copy(chargeDueDate = due)
+
 }

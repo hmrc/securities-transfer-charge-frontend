@@ -27,7 +27,7 @@ import uk.gov.hmrc.securitiestransferchargefrontend.models.search.EtmpTransactio
 
 import scala.concurrent.{ExecutionContext, Future}
 
-class DashboardClientImplSpec extends AnyWordSpec with Matchers with ScalaFutures {
+class DashboardClientSpec extends AnyWordSpec with Matchers with ScalaFutures {
 
   implicit val ec: ExecutionContext = ExecutionContext.global
   implicit val hc: HeaderCarrier     = HeaderCarrier()

@@ -19,11 +19,13 @@ package uk.gov.hmrc.securitiestransferchargefrontend.models.search
 import java.time.LocalDate
 
 final case class SubmissionSummary(
-  submissionId: String,
-  paymentDueBy: Option[String],
-  status      : SubmissionStatus,
-  sortDate    : LocalDate
-)
+  submissionId      : String,
+  maybePaymentDueBy : Option[String],
+  status            : SubmissionStatus,
+  sortDate          : LocalDate
+) {
+  def paymentDueBy: String = maybePaymentDueBy.getOrElse("N/A")
+}
 
 object SubmissionSummary:
   val sorted: Seq[SubmissionSummary] => Seq[SubmissionSummary] = 
