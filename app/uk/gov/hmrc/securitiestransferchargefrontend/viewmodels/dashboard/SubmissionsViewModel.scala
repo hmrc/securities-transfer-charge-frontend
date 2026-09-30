@@ -48,12 +48,10 @@ object SubmissionsViewModel {
 
   private def labelWithTag(text: String, count: Int, tagClass: String): String =
     s"""$text <strong class="govuk-tag govuk-!-margin-left-1 $tagClass">$count</strong>"""
-
-  private def buildTabs(drafts: Seq[SubmissionSummary],readyToPay:Seq[SubmissionSummary],overdue:Seq[SubmissionSummary],recent:Seq[SubmissionSummary])(implicit messages: Messages): Seq[SubmissionTab] = {
-
-    val unused = readyToPay ++ overdue ++ recent
-    println(unused)
-    val recentSubmissionsTab = SubmissionTab(
+  
+  private def buildTabs(drafts: Seq[SubmissionSummary])(implicit messages: Messages): Seq[SubmissionTab] = {
+    
+    val recentSubmissionsTab: SubmissionTab = SubmissionTab(
         id = messages("submissions.recentSubmissions.tabId"),
         label = messages("submissions.recentSubmissions.panel.heading"),
         heading = messages("submissions.recentSubmissions.panel.heading"),
@@ -61,8 +59,9 @@ object SubmissionsViewModel {
         count = 0,
         table = None
       )
+    
 
-    val draftSubmissionsTab = SubmissionTab(
+    val draftSubmissionsTab: SubmissionTab = SubmissionTab(
         id = messages("submissions.drafts.tabId"),
         label = labelWithTag(messages("submissions.drafts.panel.heading"), drafts.size, "govuk-tag--grey"),
         heading = messages("submissions.drafts.panel.heading"),
@@ -71,7 +70,7 @@ object SubmissionsViewModel {
         table = Some(draftsTable(drafts))
       )
 
-    val readyToPaySubmissionsTab = SubmissionTab(
+    val readyToPaySubmissionsTab: SubmissionTab = SubmissionTab(
         id = messages("submissions.readyToPay.tabId"),
         label = labelWithTag(messages("submissions.readyToPay.panel.heading"), 0, "govuk-tag--blue"),
         heading = messages("submissions.readyToPay.panel.heading"),
@@ -80,7 +79,7 @@ object SubmissionsViewModel {
         table = None
       )
 
-    val overdueSubmissionsTab = SubmissionTab(
+    val overdueSubmissionsTab: SubmissionTab = SubmissionTab(
         id = messages("submissions.overdue.tabId"),
         label = labelWithTag(messages("submissions.overdue.panel.heading"), 0, "govuk-tag--red"),
         heading = messages("submissions.overdue.panel.heading"),
@@ -92,8 +91,8 @@ object SubmissionsViewModel {
     Seq(recentSubmissionsTab, draftSubmissionsTab, readyToPaySubmissionsTab, overdueSubmissionsTab)
   }
 
-  def build(drafts: Seq[SubmissionSummary], readyToPay:Seq[SubmissionSummary], overdue:Seq[SubmissionSummary], recent:Seq[SubmissionSummary])(implicit messages: Messages): SubmissionsViewModel =
+  def build(drafts: Seq[SubmissionSummary])(implicit messages: Messages): SubmissionsViewModel =
     SubmissionsViewModel(
-      tabs = buildTabs(drafts,readyToPay,overdue,recent)
+      tabs = buildTabs(drafts)
     )
 }

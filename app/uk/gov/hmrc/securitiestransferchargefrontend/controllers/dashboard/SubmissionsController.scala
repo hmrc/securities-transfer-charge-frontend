@@ -38,18 +38,15 @@ class SubmissionsController @Inject()(
 
 
   def onPageLoad(): Action[AnyContent] = auth.async { implicit request =>
-
-    val subscriptionId = request.subscriptionId
+    
     val userId = UserId(request.internalId)
     val groupId = GroupIdentifier(request.groupIdentifier)
 
     for {
       drafts <- dashboardService.getDrafts(userId, groupId)
-      readyToPay <- dashboardService.getReadyToPay(subscriptionId)
-      overdue <- dashboardService.getOverdue(subscriptionId)
-      recent <- dashboardService.getRecent(subscriptionId)
+      
     } yield {
-      val viewModel = SubmissionsViewModel.build(drafts, readyToPay, overdue, recent)
+      val viewModel = SubmissionsViewModel.build(drafts)
       Ok(view(viewModel))
     }
   }
