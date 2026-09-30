@@ -32,6 +32,8 @@ import uk.gov.hmrc.securitiestransferchargefrontend.models.nrs.IdentityData
 import uk.gov.hmrc.securitiestransferchargefrontend.models.sh03.shared.{CompanyDetails, DetailsOfThisSharePurchase}
 import uk.gov.hmrc.securitiestransferchargefrontend.models.shared.AgentReference
 import uk.gov.hmrc.securitiestransferchargefrontend.models.submission.{Agent, Individual, Organisation}
+import uk.gov.hmrc.securitiestransferchargefrontend.services.SubmissionStatus.Draft
+import uk.gov.hmrc.securitiestransferchargefrontend.services.SubmissionSummary
 
 import java.time.LocalDate
 import scala.concurrent.{ExecutionContext, Future}
@@ -65,11 +67,11 @@ object Fixtures {
     name = Some(Name(Some("Bob"), Some("Collins"))),
     dateOfBirth = Some(LocalDate.parse("1980-08-10")),
     email = Some("bob.collins@foo.bar"),
-    agentInformation = Some(AgentInformation(None,None,Some("Agent Name"))),
+    agentInformation = Some(AgentInformation(None, None, Some("Agent Name"))),
     groupIdentifier = Some("my-fancy-group"),
     credentialRole = Some("admin"),
     mdtpInformation = None,
-    itmpName = Some(ItmpName(Some("First"),None,Some("Last"))),
+    itmpName = Some(ItmpName(Some("First"), None, Some("Last"))),
     itmpDateOfBirth = None,
     itmpAddress = None,
     affinityGroup = Some("individual"),
@@ -160,18 +162,27 @@ object Fixtures {
 
   val sftDetailsOfThisTransfer: DetailsOfThisTransfer = DetailsOfThisTransfer(numberOfShares = 10,
     typeOfShares = "Ordinary", amountPaid = BigDecimal(500), marketValue = Some(BigDecimal(100)))
-  
+
   val agentReference: AgentReference = AgentReference(Some("Ref-1234"))
-  
-  val sh03CompanyDetails: CompanyDetails = CompanyDetails(companyName = "Company 1",companyRegistrationNumber = "12345678",isPlc = true)
-  
-  val sh03DetailsOfThisSharePurchase: DetailsOfThisSharePurchase =  DetailsOfThisSharePurchase(numberOfShares = 500, 
+
+  val sh03CompanyDetails: CompanyDetails = CompanyDetails(companyName = "Company 1", companyRegistrationNumber = "12345678", isPlc = true)
+
+  val sh03DetailsOfThisSharePurchase: DetailsOfThisSharePurchase = DetailsOfThisSharePurchase(numberOfShares = 500,
     typeOfShares = "Ordinary", amountPaid = BigDecimal(56999), marketValue = Some(BigDecimal(3)))
 
   val uploadedFileErrors: Seq[UploadedFileError] = Seq(
     UploadedFileError(cell = "J6", error = "The seller's name cannot contain numbers"),
     UploadedFileError(cell = "J36", error = "You have selected that the buyer is a company, you need to enter the registered address"),
     UploadedFileError(cell = "K3", error = "Buyer's country can only contain letters, numbers and hyphens")
+  )
+
+  val drafts: Seq[SubmissionSummary] = List(
+    SubmissionSummary(
+      submissionId = testSubmissionId.toString,
+      paymentDueBy = "N/A",
+      status = Draft,
+      sortDate = LocalDate.parse("2026-10-19")
+    )
   )
 
   class FakeAuthConnectorSuccess(value: Any) extends AuthConnector {

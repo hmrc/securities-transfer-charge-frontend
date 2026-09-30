@@ -14,17 +14,20 @@
  * limitations under the License.
  */
 
-package views.stf.individuals
+package views.dashboard
 
+import base.Fixtures
+import base.Fixtures.testSubmissionId
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
 import play.api.Application
-import uk.gov.hmrc.securitiestransferchargefrontend.views.html.dashboard.SubmissionsView
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.dashboard.routes
+import uk.gov.hmrc.securitiestransferchargefrontend.services.SubmissionSummary
 import uk.gov.hmrc.securitiestransferchargefrontend.viewmodels.dashboard.SubmissionsViewModel
+import uk.gov.hmrc.securitiestransferchargefrontend.views.html.dashboard.SubmissionsView
 import views.ViewBaseSpec
 
-import scala.jdk.CollectionConverters._
+import scala.jdk.CollectionConverters.*
 
 class SubmissionsViewSpec extends ViewBaseSpec {
 
@@ -66,7 +69,7 @@ class SubmissionsViewSpec extends ViewBaseSpec {
 
     "when rendered with no submissions " - {
       
-      val doc = view(SubmissionsViewModel.empty())
+      val doc = view(SubmissionsViewModel.build(Seq.empty[SubmissionSummary]))
       
       val tabs = doc.select("a.govuk-tabs__tab")
       val panels = doc.select(".govuk-tabs__panel")
@@ -178,6 +181,52 @@ class SubmissionsViewSpec extends ViewBaseSpec {
         )
       }
       
+    }
+  }
+
+  "when rendered with drafts" - {
+
+    val doc = view(SubmissionsViewModel.build(Fixtures.drafts))
+    val panels = doc.select(".govuk-tabs__panel")
+
+    "select only the drafts tab" in {
+      val items = doc.select("li.govuk-tabs__list-item")
+
+      items.get(0).hasClass("govuk-tabs__list-item--selected") mustBe true
+      items.asScala
+        .drop(1)
+        .foreach(_.hasClass("govuk-tabs__list-item--selected") mustBe false)
+    }
+
+    "show only the drafts panel" in {
+      panels.get(0).hasClass("govuk-tabs__panel--hidden") mustBe false
+      panels.asScala
+        .drop(1)
+        .foreach(_.hasClass("govuk-tabs__panel--hidden") mustBe true)
+    }
+
+    "render the drafts table with accessible hidden text" in {
+      val draftsPanel = doc.select("#drafts")
+      val table = draftsPanel.select("table.govuk-table")
+
+      table.size() mustBe 1
+
+      val hiddenText = table.select("a.govuk-link .govuk-visually-hidden")
+
+      hiddenText.size() mustBe 1
+      hiddenText.text() mustBe messages("submissions.drafts.action.hidden", testSubmissionId)
+    }
+
+    "show the empty message for the other panels" in {
+
+      panels.asScala
+        .map(_.select("p.govuk-body").text())
+        .filter(_.nonEmpty)
+        .toList mustBe List(
+        ExpectedContent.noRecent,
+        ExpectedContent.noReadyToPay,
+        ExpectedContent.noOverdue
+      )
     }
   }
 }

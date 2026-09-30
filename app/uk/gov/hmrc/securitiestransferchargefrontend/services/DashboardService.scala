@@ -30,6 +30,7 @@ enum SubmissionStatus:
     this match
       case ReadyToPay     => "Ready to pay"
       case PartialFailure => "Partial failure"
+      case Draft => "Draft"
       case _              => super.toString
 
 
