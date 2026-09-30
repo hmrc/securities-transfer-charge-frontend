@@ -29,12 +29,12 @@
 
 @(submissions: SubmissionsViewModel)(implicit request: Request[_], messages: Messages)
 
-@layout(pageTitle = titleNoForm(messages("submissions.title")),mainContentLayout = Some(TemplateOverrides.noMainContentLayout),showBackLink = false) {
+@layout(pageTitle = s"${messages("submissions.title")} - ${messages("reportAndPay.title")} - ${messages("site.govuk")}", mainContentLayout = Some(TemplateOverrides.noMainContentLayout), showBackLink = false) {
 
     @govukBreadcrumbs(
         Breadcrumbs(items = Seq(
                 BreadcrumbsItem(content = Text(messages("breadcrumbs.dashboard")), href = Some(routes.DashboardController.onPageLoad().url)),
-                BreadcrumbsItem(content = Text(messages("breadcrumbs.submissions")))
+                BreadcrumbsItem(content = Text(messages("breadcrumbs.submissions")), href = Some("#"))
             )
         )
     )

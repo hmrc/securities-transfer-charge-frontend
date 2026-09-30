@@ -44,7 +44,7 @@ class SubmissionsViewSpec extends ViewBaseSpec {
   object ExpectedContent {
     val title: String = messages("submissions.title")
     val caption: String = messages("submissions.caption")
-    
+
     val dashboardBreadcrumb: String = messages("breadcrumbs.dashboard")
     val submissionsBreadcrumb: String = messages("breadcrumbs.submissions")
 
@@ -68,9 +68,9 @@ class SubmissionsViewSpec extends ViewBaseSpec {
   "The SubmissionsView" - {
 
     "when rendered with no submissions " - {
-      
+
       val doc = view(SubmissionsViewModel.build(Seq.empty[SubmissionSummary]))
-      
+
       val tabs = doc.select("a.govuk-tabs__tab")
       val panels = doc.select(".govuk-tabs__panel")
       val breadcrumbs = doc.select(".govuk-breadcrumbs__list-item")
@@ -91,13 +91,6 @@ class SubmissionsViewSpec extends ViewBaseSpec {
         val link = breadcrumbs.get(0).select("a.govuk-breadcrumbs__link")
         link.text() mustBe ExpectedContent.dashboardBreadcrumb
         link.attr("href") mustBe routes.DashboardController.onPageLoad().url
-      }
-
-      "have the submissions breadcrumb as the current page, without a link" in {
-        val current = breadcrumbs.get(1)
-        current.text() mustBe ExpectedContent.submissionsBreadcrumb
-        current.select("a").size() mustBe 0
-        current.attr("aria-current") mustBe "page"
       }
 
       "have the tabs component" in {
@@ -180,53 +173,125 @@ class SubmissionsViewSpec extends ViewBaseSpec {
           ExpectedContent.noOverdue
         )
       }
-      
-    }
-  }
-
-  "when rendered with drafts" - {
-
-    val doc = view(SubmissionsViewModel.build(Fixtures.drafts))
-    val panels = doc.select(".govuk-tabs__panel")
-
-    "select only the drafts tab" in {
-      val items = doc.select("li.govuk-tabs__list-item")
-
-      items.get(0).hasClass("govuk-tabs__list-item--selected") mustBe true
-      items.asScala
-        .drop(1)
-        .foreach(_.hasClass("govuk-tabs__list-item--selected") mustBe false)
     }
 
-    "show only the drafts panel" in {
-      panels.get(0).hasClass("govuk-tabs__panel--hidden") mustBe false
-      panels.asScala
-        .drop(1)
-        .foreach(_.hasClass("govuk-tabs__panel--hidden") mustBe true)
+    "when rendered with drafts" - {
+
+      val doc = view(SubmissionsViewModel.build(Fixtures.drafts))
+      val panels = doc.select(".govuk-tabs__panel")
+
+      "select only the drafts tab" in {
+        val items = doc.select("li.govuk-tabs__list-item")
+
+        items.get(0).hasClass("govuk-tabs__list-item--selected") mustBe true
+        items.asScala
+          .drop(1)
+          .foreach(_.hasClass("govuk-tabs__list-item--selected") mustBe false)
+      }
+
+      "show only the drafts panel" in {
+        panels.get(0).hasClass("govuk-tabs__panel--hidden") mustBe false
+        panels.asScala
+          .drop(1)
+          .foreach(_.hasClass("govuk-tabs__panel--hidden") mustBe true)
+      }
+
+      "render the drafts table with accessible hidden text" in {
+        val draftsPanel = doc.select("#drafts")
+        val table = draftsPanel.select("table.govuk-table")
+
+        table.size() mustBe 1
+
+        val hiddenText = table.select("a.govuk-link .govuk-visually-hidden")
+
+        hiddenText.size() mustBe 1
+        hiddenText.text() mustBe messages("submissions.drafts.action.hidden", testSubmissionId)
+      }
+
+      "show the empty message for the other panels" in {
+
+        panels.asScala
+          .map(_.select("p.govuk-body").text())
+          .filter(_.nonEmpty)
+          .toList mustBe List(
+          ExpectedContent.noRecent,
+          ExpectedContent.noReadyToPay,
+          ExpectedContent.noOverdue
+        )
+      }
     }
 
-    "render the drafts table with accessible hidden text" in {
-      val draftsPanel = doc.select("#drafts")
-      val table = draftsPanel.select("table.govuk-table")
+    "when rendered with ready to pay submissions" - {
 
-      table.size() mustBe 1
+      val readyToPaySubmissions: Seq[SubmissionSummary] = (1 to 10).map { i =>
+        SubmissionSummary(
+          submissionId = f"STC-000000$i%02d",
+          paymentDueBy = java.time.LocalDate.of(2026, 10, i).toString,
+          status = uk.gov.hmrc.securitiestransferchargefrontend.services.SubmissionStatus.ReadyToPay,
+          sortDate = java.time.LocalDate.of(2026, 9, i)
+        )
+      }
 
-      val hiddenText = table.select("a.govuk-link .govuk-visually-hidden")
+      val doc = view(SubmissionsViewModel.build(readyToPay = readyToPaySubmissions))
+      val tabs = doc.select("a.govuk-tabs__tab")
+      val readyToPayPanel = doc.select(s"#${ExpectedContent.readyToPayTabId}")
+      val tableRows = readyToPayPanel.select("tbody .govuk-table__row")
 
-      hiddenText.size() mustBe 1
-      hiddenText.text() mustBe messages("submissions.drafts.action.hidden", testSubmissionId)
-    }
+      "display the total number of ready to pay submissions in the blue tab tag" in {
+        val tag = tabs.get(2).select(".govuk-tag")
+        tag.text() mustBe "10"
+        tag.hasClass("govuk-tag--blue") mustBe true
+      }
 
-    "show the empty message for the other panels" in {
+      "not display the empty message in the ready to pay panel" in {
+        readyToPayPanel.select("p.govuk-body").size() mustBe 0
+      }
 
-      panels.asScala
-        .map(_.select("p.govuk-body").text())
-        .filter(_.nonEmpty)
-        .toList mustBe List(
-        ExpectedContent.noRecent,
-        ExpectedContent.noReadyToPay,
-        ExpectedContent.noOverdue
-      )
+      "render the ready to pay table with the correct column headers" in {
+        val headers = readyToPayPanel.select("thead .govuk-table__header").asScala.map(_.text()).toList
+        headers mustBe List(
+          messages("submissions.readyToPay.table.id.heading"),
+          messages("submissions.readyToPay.table.paymentDueBy.heading"),
+          messages("submissions.readyToPay.table.status.heading"),
+          messages("submissions.readyToPay.table.action.heading")
+        )
+      }
+
+      "display a maximum of 10 rows ordered by most recent submission date descending" in {
+        tableRows.size() mustBe 10
+
+        val displayedIds = tableRows.asScala.map(_.select("td").get(0).text()).toList
+        displayedIds mustBe (10 to 1 by -1).map(i => f"STC-000000$i%02d").toList
+      }
+
+      "display the formatted payment due date, blue status tag, and View link with visually hidden submission ID" in {
+        val firstRowCells = tableRows.get(0).select("td")
+
+        firstRowCells.get(0).text() mustBe "STC-00000010"
+        firstRowCells.get(1).text() mustBe "10 October 2026"
+
+        val statusTag = firstRowCells.get(2).select(".govuk-tag")
+        statusTag.text() mustBe messages("submissions.status.readyToPay")
+        statusTag.hasClass("govuk-tag--blue") mustBe true
+
+        val viewLink = firstRowCells.get(3).select("a.govuk-link")
+        viewLink.attr("href") mustBe "#"
+        viewLink.text() mustBe s"${messages("submissions.action.view")} ${messages("submissions.action.view.hidden", "STC-00000010")}"
+        viewLink.select(".govuk-visually-hidden").text() mustBe messages("submissions.action.view.hidden", "STC-00000010")
+      }
+
+      "show the empty message for the other panels" in {
+        val panels = doc.select(".govuk-tabs__panel")
+
+        panels.asScala
+          .map(_.select("p.govuk-body").text())
+          .filter(_.nonEmpty)
+          .toList mustBe List(
+          ExpectedContent.noRecent,
+          ExpectedContent.noDrafts,
+          ExpectedContent.noOverdue
+        )
+      }
     }
   }
 }
