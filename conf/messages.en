@@ -1343,6 +1343,21 @@ dashboard.stf = securities transfer (STF)
 dashboard.sh03 = share buyback (SH03)
 
 
+submissions.title = Submissions
+submissions.caption = Submissions
+submissions.recentSubmissions.panel.heading = Recent submissions
+submissions.drafts.panel.heading = Drafts
+submissions.readyToPay.panel.heading = Ready to pay
+submissions.overdue.panel.heading = Overdue
+submissions.recentSubmissions.tabId = recent-submissions
+submissions.drafts.tabId = drafts
+submissions.readyToPay.tabId = ready-to-pay
+submissions.overdue.tabId = overdue
+submissions.noRecentSubmissions = You have no submissions from the last 18 months.
+submissions.noDraftSubmissions = You have no draft submissions.
+submissions.noReadyToPaySubmissions = You have no ready to pay submissions.
+submissions.noOverdueSubmissions = You have no overdue submissions.
+
 recentSubmissions.title = Recent submissions
 recentSubmissions.heading = Submissions
 recentSubmissions.no-recent.h2 = You have no recent submissions
@@ -1353,3 +1368,10 @@ breadcrumbs.dashboard = Dashboard
 breadcrumbs.submissions = Submissions
 
 reportAndPay.title = Report and pay for a securities transfer
+
+submissions.drafts.table.id.heading = Submission ID
+submissions.drafts.table.status.heading = Status
+submissions.drafts.table.action.heading = Action
+
+submissions.drafts.action.view= View
+submissions.drafts.action.hidden= View submission ID {0}

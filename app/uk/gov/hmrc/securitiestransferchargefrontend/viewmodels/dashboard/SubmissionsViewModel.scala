@@ -16,4 +16,87 @@
 
 package uk.gov.hmrc.securitiestransferchargefrontend.viewmodels.dashboard
 
-case class SubmissionsViewModel(overdueCount: Int, readyToPayCount: Int, draftCount: Int)
+import play.api.i18n.Messages
+import uk.gov.hmrc.govukfrontend.views.Aliases.{HeadCell, TableRow}
+import uk.gov.hmrc.govukfrontend.views.viewmodels.content.{HtmlContent, Text}
+import uk.gov.hmrc.govukfrontend.views.viewmodels.table.Table
+import uk.gov.hmrc.securitiestransferchargefrontend.models.search.SubmissionSummary
+
+case class SubmissionTab(id: String, label: String, heading: String, emptyText: String, count: Int, table: Option[Table])
+
+case class SubmissionsViewModel(tabs: Seq[SubmissionTab])
+
+object SubmissionsViewModel {
+
+  private def draftsTable(drafts: Seq[SubmissionSummary])(implicit messages: Messages): Table =
+    Table(
+      head = Some(
+        Seq(
+          HeadCell(content = Text(messages("submissions.drafts.table.id.heading"))),
+          HeadCell(content = Text(messages("submissions.drafts.table.status.heading"))),
+          HeadCell(content = Text(messages("submissions.drafts.table.action.heading")))
+        )
+      ),
+      rows = drafts.map { draft =>
+        Seq(
+          TableRow(content = Text(draft.submissionId)),
+          TableRow(content = HtmlContent(s"""<strong class="govuk-tag govuk-tag--grey"> ${draft.status.toString}</strong>""".stripMargin)),
+          TableRow(
+            content = HtmlContent(
+              s"""<a class="govuk-link" href="#">${messages("submissions.drafts.action.view")}<span class="govuk-visually-hidden">${messages("submissions.drafts.action.hidden", draft.submissionId)}</span></a>""".stripMargin
+            )
+          )
+        )
+      }
+    )
+
+  private def labelWithTag(text: String, count: Int, tagClass: String): String =
+    s"""$text <strong class="govuk-tag govuk-!-margin-left-1 $tagClass">$count</strong>"""
+
+  private def buildTabs(drafts: Seq[SubmissionSummary])(implicit messages: Messages): Seq[SubmissionTab] = {
+
+    val recentSubmissionsTab: SubmissionTab = SubmissionTab(
+        id = messages("submissions.recentSubmissions.tabId"),
+        label = messages("submissions.recentSubmissions.panel.heading"),
+        heading = messages("submissions.recentSubmissions.panel.heading"),
+        emptyText = messages("submissions.noRecentSubmissions"),
+        count = 0,
+        table = None
+      )
+
+
+    val draftSubmissionsTab: SubmissionTab = SubmissionTab(
+        id = messages("submissions.drafts.tabId"),
+        label = labelWithTag(messages("submissions.drafts.panel.heading"), drafts.size, "govuk-tag--grey"),
+        heading = messages("submissions.drafts.panel.heading"),
+        emptyText = messages("submissions.noDraftSubmissions"),
+        count = drafts.size,
+        table = Some(draftsTable(drafts))
+      )
+
+    val readyToPaySubmissionsTab: SubmissionTab = SubmissionTab(
+        id = messages("submissions.readyToPay.tabId"),
+        label = labelWithTag(messages("submissions.readyToPay.panel.heading"), 0, "govuk-tag--blue"),
+        heading = messages("submissions.readyToPay.panel.heading"),
+        emptyText = messages("submissions.noReadyToPaySubmissions"),
+        count = 0,
+        table = None
+      )
+
+    val overdueSubmissionsTab: SubmissionTab = SubmissionTab(
+        id = messages("submissions.overdue.tabId"),
+        label = labelWithTag(messages("submissions.overdue.panel.heading"), 0, "govuk-tag--red"),
+        heading = messages("submissions.overdue.panel.heading"),
+        emptyText = messages("submissions.noOverdueSubmissions"),
+        count = 0,
+        table = None
+      )
+
+    Seq(recentSubmissionsTab, draftSubmissionsTab, readyToPaySubmissionsTab, overdueSubmissionsTab)
+  }
+
+  def build(drafts: Seq[SubmissionSummary])(implicit messages: Messages): SubmissionsViewModel =
+    SubmissionsViewModel(
+      tabs = buildTabs(drafts)
+    )
+}

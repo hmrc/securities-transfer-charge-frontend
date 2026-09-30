@@ -14,18 +14,6 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.securitiestransferchargefrontend.models.search
+package uk.gov.hmrc.securitiestransferchargefrontend.viewmodels.dashboard
 
-enum SubmissionStatus:
-  
-  case Draft, Processing, ReadyToPay, Paid, Overdue, PartialFailure, Failed
-  
-  override def toString: String =
-    this match
-      case ReadyToPay     => "Ready to pay"
-      case PartialFailure => "Partial failure"
-      case Draft          => "Draft"
-      case Processing     => "Processing"
-      case Paid           => "Paid"
-      case Overdue        => "Overdue"
-      case Failed         => "Failed"
+case class DashboardViewModel(overdueCount: Int, readyToPayCount: Int, draftCount: Int)

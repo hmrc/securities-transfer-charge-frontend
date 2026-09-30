@@ -48,7 +48,7 @@ class SaveAndReturnClientImplSpec extends SpecBase {
 
     when(mockConfig.saveAndReturnUrl)
       .thenReturn(baseUrl)
-    
+
     when(mockConfig.saveAndReturnRetrieval)
       .thenReturn(SaveAndReturnRetrievalType.UserAndGroup)
 

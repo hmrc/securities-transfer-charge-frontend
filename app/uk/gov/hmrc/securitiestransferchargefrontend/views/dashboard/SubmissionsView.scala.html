@@ -1,0 +1,87 @@
+@*
+ * Copyright 2026 HM Revenue & Customs
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *@
+
+@import uk.gov.hmrc.govukfrontend.views.html.components._
+@import uk.gov.hmrc.hmrcfrontend.views.viewmodels.hmrcstandardpage.TemplateOverrides
+@import uk.gov.hmrc.securitiestransferchargefrontend.viewmodels.dashboard.SubmissionsViewModel
+@import uk.gov.hmrc.securitiestransferchargefrontend.views.html.templates
+@import uk.gov.hmrc.securitiestransferchargefrontend.controllers.dashboard.routes
+
+
+@this(
+    layout: templates.Layout,
+    govukBreadcrumbs: GovukBreadcrumbs,
+    govukTable: GovukTable
+)
+
+@(submissions: SubmissionsViewModel)(implicit request: Request[_], messages: Messages)
+
+@layout(pageTitle = titleNoForm(messages("submissions.title")),mainContentLayout = Some(TemplateOverrides.noMainContentLayout),showBackLink = false) {
+
+    @govukBreadcrumbs(
+        Breadcrumbs(items = Seq(
+                BreadcrumbsItem(content = Text(messages("breadcrumbs.dashboard")), href = Some(routes.DashboardController.onPageLoad().url)),
+                BreadcrumbsItem(content = Text(messages("breadcrumbs.submissions")))
+            )
+        )
+    )
+
+    <h1 class="govuk-heading-l">
+        @messages("submissions.caption")
+    </h1>
+
+    <div class="govuk-grid-row">
+        <div class="govuk-grid-column-full">
+            <div class="govuk-tabs" data-module="govuk-tabs">
+                <h2 class="govuk-tabs__title">Submissions</h2>
+
+                <ul class="govuk-tabs__list">
+                    @submissions.tabs.zipWithIndex.map { case (item, index) =>
+                        <li class="govuk-tabs__list-item@if(index == 0){ govuk-tabs__list-item--selected}">
+                            <a class="govuk-tabs__tab" href="#@item.id">
+                                @Html(item.label)
+                            </a>
+                        </li>
+                    }
+
+                </ul>
+
+                @submissions.tabs.zipWithIndex.map { case (item, index) =>
+
+                    <div class="govuk-tabs__panel@if(index != 0){ govuk-tabs__panel--hidden}" id="@item.id">
+
+                        <h2 class="govuk-heading-m">
+                            @item.heading
+                        </h2>
+
+                        @if(item.count == 0) {
+
+                            <p class="govuk-body">
+                                @item.emptyText
+                            </p>
+
+                        } else {
+
+                            @item.table.map { table =>
+                                @govukTable(table)
+                            }
+                        }
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+}
