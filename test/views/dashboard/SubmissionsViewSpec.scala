@@ -17,6 +17,7 @@
 package views.dashboard
 
 import base.Fixtures
+import base.Fixtures.testSubmissionId
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
 import play.api.Application
@@ -204,12 +205,16 @@ class SubmissionsViewSpec extends ViewBaseSpec {
         .foreach(_.hasClass("govuk-tabs__panel--hidden") mustBe true)
     }
 
-    "render the drafts table" in {
+    "render the drafts table with accessible hidden text" in {
       val draftsPanel = doc.select("#drafts")
       val table = draftsPanel.select("table.govuk-table")
 
-      draftsPanel.size() mustBe 1
       table.size() mustBe 1
+
+      val hiddenText = table.select("a.govuk-link .govuk-visually-hidden")
+
+      hiddenText.size() mustBe 1
+      hiddenText.text() mustBe messages("submissions.drafts.action.hidden", testSubmissionId)
     }
 
     "show the empty message for the other panels" in {

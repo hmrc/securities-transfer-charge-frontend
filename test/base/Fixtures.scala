@@ -178,7 +178,7 @@ object Fixtures {
 
   val drafts: Seq[SubmissionSummary] = List(
     SubmissionSummary(
-      submissionId = "STC-00000219",
+      submissionId = testSubmissionId.toString,
       paymentDueBy = "N/A",
       status = Draft,
       sortDate = LocalDate.parse("2026-10-19")

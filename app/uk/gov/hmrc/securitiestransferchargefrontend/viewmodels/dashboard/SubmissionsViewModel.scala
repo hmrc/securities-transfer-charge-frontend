@@ -41,16 +41,20 @@ object SubmissionsViewModel {
         Seq(
           TableRow(content = Text(draft.submissionId)),
           TableRow(content = HtmlContent(s"""<strong class="govuk-tag govuk-tag--grey"> ${draft.status.toString}</strong>""".stripMargin)),
-          TableRow(content = HtmlContent("""<a class="govuk-link" href="#">View</a>"""))
+          TableRow(
+            content = HtmlContent(
+              s"""<a class="govuk-link" href="#">${messages("submissions.drafts.action.view")}<span class="govuk-visually-hidden">${messages("submissions.drafts.action.hidden", draft.submissionId)}</span></a>""".stripMargin
+            )
+          )
         )
       }
     )
 
   private def labelWithTag(text: String, count: Int, tagClass: String): String =
     s"""$text <strong class="govuk-tag govuk-!-margin-left-1 $tagClass">$count</strong>"""
-  
+
   private def buildTabs(drafts: Seq[SubmissionSummary])(implicit messages: Messages): Seq[SubmissionTab] = {
-    
+
     val recentSubmissionsTab: SubmissionTab = SubmissionTab(
         id = messages("submissions.recentSubmissions.tabId"),
         label = messages("submissions.recentSubmissions.panel.heading"),
@@ -59,7 +63,7 @@ object SubmissionsViewModel {
         count = 0,
         table = None
       )
-    
+
 
     val draftSubmissionsTab: SubmissionTab = SubmissionTab(
         id = messages("submissions.drafts.tabId"),
