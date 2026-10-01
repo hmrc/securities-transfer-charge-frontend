@@ -26,7 +26,7 @@ import play.api.test.FakeRequest
 import play.api.test.Helpers.*
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.dashboard.routes
-import uk.gov.hmrc.securitiestransferchargefrontend.domain.{GroupIdentifier, UserId}
+import uk.gov.hmrc.securitiestransferchargefrontend.domain.{GroupIdentifier, SubscriptionId, UserId}
 import uk.gov.hmrc.securitiestransferchargefrontend.services.DashboardService
 import uk.gov.hmrc.securitiestransferchargefrontend.viewmodels.dashboard.SubmissionsViewModel
 import uk.gov.hmrc.securitiestransferchargefrontend.views.html.dashboard.SubmissionsView
@@ -39,15 +39,20 @@ class SubmissionsControllerSpec extends SpecBase with MockitoSugar {
 
   val mockDashboardService: DashboardService = mock[DashboardService]
 
-  private def mockDrafts(): Unit =
+  private def mockServiceCalls(): Unit = {
     when(mockDashboardService.getDrafts(any[UserId], any[GroupIdentifier])(any[HeaderCarrier]))
       .thenReturn(Future.successful(Fixtures.drafts))
+
+    when(mockDashboardService.getReadyToPay(any[SubscriptionId])(any[HeaderCarrier]))
+      .thenReturn(Future.successful(Fixtures.readyToPay))
+    
+  }
 
   "SubmissionsController" - {
 
     "must return OK and the correct view" in {
 
-      mockDrafts()
+      mockServiceCalls()
 
       val application =
         applicationBuilder(userAnswers = Some(emptyUserAnswers))
@@ -64,7 +69,10 @@ class SubmissionsControllerSpec extends SpecBase with MockitoSugar {
 
         implicit val msgs: Messages = messages(application)
 
-        val submissionsViewModel = SubmissionsViewModel.build(Fixtures.drafts)
+        val submissionsViewModel = SubmissionsViewModel.build(
+          drafts = Fixtures.drafts,
+          readyToPay = Fixtures.readyToPay
+        )
 
         status(result) mustEqual OK
 

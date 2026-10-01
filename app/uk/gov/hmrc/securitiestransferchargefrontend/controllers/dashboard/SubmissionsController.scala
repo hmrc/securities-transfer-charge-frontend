@@ -33,20 +33,21 @@ class SubmissionsController @Inject()(
                                        auth: StcAuthEnrolledAction,
                                        val controllerComponents: MessagesControllerComponents,
                                        view: SubmissionsView,
-                                       dashboardService: DashboardService,
+                                       dashboardService: DashboardService
                                      )(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport {
 
 
   def onPageLoad(): Action[AnyContent] = auth.async { implicit request =>
-    
+
+    val subscriptionId = request.subscriptionId
     val userId = UserId(request.internalId)
     val groupId = GroupIdentifier(request.groupIdentifier)
 
     for {
-      drafts <- dashboardService.getDrafts(userId, groupId)
-      
+      drafts     <- dashboardService.getDrafts(userId, groupId)
+      readyToPay <- dashboardService.getReadyToPay(subscriptionId)
     } yield {
-      val viewModel = SubmissionsViewModel.build(drafts)
+      val viewModel = SubmissionsViewModel.build(drafts, readyToPay)
       Ok(view(viewModel))
     }
   }
