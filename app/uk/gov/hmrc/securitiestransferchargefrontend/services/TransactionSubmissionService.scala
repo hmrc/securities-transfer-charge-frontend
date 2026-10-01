@@ -115,7 +115,7 @@ final class TransactionSubmissionServiceImpl @Inject()(
     }
 
   def submitSingleSh03(using request: StcDataRequest[?]): Future[Boolean] = {
-    given hc: HeaderCarrier = headerCarrierCreator.create(request)
+    implicit val hc: HeaderCarrier = headerCarrierCreator.create(request)
     lazy val submissionId = request.userAnswers.submissionId
     val innerRequest = request.request
     lazy val subscriptionId = innerRequest.subscriptionId

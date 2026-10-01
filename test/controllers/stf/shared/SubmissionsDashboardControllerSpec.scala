@@ -26,11 +26,9 @@ import play.api.test.FakeRequest
 import play.api.test.Helpers.*
 import uk.gov.hmrc.auth.core.AffinityGroup
 import uk.gov.hmrc.securitiestransferchargefrontend.clients.{SaveAndReturnClient, SubmissionIdClient}
-import uk.gov.hmrc.securitiestransferchargefrontend.config.FrontendAppConfig
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.shared.routes
 import uk.gov.hmrc.securitiestransferchargefrontend.domain.{GroupIdentifier, SubmissionId, UserId}
-import uk.gov.hmrc.securitiestransferchargefrontend.models.JourneyType.STF
-import uk.gov.hmrc.securitiestransferchargefrontend.models.UserAnswersSummary
+import uk.gov.hmrc.securitiestransferchargefrontend.models.{JourneyType, UserAnswersSummary}
 import uk.gov.hmrc.securitiestransferchargefrontend.models.audit.AuditType.Stf
 import uk.gov.hmrc.securitiestransferchargefrontend.models.audit.JourneyStatus.StartSubmission
 import uk.gov.hmrc.securitiestransferchargefrontend.navigation.Navigator
@@ -56,11 +54,7 @@ class SubmissionsDashboardControllerSpec extends SpecBase with MockitoSugar with
 
         val mockSaveAndReturnClient = mock[SaveAndReturnClient]
 
-        // Mock both listByUser and listByGroup to return empty lists because one or the other is called depending on the config.
-        when(mockSaveAndReturnClient.listByUser(any[UserId])(any()))
-          .thenReturn(Future.successful(List.empty))
-
-        when(mockSaveAndReturnClient.listByGroup(any[GroupIdentifier])(any()))
+        when(mockSaveAndReturnClient.getDraftSummaries(any[UserId], any[GroupIdentifier])(any()))
           .thenReturn(Future.successful(List.empty))
 
         val application =
@@ -74,7 +68,6 @@ class SubmissionsDashboardControllerSpec extends SpecBase with MockitoSugar with
 
           val result = route(application, request).value
           val view = application.injector.instanceOf[SubmissionsDashboardView]
-          val config = application.injector.instanceOf[FrontendAppConfig]
 
           status(result) mustEqual OK
 
@@ -84,11 +77,8 @@ class SubmissionsDashboardControllerSpec extends SpecBase with MockitoSugar with
               messages(application)
             ).toString
 
-          if (config.saveAndReturnRetrieval == config.SaveAndReturnRetrievalType.UserAndGroup) {
-            verify(mockSaveAndReturnClient).listByGroup(any[GroupIdentifier])(any())
-          } else {
-            verify(mockSaveAndReturnClient).listByUser(any[UserId])(any())
-          }        }
+          verify(mockSaveAndReturnClient).getDraftSummaries(any[UserId], any[GroupIdentifier])(any())
+        }
       }
 
       "must return OK and render submission IDs when they exist" in {
@@ -96,22 +86,11 @@ class SubmissionsDashboardControllerSpec extends SpecBase with MockitoSugar with
         val mockSaveAndReturnClient = mock[SaveAndReturnClient]
 
         val summaries = List(
-          UserAnswersSummary(
-            submissionId = SubmissionId("STC-123456789"),
-            journeyType = STF,
-            lastUpdated = Instant.now()
-          ),
-          UserAnswersSummary(
-            submissionId = SubmissionId("STC-987654321"),
-            journeyType = STF,
-            lastUpdated = Instant.now()
-          )
+          UserAnswersSummary(SubmissionId("STC-123456789"), JourneyType.STF, Instant.now()),
+          UserAnswersSummary(SubmissionId("STC-273836322"), JourneyType.SH03, Instant.now().minusSeconds(120))
         )
 
-        when(mockSaveAndReturnClient.listByUser(any[UserId])(any()))
-          .thenReturn(Future.successful(summaries))
-
-        when(mockSaveAndReturnClient.listByGroup(any[GroupIdentifier])(any()))
+        when(mockSaveAndReturnClient.getDraftSummaries(any[UserId], any[GroupIdentifier])(any()))
           .thenReturn(Future.successful(summaries))
 
         val application =
@@ -125,7 +104,6 @@ class SubmissionsDashboardControllerSpec extends SpecBase with MockitoSugar with
 
           val result = route(application, request).value
           val view = application.injector.instanceOf[SubmissionsDashboardView]
-          val config = application.injector.instanceOf[FrontendAppConfig]
 
           status(result) mustEqual OK
 
@@ -135,11 +113,7 @@ class SubmissionsDashboardControllerSpec extends SpecBase with MockitoSugar with
               messages(application)
             ).toString
 
-          if (config.saveAndReturnRetrieval == config.SaveAndReturnRetrievalType.UserAndGroup) {
-            verify(mockSaveAndReturnClient).listByGroup(any[GroupIdentifier])(any())
-          } else {
-            verify(mockSaveAndReturnClient).listByUser(any[UserId])(any())
-          }
+            verify(mockSaveAndReturnClient).getDraftSummaries(any[UserId], any[GroupIdentifier])(any())
         }
       }
     }

@@ -22,10 +22,11 @@ import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
 import play.api.Application
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.dashboard.routes
-import uk.gov.hmrc.securitiestransferchargefrontend.services.SubmissionSummary
+import uk.gov.hmrc.securitiestransferchargefrontend.models.search.SubmissionSummary
 import uk.gov.hmrc.securitiestransferchargefrontend.viewmodels.dashboard.SubmissionsViewModel
 import uk.gov.hmrc.securitiestransferchargefrontend.views.html.dashboard.SubmissionsView
 import views.ViewBaseSpec
+import uk.gov.hmrc.securitiestransferchargefrontend.models.search.SubmissionStatus.*
 
 import scala.jdk.CollectionConverters.*
 
@@ -68,9 +69,9 @@ class SubmissionsViewSpec extends ViewBaseSpec {
   "The SubmissionsView" - {
 
     "when rendered with no submissions " - {
-      
+
       val doc = view(SubmissionsViewModel.build(Seq.empty[SubmissionSummary], Seq.empty[SubmissionSummary]))
-      
+
       val tabs = doc.select("a.govuk-tabs__tab")
       val panels = doc.select(".govuk-tabs__panel")
       val breadcrumbs = doc.select(".govuk-breadcrumbs__list-item")
@@ -226,8 +227,8 @@ class SubmissionsViewSpec extends ViewBaseSpec {
       val readyToPaySubmissions: Seq[SubmissionSummary] = (10 to 1 by -1).map { i =>
         SubmissionSummary(
           submissionId = f"STC-000000$i%02d",
-          paymentDueBy = java.time.LocalDate.of(2026, 10, i).toString,
-          status = uk.gov.hmrc.securitiestransferchargefrontend.services.SubmissionStatus.ReadyToPay,
+          maybePaymentDueBy = Some(java.time.LocalDate.of(2026, 10, i).toString),
+          status = ReadyToPay,
           sortDate = java.time.LocalDate.of(2026, 9, i)
         )
       }

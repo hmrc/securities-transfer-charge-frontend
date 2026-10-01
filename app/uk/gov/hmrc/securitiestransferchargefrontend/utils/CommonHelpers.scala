@@ -24,6 +24,7 @@ import uk.gov.hmrc.securitiestransferchargefrontend.controllers.actions.requests
 import uk.gov.hmrc.securitiestransferchargefrontend.models.JourneyType
 import uk.gov.hmrc.securitiestransferchargefrontend.pages.stf.single.ConnectedPersonsPage
 
+import java.time.LocalDate
 import scala.concurrent.{ExecutionContext, Future}
 
 object CommonHelpers {
@@ -59,9 +60,12 @@ object CommonHelpers {
     "%,d".format(n)
   }
 
+  def isInThePast: LocalDate => Boolean = d => d.isBefore(LocalDate.now())
+
+
   val authToken: HeaderCarrier => String =
     _.authorization
       .map(_.value)
       .getOrElse("")
-  
+
 }

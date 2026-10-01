@@ -20,14 +20,13 @@ import play.api.i18n.Messages
 import uk.gov.hmrc.govukfrontend.views.Aliases.{HeadCell, TableRow}
 import uk.gov.hmrc.govukfrontend.views.viewmodels.content.{HtmlContent, Text}
 import uk.gov.hmrc.govukfrontend.views.viewmodels.table.Table
-import uk.gov.hmrc.securitiestransferchargefrontend.services.SubmissionStatus.{Draft, ReadyToPay, Overdue}
-import uk.gov.hmrc.securitiestransferchargefrontend.services.{SubmissionStatus, SubmissionSummary}
+import uk.gov.hmrc.securitiestransferchargefrontend.models.search.SubmissionStatus.{Draft, Overdue, ReadyToPay}
+import uk.gov.hmrc.securitiestransferchargefrontend.models.search.{SubmissionStatus, SubmissionSummary}
 
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 import java.util.Locale
 import scala.util.Try
-
 
 case class SubmissionTab(id: String, label: String, heading: String, emptyText: String, count: Int, table: Option[Table])
 

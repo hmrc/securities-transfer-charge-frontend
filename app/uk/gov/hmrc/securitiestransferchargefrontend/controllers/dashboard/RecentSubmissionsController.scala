@@ -20,6 +20,7 @@ import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.actions.StcAuthEnrolledAction
+import uk.gov.hmrc.securitiestransferchargefrontend.domain.{GroupIdentifier, UserId}
 import uk.gov.hmrc.securitiestransferchargefrontend.services.DashboardService
 import uk.gov.hmrc.securitiestransferchargefrontend.views.html.dashboard.RecentSubmissionsView
 
@@ -35,7 +36,10 @@ class RecentSubmissionsController @Inject()(
                                            )(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport {
 
   def onPageLoad(): Action[AnyContent] = stcAuthEnrolled.async { implicit request =>
-    dashboardService.getRecent(request.subscriptionId).map { recent =>
+    dashboardService.getRecent(
+      UserId(request.internalId),
+      GroupIdentifier(request.groupIdentifier),
+      request.subscriptionId).map { recent =>
       if (recent.isEmpty) {
         Ok(view())
       } else {

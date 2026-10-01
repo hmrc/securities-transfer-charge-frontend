@@ -27,7 +27,8 @@ import uk.gov.hmrc.auth.core.AffinityGroup
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.dashboard.routes
 import uk.gov.hmrc.securitiestransferchargefrontend.domain.{GroupIdentifier, SubscriptionId, UserId}
-import uk.gov.hmrc.securitiestransferchargefrontend.services.{DashboardCounts, DashboardService}
+import uk.gov.hmrc.securitiestransferchargefrontend.models.search.DashboardCounts
+import uk.gov.hmrc.securitiestransferchargefrontend.services.DashboardService
 import uk.gov.hmrc.securitiestransferchargefrontend.viewmodels.dashboard.DashboardViewModel
 import uk.gov.hmrc.securitiestransferchargefrontend.views.html.dashboard.DashboardView
 
