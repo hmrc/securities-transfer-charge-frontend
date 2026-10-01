@@ -98,14 +98,13 @@ final class TransactionSubmissionServiceImpl @Inject()(
 
     etmpSubmissionService
       .submitSingleStf(request.request.subscriptionId, request.userAnswers, getAffinityData(request.request.affinityGroup))
-      .flatMap {
-        case stfResponse: SubmissionCreateResponseSuccess => Future {
+      .map {
+        case stfResponse: SubmissionCreateResponseSuccess =>
           transactionResponseRepository.store(submissionId, stfResponse)
           saveAndReturnClient.deleteDraft(submissionId)
           Some(stfResponse.utrn)
-        }
 
-        case _ => Future.successful(None)
+        case _ => None
       }
       .flatMap { maybeUtrn =>
         maybeUtrn.foreach(utrn => sendSingleSubmissionDataToNRS(submissionId, utrn))
@@ -124,18 +123,16 @@ final class TransactionSubmissionServiceImpl @Inject()(
     lazy val credentialId = innerRequest.credentialId
     etmpSubmissionService
       .submitSingleSh03(subscriptionId, request.userAnswers, getAffinityData(affinityGroup))
-      .flatMap {
-        case sh03Response: SubmissionCreateResponseSuccess => Future {
+      .map {
+        case sh03Response: SubmissionCreateResponseSuccess =>
           auditService.audit(AuditModel(SubmissionSuccess, subscriptionId, affinityGroup, credentialId, Some(submissionId), Sh03))
           transactionResponseRepository.store(submissionId, sh03Response)
           saveAndReturnClient.deleteDraft(submissionId)
           Some(sh03Response.utrn)
-        }
 
-        case _ => Future {
+        case _ =>
           auditService.audit(AuditModel(SubmissionFailure, innerRequest.subscriptionId, innerRequest.affinityGroup, innerRequest.credentialId, Some(request.userAnswers.submissionId), Sh03))
           None
-        }
       }
       .flatMap { maybeUtrn =>
         maybeUtrn.foreach(utrn => sendSingleSubmissionDataToNRS(submissionId, utrn))
