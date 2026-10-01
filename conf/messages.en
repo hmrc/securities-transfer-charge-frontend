@@ -1375,3 +1375,12 @@ submissions.drafts.table.action.heading = Action
 
 submissions.drafts.action.view= View
 submissions.drafts.action.hidden= View submission ID {0}
+
+submissions.readyToPay.table.id.heading = Submission ID
+submissions.readyToPay.table.paymentDueBy.heading = Payment due by
+submissions.readyToPay.table.status.heading = Status
+submissions.readyToPay.table.action.heading = Action
+
+submissions.status.readyToPay = Ready to pay
+submissions.action.view = View
+submissions.action.view.hidden = View submission ID {0}

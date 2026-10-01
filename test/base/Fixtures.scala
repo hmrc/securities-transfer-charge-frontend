@@ -29,7 +29,7 @@ import uk.gov.hmrc.securitiestransferchargefrontend.models.JourneyType.STF
 import uk.gov.hmrc.securitiestransferchargefrontend.models.stf.{Address, AlfAddress, AlfConfirmedAddress, ConfirmableAddress, Country, DetailsOfThisTransfer, SecuritiesTarget, UploadedFileError}
 import uk.gov.hmrc.securitiestransferchargefrontend.models.UserAnswers
 import uk.gov.hmrc.securitiestransferchargefrontend.models.nrs.IdentityData
-import uk.gov.hmrc.securitiestransferchargefrontend.models.search.SubmissionStatus.Draft
+import uk.gov.hmrc.securitiestransferchargefrontend.models.search.SubmissionStatus.*
 import uk.gov.hmrc.securitiestransferchargefrontend.models.search.{EtmpChargeDetail, EtmpSuccessResponse, EtmpTransactionDetail, SubmissionSummary}
 import uk.gov.hmrc.securitiestransferchargefrontend.models.sh03.shared.{CompanyDetails, DetailsOfThisSharePurchase}
 import uk.gov.hmrc.securitiestransferchargefrontend.models.shared.AgentReference
@@ -184,6 +184,15 @@ object Fixtures {
       maybePaymentDueBy = None,
       status = Draft,
       sortDate = LocalDate.parse("2026-10-19")
+    )
+  )
+
+  val readyToPay: Seq[SubmissionSummary] = List(
+    SubmissionSummary(
+      submissionId = "STC-10000001",
+      maybePaymentDueBy = Some("2026-10-30"),
+      status = ReadyToPay,
+      sortDate = LocalDate.parse("2026-09-30")
     )
   )
 
