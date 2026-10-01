@@ -196,6 +196,15 @@ object Fixtures {
     )
   )
 
+  val overdue: Seq[SubmissionSummary] = List(
+    SubmissionSummary(
+      submissionId = testSubmissionId.toString,
+      maybePaymentDueBy = Some("2026-09-29"),
+      status = Overdue,
+      sortDate = LocalDate.parse("2026-08-30")
+    )
+  )
+
   class FakeAuthConnectorSuccess(value: Any) extends AuthConnector {
 
     override def authorise[A](predicate: Predicate, retrieval: Retrieval[A])(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[A] =

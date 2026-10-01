@@ -46,8 +46,9 @@ class SubmissionsController @Inject()(
     for {
       drafts     <- dashboardService.getDrafts(userId, groupId)
       readyToPay <- dashboardService.getReadyToPay(subscriptionId)
+      overdue <- dashboardService.getOverdue(subscriptionId)
     } yield {
-      val viewModel = SubmissionsViewModel.build(drafts, readyToPay)
+      val viewModel = SubmissionsViewModel.build(drafts, readyToPay, overdue)
       Ok(view(viewModel))
     }
   }

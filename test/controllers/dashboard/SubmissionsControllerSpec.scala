@@ -43,10 +43,13 @@ class SubmissionsControllerSpec extends SpecBase with MockitoSugar {
     when(mockDashboardService.getDrafts(any[UserId], any[GroupIdentifier])(any[HeaderCarrier]))
       .thenReturn(Future.successful(Fixtures.drafts))
 
+    when(mockDashboardService.getOverdue(any[SubscriptionId])(any[HeaderCarrier]))
+      .thenReturn(Future.successful(Fixtures.overdue))
+
     when(mockDashboardService.getReadyToPay(any[SubscriptionId])(any[HeaderCarrier]))
       .thenReturn(Future.successful(Fixtures.readyToPay))
-    
   }
+
 
   "SubmissionsController" - {
 
@@ -71,7 +74,8 @@ class SubmissionsControllerSpec extends SpecBase with MockitoSugar {
 
         val submissionsViewModel = SubmissionsViewModel.build(
           drafts = Fixtures.drafts,
-          readyToPay = Fixtures.readyToPay
+          readyToPay = Fixtures.readyToPay,
+          overdue = Fixtures.overdue
         )
 
         status(result) mustEqual OK

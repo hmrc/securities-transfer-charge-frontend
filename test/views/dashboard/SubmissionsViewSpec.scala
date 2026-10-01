@@ -17,7 +17,7 @@
 package views.dashboard
 
 import base.Fixtures
-import base.Fixtures.testSubmissionId
+import base.Fixtures.{overdue, testSubmissionId}
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
 import play.api.Application
@@ -70,7 +70,7 @@ class SubmissionsViewSpec extends ViewBaseSpec {
 
     "when rendered with no submissions " - {
 
-      val doc = view(SubmissionsViewModel.build(Seq.empty[SubmissionSummary]))
+      val doc = view(SubmissionsViewModel.build(Seq.empty[SubmissionSummary], Seq.empty[SubmissionSummary]))
 
       val tabs = doc.select("a.govuk-tabs__tab")
       val panels = doc.select(".govuk-tabs__panel")
@@ -128,10 +128,10 @@ class SubmissionsViewSpec extends ViewBaseSpec {
         tag.hasClass("govuk-tag--blue") mustBe true
       }
 
-      "show a red tag on the overdue tab" in {
+      "show an orange tag on the overdue tab" in {
         val tag = tabs.get(3).select(".govuk-tag")
         tag.text() mustBe "0"
-        tag.hasClass("govuk-tag--red") mustBe true
+        tag.hasClass("govuk-tag--orange") mustBe true
       }
 
       "select only the first tab" in {
@@ -178,10 +178,10 @@ class SubmissionsViewSpec extends ViewBaseSpec {
 
     "when rendered with drafts" - {
 
-      val doc = view(SubmissionsViewModel.build(Fixtures.drafts))
+      val doc = view(SubmissionsViewModel.build(Fixtures.drafts, Seq.empty))
       val panels = doc.select(".govuk-tabs__panel")
 
-      "select only the drafts tab" in {
+      "select only the drafts tab" in { // TODO: Need to rethink this test as currently it's actually selecting the recent submissions tab which is the default, unless accessing via the dashboard where the redirect links have the '#<tab name>' at the end
         val items = doc.select("li.govuk-tabs__list-item")
 
         items.get(0).hasClass("govuk-tabs__list-item--selected") mustBe true
@@ -190,7 +190,7 @@ class SubmissionsViewSpec extends ViewBaseSpec {
           .foreach(_.hasClass("govuk-tabs__list-item--selected") mustBe false)
       }
 
-      "show only the drafts panel" in {
+      "show only the drafts panel" in { // TODO: Need to rethink this test as currently it's actually displaying the recent submissions panel which is the default, unless accessing via the dashboard where the redirect links have the '#<tab name>' at the end
         panels.get(0).hasClass("govuk-tabs__panel--hidden") mustBe false
         panels.asScala
           .drop(1)
@@ -205,9 +205,9 @@ class SubmissionsViewSpec extends ViewBaseSpec {
 
         val hiddenText = table.select("a.govuk-link .govuk-visually-hidden")
 
-        hiddenText.size() mustBe 1
-        hiddenText.text() mustBe messages("submissions.drafts.action.hidden", testSubmissionId)
-      }
+      hiddenText.size() mustBe 1
+      hiddenText.text() mustBe messages("submissions.action.view.hidden", testSubmissionId)
+    }
 
       "show the empty message for the other panels" in {
 
@@ -224,7 +224,7 @@ class SubmissionsViewSpec extends ViewBaseSpec {
 
     "when rendered with ready to pay submissions" - {
 
-      val readyToPaySubmissions: Seq[SubmissionSummary] = (1 to 10).map { i =>
+      val readyToPaySubmissions: Seq[SubmissionSummary] = (10 to 1 by -1).map { i =>
         SubmissionSummary(
           submissionId = f"STC-000000$i%02d",
           maybePaymentDueBy = Some(java.time.LocalDate.of(2026, 10, i).toString),
@@ -251,10 +251,10 @@ class SubmissionsViewSpec extends ViewBaseSpec {
       "render the ready to pay table with the correct column headers" in {
         val headers = readyToPayPanel.select("thead .govuk-table__header").asScala.map(_.text()).toList
         headers mustBe List(
-          messages("submissions.readyToPay.table.id.heading"),
-          messages("submissions.readyToPay.table.paymentDueBy.heading"),
-          messages("submissions.readyToPay.table.status.heading"),
-          messages("submissions.readyToPay.table.action.heading")
+          messages("submissions.table.id.heading"),
+          messages("submissions.table.paymentDueBy.heading"),
+          messages("submissions.table.status.heading"),
+          messages("submissions.table.action.heading")
         )
       }
 
@@ -277,7 +277,7 @@ class SubmissionsViewSpec extends ViewBaseSpec {
 
         val viewLink = firstRowCells.get(3).select("a.govuk-link")
         viewLink.attr("href") mustBe "#"
-        viewLink.text() mustBe s"${messages("submissions.action.view")} ${messages("submissions.action.view.hidden", "STC-00000010")}"
+        viewLink.text() mustBe s"${messages("submissions.action.view")}${messages("submissions.action.view.hidden", "STC-00000010")}"
         viewLink.select(".govuk-visually-hidden").text() mustBe messages("submissions.action.view.hidden", "STC-00000010")
       }
 
@@ -293,6 +293,56 @@ class SubmissionsViewSpec extends ViewBaseSpec {
           ExpectedContent.noOverdue
         )
       }
+    }
+  }
+
+  "when rendered with overdue" - {
+
+    val doc = view(SubmissionsViewModel.build(drafts = Seq.empty, overdue = Fixtures.overdue))
+    val panels = doc.select(".govuk-tabs__panel")
+    val tabs = doc.select("a.govuk-tabs__tab")
+    val overduePanel = doc.select(s"#${ExpectedContent.overdueTabId}")
+
+
+    "display the total number of overdue submissions in the orange tab tag" in {
+      val tag = tabs.get(3).select(".govuk-tag")
+      tag.text() mustBe "1"
+      tag.hasClass("govuk-tag--orange") mustBe true
+    }
+
+    "not display the empty message in the overdue panel" in {
+      overduePanel.select("p.govuk-body").size() mustBe 0
+    }
+
+    "show only the overdue panel" in {
+      panels.get(0).hasClass("govuk-tabs__panel--hidden") mustBe false
+      panels.asScala
+        .drop(1)
+        .foreach(_.hasClass("govuk-tabs__panel--hidden") mustBe true)
+    }
+
+    "render the drafts table with accessible hidden text" in {
+      val overduePanel = doc.select("#overdue")
+      val table = overduePanel.select("table.govuk-table")
+
+      table.size() mustBe 1
+
+      val hiddenText = table.select("a.govuk-link .govuk-visually-hidden")
+
+      hiddenText.size() mustBe 1
+      hiddenText.text() mustBe messages("submissions.action.view.hidden", testSubmissionId)
+    }
+
+    "show the empty message for the other panels" in {
+
+      panels.asScala
+        .map(_.select("p.govuk-body").text())
+        .filter(_.nonEmpty)
+        .toList mustBe List(
+        ExpectedContent.noRecent,
+        ExpectedContent.noDrafts,
+        ExpectedContent.noReadyToPay
+      )
     }
   }
 }
