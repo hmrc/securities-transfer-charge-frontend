@@ -302,7 +302,6 @@ class SubmissionsViewSpec extends ViewBaseSpec {
     val panels = doc.select(".govuk-tabs__panel")
     val tabs = doc.select("a.govuk-tabs__tab")
     val overduePanel = doc.select(s"#${ExpectedContent.overdueTabId}")
-//    val tableRows = overduePanel.select("tbody .govuk-table__row")
 
 
     "display the total number of overdue submissions in the orange tab tag" in {
