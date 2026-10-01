@@ -1374,5 +1374,9 @@ submissions.table.paymentDueBy.heading = Payment due by
 submissions.table.status.heading = Status
 submissions.table.action.heading = Action
 
+submissions.status.readyToPay = Ready to pay
+submissions.status.draft = Draft
+submissions.status.overdue = Overdue
+
 submissions.action.view = View
-submissions.action.hidden = View submission ID {0}
+submissions.action.view.hidden = View submission ID {0}

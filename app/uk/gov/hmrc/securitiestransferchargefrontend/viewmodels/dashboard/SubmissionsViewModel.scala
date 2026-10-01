@@ -35,6 +35,7 @@ case class SubmissionsViewModel(tabs: Seq[SubmissionTab])
 
 object SubmissionsViewModel {
 
+  private val maxRecords = 10
   private val govUkDateFormatter = DateTimeFormatter.ofPattern("d MMMM uuuu", Locale.UK)
 
   private def formatDate(dateStr: String): String =
@@ -53,7 +54,7 @@ object SubmissionsViewModel {
 
   private def viewLink(submissionId: String)(implicit messages: Messages): HtmlContent = {
     val view = messages("submissions.action.view")
-    val hiddenText = messages("submissions.action.hidden", submissionId)
+    val hiddenText = messages("submissions.action.view.hidden", submissionId)
 
     HtmlContent(
       s"""<a class="govuk-link" href="#">$view<span class="govuk-visually-hidden">$hiddenText</span></a>"""
@@ -76,7 +77,7 @@ object SubmissionsViewModel {
             HeadCell(content = Text(messages("submissions.table.action.heading")))
           )
       ),
-      rows = summaries.map { summary =>
+      rows = summaries.take(maxRecords).map { summary =>
         val paymentDueByCell: Seq[TableRow] =
           if (isDraftsTab) Seq.empty else Seq(TableRow(content = Text(formatDate(summary.paymentDueBy)), classes = "govuk-!-text-align-right"))
 
@@ -95,6 +96,7 @@ object SubmissionsViewModel {
 
   private def buildTabs(
                          drafts: Seq[SubmissionSummary],
+                         readyToPay: Seq[SubmissionSummary],
                          overdue: Seq[SubmissionSummary]
                        )(implicit messages: Messages): Seq[SubmissionTab] = {
 
@@ -118,11 +120,11 @@ object SubmissionsViewModel {
 
     val readyToPaySubmissionsTab: SubmissionTab = SubmissionTab(
       id = messages("submissions.readyToPay.tabId"),
-      label = labelWithTag(messages("submissions.readyToPay.panel.heading"), 0, ReadyToPay),
+      label = labelWithTag(messages("submissions.readyToPay.panel.heading"), readyToPay.size, ReadyToPay),
       heading = messages("submissions.readyToPay.panel.heading"),
       emptyText = messages("submissions.noReadyToPaySubmissions"),
-      count = 0,
-      table = None
+      count = readyToPay.size,
+      table = Some(submissionsTable(readyToPay))
     )
 
     val overdueSubmissionsTab: SubmissionTab = SubmissionTab(
@@ -137,8 +139,12 @@ object SubmissionsViewModel {
     Seq(recentSubmissionsTab, draftSubmissionsTab, readyToPaySubmissionsTab, overdueSubmissionsTab)
   }
 
-  def build(drafts: Seq[SubmissionSummary], overdue: Seq[SubmissionSummary])(implicit messages: Messages): SubmissionsViewModel =
+  def build(
+             drafts: Seq[SubmissionSummary] = Seq.empty,
+             readyToPay: Seq[SubmissionSummary] = Seq.empty,
+             overdue: Seq[SubmissionSummary] = Seq.empty
+           )(implicit messages: Messages): SubmissionsViewModel =
     SubmissionsViewModel(
-      tabs = buildTabs(drafts, overdue)
+      tabs = buildTabs(drafts, readyToPay, overdue)
     )
 }

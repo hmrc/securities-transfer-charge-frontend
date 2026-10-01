@@ -39,21 +39,23 @@ class SubmissionsControllerSpec extends SpecBase with MockitoSugar {
 
   val mockDashboardService: DashboardService = mock[DashboardService]
 
-  private def mockDrafts(): Unit =
+  private def mockServiceCalls(): Unit = {
     when(mockDashboardService.getDrafts(any[UserId], any[GroupIdentifier])(any[HeaderCarrier]))
       .thenReturn(Future.successful(Fixtures.drafts))
 
-  private def mockOverdue(): Unit =
     when(mockDashboardService.getOverdue(any[SubscriptionId])(any[HeaderCarrier]))
       .thenReturn(Future.successful(Fixtures.overdue))
+
+    when(mockDashboardService.getReadyToPay(any[SubscriptionId])(any[HeaderCarrier]))
+      .thenReturn(Future.successful(Fixtures.readyToPay))
+  }
 
 
   "SubmissionsController" - {
 
     "must return OK and the correct view" in {
 
-      mockDrafts()
-      mockOverdue()
+      mockServiceCalls()
 
       val application =
         applicationBuilder(userAnswers = Some(emptyUserAnswers))
@@ -70,7 +72,11 @@ class SubmissionsControllerSpec extends SpecBase with MockitoSugar {
 
         implicit val msgs: Messages = messages(application)
 
-        val submissionsViewModel = SubmissionsViewModel.build(Fixtures.drafts, Fixtures.overdue)
+        val submissionsViewModel = SubmissionsViewModel.build(
+          drafts = Fixtures.drafts,
+          readyToPay = Fixtures.readyToPay,
+          overdue = Fixtures.overdue
+        )
 
         status(result) mustEqual OK
 

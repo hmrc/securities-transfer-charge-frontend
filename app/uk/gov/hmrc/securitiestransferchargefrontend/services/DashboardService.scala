@@ -34,7 +34,6 @@ enum SubmissionStatus:
       case Overdue        => "Overdue"
       case _              => super.toString
 
-
 final case class SubmissionSummary(
                                     submissionId: String,
                                     paymentDueBy: String,
@@ -86,16 +85,64 @@ final class DashboardServiceImpl @Inject()(
 
   private val readyToPay: Seq[SubmissionSummary] = List(
     SubmissionSummary(
-      submissionId = "STC-00000018",
-      paymentDueBy = "2026-10-08",
+      submissionId = "STC-10000001",
+      paymentDueBy = "2026-10-30",
       status = ReadyToPay,
-      sortDate = LocalDate.parse("2026-09-08")
+      sortDate = LocalDate.parse("2026-09-30")
     ),
     SubmissionSummary(
-      submissionId = "STC-00000019",
-      paymentDueBy = "2026-10-19",
+      submissionId = "STC-10000002",
+      paymentDueBy = "2026-10-29",
       status = ReadyToPay,
-      sortDate = LocalDate.parse("2026-09-19")
+      sortDate = LocalDate.parse("2026-09-29")
+    ),
+    SubmissionSummary(
+      submissionId = "STC-10000003",
+      paymentDueBy = "2026-10-28",
+      status = ReadyToPay,
+      sortDate = LocalDate.parse("2026-09-28")
+    ),
+    SubmissionSummary(
+      submissionId = "STC-10000004",
+      paymentDueBy = "2026-10-27",
+      status = ReadyToPay,
+      sortDate = LocalDate.parse("2026-09-27")
+    ),
+    SubmissionSummary(
+      submissionId = "STC-10000005",
+      paymentDueBy = "2026-10-26",
+      status = ReadyToPay,
+      sortDate = LocalDate.parse("2026-09-26")
+    ),
+    SubmissionSummary(
+      submissionId = "STC-10000006",
+      paymentDueBy = "2026-10-25",
+      status = ReadyToPay,
+      sortDate = LocalDate.parse("2026-09-25")
+    ),
+    SubmissionSummary(
+      submissionId = "STC-10000007",
+      paymentDueBy = "2026-10-24",
+      status = ReadyToPay,
+      sortDate = LocalDate.parse("2026-09-24")
+    ),
+    SubmissionSummary(
+      submissionId = "STC-10000008",
+      paymentDueBy = "2026-10-23",
+      status = ReadyToPay,
+      sortDate = LocalDate.parse("2026-09-23")
+    ),
+    SubmissionSummary(
+      submissionId = "STC-10000009",
+      paymentDueBy = "2026-10-22",
+      status = ReadyToPay,
+      sortDate = LocalDate.parse("2026-09-22")
+    ),
+    SubmissionSummary(
+      submissionId = "STC-10000010",
+      paymentDueBy = "2026-10-21",
+      status = ReadyToPay,
+      sortDate = LocalDate.parse("2026-09-21")
     )
   )
 
@@ -126,7 +173,11 @@ final class DashboardServiceImpl @Inject()(
   }
 
   override def getReadyToPay(subscriptionId: SubscriptionId)(implicit hc: HeaderCarrier): Future[Seq[SubmissionSummary]] = {
-    Future.successful(sorted(readyToPay))
+    if (subscriptionId.value.toLowerCase.contains("empty")) {
+      Future.successful(Seq.empty)
+    } else {
+      Future.successful(sorted(readyToPay))
+    }
   }
 
   override def getOverdue(subscriptionId: SubscriptionId)(implicit hc: HeaderCarrier): Future[Seq[SubmissionSummary]] = {
