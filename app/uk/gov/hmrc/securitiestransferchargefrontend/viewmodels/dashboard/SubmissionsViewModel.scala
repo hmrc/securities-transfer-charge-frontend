@@ -20,7 +20,7 @@ import play.api.i18n.Messages
 import uk.gov.hmrc.govukfrontend.views.Aliases.{HeadCell, TableRow}
 import uk.gov.hmrc.govukfrontend.views.viewmodels.content.{HtmlContent, Text}
 import uk.gov.hmrc.govukfrontend.views.viewmodels.table.Table
-import uk.gov.hmrc.securitiestransferchargefrontend.services.SubmissionSummary
+import uk.gov.hmrc.securitiestransferchargefrontend.models.search.SubmissionSummary
 
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter

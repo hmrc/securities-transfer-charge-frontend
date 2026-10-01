@@ -16,47 +16,29 @@
 
 package clients
 
+import base.Fixtures
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.securitiestransferchargefrontend.clients.SaveAndReturnClient
 import uk.gov.hmrc.securitiestransferchargefrontend.domain.{GroupIdentifier, SubmissionId, UserId}
 import uk.gov.hmrc.securitiestransferchargefrontend.models.JourneyType.STF
-import uk.gov.hmrc.securitiestransferchargefrontend.models.{UserAnswers, UserAnswersSummary}
+import uk.gov.hmrc.securitiestransferchargefrontend.models.{JourneyType, UserAnswers, UserAnswersSummary}
 
 import java.time.Instant
 import scala.concurrent.Future
 
 class FakeSaveAndReturnClient extends SaveAndReturnClient:
-  private val stubUserId: UserId = UserId("bob123")
-  private val stubSubmissionId: SubmissionId = SubmissionId.apply("STC-000000001")
-  private val stubGroupIdentifier: GroupIdentifier = GroupIdentifier.apply("group-001")
-  private val stubUserAnswers: UserAnswers = UserAnswers(stubUserId, stubGroupIdentifier, stubSubmissionId,STF)
+  private val stubUserId: UserId = Fixtures.testInternalId
+  private val stubSummary: UserAnswersSummary = UserAnswersSummary(Fixtures.testSubmissionId, JourneyType.STF, Instant.now())
+  private val stubGroupIdentifier: GroupIdentifier = Fixtures.testGroupIdentifier
+  private val stubUserAnswers: UserAnswers = UserAnswers(stubUserId, stubGroupIdentifier, Fixtures.testSubmissionId, STF)
 
   override def save(userAnswers: UserAnswers)(implicit hc: HeaderCarrier): Future[Unit] = Future.successful(())
 
   override def retrieve(submissionId: SubmissionId)(implicit hc: HeaderCarrier): Future[UserAnswers] = Future.successful(stubUserAnswers)
 
-  override def listByUser(userId: UserId)(implicit hc: HeaderCarrier): Future[List[UserAnswersSummary]] =
-    Future.successful(
-      List(
-        UserAnswersSummary(
-          submissionId = stubSubmissionId, 
-          journeyType = STF,
-          lastUpdated = Instant.now())
-      )
-    )
-
-  override def listByGroup(groupIdentifier: GroupIdentifier)(implicit hc: HeaderCarrier): Future[List[UserAnswersSummary]] =
-    Future.successful(
-      List(
-        UserAnswersSummary(
-          submissionId = stubSubmissionId,
-          journeyType = STF,
-          lastUpdated = Instant.now())
-      )
-    )
+  override def getDraftSummaries(userId: UserId, groupIdentifier: GroupIdentifier)(implicit headerCarrier: HeaderCarrier): Future[List[UserAnswersSummary]] = Future.successful(List(stubSummary))
 
   override def deleteDraft(submissionId: SubmissionId)(implicit hc: HeaderCarrier): Future[Unit] = Future.successful(())
 
 object FakeSaveAndReturnClient:
   def apply(): SaveAndReturnClient = new FakeSaveAndReturnClient
-

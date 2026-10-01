@@ -25,7 +25,8 @@ import play.api.test.FakeRequest
 import play.api.test.Helpers.*
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.dashboard.routes as dashboardRoutes
-import uk.gov.hmrc.securitiestransferchargefrontend.services.{DashboardService, SubmissionStatus, SubmissionSummary}
+import uk.gov.hmrc.securitiestransferchargefrontend.models.search.{SubmissionStatus, SubmissionSummary}
+import uk.gov.hmrc.securitiestransferchargefrontend.services.{DashboardService}
 import uk.gov.hmrc.securitiestransferchargefrontend.views.html.dashboard.RecentSubmissionsView
 
 import java.time.LocalDate
@@ -41,7 +42,7 @@ class RecentSubmissionsControllerSpec extends SpecBase with MockitoSugar {
 
     "must return OK and the empty submissions view when there are no recent submissions" in {
 
-      when(mockDashboardService.getRecent(any())(any[HeaderCarrier]))
+      when(mockDashboardService.getRecent(any(), any(), any())(any[HeaderCarrier]))
         .thenReturn(Future.successful(Seq.empty))
 
       val application = applicationBuilder(userAnswers = Some(emptyUserAnswers), affinityGroup = individualAffinity)
@@ -63,10 +64,10 @@ class RecentSubmissionsControllerSpec extends SpecBase with MockitoSugar {
     "must redirect to the Submissions page when recent submissions exist" in {
 
       val recentSummaries = Seq(
-        SubmissionSummary("STC-001", "2026-10-10", SubmissionStatus.ReadyToPay, LocalDate.parse("2026-09-10"))
+        SubmissionSummary("STC-001", Some("2026-10-10"), SubmissionStatus.ReadyToPay, LocalDate.parse("2026-09-10"))
       )
 
-      when(mockDashboardService.getRecent(any())(any[HeaderCarrier]))
+      when(mockDashboardService.getRecent(any(), any(), any())(any[HeaderCarrier]))
         .thenReturn(Future.successful(recentSummaries))
 
       val application = applicationBuilder(userAnswers = Some(emptyUserAnswers), affinityGroup = individualAffinity)

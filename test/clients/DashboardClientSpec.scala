@@ -19,13 +19,15 @@ package clients
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.matchers.must.Matchers
 import org.scalatest.wordspec.AnyWordSpec
+import org.scalatestplus.mockito.MockitoSugar.mock
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.securitiestransferchargefrontend.clients.DashboardClient
 import uk.gov.hmrc.securitiestransferchargefrontend.domain.SubscriptionId
+import uk.gov.hmrc.securitiestransferchargefrontend.models.search.EtmpTransactionSummaryResponse
 
 import scala.concurrent.{ExecutionContext, Future}
 
-class DashboardClientImplSpec extends AnyWordSpec with Matchers with ScalaFutures {
+class DashboardClientSpec extends AnyWordSpec with Matchers with ScalaFutures {
 
   implicit val ec: ExecutionContext = ExecutionContext.global
   implicit val hc: HeaderCarrier     = HeaderCarrier()
@@ -37,6 +39,17 @@ class DashboardClientImplSpec extends AnyWordSpec with Matchers with ScalaFuture
 
     override def getOverdueTransactionsCount(subscriptionId: SubscriptionId)(implicit hc: HeaderCarrier): Future[Int] =
       Future.successful(5)
+
+    override def getRecentTransactions(subscriptionId: SubscriptionId)(implicit hc: HeaderCarrier): Future[EtmpTransactionSummaryResponse] =
+      Future.successful(mock[EtmpTransactionSummaryResponse])
+
+    override def getReadyToPayTransactions(subscriptionId: SubscriptionId)(implicit hc: HeaderCarrier): Future[EtmpTransactionSummaryResponse] =
+      Future.successful(mock[EtmpTransactionSummaryResponse])
+
+
+    override def getOverdueTransactions(subscriptionId: SubscriptionId)(implicit hc: HeaderCarrier): Future[EtmpTransactionSummaryResponse] =
+      Future.successful(mock[EtmpTransactionSummaryResponse])
+
   }
 
   "DashboardClientClientImpl" should {
@@ -62,6 +75,15 @@ class DashboardClientImplSpec extends AnyWordSpec with Matchers with ScalaFuture
           Future.failed(RuntimeException("Exception"))
 
         override def getOverdueTransactionsCount(subscriptionId: SubscriptionId)(implicit hc: HeaderCarrier): Future[Int] =
+          Future.failed(RuntimeException("Exception"))
+
+        override def getRecentTransactions(subscriptionId: SubscriptionId)(implicit hc: HeaderCarrier): Future[EtmpTransactionSummaryResponse] =
+          Future.failed(RuntimeException("Exception"))
+
+        override def getReadyToPayTransactions(subscriptionId: SubscriptionId)(implicit hc: HeaderCarrier): Future[EtmpTransactionSummaryResponse] =
+          Future.failed(RuntimeException("Exception"))
+
+        override def getOverdueTransactions(subscriptionId: SubscriptionId)(implicit hc: HeaderCarrier): Future[EtmpTransactionSummaryResponse] =
           Future.failed(RuntimeException("Exception"))
       }
 
