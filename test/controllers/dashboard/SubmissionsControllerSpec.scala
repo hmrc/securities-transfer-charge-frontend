@@ -26,7 +26,7 @@ import play.api.test.FakeRequest
 import play.api.test.Helpers.*
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.dashboard.routes
-import uk.gov.hmrc.securitiestransferchargefrontend.domain.{GroupIdentifier, UserId}
+import uk.gov.hmrc.securitiestransferchargefrontend.domain.{GroupIdentifier, SubscriptionId, UserId}
 import uk.gov.hmrc.securitiestransferchargefrontend.services.DashboardService
 import uk.gov.hmrc.securitiestransferchargefrontend.viewmodels.dashboard.SubmissionsViewModel
 import uk.gov.hmrc.securitiestransferchargefrontend.views.html.dashboard.SubmissionsView
@@ -43,11 +43,17 @@ class SubmissionsControllerSpec extends SpecBase with MockitoSugar {
     when(mockDashboardService.getDrafts(any[UserId], any[GroupIdentifier])(any[HeaderCarrier]))
       .thenReturn(Future.successful(Fixtures.drafts))
 
+  private def mockOverdue(): Unit =
+    when(mockDashboardService.getOverdue(any[SubscriptionId])(any[HeaderCarrier]))
+      .thenReturn(Future.successful(Fixtures.overdue))
+
+
   "SubmissionsController" - {
 
     "must return OK and the correct view" in {
 
       mockDrafts()
+      mockOverdue()
 
       val application =
         applicationBuilder(userAnswers = Some(emptyUserAnswers))
@@ -64,7 +70,7 @@ class SubmissionsControllerSpec extends SpecBase with MockitoSugar {
 
         implicit val msgs: Messages = messages(application)
 
-        val submissionsViewModel = SubmissionsViewModel.build(Fixtures.drafts)
+        val submissionsViewModel = SubmissionsViewModel.build(Fixtures.drafts, Fixtures.overdue)
 
         status(result) mustEqual OK
 

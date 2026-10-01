@@ -185,6 +185,24 @@ object Fixtures {
     )
   )
 
+  val readyToPay: Seq[SubmissionSummary] = List(
+    SubmissionSummary(
+      submissionId = "STC-10000001",
+      paymentDueBy = "2026-10-30",
+      status = uk.gov.hmrc.securitiestransferchargefrontend.services.SubmissionStatus.ReadyToPay,
+      sortDate = LocalDate.parse("2026-09-30")
+    )
+  )
+
+  val overdue: Seq[SubmissionSummary] = List(
+    SubmissionSummary(
+      submissionId = testSubmissionId.toString,
+      paymentDueBy = "2026-09-29",
+      status = uk.gov.hmrc.securitiestransferchargefrontend.services.SubmissionStatus.ReadyToPay,
+      sortDate = LocalDate.parse("2026-08-30")
+    )
+  )
+
   class FakeAuthConnectorSuccess(value: Any) extends AuthConnector {
 
     override def authorise[A](predicate: Predicate, retrieval: Retrieval[A])(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[A] =

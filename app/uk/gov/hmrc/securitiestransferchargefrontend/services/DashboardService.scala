@@ -18,7 +18,7 @@ package uk.gov.hmrc.securitiestransferchargefrontend.services
 
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.securitiestransferchargefrontend.domain.{GroupIdentifier, SubscriptionId, UserId}
-import uk.gov.hmrc.securitiestransferchargefrontend.services.SubmissionStatus.{Draft, Overdue}
+import uk.gov.hmrc.securitiestransferchargefrontend.services.SubmissionStatus.{Draft, Overdue, ReadyToPay}
 
 import java.time.LocalDate
 import javax.inject.Inject
@@ -30,7 +30,8 @@ enum SubmissionStatus:
     this match
       case ReadyToPay     => "Ready to pay"
       case PartialFailure => "Partial failure"
-      case Draft => "Draft"
+      case Draft          => "Draft"
+      case Overdue        => "Overdue"
       case _              => super.toString
 
 
@@ -87,13 +88,13 @@ final class DashboardServiceImpl @Inject()(
     SubmissionSummary(
       submissionId = "STC-00000018",
       paymentDueBy = "2026-10-08",
-      status = Overdue,
+      status = ReadyToPay,
       sortDate = LocalDate.parse("2026-09-08")
     ),
     SubmissionSummary(
       submissionId = "STC-00000019",
       paymentDueBy = "2026-10-19",
-      status = Overdue,
+      status = ReadyToPay,
       sortDate = LocalDate.parse("2026-09-19")
     )
   )
@@ -129,7 +130,11 @@ final class DashboardServiceImpl @Inject()(
   }
 
   override def getOverdue(subscriptionId: SubscriptionId)(implicit hc: HeaderCarrier): Future[Seq[SubmissionSummary]] = {
-    Future.successful(sorted(overdue))
+    if (subscriptionId.value.toLowerCase.contains("empty")) {
+      Future.successful(Seq.empty)
+    } else {
+      Future.successful(sorted(overdue))
+    }
   }
 
   override def getRecent(subscriptionId: SubscriptionId)(implicit hc: HeaderCarrier): Future[Seq[SubmissionSummary]] = {

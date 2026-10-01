@@ -41,12 +41,13 @@ class SubmissionsController @Inject()(
     
     val userId = UserId(request.internalId)
     val groupId = GroupIdentifier(request.groupIdentifier)
+    val subscriptionId = request.subscriptionId
 
     for {
       drafts <- dashboardService.getDrafts(userId, groupId)
-      
+      overdue <- dashboardService.getOverdue(subscriptionId)
     } yield {
-      val viewModel = SubmissionsViewModel.build(drafts)
+      val viewModel = SubmissionsViewModel.build(drafts, overdue)
       Ok(view(viewModel))
     }
   }
