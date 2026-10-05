@@ -205,8 +205,8 @@ class SubmissionsViewSpec extends ViewBaseSpec {
 
         val hiddenText = table.select("a.govuk-link .govuk-visually-hidden")
 
-      hiddenText.size() mustBe 1
-      hiddenText.text() mustBe messages("submissions.action.view.hidden", testSubmissionId)
+        hiddenText.size() mustBe 1
+        hiddenText.text() mustBe messages("submissions.action.view.hidden", testSubmissionId)
     }
 
       "show the empty message for the other panels" in {
@@ -298,7 +298,7 @@ class SubmissionsViewSpec extends ViewBaseSpec {
 
   "when rendered with overdue" - {
 
-    val doc = view(SubmissionsViewModel.build(drafts = Seq.empty, overdue = Fixtures.overdue))
+    val doc = view(SubmissionsViewModel.build(drafts = Seq.empty, overdue = overdue))
     val panels = doc.select(".govuk-tabs__panel")
     val tabs = doc.select("a.govuk-tabs__tab")
     val overduePanel = doc.select(s"#${ExpectedContent.overdueTabId}")
