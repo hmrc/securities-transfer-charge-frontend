@@ -16,8 +16,7 @@
 
 package views.dashboard
 
-import base.Fixtures
-import base.Fixtures.{overdue, testSubmissionId}
+import base.Fixtures.{overdue, testSubmissionId,readyToPay,drafts}
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
 import play.api.Application
@@ -178,7 +177,7 @@ class SubmissionsViewSpec extends ViewBaseSpec {
 
     "when rendered with drafts" - {
 
-      val doc = view(SubmissionsViewModel.build(Fixtures.drafts, Seq.empty))
+      val doc = view(SubmissionsViewModel.build(drafts = drafts))
       val panels = doc.select(".govuk-tabs__panel")
 
       "select only the drafts tab" in { // TODO: Need to rethink this test as currently it's actually selecting the recent submissions tab which is the default, unless accessing via the dashboard where the redirect links have the '#<tab name>' at the end
@@ -298,7 +297,7 @@ class SubmissionsViewSpec extends ViewBaseSpec {
 
   "when rendered with overdue" - {
 
-    val doc = view(SubmissionsViewModel.build(drafts = Seq.empty, overdue = overdue))
+    val doc = view(SubmissionsViewModel.build(overdue = overdue))
     val panels = doc.select(".govuk-tabs__panel")
     val tabs = doc.select("a.govuk-tabs__tab")
     val overduePanel = doc.select(s"#${ExpectedContent.overdueTabId}")
@@ -345,4 +344,70 @@ class SubmissionsViewSpec extends ViewBaseSpec {
       )
     }
   }
+
+  "when rendered with recent submissions" - {
+
+    val recent = readyToPay ++ drafts ++ overdue
+    val doc = view(SubmissionsViewModel.build(recent = recent))
+
+    val recentPanel = doc.select("#recent-submissions")
+    val table = recentPanel.select("table.govuk-table")
+
+    "display the correct tags" in {
+      val tabs = doc.select("a.govuk-tabs__tab")
+      val tags = tabs.select(".govuk-tag")
+
+      tags.get(0).hasClass("govuk-tag--grey") mustBe true
+      tags.get(1).hasClass("govuk-tag--blue") mustBe true
+      tags.get(2).hasClass("govuk-tag--orange") mustBe true
+    }
+
+    "render the recent submissions table" in {
+      table.size() mustBe 1
+    }
+
+    "have the correct body text" in {
+      doc.select(".govuk-body").get(0).text() mustBe messages("submissions.recentSubmissions.body")
+    }
+
+    "render the correct table headings" in {
+      val headings = table.select("thead th").eachText().asScala
+
+      headings must contain theSameElementsInOrderAs Seq(
+        messages("submissions.table.id.heading"),
+        messages("submissions.table.paymentDueBy.heading"),
+        messages("submissions.table.status.heading"),
+        messages("submissions.table.action.heading")
+      )
+    }
+
+    "render a row for each recent submission" in {
+      val rows = table.select("tbody tr")
+
+      rows.size() mustBe recent.size
+    }
+
+    "display each submission ID" in {
+      val submissionIds = table
+        .select("tbody tr td:first-child")
+        .eachText()
+        .asScala
+
+      submissionIds must contain theSameElementsInOrderAs recent.map(_.submissionId)
+    }
+
+    "render the View links with accessible hidden text" in {
+      val links = table.select("a.govuk-link")
+
+      links.size() mustBe recent.size
+
+      recent.zipWithIndex.foreach { case (submission, index) =>
+        val link = links.get(index)
+
+        link.select(".govuk-visually-hidden").text() mustBe
+          s"${messages("submissions.action.view.hidden",submission.submissionId)}"
+      }
+    }
+  }
+
 }
