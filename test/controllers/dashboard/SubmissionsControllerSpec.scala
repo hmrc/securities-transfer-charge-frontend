@@ -16,7 +16,8 @@
 
 package controllers.dashboard
 
-import base.{Fixtures, SpecBase}
+import base.SpecBase
+import base.Fixtures.{overdue,readyToPay,drafts}
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.when
 import org.scalatestplus.mockito.MockitoSugar
@@ -27,6 +28,7 @@ import play.api.test.Helpers.*
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.dashboard.routes
 import uk.gov.hmrc.securitiestransferchargefrontend.domain.{GroupIdentifier, SubscriptionId, UserId}
+import uk.gov.hmrc.securitiestransferchargefrontend.models.search.SubmissionSummary
 import uk.gov.hmrc.securitiestransferchargefrontend.services.DashboardService
 import uk.gov.hmrc.securitiestransferchargefrontend.viewmodels.dashboard.SubmissionsViewModel
 import uk.gov.hmrc.securitiestransferchargefrontend.views.html.dashboard.SubmissionsView
@@ -38,16 +40,20 @@ class SubmissionsControllerSpec extends SpecBase with MockitoSugar {
   lazy val submissionsRoute: String = routes.SubmissionsController.onPageLoad().url
 
   val mockDashboardService: DashboardService = mock[DashboardService]
+  val recent: Seq[SubmissionSummary] = drafts ++ overdue ++ overdue
 
   private def mockServiceCalls(): Unit = {
     when(mockDashboardService.getDrafts(any[UserId], any[GroupIdentifier])(any[HeaderCarrier]))
-      .thenReturn(Future.successful(Fixtures.drafts))
+      .thenReturn(Future.successful(drafts))
 
     when(mockDashboardService.getOverdue(any[SubscriptionId])(any[HeaderCarrier]))
-      .thenReturn(Future.successful(Fixtures.overdue))
+      .thenReturn(Future.successful(overdue))
 
     when(mockDashboardService.getReadyToPay(any[SubscriptionId])(any[HeaderCarrier]))
-      .thenReturn(Future.successful(Fixtures.readyToPay))
+      .thenReturn(Future.successful(readyToPay))
+
+    when(mockDashboardService.getRecent(any[UserId], any[GroupIdentifier],any[SubscriptionId])(any[HeaderCarrier]))
+      .thenReturn(Future.successful(recent))
   }
 
 
@@ -73,9 +79,10 @@ class SubmissionsControllerSpec extends SpecBase with MockitoSugar {
         implicit val msgs: Messages = messages(application)
 
         val submissionsViewModel = SubmissionsViewModel.build(
-          drafts = Fixtures.drafts,
-          readyToPay = Fixtures.readyToPay,
-          overdue = Fixtures.overdue
+          drafts = drafts,
+          readyToPay = readyToPay,
+          overdue = overdue,
+          recent = recent
         )
 
         status(result) mustEqual OK

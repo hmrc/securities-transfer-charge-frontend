@@ -1350,6 +1350,7 @@ submissions.drafts.panel.heading = Drafts
 submissions.readyToPay.panel.heading = Ready to pay
 submissions.overdue.panel.heading = Overdue
 submissions.recentSubmissions.tabId = recent-submissions
+submissions.recentSubmissions.body = Displaying submissions from the last 18 months.
 submissions.drafts.tabId = drafts
 submissions.readyToPay.tabId = ready-to-pay
 submissions.overdue.tabId = overdue

@@ -24,7 +24,7 @@ final case class SubmissionSummary(
   status            : SubmissionStatus,
   sortDate          : LocalDate
 ) {
-  def paymentDueBy: String = maybePaymentDueBy.getOrElse("N/A")
+  def paymentDueBy: String = maybePaymentDueBy.getOrElse("Not submitted")
 }
 
 object SubmissionSummary:
