@@ -16,44 +16,23 @@
 
 package uk.gov.hmrc.securitiestransferchargefrontend.clients
 
-import play.api.libs.json.*
-import uk.gov.hmrc.http.HttpReads.Implicits.*
-import uk.gov.hmrc.http.client.HttpClientV2
-import uk.gov.hmrc.http.{HeaderCarrier, StringContextOps}
-import uk.gov.hmrc.securitiestransferchargefrontend.config.FrontendAppConfig
+import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.securitiestransferchargefrontend.domain.SubscriptionId
 import uk.gov.hmrc.securitiestransferchargefrontend.models.search.EtmpTransactionSummaryResponse
 
-import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 
 
 trait DashboardClient:
-  def getReadyToPayTransactionsCount(subscriptionId: SubscriptionId)(implicit hc: HeaderCarrier): Future[Int]
-  def getOverdueTransactionsCount(subscriptionId: SubscriptionId)(implicit hc: HeaderCarrier): Future[Int]
+  implicit val ec: ExecutionContext
+  def getReadyToPayTransactionsCount(subscriptionId: SubscriptionId)(implicit hc: HeaderCarrier): Future[Int] =
+    getReadyToPayTransactions(subscriptionId)
+      .map(_.success.transactionsCount)
+      
+  def getOverdueTransactionsCount(subscriptionId: SubscriptionId)(implicit hc: HeaderCarrier): Future[Int] =
+    getOverdueTransactions(subscriptionId)
+      .map(_.success.transactionsCount)
   
   def getRecentTransactions(subscriptionId: SubscriptionId)(implicit hc: HeaderCarrier): Future[EtmpTransactionSummaryResponse]
   def getReadyToPayTransactions(subscriptionId: SubscriptionId)(implicit hc: HeaderCarrier): Future[EtmpTransactionSummaryResponse]
   def getOverdueTransactions(subscriptionId: SubscriptionId)(implicit hc: HeaderCarrier): Future[EtmpTransactionSummaryResponse]
-
-class DashboardClientImpl @Inject()(http: HttpClientV2, appConfig: FrontendAppConfig)(implicit ec: ExecutionContext) extends DashboardClient:
-
-  override def getReadyToPayTransactionsCount(subscriptionId: SubscriptionId)(implicit hc: HeaderCarrier): Future[Int] =
-    http.get(url"${appConfig.dashboardServiceUrl}/dashboard/ready-to-pay/count/${subscriptionId.value}")
-      .execute[Int]
-
-  override def getOverdueTransactionsCount(subscriptionId: SubscriptionId)(implicit hc: HeaderCarrier): Future[Int] =
-    http.get(url"${appConfig.dashboardServiceUrl}/dashboard/overdue/count/${subscriptionId.value}")
-      .execute[Int]
-
-  override def getRecentTransactions(subscriptionId: SubscriptionId)(implicit hc: HeaderCarrier): Future[EtmpTransactionSummaryResponse] =
-    http.get(url"${appConfig.dashboardServiceUrl}/dashboard/recent-transactions/${subscriptionId.value}")
-      .execute[EtmpTransactionSummaryResponse]
-
-  override def getReadyToPayTransactions(subscriptionId: SubscriptionId)(implicit hc: HeaderCarrier): Future[EtmpTransactionSummaryResponse] =
-    http.get(url"${appConfig.dashboardServiceUrl}/dashboard/ready-to-pay/${subscriptionId.value}")
-      .execute[EtmpTransactionSummaryResponse]
-
-  override def getOverdueTransactions(subscriptionId: SubscriptionId)(implicit hc: HeaderCarrier): Future[EtmpTransactionSummaryResponse] =
-    http.get(url"${appConfig.dashboardServiceUrl}/dashboard/overdue/${subscriptionId.value}")
-      .execute[EtmpTransactionSummaryResponse]
