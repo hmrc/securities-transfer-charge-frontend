@@ -41,10 +41,11 @@ object SubmissionsViewModel {
     Try(LocalDate.parse(dateStr).format(govUkDateFormatter)).getOrElse(dateStr)
 
   private def statusTagClass(status: SubmissionStatus): String = status match {
-    case SubmissionStatus.ReadyToPay        => "govuk-tag--blue"
-    case SubmissionStatus.Draft             => "govuk-tag--grey"
-    case SubmissionStatus.Overdue           => "govuk-tag--orange"
-    case _                                  => "govuk-tag--white"
+    case SubmissionStatus.ReadyToPay => "govuk-tag--blue"
+    case SubmissionStatus.Draft => "govuk-tag--grey"
+    case SubmissionStatus.Overdue => "govuk-tag--orange"
+    case SubmissionStatus.Paid => "govuk-tag--green"
+    case _ => "govuk-tag--white"
   }
 
   private def statusTag(status: SubmissionStatus): HtmlContent = {
@@ -96,7 +97,8 @@ object SubmissionsViewModel {
   private def buildTabs(
                          drafts: Seq[SubmissionSummary],
                          readyToPay: Seq[SubmissionSummary],
-                         overdue: Seq[SubmissionSummary]
+                         overdue: Seq[SubmissionSummary],
+                         recent: Seq[SubmissionSummary]
                        )(implicit messages: Messages): Seq[SubmissionTab] = {
 
     val recentSubmissionsTab: SubmissionTab = SubmissionTab(
@@ -104,8 +106,8 @@ object SubmissionsViewModel {
       label = messages("submissions.recentSubmissions.panel.heading"),
       heading = messages("submissions.recentSubmissions.panel.heading"),
       emptyText = messages("submissions.noRecentSubmissions"),
-      count = 0, // TODO: update when building recent submissions tab
-      table = None
+      count = recent.size,
+      table = Some(submissionsTable(recent))
     )
 
     val draftSubmissionsTab: SubmissionTab = SubmissionTab(
@@ -141,9 +143,10 @@ object SubmissionsViewModel {
   def build(
              drafts: Seq[SubmissionSummary] = Seq.empty,
              readyToPay: Seq[SubmissionSummary] = Seq.empty,
-             overdue: Seq[SubmissionSummary] = Seq.empty
+             overdue: Seq[SubmissionSummary] = Seq.empty,
+             recent: Seq[SubmissionSummary] = Seq.empty
            )(implicit messages: Messages): SubmissionsViewModel =
     SubmissionsViewModel(
-      tabs = buildTabs(drafts, readyToPay, overdue)
+      tabs = buildTabs(drafts, readyToPay, overdue, recent)
     )
 }

@@ -19,12 +19,14 @@ package uk.gov.hmrc.securitiestransferchargefrontend.controllers.sh03.agents.sin
 import com.google.inject.Inject
 import play.api.i18n.{I18nSupport, Lang, Messages, MessagesApi}
 import play.api.mvc.{Action, AnyContent, Call, MessagesControllerComponents}
+import play.twirl.api.HtmlFormat
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.actions.*
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.actions.requests.StcDataRequest
 import uk.gov.hmrc.securitiestransferchargefrontend.models.{Mode, NormalMode, UserAnswers}
 import uk.gov.hmrc.securitiestransferchargefrontend.navigation.Navigator
 import uk.gov.hmrc.securitiestransferchargefrontend.pages.sh03.shared.CheckYourAnswersPage
+import uk.gov.hmrc.securitiestransferchargefrontend.repositories.{CyaHtmlData, CyaHtmlRepository}
 import uk.gov.hmrc.securitiestransferchargefrontend.services.TransactionSubmissionService
 import uk.gov.hmrc.securitiestransferchargefrontend.services.sh03.TaxDueCalculationService
 import uk.gov.hmrc.securitiestransferchargefrontend.services.stf.shared.FormattingService
@@ -46,7 +48,8 @@ class CheckYourAnswersController @Inject()(
                                             view: CheckYourAnswersView,
                                             taxDueCalculationService: TaxDueCalculationService,
                                             formattingService: FormattingService,
-                                            transactionSubmissionService: TransactionSubmissionService
+                                            transactionSubmissionService: TransactionSubmissionService,
+                                            cyaHtmlRepository: CyaHtmlRepository
                                           )(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport {
 
   lazy val backLinkCall: Mode => UserAnswers => Call = mode => userAnswers => navigator.previousPage(CheckYourAnswersPage, mode, userAnswers)
@@ -85,7 +88,11 @@ class CheckYourAnswersController @Inject()(
       paymentDueDateFormatted = paymentDueDateFormatted
     )
 
-    Ok(view(viewModel, backLinkCall(NormalMode)(request.userAnswers)))
+    val html: HtmlFormat.Appendable = view(viewModel, backLinkCall(NormalMode)(request.userAnswers))
+    
+    cyaHtmlRepository.store(CyaHtmlData(submissionId = userAnswers.submissionId, html = html))
+    Ok(html)
+    
   }
 
   def onSubmit(): Action[AnyContent] = (stcAuthEnrolled andThen getData andThen requireData).async { implicit request =>
