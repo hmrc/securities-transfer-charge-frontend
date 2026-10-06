@@ -17,7 +17,6 @@
 package uk.gov.hmrc.securitiestransferchargefrontend.clients
 
 import base.{Fixtures, SpecBase}
-import org.mockito.Mockito.when
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatestplus.mockito.MockitoSugar
 import uk.gov.hmrc.http.HeaderCarrier
@@ -26,6 +25,7 @@ import org.mockito.ArgumentMatchers.any
 import uk.gov.hmrc.securitiestransferchargefrontend.domain.SubscriptionId
 import java.io.FileNotFoundException
 import scala.concurrent.Future
+import org.mockito.Mockito.{times, verify, when, never}
 
 class DashboardClientCacheSpec extends SpecBase with MockitoSugar with ScalaFutures {
 
@@ -62,6 +62,7 @@ class DashboardClientCacheSpec extends SpecBase with MockitoSugar with ScalaFutu
         cache.getReadyToPayTransactions(Fixtures.testSubscriptionId)(Fixtures.hc)
 
       whenReady(outcome) { resp =>
+        verify(repo, never).store(any[String], any[EtmpTransactionSummaryResponse])
         resp mustBe testSummaryResponse
       }
     }
@@ -76,6 +77,7 @@ class DashboardClientCacheSpec extends SpecBase with MockitoSugar with ScalaFutu
         cache.getReadyToPayTransactions(Fixtures.testSubscriptionId)(Fixtures.hc)
 
       whenReady(outcome) { resp =>
+        verify(repo, times(1)).store(any[String], any[EtmpTransactionSummaryResponse])
         resp mustBe testSummaryResponse
       }
     }
@@ -90,6 +92,7 @@ class DashboardClientCacheSpec extends SpecBase with MockitoSugar with ScalaFutu
         cache.getReadyToPayTransactions(Fixtures.testSubscriptionId)(Fixtures.hc)
 
       whenReady(outcome) { resp =>
+        verify(repo, times(1)).store(any[String], any[EtmpTransactionSummaryResponse])
         resp mustBe testSummaryResponse
       }
     }

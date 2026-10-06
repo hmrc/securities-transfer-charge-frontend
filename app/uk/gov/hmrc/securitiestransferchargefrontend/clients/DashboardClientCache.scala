@@ -24,7 +24,7 @@ import uk.gov.hmrc.securitiestransferchargefrontend.models.search.EtmpTransactio
 import javax.inject.{Inject, Named}
 import scala.concurrent.{ExecutionContext, Future}
 import scala.util.control.NonFatal
-import scala.util.Failure
+import scala.util.{Success, Failure}
 
 trait DashboardClientDataCache:
   def store(key: String, value: EtmpTransactionSummaryResponse): Future[Unit]
@@ -67,15 +67,13 @@ class DashboardClientCache @Inject() (
       serviceCall = () => dashboardClient.getOverdueTransactions(subscriptionId)
     )
    
-  private[clients] val cacheHit: EtmpTransactionSummaryResponse => Future[EtmpTransactionSummaryResponse] = Future.successful
+  private[clients] val cacheHit: EtmpTransactionSummaryResponse => Future[EtmpTransactionSummaryResponse] =
+    Future.successful
+
   private[clients] def cacheMiss(key: String, serviceCall: ServiceCall): Future[EtmpTransactionSummaryResponse] = {
-    serviceCall().map { resp =>
-      cache.store(key, resp)
-      resp
-    }.andThen {
-      case Failure(exception) =>
-        logger.warn("Dashboard client cache failed to call the dashboard service.")
-        Future.failed(exception)
+    serviceCall().andThen {
+      case Success(value)     => cache.store(key, value)
+      case Failure(exception) => logger.warn("Dashboard client cache failed to call the dashboard service.")
     }
   }
   
