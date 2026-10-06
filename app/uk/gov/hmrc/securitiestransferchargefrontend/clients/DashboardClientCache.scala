@@ -16,55 +16,77 @@
 
 package uk.gov.hmrc.securitiestransferchargefrontend.clients
 
+import play.api.Logging
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.securitiestransferchargefrontend.domain.SubscriptionId
 import uk.gov.hmrc.securitiestransferchargefrontend.models.search.EtmpTransactionSummaryResponse
 
-import javax.inject.Inject
+import javax.inject.{Inject, Named}
 import scala.concurrent.{ExecutionContext, Future}
+import scala.util.control.NonFatal
+import scala.util.Failure
 
 trait DashboardClientDataCache:
   def store(key: String, value: EtmpTransactionSummaryResponse): Future[Unit]
   def retrieve(key: String): Future[Option[EtmpTransactionSummaryResponse]]
   
-object DashboardClientDataCache:
-  val recentKey = "Recent"
-  val readyToPayKey = "ReadyToPay"
-  val overdueKey = "Overdue"
+sealed trait DashboardClientDataCacheKey:
+  def apply(id: SubscriptionId): String
+
+case object Recent extends DashboardClientDataCacheKey:
+  def apply(id: SubscriptionId): String = s"Recent:${id.value}"
+
+case object ReadyToPay extends DashboardClientDataCacheKey:
+  def apply(id: SubscriptionId): String = s"ReadyToPay:${id.value}"
+
+case object Overdue extends DashboardClientDataCacheKey:
+  def apply(id: SubscriptionId): String = s"Overdue:${id.value}"
 
 class DashboardClientCache @Inject() (
-  dashboardClient: DashboardClient,
+  @Named("etmp") dashboardClient: DashboardClient,
   cache: DashboardClientDataCache
-)(implicit val ec: ExecutionContext) extends DashboardClient {
+)(implicit val ec: ExecutionContext) extends DashboardClient with Logging {
   
   private type ServiceCall = () => Future[EtmpTransactionSummaryResponse]
   
   override def getRecentTransactions(subscriptionId: SubscriptionId)(implicit hc: HeaderCarrier): Future[EtmpTransactionSummaryResponse] =
-    val serviceCall = () => dashboardClient.getRecentTransactions(subscriptionId)
-    checkCache(DashboardClientDataCache.recentKey, serviceCall)
+    checkCache(
+      key         = Recent(subscriptionId),
+      serviceCall = () => dashboardClient.getRecentTransactions(subscriptionId)
+    )
 
   override def getReadyToPayTransactions(subscriptionId: SubscriptionId)(implicit hc: HeaderCarrier): Future[EtmpTransactionSummaryResponse] =
-    val serviceCall = () => dashboardClient.getRecentTransactions(subscriptionId)
-    checkCache(DashboardClientDataCache.readyToPayKey, serviceCall)
+    checkCache(
+      key         = ReadyToPay(subscriptionId),
+      serviceCall = () => dashboardClient.getReadyToPayTransactions(subscriptionId)
+    )
 
   override def getOverdueTransactions(subscriptionId: SubscriptionId)(implicit hc: HeaderCarrier): Future[EtmpTransactionSummaryResponse] =
-    val serviceCall = () => dashboardClient.getOverdueTransactions(subscriptionId)
-    checkCache(DashboardClientDataCache.overdueKey, serviceCall)
+    checkCache(
+      key         = Overdue(subscriptionId),
+      serviceCall = () => dashboardClient.getOverdueTransactions(subscriptionId)
+    )
    
-  val cacheHit: EtmpTransactionSummaryResponse => Future[EtmpTransactionSummaryResponse] = Future.successful
-  val cacheMiss: String => ServiceCall => Future[EtmpTransactionSummaryResponse] = key => serviceCall => for {
-    resp <- serviceCall()
-  } yield {
-    cache.store(key, resp)
-    resp
+  private[clients] val cacheHit: EtmpTransactionSummaryResponse => Future[EtmpTransactionSummaryResponse] = Future.successful
+  private[clients] def cacheMiss(key: String, serviceCall: ServiceCall): Future[EtmpTransactionSummaryResponse] = {
+    serviceCall().map { resp =>
+      cache.store(key, resp)
+      resp
+    }.andThen {
+      case Failure(exception) =>
+        logger.warn("Dashboard client cache failed to call the dashboard service.")
+        Future.failed(exception)
+    }
   }
   
-  def checkCache(key: String, serviceCall: ServiceCall): Future[EtmpTransactionSummaryResponse] = {
-    cache
-      .retrieve(key)
-      .flatMap(
-        _.fold(
-          cacheMiss(key)(serviceCall))(cacheHit)
-      )
+  private[clients] def checkCache(key: String, serviceCall: ServiceCall): Future[EtmpTransactionSummaryResponse] =
+    cache.retrieve(key).recover {
+    case NonFatal(_) =>
+      logger.warn("Dashboard client cache: call to repository failed.")
+      None // treat failure like a cache miss
+  }.flatMap {
+    case Some(value) => cacheHit(value)
+    case None        => cacheMiss(key, serviceCall)
   }
+
 }
