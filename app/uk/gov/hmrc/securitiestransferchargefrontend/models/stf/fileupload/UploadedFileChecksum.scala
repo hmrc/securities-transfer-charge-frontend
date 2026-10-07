@@ -24,6 +24,5 @@ final case class UploadedFileChecksum(checksum: String, uploadedAt: Instant = In
 
 object UploadedFileChecksum {
   implicit val instantFormat: Format[Instant] = MongoJavatimeFormats.instantFormat
-
   implicit val format: OFormat[UploadedFileChecksum] = Json.format[UploadedFileChecksum]
 }

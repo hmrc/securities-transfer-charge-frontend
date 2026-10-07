@@ -20,7 +20,7 @@ import com.google.inject.AbstractModule
 import com.google.inject.name.Names
 import play.api.http.HttpErrorHandler
 import uk.gov.hmrc.securitiestransferchargefrontend.clients.registration.{NrsClient, NrsClientImpl, RegistrationClient, RegistrationClientImpl}
-import uk.gov.hmrc.securitiestransferchargefrontend.clients.{DashboardClient, DashboardClientImpl, EtmpSubmissionClient, EtmpSubmissionClientImpl, SaveAndReturnClient, SaveAndReturnClientImpl, SubmissionIdClient, SubmissionIdClientImpl}
+import uk.gov.hmrc.securitiestransferchargefrontend.clients.{DashboardClientDataCache, *}
 import uk.gov.hmrc.securitiestransferchargefrontend.connectors.*
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.actions.*
 import uk.gov.hmrc.securitiestransferchargefrontend.handlers.ErrorHandler
@@ -30,7 +30,7 @@ import uk.gov.hmrc.securitiestransferchargefrontend.navigation.stf.agents.StfAge
 import uk.gov.hmrc.securitiestransferchargefrontend.navigation.stf.individuals.StfNavigator
 import uk.gov.hmrc.securitiestransferchargefrontend.navigation.stf.organisations.StfOrgNavigator
 import uk.gov.hmrc.securitiestransferchargefrontend.navigation.{Navigator, PersistentNavigator}
-import uk.gov.hmrc.securitiestransferchargefrontend.repositories.{ChecksumRepository, ChecksumRepositoryImpl, CyaHtmlRepository, CyaHtmlRepositoryImpl, ParsedStcRowsRepository, ParsedStcRowsRepositoryImpl, SessionRepository, SessionRepositoryImpl, SubscriptionDataRepository, SubscriptionDataRepositoryImpl, TransactionResponseRepository, TransactionResponseRepositoryImpl, UpscanJourneyRepository, UpscanJourneyRepositoryImpl, ValidationErrorRepository, ValidationErrorRepositoryImpl}
+import uk.gov.hmrc.securitiestransferchargefrontend.repositories.{ChecksumRepository, ChecksumRepositoryImpl, CyaHtmlRepository, CyaHtmlRepositoryImpl, DashboardClientDataRepository, ParsedStcRowsRepository, ParsedStcRowsRepositoryImpl, SessionRepository, SessionRepositoryImpl, SubscriptionDataRepository, SubscriptionDataRepositoryImpl, TransactionResponseRepository, TransactionResponseRepositoryImpl, UpscanJourneyRepository, UpscanJourneyRepositoryImpl, ValidationErrorRepository, ValidationErrorRepositoryImpl}
 import uk.gov.hmrc.securitiestransferchargefrontend.services.*
 import uk.gov.hmrc.securitiestransferchargefrontend.services.fileupload.*
 import uk.gov.hmrc.securitiestransferchargefrontend.services.fileupload.processing.{DefaultFileProcessingRefreshCounterFactory, FileProcessingRefreshCounterFactory}
@@ -111,13 +111,23 @@ class Module extends AbstractModule {
     bind(classOf[PersistentNavigator])
       .annotatedWith(Names.named("orgSh03"))
       .to(classOf[Sh03OrgNavigator])
+    
     bind(classOf[ValidationErrorRepository])
       .to(classOf[ValidationErrorRepositoryImpl])
     bind(classOf[ParsedStcRowsRepository])
       .to(classOf[ParsedStcRowsRepositoryImpl])
+    
     bind(classOf[DashboardClient])
+      .annotatedWith(Names.named("etmp"))
       .to(classOf[DashboardClientImpl])
+    bind(classOf[DashboardClient])
+      .annotatedWith(Names.named("cache"))
+      .to(classOf[DashboardClientCache])
+    
     bind(classOf[DashboardService])
       .to(classOf[DashboardServiceImpl])
+    bind(classOf[DashboardClientDataCache])
+      .to(classOf[DashboardClientDataRepository])
+    
   }
 }

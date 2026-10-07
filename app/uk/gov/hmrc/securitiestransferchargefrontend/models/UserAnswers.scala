@@ -33,6 +33,7 @@ case class UserAnswers(userId: UserId,
                        fileUploadReference: Option[String] = None,
                        nextPage: Option[Call] = None,
                        data: JsObject = Json.obj(),
+                       createdAt: Instant = Instant.now,
                        lastUpdated: Instant = Instant.now) {
 
   def setNextPage(call: Call): UserAnswers = this.copy(nextPage = Some(call))
@@ -121,6 +122,7 @@ object UserAnswers {
       (__ \ "fileUploadReference").readNullable[String] and
       (__ \ "nextPage").readNullable[Call] and
       (__ \ "data").read[JsObject] and
+      (__ \ "createdAt").read(MongoJavatimeFormats.instantFormat) and
       (__ \ "lastUpdated").read(MongoJavatimeFormats.instantFormat)
     )(UserAnswers.apply _)
 
@@ -132,8 +134,9 @@ object UserAnswers {
       (__ \ "fileUploadReference").writeNullable[String] and
       (__ \ "nextPage").writeNullable[Call] and
       (__ \ "data").write[JsObject] and
+      (__ \ "createdAt").write(MongoJavatimeFormats.instantFormat) and
       (__ \ "lastUpdated").write(MongoJavatimeFormats.instantFormat)
-    )(ua => (ua.userId, ua.groupIdentifier, ua.submissionId, ua.journeyType,ua.fileUploadReference, ua.nextPage, ua.data, ua.lastUpdated))
+    )(ua => (ua.userId, ua.groupIdentifier, ua.submissionId, ua.journeyType,ua.fileUploadReference, ua.nextPage, ua.data, ua.createdAt, ua.lastUpdated))
 
   implicit val format: OFormat[UserAnswers] = OFormat(reads, writes)
 }

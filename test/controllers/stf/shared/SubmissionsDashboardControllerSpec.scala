@@ -86,8 +86,8 @@ class SubmissionsDashboardControllerSpec extends SpecBase with MockitoSugar with
         val mockSaveAndReturnClient = mock[SaveAndReturnClient]
 
         val summaries = List(
-          UserAnswersSummary(SubmissionId("STC-123456789"), None, JourneyType.STF, Instant.now()),
-          UserAnswersSummary(SubmissionId("STC-273836322"), None, JourneyType.SH03, Instant.now().minusSeconds(120))
+          UserAnswersSummary(SubmissionId("STC-123456789"), None, JourneyType.STF, Instant.now().minusSeconds(300), Instant.now()),
+          UserAnswersSummary(SubmissionId("STC-273836322"), None, JourneyType.SH03, Instant.now().minusSeconds(480), Instant.now().minusSeconds(120))
         )
 
         when(mockSaveAndReturnClient.getDraftSummaries(any[UserId], any[GroupIdentifier])(any()))
