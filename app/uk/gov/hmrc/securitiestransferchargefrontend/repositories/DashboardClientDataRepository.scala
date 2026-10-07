@@ -15,7 +15,6 @@
  */
 
 package uk.gov.hmrc.securitiestransferchargefrontend.repositories
-
 import org.mongodb.scala.bson.conversions.Bson
 import org.mongodb.scala.model.{Filters, IndexModel, IndexOptions, Indexes, ReplaceOptions}
 import play.api.libs.json.{Json, OFormat}
@@ -24,7 +23,8 @@ import uk.gov.hmrc.mongo.play.json.PlayMongoRepository
 import uk.gov.hmrc.securitiestransferchargefrontend.clients.DashboardClientDataCache
 import uk.gov.hmrc.securitiestransferchargefrontend.config.FrontendAppConfig
 import uk.gov.hmrc.securitiestransferchargefrontend.models.search.EtmpTransactionSummaryResponse
-
+import uk.gov.hmrc.mongo.play.json.formats.MongoJavatimeFormats
+import play.api.libs.json.Format
 import java.time.Instant
 import java.util.concurrent.TimeUnit
 import javax.inject.{Inject, Singleton}
@@ -37,6 +37,7 @@ final case class DashboardClientData(
 )
 
 object DashboardClientData {
+  given Format[Instant] = MongoJavatimeFormats.instantFormat
   given OFormat[DashboardClientData] = Json.format[DashboardClientData]
 }
 
@@ -49,9 +50,10 @@ class DashboardClientDataRepository @Inject() (
     collectionName = "dashboard-client-cache-store",
     mongoComponent = mongoComponent,
     domainFormat = DashboardClientData.given_OFormat_DashboardClientData,
+    replaceIndexes = true,
     indexes = Seq(
       IndexModel(
-        Indexes.ascending("uploadedAt"),
+        Indexes.ascending("createdAt"),
         IndexOptions()
           .name("dashboard_client_cache_uploadedAt_ttl_idx")
           .expireAfter(appConfig.dashboardClientCacheTtlMins, TimeUnit.MINUTES)

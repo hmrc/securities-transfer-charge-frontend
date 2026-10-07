@@ -73,7 +73,7 @@ class DashboardClientCache @Inject() (
   private[clients] def cacheMiss(key: String, serviceCall: ServiceCall): Future[EtmpTransactionSummaryResponse] = {
     serviceCall().andThen {
       case Success(value)     => cache.store(key, value)
-      case Failure(exception) => logger.warn("Dashboard client cache failed to call the dashboard service.")
+      case Failure(exception) => logger.warn(s"Dashboard client cache failed to call the dashboard service: ${exception}")
     }
   }
   

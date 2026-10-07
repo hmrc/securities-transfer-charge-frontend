@@ -21,6 +21,7 @@ import org.mongodb.scala.model.{Filters, IndexModel, IndexOptions, Indexes, Repl
 import play.twirl.api.HtmlFormat
 import uk.gov.hmrc.mongo.MongoComponent
 import uk.gov.hmrc.mongo.play.json.PlayMongoRepository
+import uk.gov.hmrc.mongo.play.json.formats.MongoJavatimeFormats
 import uk.gov.hmrc.securitiestransferchargefrontend.config.FrontendAppConfig
 import uk.gov.hmrc.securitiestransferchargefrontend.domain.SubmissionId
 
@@ -44,6 +45,7 @@ final class CyaHtmlRepositoryImpl @Inject() (
     collectionName = "cya-html-store",
     mongoComponent = mongoComponent,
     domainFormat = CyaHtmlData.given_OFormat_CyaHtmlData,
+    replaceIndexes = true,
     indexes = Seq(
       IndexModel(
         Indexes.ascending("uploadedAt"),
@@ -77,6 +79,8 @@ final class CyaHtmlRepositoryImpl @Inject() (
 object CyaHtmlData:
   import play.api.libs.json._
   import play.twirl.api.{Html, HtmlFormat}
+
+  given Format[Instant] = MongoJavatimeFormats.instantFormat
 
   given Writes[HtmlFormat.Appendable] =
     Writes { html => JsString(html.body) }
