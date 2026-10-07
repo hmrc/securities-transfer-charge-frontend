@@ -22,12 +22,12 @@ import uk.gov.hmrc.securitiestransferchargefrontend.domain.SubmissionId
 import java.time.Instant
 
 final case class UserAnswersSummary(
-  submissionId: SubmissionId,
-  journeyType: JourneyType,
-  lastUpdated: Instant
+  submissionId        : SubmissionId,
+  maybeAgentReference : Option[String],
+  journeyType         : JourneyType,
+  lastUpdated         : Instant
 )
 
 object UserAnswersSummary:
   given Reads[UserAnswersSummary] = Json.reads[UserAnswersSummary]
   given Writes[UserAnswersSummary] = Json.writes[UserAnswersSummary]
-  

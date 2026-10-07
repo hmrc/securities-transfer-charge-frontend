@@ -19,12 +19,14 @@ package uk.gov.hmrc.securitiestransferchargefrontend.models.search
 import java.time.LocalDate
 
 final case class SubmissionSummary(
-  submissionId      : String,
-  maybePaymentDueBy : Option[String],
-  status            : SubmissionStatus,
-  sortDate          : LocalDate
+  submissionId        : String,
+  maybePaymentDueBy   : Option[String],
+  maybeAgentReference : Option[String],
+  status              : SubmissionStatus,
+  sortDate            : LocalDate
 ) {
   def paymentDueBy: String = maybePaymentDueBy.getOrElse("Not submitted")
+  def agentReference: String = maybeAgentReference.getOrElse("Not provided")
 }
 
 object SubmissionSummary:

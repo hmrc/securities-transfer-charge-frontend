@@ -227,6 +227,7 @@ class SubmissionsViewSpec extends ViewBaseSpec {
         SubmissionSummary(
           submissionId = f"STC-000000$i%02d",
           maybePaymentDueBy = Some(java.time.LocalDate.of(2026, 10, i).toString),
+          maybeAgentReference = None,
           status = ReadyToPay,
           sortDate = java.time.LocalDate.of(2026, 9, i)
         )
