@@ -23,6 +23,7 @@ import java.time.Instant
 
 final case class UserAnswersSummary(
   submissionId: SubmissionId,
+  maybeAgentReference : Option[String],
   journeyType: JourneyType,
   createdAt: Instant,
   lastUpdated: Instant
@@ -31,4 +32,3 @@ final case class UserAnswersSummary(
 object UserAnswersSummary:
   given Reads[UserAnswersSummary] = Json.reads[UserAnswersSummary]
   given Writes[UserAnswersSummary] = Json.writes[UserAnswersSummary]
-  
