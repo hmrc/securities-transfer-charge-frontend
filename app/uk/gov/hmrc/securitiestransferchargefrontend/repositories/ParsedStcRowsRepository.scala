@@ -46,6 +46,7 @@ class ParsedStcRowsRepositoryImpl @Inject()(
     collectionName = "parsedStcRows",
     mongoComponent = mongoComponent,
     domainFormat = ParsedStcRowsDocument.format,
+    replaceIndexes = true,
     indexes = Seq(
       IndexModel(
         Indexes.ascending("createdAt"),

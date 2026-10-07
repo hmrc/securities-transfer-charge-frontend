@@ -20,16 +20,15 @@ import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.securitiestransferchargefrontend.clients.{DashboardClient, SaveAndReturnClient}
 import uk.gov.hmrc.securitiestransferchargefrontend.domain.{GroupIdentifier, SubscriptionId, UserId}
 import uk.gov.hmrc.securitiestransferchargefrontend.models.UserAnswersSummary
-import uk.gov.hmrc.securitiestransferchargefrontend.models.search.{DashboardCounts, EtmpChargeDetail, EtmpTransactionSummaryResponse, SubmissionStatus, SubmissionSummary}
 import uk.gov.hmrc.securitiestransferchargefrontend.models.search.EtmpSuccessResponseExtensions.*
 import uk.gov.hmrc.securitiestransferchargefrontend.models.search.SubmissionStatus.{Draft, Overdue, Paid, ReadyToPay}
+import uk.gov.hmrc.securitiestransferchargefrontend.models.search.*
 import uk.gov.hmrc.securitiestransferchargefrontend.services.DashboardService.draftToSubmissionSummary
 import uk.gov.hmrc.securitiestransferchargefrontend.utils.DateTimeFormats
 
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
-import javax.inject.Inject
-
+import javax.inject.{Inject, Named}
 import scala.concurrent.{ExecutionContext, Future}
 
 trait DashboardService:
@@ -42,7 +41,7 @@ trait DashboardService:
 
 final class DashboardServiceImpl @Inject()(
   saveAndReturnClient: SaveAndReturnClient,
-  dashboardClient: DashboardClient
+  @Named("cache") dashboardClient: DashboardClient
 )(using
   ec: ExecutionContext
 ) extends DashboardService {

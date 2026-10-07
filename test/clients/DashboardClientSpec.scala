@@ -26,6 +26,7 @@ import uk.gov.hmrc.securitiestransferchargefrontend.domain.SubscriptionId
 import uk.gov.hmrc.securitiestransferchargefrontend.models.search.EtmpTransactionSummaryResponse
 
 import scala.concurrent.{ExecutionContext, Future}
+import scala.concurrent.ExecutionContext.Implicits.global
 
 class DashboardClientSpec extends AnyWordSpec with Matchers with ScalaFutures {
 
@@ -34,6 +35,8 @@ class DashboardClientSpec extends AnyWordSpec with Matchers with ScalaFutures {
 
   val subscriptionId: SubscriptionId = SubscriptionId("Sub-123456")
   val client: DashboardClient = new DashboardClient {
+    override implicit val ec: ExecutionContext = global
+
     override def getReadyToPayTransactionsCount(subscriptionId: SubscriptionId)(implicit hc: HeaderCarrier): Future[Int] =
       Future.successful(1)
 
@@ -71,6 +74,8 @@ class DashboardClientSpec extends AnyWordSpec with Matchers with ScalaFutures {
     "propagate failure when service fails" in {
 
       val client: DashboardClient = new DashboardClient {
+        override implicit val ec: ExecutionContext = global
+
         override def getReadyToPayTransactionsCount(subscriptionId: SubscriptionId)(implicit hc: HeaderCarrier): Future[Int] =
           Future.failed(RuntimeException("Exception"))
 
