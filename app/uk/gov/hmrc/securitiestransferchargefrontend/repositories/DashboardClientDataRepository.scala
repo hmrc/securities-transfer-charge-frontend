@@ -27,7 +27,7 @@ import uk.gov.hmrc.securitiestransferchargefrontend.models.search.EtmpTransactio
 
 import java.time.Instant
 import java.util.concurrent.TimeUnit
-import javax.inject.Inject
+import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
 
 final case class DashboardClientData(
@@ -40,6 +40,7 @@ object DashboardClientData {
   given OFormat[DashboardClientData] = Json.format[DashboardClientData]
 }
 
+@Singleton
 class DashboardClientDataRepository @Inject() (
   mongoComponent: MongoComponent,
   appConfig: FrontendAppConfig)(
