@@ -124,8 +124,8 @@ class SaveAndReturnClientImplSpec extends SpecBase {
 
         val summaries: List[UserAnswersSummary] =
           List(
-            UserAnswersSummary(SubmissionId("123"), None, JourneyType.STF, Instant.now()),
-            UserAnswersSummary(SubmissionId("345"), None, JourneyType.SH03, Instant.now().minusSeconds(120))
+            UserAnswersSummary(SubmissionId("123"), None, JourneyType.STF, Instant.now().minusSeconds(300), Instant.now()),
+            UserAnswersSummary(SubmissionId("345"), None, JourneyType.SH03, Instant.now().minusSeconds(480), Instant.now().minusSeconds(120))
           )
 
         when(mockRequestBuilder.execute[List[SubmissionId]](any(), any()))

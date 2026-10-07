@@ -22,10 +22,11 @@ import uk.gov.hmrc.securitiestransferchargefrontend.domain.SubmissionId
 import java.time.Instant
 
 final case class UserAnswersSummary(
-  submissionId        : SubmissionId,
+  submissionId: SubmissionId,
   maybeAgentReference : Option[String],
-  journeyType         : JourneyType,
-  lastUpdated         : Instant
+  journeyType: JourneyType,
+  createdAt: Instant,
+  lastUpdated: Instant
 )
 
 object UserAnswersSummary:
