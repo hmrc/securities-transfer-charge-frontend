@@ -89,7 +89,7 @@ object DashboardService:
       submissionId = uas.submissionId.value,
       maybePaymentDueBy = None,
       status = Draft,
-      sortDate = LocalDate.ofInstant(uas.createdAt, DateTimeFormats.ukZoneId)
+      sortDate = LocalDate.ofInstant(uas.lastUpdated, DateTimeFormats.ukZoneId)
     )
 
   private[services] val submissionDueBy: Seq[EtmpChargeDetail] => Option[LocalDate] =

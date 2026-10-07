@@ -28,7 +28,7 @@ import scala.concurrent.Future
 
 class FakeSaveAndReturnClient extends SaveAndReturnClient:
   private val stubUserId: UserId = Fixtures.testInternalId
-  private val stubSummary: UserAnswersSummary = UserAnswersSummary(Fixtures.testSubmissionId, JourneyType.STF, Instant.now())
+  private val stubSummary: UserAnswersSummary = UserAnswersSummary(Fixtures.testSubmissionId, JourneyType.STF, Instant.now().minusSeconds(300), Instant.now())
   private val stubGroupIdentifier: GroupIdentifier = Fixtures.testGroupIdentifier
   private val stubUserAnswers: UserAnswers = UserAnswers(stubUserId, stubGroupIdentifier, Fixtures.testSubmissionId, STF)
 

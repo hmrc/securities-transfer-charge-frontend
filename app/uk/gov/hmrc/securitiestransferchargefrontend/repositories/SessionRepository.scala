@@ -51,9 +51,9 @@ class SessionRepositoryImpl @Inject()(
     domainFormat   = UserAnswers.format,
     indexes        = Seq(
       IndexModel(
-        Indexes.ascending("lastUpdated"),
+        Indexes.ascending("createdAt"),
         IndexOptions()
-          .name("lastUpdatedIdx")
+          .name("createdAtIdx")
           .expireAfter(appConfig.cacheTtl, TimeUnit.SECONDS),
       )
     )

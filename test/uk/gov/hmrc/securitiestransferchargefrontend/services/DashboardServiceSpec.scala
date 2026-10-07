@@ -50,7 +50,8 @@ class DashboardServiceSpec extends SpecBase with ScalaFutures with MockitoSugar 
               UserAnswersSummary(
                 submissionId = Fixtures.testSubmissionId,
                 journeyType = STF,
-                createdAt = Instant.now()
+                createdAt = Instant.now(),
+                lastUpdated = Instant.now()
               )
             )
           )
@@ -84,7 +85,8 @@ class DashboardServiceSpec extends SpecBase with ScalaFutures with MockitoSugar 
               UserAnswersSummary(
                 submissionId = Fixtures.testSubmissionId,
                 journeyType = STF,
-                createdAt = Instant.now()
+                createdAt = Instant.now(),
+                lastUpdated = Instant.now()
               )
             )
           )
