@@ -64,7 +64,7 @@ class RecentSubmissionsControllerSpec extends SpecBase with MockitoSugar {
     "must redirect to the Submissions page when recent submissions exist" in {
 
       val recentSummaries = Seq(
-        SubmissionSummary("STC-001", Some("2026-10-10"), SubmissionStatus.ReadyToPay, LocalDate.parse("2026-09-10"))
+        SubmissionSummary("STC-001", Some("2026-10-10"), None, SubmissionStatus.ReadyToPay, LocalDate.parse("2026-09-10"))
       )
 
       when(mockDashboardService.getRecent(any(), any(), any())(any[HeaderCarrier]))

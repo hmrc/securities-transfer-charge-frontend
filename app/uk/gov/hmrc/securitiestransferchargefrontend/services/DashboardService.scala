@@ -85,10 +85,11 @@ object DashboardService:
 
   private[services] val draftToSubmissionSummary: UserAnswersSummary => SubmissionSummary = uas =>
     SubmissionSummary(
-      submissionId = uas.submissionId.value,
-      maybePaymentDueBy = None,
-      status = Draft,
-      sortDate = LocalDate.ofInstant(uas.lastUpdated, DateTimeFormats.ukZoneId)
+      submissionId        = uas.submissionId.value,
+      maybePaymentDueBy   = None,
+      maybeAgentReference = uas.maybeAgentReference,
+      status              = Draft,
+      sortDate            = LocalDate.ofInstant(uas.lastUpdated, DateTimeFormats.ukZoneId)
     )
 
   private[services] val submissionDueBy: Seq[EtmpChargeDetail] => Option[LocalDate] =
@@ -110,6 +111,7 @@ object DashboardService:
         SubmissionSummary(
           submissionId = submission.submissionId,
           maybePaymentDueBy = submissionDueBy(charges).map(_.format(DateTimeFormatter.ISO_DATE)),
+          maybeAgentReference = submission.clientReference,
           status = maybeStatus.getOrElse(getSubmissionStatus(charges)),
           sortDate = submission.submissionDate
         )

@@ -182,6 +182,7 @@ object Fixtures {
     SubmissionSummary(
       submissionId = testSubmissionId.toString,
       maybePaymentDueBy = None,
+      maybeAgentReference = None,
       status = Draft,
       sortDate = LocalDate.parse("2026-10-19")
     )
@@ -191,6 +192,7 @@ object Fixtures {
     SubmissionSummary(
       submissionId = "STC-10000001",
       maybePaymentDueBy = Some("2026-10-30"),
+      maybeAgentReference = None,
       status = ReadyToPay,
       sortDate = LocalDate.parse("2026-09-30")
     )
@@ -200,6 +202,7 @@ object Fixtures {
     SubmissionSummary(
       submissionId = testSubmissionId.toString,
       maybePaymentDueBy = Some("2026-09-29"),
+      maybeAgentReference = None,
       status = Overdue,
       sortDate = LocalDate.parse("2026-08-30")
     )
