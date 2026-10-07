@@ -21,7 +21,7 @@ import uk.gov.hmrc.securitiestransferchargefrontend.clients.{DashboardClient, Sa
 import uk.gov.hmrc.securitiestransferchargefrontend.domain.{GroupIdentifier, SubscriptionId, UserId}
 import uk.gov.hmrc.securitiestransferchargefrontend.models.UserAnswersSummary
 import uk.gov.hmrc.securitiestransferchargefrontend.models.search.EtmpSuccessResponseExtensions.*
-import uk.gov.hmrc.securitiestransferchargefrontend.models.search.SubmissionStatus.{Draft, Overdue, Paid, ReadyToPay}
+import uk.gov.hmrc.securitiestransferchargefrontend.models.search.SubmissionStatus.*
 import uk.gov.hmrc.securitiestransferchargefrontend.models.search.*
 import uk.gov.hmrc.securitiestransferchargefrontend.services.DashboardService.draftToSubmissionSummary
 import uk.gov.hmrc.securitiestransferchargefrontend.utils.DateTimeFormats
@@ -112,12 +112,9 @@ object DashboardService:
           submissionId = submission.submissionId,
           maybePaymentDueBy = submissionDueBy(charges).map(_.format(DateTimeFormatter.ISO_DATE)),
           maybeAgentReference = submission.clientReference,
-          status = maybeStatus.getOrElse(getSubmissionStatus(charges)),
+          status = maybeStatus.getOrElse(submission.submissionStatus),
           sortDate = submission.submissionDate
         )
   }
 
-  def getSubmissionStatus: Seq[EtmpChargeDetail] => SubmissionStatus = charges =>
-    if charges.exists(_.isOverdue) then Overdue
-    else if charges.exists(_.isUnpaid) then ReadyToPay
-    else Paid
+  

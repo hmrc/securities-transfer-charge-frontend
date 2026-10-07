@@ -44,7 +44,7 @@ object EtmpSuccessResponseExtensions:
         submissionId    = submissionData.submissionId,
         submissionDate  = submissionData.submissionDate,
         clientReference = submissionData.clientReference,
-        declareeName    = submissionData.declareeName,
+        declareeName    = Some(submissionData.declareeName), // TODO: ETMP needs to make declaree name optional.
         transfers       = transactions.map(transfersForSubmission)
       )
     }
@@ -59,11 +59,25 @@ object EtmpSuccessResponseExtensions:
         charges     = charges
       )
     }
-  
+
+  object ChargeTypes {
+    val tax                 = "STT"
+    val lateFiling          = "LFP"
+    val latePayment         = "LPP"
+    val latePaymentInterest = "LPI"
+  }
+
   extension (charge: EtmpChargeDetail)
 
     private def hasPendingAmount: EtmpChargeDetail => Boolean = chg => chg.chargeAmountPending > 0
 
-    def isPaid: Boolean = charge.chargeAmountPending == 0
-    def isUnpaid: Boolean = hasPendingAmount(charge) && !isInThePast (charge.chargeDueDate)
-    def isOverdue: Boolean = hasPendingAmount (charge) && isInThePast (charge.chargeDueDate)
+    def isPaid    : Boolean = charge.chargeAmountPending == 0
+    def isUnpaid  : Boolean = hasPendingAmount(charge) && !isInThePast(charge.chargeDueDate)
+    def isOverdue : Boolean = hasPendingAmount(charge) && isInThePast(charge.chargeDueDate)
+
+    private def chargeTypeIs: String => Boolean = _ == charge.chargeType
+    
+    def isTaxCharge           : Boolean = chargeTypeIs(ChargeTypes.tax)
+    def isLateFilingPenalty   : Boolean = chargeTypeIs(ChargeTypes.lateFiling)
+    def isLatePaymentPenalty  : Boolean = chargeTypeIs(ChargeTypes.latePayment)
+    def isLatePaymentInterest : Boolean = chargeTypeIs(ChargeTypes.latePaymentInterest)
