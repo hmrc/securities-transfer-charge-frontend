@@ -32,19 +32,16 @@ final case class SttSubmission(
 ) {
 
   private val toPay: (SttTransfer => BigDecimal) => BigDecimal =
-    chargeType => transfers.map(chargeType).sum
-
-  def submissionType: TransferType = if declareeName.isEmpty then STF else SH03
+    extractChargeAmount => transfers.map(extractChargeAmount).sum
 
   def taxToPay                  : BigDecimal = toPay(_.taxToPay)
   def lateFilingPenaltiesToPay  : BigDecimal = toPay(_.lateFilingPenaltiesToPay)
   def latePaymentPenaltiesToPay : BigDecimal = toPay(_.latePaymentPenaltiesToPay)
   def latePaymentInterestToPay  : BigDecimal = toPay(_.latePaymentInterestToPay)
   def originalTotalAmount       : BigDecimal = toPay(_.originalTotalAmount)
-
-  private def allCharges: Seq[EtmpChargeDetail] = transfers.flatMap(_.charges)
-
-  def paymentDueByDate: LocalDate = allCharges.map(_.chargeDueDate).min
+  
+  def submissionType: TransferType = if declareeName.isDefined then SH03 else STF
+  def paymentDueByDate: LocalDate = transfers.map(_.paymentDueByDate).min
   def numberOfTransfers: Int = transfers.length
   def submissionStatus: SubmissionStatus = SubmissionStatus.aggregateStatus(transfers.map(_.status))
 }
@@ -60,8 +57,10 @@ final case class SttTransfer(
   import SttTransfer.*
 
   def status: TransferStatus =
-    if charges.exists(_.isOverdue) then Overdue
-    else if charges.exists(_.isUnpaid) then ReadyToPay
+    if charges.exists(_.isOverdue)
+      then Overdue
+    else if charges.exists(_.isUnpaid)
+      then ReadyToPay
     else Paid
 
   def originalTotalAmount: BigDecimal = totalOriginal(charges)
@@ -73,6 +72,9 @@ final case class SttTransfer(
   def lateFilingPenaltiesToPay  : BigDecimal = toPay(_.isLateFilingPenalty)
   def latePaymentPenaltiesToPay : BigDecimal = toPay(_.isLatePaymentPenalty)
   def latePaymentInterestToPay  : BigDecimal = toPay(_.isLatePaymentInterest)
+  def totalToPay                : BigDecimal = toPay(_ => true)
+
+  def paymentDueByDate: LocalDate = charges.map(_.chargeDueDate).min
 }
 
 object SttTransfer:

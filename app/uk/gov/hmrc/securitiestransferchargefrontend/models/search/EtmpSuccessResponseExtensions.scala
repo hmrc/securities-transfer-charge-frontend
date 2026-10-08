@@ -35,6 +35,9 @@ object EtmpSuccessResponseExtensions:
         .map(_.submissionId)
         .distinct
 
+    private def declareeName(s: String): Option[String] =
+      if s.isBlank then None else Some(s)
+
     def toSttSubmissions: Seq[SttSubmission] = for {
       submissionId  <- allSubmissionIds
       transactions   = allTransactionDetails.filter(_.submissionId == submissionId) // >= 1
@@ -44,7 +47,7 @@ object EtmpSuccessResponseExtensions:
         submissionId    = submissionData.submissionId,
         submissionDate  = submissionData.submissionDate,
         clientReference = submissionData.clientReference,
-        declareeName    = Some(submissionData.declareeName), // TODO: ETMP needs to make declaree name optional.
+        declareeName    = declareeName(submissionData.declareeName), // TODO: ETMP needs to make declaree name optional.
         transfers       = transactions.map(transfersForSubmission)
       )
     }
@@ -60,7 +63,7 @@ object EtmpSuccessResponseExtensions:
       )
     }
 
-  object ChargeTypes {
+  object ChargeType {
     val tax                 = "STT"
     val lateFiling          = "LFP"
     val latePayment         = "LPP"
@@ -77,7 +80,7 @@ object EtmpSuccessResponseExtensions:
 
     private def chargeTypeIs: String => Boolean = _ == charge.chargeType
     
-    def isTaxCharge           : Boolean = chargeTypeIs(ChargeTypes.tax)
-    def isLateFilingPenalty   : Boolean = chargeTypeIs(ChargeTypes.lateFiling)
-    def isLatePaymentPenalty  : Boolean = chargeTypeIs(ChargeTypes.latePayment)
-    def isLatePaymentInterest : Boolean = chargeTypeIs(ChargeTypes.latePaymentInterest)
+    def isTaxCharge           : Boolean = chargeTypeIs(ChargeType.tax)
+    def isLateFilingPenalty   : Boolean = chargeTypeIs(ChargeType.lateFiling)
+    def isLatePaymentPenalty  : Boolean = chargeTypeIs(ChargeType.latePayment)
+    def isLatePaymentInterest : Boolean = chargeTypeIs(ChargeType.latePaymentInterest)
