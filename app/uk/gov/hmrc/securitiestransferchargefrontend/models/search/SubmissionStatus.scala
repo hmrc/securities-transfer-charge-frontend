@@ -29,3 +29,12 @@ enum SubmissionStatus:
       case Paid           => "Paid"
       case Overdue        => "Overdue"
       case Failed         => "Failed"
+
+object SubmissionStatus:
+  def aggregateStatus: Seq[SubmissionStatus] => SubmissionStatus =
+    statuses =>
+      if statuses.contains(Overdue) then Overdue
+      else if statuses.contains(ReadyToPay) then ReadyToPay
+      else Paid
+
+type TransferStatus = SubmissionStatus

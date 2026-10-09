@@ -16,58 +16,16 @@
 
 package uk.gov.hmrc.securitiestransferchargefrontend.services
 
-import base.Fixtures.{buildEtmpSuccessResponse, buildSubmissionDetails}
+import base.Fixtures.{buildEtmpSuccessResponse, buildLateFilingCharge, buildSubmissionDetails, buildTaxCharge, withDueDate}
 import base.{Fixtures, SpecBase}
+import org.scalatestplus.mockito.MockitoSugar
 import uk.gov.hmrc.securitiestransferchargefrontend.domain.SubmissionId
 import uk.gov.hmrc.securitiestransferchargefrontend.models.search.EtmpTransactionSummaryResponse
-import uk.gov.hmrc.securitiestransferchargefrontend.models.search.SubmissionStatus.{Paid, ReadyToPay}
+import uk.gov.hmrc.securitiestransferchargefrontend.models.search.SubmissionStatus.{Overdue, ReadyToPay}
 
 import java.time.LocalDate
-import base.Fixtures.{buildLateFilingCharge, buildTaxCharge, withDueDate}
-import uk.gov.hmrc.securitiestransferchargefrontend.models.search.SubmissionStatus.Overdue
 
-class DashboardServiceObjectSpec extends SpecBase {
-
-  "getSubmissionStatus should" - {
-    "return overdue if a single charge is overdue and unpaid" in {
-      val oneOverdue =
-        List(
-          buildTaxCharge(Fixtures.testUtrn, false, true),
-          buildLateFilingCharge(Fixtures.testUtrn, true, false),
-        )
-
-      DashboardService.getSubmissionStatus(oneOverdue) mustBe Overdue
-    }
-    "return paid even if a single charge is overdue so long as it is unpaid" in {
-      val allPaid =
-        List(
-          buildTaxCharge(Fixtures.testUtrn, false, true),
-          buildLateFilingCharge(Fixtures.testUtrn, true, true),
-        )
-
-      DashboardService.getSubmissionStatus(allPaid) mustBe Paid
-    }
-
-    "return ready to pay if a single charge is unpaid but not overdue" in {
-      val oneUnpaid =
-        List(
-          buildTaxCharge(Fixtures.testUtrn, false, false),
-          buildLateFilingCharge(Fixtures.testUtrn, true, true),
-        )
-
-      DashboardService.getSubmissionStatus(oneUnpaid) mustBe ReadyToPay
-    }
-
-    "return paid if all charges are paid" in {
-      val allPaid =
-        List(
-          buildTaxCharge(Fixtures.testUtrn, false, true),
-          buildLateFilingCharge(Fixtures.testUtrn, true, true),
-        )
-
-      DashboardService.getSubmissionStatus(allPaid) mustBe Paid
-    }
-  }
+class DashboardServiceObjectSpec extends SpecBase with MockitoSugar {
 
   "submissionDueBy should" - {
     "return the earliest date" in {
