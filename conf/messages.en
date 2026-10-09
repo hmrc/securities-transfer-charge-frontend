@@ -1381,3 +1381,15 @@ submissions.status.overdue = Overdue
 
 submissions.action.view = View
 submissions.action.view.hidden = View submission ID {0}
+
+submissionDetails.title = Submission {0}
+submissionDetails.heading = Submission {0}
+
+submissionDetails.print = Print this page
+submissionDetails.total.heading = Total: {0}
+submissionDetails.paymentDueBy = Payment due by:
+
+submissionDetails.submission.date = Submission date
+submissionDetails.submission.type = Submission type
+submissionDetails.submission.transfers = Transfers in this submission
+submissionDetails.submission.totalTaxDue = Total tax due

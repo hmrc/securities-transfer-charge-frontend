@@ -1,0 +1,59 @@
+@*
+ * Copyright 2026 HM Revenue & Customs
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *@
+
+@import uk.gov.hmrc.securitiestransferchargefrontend.views.html.templates
+@import uk.gov.hmrc.securitiestransferchargefrontend.controllers.dashboard.routes as dashboardRoutes
+@import views.html.helper.CSPNonce
+
+@this(
+        layout: templates.Layout,
+        govukBreadcrumbs: GovukBreadcrumbs,
+        govukButton: GovukButton
+)
+
+@(submissionId: String)(implicit request: Request[_], messages: Messages)
+
+@layout(
+    pageTitle = titleNoForm(messages("submissionDetails.title", submissionId)),
+    additionalScripts = Some(HtmlFormat.raw(s"""<script ${CSPNonce.attr} src="${routes.Assets.versioned("javascripts/print.js").url}"></script>""")),
+    showBackLink = false
+) {
+
+    @govukBreadcrumbs(
+        Breadcrumbs(items = Seq(
+            BreadcrumbsItem(content = Text(messages("breadcrumbs.dashboard")), href = Some(dashboardRoutes.DashboardController.onPageLoad().url)),
+            BreadcrumbsItem(content = Text(messages("breadcrumbs.submissions")), href = Some(dashboardRoutes.SubmissionsController.onPageLoad().url))
+            )
+        )
+    )
+
+    <h1 class="govuk-heading-l">@messages("submissionDetails.heading", submissionId)</h1>
+
+    @govukButton(
+        ButtonViewModel(Text(messages("submissionDetails.print")))
+            .asInput("button")
+            .asSecondaryButton()
+            .withCssClass("govuk-!-display-none-print")
+            .withAttribute("id" -> "print-this-page")
+        )
+
+    <div class="tax-card">
+        <h2 class="govuk-heading-m">@messages("submissionDetails.total.heading", "0.00")</h2>
+        <p class="govuk-body-s">@messages("submissionDetails.paymentDueBy") <strong>23 October 2026</strong></p>
+    </div>
+
+
+}

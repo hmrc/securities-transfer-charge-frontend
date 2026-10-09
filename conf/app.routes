@@ -506,3 +506,5 @@ GET       /dashboard/start-stf                          uk.gov.hmrc.securitiestr
 GET       /dashboard/start-sh03                         uk.gov.hmrc.securitiestransferchargefrontend.controllers.dashboard.StartSubmissionController.startSh03()
 
 GET        /recent-submissions                          uk.gov.hmrc.securitiestransferchargefrontend.controllers.dashboard.RecentSubmissionsController.onPageLoad()
+
+GET        /submission-details/:submissionId                       uk.gov.hmrc.securitiestransferchargefrontend.controllers.dashboard.SubmissionDetailsController.onPageLoad(submissionId: String)
