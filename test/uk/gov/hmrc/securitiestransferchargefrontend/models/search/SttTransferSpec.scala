@@ -27,74 +27,7 @@ import java.time.LocalDate
 
 class SttTransferSpec extends AnyPropSpec with ScalaCheckPropertyChecks with Matchers {
 
-  val genUtrn: Gen[String] = Gen.listOfN(8, Gen.numChar).map(_.mkString)
-
-  val sttCharge: (String, String) = ("STT", "Securities transfer tax")
-  val lateFilingPenalty: (String, String) = ("LFP", "Late filing penalty")
-  val latePaymentPenalty: (String, String) = ("LPP", "Late payment penalty")
-  val latePaymentInterest: (String, String) = ("LPI", "Late payment interest")
-
-  def genNonEmptyStringWithMaxSize(max: Int): Gen[String] =
-    Gen.alphaStr.suchThat(_.nonEmpty).map(_.take(max))
-
-  val localDatePlusMinus30Days: Gen[LocalDate] = Gen.delay {
-    val today = LocalDate.now()
-    val minEpoch = today.minusDays(30).toEpochDay
-    val maxEpoch = today.plusDays(30).toEpochDay
-
-    Gen.chooseNum[Long](minEpoch, maxEpoch).map(LocalDate.ofEpochDay)
-  }
-
-  val genEtmpChargeDetail: Tuple2[String, String] => Gen[EtmpChargeDetail] = typeAndDesc => for {
-    utrn <- genUtrn
-    (typ, desc) = typeAndDesc
-    ref <- genNonEmptyStringWithMaxSize(24)
-    total <- Gen.chooseNum(0, 1_000_000_000)
-    due <- localDatePlusMinus30Days
-    pending <- Gen.posNum[Int].suchThat(_ < total)
-  } yield EtmpChargeDetail(utrn, desc, ref, typ, total, due, pending)
-
-  val genTaxCharge: Gen[EtmpChargeDetail] = genEtmpChargeDetail(sttCharge)
-  val genLfpCharge: Gen[EtmpChargeDetail] = genEtmpChargeDetail(lateFilingPenalty)
-  val genLppCharge: Gen[EtmpChargeDetail] = genEtmpChargeDetail(latePaymentPenalty)
-  val genLpiCharge: Gen[EtmpChargeDetail] = genEtmpChargeDetail(latePaymentInterest)
-
-  val withZeroPending: EtmpChargeDetail => EtmpChargeDetail = _.copy(chargeAmountPending = 0)
-  val dueInThePast: EtmpChargeDetail => EtmpChargeDetail = _.copy(chargeDueDate = LocalDate.now().minusDays(2))
-  val dueInTheFuture: EtmpChargeDetail => EtmpChargeDetail = _.copy(chargeDueDate = LocalDate.now().plusDays(2))
-
-  val genTransfer: Seq[EtmpChargeDetail] => Gen[SttTransfer] = chgs => for {
-    utrn <- genUtrn
-    buyers <- Gen.alphaStr
-    sellers <- Gen.alphaStr
-    company <- Gen.alphaStr
-  } yield SttTransfer(
-    utrn = utrn,
-    buyerNames = buyers,
-    sellerNames = Some(sellers),
-    companyName = company,
-    charges = chgs
-  )
-
-  val genListOfCharges: Gen[Seq[EtmpChargeDetail]] = {
-    for {
-      tax <- genTaxCharge
-      lfp <- Gen.option(genLfpCharge)
-      lpp <- Gen.option(genLppCharge)
-      lpiCount <- lpp match {
-        case Some(_) => Gen.choose(0, 10)
-        case None => Gen.const(0)
-      }
-      lpis <- Gen.listOfN(lpiCount, genLpiCharge)
-    } yield {
-      List(tax) ++ lfp.toList ++ lpp.toList ++ lpis
-    }
-  }
-
-  val genTransferWithTaxes: Gen[SttTransfer] = for {
-    cs <- genListOfCharges
-    tf <- genTransfer(cs)
-  } yield tf
+  import SttTransferSpec.*
 
   implicit val config: PropertyCheckConfiguration =
     PropertyCheckConfiguration(
@@ -180,4 +113,76 @@ class SttTransferSpec extends AnyPropSpec with ScalaCheckPropertyChecks with Mat
       else tf.status mustBe Paid
     }
   }
+}
+
+object SttTransferSpec {
+
+  val genUtrn: Gen[String] = Gen.listOfN(8, Gen.numChar).map(_.mkString)
+
+  val sttCharge: (String, String) = ("STT", "Securities transfer tax")
+  val lateFilingPenalty: (String, String) = ("LFP", "Late filing penalty")
+  val latePaymentPenalty: (String, String) = ("LPP", "Late payment penalty")
+  val latePaymentInterest: (String, String) = ("LPI", "Late payment interest")
+
+  def genNonEmptyStringWithMaxSize(max: Int): Gen[String] =
+    Gen.alphaStr.suchThat(_.nonEmpty).map(_.take(max))
+
+  val localDatePlusMinus30Days: Gen[LocalDate] = Gen.delay {
+    val today = LocalDate.now()
+    val minEpoch = today.minusDays(30).toEpochDay
+    val maxEpoch = today.plusDays(30).toEpochDay
+
+    Gen.chooseNum[Long](minEpoch, maxEpoch).map(LocalDate.ofEpochDay)
+  }
+
+  val genEtmpChargeDetail: Tuple2[String, String] => Gen[EtmpChargeDetail] = typeAndDesc => for {
+    utrn <- genUtrn
+    (typ, desc) = typeAndDesc
+    ref <- genNonEmptyStringWithMaxSize(24)
+    total <- Gen.chooseNum(0, 1_000_000_000)
+    due <- localDatePlusMinus30Days
+    pending <- Gen.posNum[Int].suchThat(_ < total)
+  } yield EtmpChargeDetail(utrn, desc, ref, typ, total, due, pending)
+
+  val genTaxCharge: Gen[EtmpChargeDetail] = genEtmpChargeDetail(sttCharge)
+  val genLfpCharge: Gen[EtmpChargeDetail] = genEtmpChargeDetail(lateFilingPenalty)
+  val genLppCharge: Gen[EtmpChargeDetail] = genEtmpChargeDetail(latePaymentPenalty)
+  val genLpiCharge: Gen[EtmpChargeDetail] = genEtmpChargeDetail(latePaymentInterest)
+
+  val withZeroPending: EtmpChargeDetail => EtmpChargeDetail = _.copy(chargeAmountPending = 0)
+  val dueInThePast: EtmpChargeDetail => EtmpChargeDetail = _.copy(chargeDueDate = LocalDate.now().minusDays(2))
+  val dueInTheFuture: EtmpChargeDetail => EtmpChargeDetail = _.copy(chargeDueDate = LocalDate.now().plusDays(2))
+
+  val genTransfer: Seq[EtmpChargeDetail] => Gen[SttTransfer] = chgs => for {
+    utrn <- genUtrn
+    buyers <- Gen.alphaStr
+    sellers <- Gen.alphaStr
+    company <- Gen.alphaStr
+  } yield SttTransfer(
+    utrn = utrn,
+    buyerNames = buyers,
+    sellerNames = Some(sellers),
+    companyName = company,
+    charges = chgs
+  )
+
+  val genListOfCharges: Gen[Seq[EtmpChargeDetail]] = {
+    for {
+      tax <- genTaxCharge
+      lfp <- Gen.option(genLfpCharge)
+      lpp <- Gen.option(genLppCharge)
+      lpiCount <- lpp match {
+        case Some(_) => Gen.choose(0, 10)
+        case None => Gen.const(0)
+      }
+      lpis <- Gen.listOfN(lpiCount, genLpiCharge)
+    } yield {
+      List(tax) ++ lfp.toList ++ lpp.toList ++ lpis
+    }
+  }
+
+  val genTransferWithTaxes: Gen[SttTransfer] = for {
+    cs <- genListOfCharges
+    tf <- genTransfer(cs)
+  } yield tf
 }

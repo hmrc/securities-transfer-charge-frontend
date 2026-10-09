@@ -22,6 +22,7 @@ import uk.gov.hmrc.securitiestransferchargefrontend.domain.TransferType
 import uk.gov.hmrc.securitiestransferchargefrontend.domain.TransferType.*
 import uk.gov.hmrc.securitiestransferchargefrontend.models.search.SttTransfer.totalPending
 import uk.gov.hmrc.securitiestransferchargefrontend.models.search.SubmissionStatus.*
+import uk.gov.hmrc.securitiestransferchargefrontend.models.submission.ReasonForPurchase
 
 final case class SttSubmission(
   submissionId    : String,
@@ -39,20 +40,22 @@ final case class SttSubmission(
   def latePaymentPenaltiesToPay : BigDecimal = toPay(_.latePaymentPenaltiesToPay)
   def latePaymentInterestToPay  : BigDecimal = toPay(_.latePaymentInterestToPay)
   def originalTotalAmount       : BigDecimal = toPay(_.originalTotalAmount)
-  
-  def submissionType: TransferType = if declareeName.isDefined then SH03 else STF
-  def paymentDueByDate: LocalDate = transfers.map(_.paymentDueByDate).min
-  def numberOfTransfers: Int = transfers.length
-  def submissionStatus: SubmissionStatus = SubmissionStatus.aggregateStatus(transfers.map(_.status))
+
+  def submissionType    : TransferType      = if declareeName.isDefined then SH03 else STF
+  def paymentDueByDate  : LocalDate         = transfers.map(_.paymentDueByDate).min
+  def numberOfTransfers : Int               = transfers.length
+  def submissionStatus  : SubmissionStatus  = SubmissionStatus.aggregateStatus(transfers.map(_.status))
 }
 
 
 final case class SttTransfer(
-  utrn        : String,
-  buyerNames  : String,
-  sellerNames : Option[String],
-  companyName : String,
-  charges     : Seq[EtmpChargeDetail]
+  utrn              : String,
+  buyerNames        : String,
+  sellerNames       : Option[String],
+  companyName       : String,
+  charges           : Seq[EtmpChargeDetail],
+  numberOfShares    : Int = 0, // TODO: ETMP do not currently supply this via transaction summary
+  reasonForPurchase : Option[ReasonForPurchase] = None // TODO: ETMP do not currently supply this via transaction summary
 ) {
   import SttTransfer.*
 
