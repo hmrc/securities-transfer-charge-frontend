@@ -42,6 +42,7 @@ trait EtmpSubmissionClient:
     payload: SubmissionBatchPayload
   )(implicit hc: HeaderCarrier): Future[StcTransactionCreateResponse]
 
+
 class EtmpSubmissionClientImpl @Inject()(
   http: HttpClientV2,
   appConfig: FrontendAppConfig)(
@@ -72,4 +73,3 @@ class EtmpSubmissionClientImpl @Inject()(
         case otherResponse => logInfoAndFailNon201(s"Received $otherResponse when submitting to ETMP")
       }
     }
-
