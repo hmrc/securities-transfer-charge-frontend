@@ -18,7 +18,7 @@ package uk.gov.hmrc.securitiestransferchargefrontend.services
 
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.securitiestransferchargefrontend.clients.{DashboardClient, SaveAndReturnClient}
-import uk.gov.hmrc.securitiestransferchargefrontend.domain.{GroupIdentifier, SubscriptionId, UserId}
+import uk.gov.hmrc.securitiestransferchargefrontend.domain.{GroupIdentifier, SubmissionId, SubscriptionId, UserId}
 import uk.gov.hmrc.securitiestransferchargefrontend.models.UserAnswersSummary
 import uk.gov.hmrc.securitiestransferchargefrontend.models.search.EtmpSuccessResponseExtensions.*
 import uk.gov.hmrc.securitiestransferchargefrontend.models.search.SubmissionStatus.*
@@ -38,6 +38,8 @@ trait DashboardService:
   def getDrafts(userId: UserId, groupId: GroupIdentifier)(implicit hc: HeaderCarrier): Future[Seq[SubmissionSummary]]
   def getReadyToPay(subscriptionId: SubscriptionId)(implicit hc: HeaderCarrier): Future[Seq[SubmissionSummary]]
   def getOverdue(subscriptionId: SubscriptionId)(implicit hc: HeaderCarrier): Future[Seq[SubmissionSummary]]
+  
+  def getSubmissionSummary(subscriptionId: SubscriptionId, submissionId: SubmissionId)(implicit hc: HeaderCarrier): Future[SttSubmission]
 
 final class DashboardServiceImpl @Inject()(
   saveAndReturnClient: SaveAndReturnClient,
@@ -79,6 +81,12 @@ final class DashboardServiceImpl @Inject()(
     readyToPay = readyToPayCount,
     overdue    = overdueCount
   )
+
+  override def getSubmissionSummary(subscriptionId: SubscriptionId, submissionId: SubmissionId)(implicit hc: HeaderCarrier): Future[SttSubmission] = for {
+    response <- dashboardClient.getSubmission(subscriptionId, submissionId)
+    subs = toSttSubmissionList(response)
+  } yield subs.head
+
 }
 
 object DashboardService:
@@ -92,18 +100,16 @@ object DashboardService:
       sortDate            = LocalDate.ofInstant(uas.lastUpdated, DateTimeFormats.ukZoneId)
     )
 
-  private[services] val submissionDueBy: Seq[EtmpChargeDetail] => Option[LocalDate] =
-    charges =>
-      charges
-        .map(_.chargeDueDate)
-        .minOption
+  private[services] val submissionDueBy: Seq[EtmpChargeDetail] => Option[LocalDate] = charges =>
+    charges
+      .map(_.chargeDueDate)
+      .minOption
 
-
+  private[services] def toSttSubmissionList(txs: EtmpTransactionSummaryResponse): Seq[SttSubmission] =
+    txs.success.toSttSubmissions
+  
   private[services] def toSummaryList(txs: EtmpTransactionSummaryResponse, maybeStatus: Option[SubmissionStatus] = None): Seq[SubmissionSummary] = {
-    val submissions =
-      txs
-      .success
-      .toSttSubmissions
+    val submissions = toSttSubmissionList(txs)
     for {
       submission <- submissions
       charges = submission.transfers.flatMap(_.charges)

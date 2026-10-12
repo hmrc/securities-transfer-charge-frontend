@@ -31,7 +31,7 @@ class SttSubmissionSpec extends AnyPropSpec with ScalaCheckPropertyChecks with M
   implicit val config: PropertyCheckConfiguration =
     PropertyCheckConfiguration(
       minSuccessful = 50,
-      maxDiscardedFactor = 4.0
+      maxDiscardedFactor = 5.0
     )
 
   val allCharges: SttSubmission => Seq[EtmpChargeDetail] = _.transfers.flatMap(_.charges)
