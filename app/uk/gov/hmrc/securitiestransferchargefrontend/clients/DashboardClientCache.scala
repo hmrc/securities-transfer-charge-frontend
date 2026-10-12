@@ -18,13 +18,13 @@ package uk.gov.hmrc.securitiestransferchargefrontend.clients
 
 import play.api.Logging
 import uk.gov.hmrc.http.HeaderCarrier
-import uk.gov.hmrc.securitiestransferchargefrontend.domain.SubscriptionId
+import uk.gov.hmrc.securitiestransferchargefrontend.domain.{SubmissionId, SubscriptionId}
 import uk.gov.hmrc.securitiestransferchargefrontend.models.search.EtmpTransactionSummaryResponse
 
 import javax.inject.{Inject, Named}
 import scala.concurrent.{ExecutionContext, Future}
 import scala.util.control.NonFatal
-import scala.util.{Success, Failure}
+import scala.util.{Failure, Success}
 
 trait DashboardClientDataCache:
   def store(key: String, value: EtmpTransactionSummaryResponse): Future[Unit]
@@ -66,7 +66,11 @@ class DashboardClientCache @Inject() (
       key         = Overdue(subscriptionId),
       serviceCall = () => dashboardClient.getOverdueTransactions(subscriptionId)
     )
-   
+
+  override def getSubmission(subscriptionId: SubscriptionId, submissionId: SubmissionId)(implicit hc: HeaderCarrier): Future[EtmpTransactionSummaryResponse] =
+    // We don't cache individual submissions
+    dashboardClient.getSubmission(subscriptionId, submissionId)
+
   private[clients] val cacheHit: EtmpTransactionSummaryResponse => Future[EtmpTransactionSummaryResponse] =
     Future.successful
 
@@ -76,7 +80,7 @@ class DashboardClientCache @Inject() (
       case Failure(exception) => logger.warn(s"Dashboard client cache failed to call the dashboard service: ${exception}")
     }
   }
-  
+
   private[clients] def checkCache(key: String, serviceCall: ServiceCall): Future[EtmpTransactionSummaryResponse] =
     cache.retrieve(key).recover {
     case NonFatal(_) =>
@@ -86,5 +90,4 @@ class DashboardClientCache @Inject() (
     case Some(value) => cacheHit(value)
     case None        => cacheMiss(key, serviceCall)
   }
-
 }

@@ -22,7 +22,7 @@ import org.scalatest.wordspec.AnyWordSpec
 import org.scalatestplus.mockito.MockitoSugar.mock
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.securitiestransferchargefrontend.clients.DashboardClient
-import uk.gov.hmrc.securitiestransferchargefrontend.domain.SubscriptionId
+import uk.gov.hmrc.securitiestransferchargefrontend.domain.{SubmissionId, SubscriptionId}
 import uk.gov.hmrc.securitiestransferchargefrontend.models.search.EtmpTransactionSummaryResponse
 
 import scala.concurrent.{ExecutionContext, Future}
@@ -51,6 +51,9 @@ class DashboardClientSpec extends AnyWordSpec with Matchers with ScalaFutures {
 
 
     override def getOverdueTransactions(subscriptionId: SubscriptionId)(implicit hc: HeaderCarrier): Future[EtmpTransactionSummaryResponse] =
+      Future.successful(mock[EtmpTransactionSummaryResponse])
+
+    override def getSubmission(subscriptionId: SubscriptionId, submissionId: SubmissionId)(implicit hc: HeaderCarrier): Future[EtmpTransactionSummaryResponse] =
       Future.successful(mock[EtmpTransactionSummaryResponse])
 
   }
@@ -89,6 +92,9 @@ class DashboardClientSpec extends AnyWordSpec with Matchers with ScalaFutures {
           Future.failed(RuntimeException("Exception"))
 
         override def getOverdueTransactions(subscriptionId: SubscriptionId)(implicit hc: HeaderCarrier): Future[EtmpTransactionSummaryResponse] =
+          Future.failed(RuntimeException("Exception"))
+
+        override def getSubmission(subscriptionId: SubscriptionId, submissionId: SubmissionId)(implicit hc: HeaderCarrier): Future[EtmpTransactionSummaryResponse] =
           Future.failed(RuntimeException("Exception"))
       }
 
