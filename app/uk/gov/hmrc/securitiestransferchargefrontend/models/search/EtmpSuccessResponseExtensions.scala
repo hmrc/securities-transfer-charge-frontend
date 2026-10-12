@@ -48,11 +48,11 @@ object EtmpSuccessResponseExtensions:
         submissionDate  = submissionData.submissionDate,
         clientReference = submissionData.clientReference,
         declareeName    = declareeName(submissionData.declareeName), // TODO: ETMP needs to make declaree name optional.
-        transfers       = transactions.map(transfersForSubmission)
+        transfers       = transactions.map(toSttTransfer)
       )
     }
 
-    private def transfersForSubmission(tx: EtmpTransactionDetail): SttTransfer = {
+    private def toSttTransfer(tx: EtmpTransactionDetail): SttTransfer = {
       val charges = allChargeDetails.filter(_.utrn == tx.utrn)
       SttTransfer(
         utrn        = tx.utrn,
