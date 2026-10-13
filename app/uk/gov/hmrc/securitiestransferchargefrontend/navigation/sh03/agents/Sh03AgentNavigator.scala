@@ -33,16 +33,18 @@ import uk.gov.hmrc.securitiestransferchargefrontend.pages.*
 import uk.gov.hmrc.securitiestransferchargefrontend.pages.sh03.*
 import uk.gov.hmrc.securitiestransferchargefrontend.pages.sh03.bulk.{BulkAgentReferencePage, BulkCheckYourAnswersPage, BulkCompanyDetailsPage, BulkRoleAtPurchasingCompanyPage}
 import uk.gov.hmrc.securitiestransferchargefrontend.pages.sh03.shared.CheckYourAnswersPage
+import uk.gov.hmrc.securitiestransferchargefrontend.repositories.SessionRepository
 import uk.gov.hmrc.securitiestransferchargefrontend.services.AnswerPersistenceService
 
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
-class Sh03AgentNavigator @Inject()(answerPersistenceService: AnswerPersistenceService, appConfig: FrontendAppConfig)
+class Sh03AgentNavigator @Inject()(answerPersistenceService: AnswerPersistenceService, appConfig: FrontendAppConfig, sessionRepo: SessionRepository)
                                   (implicit ec: ExecutionContext) extends AbstractModeNavigator with PersistentNavigator:
 
   override lazy val dashboardPage: Call = sharedRoutes.SubmissionsDashboardController.onPageLoad()
+  override val sessionRepository: SessionRepository = sessionRepo
   val defaultPage: Call = routes.JourneyRecoveryController.onPageLoad()
   val errorPages: List[Call] = List(defaultPage)
 

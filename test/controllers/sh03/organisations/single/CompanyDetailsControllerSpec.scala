@@ -22,7 +22,6 @@ import play.api.data.Form
 import play.api.inject.bind
 import play.api.test.FakeRequest
 import play.api.test.Helpers.*
-import uk.gov.hmrc.securitiestransferchargefrontend.controllers.routes
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.sh03.organisations.single.routes as sh03OrgSingleRoutes
 import uk.gov.hmrc.securitiestransferchargefrontend.forms.sh03.shared.CompanyDetailsFormProvider
 import uk.gov.hmrc.securitiestransferchargefrontend.models.JourneyType.SH03
@@ -39,7 +38,7 @@ class CompanyDetailsControllerSpec extends SpecBase with MockitoSugar {
 
   lazy val companyDetailsRoute: String = sh03OrgSingleRoutes.CompanyDetailsController.onPageLoad(NormalMode).url
 
-  val validAnswer = CompanyDetails("Test Company Ltd", "AB123456", true)
+  val validAnswer: CompanyDetails = CompanyDetails("Test Company Ltd", "AB123456", true)
 
   "CompanyDetailsController" - {
 
@@ -185,40 +184,6 @@ class CompanyDetailsControllerSpec extends SpecBase with MockitoSugar {
         val result = route(application, request).value
 
         status(result) mustEqual BAD_REQUEST
-      }
-    }
-
-    "must redirect to Journey Recovery for a GET if no existing data is found" in {
-
-      val application = applicationBuilder(userAnswers = None, affinityGroup = orgAffinity).build()
-
-      running(application) {
-        val request = FakeRequest(GET, companyDetailsRoute)
-
-        val result = route(application, request).value
-
-        status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual routes.JourneyRecoveryController.onPageLoad().url
-      }
-    }
-
-    "must redirect to Journey Recovery for a POST if no existing data is found" in {
-
-      val application = applicationBuilder(userAnswers = None, affinityGroup = orgAffinity).build()
-
-      running(application) {
-        val request =
-          FakeRequest(POST, companyDetailsRoute)
-            .withFormUrlEncodedBody(
-              ("companyName", "Test Company Ltd"),
-              ("companyRegistrationNumber", "AB123456"),
-              ("isPlc", "true")
-            )
-
-        val result = route(application, request).value
-
-        status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual routes.JourneyRecoveryController.onPageLoad().url
       }
     }
   }

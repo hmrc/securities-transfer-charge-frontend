@@ -22,7 +22,6 @@ import org.mockito.Mockito.when
 import org.scalatestplus.mockito.MockitoSugar
 import play.api.data.Form
 import play.api.inject.bind
-import play.api.mvc.Call
 import play.api.test.FakeRequest
 import play.api.test.Helpers.*
 import uk.gov.hmrc.auth.core.AffinityGroup
@@ -42,9 +41,7 @@ import scala.concurrent.Future
 import scala.util.Random
 
 class AgentReferenceControllerSpec extends SpecBase with MockitoSugar {
-
-  def onwardRoute = Call("GET", "/foo")
-
+  
   val formProvider = new AgentReferenceFormProvider()
   val form: Form[AgentReference] = formProvider()
   val fileUploadReference = "fileUploadRef"
@@ -99,6 +96,8 @@ class AgentReferenceControllerSpec extends SpecBase with MockitoSugar {
 
       val application =
         applicationBuilder(userAnswers = Some(updatedAnswers), AffinityGroup.Agent, sessionRepository = mockSessionRepository)
+          .overrides(
+            bind[Navigator].qualifiedWith("agents").toInstance(getNavigator))
           .build()
 
       running(application) {
@@ -109,7 +108,7 @@ class AgentReferenceControllerSpec extends SpecBase with MockitoSugar {
         val result = route(application, request).value
 
         status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual agentRoutes.CheckYourAnswersController.onPageLoad().url
+        redirectLocation(result).value mustEqual testNextPage.url
       }
     }
 

@@ -26,6 +26,8 @@ import play.api.test.FakeRequest
 import play.api.test.Helpers.*
 import uk.gov.hmrc.securitiestransferchargefrontend.clients.SubmissionIdClient
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.sh03.organisations.routes as orgRoutes
+import uk.gov.hmrc.securitiestransferchargefrontend.controllers.sh03.organisations.bulk.routes as bulkRoutes
+import uk.gov.hmrc.securitiestransferchargefrontend.controllers.sh03.organisations.single.routes as singleRoutes
 import uk.gov.hmrc.securitiestransferchargefrontend.forms.sh03.shared.HowToNotifyAboutShareBuybackFormProvider
 import uk.gov.hmrc.securitiestransferchargefrontend.models.JourneyType.SH03
 import uk.gov.hmrc.securitiestransferchargefrontend.models.sh03.HowToNotifyAboutShareBuyback
@@ -76,7 +78,6 @@ class HowToNotifyAboutShareBuybackControllerSpec extends SpecBase with MockitoSu
 
       val application = applicationBuilder(userAnswers = Some(userAnswers), affinityGroup = orgAffinity)
         .overrides(
-          bind[Navigator].qualifiedWith("orgSh03").toInstance(getNavigator),
           bind[SubmissionIdClient].toInstance(mockIdClient)
         )
         .build()
@@ -90,7 +91,7 @@ class HowToNotifyAboutShareBuybackControllerSpec extends SpecBase with MockitoSu
 
         status(result) mustEqual SEE_OTHER
 
-        redirectLocation(result).value mustEqual testNextPage.url
+        redirectLocation(result).value mustEqual singleRoutes.CompanyDetailsController.onPageLoad(NormalMode).url
       }
     }
 
@@ -106,7 +107,6 @@ class HowToNotifyAboutShareBuybackControllerSpec extends SpecBase with MockitoSu
 
       val application = applicationBuilder(userAnswers = Some(userAnswers), affinityGroup = orgAffinity)
         .overrides(
-          bind[Navigator].qualifiedWith("orgSh03").toInstance(getNavigator),
           bind[SubmissionIdClient].toInstance(mockIdClient)
         )
         .build()
@@ -120,7 +120,7 @@ class HowToNotifyAboutShareBuybackControllerSpec extends SpecBase with MockitoSu
 
         status(result) mustEqual SEE_OTHER
 
-        redirectLocation(result).value mustEqual testNextPage.url
+        redirectLocation(result).value mustEqual bulkRoutes.CompanyDetailsController.onPageLoad(NormalMode).url
       }
     }
 

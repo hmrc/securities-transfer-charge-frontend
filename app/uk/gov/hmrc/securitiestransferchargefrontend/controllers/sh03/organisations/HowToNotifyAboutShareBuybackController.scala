@@ -20,29 +20,28 @@ import play.api.data.Form
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, Call, MessagesControllerComponents}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
-import uk.gov.hmrc.securitiestransferchargefrontend.clients.SubmissionIdClient
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.actions.*
-import uk.gov.hmrc.securitiestransferchargefrontend.domain.{GroupIdentifier, UserId}
+import uk.gov.hmrc.securitiestransferchargefrontend.controllers.sh03.organisations.bulk.routes as bulkRoutes
+import uk.gov.hmrc.securitiestransferchargefrontend.controllers.sh03.organisations.single.routes as singleRoutes
 import uk.gov.hmrc.securitiestransferchargefrontend.forms.sh03.shared.HowToNotifyAboutShareBuybackFormProvider
 import uk.gov.hmrc.securitiestransferchargefrontend.models.sh03.HowToNotifyAboutShareBuyback
-import uk.gov.hmrc.securitiestransferchargefrontend.models.{JourneyType, Mode, NormalMode, UserAnswers}
+import uk.gov.hmrc.securitiestransferchargefrontend.models.{Mode, NormalMode, UserAnswers}
 import uk.gov.hmrc.securitiestransferchargefrontend.navigation.Navigator
 import uk.gov.hmrc.securitiestransferchargefrontend.pages.sh03.HowToNotifyAboutShareBuybackPage
 import uk.gov.hmrc.securitiestransferchargefrontend.views.html.sh03.organisations.HowToNotifyAboutShareBuybackView
 
 import javax.inject.{Inject, Named}
-import scala.concurrent.{ExecutionContext, Future}
+import scala.concurrent.Future
 
 class HowToNotifyAboutShareBuybackController @Inject()(
                                                         override val messagesApi: MessagesApi,
                                                         @Named("orgSh03") navigator: Navigator,
-                                                        idClient: SubmissionIdClient,
                                                         stcAuthEnrolled: StcAuthEnrolledAction,
                                                         getData: StcDataRetrievalAction,
                                                         formProvider: HowToNotifyAboutShareBuybackFormProvider,
                                                         val controllerComponents: MessagesControllerComponents,
                                                         view: HowToNotifyAboutShareBuybackView
-                                                      )(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport {
+                                                      ) extends FrontendBaseController with I18nSupport {
 
   lazy val backLinkCall: Mode => Option[UserAnswers] => Call =
     mode => userAnswers => navigator.previousPage(HowToNotifyAboutShareBuybackPage, mode, userAnswers)
@@ -65,22 +64,23 @@ class HowToNotifyAboutShareBuybackController @Inject()(
 
   def onSubmit(): Action[AnyContent] = (stcAuthEnrolled andThen getData).async {
     implicit request =>
+
       val innerRequest = request.request
-      val userId = UserId(innerRequest.internalId)
-      val group = GroupIdentifier(innerRequest.groupIdentifier)
       val form: Form[HowToNotifyAboutShareBuyback] = formProvider(innerRequest.affinityGroupKey)
 
       form.bindFromRequest().fold(
         formWithErrors =>
-          Future.successful(BadRequest(view(formWithErrors, NormalMode, innerRequest.affinityGroupKey, backLinkCall(NormalMode)(request.userAnswers)))),
+          Future.successful(
+            BadRequest(view(formWithErrors, NormalMode, innerRequest.affinityGroupKey, backLinkCall(NormalMode)(request.userAnswers)))
+          ),
 
-        howToNotify =>
-          for {
-            submissionId <- idClient.nextSubmissionId()
-            emptyAnswers = UserAnswers.empty(userId)(group)(submissionId)(JourneyType.SH03)
-            updatedAnswers <- Future.fromTry(emptyAnswers.set(HowToNotifyAboutShareBuybackPage, howToNotify))
-            nextPage <- navigator.nextPage(HowToNotifyAboutShareBuybackPage, NormalMode, updatedAnswers)
-          } yield Redirect(nextPage)
+        {
+          case HowToNotifyAboutShareBuyback.OneAtATime =>
+            Future.successful(Redirect(singleRoutes.CompanyDetailsController.onPageLoad(NormalMode)))
+
+          case HowToNotifyAboutShareBuyback.MoreThanOneAtATime =>
+            Future.successful(Redirect(bulkRoutes.CompanyDetailsController.onPageLoad(NormalMode)))
+        }
       )
   }
 }

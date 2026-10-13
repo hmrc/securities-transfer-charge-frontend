@@ -21,9 +21,12 @@ import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, Call, MessagesControllerComponents}
 import play.twirl.api.Html
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
+import uk.gov.hmrc.securitiestransferchargefrontend.clients.SubmissionIdClient
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.actions.*
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.shared.SaveAndReturnButton.isReturn
+import uk.gov.hmrc.securitiestransferchargefrontend.domain.{GroupIdentifier, UserId}
 import uk.gov.hmrc.securitiestransferchargefrontend.forms.shared.AgentReferenceFormProvider
+import uk.gov.hmrc.securitiestransferchargefrontend.models.JourneyType.STF
 import uk.gov.hmrc.securitiestransferchargefrontend.models.shared.AgentReference
 import uk.gov.hmrc.securitiestransferchargefrontend.models.{Mode, UserAnswers}
 import uk.gov.hmrc.securitiestransferchargefrontend.navigation.Navigator
@@ -38,30 +41,31 @@ class AgentReferenceController @Inject()(
                                         @Named("agents") navigator: Navigator,
                                         stcAuthEnrolled: StcAuthEnrolledAction,
                                         getData: StcDataRetrievalAction,
-                                        requireData: StcDataRequiredAction,
                                         formProvider: AgentReferenceFormProvider,
                                         val controllerComponents: MessagesControllerComponents,
-                                        view: AgentReferenceView
+                                        view: AgentReferenceView,
+                                        idClient: SubmissionIdClient
                                     )(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport {
 
   val form: Form[AgentReference] = formProvider()
 
-  lazy val backLinkCall: Mode => UserAnswers => Call =
+  lazy val backLinkCall: Mode => Option[UserAnswers] => Call =
     mode => userAnswers => navigator.previousPage(AgentReferencePage, mode, userAnswers)
 
-  def onPageLoad(mode: Mode): Action[AnyContent] = (stcAuthEnrolled andThen getData andThen requireData) {
+  def onPageLoad(mode: Mode): Action[AnyContent] = (stcAuthEnrolled andThen getData) {
     implicit request =>
 
-      val preparedForm = request.userAnswers.get(AgentReferencePage) match {
-        case None => form
-        case Some(value) => form.fill(value)
-      }
+      val preparedForm = request.userAnswers.flatMap(_.get(AgentReferencePage))
+        .map(form.fill)
+        .getOrElse(form)
 
       Ok(view(preparedForm, mode, backLinkCall(mode)(request.userAnswers)): Html)
   }
 
-  def onSubmit(mode: Mode): Action[AnyContent] = (stcAuthEnrolled andThen getData andThen requireData).async {
+  def onSubmit(mode: Mode): Action[AnyContent] = (stcAuthEnrolled andThen getData).async {
     implicit request =>
+      val userId = UserId(request.request.internalId)
+      val group = GroupIdentifier(request.request.groupIdentifier)
 
       form.bindFromRequest().fold(
         formWithErrors =>
@@ -69,7 +73,10 @@ class AgentReferenceController @Inject()(
 
         value =>
           for {
-            updatedAnswers <- Future.fromTry(request.userAnswers.set(AgentReferencePage, value))
+            answers <- request.userAnswers.fold {
+              idClient.nextSubmissionId().map(submissionId => UserAnswers.empty(userId)(group)(submissionId)(STF))
+            }(Future.successful)
+            updatedAnswers <- Future.fromTry(answers.set(AgentReferencePage, value))
             nextPage       <- navigator.nextPage(AgentReferencePage, mode, updatedAnswers, isReturn(request))
           } yield Redirect(nextPage)
       )

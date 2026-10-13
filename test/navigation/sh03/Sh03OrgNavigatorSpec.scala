@@ -17,27 +17,26 @@
 package navigation.sh03
 
 import base.SpecBase
-import base.stubs.StubAnswerPersistenceService
+import base.stubs.{StubAnswerPersistenceService, StubSessionRepository}
 import org.mockito.Mockito.when
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatestplus.mockito.MockitoSugar.mock
 import play.api.mvc.Call
 import uk.gov.hmrc.securitiestransferchargefrontend.config.FrontendAppConfig
+import uk.gov.hmrc.securitiestransferchargefrontend.controllers.fileUpload.routes as fileUploadRoutes
+import uk.gov.hmrc.securitiestransferchargefrontend.controllers.routes as commonRoutes
+import uk.gov.hmrc.securitiestransferchargefrontend.controllers.sh03.organisations.bulk.routes as sh03OrgBulkRoutes
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.sh03.organisations.routes as sh03OrgRoutes
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.sh03.organisations.single.routes as sh03OrgSingleRoutes
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.sh03.shared.routes as sharedRoutes
-import uk.gov.hmrc.securitiestransferchargefrontend.controllers.sh03.organisations.bulk.routes as sh03OrgBulkRoutes
-import uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.shared.routes as stfSharedRoutes
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.sh03.shared.single.routes as sh03SharedSingleRoutes
-import uk.gov.hmrc.securitiestransferchargefrontend.controllers.routes as commonRoutes
-import uk.gov.hmrc.securitiestransferchargefrontend.models.sh03.HowToNotifyAboutShareBuyback
+import uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.shared.routes as stfSharedRoutes
+import uk.gov.hmrc.securitiestransferchargefrontend.models.JourneyType.SH03
 import uk.gov.hmrc.securitiestransferchargefrontend.models.sh03.shared.*
 import uk.gov.hmrc.securitiestransferchargefrontend.models.{CheckMode, NormalMode, UserAnswers}
 import uk.gov.hmrc.securitiestransferchargefrontend.navigation.sh03.organisations.Sh03OrgNavigator
 import uk.gov.hmrc.securitiestransferchargefrontend.pages.Page
 import uk.gov.hmrc.securitiestransferchargefrontend.pages.sh03.*
-import uk.gov.hmrc.securitiestransferchargefrontend.controllers.fileUpload.routes as fileUploadRoutes
-import uk.gov.hmrc.securitiestransferchargefrontend.models.JourneyType.SH03
 import uk.gov.hmrc.securitiestransferchargefrontend.pages.sh03.bulk.{BulkCheckYourAnswersPage, BulkCompanyDetailsPage, BulkRoleAtPurchasingCompanyPage, CannotSubmitFormErrorPage}
 import uk.gov.hmrc.securitiestransferchargefrontend.pages.sh03.shared.CheckYourAnswersPage
 
@@ -47,9 +46,9 @@ class Sh03OrgNavigatorSpec extends SpecBase with ScalaFutures {
 
   private val mockConfig: FrontendAppConfig = mock[FrontendAppConfig]
   when(mockConfig.firstChargingPoint).thenReturn(LocalDate.of(2026, 1, 1))
-
+  
   lazy val cyaPage: Call = sh03OrgSingleRoutes.CheckYourAnswersController.onPageLoad()
-  val navigator = new Sh03OrgNavigator(StubAnswerPersistenceService(), mockConfig)
+  val navigator = new Sh03OrgNavigator(StubAnswerPersistenceService(), mockConfig,StubSessionRepository())
 
   private val companyDetails = CompanyDetails(
     companyName = "Company1",
@@ -79,22 +78,6 @@ class Sh03OrgNavigatorSpec extends SpecBase with ScalaFutures {
         val result = navigator.nextPage(AnyPage, NormalMode, UserAnswers(testUserId, testGroupIdentifier, submissionId,SH03), true)(fakeRequest)
         whenReady(result) { res =>
           res mustBe navigator.dashboardPage
-        }
-      }
-
-      "must go from HowToNotifyAboutShareBuybackPage to CompanyDetailsPage when OneAtATime is selected" in {
-        val answers = emptyUserAnswers.set(HowToNotifyAboutShareBuybackPage, HowToNotifyAboutShareBuyback.OneAtATime).get
-        val result = navigator.nextPage(HowToNotifyAboutShareBuybackPage, NormalMode, answers)(fakeRequest)
-        whenReady(result) { res =>
-          res mustBe sh03OrgSingleRoutes.CompanyDetailsController.onPageLoad(NormalMode)
-        }
-      }
-
-      "must go from HowToNotifyAboutShareBuybackPage to Bulk CompanyDetailsPage when MoreThanOneAtATime is selected" in {
-        val answers = emptyUserAnswers.set(HowToNotifyAboutShareBuybackPage, HowToNotifyAboutShareBuyback.MoreThanOneAtATime).get
-        val result = navigator.nextPage(HowToNotifyAboutShareBuybackPage, NormalMode, answers)(fakeRequest)
-        whenReady(result) { res =>
-          res mustBe sh03OrgBulkRoutes.CompanyDetailsController.onPageLoad(NormalMode)
         }
       }
 

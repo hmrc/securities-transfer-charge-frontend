@@ -61,12 +61,7 @@ class ForwardRoutes(answerPersistenceService: AnswerPersistenceService,
         case MoreThanOneAtATime => agentBulkRoutes.TemplateInstructionsController.onPageLoad()
       }
     }
-    case AgentReferencePage => userAnswers => {
-      dataDependent(HowToNotifyAboutSecuritiesTransferPage, userAnswers) {
-        case OneAtATime => agentSingleRoutes.NameOfBuyerController.onPageLoad(NormalMode)
-        case MoreThanOneAtATime => bulkCyaPage
-      }
-    }
+    case AgentReferencePage => userAnswers => goTo(agentSingleRoutes.NameOfBuyerController.onPageLoad(NormalMode), Some(userAnswers))
     case NameOfBuyerPage => userAnswers => dataRequired(NameOfBuyerPage, userAnswers, agentSingleRoutes.AddressController.onPageLoad(NormalMode))
     case StfBuyersAddressPage => userAnswers => dataRequired(StfBuyersAddressPage, userAnswers, agentSingleRoutes.NameOfSellerController.onPageLoad(NormalMode))
     case NameOfSellerPage => userAnswers => dataRequired(NameOfSellerPage, userAnswers, agentSingleRoutes.StfSellerAddressController.onPageLoad(NormalMode))

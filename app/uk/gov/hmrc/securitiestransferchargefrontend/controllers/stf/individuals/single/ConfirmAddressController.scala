@@ -19,14 +19,14 @@ package uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.individuals
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
-import uk.gov.hmrc.securitiestransferchargefrontend.connectors.{SubscriptionConnector, SubscriptionStatusErrorException}
+import uk.gov.hmrc.securitiestransferchargefrontend.clients.SubmissionIdClient
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.actions.*
-import uk.gov.hmrc.securitiestransferchargefrontend.models.{Mode, NormalMode}
+import uk.gov.hmrc.securitiestransferchargefrontend.domain.{GroupIdentifier, UserId}
+import uk.gov.hmrc.securitiestransferchargefrontend.models.JourneyType.STF
+import uk.gov.hmrc.securitiestransferchargefrontend.models.{Mode, NormalMode, UserAnswers}
 import uk.gov.hmrc.securitiestransferchargefrontend.navigation.Navigator
 import uk.gov.hmrc.securitiestransferchargefrontend.pages.stf.single.ConfirmAddressPage
-import uk.gov.hmrc.securitiestransferchargefrontend.repositories.SubscriptionDataRepository
-import uk.gov.hmrc.securitiestransferchargefrontend.services.AddressService
-import uk.gov.hmrc.securitiestransferchargefrontend.utils.CommonHelpers.FutureOptionOps
+import uk.gov.hmrc.securitiestransferchargefrontend.services.{AddressService, SubscriptionService}
 import uk.gov.hmrc.securitiestransferchargefrontend.views.html.stf.individuals.single.ConfirmAddressView
 
 import javax.inject.{Inject, Named}
@@ -38,42 +38,42 @@ class ConfirmAddressController @Inject()(
                                           override val messagesApi: MessagesApi,
                                           stcAuthEnrolled: StcAuthEnrolledAction,
                                           getData: StcDataRetrievalAction,
-                                          requireData: StcDataRequiredAction,
-                                          subscriptionConnector: SubscriptionConnector,
-                                          subscriptionDataRepository: SubscriptionDataRepository,
+                                          subscriptionService: SubscriptionService,
                                           val controllerComponents: MessagesControllerComponents,
                                           view: ConfirmAddressView,
                                           addressService: AddressService,
-                                          @Named("individuals") navigator: Navigator
+                                          @Named("individuals") navigator: Navigator,
+                                          idClient: SubmissionIdClient
                                         )(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport {
 
   private lazy val kickOutPage = navigator.errorPage(ConfirmAddressPage)
-  
-  def onPageLoad: Action[AnyContent] =
-    (stcAuthEnrolled andThen getData).async { implicit request =>
 
-      subscriptionConnector.getAndStoreSubscription(request.request.subscriptionId)
-        .map { subscription =>
-          Ok(view(addressService.extractConfirmableAddress(subscription)))
-        }
-        .recover {
-          //Need to confirm Kick out page
-          case _: SubscriptionStatusErrorException => Redirect(kickOutPage)
-        }
-    }
+  def onPageLoad: Action[AnyContent] = stcAuthEnrolled.async { implicit request =>
 
-  def onSubmit(mode: Mode = NormalMode): Action[AnyContent] =
-    (stcAuthEnrolled andThen getData andThen requireData).async { implicit request =>
-      (
-        for {
-          subscriptionData <- subscriptionDataRepository.getSubscriptionData(request.request.subscriptionId)
-            .getOrFail(new SubscriptionDataNotFoundException("Subscription data not found"))
-          address = addressService.extractConfirmableAddress(subscriptionData.subscriptionDetails)
-          updatedAnswers <- Future.fromTry(request.userAnswers.set(ConfirmAddressPage, address))
-          nextPage <- navigator.nextPage(ConfirmAddressPage, mode, updatedAnswers)
-        } yield Redirect(nextPage)
-        ).recover {
-        case _: SubscriptionDataNotFoundException => Redirect(kickOutPage)
+    subscriptionService.getSubscription(request.subscriptionId).map { subscription =>
+        val address = addressService.extractConfirmableAddress(subscription)
+        Ok(view(address))
       }
-    }
+      .recover {
+        case _ => Redirect(kickOutPage)
+      }
+    
+  }
+
+  def onSubmit(mode: Mode = NormalMode): Action[AnyContent] = (stcAuthEnrolled andThen getData).async { implicit request =>
+
+    val userId = UserId(request.request.internalId)
+    val group = GroupIdentifier(request.request.groupIdentifier)
+
+    for {
+      subscription <- subscriptionService.getSubscription(request.request.subscriptionId)
+      address = addressService.extractConfirmableAddress(subscription)
+      answers <- request.userAnswers.fold {
+        idClient.nextSubmissionId().map(submissionId => UserAnswers.empty(userId)(group)(submissionId)(STF))
+      }(Future.successful)
+      updatedAnswers <- Future.fromTry(answers.set(ConfirmAddressPage, address))
+      nextPage <- navigator.nextPage(ConfirmAddressPage, mode, updatedAnswers)
+    } yield Redirect(nextPage)
+  }
+  
 }

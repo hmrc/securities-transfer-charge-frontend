@@ -20,19 +20,18 @@ import play.api.data.Form
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, Call, MessagesControllerComponents}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
-import uk.gov.hmrc.securitiestransferchargefrontend.clients.SubmissionIdClient
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.actions.*
-import uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.shared.SaveAndReturnButton.isReturn
-import uk.gov.hmrc.securitiestransferchargefrontend.domain.{GroupIdentifier, UserId}
+import uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.organisations.bulk.routes as bulkRoutes
+import uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.organisations.single.routes as singleRoutes
 import uk.gov.hmrc.securitiestransferchargefrontend.forms.stf.organisations.HowToNotifyAboutSecuritiesTransferFormProvider
 import uk.gov.hmrc.securitiestransferchargefrontend.models.stf.HowToNotifyAboutSecuritiesTransfer
-import uk.gov.hmrc.securitiestransferchargefrontend.models.{JourneyType, Mode, NormalMode, UserAnswers}
+import uk.gov.hmrc.securitiestransferchargefrontend.models.{Mode, NormalMode, UserAnswers}
 import uk.gov.hmrc.securitiestransferchargefrontend.navigation.Navigator
 import uk.gov.hmrc.securitiestransferchargefrontend.pages.stf.shared.HowToNotifyAboutSecuritiesTransferPage
 import uk.gov.hmrc.securitiestransferchargefrontend.views.html.stf.organisations.HowToNotifyAboutSecuritiesTransferView
 
 import javax.inject.{Inject, Named}
-import scala.concurrent.{ExecutionContext, Future}
+import scala.concurrent.Future
 
 class HowToNotifyAboutSecuritiesTransferController @Inject()(
                                                               override val messagesApi: MessagesApi,
@@ -41,9 +40,8 @@ class HowToNotifyAboutSecuritiesTransferController @Inject()(
                                                               getData: StcDataRetrievalAction,
                                                               formProvider: HowToNotifyAboutSecuritiesTransferFormProvider,
                                                               val controllerComponents: MessagesControllerComponents,
-                                                              view: HowToNotifyAboutSecuritiesTransferView,
-                                                              idClient: SubmissionIdClient
-                                                            )(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport {
+                                                              view: HowToNotifyAboutSecuritiesTransferView
+                                                            ) extends FrontendBaseController with I18nSupport {
 
   val form: Form[HowToNotifyAboutSecuritiesTransfer] = formProvider()
 
@@ -65,22 +63,13 @@ class HowToNotifyAboutSecuritiesTransferController @Inject()(
   def onSubmit(): Action[AnyContent] = (stcAuthEnrolled andThen getData).async {
     implicit request =>
 
-      val innerRequest = request.request
-      val userId = UserId(innerRequest.internalId)
-      val group = GroupIdentifier(innerRequest.groupIdentifier)
-
       form.bindFromRequest().fold(
         formWithErrors =>
-          Future.successful(BadRequest(view(formWithErrors, NormalMode, innerRequest.affinityGroupKey, backLinkCall(NormalMode)(request.userAnswers)))),
-
-        howToNotify =>
-          for {
-            answers <- request.userAnswers.fold {
-              idClient.nextSubmissionId().map(submissionId => UserAnswers.empty(userId)(group)(submissionId)(JourneyType.STF))
-            }(Future.successful)
-            updatedAnswers <- Future.fromTry(answers.set(HowToNotifyAboutSecuritiesTransferPage, howToNotify))
-            nextPage <- orgNavigator.nextPage(HowToNotifyAboutSecuritiesTransferPage, NormalMode, updatedAnswers, isReturn(request))
-          } yield Redirect(nextPage)
+          Future.successful(BadRequest(view(formWithErrors, NormalMode, request.request.affinityGroupKey, backLinkCall(NormalMode)(request.userAnswers)))),
+        {
+          case HowToNotifyAboutSecuritiesTransfer.OneAtATime => Future.successful(Redirect(singleRoutes.ConfirmAddressController.onPageLoad()))
+          case HowToNotifyAboutSecuritiesTransfer.MoreThanOneAtATime => Future.successful(Redirect(bulkRoutes.TemplateInstructionsController.onPageLoad()))
+        }
       )
   }
 }
