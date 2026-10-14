@@ -26,7 +26,7 @@ import play.api.test.Helpers.*
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.dashboard.routes as dashboardRoutes
 import uk.gov.hmrc.securitiestransferchargefrontend.models.search.{SubmissionStatus, SubmissionSummary}
-import uk.gov.hmrc.securitiestransferchargefrontend.services.{DashboardService}
+import uk.gov.hmrc.securitiestransferchargefrontend.services.DashboardService
 import uk.gov.hmrc.securitiestransferchargefrontend.views.html.dashboard.RecentSubmissionsView
 
 import java.time.LocalDate
@@ -57,7 +57,7 @@ class RecentSubmissionsControllerSpec extends SpecBase with MockitoSugar {
         val view = application.injector.instanceOf[RecentSubmissionsView]
 
         status(result) mustEqual OK
-        contentAsString(result) mustEqual view()(request, messages(application)).toString
+        contentAsString(result) mustEqual view(isIndividual = true)(request, messages(application)).toString
       }
     }
 

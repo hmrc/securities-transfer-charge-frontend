@@ -24,7 +24,7 @@
     govukButton: GovukButton
 )
 
-@()(implicit request: Request[_], messages: Messages)
+@(isIndividual: Boolean)(implicit request: Request[_], messages: Messages)
 
 @layout(
     pageTitle = s"${messages("recentSubmissions.title")} - ${messages("reportAndPay.title")} - ${messages("site.govuk")}",
@@ -56,11 +56,29 @@
         @messages("recentSubmissions.no-recent.p")
     </p>
 
-    <div class="govuk-!-margin-bottom-6">
-        @govukButton(Button(
-            content = Text(messages("recentSubmissions.button.stf")),
-            href = Some(dashboardRoutes.StartSubmissionController.startStf().url)
-        ))
-    </div>
+    @if(isIndividual) {
+        <div class="govuk-!-margin-bottom-6">
+            @govukButton(Button(
+                content = Text(messages("recentSubmissions.button.stf")),
+                href = Some(dashboardRoutes.StartSubmissionController.startStf().url)
+            ))
+        </div>
+    } else {
+        <p class="govuk-body">
+            @messages("dashboard.tell-us")
+        </p>
 
+        <ul class="govuk-list govuk-list--bullet govuk-!-margin-left-4">
+            <li>
+                <a class="govuk-link" href="@dashboardRoutes.StartSubmissionController.startStf().url">
+                    @messages("dashboard.stf")
+                </a>
+            </li>
+            <li>
+                <a class="govuk-link" href="@dashboardRoutes.StartSubmissionController.startSh03().url">
+                    @messages("dashboard.sh03")
+                </a>
+            </li>
+        </ul>
+    }
 }

@@ -25,13 +25,12 @@ import views.ViewBaseSpec
 
 class RecentSubmissionsViewSpec extends ViewBaseSpec {
 
-  override def fakeApplication(): Application =
-    applicationBuilder().build()
+  override def fakeApplication(): Application = applicationBuilder().build()
 
   private val viewInstance = app.injector.instanceOf[RecentSubmissionsView]
 
-  def view(): Document = Jsoup.parse(
-    viewInstance()(fakeRequest, messages).body
+  def view(isIndividual: Boolean): Document = Jsoup.parse(
+    viewInstance(isIndividual)(fakeRequest, messages).body
   )
 
   object ExpectedContent {
@@ -42,54 +41,105 @@ class RecentSubmissionsViewSpec extends ViewBaseSpec {
     val buttonText: String = messages("recentSubmissions.button.stf")
     val breadcrumbDashboard: String = messages("breadcrumbs.dashboard")
     val breadcrumbSubmissions: String = messages("breadcrumbs.submissions")
+    val tellUs: String = messages("dashboard.tell-us")
+    val stf: String = messages("dashboard.stf")
+    val sh03: String = messages("dashboard.sh03")
   }
 
   "The RecentSubmissionsView" - {
 
-    val doc = view()
+    "when rendering common content" - {
 
-    "have the correct title" in {
-      doc.title() mustBe ExpectedContent.title
-    }
+      val doc = view(isIndividual = true)
 
-    "have the correct heading" in {
-      doc.select("h1.govuk-heading-xl").text() mustBe ExpectedContent.heading
-    }
-
-    "have the correct sub-heading (h2)" in {
-      doc.select("h2.govuk-heading-m").text() mustBe ExpectedContent.h2
-    }
-
-    "have the correct body text" in {
-      doc.select("p.govuk-body").text() mustBe ExpectedContent.p
-    }
-
-    "have a button to create a new submission" - {
-
-      val button = doc.select(".govuk-button")
-
-      "with the correct text" in {
-        button.text() mustBe ExpectedContent.buttonText
+      "have the correct title" in {
+        doc.title() mustBe ExpectedContent.title
       }
 
-      "with the correct href" in {
-        button.attr("href") mustBe dashboardRoutes.StartSubmissionController.startStf().url
+      "have the correct heading" in {
+        doc.select("h1.govuk-heading-xl").text() mustBe ExpectedContent.heading
+      }
+
+      "have the correct sub-heading (h2)" in {
+        doc.select("h2.govuk-heading-m").text() mustBe ExpectedContent.h2
+      }
+
+      "have the correct body text" in {
+        doc.select("p.govuk-body").text() mustBe ExpectedContent.p
+      }
+
+      "have the correct breadcrumb navigation" - {
+
+        val breadcrumbs = doc.select(".govuk-breadcrumbs__list-item")
+
+        "showing the Dashboard link" in {
+          val dashboardCrumb = breadcrumbs.get(0)
+          dashboardCrumb.text() mustBe ExpectedContent.breadcrumbDashboard
+          dashboardCrumb.select("a").attr("href") mustBe dashboardRoutes.DashboardController.onPageLoad().url
+        }
+
+        "showing the current Submissions page text" in {
+          val submissionsCrumb = breadcrumbs.get(1)
+          submissionsCrumb.text() mustBe ExpectedContent.breadcrumbSubmissions
+        }
       }
     }
 
-    "have the correct breadcrumb navigation" - {
+    "when isIndividual is true" - {
 
-      val breadcrumbs = doc.select(".govuk-breadcrumbs__list-item")
+      val doc = view(isIndividual = true)
 
-      "showing the Dashboard link" in {
-        val dashboardCrumb = breadcrumbs.get(0)
-        dashboardCrumb.text() mustBe ExpectedContent.breadcrumbDashboard
-        dashboardCrumb.select("a").attr("href") mustBe dashboardRoutes.DashboardController.onPageLoad().url
+      "have a button to create a new submission" - {
+
+        val button = doc.select(".govuk-button")
+
+        "with the correct text" in {
+          button.text() mustBe ExpectedContent.buttonText
+        }
+
+        "with the correct href" in {
+          button.attr("href") mustBe dashboardRoutes.StartSubmissionController.startStf().url
+        }
       }
 
-      "showing the current Submissions page text" in {
-        val submissionsCrumb = breadcrumbs.get(1)
-        submissionsCrumb.text() mustBe ExpectedContent.breadcrumbSubmissions
+      "not display the STF and SH03 links" in {
+        doc.select("ul.govuk-list--bullet li").size() mustBe 0
+      }
+    }
+
+    "when isIndividual is false" - {
+
+      val doc = view(isIndividual = false)
+
+      "display the correct introductory text" in {
+        doc.select("p.govuk-body").last().text() mustBe ExpectedContent.tellUs
+      }
+
+      "display the STF and SH03 links" - {
+
+        val links = doc.select("ul.govuk-list--bullet li a")
+
+        "display two links" in {
+          links.size() mustBe 2
+        }
+
+        "display the STF link with the correct text and href" in {
+          val stfLink = links.get(0)
+
+          stfLink.text() mustBe ExpectedContent.stf
+          stfLink.attr("href") mustBe dashboardRoutes.StartSubmissionController.startStf().url
+        }
+
+        "display the SH03 link with the correct text and href" in {
+          val sh03Link = links.get(1)
+
+          sh03Link.text() mustBe ExpectedContent.sh03
+          sh03Link.attr("href") mustBe dashboardRoutes.StartSubmissionController.startSh03().url
+        }
+      }
+
+      "not display the create submission button" in {
+        doc.select(".govuk-button").size() mustBe 0
       }
     }
   }
