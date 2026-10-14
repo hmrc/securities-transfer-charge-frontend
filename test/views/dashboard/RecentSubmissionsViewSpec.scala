@@ -111,7 +111,7 @@ class RecentSubmissionsViewSpec extends ViewBaseSpec {
 
       val doc = view(isIndividual = false)
 
-      "display the correct introductory text" in {
+      "display the correct text" in {
         doc.select("p.govuk-body").last().text() mustBe ExpectedContent.tellUs
       }
 
