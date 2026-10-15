@@ -20,19 +20,34 @@ import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.actions.*
+import uk.gov.hmrc.securitiestransferchargefrontend.domain.SubmissionId
+import uk.gov.hmrc.securitiestransferchargefrontend.services.DashboardService
+import uk.gov.hmrc.securitiestransferchargefrontend.services.stf.shared.FormattingService
+import uk.gov.hmrc.securitiestransferchargefrontend.viewmodels.dashboard.SubmissionDetailsViewModel
 import uk.gov.hmrc.securitiestransferchargefrontend.views.html.dashboard.SubmissionDetailsView
 
 import javax.inject.Inject
+import scala.concurrent.ExecutionContext
 
 class SubmissionDetailsController @Inject()(
                                        override val messagesApi: MessagesApi,
-                                       identify: IdentifierAction,
+                                       auth: StcAuthEnrolledAction,
+                                       getData: StcDataRetrievalAction,
                                        val controllerComponents: MessagesControllerComponents,
-                                       view: SubmissionDetailsView
-                                     ) extends FrontendBaseController with I18nSupport {
+                                       view: SubmissionDetailsView,
+                                       dashboardService: DashboardService,
+                                       formattingService: FormattingService 
+                                     )(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport {
 
-  def onPageLoad(submissionId: String): Action[AnyContent] = identify {
+  def onPageLoad(submissionId: String): Action[AnyContent] = (auth andThen getData).async {
     implicit request =>
-      Ok(view(submissionId))
+      val subscriptionId = request.request.subscriptionId
+      val subId = SubmissionId(submissionId)
+
+      dashboardService.getSubmission(subscriptionId, subId).map {sttSubmission =>
+        val viewModel = SubmissionDetailsViewModel.build(submission = sttSubmission, formattingService)
+        
+        Ok(view(viewModel))
+      }
   }
 }

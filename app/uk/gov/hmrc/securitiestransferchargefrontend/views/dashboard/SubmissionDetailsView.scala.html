@@ -16,20 +16,28 @@
 
 @import uk.gov.hmrc.securitiestransferchargefrontend.views.html.templates
 @import uk.gov.hmrc.securitiestransferchargefrontend.controllers.dashboard.routes as dashboardRoutes
+@import uk.gov.hmrc.securitiestransferchargefrontend.viewmodels.dashboard.SubmissionDetailsViewModel
+@import uk.gov.hmrc.securitiestransferchargefrontend.models.submission.SubmissionDetailsSummary
+@import uk.gov.hmrc.hmrcfrontend.views.viewmodels.hmrcstandardpage.TemplateOverrides
+
 @import views.html.helper.CSPNonce
 
 @this(
         layout: templates.Layout,
         govukBreadcrumbs: GovukBreadcrumbs,
-        govukButton: GovukButton
+        govukButton: GovukButton,
+        govUkSummaryList: GovukSummaryList,
+        govukTable: GovukTable
 )
 
-@(submissionId: String)(implicit request: Request[_], messages: Messages)
+@(viewModel: SubmissionDetailsViewModel)(implicit request: Request[_], messages: Messages)
 
 @layout(
-    pageTitle = titleNoForm(messages("submissionDetails.title", submissionId)),
-    additionalScripts = Some(HtmlFormat.raw(s"""<script ${CSPNonce.attr} src="${routes.Assets.versioned("javascripts/print.js").url}"></script>""")),
-    showBackLink = false
+    pageTitle = titleNoForm(messages("submissionDetails.title", viewModel.submissionId)),
+    additionalScripts = Some(HtmlFormat.raw(s"""<script ${CSPNonce.attr} src="${routes.Assets.versioned("javascripts/print.js").url}"></script><script ${CSPNonce.attr}> document.addEventListener('DOMContentLoaded', function() { if (window.GOVUKFrontend) { window.GOVUKFrontend.initAll(); } }); </script>
+""")),
+    showBackLink = false,
+    mainContentLayout = Some(TemplateOverrides.noMainContentLayout)
 ) {
 
     @govukBreadcrumbs(
@@ -40,7 +48,7 @@
         )
     )
 
-    <h1 class="govuk-heading-l">@messages("submissionDetails.heading", submissionId)</h1>
+    <h1 class="govuk-heading-l">@messages("submissionDetails.heading", viewModel.submissionId)</h1>
 
     @govukButton(
         ButtonViewModel(Text(messages("submissionDetails.print")))
@@ -50,10 +58,59 @@
             .withAttribute("id" -> "print-this-page")
         )
 
-    <div class="tax-card">
-        <h2 class="govuk-heading-m">@messages("submissionDetails.total.heading", "0.00")</h2>
-        <p class="govuk-body-s">@messages("submissionDetails.paymentDueBy") <strong>23 October 2026</strong></p>
+    <div class="govuk-grid-row">
+        <div class="govuk-grid-column-two-thirds">
+            <div class="tax-card govuk-!-margin-bottom-7">
+                <h2 class="govuk-heading-m">@messages("submissionDetails.total.heading", viewModel.summary.total)</h2>
+                <p class="govuk-body-s">@messages("submissionDetails.paymentDueBy") <strong>@viewModel.summary.paymentDueBy</strong></p>
+                @govUkSummaryList(viewModel.summary.summaryList)
+                @govukButton(
+                    Button(
+                        href = Some("#"),
+                        content = Text(messages("submissionDetails.submission.payForSubmission")),
+                        classes = "govuk-!-margin-bottom-0"
+                    )
+                )
+            </div>
+        </div>
     </div>
 
+<div class="govuk-grid-row">
+    <div class="govuk-grid-column-full">
+        <div class="govuk-tabs" data-module="govuk-tabs">
+            <h2 class="govuk-tabs__title">Transfers</h2>
+
+            <ul class="govuk-tabs__list">
+                @viewModel.tabs.zipWithIndex.map { case (item, index) =>
+                <li class="govuk-tabs__list-item@if(index == 0){ govuk-tabs__list-item--selected}">
+                    <a class="govuk-tabs__tab" href="#@item.id">
+                        @Html(item.label)
+                    </a>
+                </li>
+                }
+
+            </ul>
+
+            @viewModel.tabs.zipWithIndex.map { case (item, index) =>
+
+            <div class="govuk-tabs__panel@if(index != 0){ govuk-tabs__panel--hidden}" id="@item.id">
+
+                <h2 class="govuk-heading-m">
+                    @item.heading
+                </h2>
+
+                @item.table match {
+                    case Some(table) => {
+                        @govukTable(table)
+                    }
+                    case None => {
+                        <p class="govuk-body">@item.emptyText</p>
+                    }
+                }
+            </div>
+            }
+        </div>
+    </div>
+</div>
 
 }

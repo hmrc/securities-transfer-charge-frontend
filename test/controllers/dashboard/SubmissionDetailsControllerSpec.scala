@@ -17,10 +17,20 @@
 package controllers.dashboard
 
 import base.SpecBase
+import base.Fixtures.*
+import org.mockito.ArgumentMatchers.any
+import org.mockito.Mockito.when
+import org.scalatestplus.mockito.MockitoSugar.mock
+import play.api.inject.bind
 import play.api.test.FakeRequest
 import play.api.test.Helpers.*
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.dashboard.routes
+import uk.gov.hmrc.securitiestransferchargefrontend.services.DashboardService
+import uk.gov.hmrc.securitiestransferchargefrontend.services.stf.shared.FormattingService
+import uk.gov.hmrc.securitiestransferchargefrontend.viewmodels.dashboard.SubmissionDetailsViewModel
 import uk.gov.hmrc.securitiestransferchargefrontend.views.html.dashboard.SubmissionDetailsView
+
+import scala.concurrent.Future
 
 class SubmissionDetailsControllerSpec extends SpecBase {
 
@@ -28,17 +38,29 @@ class SubmissionDetailsControllerSpec extends SpecBase {
 
     "must return OK and the correct view for a GET" in {
 
-      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers)).build()
+      val mockDashboardService = mock[DashboardService]
+
+      when(mockDashboardService.getSubmission(any(), any())(any()))
+        .thenReturn(Future.successful(singleSubmissionReadyToPay))
+
+      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers))
+        .overrides(bind[DashboardService].toInstance(mockDashboardService))
+        .build()
+
 
       running(application) {
-        val request = FakeRequest(GET, routes.SubmissionDetailsController.onPageLoad("Test").url)
+        val request = FakeRequest(GET, routes.SubmissionDetailsController.onPageLoad(testSubmissionId.toString).url)
+
+        val formatter = application.injector.instanceOf[FormattingService]
+        val view = application.injector.instanceOf[SubmissionDetailsView]
+        val viewModel: SubmissionDetailsViewModel =
+          SubmissionDetailsViewModel.build(singleSubmissionReadyToPay, formatter)(messages(application))
 
         val result = route(application, request).value
 
-        val view = application.injector.instanceOf[SubmissionDetailsView]
 
         status(result) mustEqual OK
-        contentAsString(result) mustEqual view("Test")(request, messages(application)).toString
+        contentAsString(result) mustEqual view(viewModel)(request, messages(application)).toString
       }
     }
   }
