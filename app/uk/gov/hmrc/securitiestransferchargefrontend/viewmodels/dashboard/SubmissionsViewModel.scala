@@ -61,16 +61,23 @@ object SubmissionsViewModel {
     )
   }
 
-  private def submissionsTable(summaries: Seq[SubmissionSummary], isDraftsTab: Boolean = false)(implicit messages: Messages): Table = {
+  private def submissionsTable(summaries: Seq[SubmissionSummary], isDraftsTab: Boolean = false, isAgent: Boolean)(implicit messages: Messages): Table = {
 
     val paymentDueByHead: Seq[HeadCell] =
       if (isDraftsTab)
         Seq.empty
-      else  Seq(HeadCell(content = Text(messages("submissions.table.paymentDueBy.heading")), classes = "govuk-!-text-align-right"))
+      else Seq(HeadCell(content = Text(messages("submissions.table.paymentDueBy.heading")), classes = "govuk-!-text-align-right"))
+
+    val yourReferenceHead =
+      if (isAgent)
+        Seq(HeadCell(content = Text(messages("submissions.table.yourReference.heading"))))
+      else Seq.empty
+
 
     Table(
       head = Some(
         Seq(HeadCell(content = Text(messages("submissions.table.id.heading")))) ++
+          yourReferenceHead ++
           paymentDueByHead ++
           Seq(
             HeadCell(content = Text(messages("submissions.table.status.heading"))),
@@ -81,7 +88,11 @@ object SubmissionsViewModel {
         val paymentDueByCell: Seq[TableRow] =
           if (isDraftsTab) Seq.empty else Seq(TableRow(content = Text(formatDate(summary.paymentDueBy)), classes = "govuk-!-text-align-right"))
 
+        val yourReferenceCell: Seq[TableRow] =
+          if (isAgent) Seq(TableRow(content = Text(summary.agentReference))) else Seq.empty
+
         Seq(TableRow(content = Text(summary.submissionId))) ++
+          yourReferenceCell ++
           paymentDueByCell ++
           Seq(
             TableRow(content = statusTag(summary.status)),
@@ -98,7 +109,8 @@ object SubmissionsViewModel {
                          drafts: Seq[SubmissionSummary],
                          readyToPay: Seq[SubmissionSummary],
                          overdue: Seq[SubmissionSummary],
-                         recent: Seq[SubmissionSummary]
+                         recent: Seq[SubmissionSummary],
+                         isAgent: Boolean
                        )(implicit messages: Messages): Seq[SubmissionTab] = {
 
     val recentSubmissionsTab: SubmissionTab = SubmissionTab(
@@ -107,7 +119,7 @@ object SubmissionsViewModel {
       heading = messages("submissions.recentSubmissions.panel.heading"),
       emptyText = messages("submissions.noRecentSubmissions"),
       count = recent.size,
-      table = Some(submissionsTable(recent))
+      table = Some(submissionsTable(recent, isAgent = isAgent))
     )
 
     val draftSubmissionsTab: SubmissionTab = SubmissionTab(
@@ -116,7 +128,7 @@ object SubmissionsViewModel {
       heading = messages("submissions.drafts.panel.heading"),
       emptyText = messages("submissions.noDraftSubmissions"),
       count = drafts.size,
-      table = Some(submissionsTable(drafts, true))
+      table = Some(submissionsTable(drafts, isDraftsTab = true, isAgent = isAgent))
     )
 
     val readyToPaySubmissionsTab: SubmissionTab = SubmissionTab(
@@ -125,7 +137,7 @@ object SubmissionsViewModel {
       heading = messages("submissions.readyToPay.panel.heading"),
       emptyText = messages("submissions.noReadyToPaySubmissions"),
       count = readyToPay.size,
-      table = Some(submissionsTable(readyToPay))
+      table = Some(submissionsTable(readyToPay, isAgent = isAgent))
     )
 
     val overdueSubmissionsTab: SubmissionTab = SubmissionTab(
@@ -134,7 +146,7 @@ object SubmissionsViewModel {
       heading = messages("submissions.overdue.panel.heading"),
       emptyText = messages("submissions.noOverdueSubmissions"),
       count = overdue.size,
-      table = Some(submissionsTable(overdue))
+      table = Some(submissionsTable(overdue, isAgent = isAgent))
     )
 
     Seq(recentSubmissionsTab, draftSubmissionsTab, readyToPaySubmissionsTab, overdueSubmissionsTab)
@@ -144,9 +156,10 @@ object SubmissionsViewModel {
              drafts: Seq[SubmissionSummary] = Seq.empty,
              readyToPay: Seq[SubmissionSummary] = Seq.empty,
              overdue: Seq[SubmissionSummary] = Seq.empty,
-             recent: Seq[SubmissionSummary] = Seq.empty
+             recent: Seq[SubmissionSummary] = Seq.empty,
+             isAgent:Boolean = false
            )(implicit messages: Messages): SubmissionsViewModel =
     SubmissionsViewModel(
-      tabs = buildTabs(drafts, readyToPay, overdue, recent)
+      tabs = buildTabs(drafts, readyToPay, overdue, recent,isAgent)
     )
 }

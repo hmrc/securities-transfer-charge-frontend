@@ -39,4 +39,5 @@ case class StcAuthorisedRequest[A](
     }
 
   val isIndividual: Boolean = affinityGroup == AffinityGroup.Individual
+  val isAgent: Boolean = affinityGroup == AffinityGroup.Agent
 }
