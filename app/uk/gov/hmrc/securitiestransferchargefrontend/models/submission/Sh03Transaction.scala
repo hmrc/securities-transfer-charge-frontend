@@ -26,7 +26,6 @@ import uk.gov.hmrc.securitiestransferchargefrontend.models.sh03.shared.{ReasonFo
 import java.time.LocalDate
 
 case class Sh03Transaction(
-                            howToNotifyAboutShareBuyback: Option[HowToNotifyAboutShareBuyback],
                             agentReference: Option[AgentReference],
                             companyDetails: CompanyDetails,
                             reasonForPurchase: ReasonForPurchase,

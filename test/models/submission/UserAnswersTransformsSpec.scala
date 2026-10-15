@@ -20,10 +20,9 @@ import base.Fixtures.*
 import base.SpecBase
 import uk.gov.hmrc.securitiestransferchargefrontend.domain.TransferType
 import uk.gov.hmrc.securitiestransferchargefrontend.domain.TransferType.{SH03, STF}
-import uk.gov.hmrc.securitiestransferchargefrontend.models.sh03.HowToNotifyAboutShareBuyback
 import uk.gov.hmrc.securitiestransferchargefrontend.models.sh03.shared.ReasonForPurchase.{ForCancellation, ToPlaceIntoTreasury}
 import uk.gov.hmrc.securitiestransferchargefrontend.models.sh03.shared.RoleAtPurchasingCompany
-import uk.gov.hmrc.securitiestransferchargefrontend.models.stf.{ConfirmableAddress, HowToNotifyAboutSecuritiesTransfer}
+import uk.gov.hmrc.securitiestransferchargefrontend.models.stf.ConfirmableAddress
 import uk.gov.hmrc.securitiestransferchargefrontend.models.stf.TaxRate.HalfPercent
 import uk.gov.hmrc.securitiestransferchargefrontend.models.submission.{ReasonForPurchase as etmpReasonForPurchase, *}
 
@@ -31,7 +30,7 @@ import java.time.LocalDate
 
 class UserAnswersTransformsSpec extends SpecBase {
 
-  private val baseStfTransaction = StfTransaction(howToNotifyAboutSecuritiesTransfer = HowToNotifyAboutSecuritiesTransfer.OneAtATime,
+  private val baseStfTransaction = StfTransaction(
     agentReference = Some(agentReference),
     confirmedAddress = Some(confirmableAddress),
     nameOfBuyer = Some("buyer 1"),
@@ -50,7 +49,7 @@ class UserAnswersTransformsSpec extends SpecBase {
     amountPaidForSecurities = Some(BigDecimal(50)),
     totalMarketValue =  Some(BigDecimal(10)))
 
-  private val baseSh03Transaction = Sh03Transaction(howToNotifyAboutShareBuyback = Some(HowToNotifyAboutShareBuyback.OneAtATime),
+  private val baseSh03Transaction = Sh03Transaction(
     agentReference = Some(agentReference),
     companyDetails = sh03CompanyDetails,
     reasonForPurchase = ForCancellation,

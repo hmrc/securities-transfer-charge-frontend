@@ -25,14 +25,12 @@ import org.scalatest.freespec.AnyFreeSpec
 import org.scalatest.matchers.must.Matchers
 import org.scalatestplus.mockito.MockitoSugar
 import uk.gov.hmrc.securitiestransferchargefrontend.models.UserAnswers
-import uk.gov.hmrc.securitiestransferchargefrontend.models.sh03.HowToNotifyAboutShareBuyback
 import uk.gov.hmrc.securitiestransferchargefrontend.models.sh03.shared.{ReasonForPurchase, RoleAtPurchasingCompany}
-import uk.gov.hmrc.securitiestransferchargefrontend.models.stf.HowToNotifyAboutSecuritiesTransfer.OneAtATime
 import uk.gov.hmrc.securitiestransferchargefrontend.models.stf.*
 import uk.gov.hmrc.securitiestransferchargefrontend.models.submission.*
 import uk.gov.hmrc.securitiestransferchargefrontend.pages.sh03.RoleAtPurchasingCompanyPage
-import uk.gov.hmrc.securitiestransferchargefrontend.services.*
 import uk.gov.hmrc.securitiestransferchargefrontend.pages.stf.shared.AgentReferencePage
+import uk.gov.hmrc.securitiestransferchargefrontend.services.*
 
 import java.time.LocalDate
 
@@ -41,7 +39,6 @@ class EtmpSubmissionServiceSpec extends AnyFreeSpec with Matchers with SpecBase 
   private val mockUserAnswers = mock[UserAnswers]
 
   private val stfTransaction = StfTransaction(
-    howToNotifyAboutSecuritiesTransfer = OneAtATime,
     agentReference = None,
     confirmedAddress = Some(ConfirmableAddress(List("123 Main Street", "London"), "SW1A 1AA", Some(Country("United Kingdom", "GB")))),
     nameOfBuyer = Some("John Smith"),
@@ -67,7 +64,6 @@ class EtmpSubmissionServiceSpec extends AnyFreeSpec with Matchers with SpecBase 
   )
 
   private val sh03Transaction  = Sh03Transaction(
-    howToNotifyAboutShareBuyback = Some(HowToNotifyAboutShareBuyback.OneAtATime),
     agentReference = None,
     companyDetails = Fixtures.sh03CompanyDetails,
     reasonForPurchase = ReasonForPurchase.ForCancellation,

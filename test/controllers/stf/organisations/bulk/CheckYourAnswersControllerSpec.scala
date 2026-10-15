@@ -24,6 +24,7 @@ import play.api.i18n.Lang
 import play.api.inject.bind
 import play.api.test.FakeRequest
 import play.api.test.Helpers.*
+import uk.gov.hmrc.securitiestransferchargefrontend.clients.SubmissionIdClient
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.routes
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.organisations.bulk.routes as bulkRoutes
 import uk.gov.hmrc.securitiestransferchargefrontend.models.stf.fileupload.{ParsedStcRow, ParsedStcRowsDocument}
@@ -121,10 +122,15 @@ class CheckYourAnswersControllerSpec extends SpecBase with MockitoSugar with Fil
 
     "must redirect to the next page when valid data is submitted" in {
 
+      val mockSubmissionIdClient = mock[SubmissionIdClient]
+
+      when(mockSubmissionIdClient.nextSubmissionId()(any())).thenReturn(Future.successful(submissionId))
+
       val application =
         applicationBuilder(userAnswers = Some(emptyUserAnswers), affinityGroup = individualAffinity)
           .overrides(
-            bind[Navigator].qualifiedWith("organisations").toInstance(getNavigator)
+            bind[Navigator].qualifiedWith("organisations").toInstance(getNavigator),
+            bind[SubmissionIdClient].toInstance(mockSubmissionIdClient)
           )
           .build()
 

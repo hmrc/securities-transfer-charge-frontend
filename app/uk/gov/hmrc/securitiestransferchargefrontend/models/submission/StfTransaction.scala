@@ -24,7 +24,6 @@ import uk.gov.hmrc.securitiestransferchargefrontend.pages.QuestionPage
 import java.time.LocalDate
 
 case class StfTransaction(
-                           howToNotifyAboutSecuritiesTransfer: HowToNotifyAboutSecuritiesTransfer,
                            agentReference: Option[AgentReference],
                            confirmedAddress: Option[ConfirmableAddress],
                            nameOfBuyer: Option[String],

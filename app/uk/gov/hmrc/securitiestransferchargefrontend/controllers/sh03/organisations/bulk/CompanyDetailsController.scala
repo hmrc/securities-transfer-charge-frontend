@@ -20,11 +20,13 @@ import play.api.data.Form
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, Call, MessagesControllerComponents}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
+import uk.gov.hmrc.securitiestransferchargefrontend.clients.SubmissionIdClient
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.actions.*
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.shared.SaveAndReturnButton.isReturn
+import uk.gov.hmrc.securitiestransferchargefrontend.domain.{GroupIdentifier, UserId}
 import uk.gov.hmrc.securitiestransferchargefrontend.forms.sh03.organisations.bulk.CompanyDetailsFormProvider
 import uk.gov.hmrc.securitiestransferchargefrontend.models.sh03.bulk.CompanyDetails
-import uk.gov.hmrc.securitiestransferchargefrontend.models.{Mode, UserAnswers}
+import uk.gov.hmrc.securitiestransferchargefrontend.models.{JourneyType, Mode, UserAnswers}
 import uk.gov.hmrc.securitiestransferchargefrontend.navigation.Navigator
 import uk.gov.hmrc.securitiestransferchargefrontend.pages.sh03.bulk.BulkCompanyDetailsPage
 import uk.gov.hmrc.securitiestransferchargefrontend.views.html.sh03.organisations.bulk.CompanyDetailsView
@@ -37,38 +39,42 @@ class CompanyDetailsController @Inject()(
                                         @Named("orgSh03") navigator: Navigator,
                                         stcAuthEnrolled: StcAuthEnrolledAction,
                                         getData: StcDataRetrievalAction,
-                                        requireData: StcDataRequiredAction,
                                         formProvider: CompanyDetailsFormProvider,
                                         val controllerComponents: MessagesControllerComponents,
-                                        view: CompanyDetailsView
+                                        view: CompanyDetailsView,
+                                        idClient: SubmissionIdClient,
                                     )(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport {
 
   val form: Form[CompanyDetails] = formProvider()
 
-  lazy val backLinkCall: Mode => UserAnswers => Call =
+  lazy val backLinkCall: Mode => Option[UserAnswers] => Call =
     mode => userAnswers => navigator.previousPage(BulkCompanyDetailsPage, mode, userAnswers)
 
-  def onPageLoad(mode: Mode): Action[AnyContent] = (stcAuthEnrolled andThen getData andThen requireData) {
+  def onPageLoad(mode: Mode): Action[AnyContent] = (stcAuthEnrolled andThen getData) {
     implicit request =>
 
-      val preparedForm = request.userAnswers.get(BulkCompanyDetailsPage) match {
-        case None => form
-        case Some(value) => form.fill(value)
-      }
+      val preparedForm = request.userAnswers.flatMap(_.get(BulkCompanyDetailsPage))
+        .map(form.fill)
+        .getOrElse(form)
 
       Ok(view(preparedForm, mode, backLinkCall(mode)(request.userAnswers)))
   }
 
-  def onSubmit(mode: Mode): Action[AnyContent] = (stcAuthEnrolled andThen getData andThen requireData).async {
+  def onSubmit(mode: Mode): Action[AnyContent] = (stcAuthEnrolled andThen getData).async {
     implicit request =>
 
+      val userId = UserId(request.request.internalId)
+      val group = GroupIdentifier(request.request.groupIdentifier)
       form.bindFromRequest().fold(
         formWithErrors =>
           Future.successful(BadRequest(view(formWithErrors, mode, backLinkCall(mode)(request.userAnswers)))),
 
         value =>
           for {
-            updatedAnswers <- Future.fromTry(request.userAnswers.set(BulkCompanyDetailsPage, value))
+            answers <- request.userAnswers.fold {
+              idClient.nextSubmissionId().map(submissionId => UserAnswers.empty(userId)(group)(submissionId)(JourneyType.SH03))
+            } (Future.successful)
+            updatedAnswers <- Future.fromTry(answers.set(BulkCompanyDetailsPage, value))
             nextPage       <- navigator.nextPage(BulkCompanyDetailsPage, mode, updatedAnswers, isReturn(request))
           } yield Redirect(nextPage)
       )
