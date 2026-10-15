@@ -18,124 +18,166 @@ package controllers.stf.individuals.single
 
 import base.Fixtures.confirmableAddress
 import base.SpecBase
+import base.stubs.StubSubscriptionService
 import org.mockito.ArgumentMatchers.any
-import org.mockito.Mockito.when
+import org.mockito.Mockito.{never, times, verify, when}
 import org.scalatestplus.mockito.MockitoSugar.mock
 import play.api.inject
 import play.api.test.FakeRequest
 import play.api.test.Helpers.*
 import uk.gov.hmrc.http.HeaderCarrier
-import uk.gov.hmrc.securitiestransferchargefrontend.clients.SaveAndReturnClient
-import uk.gov.hmrc.securitiestransferchargefrontend.connectors.SubscriptionConnector
+import uk.gov.hmrc.securitiestransferchargefrontend.clients.SubmissionIdClient
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.routes
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.individuals.single.routes as individualRoutes
-import uk.gov.hmrc.securitiestransferchargefrontend.domain.SubscriptionId
-import uk.gov.hmrc.securitiestransferchargefrontend.models.{NormalMode, UserAnswers}
-import uk.gov.hmrc.securitiestransferchargefrontend.repositories.{SubscriptionData, SubscriptionDataRepository}
-import uk.gov.hmrc.securitiestransferchargefrontend.services.AddressService
+import uk.gov.hmrc.securitiestransferchargefrontend.domain.SubmissionId
+import uk.gov.hmrc.securitiestransferchargefrontend.models.NormalMode
+import uk.gov.hmrc.securitiestransferchargefrontend.services.{AddressService, SubscriptionService}
 import uk.gov.hmrc.securitiestransferchargefrontend.views.html.stf.individuals.single.ConfirmAddressView
 
 import scala.concurrent.Future
 
 class ConfirmAddressControllerSpec extends SpecBase {
-  
-  val subscriptionData: SubscriptionData = SubscriptionData(subscriptionId = SubscriptionId("Sub-01"), subscriptionDetails = subscription)
-
-
 
   "ConfirmAddress Controller" - {
 
     "must return OK and the correct view for a GET" in {
 
-      val mockSubscriptionConnector = mock[SubscriptionConnector]
+      val mockSubscriptionService = mock[SubscriptionService]
       val mockAddressService = mock[AddressService]
 
-      when(mockSubscriptionConnector.getAndStoreSubscription(any())(any()))
+      when(mockSubscriptionService.getSubscription(any())(any()))
         .thenReturn(Future.successful(subscription))
-      when(mockAddressService.extractConfirmableAddress(subscription)).thenReturn(confirmableAddress)
 
-      val application =
-        applicationBuilder(userAnswers = Some(emptyUserAnswers), affinityGroup = individualAffinity)
-          .overrides(
-            inject.bind[SubscriptionConnector].toInstance(mockSubscriptionConnector),
-            inject.bind[AddressService].toInstance(mockAddressService),
-          )
-          .build()
+      when(mockAddressService.extractConfirmableAddress(subscription))
+        .thenReturn(confirmableAddress)
+
+      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers), affinityGroup = individualAffinity)
+        .overrides(
+          inject.bind[SubscriptionService].toInstance(mockSubscriptionService),
+          inject.bind[AddressService].toInstance(mockAddressService)
+        )
+        .build()
 
       running(application) {
-        val request = FakeRequest(GET, individualRoutes.ConfirmAddressController.onPageLoad().url)
+        val request =
+          FakeRequest(GET, individualRoutes.ConfirmAddressController.onPageLoad().url)
 
         val result = route(application, request).value
-
         val view = application.injector.instanceOf[ConfirmAddressView]
-
 
         status(result) mustEqual OK
         contentAsString(result) mustEqual view(confirmableAddress)(request, messages(application)).toString
       }
     }
 
-    "must store address and redirect on successful POST" in {
+    "must redirect to the error page when GET subscription retrieval fails" in {
 
-      val mockSubscriptionDataRepository = mock[SubscriptionDataRepository]
-      val mockAddressService = mock[AddressService]
-      val saveAndReturnClient = mock[SaveAndReturnClient]
+      val mockSubscriptionService = mock[SubscriptionService]
 
-      when(mockSubscriptionDataRepository.getSubscriptionData(any()))
-        .thenReturn(Future.successful(Some(subscriptionData)))
+      when(mockSubscriptionService.getSubscription(any())(any()))
+        .thenReturn(Future.failed(new RuntimeException("Subscription error")))
 
-      when(
-        mockAddressService.extractConfirmableAddress(
-          subscriptionData.subscriptionDetails
+      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers), affinityGroup = individualAffinity)
+        .overrides(
+          inject.bind[SubscriptionService].toInstance(mockSubscriptionService)
         )
-      ).thenReturn(confirmableAddress)
-
-      when(saveAndReturnClient.save(any[UserAnswers]())(any[HeaderCarrier]()))
-        .thenReturn(Future.successful(()))
-
-      val application =
-        applicationBuilder(userAnswers = Some(emptyUserAnswers), affinityGroup = individualAffinity)
-          .overrides(
-            inject.bind[SubscriptionDataRepository].toInstance(mockSubscriptionDataRepository),
-            inject.bind[AddressService].toInstance(mockAddressService),
-          )
-          .build()
+        .build()
 
       running(application) {
-
         val request =
-          FakeRequest(POST, individualRoutes.ConfirmAddressController.onSubmit(NormalMode).url)
+          FakeRequest(GET, individualRoutes.ConfirmAddressController.onPageLoad().url)
 
         val result = route(application, request).value
 
         status(result) mustEqual SEE_OTHER
-
+        redirectLocation(result).value mustEqual routes.JourneyRecoveryController.onPageLoad().url
       }
     }
 
-    "must redirect to journey recovery when no subscription is found" in {
+    "must reuse existing user answers and redirect on successful POST" in {
 
-      val mockSubscriptionDataRepository = mock[SubscriptionDataRepository]
+      val mockSubscriptionService = mock[SubscriptionService]
+      val mockAddressService = mock[AddressService]
+      val mockIdClient = mock[SubmissionIdClient]
 
-      when(mockSubscriptionDataRepository.getSubscriptionData(any()))
-        .thenReturn(Future.successful(None))
+      when(mockSubscriptionService.getSubscription(any())(any()))
+        .thenReturn(Future.successful(subscription))
+
+      when(mockAddressService.extractConfirmableAddress(subscription))
+        .thenReturn(confirmableAddress)
 
       val application =
         applicationBuilder(userAnswers = Some(emptyUserAnswers), affinityGroup = individualAffinity)
           .overrides(
-            inject.bind[SubscriptionDataRepository].toInstance(mockSubscriptionDataRepository)
+            inject.bind[SubscriptionService].toInstance(mockSubscriptionService),
+            inject.bind[AddressService].toInstance(mockAddressService),
+            inject.bind[SubmissionIdClient].toInstance(mockIdClient)
           )
           .build()
 
       running(application) {
-
         val request =
           FakeRequest(POST, individualRoutes.ConfirmAddressController.onSubmit(NormalMode).url)
 
         val result = route(application, request).value
 
         status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value.contains(routes.JourneyRecoveryController.onPageLoad().url) mustEqual true
+
+        verify(mockIdClient, never()).nextSubmissionId()
+      }
+    }
+
+    "must generate a submission ID when no user answers exist" in {
+
+      val mockAddressService = mock[AddressService]
+      val mockIdClient = mock[SubmissionIdClient]
+
+      when(mockAddressService.extractConfirmableAddress(subscription))
+        .thenReturn(confirmableAddress)
+
+      when(mockIdClient.nextSubmissionId()(any[HeaderCarrier]))
+        .thenReturn(Future.successful(SubmissionId("STC-000000001")))
+
+      val application = applicationBuilder(userAnswers = None, affinityGroup = individualAffinity)
+        .overrides(
+          inject.bind[SubscriptionService].toInstance(StubSubscriptionService()),
+          inject.bind[AddressService].toInstance(mockAddressService),
+          inject.bind[SubmissionIdClient].toInstance(mockIdClient)
+        )
+        .build()
+
+      running(application) {
+        val request = FakeRequest(POST, individualRoutes.ConfirmAddressController.onSubmit(NormalMode).url)
+
+        val result = route(application, request).value
+
+        status(result) mustEqual SEE_OTHER
+
+        verify(mockIdClient, times(1)).nextSubmissionId()(any[HeaderCarrier])
+      }
+    }
+
+    "must fail when subscription retrieval fails on POST" in {
+
+      val mockSubscriptionService = mock[SubscriptionService]
+
+      when(mockSubscriptionService.getSubscription(any())(any()))
+        .thenReturn(Future.failed(new RuntimeException("Subscription error")))
+
+      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers), affinityGroup = individualAffinity)
+        .overrides(
+          inject.bind[SubscriptionService].toInstance(mockSubscriptionService)
+        )
+        .build()
+
+      running(application) {
+        val request = FakeRequest(POST, individualRoutes.ConfirmAddressController.onSubmit(NormalMode).url)
+
+        val result = route(application, request).value
+
+        intercept[RuntimeException] {
+          status(result)
+        }
       }
     }
   }

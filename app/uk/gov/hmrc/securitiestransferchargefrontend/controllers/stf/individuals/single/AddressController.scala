@@ -19,11 +19,14 @@ package uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.individuals
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.play.http.HeaderCarrierConverter
+import uk.gov.hmrc.securitiestransferchargefrontend.clients.SubmissionIdClient
 import uk.gov.hmrc.securitiestransferchargefrontend.config.FrontendAppConfig
 import uk.gov.hmrc.securitiestransferchargefrontend.connectors.AlfAddressConnector
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.AbstractAddressController
-import uk.gov.hmrc.securitiestransferchargefrontend.controllers.actions.{StcAuthEnrolledAction, StcDataRequiredAction, StcDataRetrievalAction}
-import uk.gov.hmrc.securitiestransferchargefrontend.models.NormalMode
+import uk.gov.hmrc.securitiestransferchargefrontend.controllers.actions.{StcAuthEnrolledAction, StcDataRetrievalAction}
+import uk.gov.hmrc.securitiestransferchargefrontend.domain.{GroupIdentifier, UserId}
+import uk.gov.hmrc.securitiestransferchargefrontend.models.JourneyType.STF
+import uk.gov.hmrc.securitiestransferchargefrontend.models.{NormalMode, UserAnswers}
 import uk.gov.hmrc.securitiestransferchargefrontend.navigation.Navigator
 import uk.gov.hmrc.securitiestransferchargefrontend.pages.stf.single.StfBuyersAddressPage
 
@@ -34,9 +37,9 @@ class AddressController @Inject()(val controllerComponents: MessagesControllerCo
                                   alf: AlfAddressConnector,
                                   auth: StcAuthEnrolledAction,
                                   getData: StcDataRetrievalAction,
-                                  requireData: StcDataRequiredAction,
                                   @Named("individuals") val navigator: Navigator,
-                                  config: FrontendAppConfig)
+                                  config: FrontendAppConfig,
+                                  idClient: SubmissionIdClient)
                                  (implicit ec: ExecutionContext) extends AbstractAddressController(alf):
   
   def onPageLoad: Action[AnyContent] = auth.async {
@@ -44,12 +47,19 @@ class AddressController @Inject()(val controllerComponents: MessagesControllerCo
       super.pageLoad(config.buyersAlfConfigFileLocation, config.alfStfBuyersContinueUrl)
   }
 
-  def onReturn(addressId: String): Action[AnyContent] = (auth andThen getData andThen requireData).async {
+  def onReturn(addressId: String): Action[AnyContent] = (auth andThen getData).async {
     implicit request =>
       implicit val hc: HeaderCarrier = HeaderCarrierConverter.fromRequestAndSession(request, request.session)
+      
+      val userId = UserId(request.request.internalId)
+      val group = GroupIdentifier(request.request.groupIdentifier)
+      
       for {
         address     <- super.alfReturn(addressId)
-        userAnswers <- Future.fromTry(request.userAnswers.set(StfBuyersAddressPage, address))
+        answers <- request.userAnswers.fold {
+          idClient.nextSubmissionId().map(submissionId => UserAnswers.empty(userId)(group)(submissionId)(STF))
+        }(Future.successful)
+        userAnswers <- Future.fromTry(answers.set(StfBuyersAddressPage, address))
         nextPage    <- navigator.nextPage(StfBuyersAddressPage, NormalMode, userAnswers)
       } yield Redirect(nextPage)
   }

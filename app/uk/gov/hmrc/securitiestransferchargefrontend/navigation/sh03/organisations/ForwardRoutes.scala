@@ -19,17 +19,16 @@ package uk.gov.hmrc.securitiestransferchargefrontend.navigation.sh03.organisatio
 import play.api.mvc.Call
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.securitiestransferchargefrontend.config.FrontendAppConfig
-import uk.gov.hmrc.securitiestransferchargefrontend.controllers.sh03.organisations.single.routes as sh03OrgSingleRoutes
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.sh03.organisations.bulk.routes as sh03OrgBulkRoutes
+import uk.gov.hmrc.securitiestransferchargefrontend.controllers.sh03.organisations.single.routes as sh03OrgSingleRoutes
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.sh03.shared.single.routes as sh03SharedSingleRoutes
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.shared.routes as stfSharedRoutes
-import uk.gov.hmrc.securitiestransferchargefrontend.models.sh03.HowToNotifyAboutShareBuyback.{MoreThanOneAtATime, OneAtATime}
 import uk.gov.hmrc.securitiestransferchargefrontend.models.sh03.shared.{ReasonForPurchase, RoleAtPurchasingCompany}
 import uk.gov.hmrc.securitiestransferchargefrontend.models.{CheckMode, Mode, NormalMode, UserAnswers}
 import uk.gov.hmrc.securitiestransferchargefrontend.navigation.PersistentNavigationHelper
 import uk.gov.hmrc.securitiestransferchargefrontend.pages.Page
 import uk.gov.hmrc.securitiestransferchargefrontend.pages.sh03.*
-import uk.gov.hmrc.securitiestransferchargefrontend.pages.sh03.bulk.{BulkCompanyDetailsPage, BulkRoleAtPurchasingCompanyPage, BulkCheckYourAnswersPage}
+import uk.gov.hmrc.securitiestransferchargefrontend.pages.sh03.bulk.{BulkCheckYourAnswersPage, BulkCompanyDetailsPage, BulkRoleAtPurchasingCompanyPage}
 import uk.gov.hmrc.securitiestransferchargefrontend.pages.sh03.shared.CheckYourAnswersPage
 import uk.gov.hmrc.securitiestransferchargefrontend.services.AnswerPersistenceService
 
@@ -55,14 +54,7 @@ class ForwardRoutes(answerPersistenceService: AnswerPersistenceService,
   }
 
   private def normalRoutes(page: Page)(implicit hc: HeaderCarrier): UserAnswers => Future[Call] = page match {
-
-    case HowToNotifyAboutShareBuybackPage => userAnswers => {
-      dataDependent(HowToNotifyAboutShareBuybackPage, userAnswers) {
-        case OneAtATime => sh03OrgSingleRoutes.CompanyDetailsController.onPageLoad(NormalMode)
-        case MoreThanOneAtATime => sh03OrgBulkRoutes.CompanyDetailsController.onPageLoad(NormalMode)
-      }
-    }
-
+    
     case CompanyDetailsPage => userAnswers =>
       dataRequired(CompanyDetailsPage, userAnswers, sh03OrgSingleRoutes.ReasonForPurchaseController.onPageLoad(NormalMode))
 

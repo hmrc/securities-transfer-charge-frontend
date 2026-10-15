@@ -32,6 +32,7 @@ import uk.gov.hmrc.securitiestransferchargefrontend.navigation.*
 import uk.gov.hmrc.securitiestransferchargefrontend.pages.*
 import uk.gov.hmrc.securitiestransferchargefrontend.pages.stf.shared.*
 import uk.gov.hmrc.securitiestransferchargefrontend.pages.stf.single.*
+import uk.gov.hmrc.securitiestransferchargefrontend.repositories.SessionRepository
 import uk.gov.hmrc.securitiestransferchargefrontend.services.AnswerPersistenceService
 
 import javax.inject.Inject
@@ -39,10 +40,12 @@ import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
 class StfAgentNavigator @Inject()(appConfig: FrontendAppConfig,
-                                  answerPersistenceService: AnswerPersistenceService)
+                                  answerPersistenceService: AnswerPersistenceService,
+                                  sessionRepo:SessionRepository)
                                (implicit ec: ExecutionContext) extends AbstractModeNavigator with PersistentNavigator:
 
   override lazy val dashboardPage: Call = sharedRoutes.SubmissionsDashboardController.onPageLoad()
+  override val sessionRepository: SessionRepository = sessionRepo
   val defaultPage: Call = routes.JourneyRecoveryController.onPageLoad()
   val errorPages: List[Call] = List(defaultPage)
 

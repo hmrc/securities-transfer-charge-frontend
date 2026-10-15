@@ -128,6 +128,8 @@ class Module extends AbstractModule {
       .to(classOf[DashboardServiceImpl])
     bind(classOf[DashboardClientDataCache])
       .to(classOf[DashboardClientDataRepository])
+    bind(classOf[SubscriptionService])
+      .to(classOf[SubscriptionServiceImpl])
     
   }
 }

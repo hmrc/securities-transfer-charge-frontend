@@ -16,17 +16,16 @@
 
 package navigation.stf
 
-import base.stubs.StubAnswerPersistenceService
+import base.stubs.{StubAnswerPersistenceService, StubSessionRepository}
 import base.{Fixtures, SpecBase}
 import org.mockito.Mockito.when
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatestplus.mockito.MockitoSugar.mock
 import uk.gov.hmrc.securitiestransferchargefrontend.config.FrontendAppConfig
+import uk.gov.hmrc.securitiestransferchargefrontend.controllers.dashboard.routes as dashboardroutes
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.routes
-import uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.individuals.bulk.routes as individualBulkRoutes
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.individuals.routes as individualRoutes
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.individuals.single.routes as individualSingleRoutes
-import uk.gov.hmrc.securitiestransferchargefrontend.controllers.dashboard.routes as dashboardroutes
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.individuals.single.routes as stfSingleCyaRoutes
 import uk.gov.hmrc.securitiestransferchargefrontend.models.*
 import uk.gov.hmrc.securitiestransferchargefrontend.models.JourneyType.STF
@@ -45,7 +44,7 @@ class StfNavigatorSpec extends SpecBase with ScalaFutures {
 
   val validAnswer = 0
   
-  val navigator = new StfNavigator(mockConfig, StubAnswerPersistenceService())
+  val navigator = new StfNavigator(mockConfig, StubAnswerPersistenceService(),StubSessionRepository())
 
   "StfNavigator" - {
 
@@ -71,22 +70,6 @@ class StfNavigatorSpec extends SpecBase with ScalaFutures {
         val result = navigator.nextPage(SubmissionsDashboardPage, NormalMode, emptyUserAnswers)(fakeRequest)
         whenReady(result) { res =>
           res mustBe individualRoutes.HowToNotifyAboutSecuritiesTransferController.onPageLoad()
-        }
-      }
-
-      "must go from the HowToNotifyAboutSecuritiesTransfer to ConfirmAddressController when one at a time is selected" in {
-        val answers = emptyUserAnswers.set(HowToNotifyAboutSecuritiesTransferPage, HowToNotifyAboutSecuritiesTransfer.OneAtATime).get
-        val result = navigator.nextPage(HowToNotifyAboutSecuritiesTransferPage, NormalMode, answers)(fakeRequest)
-        whenReady(result) { res =>
-          res mustBe individualSingleRoutes.ConfirmAddressController.onPageLoad()
-        }
-      }
-
-      "must go from the HowToNotifyAboutSecuritiesTransfer to TemplateInstructionsController when more than one at a time is selected" in {
-        val answers = emptyUserAnswers.set(HowToNotifyAboutSecuritiesTransferPage, HowToNotifyAboutSecuritiesTransfer.MoreThanOneAtATime).get
-        val result = navigator.nextPage(HowToNotifyAboutSecuritiesTransferPage, NormalMode, answers)(fakeRequest)
-        whenReady(result) { res =>
-          res mustBe individualBulkRoutes.TemplateInstructionsController.onPageLoad()
         }
       }
 

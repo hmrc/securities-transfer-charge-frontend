@@ -19,9 +19,12 @@ package uk.gov.hmrc.securitiestransferchargefrontend.controllers.sh03.organisati
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, Call, MessagesControllerComponents}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
+import uk.gov.hmrc.securitiestransferchargefrontend.clients.SubmissionIdClient
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.actions.*
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.shared.SaveAndReturnButton.isReturn
+import uk.gov.hmrc.securitiestransferchargefrontend.domain.{GroupIdentifier, UserId}
 import uk.gov.hmrc.securitiestransferchargefrontend.forms.sh03.shared.CompanyDetailsFormProvider
+import uk.gov.hmrc.securitiestransferchargefrontend.models.JourneyType.SH03
 import uk.gov.hmrc.securitiestransferchargefrontend.models.sh03.shared.CompanyDetails
 import uk.gov.hmrc.securitiestransferchargefrontend.models.{Mode, UserAnswers}
 import uk.gov.hmrc.securitiestransferchargefrontend.navigation.Navigator
@@ -36,34 +39,34 @@ class CompanyDetailsController @Inject()(
                                           @Named("orgSh03") navigator: Navigator,
                                           stcAuthEnrolled: StcAuthEnrolledAction,
                                           getData: StcDataRetrievalAction,
-                                          requireData: StcDataRequiredAction,
                                           formProvider: CompanyDetailsFormProvider,
                                           val controllerComponents: MessagesControllerComponents,
-                                          view: CompanyDetailsView
+                                          view: CompanyDetailsView,
+                                          idClient: SubmissionIdClient
                                         )(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport {
 
-  lazy val backLinkCall: Mode => UserAnswers => Call =
+  lazy val backLinkCall: Mode => Option[UserAnswers] => Call =
     mode => userAnswers => navigator.previousPage(CompanyDetailsPage, mode, userAnswers)
 
-  def onPageLoad(mode: Mode): Action[AnyContent] = (stcAuthEnrolled andThen getData andThen requireData).async {
+  def onPageLoad(mode: Mode): Action[AnyContent] = (stcAuthEnrolled andThen getData).async {
     implicit request =>
       val innerRequest = request.request
       val affinityKey = innerRequest.affinityGroupKey
       val form = formProvider(affinityKey)
 
-      val preparedForm = request.userAnswers.get(CompanyDetailsPage) match {
-        case None => form
-        case Some(value) => form.fill(value)
-      }
+      val preparedForm = request.userAnswers.flatMap(_.get(CompanyDetailsPage))
+        .map(form.fill)
+        .getOrElse(form)
 
       Future.successful(Ok(view(preparedForm, mode, backLinkCall(mode)(request.userAnswers))))
   }
 
-  def onSubmit(mode: Mode): Action[AnyContent] = (stcAuthEnrolled andThen getData andThen requireData).async {
+  def onSubmit(mode: Mode): Action[AnyContent] = (stcAuthEnrolled andThen getData).async {
     implicit request =>
-      val innerRequest = request.request
-      val affinityKey = innerRequest.affinityGroupKey
+      val affinityKey = request.request.affinityGroupKey
       val form = formProvider(affinityKey)
+      val userId = UserId(request.request.internalId)
+      val group = GroupIdentifier(request.request.groupIdentifier)
 
       form.bindFromRequest().fold(
         formWithErrors =>
@@ -71,10 +74,13 @@ class CompanyDetailsController @Inject()(
 
         value =>
           for {
-            updatedAnswers <- Future.fromTry(request.userAnswers.set(CompanyDetailsPage, value))
+            answers <- request.userAnswers.fold {
+              idClient.nextSubmissionId().map(submissionId => UserAnswers.empty(userId)(group)(submissionId)(SH03))
+            }(Future.successful)
+            updatedAnswers <- Future.fromTry(answers.set(CompanyDetailsPage, value))
             nextPage <- navigator.nextPage(CompanyDetailsPage, mode, updatedAnswers, isReturn(request))
           } yield Redirect(nextPage)
       )
   }
-  
+
 }

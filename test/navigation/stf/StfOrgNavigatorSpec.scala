@@ -16,18 +16,17 @@
 
 package navigation.stf
 
-import base.stubs.StubAnswerPersistenceService
+import base.stubs.{StubAnswerPersistenceService, StubSessionRepository}
 import base.{Fixtures, SpecBase}
 import org.mockito.Mockito.when
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatestplus.mockito.MockitoSugar.mock
 import uk.gov.hmrc.securitiestransferchargefrontend.config.FrontendAppConfig
+import uk.gov.hmrc.securitiestransferchargefrontend.controllers.dashboard.routes as dashboardroutes
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.routes
-import uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.organisations.bulk.routes as orgBulkRoutes
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.organisations.routes as orgRoutes
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.organisations.single.routes as orgSingleRoutes
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.organisations.single.routes as stfSingleCyaRoutes
-import uk.gov.hmrc.securitiestransferchargefrontend.controllers.dashboard.routes as dashboardroutes
 import uk.gov.hmrc.securitiestransferchargefrontend.models.*
 import uk.gov.hmrc.securitiestransferchargefrontend.models.JourneyType.STF
 import uk.gov.hmrc.securitiestransferchargefrontend.models.stf.*
@@ -42,10 +41,10 @@ class StfOrgNavigatorSpec extends SpecBase with ScalaFutures {
 
   private val mockConfig: FrontendAppConfig = mock[FrontendAppConfig]
   when(mockConfig.firstChargingPoint).thenReturn(LocalDate.of(2026, 1, 1))
-
+  
   val validAnswer = 0
 
-  val navigator = new StfOrgNavigator(mockConfig, StubAnswerPersistenceService())
+  val navigator = new StfOrgNavigator(mockConfig, StubAnswerPersistenceService(), StubSessionRepository())
 
   "StfOrgNavigator" - {
 
@@ -53,7 +52,7 @@ class StfOrgNavigatorSpec extends SpecBase with ScalaFutures {
 
       "must go from a page that doesn't exist in the route map to default page" in {
         case object UnknownPage extends Page
-        val result = navigator.nextPage(UnknownPage, NormalMode, UserAnswers(testUserId, testGroupIdentifier, submissionId,STF))(fakeRequest)
+        val result = navigator.nextPage(UnknownPage, NormalMode, UserAnswers(testUserId, testGroupIdentifier, submissionId, STF))(fakeRequest)
         whenReady(result) { res =>
           res mustBe navigator.defaultPage
         }
@@ -61,7 +60,7 @@ class StfOrgNavigatorSpec extends SpecBase with ScalaFutures {
 
       "must go from any page to the dashboard page if isReturn is true" in {
         case object AnyPage extends Page
-        val result = navigator.nextPage(AnyPage, NormalMode, UserAnswers(testUserId, testGroupIdentifier, submissionId,STF), true)(fakeRequest)
+        val result = navigator.nextPage(AnyPage, NormalMode, UserAnswers(testUserId, testGroupIdentifier, submissionId, STF), true)(fakeRequest)
         whenReady(result) { res =>
           res mustBe navigator.dashboardPage
         }
@@ -71,22 +70,6 @@ class StfOrgNavigatorSpec extends SpecBase with ScalaFutures {
         val result = navigator.nextPage(SubmissionsDashboardPage, NormalMode, emptyUserAnswers)(fakeRequest)
         whenReady(result) { res =>
           res mustBe orgRoutes.HowToNotifyAboutSecuritiesTransferController.onPageLoad()
-        }
-      }
-
-      "must go from the HowToNotifyAboutSecuritiesTransfer to ConfirmAddressController when one at a time is selected" in {
-        val answers = emptyUserAnswers.set(HowToNotifyAboutSecuritiesTransferPage, HowToNotifyAboutSecuritiesTransfer.OneAtATime).get
-        val result = navigator.nextPage(HowToNotifyAboutSecuritiesTransferPage, NormalMode, answers)(fakeRequest)
-        whenReady(result) { res =>
-          res mustBe orgSingleRoutes.ConfirmAddressController.onPageLoad()
-        }
-      }
-
-      "must go from the HowToNotifyAboutSecuritiesTransfer to TemplateInstructionsController when more than one at a time is selected" in {
-        val answers = emptyUserAnswers.set(HowToNotifyAboutSecuritiesTransferPage, HowToNotifyAboutSecuritiesTransfer.MoreThanOneAtATime).get
-        val result = navigator.nextPage(HowToNotifyAboutSecuritiesTransferPage, NormalMode, answers)(fakeRequest)
-        whenReady(result) { res =>
-          res mustBe orgBulkRoutes.TemplateInstructionsController.onPageLoad()
         }
       }
 
@@ -251,7 +234,7 @@ class StfOrgNavigatorSpec extends SpecBase with ScalaFutures {
       "must go from a page that doesn't exist in the edit route map to CheckYourAnswers" in {
 
         case object UnknownPage extends Page
-        val result = navigator.nextPage(UnknownPage, CheckMode, UserAnswers(testUserId, testGroupIdentifier, submissionId,STF))(fakeRequest)
+        val result = navigator.nextPage(UnknownPage, CheckMode, UserAnswers(testUserId, testGroupIdentifier, submissionId, STF))(fakeRequest)
         whenReady(result) { res =>
           res mustBe stfSingleCyaRoutes.CheckYourAnswersController.onPageLoad()
         }

@@ -48,8 +48,8 @@ POST       /stf/change/confirm-address                    uk.gov.hmrc.securities
 GET        /submissions-dashboard                         uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.shared.SubmissionsDashboardController.onPageLoad()
 POST       /submissions-dashboard                         uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.shared.SubmissionsDashboardController.onSubmit()
 
-GET        /stf/how-many-transfers                        uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.individuals.HowToNotifyAboutSecuritiesTransferController.onPageLoad(mode: Mode = NormalMode)
-POST       /stf/how-many-transfers                        uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.individuals.HowToNotifyAboutSecuritiesTransferController.onSubmit(mode: Mode = NormalMode)
+GET        /stf/how-many-transfers                        uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.individuals.HowToNotifyAboutSecuritiesTransferController.onPageLoad()
+POST       /stf/how-many-transfers                        uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.individuals.HowToNotifyAboutSecuritiesTransferController.onSubmit()
 
 GET        /stf/seller-name                               uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.individuals.single.NameOfSellerController.onPageLoad(mode: Mode = NormalMode)
 POST       /stf/seller-name                               uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.individuals.single.NameOfSellerController.onSubmit(mode: Mode = NormalMode)

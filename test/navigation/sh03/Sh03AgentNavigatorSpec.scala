@@ -17,29 +17,29 @@
 package navigation.sh03
 
 import base.SpecBase
-import base.stubs.StubAnswerPersistenceService
+import base.stubs.{StubAnswerPersistenceService, StubSessionRepository}
 import org.mockito.Mockito.when
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatestplus.mockito.MockitoSugar.mock
 import uk.gov.hmrc.securitiestransferchargefrontend.config.FrontendAppConfig
+import uk.gov.hmrc.securitiestransferchargefrontend.controllers.fileUpload.routes as fileUploadRoutes
+import uk.gov.hmrc.securitiestransferchargefrontend.controllers.sh03.agents.bulk.routes as sh03AgentBulkRoutes
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.sh03.agents.routes as sh03AgentRoutes
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.sh03.agents.single.routes as sh03AgentSingleRoutes
-import uk.gov.hmrc.securitiestransferchargefrontend.controllers.sh03.agents.bulk.routes as sh03AgentBulkRoutes
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.sh03.shared.routes as sharedRoutes
-import uk.gov.hmrc.securitiestransferchargefrontend.controllers.fileUpload.routes as fileUploadRoutes
-import uk.gov.hmrc.securitiestransferchargefrontend.pages.sh03.bulk.*
+import uk.gov.hmrc.securitiestransferchargefrontend.controllers.sh03.shared.single.routes as sh03SharedSingleRoutes
+import uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.shared.routes as stfSharedRoutes
+import uk.gov.hmrc.securitiestransferchargefrontend.models.JourneyType.SH03
 import uk.gov.hmrc.securitiestransferchargefrontend.models.sh03.HowToNotifyAboutShareBuyback
-import uk.gov.hmrc.securitiestransferchargefrontend.models.sh03.shared.*
 import uk.gov.hmrc.securitiestransferchargefrontend.models.sh03.bulk.CompanyDetails as AgentBulkCompanyDetails
+import uk.gov.hmrc.securitiestransferchargefrontend.models.sh03.shared.*
 import uk.gov.hmrc.securitiestransferchargefrontend.models.shared.AgentReference
 import uk.gov.hmrc.securitiestransferchargefrontend.models.{CheckMode, NormalMode, UserAnswers}
 import uk.gov.hmrc.securitiestransferchargefrontend.navigation.sh03.agents.Sh03AgentNavigator
 import uk.gov.hmrc.securitiestransferchargefrontend.pages.Page
 import uk.gov.hmrc.securitiestransferchargefrontend.pages.sh03.*
+import uk.gov.hmrc.securitiestransferchargefrontend.pages.sh03.bulk.*
 import uk.gov.hmrc.securitiestransferchargefrontend.pages.sh03.shared.CheckYourAnswersPage
-import uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.shared.routes as stfSharedRoutes
-import uk.gov.hmrc.securitiestransferchargefrontend.controllers.sh03.shared.single.routes as sh03SharedSingleRoutes
-import uk.gov.hmrc.securitiestransferchargefrontend.models.JourneyType.SH03
 
 import java.time.LocalDate
 
@@ -47,10 +47,10 @@ class Sh03AgentNavigatorSpec extends SpecBase with ScalaFutures {
 
   private val mockConfig: FrontendAppConfig = mock[FrontendAppConfig]
   when(mockConfig.firstChargingPoint).thenReturn(LocalDate.of(2026, 1, 1))
-
+  
   private lazy val cyaPage = sh03AgentSingleRoutes.CheckYourAnswersController.onPageLoad()
   private lazy val agentBulkCyaPage = sh03AgentBulkRoutes.CheckYourAnswersController.onPageLoad()
-  val navigator = new Sh03AgentNavigator(StubAnswerPersistenceService(), mockConfig)
+  val navigator = new Sh03AgentNavigator(StubAnswerPersistenceService(), mockConfig,StubSessionRepository())
 
   private val companyDetails = CompanyDetails(
     companyName = "Company1",

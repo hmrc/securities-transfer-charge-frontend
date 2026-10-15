@@ -21,14 +21,19 @@ import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.play.http.HeaderCarrierConverter
 import uk.gov.hmrc.securitiestransferchargefrontend.models.{Mode, UserAnswers}
 import uk.gov.hmrc.securitiestransferchargefrontend.pages.Page
+import uk.gov.hmrc.securitiestransferchargefrontend.repositories.SessionRepository
 
 import scala.concurrent.{ExecutionContext, Future}
 
 trait Navigator:
   def nextPage(page: Page, mode: Mode, userAnswers: UserAnswers, isReturn: Boolean = false)(implicit request: Request[?]): Future[Call]
+
   def previousPage(page: Page, mode: Mode, userAnswers: UserAnswers): Call
+
   def previousPage(page: Page, mode: Mode, userAnswers: Option[UserAnswers]): Call
+
   def errorPage(forPage: Page): Call
+
   val userAnswersValidator: UserAnswersValidator
 
 
@@ -38,11 +43,16 @@ abstract class AbstractModeNavigator(implicit ex: ExecutionContext) extends Navi
   def predecessorRoutes(page: Page, mode: Mode): Option[UserAnswers] => Call
 
   lazy val dashboardPage: Call
+  val sessionRepository: SessionRepository
 
   def nextPage(page: Page, mode: Mode, userAnswers: UserAnswers, isReturn: Boolean)(implicit request: Request[?]): Future[Call] = {
     implicit lazy val hc: HeaderCarrier = HeaderCarrierConverter.fromRequestAndSession(request, request.session)
-    val maybeRedirectToDashboard: Call => Call = if (isReturn) _ => dashboardPage else identity
-    forwardRoutes(page, mode)(hc)(userAnswers).map(maybeRedirectToDashboard)
+
+    val maybeRedirectToDashboard: Call => Future[Call] =
+      if (isReturn) _ => sessionRepository.clear(userAnswers.userId).map(_ => dashboardPage)
+      else call => Future.successful(call)
+
+    forwardRoutes(page, mode)(hc)(userAnswers).flatMap(maybeRedirectToDashboard)
   }
 
   override def previousPage(page: Page, mode: Mode, userAnswers: UserAnswers): Call =

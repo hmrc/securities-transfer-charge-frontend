@@ -86,8 +86,8 @@ class FrontendAppConfig @Inject() (configuration: Configuration, servicesConfig:
   val sellerAlfConfigFileLocation: String = configuration.get[String]("alf.stf-seller-config-file")
   val reliefsFileLocation: String = configuration.get[String]("reliefs.reliefs-config-file")
 
-  private val exitSurveyBaseUrl: String = configuration.get[Service]("microservice.services.feedback-frontend").baseUrl
-  val exitSurveyUrl: String             = s"$exitSurveyBaseUrl/feedback/securities-transfer-charge-frontend"
+  private val exitSurveyBaseUrl: String = configuration.get[String]("feedback-frontend.url")
+  val exitSurveyUrl: String             = s"$exitSurveyBaseUrl/securities-transfer-charge-frontend"
 
   val languageTranslationEnabled: Boolean =
     configuration.get[Boolean]("features.welsh-translation")
