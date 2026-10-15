@@ -41,7 +41,7 @@ class RecentSubmissionsController @Inject()(
       GroupIdentifier(request.groupIdentifier),
       request.subscriptionId).map { recent =>
       if (recent.isEmpty) {
-        Ok(view())
+        Ok(view(request.isIndividual))
       } else {
         Redirect(routes.SubmissionsController.onPageLoad())
       }
