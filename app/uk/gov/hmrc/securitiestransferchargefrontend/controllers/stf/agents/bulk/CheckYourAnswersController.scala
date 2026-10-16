@@ -20,13 +20,12 @@ import com.google.inject.Inject
 import play.api.i18n.{I18nSupport, Messages, MessagesApi}
 import play.api.mvc.{Action, AnyContent, Call, MessagesControllerComponents}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
-import uk.gov.hmrc.securitiestransferchargefrontend.controllers.routes.JourneyRecoveryController
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.actions.*
+import uk.gov.hmrc.securitiestransferchargefrontend.controllers.routes.JourneyRecoveryController
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.shared.SaveAndReturnButton.isReturn
 import uk.gov.hmrc.securitiestransferchargefrontend.models.{Mode, NormalMode, UserAnswers}
 import uk.gov.hmrc.securitiestransferchargefrontend.navigation.Navigator
 import uk.gov.hmrc.securitiestransferchargefrontend.pages.stf.bulk.BulkCheckYourAnswersPage
-import uk.gov.hmrc.securitiestransferchargefrontend.pages.stf.shared.*
 import uk.gov.hmrc.securitiestransferchargefrontend.repositories.ParsedStcRowsRepository
 import uk.gov.hmrc.securitiestransferchargefrontend.services.stf.agents.bulk.CheckYourAnswersService
 import uk.gov.hmrc.securitiestransferchargefrontend.views.html.stf.agents.bulk.CheckYourAnswersView
@@ -66,7 +65,7 @@ class CheckYourAnswersController @Inject()(
   def onSubmit(): Action[AnyContent] = (stcAuthEnrolled andThen getData andThen requireData).async {
     implicit request =>
       for {
-        nextPage <- navigator.nextPage(CheckYourAnswersPage, NormalMode, request.userAnswers, isReturn(request))
+        nextPage <- navigator.nextPage(BulkCheckYourAnswersPage, NormalMode, request.userAnswers, isReturn(request))
       } yield Redirect(nextPage)
   }
 

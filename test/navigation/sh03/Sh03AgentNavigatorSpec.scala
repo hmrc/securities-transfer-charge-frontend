@@ -26,9 +26,9 @@ import uk.gov.hmrc.securitiestransferchargefrontend.controllers.fileUpload.route
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.sh03.agents.bulk.routes as sh03AgentBulkRoutes
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.sh03.agents.routes as sh03AgentRoutes
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.sh03.agents.single.routes as sh03AgentSingleRoutes
+import uk.gov.hmrc.securitiestransferchargefrontend.controllers.sh03.shared.bulk.routes as bulkRoutes
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.sh03.shared.routes as sharedRoutes
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.sh03.shared.single.routes as sh03SharedSingleRoutes
-import uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.shared.routes as stfSharedRoutes
 import uk.gov.hmrc.securitiestransferchargefrontend.models.JourneyType.SH03
 import uk.gov.hmrc.securitiestransferchargefrontend.models.sh03.HowToNotifyAboutShareBuyback
 import uk.gov.hmrc.securitiestransferchargefrontend.models.sh03.bulk.CompanyDetails as AgentBulkCompanyDetails
@@ -85,22 +85,6 @@ class Sh03AgentNavigatorSpec extends SpecBase with ScalaFutures {
         val result = navigator.nextPage(AnyPage, NormalMode, UserAnswers(testUserId, testGroupIdentifier, submissionId,SH03), true)(fakeRequest)
         whenReady(result) { res =>
           res mustBe navigator.dashboardPage
-        }
-      }
-
-      "must go from the HowToNotifyAboutShareBuybackPage to AgentReferencePage when one at a time is selected" in {
-        val answers = emptyUserAnswers.set(HowToNotifyAboutShareBuybackPage, HowToNotifyAboutShareBuyback.OneAtATime).get
-        val result = navigator.nextPage(HowToNotifyAboutShareBuybackPage, NormalMode, answers)(fakeRequest)
-        whenReady(result) { res =>
-          res mustBe sh03AgentSingleRoutes.AgentReferenceController.onPageLoad(NormalMode)
-        }
-      }
-
-      "must go from the HowToNotifyAboutShareBuybackPage to BulkAgentReferencePage when one at a time is selected" in {
-        val answers = emptyUserAnswers.set(HowToNotifyAboutShareBuybackPage, HowToNotifyAboutShareBuyback.MoreThanOneAtATime).get
-        val result = navigator.nextPage(HowToNotifyAboutShareBuybackPage, NormalMode, answers)(fakeRequest)
-        whenReady(result) { res =>
-          res mustBe sh03AgentBulkRoutes.AgentReferenceController.onPageLoad(NormalMode)
         }
       }
 
@@ -248,7 +232,7 @@ class Sh03AgentNavigatorSpec extends SpecBase with ScalaFutures {
       "must go from BulkCheckYourAnswersPage to ConfirmationController" in {
         val result = navigator.nextPage(BulkCheckYourAnswersPage, NormalMode, emptyUserAnswers)(fakeRequest)
         whenReady(result) { res =>
-          res mustBe stfSharedRoutes.ConfirmationController.onPageLoad()
+          res mustBe bulkRoutes.ConfirmationController.onPageLoad()
         }
       }
 

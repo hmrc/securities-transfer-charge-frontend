@@ -31,6 +31,10 @@ POST       /stf/check-your-answers                      uk.gov.hmrc.securitiestr
 
 GET        /stf/submission-confirmation                 uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.shared.ConfirmationController.onPageLoad()
 
+GET        /stf/bulk/submission-confirmation                 uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.shared.bulk.ConfirmationController.onPageLoad()
+GET        /sh03/bulk/submission-confirmation                 uk.gov.hmrc.securitiestransferchargefrontend.controllers.sh03.shared.bulk.ConfirmationController.onPageLoad()
+
+
 GET        /stf/org/check-answers                  uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.organisations.single.CheckYourAnswersController.onPageLoad()
 POST       /stf/org/check-answers                  uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.organisations.single.CheckYourAnswersController.onSubmit()
 

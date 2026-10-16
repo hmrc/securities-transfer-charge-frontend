@@ -20,10 +20,12 @@ import com.google.inject.Inject
 import play.api.i18n.{I18nSupport, Lang, Messages, MessagesApi}
 import play.api.mvc.{Action, AnyContent, Call, MessagesControllerComponents}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
+import uk.gov.hmrc.securitiestransferchargefrontend.clients.SubmissionIdClient
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.actions.*
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.routes
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.shared.SaveAndReturnButton.isReturn
-import uk.gov.hmrc.securitiestransferchargefrontend.models.{Mode, NormalMode, UserAnswers}
+import uk.gov.hmrc.securitiestransferchargefrontend.domain.{GroupIdentifier, UserId}
+import uk.gov.hmrc.securitiestransferchargefrontend.models.{JourneyType, Mode, NormalMode, UserAnswers}
 import uk.gov.hmrc.securitiestransferchargefrontend.navigation.Navigator
 import uk.gov.hmrc.securitiestransferchargefrontend.pages.stf.bulk.BulkCheckYourAnswersPage
 import uk.gov.hmrc.securitiestransferchargefrontend.repositories.ParsedStcRowsRepository
@@ -38,12 +40,11 @@ class CheckYourAnswersController @Inject()(
                                             @Named("organisations") navigator: Navigator,
                                             stcAuthEnrolled: StcAuthEnrolledAction,
                                             getData: StcDataRetrievalAction,
-                                            requireData: StcDataRequiredAction,
                                             val controllerComponents: MessagesControllerComponents,
                                             view: CheckYourAnswersView,
                                             checkYourAnswersService: CheckYourAnswersService,
                                             parsedStcRowsRepository: ParsedStcRowsRepository,
-
+                                            idClient: SubmissionIdClient
                                           )(implicit ec: ExecutionContext)
   extends FrontendBaseController with I18nSupport {
 
@@ -64,11 +65,15 @@ class CheckYourAnswersController @Inject()(
   }
 
 
-  def onSubmit(): Action[AnyContent] = (stcAuthEnrolled andThen getData andThen requireData).async {
+  def onSubmit(): Action[AnyContent] = (stcAuthEnrolled andThen getData).async {
     implicit request =>
 
+      val userId = UserId(request.request.internalId)
+      val group = GroupIdentifier(request.request.groupIdentifier)
       for {
-        nextPage <- navigator.nextPage(BulkCheckYourAnswersPage, NormalMode, request.userAnswers, isReturn(request))
+        submissionId <- idClient.nextSubmissionId()
+        answers = UserAnswers.empty(userId)(group)(submissionId)(JourneyType.STF)
+        nextPage <- navigator.nextPage(BulkCheckYourAnswersPage, NormalMode, answers, isReturn(request))
       } yield Redirect(nextPage)
   }
 }
