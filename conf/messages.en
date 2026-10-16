@@ -1374,6 +1374,7 @@ submissions.table.id.heading = Submission ID
 submissions.table.paymentDueBy.heading = Payment due by
 submissions.table.status.heading = Status
 submissions.table.action.heading = Action
+submissions.table.yourReference.heading = Your reference
 
 submissions.status.readyToPay = Ready to pay
 submissions.status.draft = Draft

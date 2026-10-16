@@ -16,17 +16,18 @@
 
 package views.dashboard
 
-import base.Fixtures.{overdue, testSubmissionId,readyToPay,drafts}
+import base.Fixtures.{drafts, overdue, readyToPay, testSubmissionId}
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
 import play.api.Application
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.dashboard.routes
+import uk.gov.hmrc.securitiestransferchargefrontend.models.search.SubmissionStatus.*
 import uk.gov.hmrc.securitiestransferchargefrontend.models.search.SubmissionSummary
 import uk.gov.hmrc.securitiestransferchargefrontend.viewmodels.dashboard.SubmissionsViewModel
 import uk.gov.hmrc.securitiestransferchargefrontend.views.html.dashboard.SubmissionsView
 import views.ViewBaseSpec
-import uk.gov.hmrc.securitiestransferchargefrontend.models.search.SubmissionStatus.*
 
+import java.time.LocalDate
 import scala.jdk.CollectionConverters.*
 
 class SubmissionsViewSpec extends ViewBaseSpec {
@@ -206,7 +207,7 @@ class SubmissionsViewSpec extends ViewBaseSpec {
 
         hiddenText.size() mustBe 1
         hiddenText.text() mustBe messages("submissions.action.view.hidden", testSubmissionId)
-    }
+      }
 
       "show the empty message for the other panels" in {
 
@@ -406,9 +407,150 @@ class SubmissionsViewSpec extends ViewBaseSpec {
         val link = links.get(index)
 
         link.select(".govuk-visually-hidden").text() mustBe
-          s"${messages("submissions.action.view.hidden",submission.submissionId)}"
+          s"${messages("submissions.action.view.hidden", submission.submissionId)}"
       }
     }
   }
 
+
+  "when rendered for an agent" - {
+
+    val recent = readyToPay ++ overdue
+
+    val doc = view(SubmissionsViewModel.build(readyToPay = readyToPay, overdue = overdue, recent = recent, isAgent = true))
+
+    val submissions = Seq(
+      (ExpectedContent.readyToPayTabId, readyToPay),
+      (ExpectedContent.overdueTabId, overdue),
+      (ExpectedContent.recentTabId, recent)
+    )
+
+    submissions.foreach { case (tabId, expectedSubmissions) =>
+
+      s"render the correct column headings for $tabId" in {
+        val headings = doc
+          .select(s"#$tabId thead .govuk-table__header")
+          .asScala
+          .map(_.text())
+          .toList
+
+        headings mustBe List(
+          messages("submissions.table.id.heading"),
+          messages("submissions.table.yourReference.heading"),
+          messages("submissions.table.paymentDueBy.heading"),
+          messages("submissions.table.status.heading"),
+          messages("submissions.table.action.heading")
+        )
+      }
+
+      s"display the agent reference for each submission in $tabId" in {
+        val rows = doc.select(s"#$tabId tbody .govuk-table__row")
+
+        rows.size() mustBe expectedSubmissions.size
+
+        rows.asScala.zip(expectedSubmissions).foreach { case (row, submission) =>
+          val cells = row.select("td")
+
+          cells.get(0).text() mustBe submission.submissionId
+          cells.get(1).text() mustBe submission.agentReference
+        }
+      }
+    }
+  }
+
+
+  "when rendered with drafts for an agent without an agent reference" - {
+
+    val drafts: Seq[SubmissionSummary] = List(
+      SubmissionSummary(
+        submissionId = testSubmissionId.toString,
+        maybePaymentDueBy = None,
+        maybeAgentReference = None,
+        status = Draft,
+        sortDate = LocalDate.parse("2026-10-19")
+      )
+    )
+
+    val doc = view(SubmissionsViewModel.build(
+        drafts = drafts,
+        isAgent = true
+      )
+    )
+
+    val draftsPanel = doc.select(s"#${ExpectedContent.draftsTabId}")
+
+    "display the Your reference column heading" in {
+      val headings = draftsPanel
+        .select("thead .govuk-table__header")
+        .asScala
+        .map(_.text())
+        .toList
+
+      headings mustBe List(
+        messages("submissions.table.id.heading"),
+        messages("submissions.table.yourReference.heading"),
+        messages("submissions.table.status.heading"),
+        messages("submissions.table.action.heading")
+      )
+    }
+
+    "display Not provided as the agent reference for each draft" in {
+      val rows = draftsPanel.select("tbody .govuk-table__row")
+
+      rows.size() mustBe drafts.size
+
+      rows.asScala.zip(drafts).foreach { case (row, submission) =>
+        val cells = row.select("td")
+
+        cells.get(0).text() mustBe submission.submissionId
+        cells.get(1).text() mustBe "Not provided"
+      }
+    }
+  }
+
+  "when rendered with drafts for an agent with an agent reference" - {
+    val reference = "Reference-1234"
+
+    val drafts: Seq[SubmissionSummary] = List(
+      SubmissionSummary(
+        submissionId = testSubmissionId.toString,
+        maybePaymentDueBy = None,
+        maybeAgentReference = Some(reference),
+        status = Draft,
+        sortDate = LocalDate.parse("2026-10-19")
+      )
+    )
+
+    val doc = view(SubmissionsViewModel.build(drafts = drafts, isAgent = true))
+
+    val draftsPanel = doc.select(s"#${ExpectedContent.draftsTabId}")
+
+    "display the Your reference column heading" in {
+      val headings = draftsPanel
+        .select("thead .govuk-table__header")
+        .asScala
+        .map(_.text())
+        .toList
+
+      headings mustBe List(
+        messages("submissions.table.id.heading"),
+        messages("submissions.table.yourReference.heading"),
+        messages("submissions.table.status.heading"),
+        messages("submissions.table.action.heading")
+      )
+    }
+
+    "display Not provided as the agent reference for each draft" in {
+      val rows = draftsPanel.select("tbody .govuk-table__row")
+
+      rows.size() mustBe drafts.size
+
+      rows.asScala.zip(drafts).foreach { case (row, submission) =>
+        val cells = row.select("td")
+
+        cells.get(0).text() mustBe submission.submissionId
+        cells.get(1).text() mustBe reference
+      }
+    }
+  }
 }
