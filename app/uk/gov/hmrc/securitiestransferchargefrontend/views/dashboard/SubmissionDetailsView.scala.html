@@ -33,9 +33,8 @@
 @(viewModel: SubmissionDetailsViewModel)(implicit request: Request[_], messages: Messages)
 
 @layout(
-    pageTitle = titleNoForm(messages("submissionDetails.title", viewModel.submissionId)),
-    additionalScripts = Some(HtmlFormat.raw(s"""<script ${CSPNonce.attr} src="${routes.Assets.versioned("javascripts/print.js").url}"></script><script ${CSPNonce.attr}> document.addEventListener('DOMContentLoaded', function() { if (window.GOVUKFrontend) { window.GOVUKFrontend.initAll(); } }); </script>
-""")),
+    pageTitle = s"${messages("submissionDetails.title", viewModel.submissionId)} - ${messages("reportAndPay.title")} - ${messages("site.govuk")}",
+    additionalScripts = Some(HtmlFormat.raw(s"""<script ${CSPNonce.attr} src="${routes.Assets.versioned("javascripts/print.js").url}"></script>""")),
     showBackLink = false,
     mainContentLayout = Some(TemplateOverrides.noMainContentLayout)
 ) {
@@ -78,7 +77,6 @@
 <div class="govuk-grid-row">
     <div class="govuk-grid-column-full">
         <div class="govuk-tabs" data-module="govuk-tabs">
-            <h2 class="govuk-tabs__title">Transfers</h2>
 
             <ul class="govuk-tabs__list">
                 @viewModel.tabs.zipWithIndex.map { case (item, index) =>
