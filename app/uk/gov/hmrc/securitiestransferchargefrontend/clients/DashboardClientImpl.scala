@@ -40,4 +40,6 @@ class DashboardClientImpl @Inject()(http: HttpClientV2, appConfig: FrontendAppCo
     http.get(url"${appConfig.dashboardServiceUrl}/dashboard/overdue/${subscriptionId.value}")
       .execute[EtmpTransactionSummaryResponse]
 
-  override def getSubmission(subscriptionId: SubscriptionId, submissionId: SubmissionId)(implicit hc: HeaderCarrier): Future[EtmpTransactionSummaryResponse] = ???
+  override def getSubmission(subscriptionId: SubscriptionId, submissionId: SubmissionId)(implicit hc: HeaderCarrier): Future[EtmpTransactionSummaryResponse] =
+    http.get(url"${appConfig.dashboardServiceUrl}/dashboard/submission/${subscriptionId.value}/${submissionId.value}")
+      .execute[EtmpTransactionSummaryResponse]
