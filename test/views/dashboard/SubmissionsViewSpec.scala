@@ -277,7 +277,7 @@ class SubmissionsViewSpec extends ViewBaseSpec {
         statusTag.hasClass("govuk-tag--blue") mustBe true
 
         val viewLink = firstRowCells.get(3).select("a.govuk-link")
-        viewLink.attr("href") mustBe "#"
+        viewLink.attr("href") mustBe routes.SubmissionDetailsController.onPageLoad("STC-00000010").url
         viewLink.text() mustBe s"${messages("submissions.action.view")}${messages("submissions.action.view.hidden", "STC-00000010")}"
         viewLink.select(".govuk-visually-hidden").text() mustBe messages("submissions.action.view.hidden", "STC-00000010")
       }

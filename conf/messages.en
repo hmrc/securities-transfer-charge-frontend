@@ -1382,3 +1382,45 @@ submissions.status.overdue = Overdue
 
 submissions.action.view = View
 submissions.action.view.hidden = View submission ID {0}
+
+submissionDetails.title = Submission {0}
+submissionDetails.heading = Submission {0}
+
+submissionDetails.print = Print this page
+submissionDetails.total.heading = Total: {0}
+submissionDetails.paymentDueBy = Payment due by:
+
+submissionDetails.submission.date = Submission date
+submissionDetails.submission.type = Submission type
+submissionDetails.submission.transfers = Transfers in this submission
+submissionDetails.submission.totalTaxDue = Total tax due
+
+submissionDetails.submission.payForSubmission = Pay for submission
+
+submissionDetails.allTransfers.tabId = all-transfers
+submissionDetails.allTransfers.panel.label = All transfers
+submissionDetails.allTransfers.panel.heading = Transfers in this submission
+submissionDetails.allTransfers.empty = No transfers to display
+
+submissionDetails.readyToPay.tabId = ready-to-pay
+submissionDetails.readyToPay.panel.label = Ready to pay
+submissionDetails.readyToPay.panel.heading = Ready to pay
+submissionDetails.readyToPay.empty = You have no ready to pay transfers.
+
+submissionDetails.overdue.tabId = Overdue
+submissionDetails.overdue.panel.label = Overdue
+submissionDetails.overdue.panel.heading = Overdue
+submissionDetails.overdue.empty = You have no overdue transfers.
+
+submissionDetails.transfers.table.reference.heading = Transfer reference
+submissionDetails.transfers.table.seller.heading = Seller
+submissionDetails.transfers.table.securitiesBoughtIn.heading = Securities bought in
+submissionDetails.transfers.table.paymentDueBy.heading = Payment due by
+submissionDetails.transfers.table.status.heading = Status
+submissionDetails.transfers.table.action.heading = Action
+
+submissionDetails.transfers.action.view = View
+submissionDetails.transfers.action.view.hidden = View transfer reference {0}
+
+submissionDetails.transferType.stf = Securities transfer (STF)
+submissionDetails.transferType.sh03 = Share buyback (SH03)

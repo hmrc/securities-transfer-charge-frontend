@@ -19,7 +19,10 @@ package uk.gov.hmrc.securitiestransferchargefrontend.services.stf.shared
 import play.api.i18n.Lang
 import uk.gov.hmrc.securitiestransferchargefrontend.utils.DateTimeFormats
 
+import java.math.RoundingMode
+import java.text.{DecimalFormat, DecimalFormatSymbols}
 import java.time.LocalDate
+import java.util.Locale
 import javax.inject.{Inject, Singleton}
 
 @Singleton
@@ -32,4 +35,35 @@ class FormattingService @Inject() {
   def formatPaymentDueDate(paymentDueDate: LocalDate)(implicit lang: Lang): String = {
     paymentDueDate.format(DateTimeFormats.dateTimeFormat())
   }
+
+  private val symbols = new DecimalFormatSymbols(Locale.UK)
+  symbols.setGroupingSeparator(',')
+  symbols.setDecimalSeparator('.')
+
+  private val formatter = new DecimalFormat("#,##0.##", symbols)
+  formatter.setRoundingMode(RoundingMode.DOWN)
+
+  private val formatterWithTwoDecimals = new DecimalFormat("#,##0.00", symbols)
+  formatterWithTwoDecimals.setRoundingMode(RoundingMode.DOWN)
+
+  def formatCurrency(taxDue: BigDecimal): String = {
+    val truncatedTaxDue = taxDue.setScale(2, BigDecimal.RoundingMode.DOWN)
+
+    val formattedTaxDue = {
+      if (truncatedTaxDue.remainder(BigDecimal(1)) == BigDecimal(0)) {
+        formatter.format(truncatedTaxDue)
+      } else {
+        formatterWithTwoDecimals.format(truncatedTaxDue)
+      }
+    }
+    s"£$formattedTaxDue"
+  }
+
+  def formatDate(date: LocalDate): String = {
+    val day = date.getDayOfMonth
+    val month = date.getMonth.toString.toLowerCase.capitalize
+    val year = date.getYear
+    s"$day $month $year"
+  }
+
 }

@@ -20,8 +20,9 @@ import play.api.i18n.Messages
 import uk.gov.hmrc.govukfrontend.views.Aliases.{HeadCell, TableRow}
 import uk.gov.hmrc.govukfrontend.views.viewmodels.content.{HtmlContent, Text}
 import uk.gov.hmrc.govukfrontend.views.viewmodels.table.Table
+import uk.gov.hmrc.securitiestransferchargefrontend.controllers.dashboard.routes
 import uk.gov.hmrc.securitiestransferchargefrontend.models.search.SubmissionStatus.{Draft, Overdue, ReadyToPay}
-import uk.gov.hmrc.securitiestransferchargefrontend.models.search.{SubmissionStatus, SubmissionSummary}
+import uk.gov.hmrc.securitiestransferchargefrontend.models.search.SubmissionSummary
 
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
@@ -40,24 +41,13 @@ object SubmissionsViewModel {
   private def formatDate(dateStr: String): String =
     Try(LocalDate.parse(dateStr).format(govUkDateFormatter)).getOrElse(dateStr)
 
-  private def statusTagClass(status: SubmissionStatus): String = status match {
-    case SubmissionStatus.ReadyToPay => "govuk-tag--blue"
-    case SubmissionStatus.Draft => "govuk-tag--grey"
-    case SubmissionStatus.Overdue => "govuk-tag--orange"
-    case SubmissionStatus.Paid => "govuk-tag--green"
-    case _ => "govuk-tag--white"
-  }
-
-  private def statusTag(status: SubmissionStatus): HtmlContent = {
-    HtmlContent(s"""<strong class="govuk-tag ${statusTagClass(status)}">${status.toString}</strong>""")
-  }
-
   private def viewLink(submissionId: String)(implicit messages: Messages): HtmlContent = {
     val view = messages("submissions.action.view")
     val hiddenText = messages("submissions.action.view.hidden", submissionId)
-
+    val href = routes.SubmissionDetailsController.onPageLoad(submissionId).url
+    
     HtmlContent(
-      s"""<a class="govuk-link" href="#">$view<span class="govuk-visually-hidden">$hiddenText</span></a>"""
+      s"""<a class="govuk-link" href="$href">$view<span class="govuk-visually-hidden">$hiddenText</span></a>"""
     )
   }
 
@@ -95,15 +85,12 @@ object SubmissionsViewModel {
           yourReferenceCell ++
           paymentDueByCell ++
           Seq(
-            TableRow(content = statusTag(summary.status)),
+            TableRow(content = StatusTag.tagHtml(summary.status)),
             TableRow(content = viewLink(summary.submissionId))
           )
       }
     )
   }
-
-  private def labelWithTag(text: String, count: Int, status: SubmissionStatus): String =
-    s"""$text <strong class="govuk-tag govuk-!-margin-left-1 ${statusTagClass(status)}">$count</strong>"""
 
   private def buildTabs(
                          drafts: Seq[SubmissionSummary],
@@ -124,7 +111,7 @@ object SubmissionsViewModel {
 
     val draftSubmissionsTab: SubmissionTab = SubmissionTab(
       id = messages("submissions.drafts.tabId"),
-      label = labelWithTag(messages("submissions.drafts.panel.heading"), drafts.size, Draft),
+      label = StatusTag.labelWithTag(messages("submissions.drafts.panel.heading"), drafts.size, Draft),
       heading = messages("submissions.drafts.panel.heading"),
       emptyText = messages("submissions.noDraftSubmissions"),
       count = drafts.size,
@@ -133,7 +120,7 @@ object SubmissionsViewModel {
 
     val readyToPaySubmissionsTab: SubmissionTab = SubmissionTab(
       id = messages("submissions.readyToPay.tabId"),
-      label = labelWithTag(messages("submissions.readyToPay.panel.heading"), readyToPay.size, ReadyToPay),
+      label = StatusTag.labelWithTag(messages("submissions.readyToPay.panel.heading"), readyToPay.size, ReadyToPay),
       heading = messages("submissions.readyToPay.panel.heading"),
       emptyText = messages("submissions.noReadyToPaySubmissions"),
       count = readyToPay.size,
@@ -142,7 +129,7 @@ object SubmissionsViewModel {
 
     val overdueSubmissionsTab: SubmissionTab = SubmissionTab(
       id = messages("submissions.overdue.tabId"),
-      label = labelWithTag(messages("submissions.overdue.panel.heading"), overdue.size, Overdue),
+      label = StatusTag.labelWithTag(messages("submissions.overdue.panel.heading"), overdue.size, Overdue),
       heading = messages("submissions.overdue.panel.heading"),
       emptyText = messages("submissions.noOverdueSubmissions"),
       count = overdue.size,

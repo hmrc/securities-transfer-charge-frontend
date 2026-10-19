@@ -39,7 +39,7 @@ trait DashboardService:
   def getReadyToPay(subscriptionId: SubscriptionId)(implicit hc: HeaderCarrier): Future[Seq[SubmissionSummary]]
   def getOverdue(subscriptionId: SubscriptionId)(implicit hc: HeaderCarrier): Future[Seq[SubmissionSummary]]
   
-  def getSubmissionSummary(subscriptionId: SubscriptionId, submissionId: SubmissionId)(implicit hc: HeaderCarrier): Future[SttSubmission]
+  def getSubmission(subscriptionId: SubscriptionId, submissionId: SubmissionId)(implicit hc: HeaderCarrier): Future[SttSubmission]
 
 final class DashboardServiceImpl @Inject()(
   saveAndReturnClient: SaveAndReturnClient,
@@ -82,7 +82,7 @@ final class DashboardServiceImpl @Inject()(
     overdue    = overdueCount
   )
 
-  override def getSubmissionSummary(subscriptionId: SubscriptionId, submissionId: SubmissionId)(implicit hc: HeaderCarrier): Future[SttSubmission] = for {
+  override def getSubmission(subscriptionId: SubscriptionId, submissionId: SubmissionId)(implicit hc: HeaderCarrier): Future[SttSubmission] = for {
     response <- dashboardClient.getSubmission(subscriptionId, submissionId)
     subs = toSttSubmissionList(response)
   } yield subs.head

@@ -30,9 +30,10 @@ import uk.gov.hmrc.securitiestransferchargefrontend.models.stf.{Address, AlfAddr
 import uk.gov.hmrc.securitiestransferchargefrontend.models.UserAnswers
 import uk.gov.hmrc.securitiestransferchargefrontend.models.nrs.IdentityData
 import uk.gov.hmrc.securitiestransferchargefrontend.models.search.SubmissionStatus.*
-import uk.gov.hmrc.securitiestransferchargefrontend.models.search.{EtmpChargeDetail, EtmpSuccessResponse, EtmpTransactionDetail, SubmissionSummary}
+import uk.gov.hmrc.securitiestransferchargefrontend.models.search.{EtmpChargeDetail, EtmpSuccessResponse, EtmpTransactionDetail, SttSubmission, SttTransfer, SubmissionSummary}
 import uk.gov.hmrc.securitiestransferchargefrontend.models.sh03.shared.{CompanyDetails, DetailsOfThisSharePurchase}
 import uk.gov.hmrc.securitiestransferchargefrontend.models.shared.AgentReference
+import uk.gov.hmrc.securitiestransferchargefrontend.models.submission.ReasonForPurchase.PurchasedForCancellation
 import uk.gov.hmrc.securitiestransferchargefrontend.models.submission.{Agent, Individual, Organisation}
 
 import java.time.LocalDate
@@ -271,5 +272,43 @@ object Fixtures {
 
   extension (chg: EtmpChargeDetail)
     def withDueDate: LocalDate => EtmpChargeDetail = due => chg.copy(chargeDueDate = due)
+
+  val readyToPaySttTransferTaxOnly: SttTransfer = SttTransfer(
+    utrn = testUtrn,
+    buyerNames = "Buyer One",
+    sellerNames = Some("Seller One"),
+    companyName = "Company",
+    charges = Seq(buildTaxCharge(testUtrn, false, false)),
+    numberOfShares = 500,
+    reasonForPurchase = Some(PurchasedForCancellation)
+  )
+
+  val readyToPaySttTransferWithLateFilingCharge: SttTransfer = SttTransfer(
+    utrn = testUtrn,
+    buyerNames = "Buyer One",
+    sellerNames = Some("Seller One"),
+    companyName = "Company",
+    charges = Seq(buildTaxCharge(testUtrn, false, false), buildLateFilingCharge(testUtrn, false, false)),
+    numberOfShares = 500,
+    reasonForPurchase = Some(PurchasedForCancellation)
+  )
+  
+  val singleSubmissionReadyToPay: SttSubmission =
+    SttSubmission(
+      submissionId = testSubmissionId.toString,
+      submissionDate = LocalDate.now().minusDays(5),
+      clientReference = None,
+      declareeName = None,
+      transfers = Seq(readyToPaySttTransferTaxOnly)
+    )
+  
+  val singleSubmissionReadyToPayWithLateFilingCharge: SttSubmission =
+    SttSubmission(
+      submissionId = testSubmissionId.toString,
+      submissionDate = LocalDate.now().minusDays(5),
+      clientReference = None,
+      declareeName = None,
+      transfers = Seq(readyToPaySttTransferWithLateFilingCharge)
+    )
 
 }

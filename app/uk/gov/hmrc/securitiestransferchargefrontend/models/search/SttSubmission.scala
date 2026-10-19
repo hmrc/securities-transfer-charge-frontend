@@ -38,6 +38,7 @@ final case class SttSubmission(
   def latePaymentPenaltiesToPay : BigDecimal = toPay(_.latePaymentPenaltiesToPay)
   def latePaymentInterestToPay  : BigDecimal = toPay(_.latePaymentInterestToPay)
   def originalTotalAmount       : BigDecimal = toPay(_.originalTotalAmount)
+  def totalToPay                : BigDecimal = toPay(_.totalToPay)
 
   def submissionType    : TransferType      = if declareeName.isDefined then SH03 else STF
   def paymentDueByDate  : LocalDate         = transfers.map(_.paymentDueByDate).min
