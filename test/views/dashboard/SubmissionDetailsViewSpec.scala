@@ -250,7 +250,7 @@ class SubmissionDetailsViewSpec extends ViewBaseSpec {
       }
 
       "have the correct heading in each panel" in {
-        panels.asScala.map(_.select("h2").text()).toList mustBe expected.tabHeadings
+        panels.asScala.map(_.select("h1").text()).toList mustBe expected.tabHeadings
       }
 
       "show a table or the empty message in each panel" in {
