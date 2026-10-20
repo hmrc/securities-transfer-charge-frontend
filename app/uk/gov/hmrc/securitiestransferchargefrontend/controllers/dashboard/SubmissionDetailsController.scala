@@ -43,9 +43,10 @@ class SubmissionDetailsController @Inject()(
     implicit request =>
       val subscriptionId = request.request.subscriptionId
       val subId = SubmissionId(submissionId)
+      val isAgent = request.request.isAgent
 
       dashboardService.getSubmission(subscriptionId, subId).map {sttSubmission =>
-        val viewModel = SubmissionDetailsViewModel.build(submission = sttSubmission, formattingService)
+        val viewModel = SubmissionDetailsViewModel.build(submission = sttSubmission, formattingService, isAgent)
         
         Ok(view(viewModel))
       }

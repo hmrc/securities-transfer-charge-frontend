@@ -39,7 +39,7 @@ object SubmissionDetailsSummary {
     )
   }
   
-  private def summaryList(submission: SttSubmission, formatter: FormattingService)(implicit messages: Messages): SummaryList = {
+  private def summaryList(submission: SttSubmission, formatter: FormattingService, isAgent:Boolean)(implicit messages: Messages): SummaryList = {
     val submissionDate = formatter.formatDate(submission.submissionDate)
     val transferType = submission.submissionType match {
       case STF    => messages("submissionDetails.transferType.stf")
@@ -48,8 +48,12 @@ object SubmissionDetailsSummary {
     }
     val numOfTransfers = submission.numberOfTransfers.toString
     val totalTaxDue = formatter.formatCurrency(submission.taxToPay)
+    val reference = submission.clientReference.getOrElse(messages("submissionDetails.submission.agent.reference.notProvided"))
+    val maybeYourReferenceRow = Option.when(isAgent) {
+      row("submissionDetails.submission.agent.reference", reference)
+    }.toSeq
 
-    val rows = Seq(
+    val rows = maybeYourReferenceRow ++ Seq(
       row("submissionDetails.submission.date", submissionDate),
       row("submissionDetails.submission.type", transferType),
       row("submissionDetails.submission.transfers", numOfTransfers),
@@ -58,12 +62,12 @@ object SubmissionDetailsSummary {
 
     SummaryList(rows = rows)
   }
-  
-  def getSummary(submission: SttSubmission, formatter: FormattingService)(implicit messages: Messages): SubmissionDetailsSummary =
+
+  def getSummary(submission: SttSubmission, formatter: FormattingService, isAgent: Boolean)(implicit messages: Messages): SubmissionDetailsSummary =
     SubmissionDetailsSummary(
-      total         = formatter.formatCurrency(submission.totalToPay),
-      paymentDueBy  = formatter.formatDate(submission.paymentDueByDate),
-      summaryList   = summaryList(submission, formatter)
+      total = formatter.formatCurrency(submission.totalToPay),
+      paymentDueBy = formatter.formatDate(submission.paymentDueByDate),
+      summaryList = summaryList(submission, formatter, isAgent)
     )
-  
+
 }

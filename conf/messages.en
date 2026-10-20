@@ -1394,6 +1394,8 @@ submissionDetails.submission.date = Submission date
 submissionDetails.submission.type = Submission type
 submissionDetails.submission.transfers = Transfers in this submission
 submissionDetails.submission.totalTaxDue = Total tax due
+submissionDetails.submission.agent.reference = Your reference
+submissionDetails.submission.agent.reference.notProvided = Not provided
 
 submissionDetails.submission.payForSubmission = Pay for submission
 
@@ -1414,6 +1416,7 @@ submissionDetails.overdue.empty = You have no overdue transfers.
 
 submissionDetails.transfers.table.reference.heading = Transfer reference
 submissionDetails.transfers.table.seller.heading = Seller
+submissionDetails.transfers.table.buyer.heading = Buyer
 submissionDetails.transfers.table.securitiesBoughtIn.heading = Securities bought in
 submissionDetails.transfers.table.paymentDueBy.heading = Payment due by
 submissionDetails.transfers.table.status.heading = Status
