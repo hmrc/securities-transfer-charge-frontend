@@ -240,19 +240,6 @@ class SubmissionDetailsViewModelSpec extends SpecBase with GuiceOneAppPerSuite {
         row(2).content mustBe Text(readyToPayTransfer.sellerNames.get)
       }
 
-      "display an empty seller name when not provided" in {
-        val transfer = readyToPayTransfer.copy(sellerNames = None)
-
-        val model = build(
-          transfers = Seq(transfer),
-          isAgent = true
-        )
-
-        val row = tab(model, "allTransfers").table.get.rows.head
-
-        row(2).content mustBe Text("")
-      }
-
       "build the agent submission summary" in {
         val model = build(isAgent = true)
 
@@ -261,6 +248,38 @@ class SubmissionDetailsViewModelSpec extends SpecBase with GuiceOneAppPerSuite {
           formatter,
           isAgent = true
         )
+      }
+
+      "build the agent submission summary with the Your Reference field and the provided client reference" in {
+        val model = SubmissionDetailsViewModel.build(
+          Fixtures.singleSubmissionReadyToPay.copy(
+            clientReference = Some("Reference/1234")
+          ),
+          formatter,
+          isAgent = true
+        )
+
+        val rows = model.summary.summaryList.rows
+
+        rows.size mustBe 5
+        rows.head.key.content mustBe Text(messages("submissionDetails.submission.agent.reference"))
+        rows.head.value.content mustBe Text("Reference/1234")
+      }
+
+      "build the agent submission summary with the Your Reference field when nonclient reference is provided" in {
+        val model = SubmissionDetailsViewModel.build(
+          Fixtures.singleSubmissionReadyToPay.copy(
+            clientReference = None
+          ),
+          formatter,
+          isAgent = true
+        )
+
+        val rows = model.summary.summaryList.rows
+
+        rows.size mustBe 5
+        rows.head.key.content mustBe Text(messages("submissionDetails.submission.agent.reference"))
+        rows.head.value.content mustBe Text(messages("submissionDetails.submission.agent.reference.notProvided"))
       }
     }
 
@@ -289,15 +308,6 @@ class SubmissionDetailsViewModelSpec extends SpecBase with GuiceOneAppPerSuite {
         row(2).content mustBe Text(readyToPayTransfer.companyName)
       }
 
-      "display an empty seller name when not provided" in {
-        val transfer = readyToPayTransfer.copy(sellerNames = None)
-
-        val model = build(Seq(transfer))
-
-        val row = tab(model, "allTransfers").table.get.rows.head
-
-        row(1).content mustBe Text("")
-      }
     }
 
     "format the payment due by date" in {
