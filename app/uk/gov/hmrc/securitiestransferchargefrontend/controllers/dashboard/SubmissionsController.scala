@@ -21,6 +21,7 @@ import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.actions.*
 import uk.gov.hmrc.securitiestransferchargefrontend.domain.{GroupIdentifier, UserId}
+import uk.gov.hmrc.securitiestransferchargefrontend.models.pagination.PaginationModel
 import uk.gov.hmrc.securitiestransferchargefrontend.services.DashboardService
 import uk.gov.hmrc.securitiestransferchargefrontend.viewmodels.dashboard.SubmissionsViewModel
 import uk.gov.hmrc.securitiestransferchargefrontend.views.html.dashboard.SubmissionsView
@@ -37,19 +38,45 @@ class SubmissionsController @Inject()(
                                      )(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport {
 
 
-  def onPageLoad(): Action[AnyContent] = auth.async { implicit request =>
+  def onPageLoad(
+                  draftsPage: Option[Int] = None,
+                  readyToPayPage: Option[Int] = None,
+                  overduePage: Option[Int] = None,
+                  recentPage: Option[Int] = None
+                ): Action[AnyContent] = auth.async { implicit request =>
 
     val subscriptionId = request.subscriptionId
     val userId = UserId(request.internalId)
     val groupId = GroupIdentifier(request.groupIdentifier)
 
     for {
-      drafts     <- dashboardService.getDrafts(userId, groupId)
-      readyToPay <- dashboardService.getReadyToPay(subscriptionId)
-      overdue <- dashboardService.getOverdue(subscriptionId)
-      recent <- dashboardService.getRecent(userId, groupId, subscriptionId)
+      allDrafts <- dashboardService.getDrafts(userId, groupId)
+      allReadyToPay <- dashboardService.getReadyToPay(subscriptionId)
+      allOverdue <- dashboardService.getOverdue(subscriptionId)
+      allRecent <- dashboardService.getRecent(userId, groupId, subscriptionId)
     } yield {
-      val viewModel = SubmissionsViewModel.build(drafts, readyToPay, overdue,recent, request.isAgent)
+
+      val paginationModel = PaginationModel(
+        draftsPage = draftsPage.getOrElse(1),
+        readyToPayPage = readyToPayPage.getOrElse(1),
+        overduePage = overduePage.getOrElse(1),
+        recentPage = recentPage.getOrElse(1),
+        totalDrafts = allDrafts.size,
+        totalReadyToPay = allReadyToPay.size,
+        totalOverdue = allOverdue.size,
+        totalRecent = allRecent.size
+      )
+
+      val viewModel = SubmissionsViewModel.build(
+        allDrafts = allDrafts,
+        allReadyToPay = allReadyToPay,
+        allOverdue = allOverdue,
+        allRecent = allRecent,
+        isAgent = request.isAgent,
+        paginationModel = paginationModel,
+        baseUrl = routes.SubmissionsController.onPageLoad(None, None, None, None).url
+      )
+
       Ok(view(viewModel))
     }
   }
