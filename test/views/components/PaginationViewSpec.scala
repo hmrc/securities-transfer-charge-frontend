@@ -35,34 +35,17 @@ class PaginationViewSpec extends ViewBaseSpec {
     "when there is only one page" - {
 
       val paginationModel = PaginationModel(totalRecent = 5, itemsPerPage = 10)
-      val viewModel = PaginationViewModel(
-        currentPage = 1,
-        totalItems = 5,
-        itemsPerPage = 10,
-        baseUrl = baseUrl,
-        tab = "recent-submissions",
-        paginationModel = paginationModel
-      )
-
-      val html = view(viewModel)
-      val document: Document = Jsoup.parse(html.toString())
+      val viewModel = paginationModel.getRecentPagination()
 
       "must not render pagination component" in {
-        document.select(".govuk-pagination").isEmpty mustBe true
+        viewModel mustBe None
       }
     }
 
     "when on the first page of multiple pages" - {
 
       val paginationModel = PaginationModel(totalRecent = 50, itemsPerPage = 10)
-      val viewModel = PaginationViewModel(
-        currentPage = 1,
-        totalItems = 50,
-        itemsPerPage = 10,
-        baseUrl = baseUrl,
-        tab = "recent-submissions",
-        paginationModel = paginationModel
-      )
+      val viewModel = paginationModel.getRecentPagination().get
 
       val html = view(viewModel)
       val document: Document = Jsoup.parse(html.toString())
@@ -86,15 +69,8 @@ class PaginationViewSpec extends ViewBaseSpec {
 
     "when on a middle page" - {
 
-      val paginationModel = PaginationModel(totalDrafts = 50, itemsPerPage = 10)
-      val viewModel = PaginationViewModel(
-        currentPage = 3,
-        totalItems = 50,
-        itemsPerPage = 10,
-        baseUrl = baseUrl,
-        tab = "drafts",
-        paginationModel = paginationModel
-      )
+      val paginationModel = PaginationModel(draftsPage = 3, totalDrafts = 50, itemsPerPage = 10)
+      val viewModel = paginationModel.getDraftsPagination().get
 
       val html = view(viewModel)
       val document: Document = Jsoup.parse(html.toString())
@@ -110,15 +86,8 @@ class PaginationViewSpec extends ViewBaseSpec {
 
     "when on the last page" - {
 
-      val paginationModel = PaginationModel(totalReadyToPay = 50, itemsPerPage = 10)
-      val viewModel = PaginationViewModel(
-        currentPage = 5,
-        totalItems = 50,
-        itemsPerPage = 10,
-        baseUrl = baseUrl,
-        tab = "ready-to-pay",
-        paginationModel = paginationModel
-      )
+      val paginationModel = PaginationModel(readyToPayPage = 5, totalReadyToPay = 50, itemsPerPage = 10)
+      val viewModel = paginationModel.getReadyToPayPagination().get
 
       val html = view(viewModel)
       val document: Document = Jsoup.parse(html.toString())
@@ -134,15 +103,8 @@ class PaginationViewSpec extends ViewBaseSpec {
 
     "when there are many pages" - {
 
-      val paginationModel = PaginationModel(totalOverdue = 200, itemsPerPage = 10)
-      val viewModel = PaginationViewModel(
-        currentPage = 15,
-        totalItems = 200,
-        itemsPerPage = 10,
-        baseUrl = baseUrl,
-        tab = "overdue",
-        paginationModel = paginationModel
-      )
+      val paginationModel = PaginationModel(overduePage = 15, totalOverdue = 200, itemsPerPage = 10)
+      val viewModel = paginationModel.getOverduePagination().get
 
       val html = view(viewModel)
       val document: Document = Jsoup.parse(html.toString())
@@ -161,15 +123,8 @@ class PaginationViewSpec extends ViewBaseSpec {
 
     "accessibility" - {
 
-      val paginationModel = PaginationModel(totalRecent = 50, itemsPerPage = 10)
-      val viewModel = PaginationViewModel(
-        currentPage = 2,
-        totalItems = 50,
-        itemsPerPage = 10,
-        baseUrl = baseUrl,
-        tab = "recent-submissions",
-        paginationModel = paginationModel
-      )
+      val paginationModel = PaginationModel(recentPage = 2, totalRecent = 50, itemsPerPage = 10)
+      val viewModel = paginationModel.getRecentPagination().get
 
       val html = view(viewModel)
       val document: Document = Jsoup.parse(html.toString())

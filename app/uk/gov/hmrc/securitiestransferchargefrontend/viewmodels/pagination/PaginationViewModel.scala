@@ -17,26 +17,23 @@
 package uk.gov.hmrc.securitiestransferchargefrontend.viewmodels.pagination
 
 import play.api.mvc.Call
-import uk.gov.hmrc.securitiestransferchargefrontend.models.pagination.PaginationModel
 
-case class PaginationViewModel(
-                                currentPage: Int,
-                                totalPages: Int,
-                                totalItems: Int,
-                                itemsPerPage: Int = 10,
-                                baseUrl: String,
-                                tab: String,
-                                paginationModel: PaginationModel
-                              ) {
+final case class PaginationViewModel private(
+                                              currentPage: Int,
+                                              totalPages: Int,
+                                              totalItems: Int,
+                                              itemsPerPage: Int,
+                                              urlForPage: Int => String
+                                            ) {
 
   private def getShowEllipsisLimit: Int = {
-    val displayingThreeDigits = currentPage >= 2
-    if (displayingThreeDigits) 11 else 15
+    val onPageAfterFirstPage = currentPage >= 2
+    if (onPageAfterFirstPage) 11 else 15
   }
 
   private def getMiddleRange: Int = {
-    val displayingThreeDigits = currentPage >= 99
-    if (displayingThreeDigits) 3 else 4
+    val onPageAfter = currentPage >= 99
+    if (onPageAfter) 3 else 4
   }
 
   def shouldDisplay: Boolean = totalPages > 1
@@ -46,9 +43,9 @@ case class PaginationViewModel(
   def nextPage: Option[Int] = if (currentPage < totalPages) Some(currentPage + 1) else None
 
   def pages: Seq[PageItem] = {
-    val showEllipsisLimit = getShowEllipsisLimit  //Show all pages if within limit (no ellipsis needed)
-    val middleRange = getMiddleRange  // Pages on each side of current
-    
+    val showEllipsisLimit = getShowEllipsisLimit //Show all pages if within limit (no ellipsis needed)
+    val middleRange = getMiddleRange // Pages on each side of current
+
     if (totalPages <= showEllipsisLimit) {
       (1 to totalPages).map(page => PageItem(page, page == currentPage))
     } else {
@@ -91,37 +88,16 @@ case class PaginationViewModel(
     }
   }
 
-  private def buildUrlForPage(page: Int): String = {
-    val updatedModel = tab match {
-      case "recent-submissions" => paginationModel.updateRecentPage(page)
-      case "drafts" => paginationModel.updateDraftsPage(page)
-      case "ready-to-pay" => paginationModel.updateReadyToPayPage(page)
-      case "overdue" => paginationModel.updateOverduePage(page)
-      case _ => paginationModel
-    }
-
-    // Build query parameters only for non-default values
-    val params = Seq(
-      if (updatedModel.draftsPage != 1) Some(s"draftsPage=${updatedModel.draftsPage}") else None,
-      if (updatedModel.readyToPayPage != 1) Some(s"readyToPayPage=${updatedModel.readyToPayPage}") else None,
-      if (updatedModel.overduePage != 1) Some(s"overduePage=${updatedModel.overduePage}") else None,
-      if (updatedModel.recentPage != 1) Some(s"recentPage=${updatedModel.recentPage}") else None
-    ).flatten
-
-    val queryString = if (params.isEmpty) "" else s"?${params.mkString("&")}"
-    s"$baseUrl$queryString#$tab"
-  }
-
   def previousPageCall: Option[Call] = {
-    previousPage.map(page => Call("GET", buildUrlForPage(page)))
+    previousPage.map(page => Call("GET", urlForPage(page)))
   }
 
   def nextPageCall: Option[Call] = {
-    nextPage.map(page => Call("GET", buildUrlForPage(page)))
+    nextPage.map(page => Call("GET", urlForPage(page)))
   }
 
   def pageCall(page: Int): Call = {
-    Call("GET", buildUrlForPage(page))
+    Call("GET", urlForPage(page))
   }
 }
 
@@ -137,9 +113,7 @@ object PaginationViewModel {
              currentPage: Int,
              totalItems: Int,
              itemsPerPage: Int,
-             baseUrl: String,
-             tab: String,
-             paginationModel: PaginationModel
+             urlForPage: Int => String
            ): PaginationViewModel = {
     val totalPages = Math.ceil(totalItems.toDouble / itemsPerPage).toInt
     PaginationViewModel(
@@ -147,9 +121,8 @@ object PaginationViewModel {
       totalPages = totalPages,
       totalItems = totalItems,
       itemsPerPage = itemsPerPage,
-      baseUrl = baseUrl,
-      tab = tab,
-      paginationModel = paginationModel
+      urlForPage = urlForPage
     )
   }
+
 }

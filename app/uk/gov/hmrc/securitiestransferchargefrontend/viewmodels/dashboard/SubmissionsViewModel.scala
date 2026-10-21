@@ -99,14 +99,13 @@ object SubmissionsViewModel {
                          overdue: Seq[SubmissionSummary],
                          recent: Seq[SubmissionSummary],
                          isAgent: Boolean,
-                         baseUrl: String,
                          paginationModel: PaginationModel
                        )(implicit messages: Messages): Seq[SubmissionTab] = {
 
-    val recentPagination = paginationModel.getRecentPagination(baseUrl)
-    val draftsPagination = paginationModel.getDraftsPagination(baseUrl)
-    val readyToPayPagination = paginationModel.getReadyToPayPagination(baseUrl)
-    val overduePagination = paginationModel.getOverduePagination(baseUrl)
+    val recentPagination = paginationModel.getRecentPagination()
+    val draftsPagination = paginationModel.getDraftsPagination()
+    val readyToPayPagination = paginationModel.getReadyToPayPagination()
+    val overduePagination = paginationModel.getOverduePagination()
 
     val recentSubmissionsTab: SubmissionTab = SubmissionTab(
       id = messages("submissions.recentSubmissions.tabId"),
@@ -161,8 +160,7 @@ object SubmissionsViewModel {
              allOverdue: Seq[SubmissionSummary] = Seq.empty,
              allRecent: Seq[SubmissionSummary] = Seq.empty,
              isAgent: Boolean = false,
-             paginationModel: PaginationModel,
-             baseUrl: String
+             paginationModel: PaginationModel
            )(implicit messages: Messages): SubmissionsViewModel = {
 
     val paginatedDrafts = paginationModel.paginateSubmissions(allDrafts, paginationModel.draftsPage)
@@ -171,7 +169,7 @@ object SubmissionsViewModel {
     val paginatedRecent = paginationModel.paginateSubmissions(allRecent, paginationModel.recentPage)
 
     SubmissionsViewModel(
-      tabs = buildTabs(paginatedDrafts, paginatedReadyToPay, paginatedOverdue, paginatedRecent, isAgent, baseUrl, paginationModel)
+      tabs = buildTabs(paginatedDrafts, paginatedReadyToPay, paginatedOverdue, paginatedRecent, isAgent, paginationModel)
     )
   }
 }

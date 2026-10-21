@@ -73,8 +73,7 @@ class SubmissionsController @Inject()(
         allOverdue = allOverdue,
         allRecent = allRecent,
         isAgent = request.isAgent,
-        paginationModel = paginationModel,
-        baseUrl = routes.SubmissionsController.onPageLoad(None, None, None, None).url
+        paginationModel = paginationModel
       )
 
       Ok(view(viewModel))

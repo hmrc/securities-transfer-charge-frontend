@@ -16,7 +16,9 @@
 
 package uk.gov.hmrc.securitiestransferchargefrontend.models.pagination
 
+import play.api.i18n.Messages
 import play.api.libs.json.{Format, Json}
+import uk.gov.hmrc.securitiestransferchargefrontend.controllers.dashboard.routes
 import uk.gov.hmrc.securitiestransferchargefrontend.models.search.SubmissionSummary
 import uk.gov.hmrc.securitiestransferchargefrontend.viewmodels.pagination.PaginationViewModel
 
@@ -24,20 +26,23 @@ import java.util.Base64
 import scala.util.Try
 
 case class PaginationModel(
-  draftsPage: Int = 1,
-  readyToPayPage: Int = 1,
-  overduePage: Int = 1,
-  recentPage: Int = 1,
-  totalDrafts: Int = 0,
-  totalReadyToPay: Int = 0,
-  totalOverdue: Int = 0,
-  totalRecent: Int = 0,
-  itemsPerPage: Int = 10
-) {
-  
+                            draftsPage: Int = 1,
+                            readyToPayPage: Int = 1,
+                            overduePage: Int = 1,
+                            recentPage: Int = 1,
+                            totalDrafts: Int = 0,
+                            totalReadyToPay: Int = 0,
+                            totalOverdue: Int = 0,
+                            totalRecent: Int = 0,
+                            itemsPerPage: Int = 10
+                          ) {
+
   def updateDraftsPage(page: Int): PaginationModel = this.copy(draftsPage = page)
+
   def updateReadyToPayPage(page: Int): PaginationModel = this.copy(readyToPayPage = page)
+
   def updateOverduePage(page: Int): PaginationModel = this.copy(overduePage = page)
+
   def updateRecentPage(page: Int): PaginationModel = this.copy(recentPage = page)
 
   def encode: String = {
@@ -51,8 +56,11 @@ case class PaginationModel(
   }
 
   def recentTotalPages: Int = calculateTotalPages(totalRecent)
+
   def draftsTotalPages: Int = calculateTotalPages(totalDrafts)
+
   def readyToPayTotalPages: Int = calculateTotalPages(totalReadyToPay)
+
   def overdueTotalPages: Int = calculateTotalPages(totalOverdue)
 
   // Pagination logic
@@ -63,36 +71,54 @@ case class PaginationModel(
   }
 
   private def createPaginationIfNeeded(
-    currentPage: Int,
-    totalPages: Int,
-    totalItems: Int,
-    baseUrl: String,
-    tabId: String
-  ): Option[PaginationViewModel] = {
+                                        currentPage: Int,
+                                        totalItems: Int,
+                                        tabId: String
+                                      ): Option[PaginationViewModel] = {
     if (totalItems > itemsPerPage) {
+      val urlForPage: Int => String = { page =>
+
+        val updatedModel = tabId match {
+          case id if id == "recent-submissions" => this.updateRecentPage(page)
+          case id if id == "drafts" => this.updateDraftsPage(page)
+          case id if id == "ready-to-pay" => this.updateReadyToPayPage(page)
+          case id if id == "overdue" => this.updateOverduePage(page)
+          case _ => this
+        }
+
+        val draftsPageParam = if (updatedModel.draftsPage != 1) Some(updatedModel.draftsPage) else None
+        val readyToPayPageParam = if (updatedModel.readyToPayPage != 1) Some(updatedModel.readyToPayPage) else None
+        val overduePageParam = if (updatedModel.overduePage != 1) Some(updatedModel.overduePage) else None
+        val recentPageParam = if (updatedModel.recentPage != 1) Some(updatedModel.recentPage) else None
+
+        routes.SubmissionsController.onPageLoad(
+          draftsPage = draftsPageParam,
+          readyToPayPage = readyToPayPageParam,
+          overduePage = overduePageParam,
+          recentPage = recentPageParam
+        ).url + s"#$tabId"
+      }
+
       Some(PaginationViewModel(
-        currentPage,
-        totalPages,
-        totalItems,
-        itemsPerPage,
-        baseUrl,
-        tabId,
-        this
+        currentPage = currentPage,
+        totalItems = totalItems,
+        itemsPerPage = itemsPerPage,
+        urlForPage = urlForPage
       ))
     } else None
   }
 
-  def getRecentPagination(baseUrl: String): Option[PaginationViewModel] =
-    createPaginationIfNeeded(recentPage, recentTotalPages, totalRecent, baseUrl, "recent-submissions")
+  def getRecentPagination()(implicit messages: Messages): Option[PaginationViewModel] =
+    createPaginationIfNeeded(recentPage, totalRecent, messages("submissions.recentSubmissions.tabId"))
 
-  def getDraftsPagination(baseUrl: String): Option[PaginationViewModel] =
-    createPaginationIfNeeded(draftsPage, draftsTotalPages, totalDrafts, baseUrl, "drafts")
+  def getDraftsPagination()(implicit messages: Messages): Option[PaginationViewModel] =
+    createPaginationIfNeeded(draftsPage, totalDrafts, messages("submissions.drafts.tabId"))
 
-  def getReadyToPayPagination(baseUrl: String): Option[PaginationViewModel] =
-    createPaginationIfNeeded(readyToPayPage, readyToPayTotalPages, totalReadyToPay, baseUrl, "ready-to-pay")
+  def getReadyToPayPagination()(implicit messages: Messages): Option[PaginationViewModel] =
+    createPaginationIfNeeded(readyToPayPage, totalReadyToPay, messages("submissions.readyToPay.tabId"))
 
-  def getOverduePagination(baseUrl: String): Option[PaginationViewModel] =
-    createPaginationIfNeeded(overduePage, overdueTotalPages, totalOverdue, baseUrl, "overdue")
+  def getOverduePagination()(implicit messages: Messages): Option[PaginationViewModel] =
+    createPaginationIfNeeded(overduePage, totalOverdue, messages("submissions.overdue.tabId"))
 }
 
 object PaginationModel {
@@ -107,20 +133,16 @@ object PaginationModel {
     }.toOption
   }
 
-  def fromQueryParam(param: Option[String]): PaginationModel = {
-    param.flatMap(decode).getOrElse(default)
-  }
-
   def apply(
-    draftsPage: Int,
-    readyToPayPage: Int,
-    overduePage: Int,
-    recentPage: Int,
-    totalDrafts: Int,
-    totalReadyToPay: Int,
-    totalOverdue: Int,
-    totalRecent: Int
-  ): PaginationModel = {
+             draftsPage: Int,
+             readyToPayPage: Int,
+             overduePage: Int,
+             recentPage: Int,
+             totalDrafts: Int,
+             totalReadyToPay: Int,
+             totalOverdue: Int,
+             totalRecent: Int
+           ): PaginationModel = {
     new PaginationModel(
       draftsPage = draftsPage,
       readyToPayPage = readyToPayPage,

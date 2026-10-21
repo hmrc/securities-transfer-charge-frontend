@@ -17,13 +17,17 @@
 package models.pagination
 
 import base.SpecBase
+import play.api.i18n.Messages
 import play.api.libs.json.Json
+import play.api.test.Helpers.stubMessages
 import uk.gov.hmrc.securitiestransferchargefrontend.models.pagination.PaginationModel
 import uk.gov.hmrc.securitiestransferchargefrontend.models.search.{SubmissionStatus, SubmissionSummary}
 
 import java.time.LocalDate
 
 class PaginationModelSpec extends SpecBase {
+
+  private implicit val messages: Messages = stubMessages()
 
   "PaginationModel" - {
 
@@ -43,7 +47,7 @@ class PaginationModelSpec extends SpecBase {
 
     "update page numbers independently for each tab" in {
       val model = PaginationModel.default
-      
+
       model.updateDraftsPage(3).draftsPage mustBe 3
       model.updateReadyToPayPage(2).readyToPayPage mustBe 2
       model.updateOverduePage(4).overduePage mustBe 4
@@ -100,32 +104,6 @@ class PaginationModelSpec extends SpecBase {
       decoded mustBe None
     }
 
-    "decode from query parameter with valid string" in {
-      val model = PaginationModel(
-        draftsPage = 2,
-        readyToPayPage = 3,
-        recentPage = 1,
-        itemsPerPage = 10
-      )
-      val encoded = model.encode
-
-      val result = PaginationModel.fromQueryParam(Some(encoded))
-
-      result mustBe model
-    }
-
-    "return default model when query parameter is None" in {
-      val result = PaginationModel.fromQueryParam(None)
-
-      result mustBe PaginationModel.default
-    }
-
-    "return default model when query parameter is invalid" in {
-      val result = PaginationModel.fromQueryParam(Some("invalid"))
-
-      result mustBe PaginationModel.default
-    }
-
     "serialize and deserialize to JSON correctly" in {
       val model = PaginationModel(
         draftsPage = 2,
@@ -146,7 +124,7 @@ class PaginationModelSpec extends SpecBase {
     }
 
     "paginate submissions correctly" in {
-      val submissions = (1 to 25).map(i => 
+      val submissions = (1 to 25).map(i =>
         SubmissionSummary(
           submissionId = s"STC-$i",
           maybePaymentDueBy = None,
@@ -157,25 +135,25 @@ class PaginationModelSpec extends SpecBase {
       )
 
       val model = PaginationModel(itemsPerPage = 10)
-      
+
       // First page
       val page1 = model.paginateSubmissions(submissions, 1)
       page1.size mustBe 10
       page1.head.submissionId mustBe "STC-1"
       page1.last.submissionId mustBe "STC-10"
-      
+
       // Middle page
       val page2 = model.paginateSubmissions(submissions, 2)
       page2.size mustBe 10
       page2.head.submissionId mustBe "STC-11"
       page2.last.submissionId mustBe "STC-20"
-      
+
       // Last page with partial results
       val page3 = model.paginateSubmissions(submissions, 3)
       page3.size mustBe 5
       page3.head.submissionId mustBe "STC-21"
       page3.last.submissionId mustBe "STC-25"
-      
+
       // Empty submissions
       model.paginateSubmissions(Seq.empty, 1) mustBe empty
     }
@@ -194,30 +172,26 @@ class PaginationModelSpec extends SpecBase {
       )
 
       // Recent pagination
-      val recentPagination = model.getRecentPagination("/dashboard")
+      val recentPagination = model.getRecentPagination()
       recentPagination.isDefined mustBe true
       recentPagination.get.currentPage mustBe 2
       recentPagination.get.totalPages mustBe 3
-      recentPagination.get.tab mustBe "recent-submissions"
 
       // Drafts pagination
-      val draftsPagination = model.getDraftsPagination("/dashboard")
+      val draftsPagination = model.getDraftsPagination()
       draftsPagination.isDefined mustBe true
       draftsPagination.get.totalPages mustBe 2
-      draftsPagination.get.tab mustBe "drafts"
 
       // Ready to pay pagination
-      val readyToPayPagination = model.getReadyToPayPagination("/dashboard")
+      val readyToPayPagination = model.getReadyToPayPagination()
       readyToPayPagination.isDefined mustBe true
       readyToPayPagination.get.currentPage mustBe 3
       readyToPayPagination.get.totalPages mustBe 5
-      readyToPayPagination.get.tab mustBe "ready-to-pay"
 
       // Overdue pagination
-      val overduePagination = model.getOverduePagination("/dashboard")
+      val overduePagination = model.getOverduePagination()
       overduePagination.isDefined mustBe true
       overduePagination.get.totalPages mustBe 2
-      overduePagination.get.tab mustBe "overdue"
     }
 
     "return None for pagination when items do not exceed itemsPerPage" in {
@@ -229,10 +203,10 @@ class PaginationModelSpec extends SpecBase {
         itemsPerPage = 10
       )
 
-      model.getRecentPagination("/dashboard") mustBe None
-      model.getDraftsPagination("/dashboard") mustBe None
-      model.getReadyToPayPagination("/dashboard") mustBe None
-      model.getOverduePagination("/dashboard") mustBe None
+      model.getRecentPagination() mustBe None
+      model.getDraftsPagination() mustBe None
+      model.getReadyToPayPagination() mustBe None
+      model.getOverduePagination() mustBe None
     }
 
     "maintain independent page numbers for each tab" in {

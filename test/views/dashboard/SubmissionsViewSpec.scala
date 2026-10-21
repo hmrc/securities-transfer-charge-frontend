@@ -60,8 +60,7 @@ class SubmissionsViewSpec extends ViewBaseSpec {
         totalReadyToPay = readyToPay.size,
         totalOverdue = overdue.size,
         totalRecent = recent.size
-      ),
-      baseUrl = routes.SubmissionsController.onPageLoad(None, None, None, None).url
+      )
     )
   }
 
@@ -447,8 +446,7 @@ class SubmissionsViewSpec extends ViewBaseSpec {
       allOverdue = overdue,
       allRecent = recent,
       isAgent = true,
-      paginationModel = PaginationModel(totalDrafts = 0, totalReadyToPay = readyToPay.size, totalOverdue = overdue.size, totalRecent = recent.size),
-      baseUrl = routes.SubmissionsController.onPageLoad(None, None, None, None).url
+      paginationModel = PaginationModel(totalDrafts = 0, totalReadyToPay = readyToPay.size, totalOverdue = overdue.size, totalRecent = recent.size)
     ))
 
     val submissions = Seq(
@@ -509,8 +507,7 @@ class SubmissionsViewSpec extends ViewBaseSpec {
       allOverdue = Seq.empty,
       allRecent = Seq.empty,
       isAgent = true,
-      paginationModel = PaginationModel(totalDrafts = drafts.size, totalReadyToPay = 0, totalOverdue = 0, totalRecent = 0),
-      baseUrl = routes.SubmissionsController.onPageLoad(None, None, None, None).url
+      paginationModel = PaginationModel(totalDrafts = drafts.size, totalReadyToPay = 0, totalOverdue = 0, totalRecent = 0)
     ))
 
     val draftsPanel = doc.select(s"#${ExpectedContent.draftsTabId}")
@@ -563,8 +560,7 @@ class SubmissionsViewSpec extends ViewBaseSpec {
       allOverdue = Seq.empty,
       allRecent = Seq.empty,
       isAgent = true,
-      paginationModel = PaginationModel(totalDrafts = drafts.size, totalReadyToPay = 0, totalOverdue = 0, totalRecent = 0),
-      baseUrl = routes.SubmissionsController.onPageLoad(None, None, None, None).url
+      paginationModel = PaginationModel(totalDrafts = drafts.size, totalReadyToPay = 0, totalOverdue = 0, totalRecent = 0)
     ))
 
     val draftsPanel = doc.select(s"#${ExpectedContent.draftsTabId}")

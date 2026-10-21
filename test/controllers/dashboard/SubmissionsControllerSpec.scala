@@ -89,8 +89,7 @@ class SubmissionsControllerSpec extends SpecBase with MockitoSugar {
             totalReadyToPay = readyToPay.size,
             totalOverdue = overdue.size,
             totalRecent = recent.size
-          ),
-          baseUrl = routes.SubmissionsController.onPageLoad(None, None, None, None).url
+          )
         )
 
         status(result) mustEqual OK
