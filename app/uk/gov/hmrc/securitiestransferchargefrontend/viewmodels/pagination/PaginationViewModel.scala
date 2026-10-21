@@ -29,7 +29,15 @@ case class PaginationViewModel(
                                 paginationModel: PaginationModel
                               ) {
 
-  private val showEllipsisLimit: Int = 12 //Show all pages if within limit (no ellipsis needed)
+  private def getShowEllipsisLimit: Int = {
+    val displayingThreeDigits = currentPage >= 2
+    if (displayingThreeDigits) 13 else 15
+  }
+
+  private def getMiddleRange: Int = {
+    val displayingThreeDigits = currentPage >= 99
+    if (displayingThreeDigits) 3 else 4
+  }
 
   def shouldDisplay: Boolean = totalPages > 1
 
@@ -38,6 +46,9 @@ case class PaginationViewModel(
   def nextPage: Option[Int] = if (currentPage < totalPages) Some(currentPage + 1) else None
 
   def pages: Seq[PageItem] = {
+    val showEllipsisLimit = getShowEllipsisLimit  //Show all pages if within limit (no ellipsis needed)
+    val middleRange = getMiddleRange  // Pages on each side of current
+    
     if (totalPages <= showEllipsisLimit) {
       (1 to totalPages).map(page => PageItem(page, page == currentPage))
     } else {
@@ -46,7 +57,6 @@ case class PaginationViewModel(
       val pagesBeforeEllipsis = showEllipsisLimit - 1 // Pages to show before ellipsis
       val startThreshold = showEllipsisLimit - 3 // When to switch from start view
       val endThreshold = showEllipsisLimit - 2 // Pages from end to show end view
-      val middleRange = 4 // Pages on each side of current
 
       val firstPage = 1
 

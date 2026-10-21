@@ -65,12 +65,12 @@ class PaginationViewModelSpec extends SpecBase {
 
     "ellipsis logic (>12 pages)" - {
       "should show ellipsis at start of pagination" in {
-        val paginationModel = PaginationModel(totalRecent = 125, itemsPerPage = 10)
-        val viewModel = PaginationViewModel(1, 125, 10, "/test", "recent-submissions", paginationModel)
+        val paginationModel = PaginationModel(totalRecent = 155, itemsPerPage = 10)
+        val viewModel = PaginationViewModel(1, 155, 10, "/test", "recent-submissions", paginationModel)
 
         viewModel.pages.head.number mustBe 1
         viewModel.pages.head.isCurrent mustBe true
-        viewModel.pages.last.number mustBe 13
+        viewModel.pages.last.number mustBe 16
         viewModel.pages.count(_.isEllipsis) mustBe 1
       }
 
