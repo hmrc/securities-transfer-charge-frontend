@@ -31,7 +31,7 @@ case class PaginationViewModel(
 
   private def getShowEllipsisLimit: Int = {
     val displayingThreeDigits = currentPage >= 2
-    if (displayingThreeDigits) 13 else 15
+    if (displayingThreeDigits) 11 else 15
   }
 
   private def getMiddleRange: Int = {
@@ -56,7 +56,7 @@ case class PaginationViewModel(
 
       val pagesBeforeEllipsis = showEllipsisLimit - 1 // Pages to show before ellipsis
       val startThreshold = showEllipsisLimit - 3 // When to switch from start view
-      val endThreshold = showEllipsisLimit - 2 // Pages from end to show end view
+      val endThreshold = showEllipsisLimit - 3 // Pages from end to show end view
 
       val firstPage = 1
 
