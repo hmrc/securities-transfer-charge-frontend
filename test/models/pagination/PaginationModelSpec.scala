@@ -17,110 +17,169 @@
 package models.pagination
 
 import base.SpecBase
-import play.api.i18n.Messages
 import play.api.libs.json.Json
-import play.api.test.Helpers.stubMessages
-import uk.gov.hmrc.securitiestransferchargefrontend.models.pagination.PaginationModel
+import uk.gov.hmrc.securitiestransferchargefrontend.models.pagination.{PaginationModel, TabPagination}
 import uk.gov.hmrc.securitiestransferchargefrontend.models.search.{SubmissionStatus, SubmissionSummary}
 
 import java.time.LocalDate
+import java.util.Base64
+import scala.util.Try
 
 class PaginationModelSpec extends SpecBase {
 
-  private implicit val messages: Messages = stubMessages()
+  private def decode(encoded: String): Option[PaginationModel] = {
+    Try {
+      val decoded = new String(Base64.getUrlDecoder.decode(encoded), "UTF-8")
+      Json.parse(decoded).as[PaginationModel]
+    }.toOption
+  }
 
   "PaginationModel" - {
 
     "create default PaginationModel with correct initial values" in {
       val model = PaginationModel.default
 
-      model.draftsPage mustBe 1
-      model.readyToPayPage mustBe 1
-      model.overduePage mustBe 1
-      model.recentPage mustBe 1
-      model.totalDrafts mustBe 0
-      model.totalReadyToPay mustBe 0
-      model.totalOverdue mustBe 0
-      model.totalRecent mustBe 0
+      model.tabs mustBe empty
       model.itemsPerPage mustBe 10
     }
 
-    "update page numbers independently for each tab" in {
-      val model = PaginationModel.default
+    "forSubmissions factory method" - {
+      "create model with all tabs configured" in {
+        val model = PaginationModel.forSubmissions(
+          draftsPage = 2,
+          readyToPayPage = 3,
+          overduePage = 1,
+          recentPage = 4,
+          totalDrafts = 20,
+          totalReadyToPay = 30,
+          totalOverdue = 10,
+          totalRecent = 40
+        )
 
-      model.updateDraftsPage(3).draftsPage mustBe 3
-      model.updateReadyToPayPage(2).readyToPayPage mustBe 2
-      model.updateOverduePage(4).overduePage mustBe 4
-      model.updateRecentPage(5).recentPage mustBe 5
+        model.getTabPage("drafts") mustBe 2
+        model.getTabPage("ready-to-pay") mustBe 3
+        model.getTabPage("overdue") mustBe 1
+        model.getTabPage("recent-submissions") mustBe 4
+
+        model.getTabTotal("drafts") mustBe 20
+        model.getTabTotal("ready-to-pay") mustBe 30
+        model.getTabTotal("overdue") mustBe 10
+        model.getTabTotal("recent-submissions") mustBe 40
+      }
+
+      "create model with default values" in {
+        val model = PaginationModel.forSubmissions()
+
+        model.getTabPage("drafts") mustBe 1
+        model.getTabPage("ready-to-pay") mustBe 1
+        model.getTabPage("overdue") mustBe 1
+        model.getTabPage("recent-submissions") mustBe 1
+
+        model.getTabTotal("drafts") mustBe 0
+        model.getTabTotal("ready-to-pay") mustBe 0
+        model.getTabTotal("overdue") mustBe 0
+        model.getTabTotal("recent-submissions") mustBe 0
+      }
     }
 
-    "calculate total pages correctly for all tabs" in {
-      val model = PaginationModel(
-        totalRecent = 25,
-        totalDrafts = 50,
-        totalReadyToPay = 15,
-        totalOverdue = 7,
-        itemsPerPage = 10
-      )
+    "updateTabPage" - {
+      "update page number for existing tab" in {
+        val model = PaginationModel.forSubmissions(draftsPage = 1, totalDrafts = 50)
+        val updated = model.updateTabPage("drafts", 3)
 
-      model.recentTotalPages mustBe 3
-      model.draftsTotalPages mustBe 5
-      model.readyToPayTotalPages mustBe 2
-      model.overdueTotalPages mustBe 1
+        updated.getTabPage("drafts") mustBe 3
+        updated.getTabTotal("drafts") mustBe 50
+      }
+
+      "return unchanged model for non-existent tab" in {
+        val model = PaginationModel.forSubmissions()
+        val updated = model.updateTabPage("non-existent", 5)
+
+        updated mustBe model
+      }
     }
 
-    "calculate total pages as 0 when no items" in {
-      val model = PaginationModel.default
+    "getTabPage" - {
+      "return page number for existing tab" in {
+        val model = PaginationModel.forSubmissions(draftsPage = 3)
+        model.getTabPage("drafts") mustBe 3
+      }
 
-      model.recentTotalPages mustBe 0
-      model.draftsTotalPages mustBe 0
-      model.readyToPayTotalPages mustBe 0
-      model.overdueTotalPages mustBe 0
+      "return 1 for non-existent tab" in {
+        val model = PaginationModel.default
+        model.getTabPage("non-existent") mustBe 1
+      }
     }
 
-    "encode and decode PaginationModel correctly" in {
-      val model = PaginationModel(
-        draftsPage = 2,
-        readyToPayPage = 3,
-        overduePage = 1,
-        recentPage = 4,
-        totalDrafts = 20,
-        totalReadyToPay = 30,
-        totalOverdue = 10,
-        totalRecent = 40,
-        itemsPerPage = 10
-      )
+    "getTabTotal" - {
+      "return total for existing tab" in {
+        val model = PaginationModel.forSubmissions(totalDrafts = 25)
+        model.getTabTotal("drafts") mustBe 25
+      }
 
-      val encoded = model.encode
-      val decoded = PaginationModel.decode(encoded)
-
-      decoded.isDefined mustBe true
-      decoded.get mustBe model
+      "return 0 for non-existent tab" in {
+        val model = PaginationModel.default
+        model.getTabTotal("non-existent") mustBe 0
+      }
     }
 
-    "handle invalid encoded string gracefully" in {
-      val decoded = PaginationModel.decode("invalid-base64-string")
+    "getTabTotalPages" - {
+      "calculate total pages correctly" in {
+        val model = PaginationModel.forSubmissions(
+          totalDrafts = 25,
+          totalReadyToPay = 50,
+          totalOverdue = 7
+        )
 
-      decoded mustBe None
+        model.getTabTotalPages("drafts") mustBe 3
+        model.getTabTotalPages("ready-to-pay") mustBe 5
+        model.getTabTotalPages("overdue") mustBe 1
+      }
+
+      "return 0 for tab with no items" in {
+        val model = PaginationModel.forSubmissions()
+        model.getTabTotalPages("drafts") mustBe 0
+      }
+    }
+
+    "encode and decode" - {
+      "encode and decode PaginationModel correctly" in {
+        val model = PaginationModel.forSubmissions(
+          draftsPage = 2,
+          readyToPayPage = 3,
+          overduePage = 1,
+          recentPage = 4,
+          totalDrafts = 20,
+          totalReadyToPay = 30,
+          totalOverdue = 10,
+          totalRecent = 40
+        )
+
+        val encoded = model.encode
+        val decoded = decode(encoded)
+
+        decoded.isDefined mustBe true
+        decoded.get.getTabPage("drafts") mustBe 2
+        decoded.get.getTabTotal("drafts") mustBe 20
+      }
+
+      "handle invalid encoded string gracefully" in {
+        val decoded = decode("invalid-base64-string")
+        decoded mustBe None
+      }
     }
 
     "serialize and deserialize to JSON correctly" in {
-      val model = PaginationModel(
+      val model = PaginationModel.forSubmissions(
         draftsPage = 2,
-        readyToPayPage = 3,
-        overduePage = 1,
-        recentPage = 4,
-        totalDrafts = 20,
-        totalReadyToPay = 30,
-        totalOverdue = 10,
-        totalRecent = 40,
-        itemsPerPage = 10
+        totalDrafts = 20
       )
 
       val json = Json.toJson(model)
       val parsed = json.as[PaginationModel]
 
-      parsed mustBe model
+      parsed.getTabPage("drafts") mustBe 2
+      parsed.getTabTotal("drafts") mustBe 20
     }
 
     "paginate submissions correctly" in {
@@ -158,93 +217,90 @@ class PaginationModelSpec extends SpecBase {
       model.paginateSubmissions(Seq.empty, 1) mustBe empty
     }
 
-    "return pagination view model when items exceed itemsPerPage" in {
-      val model = PaginationModel(
-        recentPage = 2,
-        draftsPage = 1,
-        readyToPayPage = 3,
-        overduePage = 2,
-        totalRecent = 25,
-        totalDrafts = 20,
-        totalReadyToPay = 50,
-        totalOverdue = 15,
-        itemsPerPage = 10
-      )
+    "createPaginationIfNeeded" - {
+      "return pagination view model when items exceed itemsPerPage with custom URL builder" in {
+        val model = PaginationModel.forSubmissions(
+          recentPage = 2,
+          totalRecent = 25
+        )
 
-      // Recent pagination
-      val recentPagination = model.getRecentPagination()
-      recentPagination.isDefined mustBe true
-      recentPagination.get.currentPage mustBe 2
-      recentPagination.get.totalPages mustBe 3
+        val urlBuilder: (PaginationModel, Int) => String = { (model, _) =>
+          s"/test?page=${model.getTabPage("recent-submissions")}#recent-submissions"
+        }
 
-      // Drafts pagination
-      val draftsPagination = model.getDraftsPagination()
-      draftsPagination.isDefined mustBe true
-      draftsPagination.get.totalPages mustBe 2
+        val pagination = model.createPaginationIfNeeded("recent-submissions", urlBuilder)
 
-      // Ready to pay pagination
-      val readyToPayPagination = model.getReadyToPayPagination()
-      readyToPayPagination.isDefined mustBe true
-      readyToPayPagination.get.currentPage mustBe 3
-      readyToPayPagination.get.totalPages mustBe 5
+        pagination.isDefined mustBe true
+        pagination.get.currentPage mustBe 2
+        pagination.get.totalPages mustBe 3
+        pagination.get.totalItems mustBe 25
+      }
 
-      // Overdue pagination
-      val overduePagination = model.getOverduePagination()
-      overduePagination.isDefined mustBe true
-      overduePagination.get.totalPages mustBe 2
+      "return None when items do not exceed itemsPerPage" in {
+        val model = PaginationModel.forSubmissions(totalRecent = 5)
+
+        val urlBuilder: (PaginationModel, Int) => String = { (_, page) =>
+          s"/test?page=$page"
+        }
+
+        val pagination = model.createPaginationIfNeeded("recent-submissions", urlBuilder)
+
+        pagination mustBe None
+      }
+
+      "use URL builder function correctly" in {
+        val model = PaginationModel.forSubmissions(
+          draftsPage = 1,
+          totalDrafts = 25
+        )
+
+        var capturedModel: Option[PaginationModel] = None
+        var capturedPage: Option[Int] = None
+
+        val urlBuilder: (PaginationModel, Int) => String = { (model, page) =>
+          capturedModel = Some(model)
+          capturedPage = Some(page)
+          s"/custom/url?page=$page"
+        }
+
+        val pagination = model.createPaginationIfNeeded("drafts", urlBuilder)
+
+        pagination.isDefined mustBe true
+
+        val _ = pagination.get.pageCall(2).url
+
+        capturedModel.isDefined mustBe true
+        capturedPage.isDefined mustBe true
+        capturedModel.get.getTabPage("drafts") mustBe 2 // Should be updated to page 2
+      }
+
+      "work with any tab ID (generic)" in {
+        val model = PaginationModel(
+          tabs = Map(
+            "custom-tab" -> TabPagination(1, 30)
+          )
+        )
+
+        val urlBuilder: (PaginationModel, Int) => String = { (_, page) =>
+          s"/custom?tab=custom-tab&page=$page"
+        }
+
+        val pagination = model.createPaginationIfNeeded("custom-tab", urlBuilder)
+
+        pagination.isDefined mustBe true
+        pagination.get.currentPage mustBe 1
+        pagination.get.totalPages mustBe 3
+      }
     }
 
-    "return None for pagination when items do not exceed itemsPerPage" in {
-      val model = PaginationModel(
-        totalRecent = 5,
-        totalDrafts = 8,
-        totalReadyToPay = 3,
-        totalOverdue = 9,
-        itemsPerPage = 10
-      )
+    "TabPagination" - {
+      "serialize and deserialize correctly" in {
+        val tabPagination = TabPagination(page = 3, total = 50)
+        val json = Json.toJson(tabPagination)
+        val parsed = json.as[TabPagination]
 
-      model.getRecentPagination() mustBe None
-      model.getDraftsPagination() mustBe None
-      model.getReadyToPayPagination() mustBe None
-      model.getOverduePagination() mustBe None
-    }
-
-    "maintain independent page numbers for each tab" in {
-      val model = PaginationModel(
-        draftsPage = 2,
-        readyToPayPage = 3,
-        overduePage = 1,
-        recentPage = 4,
-        itemsPerPage = 10
-      )
-
-      model.draftsPage mustBe 2
-      model.readyToPayPage mustBe 3
-      model.overduePage mustBe 1
-      model.recentPage mustBe 4
-    }
-
-    "create model using factory method with all parameters" in {
-      val model = PaginationModel(
-        draftsPage = 2,
-        readyToPayPage = 3,
-        overduePage = 4,
-        recentPage = 5,
-        totalDrafts = 20,
-        totalReadyToPay = 30,
-        totalOverdue = 40,
-        totalRecent = 50
-      )
-
-      model.draftsPage mustBe 2
-      model.readyToPayPage mustBe 3
-      model.overduePage mustBe 4
-      model.recentPage mustBe 5
-      model.totalDrafts mustBe 20
-      model.totalReadyToPay mustBe 30
-      model.totalOverdue mustBe 40
-      model.totalRecent mustBe 50
-      model.itemsPerPage mustBe 10
+        parsed mustBe tabPagination
+      }
     }
   }
 }

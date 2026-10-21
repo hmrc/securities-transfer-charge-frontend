@@ -93,6 +93,19 @@ object SubmissionsViewModel {
     )
   }
 
+  private def buildSubmissionsUrl(model: PaginationModel, tabId: String): String = {
+    val tabParams = model.tabs.map { case (id, tabPagination) =>
+      id -> (if (tabPagination.page != 1) Some(tabPagination.page) else None)
+    }
+
+    routes.SubmissionsController.onPageLoad(
+      draftsPage = tabParams.getOrElse("drafts", None),
+      readyToPayPage = tabParams.getOrElse("ready-to-pay", None),
+      overduePage = tabParams.getOrElse("overdue", None),
+      recentPage = tabParams.getOrElse("recent-submissions", None)
+    ).url + s"#$tabId"
+  }
+
   private def buildTabs(
                          drafts: Seq[SubmissionSummary],
                          readyToPay: Seq[SubmissionSummary],
@@ -102,51 +115,57 @@ object SubmissionsViewModel {
                          paginationModel: PaginationModel
                        )(implicit messages: Messages): Seq[SubmissionTab] = {
 
-    val recentPagination = paginationModel.getRecentPagination()
-    val draftsPagination = paginationModel.getDraftsPagination()
-    val readyToPayPagination = paginationModel.getReadyToPayPagination()
-    val overduePagination = paginationModel.getOverduePagination()
+    val recentTabId = messages("submissions.recentSubmissions.tabId")
+    val draftsTabId = messages("submissions.drafts.tabId")
+    val readyToPayTabId = messages("submissions.readyToPay.tabId")
+    val overdueTabId = messages("submissions.overdue.tabId")
+
+    // Create pagination with submissions-specific URL builder
+    val recentPagination = paginationModel.createPaginationIfNeeded(recentTabId, (model, _) => buildSubmissionsUrl(model, recentTabId))
+    val draftsPagination = paginationModel.createPaginationIfNeeded(draftsTabId, (model, _) => buildSubmissionsUrl(model, draftsTabId))
+    val readyToPayPagination = paginationModel.createPaginationIfNeeded(readyToPayTabId, (model, _) => buildSubmissionsUrl(model, readyToPayTabId))
+    val overduePagination = paginationModel.createPaginationIfNeeded(overdueTabId, (model, _) => buildSubmissionsUrl(model, overdueTabId))
 
     val recentSubmissionsTab: SubmissionTab = SubmissionTab(
-      id = messages("submissions.recentSubmissions.tabId"),
+      id = recentTabId,
       label = messages("submissions.recentSubmissions.panel.heading"),
       heading = messages("submissions.recentSubmissions.panel.heading"),
       emptyText = messages("submissions.noRecentSubmissions"),
       count = recent.size,
-      totalCount = paginationModel.totalRecent,
+      totalCount = paginationModel.getTabTotal(recentTabId),
       table = Some(submissionsTable(recent, isAgent = isAgent)),
       pagination = recentPagination
     )
 
     val draftSubmissionsTab: SubmissionTab = SubmissionTab(
-      id = messages("submissions.drafts.tabId"),
-      label = StatusTag.labelWithTag(messages("submissions.drafts.panel.heading"), paginationModel.totalDrafts, Draft),
+      id = draftsTabId,
+      label = StatusTag.labelWithTag(messages("submissions.drafts.panel.heading"), paginationModel.getTabTotal(draftsTabId), Draft),
       heading = messages("submissions.drafts.panel.heading"),
       emptyText = messages("submissions.noDraftSubmissions"),
       count = drafts.size,
-      totalCount = paginationModel.totalDrafts,
+      totalCount = paginationModel.getTabTotal(draftsTabId),
       table = Some(submissionsTable(drafts, isDraftsTab = true, isAgent = isAgent)),
       pagination = draftsPagination
     )
 
     val readyToPaySubmissionsTab: SubmissionTab = SubmissionTab(
-      id = messages("submissions.readyToPay.tabId"),
-      label = StatusTag.labelWithTag(messages("submissions.readyToPay.panel.heading"), paginationModel.totalReadyToPay, ReadyToPay),
+      id = readyToPayTabId,
+      label = StatusTag.labelWithTag(messages("submissions.readyToPay.panel.heading"), paginationModel.getTabTotal(readyToPayTabId), ReadyToPay),
       heading = messages("submissions.readyToPay.panel.heading"),
       emptyText = messages("submissions.noReadyToPaySubmissions"),
       count = readyToPay.size,
-      totalCount = paginationModel.totalReadyToPay,
+      totalCount = paginationModel.getTabTotal(readyToPayTabId),
       table = Some(submissionsTable(readyToPay, isAgent = isAgent)),
       pagination = readyToPayPagination
     )
 
     val overdueSubmissionsTab: SubmissionTab = SubmissionTab(
-      id = messages("submissions.overdue.tabId"),
-      label = StatusTag.labelWithTag(messages("submissions.overdue.panel.heading"), paginationModel.totalOverdue, Overdue),
+      id = overdueTabId,
+      label = StatusTag.labelWithTag(messages("submissions.overdue.panel.heading"), paginationModel.getTabTotal(overdueTabId), Overdue),
       heading = messages("submissions.overdue.panel.heading"),
       emptyText = messages("submissions.noOverdueSubmissions"),
       count = overdue.size,
-      totalCount = paginationModel.totalOverdue,
+      totalCount = paginationModel.getTabTotal(overdueTabId),
       table = Some(submissionsTable(overdue, isAgent = isAgent)),
       pagination = overduePagination
     )
@@ -163,10 +182,15 @@ object SubmissionsViewModel {
              paginationModel: PaginationModel
            )(implicit messages: Messages): SubmissionsViewModel = {
 
-    val paginatedDrafts = paginationModel.paginateSubmissions(allDrafts, paginationModel.draftsPage)
-    val paginatedReadyToPay = paginationModel.paginateSubmissions(allReadyToPay, paginationModel.readyToPayPage)
-    val paginatedOverdue = paginationModel.paginateSubmissions(allOverdue, paginationModel.overduePage)
-    val paginatedRecent = paginationModel.paginateSubmissions(allRecent, paginationModel.recentPage)
+    val recentTabId = messages("submissions.recentSubmissions.tabId")
+    val draftsTabId = messages("submissions.drafts.tabId")
+    val readyToPayTabId = messages("submissions.readyToPay.tabId")
+    val overdueTabId = messages("submissions.overdue.tabId")
+
+    val paginatedDrafts = paginationModel.paginateSubmissions(allDrafts, paginationModel.getTabPage(draftsTabId))
+    val paginatedReadyToPay = paginationModel.paginateSubmissions(allReadyToPay, paginationModel.getTabPage(readyToPayTabId))
+    val paginatedOverdue = paginationModel.paginateSubmissions(allOverdue, paginationModel.getTabPage(overdueTabId))
+    val paginatedRecent = paginationModel.paginateSubmissions(allRecent, paginationModel.getTabPage(recentTabId))
 
     SubmissionsViewModel(
       tabs = buildTabs(paginatedDrafts, paginatedReadyToPay, paginatedOverdue, paginatedRecent, isAgent, paginationModel)

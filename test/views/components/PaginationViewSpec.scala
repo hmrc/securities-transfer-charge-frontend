@@ -34,8 +34,8 @@ class PaginationViewSpec extends ViewBaseSpec {
 
     "when there is only one page" - {
 
-      val paginationModel = PaginationModel(totalRecent = 5, itemsPerPage = 10)
-      val viewModel = paginationModel.getRecentPagination()
+      val paginationModel = PaginationModel.forSubmissions(totalRecent = 5)
+      val viewModel = paginationModel.createPaginationIfNeeded("recent-submissions", (model, page) => s"$baseUrl?recent=$page")
 
       "must not render pagination component" in {
         viewModel mustBe None
@@ -44,11 +44,11 @@ class PaginationViewSpec extends ViewBaseSpec {
 
     "when on the first page of multiple pages" - {
 
-      val paginationModel = PaginationModel(totalRecent = 50, itemsPerPage = 10)
-      val viewModel = paginationModel.getRecentPagination().get
+      val paginationModel = PaginationModel.forSubmissions(totalRecent = 50)
+      val viewModel = paginationModel.createPaginationIfNeeded("recent-submissions", (model, page) => s"$baseUrl?recent=$page#recent-submissions").get
 
       val html = view(viewModel)
-      val document: Document = Jsoup.parse(html.toString())
+      val document: Document = Jsoup.parse(html.body)
 
       "must render pagination component correctly" in {
         document.select(".govuk-pagination").isEmpty mustBe false
@@ -56,7 +56,7 @@ class PaginationViewSpec extends ViewBaseSpec {
         
         val nextLink = document.select(".govuk-pagination__next a")
         nextLink.isEmpty mustBe false
-        nextLink.attr("href") must include("recentPage=2")
+        nextLink.attr("href") must include("recent=2")
         nextLink.attr("href") must include("#recent-submissions")
         
         val pageItems = document.select(".govuk-pagination__item")
@@ -69,11 +69,11 @@ class PaginationViewSpec extends ViewBaseSpec {
 
     "when on a middle page" - {
 
-      val paginationModel = PaginationModel(draftsPage = 3, totalDrafts = 50, itemsPerPage = 10)
-      val viewModel = paginationModel.getDraftsPagination().get
+      val paginationModel = PaginationModel.forSubmissions(draftsPage = 3, totalDrafts = 50)
+      val viewModel = paginationModel.createPaginationIfNeeded("drafts", (model, page) => s"$baseUrl?drafts=$page#drafts").get
 
       val html = view(viewModel)
-      val document: Document = Jsoup.parse(html.toString())
+      val document: Document = Jsoup.parse(html.body)
 
       "must render previous, next and highlight current page" in {
         document.select(".govuk-pagination__prev a").isEmpty mustBe false
@@ -86,11 +86,11 @@ class PaginationViewSpec extends ViewBaseSpec {
 
     "when on the last page" - {
 
-      val paginationModel = PaginationModel(readyToPayPage = 5, totalReadyToPay = 50, itemsPerPage = 10)
-      val viewModel = paginationModel.getReadyToPayPagination().get
+      val paginationModel = PaginationModel.forSubmissions(readyToPayPage = 5, totalReadyToPay = 50)
+      val viewModel = paginationModel.createPaginationIfNeeded("ready-to-pay", (model, page) => s"$baseUrl?readyToPay=$page#ready-to-pay").get
 
       val html = view(viewModel)
-      val document: Document = Jsoup.parse(html.toString())
+      val document: Document = Jsoup.parse(html.body)
 
       "must render previous link but not next link" in {
         document.select(".govuk-pagination__prev a").isEmpty mustBe false
@@ -103,11 +103,11 @@ class PaginationViewSpec extends ViewBaseSpec {
 
     "when there are many pages" - {
 
-      val paginationModel = PaginationModel(overduePage = 15, totalOverdue = 200, itemsPerPage = 10)
-      val viewModel = paginationModel.getOverduePagination().get
+      val paginationModel = PaginationModel.forSubmissions(overduePage = 15, totalOverdue = 200)
+      val viewModel = paginationModel.createPaginationIfNeeded("overdue", (model, page) => s"$baseUrl?overdue=$page#overdue").get
 
       val html = view(viewModel)
-      val document: Document = Jsoup.parse(html.toString())
+      val document: Document = Jsoup.parse(html.body)
 
       "must render with ellipsis and not show all pages" in {
         document.select(".govuk-pagination__prev a").isEmpty mustBe false
@@ -123,11 +123,11 @@ class PaginationViewSpec extends ViewBaseSpec {
 
     "accessibility" - {
 
-      val paginationModel = PaginationModel(recentPage = 2, totalRecent = 50, itemsPerPage = 10)
-      val viewModel = paginationModel.getRecentPagination().get
+      val paginationModel = PaginationModel.forSubmissions(recentPage = 2, totalRecent = 50)
+      val viewModel = paginationModel.createPaginationIfNeeded("recent-submissions", (model, page) => s"$baseUrl?recent=$page#recent-submissions").get
 
       val html = view(viewModel)
-      val document: Document = Jsoup.parse(html.toString())
+      val document: Document = Jsoup.parse(html.body)
 
       "must have navigation landmark" in {
         val nav = document.select("nav.govuk-pagination")

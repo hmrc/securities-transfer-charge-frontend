@@ -84,7 +84,7 @@ class SubmissionsControllerSpec extends SpecBase with MockitoSugar {
           allReadyToPay = readyToPay,
           allOverdue = overdue,
           allRecent = recent,
-          paginationModel = PaginationModel(
+          paginationModel = PaginationModel.forSubmissions(
             totalDrafts = drafts.size,
             totalReadyToPay = readyToPay.size,
             totalOverdue = overdue.size,

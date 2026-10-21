@@ -56,7 +56,7 @@ class SubmissionsController @Inject()(
       allRecent <- dashboardService.getRecent(userId, groupId, subscriptionId)
     } yield {
 
-      val paginationModel = PaginationModel(
+      val paginationModel = PaginationModel.forSubmissions(
         draftsPage = draftsPage.getOrElse(1),
         readyToPayPage = readyToPayPage.getOrElse(1),
         overduePage = overduePage.getOrElse(1),
