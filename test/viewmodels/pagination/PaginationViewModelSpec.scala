@@ -54,11 +54,11 @@ class PaginationViewModelSpec extends SpecBase {
       }
 
       "should show all pages at showEllipsisLimit boundary" in {
-        val paginationModel = PaginationModel(totalRecent = 115, itemsPerPage = 10)
-        val viewModel = PaginationViewModel(6, 115, 10, "/test", "recent-submissions", paginationModel)
+        val paginationModel = PaginationModel(totalRecent = 125, itemsPerPage = 10)
+        val viewModel = PaginationViewModel(6, 125, 10, "/test", "recent-submissions", paginationModel)
 
-        viewModel.pages must have size 12
-        viewModel.pages.map(_.number) mustBe (1 to 12)
+        viewModel.pages must have size 13
+        viewModel.pages.map(_.number) mustBe (1 to 13)
         viewModel.pages.exists(_.isEllipsis) mustBe false
       }
     }
