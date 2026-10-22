@@ -92,7 +92,8 @@ class SubmissionDetailsViewSpec extends ViewBaseSpec {
 
   private val submissions: Seq[(String, SttSubmission)] = Seq(
     "a ready to pay STF submission with a single charge" -> singleSubmissionReadyToPay,
-    "a ready to pay STF submission with a tax charge AND a late filing charge" -> singleSubmissionReadyToPayWithLateFilingCharge
+    "a ready to pay STF submission with a tax charge AND a late filing charge" -> singleSubmissionReadyToPayWithLateFilingCharge,
+    "a ready to pay SH03 submission" -> singleSubmissionReadyToPay.copy(declareeName = Some("James White"))
   )
 
   submissions.foreach { case (name, submission) =>
@@ -160,14 +161,14 @@ class SubmissionDetailsViewSpec extends ViewBaseSpec {
         val rows = doc.select(".govuk-summary-list__row")
         rows.get(1).select(".govuk-summary-list__key").text() mustBe
           expected.submissionTypeLabel
-        rows.get(1).select(".govuk-summary-list__value").text() mustBe "Securities transfer (STF)"
+        rows.get(1).select(".govuk-summary-list__value").text() mustBe expected.submissionType
       }
 
       "have the correct number of transfers in the summary list" in {
         val rows = doc.select(".govuk-summary-list__row")
         rows.get(2).select(".govuk-summary-list__key").text() mustBe
           expected.transfersLabel
-        rows.get(2).select(".govuk-summary-list__value").text() mustBe "1"
+        rows.get(2).select(".govuk-summary-list__value").text() mustBe expected.numberOfTransfers
       }
 
       "have the correct total tax due in the summary list" in {
