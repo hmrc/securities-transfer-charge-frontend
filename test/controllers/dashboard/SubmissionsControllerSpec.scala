@@ -16,8 +16,8 @@
 
 package controllers.dashboard
 
+import base.Fixtures.{drafts, overdue, readyToPay}
 import base.SpecBase
-import base.Fixtures.{overdue,readyToPay,drafts}
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.when
 import org.scalatestplus.mockito.MockitoSugar
@@ -28,6 +28,7 @@ import play.api.test.Helpers.*
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.dashboard.routes
 import uk.gov.hmrc.securitiestransferchargefrontend.domain.{GroupIdentifier, SubscriptionId, UserId}
+import uk.gov.hmrc.securitiestransferchargefrontend.models.pagination.PaginationModel
 import uk.gov.hmrc.securitiestransferchargefrontend.models.search.SubmissionSummary
 import uk.gov.hmrc.securitiestransferchargefrontend.services.DashboardService
 import uk.gov.hmrc.securitiestransferchargefrontend.viewmodels.dashboard.SubmissionsViewModel
@@ -52,7 +53,7 @@ class SubmissionsControllerSpec extends SpecBase with MockitoSugar {
     when(mockDashboardService.getReadyToPay(any[SubscriptionId])(any[HeaderCarrier]))
       .thenReturn(Future.successful(readyToPay))
 
-    when(mockDashboardService.getRecent(any[UserId], any[GroupIdentifier],any[SubscriptionId])(any[HeaderCarrier]))
+    when(mockDashboardService.getRecent(any[UserId], any[GroupIdentifier], any[SubscriptionId])(any[HeaderCarrier]))
       .thenReturn(Future.successful(recent))
   }
 
@@ -79,10 +80,16 @@ class SubmissionsControllerSpec extends SpecBase with MockitoSugar {
         implicit val msgs: Messages = messages(application)
 
         val submissionsViewModel = SubmissionsViewModel.build(
-          drafts = drafts,
-          readyToPay = readyToPay,
-          overdue = overdue,
-          recent = recent
+          allDrafts = drafts,
+          allReadyToPay = readyToPay,
+          allOverdue = overdue,
+          allRecent = recent,
+          paginationModel = PaginationModel.forSubmissions(
+            totalDrafts = drafts.size,
+            totalReadyToPay = readyToPay.size,
+            totalOverdue = overdue.size,
+            totalRecent = recent.size
+          )
         )
 
         status(result) mustEqual OK
