@@ -20,6 +20,8 @@ import base.{Fixtures, SpecBase}
 import org.scalatestplus.play.guice.GuiceOneAppPerSuite
 import play.api.i18n.{Messages, MessagesApi}
 import uk.gov.hmrc.govukfrontend.views.Aliases.Text
+import uk.gov.hmrc.securitiestransferchargefrontend.domain.TransferType
+import uk.gov.hmrc.securitiestransferchargefrontend.domain.TransferType.{SH03, STF}
 import uk.gov.hmrc.securitiestransferchargefrontend.models.search.*
 import uk.gov.hmrc.securitiestransferchargefrontend.models.search.SubmissionStatus.{Overdue, ReadyToPay}
 import uk.gov.hmrc.securitiestransferchargefrontend.models.submission.SubmissionDetailsSummary
@@ -42,11 +44,11 @@ class SubmissionDetailsViewModelSpec extends SpecBase with GuiceOneAppPerSuite {
       )
     )
 
-  private def build(transfers: Seq[SttTransfer] = Seq(readyToPayTransfer), isAgent: Boolean = false, isSh03: Boolean = false): SubmissionDetailsViewModel =
+  private def build(transfers: Seq[SttTransfer] = Seq(readyToPayTransfer), isAgent: Boolean = false, transferType: TransferType = STF): SubmissionDetailsViewModel =
     SubmissionDetailsViewModel.build(
       Fixtures.singleSubmissionReadyToPay.copy(
         transfers = transfers,
-        declareeName = if (isSh03) Some("James White") else None
+        declareeName = if (transferType == SH03) Some("James White") else None
       ),
       formatter,
       isAgent
@@ -245,26 +247,26 @@ class SubmissionDetailsViewModelSpec extends SpecBase with GuiceOneAppPerSuite {
       )
 
       "display the correct table headings" in {
-        val table = tab(build(isSh03 = true), "allTransfers").table.get
+        val table = tab(build(transferType = SH03), "allTransfers").table.get
 
         table.head.get.map(_.content) mustBe sh03Headings
       }
 
       "display the number of shares and the reason for purchase" in {
-        val row = tab(build(isSh03 = true), "allTransfers").table.get.rows.head
+        val row = tab(build(transferType = SH03), "allTransfers").table.get.rows.head
 
         row(1).content mustBe Text(readyToPayTransfer.numberOfShares.toString)
         row(2).content mustBe Text(messages("submissionDetails.reasonForPurchase.cancellation")) // TODO: update once etmp api spec is updated
       }
 
       "display the same headings when the user is an agent" in {
-        val table = tab(build(isAgent = true, isSh03 = true), "allTransfers").table.get
+        val table = tab(build(isAgent = true, transferType = SH03), "allTransfers").table.get
 
         table.head.get.map(_.content) mustBe sh03Headings
       }
 
       "display the same columns when the user is an agent" in {
-        val row = tab(build(isAgent = true, isSh03 = true), "allTransfers").table.get.rows.head
+        val row = tab(build(isAgent = true, transferType = SH03), "allTransfers").table.get.rows.head
 
         row(1).content mustBe Text(readyToPayTransfer.numberOfShares.toString)
         row(2).content mustBe Text(messages("submissionDetails.reasonForPurchase.cancellation"))  // TODO: update once etmp api spec is updated

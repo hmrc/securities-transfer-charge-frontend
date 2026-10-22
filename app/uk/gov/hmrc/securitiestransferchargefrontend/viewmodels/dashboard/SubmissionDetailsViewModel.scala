@@ -21,7 +21,7 @@ import uk.gov.hmrc.govukfrontend.views.Aliases.{HeadCell, TableRow}
 import uk.gov.hmrc.govukfrontend.views.viewmodels.content.{HtmlContent, Text}
 import uk.gov.hmrc.govukfrontend.views.viewmodels.table.Table
 import uk.gov.hmrc.securitiestransferchargefrontend.domain.TransferType
-import uk.gov.hmrc.securitiestransferchargefrontend.domain.TransferType.SH03
+import uk.gov.hmrc.securitiestransferchargefrontend.domain.TransferType.{SH03, STF}
 import uk.gov.hmrc.securitiestransferchargefrontend.models.search.SubmissionStatus.{Overdue, ReadyToPay}
 import uk.gov.hmrc.securitiestransferchargefrontend.models.search.{SttSubmission, SttTransfer, SubmissionStatus}
 import uk.gov.hmrc.securitiestransferchargefrontend.models.submission.SubmissionDetailsSummary
@@ -47,7 +47,7 @@ object SubmissionDetailsViewModel {
   private def transfersTable(transfers: Seq[SttTransfer], formatter: FormattingService, isAgent: Boolean, submissionType: TransferType)(implicit messages: Messages): Table = {
     val middleKeys = submissionType match {
       case SH03         => Seq("shares", "for")
-      case _ if isAgent => Seq("buyer", "seller")
+      case STF if isAgent => Seq("buyer", "seller")
       case _            => Seq("seller", "securitiesBoughtIn")
     }
 
@@ -67,7 +67,7 @@ object SubmissionDetailsViewModel {
 
         val (second, third) = submissionType match {
           case SH03 => (transfer.numberOfShares.toString, messages("submissionDetails.reasonForPurchase.cancellation")) // TODO: need to retrieve the actual reason once etmp api spec is updated
-          case _ if isAgent => (transfer.buyerNames, sellerNames)
+          case STF if isAgent => (transfer.buyerNames, sellerNames)
           case _ => (sellerNames, transfer.companyName)
         }
 
