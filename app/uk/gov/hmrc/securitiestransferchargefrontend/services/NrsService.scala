@@ -118,5 +118,5 @@ object NrsSearchKeys:
   val Nino            = "NINO"
   val Utr             = "UTR"
   val Arn             = "ARN"
-  val SubmissionId    = "submissionId"
+  val SubmissionId    = "submissionID"
   val Utrn            = "transferRef"
