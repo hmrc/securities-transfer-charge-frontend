@@ -20,6 +20,8 @@ import base.{Fixtures, SpecBase}
 import org.mockito.Mockito.when
 import org.scalatest.BeforeAndAfterEach
 import org.scalatestplus.mockito.MockitoSugar
+import play.api.http.MimeTypes
+import play.api.mvc.Headers
 import uk.gov.hmrc.securitiestransferchargefrontend.clients.registration.NrsClient
 import uk.gov.hmrc.securitiestransferchargefrontend.config.FrontendAppConfig
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.actions.requests.{StcAuthorisedRequest, StcDataRequest}
@@ -27,10 +29,13 @@ import uk.gov.hmrc.securitiestransferchargefrontend.models.UserAnswers
 import uk.gov.hmrc.securitiestransferchargefrontend.models.nrs.IdentityData
 import uk.gov.hmrc.securitiestransferchargefrontend.services.NrsServiceImpl
 
+import java.time.Instant
+
 class NrsServiceSpec extends SpecBase with BeforeAndAfterEach with MockitoSugar {
 
   private def mockNrsClient = mock[NrsClient]
-  private def mockConfig = mock[FrontendAppConfig]
+
+  private val mockConfig = mock[FrontendAppConfig]
 
   def getService(): NrsServiceImpl = {
     new NrsServiceImpl(mockNrsClient, mockConfig)
@@ -135,7 +140,58 @@ class NrsServiceSpec extends SpecBase with BeforeAndAfterEach with MockitoSugar 
     }
 
     "should successfully build metadata from inputs" in {
-      
+      val service = getService()
+      val request = mock[StcDataRequest[?]]
+      val authReq = mock[StcAuthorisedRequest[?]]
+      val answers = mock[UserAnswers]
+      val mockIdentityData = mock[IdentityData]
+
+      when(request.request).thenReturn(authReq)
+      when(request.headers).thenReturn(Headers())
+      when(authReq.subscriptionId).thenReturn(subscriptionId)
+      when(authReq.identityData).thenReturn(mockIdentityData)
+      when(authReq.maybeArn).thenReturn(None)
+
+      when(request.userAnswers).thenReturn(answers)
+      when(answers.submissionId).thenReturn(submissionId)
+
+      when(mockIdentityData.nino).thenReturn(None)
+      when(mockIdentityData.saUtr).thenReturn(None)
+
+      when(mockConfig.nrsBusinessId).thenReturn("stc")
+
+      val checksum = "test-checksum"
+      val notableEvent = "test-notable-event"
+
+      val before = Instant.now()
+
+      val metadata = service.createMetadata(
+        checksum = checksum,
+        notableEvent = notableEvent,
+        request = request,
+        hc = hc,
+        utrn = testUtrn
+      )
+
+      val after = Instant.now()
+
+      metadata.businessId mustBe "stc"
+      metadata.notableEvent mustBe notableEvent
+      metadata.payloadContentType mustBe MimeTypes.HTML
+      metadata.payloadSha256Checksum mustBe checksum
+      metadata.identityData mustBe mockIdentityData
+
+      metadata.searchKeys mustBe Map(
+        NrsSearchKeys.SubscriptionId -> subscriptionId.value,
+        NrsSearchKeys.SubmissionId -> submissionId.value,
+        NrsSearchKeys.Utrn -> testUtrn
+      )
+
+      val timestamp = Instant.parse(metadata.userSubmissionTimestamp)
+
+      timestamp.isBefore(before) mustBe false
+      timestamp.isAfter(after) mustBe false
+
     }
 
   }
