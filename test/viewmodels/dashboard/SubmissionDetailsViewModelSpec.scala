@@ -1,9 +1,27 @@
+/*
+ * Copyright 2026 HM Revenue & Customs
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package viewmodels.dashboard
 
 import base.{Fixtures, SpecBase}
 import org.scalatestplus.play.guice.GuiceOneAppPerSuite
 import play.api.i18n.{Messages, MessagesApi}
 import uk.gov.hmrc.govukfrontend.views.Aliases.Text
+import uk.gov.hmrc.securitiestransferchargefrontend.domain.TransferType
+import uk.gov.hmrc.securitiestransferchargefrontend.domain.TransferType.{SH03, STF}
 import uk.gov.hmrc.securitiestransferchargefrontend.models.search.*
 import uk.gov.hmrc.securitiestransferchargefrontend.models.search.SubmissionStatus.{Overdue, ReadyToPay}
 import uk.gov.hmrc.securitiestransferchargefrontend.models.submission.SubmissionDetailsSummary
@@ -26,10 +44,11 @@ class SubmissionDetailsViewModelSpec extends SpecBase with GuiceOneAppPerSuite {
       )
     )
 
-  private def build(transfers: Seq[SttTransfer] = Seq(readyToPayTransfer), isAgent: Boolean = false): SubmissionDetailsViewModel =
+  private def build(transfers: Seq[SttTransfer] = Seq(readyToPayTransfer), isAgent: Boolean = false, transferType: TransferType = STF): SubmissionDetailsViewModel =
     SubmissionDetailsViewModel.build(
       Fixtures.singleSubmissionReadyToPay.copy(
-        transfers = transfers
+        transfers = transfers,
+        declareeName = if (transferType == SH03) Some("James White") else None
       ),
       formatter,
       isAgent
@@ -214,6 +233,44 @@ class SubmissionDetailsViewModelSpec extends SpecBase with GuiceOneAppPerSuite {
           15,
           ReadyToPay
         )
+    }
+
+    "when the submission is an SH03" - {
+
+      val sh03Headings = Seq(
+        Text(messages("submissionDetails.transfers.table.reference.heading")),
+        Text(messages("submissionDetails.transfers.table.shares.heading")),
+        Text(messages("submissionDetails.transfers.table.for.heading")),
+        Text(messages("submissionDetails.transfers.table.paymentDueBy.heading")),
+        Text(messages("submissionDetails.transfers.table.status.heading")),
+        Text(messages("submissionDetails.transfers.table.action.heading"))
+      )
+
+      "display the correct table headings" in {
+        val table = tab(build(transferType = SH03), "allTransfers").table.get
+
+        table.head.get.map(_.content) mustBe sh03Headings
+      }
+
+      "display the number of shares and the reason for purchase" in {
+        val row = tab(build(transferType = SH03), "allTransfers").table.get.rows.head
+
+        row(1).content mustBe Text(readyToPayTransfer.numberOfShares.toString)
+        row(2).content mustBe Text(messages("submissionDetails.reasonForPurchase.cancellation")) // TODO: update once etmp api spec is updated
+      }
+
+      "display the same headings when the user is an agent" in {
+        val table = tab(build(isAgent = true, transferType = SH03), "allTransfers").table.get
+
+        table.head.get.map(_.content) mustBe sh03Headings
+      }
+
+      "display the same columns when the user is an agent" in {
+        val row = tab(build(isAgent = true, transferType = SH03), "allTransfers").table.get.rows.head
+
+        row(1).content mustBe Text(readyToPayTransfer.numberOfShares.toString)
+        row(2).content mustBe Text(messages("submissionDetails.reasonForPurchase.cancellation"))  // TODO: update once etmp api spec is updated
+      }
     }
 
     "when the user is an agent" - {

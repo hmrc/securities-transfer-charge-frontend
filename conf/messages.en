@@ -1419,6 +1419,8 @@ submissionDetails.transfers.table.reference.heading = Transfer reference
 submissionDetails.transfers.table.seller.heading = Seller
 submissionDetails.transfers.table.buyer.heading = Buyer
 submissionDetails.transfers.table.securitiesBoughtIn.heading = Securities bought in
+submissionDetails.transfers.table.shares.heading = Shares
+submissionDetails.transfers.table.for.heading = For
 submissionDetails.transfers.table.paymentDueBy.heading = Payment due by
 submissionDetails.transfers.table.status.heading = Status
 submissionDetails.transfers.table.action.heading = Action
@@ -1428,3 +1430,6 @@ submissionDetails.transfers.action.view.hidden = View transfer reference {0}
 
 submissionDetails.transferType.stf = Securities transfer (STF)
 submissionDetails.transferType.sh03 = Share buyback (SH03)
+
+submissionDetails.reasonForPurchase.cancellation = Cancellation
+submissionDetails.reasonForPurchase.treasury = Treasury
