@@ -18,6 +18,7 @@
 @import uk.gov.hmrc.securitiestransferchargefrontend.views.html.components.Pagination
 @import uk.gov.hmrc.hmrcfrontend.views.viewmodels.hmrcstandardpage.TemplateOverrides
 @import uk.gov.hmrc.securitiestransferchargefrontend.viewmodels.dashboard.SubmissionsViewModel
+@import uk.gov.hmrc.securitiestransferchargefrontend.viewmodels.dashboard.SubmissionTabIds
 @import uk.gov.hmrc.securitiestransferchargefrontend.views.html.templates
 @import uk.gov.hmrc.securitiestransferchargefrontend.controllers.dashboard.routes
 
@@ -77,7 +78,7 @@
 
                         } else {
 
-                            @if(item.id == messages("submissions.recentSubmissions.tabId")) {
+                            @if(item.id == SubmissionTabIds.Recent) {
                                 <p class="govuk-body">
                                     @messages("submissions.recentSubmissions.body")
                                 </p>

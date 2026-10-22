@@ -24,7 +24,7 @@ import uk.gov.hmrc.securitiestransferchargefrontend.controllers.dashboard.routes
 import uk.gov.hmrc.securitiestransferchargefrontend.models.pagination.PaginationModel
 import uk.gov.hmrc.securitiestransferchargefrontend.models.search.SubmissionStatus.*
 import uk.gov.hmrc.securitiestransferchargefrontend.models.search.SubmissionSummary
-import uk.gov.hmrc.securitiestransferchargefrontend.viewmodels.dashboard.SubmissionsViewModel
+import uk.gov.hmrc.securitiestransferchargefrontend.viewmodels.dashboard.{SubmissionTabIds, SubmissionsViewModel}
 import uk.gov.hmrc.securitiestransferchargefrontend.views.html.dashboard.SubmissionsView
 import views.ViewBaseSpec
 
@@ -77,10 +77,10 @@ class SubmissionsViewSpec extends ViewBaseSpec {
     val readyToPayHeading: String = messages("submissions.readyToPay.panel.heading")
     val overdueHeading: String = messages("submissions.overdue.panel.heading")
 
-    val recentTabId: String = messages("submissions.recentSubmissions.tabId")
-    val draftsTabId: String = messages("submissions.drafts.tabId")
-    val readyToPayTabId: String = messages("submissions.readyToPay.tabId")
-    val overdueTabId: String = messages("submissions.overdue.tabId")
+    val recentTabId: String = SubmissionTabIds.Recent
+    val draftsTabId: String = SubmissionTabIds.Drafts
+    val readyToPayTabId: String = SubmissionTabIds.ReadyToPay
+    val overdueTabId: String = SubmissionTabIds.Overdue
 
     val noRecent: String = messages("submissions.noRecentSubmissions")
     val noDrafts: String = messages("submissions.noDraftSubmissions")

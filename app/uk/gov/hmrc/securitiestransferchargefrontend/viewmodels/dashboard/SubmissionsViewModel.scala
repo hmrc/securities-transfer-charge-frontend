@@ -25,6 +25,7 @@ import uk.gov.hmrc.securitiestransferchargefrontend.models.pagination.Pagination
 import uk.gov.hmrc.securitiestransferchargefrontend.models.search.SubmissionStatus.{Draft, Overdue, ReadyToPay}
 import uk.gov.hmrc.securitiestransferchargefrontend.models.search.SubmissionSummary
 import uk.gov.hmrc.securitiestransferchargefrontend.viewmodels.pagination.PaginationViewModel
+import uk.gov.hmrc.securitiestransferchargefrontend.viewmodels.dashboard.SubmissionTabIds
 
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
@@ -36,6 +37,11 @@ case class SubmissionTab(id: String, label: String, heading: String, emptyText: 
 case class SubmissionsViewModel(tabs: Seq[SubmissionTab])
 
 object SubmissionsViewModel {
+
+  private val recentTabId = SubmissionTabIds.Recent
+  private val draftsTabId = SubmissionTabIds.Drafts
+  private val readyToPayTabId = SubmissionTabIds.ReadyToPay
+  private val overdueTabId = SubmissionTabIds.Overdue
 
   private val govUkDateFormatter = DateTimeFormatter.ofPattern("d MMMM uuuu", Locale.UK)
 
@@ -99,10 +105,10 @@ object SubmissionsViewModel {
     }
 
     routes.SubmissionsController.onPageLoad(
-      draftsPage = tabParams.getOrElse("drafts", None),
-      readyToPayPage = tabParams.getOrElse("ready-to-pay", None),
-      overduePage = tabParams.getOrElse("overdue", None),
-      recentPage = tabParams.getOrElse("recent-submissions", None)
+      draftsPage = tabParams.getOrElse(draftsTabId, None),
+      readyToPayPage = tabParams.getOrElse(readyToPayTabId, None),
+      overduePage = tabParams.getOrElse(overdueTabId, None),
+      recentPage = tabParams.getOrElse(recentTabId, None)
     ).url + s"#$tabId"
   }
 
@@ -115,10 +121,7 @@ object SubmissionsViewModel {
                          paginationModel: PaginationModel
                        )(implicit messages: Messages): Seq[SubmissionTab] = {
 
-    val recentTabId = messages("submissions.recentSubmissions.tabId")
-    val draftsTabId = messages("submissions.drafts.tabId")
-    val readyToPayTabId = messages("submissions.readyToPay.tabId")
-    val overdueTabId = messages("submissions.overdue.tabId")
+
 
     // Create pagination with submissions-specific URL builder
     val recentPagination = paginationModel.createPaginationIfNeeded(recentTabId, (model, _) => buildSubmissionsUrl(model, recentTabId))
@@ -181,11 +184,6 @@ object SubmissionsViewModel {
              isAgent: Boolean = false,
              paginationModel: PaginationModel
            )(implicit messages: Messages): SubmissionsViewModel = {
-
-    val recentTabId = messages("submissions.recentSubmissions.tabId")
-    val draftsTabId = messages("submissions.drafts.tabId")
-    val readyToPayTabId = messages("submissions.readyToPay.tabId")
-    val overdueTabId = messages("submissions.overdue.tabId")
 
     val paginatedDrafts = paginationModel.paginateSubmissions(allDrafts, paginationModel.getTabPage(draftsTabId))
     val paginatedReadyToPay = paginationModel.paginateSubmissions(allReadyToPay, paginationModel.getTabPage(readyToPayTabId))

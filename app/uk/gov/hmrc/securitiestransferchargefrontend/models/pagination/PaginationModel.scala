@@ -18,6 +18,7 @@ package uk.gov.hmrc.securitiestransferchargefrontend.models.pagination
 
 import play.api.libs.json.{Format, Json}
 import uk.gov.hmrc.securitiestransferchargefrontend.models.search.SubmissionSummary
+import uk.gov.hmrc.securitiestransferchargefrontend.viewmodels.dashboard.SubmissionTabIds
 import uk.gov.hmrc.securitiestransferchargefrontend.viewmodels.pagination.PaginationViewModel
 
 import java.util.Base64
@@ -42,8 +43,12 @@ case class PaginationModel(
     }
   }
 
+  // Clamp the page between 1 and the last page, so a bad or stale URL (e.g. ?draftsPage=999)
+  // shows the nearest valid page instead of slicing an empty list and showing the empty message for a given tab.
   def getTabPage(tabId: String): Int = {
-    tabs.get(tabId).map(_.page).getOrElse(1)
+    val requested = tabs.get(tabId).map(_.page).getOrElse(1)
+    val lastPage = math.max(1, getTabTotalPages(tabId)) // at least 1, even if there are 0 items
+    math.max(1, math.min(requested, lastPage))          // keep between page 1 and the lastPage
   }
 
   def getTabTotal(tabId: String): Int = {
@@ -111,10 +116,10 @@ object PaginationModel {
                     ): PaginationModel = {
     PaginationModel(
       tabs = Map(
-        "drafts" -> TabPagination(draftsPage, totalDrafts),
-        "ready-to-pay" -> TabPagination(readyToPayPage, totalReadyToPay),
-        "overdue" -> TabPagination(overduePage, totalOverdue),
-        "recent-submissions" -> TabPagination(recentPage, totalRecent)
+        SubmissionTabIds.Drafts -> TabPagination(draftsPage, totalDrafts),
+        SubmissionTabIds.ReadyToPay -> TabPagination(readyToPayPage, totalReadyToPay),
+        SubmissionTabIds.Overdue -> TabPagination(overduePage, totalOverdue),
+        SubmissionTabIds.Recent -> TabPagination(recentPage, totalRecent)
       )
     )
   }

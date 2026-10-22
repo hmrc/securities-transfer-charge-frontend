@@ -20,6 +20,7 @@ import base.SpecBase
 import play.api.libs.json.Json
 import uk.gov.hmrc.securitiestransferchargefrontend.models.pagination.{PaginationModel, TabPagination}
 import uk.gov.hmrc.securitiestransferchargefrontend.models.search.{SubmissionStatus, SubmissionSummary}
+import uk.gov.hmrc.securitiestransferchargefrontend.viewmodels.dashboard.SubmissionTabIds
 
 import java.time.LocalDate
 import java.util.Base64
@@ -101,13 +102,28 @@ class PaginationModelSpec extends SpecBase {
 
     "getTabPage" - {
       "return page number for existing tab" in {
-        val model = PaginationModel.forSubmissions(draftsPage = 3)
-        model.getTabPage("drafts") mustBe 3
+        val model = PaginationModel.forSubmissions(draftsPage = 3, totalDrafts = 25)
+        model.getTabPage(SubmissionTabIds.Drafts) mustBe 3
       }
 
       "return 1 for non-existent tab" in {
         val model = PaginationModel.default
         model.getTabPage("non-existent") mustBe 1
+      }
+
+      "prevent a user from accessing a page number that's too high by displaying the last page" in {
+        val model = PaginationModel.forSubmissions(draftsPage = 999, totalDrafts = 25)
+        model.getTabPage(SubmissionTabIds.Drafts) mustBe 3
+      }
+
+      "prevent a user from accessing a page number that's too low by displaying the first page" in {
+        val model = PaginationModel.forSubmissions(draftsPage = 0, totalDrafts = 25)
+        model.getTabPage(SubmissionTabIds.Drafts) mustBe 1
+      }
+
+      "return page 1 when there are no items even when given a higher page number" in {
+        val model = PaginationModel.forSubmissions(draftsPage = 5)
+        model.getTabPage(SubmissionTabIds.Drafts) mustBe 1
       }
     }
 

@@ -53,15 +53,15 @@ class PaginationViewSpec extends ViewBaseSpec {
       "must render pagination component correctly" in {
         document.select(".govuk-pagination").isEmpty mustBe false
         document.select(".govuk-pagination__prev").isEmpty mustBe true
-        
+
         val nextLink = document.select(".govuk-pagination__next a")
         nextLink.isEmpty mustBe false
         nextLink.attr("href") must include("recent=2")
         nextLink.attr("href") must include("#recent-submissions")
-        
+
         val pageItems = document.select(".govuk-pagination__item")
         pageItems.size() mustBe 5
-        
+
         val currentPageItem = document.select(".govuk-pagination__item--current")
         currentPageItem.text() mustBe "1"
       }
@@ -78,7 +78,7 @@ class PaginationViewSpec extends ViewBaseSpec {
       "must render previous, next and highlight current page" in {
         document.select(".govuk-pagination__prev a").isEmpty mustBe false
         document.select(".govuk-pagination__next a").isEmpty mustBe false
-        
+
         val currentPageItem = document.select(".govuk-pagination__item--current")
         currentPageItem.text() mustBe "3"
       }
@@ -95,7 +95,7 @@ class PaginationViewSpec extends ViewBaseSpec {
       "must render previous link but not next link" in {
         document.select(".govuk-pagination__prev a").isEmpty mustBe false
         document.select(".govuk-pagination__next").isEmpty mustBe true
-        
+
         val currentPageItem = document.select(".govuk-pagination__item--current")
         currentPageItem.text() mustBe "5"
       }
@@ -112,10 +112,10 @@ class PaginationViewSpec extends ViewBaseSpec {
       "must render with ellipsis and not show all pages" in {
         document.select(".govuk-pagination__prev a").isEmpty mustBe false
         document.select(".govuk-pagination__next a").isEmpty mustBe false
-        
+
         val currentPageItem = document.select(".govuk-pagination__item--current")
         currentPageItem.text() mustBe "15"
-        
+
         val pageItems = document.select(".govuk-pagination__item")
         pageItems.size() must be < 20
       }
