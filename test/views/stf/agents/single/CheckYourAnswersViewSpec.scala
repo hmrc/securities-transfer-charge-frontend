@@ -23,7 +23,7 @@ import play.api.mvc.Call
 import uk.gov.hmrc.govukfrontend.views.viewmodels.content.Text
 import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.{Key, SummaryList, SummaryListRow, Value}
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.agents.single.routes as agentRoutes
-import uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.shared.routes as sharedRoutes
+import uk.gov.hmrc.securitiestransferchargefrontend.controllers.dashboard.routes as dashboardRoutes
 import uk.gov.hmrc.securitiestransferchargefrontend.viewmodels.stf.shared.single.{CheckYourAnswersViewModel, SummarySection}
 import uk.gov.hmrc.securitiestransferchargefrontend.views.html.stf.agents.single.CheckYourAnswersView
 import views.ViewBaseSpec
@@ -199,7 +199,7 @@ class CheckYourAnswersViewSpec extends ViewBaseSpec {
     }
 
     "should have the correct save and return link" in {
-      view().select(".govuk-button-group a.govuk-link").attr("href") mustBe sharedRoutes.SubmissionsDashboardController.onPageLoad().url
+      view().select(".govuk-button-group a.govuk-link").attr("href") mustBe dashboardRoutes.DashboardController.onPageLoad().url
     }
 
     "should have the correct back link" in {

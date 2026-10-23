@@ -113,8 +113,8 @@ class ConfirmationViewSpec extends ViewBaseSpec {
           .orElseThrow()
 
         link.attr("href") mustBe
-          uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.shared.routes
-            .SubmissionsDashboardController
+          uk.gov.hmrc.securitiestransferchargefrontend.controllers.dashboard.routes
+            .DashboardController
             .onPageLoad()
             .url
       }

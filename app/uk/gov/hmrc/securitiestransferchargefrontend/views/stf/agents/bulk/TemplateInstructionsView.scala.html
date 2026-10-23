@@ -15,7 +15,7 @@
  *@
 
 @import uk.gov.hmrc.securitiestransferchargefrontend.views.html.templates
-@import uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.shared.routes
+@import uk.gov.hmrc.securitiestransferchargefrontend.controllers.dashboard.routes
 @import uk.gov.hmrc.securitiestransferchargefrontend.controllers.fileUpload.routes as bulkRoutes
 @import uk.gov.hmrc.securitiestransferchargefrontend.models.JourneyType
 
@@ -59,7 +59,7 @@
             ).asLink(bulkRoutes.FileUploadController.onPageLoad(JourneyType.STF).url)
         )
 
-        <a class="govuk-link" href="@routes.SubmissionsDashboardController.onPageLoad().url">
+        <a class="govuk-link" href="@routes.DashboardController.onPageLoad().url">
             @messages("return-to-dashboard.link")
         </a>
     </div>
