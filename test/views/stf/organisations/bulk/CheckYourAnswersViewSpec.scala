@@ -21,7 +21,7 @@ import org.jsoup.nodes.Document
 import play.api.Application
 import play.api.mvc.Call
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.organisations.bulk.routes
-import uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.shared.routes as sharedRoutes
+import uk.gov.hmrc.securitiestransferchargefrontend.controllers.dashboard.routes as dashboardRoutes
 import uk.gov.hmrc.securitiestransferchargefrontend.viewmodels.stf.fileupload.{CheckYourAnswersViewModel, Transfer}
 import uk.gov.hmrc.securitiestransferchargefrontend.views.html.stf.organisations.bulk.CheckYourAnswersView
 import views.ViewBaseSpec
@@ -233,7 +233,7 @@ class CheckYourAnswersViewSpec extends ViewBaseSpec {
       view()
         .select(".govuk-button-group a.govuk-link")
         .attr("href") mustBe
-        sharedRoutes.SubmissionsDashboardController.onPageLoad().url
+        dashboardRoutes.DashboardController.onPageLoad().url
     }
 
     "should have the correct back link" in {

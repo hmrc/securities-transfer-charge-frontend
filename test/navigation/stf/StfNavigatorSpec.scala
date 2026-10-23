@@ -32,7 +32,7 @@ import uk.gov.hmrc.securitiestransferchargefrontend.models.JourneyType.STF
 import uk.gov.hmrc.securitiestransferchargefrontend.models.stf.*
 import uk.gov.hmrc.securitiestransferchargefrontend.navigation.stf.individuals.StfNavigator
 import uk.gov.hmrc.securitiestransferchargefrontend.pages.*
-import uk.gov.hmrc.securitiestransferchargefrontend.pages.stf.shared.{HowToNotifyAboutSecuritiesTransferPage, SubmissionsDashboardPage}
+import uk.gov.hmrc.securitiestransferchargefrontend.pages.stf.shared.HowToNotifyAboutSecuritiesTransferPage
 import uk.gov.hmrc.securitiestransferchargefrontend.pages.stf.single.*
 
 import java.time.LocalDate
@@ -65,13 +65,7 @@ class StfNavigatorSpec extends SpecBase with ScalaFutures {
           res mustBe navigator.dashboardPage
         }
       }
-
-      "must go from SubmissionsDashboardPage to HowToNotifyAboutSecuritiesTransferController" in {
-        val result = navigator.nextPage(SubmissionsDashboardPage, NormalMode, emptyUserAnswers)(fakeRequest)
-        whenReady(result) { res =>
-          res mustBe individualRoutes.HowToNotifyAboutSecuritiesTransferController.onPageLoad()
-        }
-      }
+      
 
       "must go from the ConfirmAddressPage to NameOfSellerController" in {
         val answers = emptyUserAnswers.set(ConfirmAddressPage, Fixtures.confirmableAddress).get

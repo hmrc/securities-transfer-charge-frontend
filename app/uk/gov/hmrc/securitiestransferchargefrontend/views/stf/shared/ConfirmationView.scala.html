@@ -16,6 +16,7 @@
 
 @import uk.gov.hmrc.securitiestransferchargefrontend.models.ConfirmationViewModel
 @import uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.shared.routes
+@import uk.gov.hmrc.securitiestransferchargefrontend.controllers.dashboard.routes as dashboardRoutes
 @import uk.gov.hmrc.govukfrontend.views.html.components._
 
 @this(
@@ -41,7 +42,7 @@
     </h2>
 
     <p class="govuk-body govuk-!-margin-bottom-7">
-        @messages("confirmation.heading.transferReference.p1") <a class="govuk-link" rel="noreferrer noopener" target="_blank" href="@routes.SubmissionsDashboardController.onPageLoad().url">@messages("confirmation.heading.transferReference.link")</a> @messages("confirmation.heading.transferReference.p2")
+        @messages("confirmation.heading.transferReference.p1") <a class="govuk-link" rel="noreferrer noopener" target="_blank" href="@dashboardRoutes.DashboardController.onPageLoad().url">@messages("confirmation.heading.transferReference.link")</a> @messages("confirmation.heading.transferReference.p2")
     </p>
 
     <h2 class="govuk-heading-m">
@@ -103,7 +104,7 @@
                 ButtonViewModel(messages("confirmation.button.pay"))
             )
 
-            <a class="govuk-link" href="@routes.SubmissionsDashboardController.onPageLoad().url">
+            <a class="govuk-link" href="@dashboardRoutes.DashboardController.onPageLoad().url">
             @messages("return-to-dashboard.link")
             </a>
 

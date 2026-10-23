@@ -35,7 +35,7 @@ import uk.gov.hmrc.securitiestransferchargefrontend.models.{CheckMode, NormalMod
 import uk.gov.hmrc.securitiestransferchargefrontend.navigation.stf.agents.StfAgentNavigator
 import uk.gov.hmrc.securitiestransferchargefrontend.pages.Page
 import uk.gov.hmrc.securitiestransferchargefrontend.pages.stf.bulk.BulkCheckYourAnswersPage
-import uk.gov.hmrc.securitiestransferchargefrontend.pages.stf.shared.{AgentReferencePage, HowToNotifyAboutSecuritiesTransferPage, SubmissionsDashboardPage}
+import uk.gov.hmrc.securitiestransferchargefrontend.pages.stf.shared.{AgentReferencePage, HowToNotifyAboutSecuritiesTransferPage}
 import uk.gov.hmrc.securitiestransferchargefrontend.pages.stf.single.*
 
 import java.time.LocalDate
@@ -72,13 +72,6 @@ class StfAgentNavigatorSpec extends SpecBase with ScalaFutures {
         val result = navigator.nextPage(AnyPage, NormalMode, UserAnswers(testUserId, testGroupIdentifier, submissionId, STF), true)(fakeRequest)
         whenReady(result) { res =>
           res mustBe navigator.dashboardPage
-        }
-      }
-
-      "must go from SubmissionsDashboardPage to HowToNotifyAboutSecuritiesTransferController" in {
-        val result = navigator.nextPage(SubmissionsDashboardPage, NormalMode, emptyUserAnswers)(fakeRequest)
-        whenReady(result) { res =>
-          res mustBe agentRoutes.HowToNotifyAboutSecuritiesTransferController.onPageLoad()
         }
       }
 

@@ -19,7 +19,7 @@ package views.sh03.organisations
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
 import play.api.Application
-import uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.shared.routes
+import uk.gov.hmrc.securitiestransferchargefrontend.controllers.dashboard.routes
 import uk.gov.hmrc.securitiestransferchargefrontend.forms.sh03.shared.HowToNotifyAboutShareBuybackFormProvider
 import uk.gov.hmrc.securitiestransferchargefrontend.models.NormalMode
 import uk.gov.hmrc.securitiestransferchargefrontend.views.html.sh03.organisations.HowToNotifyAboutShareBuybackView
@@ -85,7 +85,7 @@ class HowToNotifyAboutShareBuybackViewSpec extends ViewBaseSpec {
       "have a return to dashboard link" in {
         val link = howToNotifyAboutShareBuybackView.select(".govuk-button-group a.govuk-link").first()
         link.text() mustBe ExpectedContent.returnLink
-        link.attr("href") mustBe routes.SubmissionsDashboardController.onPageLoad().url
+        link.attr("href") mustBe routes.DashboardController.onPageLoad().url
       }
     }
   }

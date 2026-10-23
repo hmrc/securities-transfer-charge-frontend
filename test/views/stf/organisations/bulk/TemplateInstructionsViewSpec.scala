@@ -20,7 +20,7 @@ import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
 import play.api.Application
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.fileUpload.routes as bulkRoutes
-import uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.shared.routes
+import uk.gov.hmrc.securitiestransferchargefrontend.controllers.dashboard.routes
 import uk.gov.hmrc.securitiestransferchargefrontend.models.JourneyType.STF
 import uk.gov.hmrc.securitiestransferchargefrontend.utils.CommonHelpers
 import uk.gov.hmrc.securitiestransferchargefrontend.views.html.stf.organisations.bulk.TemplateInstructionsView
@@ -113,10 +113,10 @@ class TemplateInstructionsViewSpec extends ViewBaseSpec {
         continueButton.attr("href") mustBe bulkRoutes.FileUploadController.onPageLoad(STF).url
       }
 
-      "have a link to return back to the submission dashboard page" in {
+      "have a link to return back to the dashboard page" in {
         val returnLink = templateInstructionsView.select(".govuk-button-group a.govuk-link").first()
         returnLink.text() mustBe ExpectedContent.returnLink
-        returnLink.attr("href") mustBe routes.SubmissionsDashboardController.onPageLoad().url
+        returnLink.attr("href") mustBe routes.DashboardController.onPageLoad().url
       }
     }
   }
