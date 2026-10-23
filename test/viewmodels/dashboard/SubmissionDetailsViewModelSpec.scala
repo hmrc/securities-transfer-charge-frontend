@@ -103,7 +103,7 @@ class SubmissionDetailsViewModelSpec extends SpecBase with GuiceOneAppPerSuite {
 
         result.table.get.rows.size mustBe 2
 
-        result.table.get.rows.map(_.head.content) mustBe Seq(Text(readyToPayTransfer.utrn), Text(overdueTransfer.utrn))
+        result.table.get.rows.map(_.head.content) mustBe Seq(Text(overdueTransfer.utrn),Text(readyToPayTransfer.utrn))
       }
 
       "include only ready to pay transfers in the Ready to Pay tab" in {

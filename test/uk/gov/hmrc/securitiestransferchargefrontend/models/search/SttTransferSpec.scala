@@ -113,6 +113,53 @@ class SttTransferSpec extends AnyPropSpec with ScalaCheckPropertyChecks with Mat
       else tf.status mustBe Paid
     }
   }
+
+  property("Transfers should be sorted by status priority and then payment due date") {
+    val today = LocalDate.now()
+
+    def transfer(utrn: String, dueDate: LocalDate, pending: Int): SttTransfer = {
+      val charge = EtmpChargeDetail(
+        utrn = utrn,
+        chargeTypeDescription = "Securities transfer tax",
+        chargeReference = "ref",
+        chargeType = "STT",
+        chargeAmountTotal = 100,
+        chargeDueDate = dueDate,
+        chargeAmountPending = pending
+      )
+
+      SttTransfer(
+        utrn = utrn,
+        buyerNames = "Buyer",
+        sellerNames = Some("Seller"),
+        companyName = "Company",
+        charges = Seq(charge)
+      )
+    }
+
+    val paidLater = transfer("paid-later", today.plusDays(10), 0)
+    val paidEarlier = transfer("paid-earlier", today.minusDays(10), 0)
+
+    val readyToPayLater = transfer("ready-later", today.plusDays(10), 50)
+    val readyToPayEarlier = transfer("ready-earlier", today.plusDays(2), 50)
+
+    val overdueLater = transfer("overdue-later", today.minusDays(2), 50)
+    val overdueEarlier = transfer("overdue-earlier", today.minusDays(10), 50)
+
+    val transfers = Seq(paidLater, readyToPayLater, overdueLater, paidEarlier, readyToPayEarlier, overdueEarlier
+    )
+
+    val sorted = SttTransfer.sort(transfers)
+
+    sorted.map(_.utrn) mustBe Seq(
+      "overdue-earlier",
+      "overdue-later",
+      "ready-earlier",
+      "ready-later",
+      "paid-earlier",
+      "paid-later"
+    )
+  }
 }
 
 object SttTransferSpec {
