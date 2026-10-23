@@ -20,6 +20,6 @@ import uk.gov.hmrc.securitiestransferchargefrontend.models.stf
 
 sealed trait AffinityData
 
-case class Individual(name: String, address: stf.Address, phone: String, email: String, nino: String) extends AffinityData
-case class Organisation(name: String, address: stf.Address, phone: String, email: String, utr: String) extends AffinityData
+case class Individual(name: String, address: stf.Address, email: String, nino: String) extends AffinityData
+case class Organisation(name: String, address: stf.Address, email: String, utr: String) extends AffinityData
 case class Agent(name: String, address: stf.Address, phone: String, email: String) extends AffinityData

@@ -39,23 +39,23 @@ object RowTransforms {
     val reliefPercentage = if reliefClaimed then Some(100) else None // TODO: Get correct percentage based on what relief is being claimed
 
     val buyerName: String = affinityData match
-      case Individual(name, _, _, _, _) => name
-      case Organisation(name, _, _, _, _) => name
+      case Individual(name, _, _, _) => name
+      case Organisation(name, _, _, _) => name
       case _ => ??? // ToDo: For agents this will be in the spreadsheet in a location tbd
 
     val buyerAddress: stf.Address = affinityData match
-      case Individual(_, address, _, _, _) => address
-      case Organisation(_, address, _, _, _) => address
+      case Individual(_, address, _, _) => address
+      case Organisation(_, address, _, _) => address
       case _ => ??? // ToDo: ToDo: For agents this will be in the spreadsheet in a location tbd
 
     val buyerEmail: String = affinityData match
-      case Individual(_, _, _, email, _) => email
-      case Organisation(_, _, _, email, _) => email
+      case Individual(_, _, email, _) => email
+      case Organisation(_, _, email, _) => email
       case _ => ??? // ToDo: For agents this will be in the spreadsheet in a location tbd
 
     val uniqueId: AffinityData => Option[String] = {
-      case Individual(_, _, _, _, nino) => Some(nino)
-      case Organisation(_, _, _, _, utr) => Some(utr)
+      case Individual(_, _, _, nino) => Some(nino)
+      case Organisation(_, _, _, utr) => Some(utr)
       case _ => None // Agents don't have to provide a unique ID for themselves or their clients, so we return None.
     }
 
@@ -133,23 +133,23 @@ object RowTransforms {
     val reliefPercentage = if reliefClaimed then Some(100) else None // TODO: Get correct percentage based on what relief is being claimed
 
     val buyerName: String = affinityData match
-      case Individual(name, _, _, _, _) => name
-      case Organisation(name, _, _, _, _) => name
+      case Individual(name, _, _, _) => name
+      case Organisation(name, _, _, _) => name
       case _ => ??? // ToDo: For agents this will be in the spreadsheet in a location tbd
 
     val buyerAddress: stf.Address = affinityData match
-      case Individual(_, address, _, _, _) => address
-      case Organisation(_, address, _, _, _) => address
+      case Individual(_, address, _, _) => address
+      case Organisation(_, address, _, _) => address
       case _ => ??? // ToDo: ToDo: For agents this will be in the spreadsheet in a location tbd
 
     val buyerEmail: String = affinityData match
-      case Individual(_, _, _, email, _) => email
-      case Organisation(_, _, _, email, _) => email
+      case Individual(_, _, email, _) => email
+      case Organisation(_, _, email, _) => email
       case _ => ??? // ToDo: For agents this will be in the spreadsheet in a location tbd
 
     val uniqueId: AffinityData => Option[String] = {
-      case Individual(_, _, _, _, nino) => Some(nino)
-      case Organisation(_, _, _, _, utr) => Some(utr)
+      case Individual(_, _, _, nino) => Some(nino)
+      case Organisation(_, _, _, utr) => Some(utr)
       case _ => None // Agents don't have to provide a unique ID for themselves or their clients, so we return None.
     }
 

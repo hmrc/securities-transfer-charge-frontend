@@ -37,7 +37,6 @@ class RowTransformsSpec extends AnyWordSpec with Matchers {
       postcode = "SW1A 2AA",
       countryCode = "GBR"
     ),
-    phone = "01234567890",
     email = "foo@bar.com",
     nino = "NY054388A"
   )

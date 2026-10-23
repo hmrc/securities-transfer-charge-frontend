@@ -32,89 +32,64 @@ import uk.gov.hmrc.securitiestransferchargefrontend.utils.HeaderCarrierCreator
 
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
+import TransactionSubmissionService.*
+import play.api.Logging
 
 trait TransactionSubmissionService:
   def submitSingleStf(implicit request: StcDataRequest[?]): Future[Boolean]
   def submitSingleSh03(implicit request: StcDataRequest[?]): Future[Boolean]
 
-
 final class TransactionSubmissionServiceImpl @Inject()(
-                                                        headerCarrierCreator: HeaderCarrierCreator,
-                                                        etmpSubmissionService: EtmpSubmissionService,
-                                                        saveAndReturnClient: SaveAndReturnClient,
-                                                        nrsService: NrsService,
-                                                        cyaHtmlRepository: CyaHtmlRepository,
-                                                        transactionResponseRepository: TransactionResponseRepository,
-                                                        auditService: AuditService)(implicit ec: ExecutionContext) extends TransactionSubmissionService {
-
-  // TODO: Some of this should come from new screens not yet developed.
-  private val getIndividualAffinityData: AffinityData =
-    Individual(
-      name = "John Smith",
-      address = Address(
-        addressLine1 = "10 High Street",
-        addressLine2 = Some("Bolton"),
-        addressLine3 = None,
-        postcode = "BL1 2TG",
-        countryCode = "UK"
-      ),
-      phone = "01234 567890",
-      email = "jsmith@foo.com",
-      nino = "NX787356B"
-    )
-
-  private val getAgentAffinityData: AffinityData =
-    Agent(
-      name = "Agent 1",
-      address = Address(
-        addressLine1 = "10 High Street",
-        addressLine2 = Some("Bolton"),
-        addressLine3 = None,
-        postcode = "BL1 2TG",
-        countryCode = "UK"
-      ),
-      phone = "07777777777",
-      email = "someemal@foo.com"
-    )
-
-  private val getOrganisationAffinityData: AffinityData =
-    Organisation(
-      name = "Business",
-      address = Address(
-        addressLine1 = "10 High Street",
-        addressLine2 = Some("Bolton"),
-        addressLine3 = None,
-        postcode = "BL1 2TG",
-        countryCode = "UK"
-      ),
-      phone = "07777777777",
-      email = "someemal@foo.com",
-      utr = "some utr" // retrieve from Auth
-    )
-
-  def submitSingleStf(using request: StcDataRequest[?]): Future[Boolean] = {
+  headerCarrierCreator          : HeaderCarrierCreator,
+  etmpSubmissionService         : EtmpSubmissionService,
+  saveAndReturnClient           : SaveAndReturnClient,
+  nrsService                    : NrsService,
+  cyaHtmlRepository             : CyaHtmlRepository,
+  transactionResponseRepository : TransactionResponseRepository,
+  auditService                  : AuditService)(
+  implicit ec: ExecutionContext
+) extends TransactionSubmissionService with Logging {
+  
+  override def submitSingleStf(using request: StcDataRequest[?]): Future[Boolean] = {
     implicit val hc: HeaderCarrier = headerCarrierCreator.create(request)
     lazy val submissionId = request.userAnswers.submissionId
 
     etmpSubmissionService
-      .submitSingleStf(request.request.subscriptionId, request.userAnswers, getAffinityData(request.request.affinityGroup))
-      .map {
+      .submitSingleStf(
+        subscriptionId  = request.request.subscriptionId,
+        userAnswers     = request.userAnswers,
+        affinityData    = getAffinityData(request.request.affinityGroup)
+      ).flatMap {
         case stfResponse: SubmissionCreateResponseSuccess =>
-          transactionResponseRepository.store(submissionId, stfResponse)
-          saveAndReturnClient.deleteDraft(submissionId)
-          Some(stfResponse.utrn)
+          handleSingleStfSuccess(stfResponse, submissionId).map(_ => true)
 
-        case _ => None
-      }
-      .flatMap { maybeUtrn =>
-        maybeUtrn.foreach(utrn => sendSingleSubmissionDataToNRS(submissionId, utrn))
-        Future {
-          if maybeUtrn.isDefined then true else false
-        }
+        case _ =>
+          handleSingleStfFailure(submissionId).map(_ => false)
       }
     }
 
-  def submitSingleSh03(using request: StcDataRequest[?]): Future[Boolean] = {
+  private def handleSingleStfSuccess(
+    stfResponse: SubmissionCreateResponseSuccess,
+    submissionId: SubmissionId)(
+    implicit hc: HeaderCarrier,
+    request: StcDataRequest[?]
+  ): Future[Unit] = {
+    logger.info(s"Successful response from ETMP for submission $submissionId")
+    transactionResponseRepository.store(submissionId, stfResponse)
+    saveAndReturnClient.deleteDraft(submissionId)
+    sendSingleSubmissionDataToNRS(submissionId, stfResponse.utrn)
+    // ToDo: Audit success
+  }
+
+  private def handleSingleStfFailure(
+    submissionId: SubmissionId
+  ): Future[Unit] = {
+    logger.warn(s"Failure response from ETMP for submission $submissionId")
+    // ToDo: Audit failure
+    Future.successful(())
+  }
+  
+  override def submitSingleSh03(using request: StcDataRequest[?]): Future[Boolean] = {
     implicit val hc: HeaderCarrier = headerCarrierCreator.create(request)
     lazy val submissionId = request.userAnswers.submissionId
     val innerRequest = request.request
@@ -156,17 +131,59 @@ final class TransactionSubmissionServiceImpl @Inject()(
       }
   }
 
-  private def getAffinityData(affinityGroup: AffinityGroup): AffinityData = {
-    affinityGroup match {
-      case AffinityGroup.Agent        => getAgentAffinityData
-      case AffinityGroup.Individual   => getIndividualAffinityData
-      case AffinityGroup.Organisation => getOrganisationAffinityData
-    }
+  private val getAffinityData: AffinityGroup => AffinityData = {
+    case AffinityGroup.Agent        => getAgentAffinityData
+    case AffinityGroup.Individual   => getIndividualAffinityData
+    case AffinityGroup.Organisation => getOrganisationAffinityData
   }
 }
 
-object TransactionSubmissionService:
+object TransactionSubmissionService {
   val clearedUserAnswers: StcDataRequest[?] => UserAnswers = { req =>
     val currentUserAnswers = req.userAnswers
     UserAnswers.empty(currentUserAnswers.userId)(currentUserAnswers.groupIdentifier)(currentUserAnswers.submissionId)(currentUserAnswers.journeyType)
   }
+
+  // TODO: Some of this should come from new screens not yet developed.
+  private[services] val getIndividualAffinityData: AffinityData =
+    Individual(
+      name = "John Smith",
+      address = Address(
+        addressLine1 = "10 High Street",
+        addressLine2 = Some("Bolton"),
+        addressLine3 = None,
+        postcode = "BL1 2TG",
+        countryCode = "UK"
+      ),
+      email = "jsmith@foo.com",
+      nino = "NX787356B"
+    )
+
+  private[services] val getAgentAffinityData: AffinityData =
+    Agent(
+      name = "Agent 1",
+      address = Address(
+        addressLine1 = "10 High Street",
+        addressLine2 = Some("Bolton"),
+        addressLine3 = None,
+        postcode = "BL1 2TG",
+        countryCode = "UK"
+      ),
+      phone = "07777777777",
+      email = "someemal@foo.com"
+    )
+
+  private[services] val getOrganisationAffinityData: AffinityData =
+    Organisation(
+      name = "Business",
+      address = Address(
+        addressLine1 = "10 High Street",
+        addressLine2 = Some("Bolton"),
+        addressLine3 = None,
+        postcode = "BL1 2TG",
+        countryCode = "UK"
+      ),
+      email = "someemal@foo.com",
+      utr = "some utr" // retrieve from Auth
+    )
+}

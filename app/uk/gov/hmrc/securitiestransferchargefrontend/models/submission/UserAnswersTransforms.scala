@@ -40,20 +40,20 @@ object UserAnswersTransforms {
       )
 
     val buyerName: String = affinityData match
-      case Individual(name, _, _, _, _) => name
-      case Organisation(name, _, _, _, _) => name
+      case Individual(name, _, _, _) => name
+      case Organisation(name, _, _, _) => name
       case Agent(_, _, _, _) => getBuyerName(stfTransaction)
 
     val buyerAddress: AlfAddress = getBuyerAddress(stfTransaction)
 
     val buyerEmail: String = affinityData match
-      case Individual(_, _, _, email, _) => email
-      case Organisation(_, _, _, email, _) => email
+      case Individual(_, _, email, _) => email
+      case Organisation(_, _, email, _) => email
       case Agent(_, _, _, _) => "foo@email.com" // ToDo: We currently do not capture the buyer's email for agents. We need to capture this info.
 
     val uniqueId: AffinityData => Option[String] = {
-      case Individual(_, _, _, _, nino) => Some(nino)
-      case Organisation(_, _, _, _, utr) => Some(utr)
+      case Individual(_, _, _, nino) => Some(nino)
+      case Organisation(_, _, _, utr) => Some(utr)
       case _ => None // Agents don't have to provide a unique ID for themselves or their clients, so we return None.
     }
 
@@ -126,21 +126,21 @@ object UserAnswersTransforms {
       )
 
     val buyerName: String = affinityData match
-      case Organisation(name, _, _, _, _) => name // is this the Org name or the contact name from their Subscription
+      case Organisation(name, _, _, _) => name // is this the Org name or the contact name from their Subscription
       case _ => "Buyer 1" // TODO we need to capture the buyer name for agents
 
     val buyerAddress: Address = affinityData match {
-      case Organisation(_, address, _, _, _) => address
+      case Organisation(_, address, _, _) => address
       case _ => address// TODO we need to capture the buyer address for agents
     }
 
     val buyerEmail: String = affinityData match
-      case Organisation(_, _, _, email, _) => email
+      case Organisation(_, _, email, _) => email
       case _ => "foo@email.com" // TODO we need to capture the buyer email for agents
 
     val uniqueId: AffinityData => Option[String] = {
-      case Individual(_, _, _, _, nino) => Some(nino)
-      case Organisation(_, _, _, _, utr) => Some(utr)
+      case Individual(_, _, _, nino) => Some(nino)
+      case Organisation(_, _, _, utr) => Some(utr)
       case _ => None // Agents don't have to provide a unique ID for themselves or their clients, so we return None.
     }
 
