@@ -144,7 +144,6 @@ object Fixtures {
       postcode = "LS1 111",
       countryCode = "GBR"
     ),
-    phone = "07777777777",
     email = "foo@bar.com",
     utr = "CT111111")
 
