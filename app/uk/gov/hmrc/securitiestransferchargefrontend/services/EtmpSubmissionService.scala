@@ -34,7 +34,21 @@ import scala.concurrent.{ExecutionContext, Future}
 
 type ChargeReference = String
 
-trait SubmissionCreateResponse
+trait SubmissionCreateResponse:
+  def fold[A](
+   onSuccess: SubmissionCreateResponseSuccess => A,
+   onPartialFailure: SubmissionCreateResponsePartialFailure => A,
+   onFailure: => A
+  ): A = this match {
+    case s: SubmissionCreateResponseSuccess => onSuccess(s)
+    case pf: SubmissionCreateResponsePartialFailure => onPartialFailure(pf)
+    case _ => onFailure
+  }
+
+  def isSuccessful: Boolean = this match {
+    case _: SubmissionCreateResponseSuccess => true
+    case _                                  => false
+  }
 
 final case class SubmissionCreateResponseSuccess(
   submissionId: SubmissionId,

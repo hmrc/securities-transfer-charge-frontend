@@ -16,24 +16,24 @@
 
 package uk.gov.hmrc.securitiestransferchargefrontend.services
 
+import play.api.Logging
 import uk.gov.hmrc.auth.core.AffinityGroup
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.securitiestransferchargefrontend.clients.SaveAndReturnClient
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.actions.requests.StcDataRequest
-import uk.gov.hmrc.securitiestransferchargefrontend.domain.SubmissionId
+import uk.gov.hmrc.securitiestransferchargefrontend.domain.TransferType.*
+import uk.gov.hmrc.securitiestransferchargefrontend.domain.{CredentialId, SubmissionId, SubscriptionId, TransferType}
 import uk.gov.hmrc.securitiestransferchargefrontend.models.UserAnswers
-import uk.gov.hmrc.securitiestransferchargefrontend.models.audit.AuditModel
-import uk.gov.hmrc.securitiestransferchargefrontend.models.audit.AuditType.Sh03
 import uk.gov.hmrc.securitiestransferchargefrontend.models.audit.JourneyStatus.{SubmissionFailure, SubmissionSuccess}
+import uk.gov.hmrc.securitiestransferchargefrontend.models.audit.{AuditModel, AuditType}
 import uk.gov.hmrc.securitiestransferchargefrontend.models.stf.Address
 import uk.gov.hmrc.securitiestransferchargefrontend.models.submission.{AffinityData, Agent, Individual, Organisation}
 import uk.gov.hmrc.securitiestransferchargefrontend.repositories.{CyaHtmlRepository, TransactionResponseRepository}
+import uk.gov.hmrc.securitiestransferchargefrontend.services.TransactionSubmissionService.*
 import uk.gov.hmrc.securitiestransferchargefrontend.utils.HeaderCarrierCreator
 
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
-import TransactionSubmissionService.*
-import play.api.Logging
 
 trait TransactionSubmissionService:
   def submitSingleStf(implicit request: StcDataRequest[?]): Future[Boolean]
@@ -47,101 +47,90 @@ final class TransactionSubmissionServiceImpl @Inject()(
   cyaHtmlRepository             : CyaHtmlRepository,
   transactionResponseRepository : TransactionResponseRepository,
   auditService                  : AuditService)(
-  implicit ec: ExecutionContext
+  implicit ec                   : ExecutionContext
 ) extends TransactionSubmissionService with Logging {
-  
-  override def submitSingleStf(using request: StcDataRequest[?]): Future[Boolean] = {
+
+  override def submitSingleStf(using request: StcDataRequest[?]): Future[Boolean] =
+    submitSingle(STF)
+
+  override def submitSingleSh03(using request: StcDataRequest[?]): Future[Boolean] =
+    submitSingle(SH03)
+
+  private def submitSingle(transferType: TransferType)(using request: StcDataRequest[?]): Future[Boolean] = {
     implicit val hc: HeaderCarrier = headerCarrierCreator.create(request)
-    lazy val submissionId = request.userAnswers.submissionId
+    val submissionId = request.userAnswers.submissionId
+    for {
+      response <- submitFunctionFor(transferType)(
+        request.request.subscriptionId,
+        request.userAnswers,
+        getAffinityData(request.request.affinityGroup)
+      )
 
-    etmpSubmissionService
-      .submitSingleStf(
-        subscriptionId  = request.request.subscriptionId,
-        userAnswers     = request.userAnswers,
-        affinityData    = getAffinityData(request.request.affinityGroup)
-      ).flatMap {
-        case stfResponse: SubmissionCreateResponseSuccess =>
-          handleSingleStfSuccess(stfResponse, submissionId).map(_ => true)
+      _ = response.fold(
+        onSuccess        = handleSingleSuccess(transferType),
+        onPartialFailure = handleSinglePartialFailure(transferType),
+        onFailure        = handleSingleFailure(transferType, submissionId)
+      )
+    } yield response.isSuccessful
+  }
 
-        case _ =>
-          handleSingleStfFailure(submissionId).map(_ => false)
-      }
-    }
+  private type SubmitFunction = (SubscriptionId, UserAnswers, AffinityData) => Future[SubmissionCreateResponse]
 
-  private def handleSingleStfSuccess(
-    stfResponse: SubmissionCreateResponseSuccess,
-    submissionId: SubmissionId)(
-    implicit hc: HeaderCarrier,
-    request: StcDataRequest[?]
-  ): Future[Unit] = {
-    logger.info(s"Successful response from ETMP for submission $submissionId")
-    transactionResponseRepository.store(submissionId, stfResponse)
+  private val submitFunctionFor: TransferType => HeaderCarrier ?=> SubmitFunction = {
+    case STF => etmpSubmissionService.submitSingleStf
+    case _ => etmpSubmissionService.submitSingleSh03
+  }
+
+  private val extractComponentsFrom: StcDataRequest[?] => (SubscriptionId, AffinityGroup, CredentialId) = req =>
+    val innerRequest = req.request
+    (innerRequest.subscriptionId, innerRequest.affinityGroup, innerRequest.credentialId)
+
+  private def handleSingleSuccess(transferType: TransferType)(successResponse: SubmissionCreateResponseSuccess)
+                                 (implicit hc: HeaderCarrier, request: StcDataRequest[?]): Boolean = {
+    val (subscriptionId, affinityGroup, credentialId) = extractComponentsFrom(request)
+    val submissionId = successResponse.submissionId
+    logger.info(s"Successful response from ETMP for ${transferType.toString} submission ${submissionId}")
+    auditService.audit(AuditModel(SubmissionSuccess, subscriptionId, affinityGroup, credentialId, Some(submissionId), AuditType.fromTransferType(transferType)))
+    transactionResponseRepository.store(submissionId, successResponse)
     saveAndReturnClient.deleteDraft(submissionId)
-    sendSingleSubmissionDataToNRS(submissionId, stfResponse.utrn)
-    // ToDo: Audit success
+    sendSingleSubmissionDataToNRS(submissionId, successResponse.utrn)
+    true
   }
 
-  private def handleSingleStfFailure(
-    submissionId: SubmissionId
-  ): Future[Unit] = {
-    logger.warn(s"Failure response from ETMP for submission $submissionId")
-    // ToDo: Audit failure
-    Future.successful(())
-  }
-  
-  override def submitSingleSh03(using request: StcDataRequest[?]): Future[Boolean] = {
-    implicit val hc: HeaderCarrier = headerCarrierCreator.create(request)
-    lazy val submissionId = request.userAnswers.submissionId
-    val innerRequest = request.request
-    lazy val subscriptionId = innerRequest.subscriptionId
-    lazy val affinityGroup = innerRequest.affinityGroup
-    lazy val credentialId = innerRequest.credentialId
-    etmpSubmissionService
-      .submitSingleSh03(subscriptionId, request.userAnswers, getAffinityData(affinityGroup))
-      .map {
-        case sh03Response: SubmissionCreateResponseSuccess =>
-          auditService.audit(AuditModel(SubmissionSuccess, subscriptionId, affinityGroup, credentialId, Some(submissionId), Sh03))
-          transactionResponseRepository.store(submissionId, sh03Response)
-          saveAndReturnClient.deleteDraft(submissionId)
-          Some(sh03Response.utrn)
-
-        case _ =>
-          auditService.audit(AuditModel(SubmissionFailure, innerRequest.subscriptionId, innerRequest.affinityGroup, innerRequest.credentialId, Some(request.userAnswers.submissionId), Sh03))
-          None
-      }
-      .flatMap { maybeUtrn =>
-        maybeUtrn.foreach(utrn => sendSingleSubmissionDataToNRS(submissionId, utrn))
-        Future {
-          if maybeUtrn.isDefined then true else false
-        }
-      }
+  private def handleSinglePartialFailure(transferType: TransferType)(pf: SubmissionCreateResponsePartialFailure): Boolean = {
+    logger.warn(s"Unexpected partial failure response for ${transferType.toString} submission ${pf.submissionId}: $pf")
+    false
   }
 
-  private def sendSingleSubmissionDataToNRS( submissionId: SubmissionId,
-                                             utrn: String
-                                           )(
-                                             implicit
-                                             request: StcDataRequest[?],
-                                             hc: HeaderCarrier): Future[Unit] = {
+  private def handleSingleFailure(transferType: TransferType, submissionId: SubmissionId)(implicit request: StcDataRequest[?], headerCarrier: HeaderCarrier): Boolean = {
+    logger.warn(s"Failure response from ETMP for ${transferType.toString} submission $submissionId")
+    val (subscriptionId, affinityGroup, credentialId) = extractComponentsFrom(request)
+    auditService.audit(AuditModel(SubmissionFailure, subscriptionId, affinityGroup, credentialId, Some(request.userAnswers.submissionId), AuditType.fromTransferType(transferType)))
+    false
+  }
+
+  private def sendSingleSubmissionDataToNRS(submissionId: SubmissionId, utrn: String)
+                                           (implicit request: StcDataRequest[?], hc: HeaderCarrier): Future[Unit] = {
     cyaHtmlRepository
       .retrieve(submissionId)
-      .collect {
-        case Some(data) =>
-          nrsService.singleSubmissionNotableEvent(data, utrn)
+      .map {
+        case Some(data) => nrsService.singleSubmissionNotableEvent(data, utrn)
+        case None       => logger.warn(s"Nothing to send to NRS for submission $submissionId - no data in CYA repository.")
       }
   }
 
-  private val getAffinityData: AffinityGroup => AffinityData = {
-    case AffinityGroup.Agent        => getAgentAffinityData
-    case AffinityGroup.Individual   => getIndividualAffinityData
-    case AffinityGroup.Organisation => getOrganisationAffinityData
-  }
 }
 
 object TransactionSubmissionService {
   val clearedUserAnswers: StcDataRequest[?] => UserAnswers = { req =>
     val currentUserAnswers = req.userAnswers
     UserAnswers.empty(currentUserAnswers.userId)(currentUserAnswers.groupIdentifier)(currentUserAnswers.submissionId)(currentUserAnswers.journeyType)
+  }
+
+  private[services] val getAffinityData: AffinityGroup => AffinityData = {
+    case AffinityGroup.Agent => getAgentAffinityData
+    case AffinityGroup.Individual => getIndividualAffinityData
+    case AffinityGroup.Organisation => getOrganisationAffinityData
   }
 
   // TODO: Some of this should come from new screens not yet developed.
