@@ -16,6 +16,7 @@
 
 @import uk.gov.hmrc.securitiestransferchargefrontend.views.html.templates
 @import uk.gov.hmrc.securitiestransferchargefrontend.controllers.dashboard.routes as dashboardRoutes
+@import uk.gov.hmrc.securitiestransferchargefrontend.controllers.pay.routes as paymentRoutes
 @import uk.gov.hmrc.securitiestransferchargefrontend.viewmodels.dashboard.SubmissionDetailsViewModel
 @import uk.gov.hmrc.securitiestransferchargefrontend.models.submission.SubmissionDetailsSummary
 @import uk.gov.hmrc.hmrcfrontend.views.viewmodels.hmrcstandardpage.TemplateOverrides
@@ -65,7 +66,7 @@
                 @govUkSummaryList(viewModel.summary.summaryList)
                 @govukButton(
                     Button(
-                        href = Some("#"),
+                        href = Some(paymentRoutes.PaymentController.startPayment(viewModel.submissionId).url),
                         content = Text(messages("submissionDetails.submission.payForSubmission")),
                         classes = "govuk-!-margin-bottom-0"
                     )

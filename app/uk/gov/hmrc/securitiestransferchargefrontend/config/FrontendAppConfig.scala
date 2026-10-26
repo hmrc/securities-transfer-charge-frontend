@@ -163,5 +163,11 @@ class FrontendAppConfig @Inject() (configuration: Configuration, servicesConfig:
   val reliefsGuidanceUrl: String = configuration.get[String]("urls.external.reliefsGuidance")
   
   // Tax calculation
-  val taxRateSH03: BigDecimal = BigDecimal(configuration.get[String]("tax-rate.sh03")) 
+  val taxRateSH03: BigDecimal = BigDecimal(configuration.get[String]("tax-rate.sh03"))
+
+  // OPS pay-api
+  lazy val payApiBaseUrl: String = servicesConfig.baseUrl("pay-api")
+
+  def paymentReturnUrl: String = s"$host$basePath/dashboard"
+  def paymentBackUrl(submissionId: String): String = s"$host$basePath/submission-details/$submissionId"
 }
