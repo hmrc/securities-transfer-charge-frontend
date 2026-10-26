@@ -1349,11 +1349,7 @@ submissions.recentSubmissions.panel.heading = Recent submissions
 submissions.drafts.panel.heading = Drafts
 submissions.readyToPay.panel.heading = Ready to pay
 submissions.overdue.panel.heading = Overdue
-submissions.recentSubmissions.tabId = recent-submissions
 submissions.recentSubmissions.body = Displaying submissions from the last 18 months.
-submissions.drafts.tabId = drafts
-submissions.readyToPay.tabId = ready-to-pay
-submissions.overdue.tabId = overdue
 submissions.noRecentSubmissions = You have no submissions from the last 18 months.
 submissions.noDraftSubmissions = You have no draft submissions.
 submissions.noReadyToPaySubmissions = You have no ready to pay submissions.
@@ -1382,6 +1378,11 @@ submissions.status.overdue = Overdue
 
 submissions.action.view = View
 submissions.action.view.hidden = View submission ID {0}
+
+pagination.previous = Previous
+pagination.next = Next
+pagination.ariaLabel = Pagination
+pagination.pageAriaLabel = Page {0}
 
 submissionDetails.title = Submission {0}
 submissionDetails.heading = Submission {0}
@@ -1418,6 +1419,8 @@ submissionDetails.transfers.table.reference.heading = Transfer reference
 submissionDetails.transfers.table.seller.heading = Seller
 submissionDetails.transfers.table.buyer.heading = Buyer
 submissionDetails.transfers.table.securitiesBoughtIn.heading = Securities bought in
+submissionDetails.transfers.table.shares.heading = Shares
+submissionDetails.transfers.table.for.heading = For
 submissionDetails.transfers.table.paymentDueBy.heading = Payment due by
 submissionDetails.transfers.table.status.heading = Status
 submissionDetails.transfers.table.action.heading = Action
@@ -1427,3 +1430,6 @@ submissionDetails.transfers.action.view.hidden = View transfer reference {0}
 
 submissionDetails.transferType.stf = Securities transfer (STF)
 submissionDetails.transferType.sh03 = Share buyback (SH03)
+
+submissionDetails.reasonForPurchase.cancellation = Cancellation
+submissionDetails.reasonForPurchase.treasury = Treasury

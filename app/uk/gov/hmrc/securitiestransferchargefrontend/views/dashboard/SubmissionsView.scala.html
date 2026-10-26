@@ -15,8 +15,10 @@
  *@
 
 @import uk.gov.hmrc.govukfrontend.views.html.components._
+@import uk.gov.hmrc.securitiestransferchargefrontend.views.html.components.Pagination
 @import uk.gov.hmrc.hmrcfrontend.views.viewmodels.hmrcstandardpage.TemplateOverrides
 @import uk.gov.hmrc.securitiestransferchargefrontend.viewmodels.dashboard.SubmissionsViewModel
+@import uk.gov.hmrc.securitiestransferchargefrontend.viewmodels.dashboard.SubmissionTabIds
 @import uk.gov.hmrc.securitiestransferchargefrontend.views.html.templates
 @import uk.gov.hmrc.securitiestransferchargefrontend.controllers.dashboard.routes
 
@@ -24,7 +26,8 @@
 @this(
     layout: templates.Layout,
     govukBreadcrumbs: GovukBreadcrumbs,
-    govukTable: GovukTable
+    govukTable: GovukTable,
+    pagination: Pagination
 )
 
 @(submissions: SubmissionsViewModel)(implicit request: Request[_], messages: Messages)
@@ -75,7 +78,7 @@
 
                         } else {
 
-                            @if(item.id == messages("submissions.recentSubmissions.tabId")) {
+                            @if(item.id == SubmissionTabIds.Recent) {
                                 <p class="govuk-body">
                                     @messages("submissions.recentSubmissions.body")
                                 </p>
@@ -83,6 +86,10 @@
 
                             @item.table.map { table =>
                                 @govukTable(table)
+                            }
+                            
+                            @item.pagination.map { paginationModel =>
+                                @pagination(paginationModel)
                             }
                         }
                     </div>

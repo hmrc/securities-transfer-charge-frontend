@@ -21,9 +21,10 @@ import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
 import play.api.Application
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.dashboard.routes
+import uk.gov.hmrc.securitiestransferchargefrontend.models.pagination.PaginationModel
 import uk.gov.hmrc.securitiestransferchargefrontend.models.search.SubmissionStatus.*
 import uk.gov.hmrc.securitiestransferchargefrontend.models.search.SubmissionSummary
-import uk.gov.hmrc.securitiestransferchargefrontend.viewmodels.dashboard.SubmissionsViewModel
+import uk.gov.hmrc.securitiestransferchargefrontend.viewmodels.dashboard.{SubmissionTabIds, SubmissionsViewModel}
 import uk.gov.hmrc.securitiestransferchargefrontend.views.html.dashboard.SubmissionsView
 import views.ViewBaseSpec
 
@@ -42,6 +43,28 @@ class SubmissionsViewSpec extends ViewBaseSpec {
     viewInstance(submissions)(fakeRequest, messages).body
   )
 
+  // Helper method to build SubmissionsViewModel with sensible defaults
+  def buildViewModel(
+                      drafts: Seq[SubmissionSummary] = Seq.empty,
+                      readyToPay: Seq[SubmissionSummary] = Seq.empty,
+                      overdue: Seq[SubmissionSummary] = Seq.empty,
+                      recent: Seq[SubmissionSummary] = Seq.empty
+                    ): SubmissionsViewModel = {
+    SubmissionsViewModel.build(
+      allDrafts = drafts,
+      allReadyToPay = readyToPay,
+      allOverdue = overdue,
+      allRecent = recent,
+      paginationModel = PaginationModel.forSubmissions(
+        totalDrafts = drafts.size,
+        totalReadyToPay = readyToPay.size,
+        totalOverdue = overdue.size,
+        totalRecent = recent.size
+      )
+    )
+  }
+
+
   object ExpectedContent {
     val title: String = messages("submissions.title")
     val caption: String = messages("submissions.caption")
@@ -54,10 +77,10 @@ class SubmissionsViewSpec extends ViewBaseSpec {
     val readyToPayHeading: String = messages("submissions.readyToPay.panel.heading")
     val overdueHeading: String = messages("submissions.overdue.panel.heading")
 
-    val recentTabId: String = messages("submissions.recentSubmissions.tabId")
-    val draftsTabId: String = messages("submissions.drafts.tabId")
-    val readyToPayTabId: String = messages("submissions.readyToPay.tabId")
-    val overdueTabId: String = messages("submissions.overdue.tabId")
+    val recentTabId: String = SubmissionTabIds.Recent
+    val draftsTabId: String = SubmissionTabIds.Drafts
+    val readyToPayTabId: String = SubmissionTabIds.ReadyToPay
+    val overdueTabId: String = SubmissionTabIds.Overdue
 
     val noRecent: String = messages("submissions.noRecentSubmissions")
     val noDrafts: String = messages("submissions.noDraftSubmissions")
@@ -70,7 +93,7 @@ class SubmissionsViewSpec extends ViewBaseSpec {
 
     "when rendered with no submissions " - {
 
-      val doc = view(SubmissionsViewModel.build(Seq.empty[SubmissionSummary], Seq.empty[SubmissionSummary]))
+      val doc = view(buildViewModel())
 
       val tabs = doc.select("a.govuk-tabs__tab")
       val panels = doc.select(".govuk-tabs__panel")
@@ -178,7 +201,7 @@ class SubmissionsViewSpec extends ViewBaseSpec {
 
     "when rendered with drafts" - {
 
-      val doc = view(SubmissionsViewModel.build(drafts = drafts))
+      val doc = view(buildViewModel(drafts = drafts))
       val panels = doc.select(".govuk-tabs__panel")
 
       "select only the drafts tab" in { // TODO: Need to rethink this test as currently it's actually selecting the recent submissions tab which is the default, unless accessing via the dashboard where the redirect links have the '#<tab name>' at the end
@@ -234,7 +257,7 @@ class SubmissionsViewSpec extends ViewBaseSpec {
         )
       }
 
-      val doc = view(SubmissionsViewModel.build(readyToPay = readyToPaySubmissions))
+      val doc = view(buildViewModel(readyToPay = readyToPaySubmissions))
       val tabs = doc.select("a.govuk-tabs__tab")
       val readyToPayPanel = doc.select(s"#${ExpectedContent.readyToPayTabId}")
       val tableRows = readyToPayPanel.select("tbody .govuk-table__row")
@@ -299,7 +322,7 @@ class SubmissionsViewSpec extends ViewBaseSpec {
 
   "when rendered with overdue" - {
 
-    val doc = view(SubmissionsViewModel.build(overdue = overdue))
+    val doc = view(buildViewModel(overdue = overdue))
     val panels = doc.select(".govuk-tabs__panel")
     val tabs = doc.select("a.govuk-tabs__tab")
     val overduePanel = doc.select(s"#${ExpectedContent.overdueTabId}")
@@ -350,7 +373,7 @@ class SubmissionsViewSpec extends ViewBaseSpec {
   "when rendered with recent submissions" - {
 
     val recent = readyToPay ++ drafts ++ overdue
-    val doc = view(SubmissionsViewModel.build(recent = recent))
+    val doc = view(buildViewModel(recent = recent))
 
     val recentPanel = doc.select("#recent-submissions")
     val table = recentPanel.select("table.govuk-table")
@@ -417,7 +440,14 @@ class SubmissionsViewSpec extends ViewBaseSpec {
 
     val recent = readyToPay ++ overdue
 
-    val doc = view(SubmissionsViewModel.build(readyToPay = readyToPay, overdue = overdue, recent = recent, isAgent = true))
+    val doc = view(SubmissionsViewModel.build(
+      allDrafts = Seq.empty,
+      allReadyToPay = readyToPay,
+      allOverdue = overdue,
+      allRecent = recent,
+      isAgent = true,
+      paginationModel = PaginationModel.forSubmissions(totalDrafts = 0, totalReadyToPay = readyToPay.size, totalOverdue = overdue.size, totalRecent = recent.size)
+    ))
 
     val submissions = Seq(
       (ExpectedContent.readyToPayTabId, readyToPay),
@@ -472,10 +502,13 @@ class SubmissionsViewSpec extends ViewBaseSpec {
     )
 
     val doc = view(SubmissionsViewModel.build(
-        drafts = drafts,
-        isAgent = true
-      )
-    )
+      allDrafts = drafts,
+      allReadyToPay = Seq.empty,
+      allOverdue = Seq.empty,
+      allRecent = Seq.empty,
+      isAgent = true,
+      paginationModel = PaginationModel.forSubmissions(totalDrafts = drafts.size, totalReadyToPay = 0, totalOverdue = 0, totalRecent = 0)
+    ))
 
     val draftsPanel = doc.select(s"#${ExpectedContent.draftsTabId}")
 
@@ -521,7 +554,14 @@ class SubmissionsViewSpec extends ViewBaseSpec {
       )
     )
 
-    val doc = view(SubmissionsViewModel.build(drafts = drafts, isAgent = true))
+    val doc = view(SubmissionsViewModel.build(
+      allDrafts = drafts,
+      allReadyToPay = Seq.empty,
+      allOverdue = Seq.empty,
+      allRecent = Seq.empty,
+      isAgent = true,
+      paginationModel = PaginationModel.forSubmissions(totalDrafts = drafts.size, totalReadyToPay = 0, totalOverdue = 0, totalRecent = 0)
+    ))
 
     val draftsPanel = doc.select(s"#${ExpectedContent.draftsTabId}")
 

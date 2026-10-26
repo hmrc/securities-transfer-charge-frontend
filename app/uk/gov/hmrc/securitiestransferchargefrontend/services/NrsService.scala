@@ -26,13 +26,12 @@ import uk.gov.hmrc.securitiestransferchargefrontend.models.nrs.{IdentityData, Nr
 import uk.gov.hmrc.securitiestransferchargefrontend.repositories.CyaHtmlData
 import uk.gov.hmrc.securitiestransferchargefrontend.utils.CommonHelpers.authToken
 
-import java.time.LocalDate
-import java.time.format.DateTimeFormatter
+import java.nio.charset.StandardCharsets
+import java.time.Instant
+import java.util.Base64
 import javax.inject.Inject
 import scala.collection.mutable.ListBuffer
 import scala.concurrent.Future
-import java.util.Base64
-import java.nio.charset.StandardCharsets
 
 trait NrsService:
   def singleSubmissionNotableEvent(
@@ -78,7 +77,7 @@ class NrsServiceImpl @Inject()(
       notableEvent            = notableEvent,
       payloadContentType      = MimeTypes.HTML,
       payloadSha256Checksum   = checksum,
-      userSubmissionTimestamp = LocalDate.now().format(DateTimeFormatter.ISO_DATE_TIME),
+      userSubmissionTimestamp = Instant.now().toString,
       identityData            = request.request.identityData,
       userAuthToken           = authToken(hc),
       headerData              = request.headers.toSimpleMap,
@@ -119,5 +118,5 @@ object NrsSearchKeys:
   val Nino            = "NINO"
   val Utr             = "UTR"
   val Arn             = "ARN"
-  val SubmissionId    = "submissionId"
+  val SubmissionId    = "submissionID"
   val Utrn            = "transferRef"
