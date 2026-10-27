@@ -150,6 +150,7 @@ class FrontendAppConfig @Inject() (configuration: Configuration, servicesConfig:
   val upscanCallbackUrl: String =  s"$stfBaseUrl$basePath/upscan-callback"
   val upscanUploadSuccessfulUrl: String = s"$host$basePath/bulk-processing"
   val upscanUploadFailureUrl: String = s"$host$basePath/upload-template/problem"
+  val upscanMaxFileSize: Int = configuration.get[Int]("upscan.maxFileSize")
 
   // File streamer
   val rowCacheSize: Int = configuration.get[Int]("file-upload.xlsx.row-cache-size")

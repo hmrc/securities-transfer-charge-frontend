@@ -528,10 +528,8 @@ fileUpload.inset.text = Accepted file types: .xlsx, .csv
 
 fileUpload.upload.another = Upload a different file
 
-fileUpload.redirectError.emptyFile = Select a file to upload
-fileUpload.redirectError.EntityTooLarge = The selected file must be smaller than 100mb
+fileUpload.redirectError.EntityTooLarge = The selected file must be smaller than 10mb
 fileUpload.redirectError.generic = The selected file could not be uploaded – try again
-fileUpload.redirectError.InvalidArgument = The selected file must be a .csv or a .xlsx
 
 fileUpload.changeFile.title = Are you sure you want to change the uploaded file?
 fileUpload.changeFile.heading = Are you sure you want to change the uploaded file?
