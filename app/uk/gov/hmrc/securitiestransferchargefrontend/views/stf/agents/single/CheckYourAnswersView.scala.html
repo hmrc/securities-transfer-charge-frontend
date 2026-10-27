@@ -19,7 +19,7 @@
 @import uk.gov.hmrc.securitiestransferchargefrontend.views.html.components.SaveAndReturnButton
 @import uk.gov.hmrc.securitiestransferchargefrontend.views.html.components.PrintLink
 @import uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.agents.single.routes as agentRoutes
-@import uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.shared.routes as sharedRoutes
+@import uk.gov.hmrc.securitiestransferchargefrontend.controllers.dashboard.routes as dashboardRoutes
 @import views.html.helper.CSPNonce
 
 @this(
@@ -83,7 +83,7 @@
             )
         }
 
-        <a class="govuk-link" href="@sharedRoutes.SubmissionsDashboardController.onPageLoad().url" style="margin-left: -11px">
+        <a class="govuk-link" href="@dashboardRoutes.DashboardController.onPageLoad().url" style="margin-left: -11px">
             @saveAndReturnButton()
         </a>
 

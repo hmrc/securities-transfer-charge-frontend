@@ -17,7 +17,7 @@
 @import uk.gov.hmrc.securitiestransferchargefrontend.viewmodels.InputWidth._
 @import uk.gov.hmrc.securitiestransferchargefrontend.viewmodels.LabelSize.Large
 @import uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.agents.bulk.routes
-@import uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.shared.routes as sharedRoutes
+@import uk.gov.hmrc.securitiestransferchargefrontend.controllers.dashboard.routes as dashboardRoutes
 @import uk.gov.hmrc.securitiestransferchargefrontend.views.html.components.SaveAndReturnButton
 @import uk.gov.hmrc.securitiestransferchargefrontend.views.html.templates
 
@@ -60,7 +60,7 @@
                 )
             )
 
-            <a class="govuk-link" href="@sharedRoutes.SubmissionsDashboardController.onPageLoad().url">
+            <a class="govuk-link" href="@dashboardRoutes.DashboardController.onPageLoad().url">
                 @messages("return-to-dashboard.link")
             </a>
         </div>

@@ -20,7 +20,7 @@ import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
 import play.api.Application
 import play.api.mvc.Call
-import uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.shared.routes
+import uk.gov.hmrc.securitiestransferchargefrontend.controllers.dashboard.routes
 import uk.gov.hmrc.securitiestransferchargefrontend.forms.stf.agents.HowToNotifyAboutSecuritiesTransferFormProvider
 import uk.gov.hmrc.securitiestransferchargefrontend.models.NormalMode
 import uk.gov.hmrc.securitiestransferchargefrontend.views.html.stf.agents.HowToNotifyAboutSecuritiesTransferView
@@ -71,10 +71,10 @@ class HowToNotifyAboutSecuritiesTransferViewSpec extends ViewBaseSpec {
         button.text() mustBe ExpectedContent.continue
       }
 
-      "have a link to return back to the submission dashboard page" in {
+      "have a link to return back to the dashboard page" in {
         val returnLink = howToNotifyAboutSecuritiesTransferView.select(".govuk-button-group a.govuk-link").first()
         returnLink.text() mustBe ExpectedContent.returnLink
-        returnLink.attr("href") mustBe routes.SubmissionsDashboardController.onPageLoad().url
+        returnLink.attr("href") mustBe routes.DashboardController.onPageLoad().url
       }
     }
   }
