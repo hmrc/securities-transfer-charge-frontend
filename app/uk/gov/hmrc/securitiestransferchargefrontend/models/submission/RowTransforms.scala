@@ -121,7 +121,7 @@ object RowTransforms {
       agentDetails = agentDetails.lift(affinityData)
     )
 
-  def fromValidatedStcRowToSh03Request(parsedRow: ParsedStcRow, affinityData: AffinityData, companyDetails:CompanyDetails,agentReference:Option[String]=None): SingleTransferRequest =
+  def fromValidatedStcRowToSh03Request(companyDetails: CompanyDetails)(parsedRow: ParsedStcRow, affinityData: AffinityData,agentReference: Option[String] = None): SingleTransferRequest =
 
     val row = parsedRow
 

@@ -59,8 +59,9 @@ final class TransactionSubmissionServiceImpl @Inject()(
   private def submitSingle(transferType: TransferType)(using request: StcDataRequest[?]): Future[Boolean] = {
     implicit val hc: HeaderCarrier = headerCarrierCreator.create(request)
     val submissionId = request.userAnswers.submissionId
+    val submit = submitFunctionFor(transferType)
     for {
-      response <- submitFunctionFor(transferType)(
+      response <- submit(
         request.request.subscriptionId,
         request.userAnswers,
         getAffinityData(request.request.affinityGroup)
@@ -77,16 +78,19 @@ final class TransactionSubmissionServiceImpl @Inject()(
   private type SubmitFunction = (SubscriptionId, UserAnswers, AffinityData) => Future[SubmissionCreateResponse]
 
   private val submitFunctionFor: TransferType => HeaderCarrier ?=> SubmitFunction = {
-    case STF => etmpSubmissionService.submitSingleStf
-    case _ => etmpSubmissionService.submitSingleSh03
+    case STF   => etmpSubmissionService.submitSingleStf
+    case SH03  => etmpSubmissionService.submitSingleSh03
+    case Other => throw new NotImplementedError("Transaction type Other is not supported.")
   }
 
-  private val extractComponentsFrom: StcDataRequest[?] => (SubscriptionId, AffinityGroup, CredentialId) = req =>
-    val innerRequest = req.request
-    (innerRequest.subscriptionId, innerRequest.affinityGroup, innerRequest.credentialId)
+  private val extractComponentsFrom: StcDataRequest[?] => (SubscriptionId, AffinityGroup, CredentialId) = req => (
+    req.request.subscriptionId, 
+    req.request.affinityGroup, 
+    req.request.credentialId
+  )
 
   private def handleSingleSuccess(transferType: TransferType)(successResponse: SubmissionCreateResponseSuccess)
-                                 (implicit hc: HeaderCarrier, request: StcDataRequest[?]): Boolean = {
+                                 (implicit hc: HeaderCarrier, request: StcDataRequest[?]): Unit = {
     val (subscriptionId, affinityGroup, credentialId) = extractComponentsFrom(request)
     val submissionId = successResponse.submissionId
     logger.info(s"Successful response from ETMP for ${transferType.toString} submission ${submissionId}")
@@ -94,19 +98,16 @@ final class TransactionSubmissionServiceImpl @Inject()(
     transactionResponseRepository.store(submissionId, successResponse)
     saveAndReturnClient.deleteDraft(submissionId)
     sendSingleSubmissionDataToNRS(submissionId, successResponse.utrn)
-    true
   }
 
-  private def handleSinglePartialFailure(transferType: TransferType)(pf: SubmissionCreateResponsePartialFailure): Boolean = {
+  private def handleSinglePartialFailure(transferType: TransferType)(pf: SubmissionCreateResponsePartialFailure): Unit = {
     logger.warn(s"Unexpected partial failure response for ${transferType.toString} submission ${pf.submissionId}: $pf")
-    false
   }
 
-  private def handleSingleFailure(transferType: TransferType, submissionId: SubmissionId)(implicit request: StcDataRequest[?], headerCarrier: HeaderCarrier): Boolean = {
+  private def handleSingleFailure(transferType: TransferType, submissionId: SubmissionId)(implicit request: StcDataRequest[?], headerCarrier: HeaderCarrier): Unit = {
     logger.warn(s"Failure response from ETMP for ${transferType.toString} submission $submissionId")
     val (subscriptionId, affinityGroup, credentialId) = extractComponentsFrom(request)
     auditService.audit(AuditModel(SubmissionFailure, subscriptionId, affinityGroup, credentialId, Some(request.userAnswers.submissionId), AuditType.fromTransferType(transferType)))
-    false
   }
 
   private def sendSingleSubmissionDataToNRS(submissionId: SubmissionId, utrn: String)

@@ -133,7 +133,7 @@ class RowTransformsSpec extends AnyWordSpec with Matchers {
       val row = parsedStcRow.copy(whatTypeOfSecurities = Some("Ordinary"))
       val companyDetails = CompanyDetails(companyName = "Company", companyRegistrationNumber = "12345678")
       val agentReference = "REF-12345"
-      RowTransforms.fromValidatedStcRowToSh03Request(row, individualData, companyDetails,Some(agentReference)) shouldBe SingleTransferRequest(
+      RowTransforms.fromValidatedStcRowToSh03Request(companyDetails)(row, individualData,Some(agentReference)) shouldBe SingleTransferRequest(
         recordId = 3,
         transactionDetails = SingleTransferTransactionDetails(
           transactionType = TransferType.SH03,

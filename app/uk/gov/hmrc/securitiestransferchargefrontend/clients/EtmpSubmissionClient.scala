@@ -17,26 +17,25 @@
 package uk.gov.hmrc.securitiestransferchargefrontend.clients
 
 import play.api.Logging
-import play.api.http.Status.CREATED
+import play.api.http.Status.*
 import play.api.libs.json.*
 import play.api.libs.ws.JsonBodyWritables.writeableOf_JsValue
-import uk.gov.hmrc.http.client.HttpClientV2
-import uk.gov.hmrc.http.{HeaderCarrier, StringContextOps}
-import uk.gov.hmrc.securitiestransferchargefrontend.config.FrontendAppConfig
-import uk.gov.hmrc.securitiestransferchargefrontend.models.submission.{StcTransactionCreateResponse, SubmissionBatchPayload}
-import uk.gov.hmrc.securitiestransferchargefrontend.utils.CommonHelpers
-
-import javax.inject.Inject
-import scala.concurrent.{ExecutionContext, Future}
-import uk.gov.hmrc.http.HttpResponse
 import uk.gov.hmrc.http.HttpReads.Implicits.*
+import uk.gov.hmrc.http.client.HttpClientV2
+import uk.gov.hmrc.http.{HeaderCarrier, HttpResponse, StringContextOps}
+import uk.gov.hmrc.securitiestransferchargefrontend.config.FrontendAppConfig
 import uk.gov.hmrc.securitiestransferchargefrontend.domain.{SubmissionId, SubscriptionId}
 import uk.gov.hmrc.securitiestransferchargefrontend.models.Headers
+import uk.gov.hmrc.securitiestransferchargefrontend.models.submission.StcTransactionCreateResponse.given
+import uk.gov.hmrc.securitiestransferchargefrontend.models.submission.*
+import uk.gov.hmrc.securitiestransferchargefrontend.utils.CommonHelpers
 
 import java.util.UUID
+import javax.inject.Inject
+import scala.concurrent.{ExecutionContext, Future}
 
 trait EtmpSubmissionClient:
-  def submitSingleTransfer(
+  def submitBatchTransfer(
     subscriptionId: SubscriptionId,
     submissionId: SubmissionId,
     payload: SubmissionBatchPayload
@@ -56,20 +55,32 @@ class EtmpSubmissionClientImpl @Inject()(
   private val logInfoAndFailParsing = (s: String) => logInfoAndFail(new SubmissionResponseParsingException(s))
   private val logInfoAndFailNon201 = (s: String) => logInfoAndFail(new SubmissionResponseException(s))
   
-  def submitSingleTransfer(subscriptionId: SubscriptionId, submissionId: SubmissionId, payload: SubmissionBatchPayload)(implicit hc: HeaderCarrier): Future[StcTransactionCreateResponse] = {
-    http.post(url"${appConfig.submissionsServiceUrl}/submission/${submissionId.value}")
+  def submitBatchTransfer(subscriptionId: SubscriptionId, submissionId: SubmissionId, payload: SubmissionBatchPayload)
+                         (implicit hc: HeaderCarrier): Future[StcTransactionCreateResponse] = {
+    http
+      .post(url"${appConfig.submissionsServiceUrl}/submission/${submissionId.value}")
       .withBody(Json.toJson(payload))
       .setHeader(
         (Headers.CorrelationId, UUID.randomUUID().toString),
         (Headers.SubscriptionId, subscriptionId.value)
       )
       .execute[HttpResponse]
-      .flatMap {
-        case response if response.status == CREATED =>
-          response.json.validate[StcTransactionCreateResponse] match {
-            case JsSuccess(createdResponse, _) => Future.successful(createdResponse)
-            case JsError(errors) => logInfoAndFailParsing("Parse errors: " + errors.toString())
-          }
-        case otherResponse => logInfoAndFailNon201(s"Received $otherResponse when submitting to ETMP")
+      .flatMap { response =>
+        response.status match {
+          case CREATED              => parseResponse[StcTransactionCreateProcessed](response)
+          case BAD_REQUEST          => parseResponse[StcTransactionCreateBadRequest](response)
+          case UNPROCESSABLE_ENTITY => parseResponse[StcTransactionCreateBusinessError](response)
+          case otherResponse        => logInfoAndFailNon201(
+            s"Received unexpected $otherResponse response when submitting to ETMP for submission $submissionId"
+          )
+        }
       }
     }
+
+  private def parseResponse[A <: StcTransactionCreateResponse](response: HttpResponse)
+                                                              (implicit reads: Reads[A]): Future[A] = {
+      response.json.validate[A] match {
+        case JsSuccess(createdResponse, _) => Future.successful(createdResponse)
+        case JsError(errors) => logInfoAndFailParsing("Parse errors: " + errors.toString())
+      }
+}

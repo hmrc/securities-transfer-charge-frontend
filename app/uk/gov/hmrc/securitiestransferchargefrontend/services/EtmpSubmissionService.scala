@@ -19,11 +19,16 @@ package uk.gov.hmrc.securitiestransferchargefrontend.services
 import play.api.Logging
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.securitiestransferchargefrontend.clients.EtmpSubmissionClient
-import uk.gov.hmrc.securitiestransferchargefrontend.domain.{SubmissionId, SubscriptionId}
+import uk.gov.hmrc.securitiestransferchargefrontend.domain.TransferType.{SH03, STF}
+import uk.gov.hmrc.securitiestransferchargefrontend.domain.{SubmissionId, SubscriptionId, TransferType}
 import uk.gov.hmrc.securitiestransferchargefrontend.models.UserAnswers
+import uk.gov.hmrc.securitiestransferchargefrontend.models.sh03.bulk.CompanyDetails
 import uk.gov.hmrc.securitiestransferchargefrontend.models.shared.AgentReference
+import uk.gov.hmrc.securitiestransferchargefrontend.models.stf.fileupload.{ParsedStcRow, ValidatedStcRow}
 import uk.gov.hmrc.securitiestransferchargefrontend.models.submission.*
 import uk.gov.hmrc.securitiestransferchargefrontend.pages.sh03.RoleAtPurchasingCompanyPage
+import uk.gov.hmrc.securitiestransferchargefrontend.pages.sh03.bulk.BulkCompanyDetailsPage
+import uk.gov.hmrc.securitiestransferchargefrontend.pages.stf.bulk.BulkAgentReferencePage
 import uk.gov.hmrc.securitiestransferchargefrontend.pages.stf.shared.AgentReferencePage
 
 import java.time.LocalDate
@@ -32,50 +37,75 @@ import java.util.Locale
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 
-type ChargeReference = String
-
-trait SubmissionCreateResponse:
-  def fold[A](
-   onSuccess: SubmissionCreateResponseSuccess => A,
-   onPartialFailure: SubmissionCreateResponsePartialFailure => A,
-   onFailure: => A
-  ): A = this match {
-    case s: SubmissionCreateResponseSuccess => onSuccess(s)
-    case pf: SubmissionCreateResponsePartialFailure => onPartialFailure(pf)
-    case _ => onFailure
-  }
-
-  def isSuccessful: Boolean = this match {
-    case _: SubmissionCreateResponseSuccess => true
-    case _                                  => false
-  }
-
-final case class SubmissionCreateResponseSuccess(
-  submissionId: SubmissionId,
-  utrn: String,
-  chargeReferences: Seq[ChargeReference],
-  taxDue: BigDecimal,
-  paymentDueBy: LocalDate,
-  agentReference: Option[String]) extends SubmissionCreateResponse
-
-final case class SubmissionCreateResponsePartialFailure(
-  submissionId: SubmissionId,
-  successfulChargeReferences: Seq[ChargeReference],
-  failedRecords: Seq[Int],
-  taxDue: BigDecimal,
-  paymentDueBy: LocalDate,
-  agentReference: Option[String]) extends SubmissionCreateResponse
-
-case object SubmissionCreateResponseFailure extends SubmissionCreateResponse
-
-val submissionFailure = Future.successful(SubmissionCreateResponseFailure)
-
 trait EtmpSubmissionService:
   def submitSingleStf(subscriptionId: SubscriptionId, userAnswers: UserAnswers, affinityData: AffinityData)(implicit hc: HeaderCarrier): Future[SubmissionCreateResponse]
   def submitSingleSh03(subscriptionId: SubscriptionId, userAnswers: UserAnswers, affinityData: AffinityData)(implicit hc: HeaderCarrier): Future[SubmissionCreateResponse]
+  def submitBulkStf(subscriptionId: SubscriptionId, rows: Seq[ValidatedStcRow], userAnswers: UserAnswers, affinityData: AffinityData)(implicit hc: HeaderCarrier): Future[SubmissionCreateResponse]
+  def submitBulkSH03(subscriptionId: SubscriptionId, rows: Seq[ValidatedStcRow], userAnswers: UserAnswers, affinityData: AffinityData)(implicit hc: HeaderCarrier): Future[SubmissionCreateResponse]
+
 
 class EtmpSubmissionServiceImpl @Inject() (etmpSubmissionsClient: EtmpSubmissionClient)(implicit ec: ExecutionContext) extends EtmpSubmissionService with Logging:
+  override def submitSingleStf (subscriptionId: SubscriptionId, userAnswers: UserAnswers, affinityData: AffinityData)
+                               (implicit hc: HeaderCarrier): Future[SubmissionCreateResponse] = {
+    userAnswers.get(StfTransaction).map { stfSingleReq =>
+      val stfReq = UserAnswersTransforms.toStfRequest(stfSingleReq, affinityData)
+      submitSingle(stfReq, subscriptionId, userAnswers)
+    }.getOrElse(handleSubmitSingleFailure(STF, userAnswers.submissionId))
+  }
 
+  override def submitSingleSh03(subscriptionId: SubscriptionId, userAnswers: UserAnswers, affinityData: AffinityData)
+                               (implicit hc: HeaderCarrier): Future[SubmissionCreateResponse] = {
+    userAnswers.get(Sh03Transaction).map { sh03SingleReq =>
+      val sh03Req = UserAnswersTransforms.toSh03Request(sh03SingleReq, affinityData)
+      submitSingle(sh03Req, subscriptionId, userAnswers)
+    }.getOrElse(handleSubmitSingleFailure(SH03, userAnswers.submissionId))
+  }
+
+  private def submitSingle(req: SingleTransferRequest, subscriptionId: SubscriptionId, userAnswers: UserAnswers)
+                  (implicit hc: HeaderCarrier): Future[SubmissionCreateResponse] = {
+    val declaration = createDeclaration(userAnswers)
+    val etmpPayload = SubmissionBatchPayload(declaration, List(req))
+    submitBatchTransfer(subscriptionId, userAnswers, etmpPayload)
+  }
+
+  private val submissionFailure = Future.successful(SubmissionCreateResponseFailure)
+  
+  private def handleSubmitSingleFailure(transferType: TransferType, submissionId: SubmissionId): Future[SubmissionCreateResponse] = {
+    logger.warn(s"Failed to submit single ${transferType.toString} transaction $submissionId - could not parse user answers.")
+    submissionFailure
+  }
+  
+  override def submitBulkStf(subscriptionId: SubscriptionId, rows: Seq[ValidatedStcRow], userAnswers: UserAnswers, affinityData: AffinityData)
+                            (implicit hc: HeaderCarrier): Future[SubmissionCreateResponse] =
+    submitBulk(RowTransforms.fromValidatedStcRowToStfRequest)(subscriptionId, rows, userAnswers, affinityData)
+
+  override def submitBulkSH03(subscriptionId: SubscriptionId, rows: Seq[ValidatedStcRow], userAnswers: UserAnswers, affinityData: AffinityData)
+                             (implicit hc: HeaderCarrier): Future[SubmissionCreateResponse] = {
+    getCompanyDetails(userAnswers).map { companyDetails =>
+      submitBulk(RowTransforms.fromValidatedStcRowToSh03Request(companyDetails))(subscriptionId, rows, userAnswers, affinityData)
+    }.getOrElse {
+      logger.warn(s"Failed to submit bulks SH03 transaction ${userAnswers.submissionId} - could not get company details.")
+      submissionFailure
+    }
+  }
+
+  private type TransformFunction = (ParsedStcRow, AffinityData, Option[String]) =>  SingleTransferRequest
+  private def submitBulk(transformFunction: TransformFunction)(subscriptionId: SubscriptionId, rows: Seq[ValidatedStcRow], userAnswers: UserAnswers, affinityData: AffinityData)
+                        (implicit hc: HeaderCarrier): Future[SubmissionCreateResponse] = {
+    val agentReference = getAgentReference(userAnswers)
+    val requests = rows.map { row => transformFunction(row.parsedRow, affinityData, agentReference) }
+    val declaration = createDeclaration(userAnswers)
+    val etmpPayload = SubmissionBatchPayload(declaration, requests)
+    submitBatchTransfer(subscriptionId, userAnswers, etmpPayload)
+  }
+ 
+  private def getAgentReference(userAnswers: UserAnswers): Option[String] =
+    (userAnswers.data \ BulkAgentReferencePage.toString).asOpt[String]
+
+  private def getCompanyDetails(userAnswers: UserAnswers): Option[CompanyDetails] = {
+    (userAnswers.data \ BulkCompanyDetailsPage.toString).asOpt[CompanyDetails]
+  }
+    
   private val formatter  = DateTimeFormatter.ofPattern("yyyy-MM-dd", Locale.UK)
 
   private val toSubmissionCreateResponse: UserAnswers => StcTransactionCreateResponse => SubmissionCreateResponse = userAnswers => {
@@ -135,25 +165,7 @@ class EtmpSubmissionServiceImpl @Inject() (etmpSubmissionsClient: EtmpSubmission
       true
     )
 
-  def submitSingleStf(subscriptionId: SubscriptionId, userAnswers: UserAnswers, affinityData: AffinityData)(implicit hc: HeaderCarrier): Future[SubmissionCreateResponse] = {
-    userAnswers.get(StfTransaction).map { stfSingleReq =>
-      val stfReq = UserAnswersTransforms.toStfRequest(stfSingleReq, affinityData)
-      val declaration = createDeclaration(userAnswers)
-      val etmpPayload = SubmissionBatchPayload(declaration, List(stfReq))
-      submitSingleTransfer(subscriptionId, userAnswers, etmpPayload)
-    }.getOrElse(submissionFailure)
-  }
-
-  def submitSingleSh03(subscriptionId: SubscriptionId, userAnswers: UserAnswers, affinityData: AffinityData)(implicit hc: HeaderCarrier): Future[SubmissionCreateResponse] = {
-    userAnswers.get(Sh03Transaction).map { sh03SingleReq =>
-      val sh03Req = UserAnswersTransforms.toSh03Request(sh03SingleReq, affinityData)
-      val declaration = createDeclaration(userAnswers)
-      val etmpPayload = SubmissionBatchPayload(declaration, List(sh03Req))
-      submitSingleTransfer(subscriptionId, userAnswers, etmpPayload)
-    }.getOrElse(submissionFailure)
-  }
-
-  private def submitSingleTransfer(subscriptionId: SubscriptionId, userAnswers: UserAnswers, etmpPayload: SubmissionBatchPayload)(implicit hc: HeaderCarrier): Future[SubmissionCreateResponse] =
+  private def submitBatchTransfer(subscriptionId: SubscriptionId, userAnswers: UserAnswers, etmpPayload: SubmissionBatchPayload)(implicit hc: HeaderCarrier): Future[SubmissionCreateResponse] =
     etmpSubmissionsClient
-      .submitSingleTransfer(subscriptionId, userAnswers.submissionId, etmpPayload)
+      .submitBatchTransfer(subscriptionId, userAnswers.submissionId, etmpPayload)
       .map(toSubmissionCreateResponse(userAnswers))
