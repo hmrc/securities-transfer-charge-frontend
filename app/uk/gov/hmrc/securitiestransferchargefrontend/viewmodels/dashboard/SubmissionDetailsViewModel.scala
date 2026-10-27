@@ -105,7 +105,7 @@ object SubmissionDetailsViewModel {
 
   def build(submission: SttSubmission, formatter: FormattingService, isAgent: Boolean = false)(implicit messages: Messages): SubmissionDetailsViewModel = {
     val submissionType = submission.submissionType
-    val transfers = submission.transfers
+    val transfers = SttTransfer.sorted(submission.transfers)
     SubmissionDetailsViewModel(
       submissionId = submission.submissionId,
       summary = SubmissionDetailsSummary.getSummary(submission, formatter, isAgent),
