@@ -64,7 +64,7 @@ object SttTransfer:
     case ReadyToPay => 1
     case _ => 2
 
-  def sort(transfers: Seq[SttTransfer]): Seq[SttTransfer] =
+  def sorted(transfers: Seq[SttTransfer]): Seq[SttTransfer] =
     transfers.sortBy(transfer => (statusPriority(transfer), transfer.paymentDueByDate))
 
 

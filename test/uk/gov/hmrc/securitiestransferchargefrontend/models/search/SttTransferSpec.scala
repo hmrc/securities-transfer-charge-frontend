@@ -149,7 +149,7 @@ class SttTransferSpec extends AnyPropSpec with ScalaCheckPropertyChecks with Mat
     val transfers = Seq(paidLater, readyToPayLater, overdueLater, paidEarlier, readyToPayEarlier, overdueEarlier
     )
 
-    val sorted = SttTransfer.sort(transfers)
+    val sorted = SttTransfer.sorted(transfers)
 
     sorted.map(_.utrn) mustBe Seq(
       "overdue-earlier",
