@@ -22,6 +22,7 @@ import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.securitiestransferchargefrontend.clients.registration.NrsClient
 import uk.gov.hmrc.securitiestransferchargefrontend.config.FrontendAppConfig
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.actions.requests.StcDataRequest
+import uk.gov.hmrc.securitiestransferchargefrontend.domain.SubmissionId
 import uk.gov.hmrc.securitiestransferchargefrontend.models.nrs.{IdentityData, NrsMetadata, NrsSingleSubmissionRequest}
 import uk.gov.hmrc.securitiestransferchargefrontend.repositories.CyaHtmlData
 import uk.gov.hmrc.securitiestransferchargefrontend.utils.CommonHelpers.authToken
@@ -40,6 +41,11 @@ trait NrsService:
   )(implicit
     request    : StcDataRequest[?],
     hc         : HeaderCarrier): Future[Unit]
+
+  def bulkSubmissionNotableEvent(
+    submissionId: SubmissionId,
+    uploadRef   : String
+  )(implicit hc : HeaderCarrier): Future[Unit]
 
 class NrsServiceImpl @Inject()(
   nrsClient: NrsClient,
@@ -63,6 +69,12 @@ class NrsServiceImpl @Inject()(
     )
 
     nrsClient.postSinglePayload(nrsRequest)
+  }
+
+  override def bulkSubmissionNotableEvent(submissionId: SubmissionId, uploadRef: String)
+                                         (implicit hc: HeaderCarrier): Future[Unit] = {
+    // TODO: Implementation
+    Future.successful(())
   }
 
   private[services] def createMetadata(

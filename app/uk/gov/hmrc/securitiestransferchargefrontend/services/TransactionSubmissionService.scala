@@ -27,6 +27,7 @@ import uk.gov.hmrc.securitiestransferchargefrontend.models.UserAnswers
 import uk.gov.hmrc.securitiestransferchargefrontend.models.audit.JourneyStatus.{SubmissionFailure, SubmissionSuccess}
 import uk.gov.hmrc.securitiestransferchargefrontend.models.audit.{AuditModel, AuditType}
 import uk.gov.hmrc.securitiestransferchargefrontend.models.stf.Address
+import uk.gov.hmrc.securitiestransferchargefrontend.models.stf.fileupload.ValidatedStcRow
 import uk.gov.hmrc.securitiestransferchargefrontend.models.submission.{AffinityData, Agent, Individual, Organisation}
 import uk.gov.hmrc.securitiestransferchargefrontend.repositories.{CyaHtmlRepository, TransactionResponseRepository}
 import uk.gov.hmrc.securitiestransferchargefrontend.services.TransactionSubmissionService.*
@@ -38,7 +39,9 @@ import scala.concurrent.{ExecutionContext, Future}
 trait TransactionSubmissionService:
   def submitSingleStf(implicit request: StcDataRequest[?]): Future[Boolean]
   def submitSingleSh03(implicit request: StcDataRequest[?]): Future[Boolean]
-
+  def submitBulkStf(rows: Seq[ValidatedStcRow])(using request: StcDataRequest[?]): Future[Boolean]
+  def submitBulkSh03(rows: Seq[ValidatedStcRow])(using request: StcDataRequest[?]): Future[Boolean]
+  
 final class TransactionSubmissionServiceImpl @Inject()(
   headerCarrierCreator          : HeaderCarrierCreator,
   etmpSubmissionService         : EtmpSubmissionService,
@@ -46,6 +49,7 @@ final class TransactionSubmissionServiceImpl @Inject()(
   nrsService                    : NrsService,
   cyaHtmlRepository             : CyaHtmlRepository,
   transactionResponseRepository : TransactionResponseRepository,
+  bulkStatusService             : BulkStatusService,
   auditService                  : AuditService)(
   implicit ec                   : ExecutionContext
 ) extends TransactionSubmissionService with Logging {
@@ -75,6 +79,33 @@ final class TransactionSubmissionServiceImpl @Inject()(
     } yield response.isSuccessful
   }
 
+  override def submitBulkStf(rows: Seq[ValidatedStcRow])(using request: StcDataRequest[?]): Future[Boolean] =
+    submitBulk(STF, rows)
+
+  override def submitBulkSh03(rows: Seq[ValidatedStcRow])(using request: StcDataRequest[?]): Future[Boolean] =
+    submitBulk(SH03, rows)
+
+  private def submitBulk(transferType: TransferType, rows: Seq[ValidatedStcRow])(using request: StcDataRequest[?]): Future[Boolean] = {
+    implicit val hc: HeaderCarrier = headerCarrierCreator.create(request)
+    val submissionId = request.userAnswers.submissionId
+    val submit = bulkSubmitFunctionFor(transferType)
+    for {
+      _ <- bulkStatusService.markAsProcessing(submissionId)
+      response <- submit(
+        request.request.subscriptionId,
+        rows,
+        request.userAnswers,
+        getAffinityData(request.request.affinityGroup)
+      )
+
+      _ = response.fold(
+        onSuccess        = handleBulkSuccess(transferType),
+        onPartialFailure = handleBulkPartialFailure(transferType),
+        onFailure        = handleBulkFailure(transferType, submissionId)
+      )
+    } yield response.isSuccessful
+  }
+
   private type SubmitFunction = (SubscriptionId, UserAnswers, AffinityData) => Future[SubmissionCreateResponse]
 
   private val submitFunctionFor: TransferType => HeaderCarrier ?=> SubmitFunction = {
@@ -83,9 +114,17 @@ final class TransactionSubmissionServiceImpl @Inject()(
     case Other => throw new NotImplementedError("Transaction type Other is not supported.")
   }
 
+  private type BulkSubmitFunction = (SubscriptionId, Seq[ValidatedStcRow], UserAnswers, AffinityData) => Future[SubmissionCreateResponse]
+
+  private val bulkSubmitFunctionFor: TransferType => HeaderCarrier ?=> BulkSubmitFunction = {
+    case STF   => etmpSubmissionService.submitBulkStf
+    case SH03  => etmpSubmissionService.submitBulkSH03
+    case Other => throw new NotImplementedError("Transaction type Other is not supported.")
+  }
+
   private val extractComponentsFrom: StcDataRequest[?] => (SubscriptionId, AffinityGroup, CredentialId) = req => (
-    req.request.subscriptionId, 
-    req.request.affinityGroup, 
+    req.request.subscriptionId,
+    req.request.affinityGroup,
     req.request.credentialId
   )
 
@@ -120,7 +159,43 @@ final class TransactionSubmissionServiceImpl @Inject()(
       }
   }
 
+  private def handleBulkSuccess(transferType: TransferType)(successResponse: SubmissionCreateResponseSuccess)
+                                 (implicit hc: HeaderCarrier, request: StcDataRequest[?]): Unit = {
+    val (subscriptionId, affinityGroup, credentialId) = extractComponentsFrom(request)
+    val submissionId = successResponse.submissionId
+    logger.info(s"Successful response from ETMP for ${transferType.toString} bulk submission ${submissionId}")
+    bulkStatusService.markAsSuccessful(submissionId)
+    auditService.audit(AuditModel(SubmissionSuccess, subscriptionId, affinityGroup, credentialId, Some(submissionId), AuditType.fromTransferType(transferType)))
+    saveAndReturnClient.deleteDraft(submissionId)
+    sendBulkSubmissionDataToNRS(submissionId)
+  }
+  
+  private def sendBulkSubmissionDataToNRS(submissionId: SubmissionId)(using request: StcDataRequest[?], hc: HeaderCarrier): Future[Unit] = {
+    request.userAnswers.fileUploadReference.map { uploadRef =>
+      nrsService.bulkSubmissionNotableEvent(submissionId, uploadRef)
+    }.getOrElse {
+      Future {
+        logger.warn(s"Failed to send bulk data to NRS for submission $submissionId - no file reference found in user answers.")
+      }
+    }
+  }
+
+  private def handleBulkPartialFailure(transferType: TransferType)(pf: SubmissionCreateResponsePartialFailure): Future[Unit] = {
+    val submissionId = pf.submissionId
+    val failures = extractFailures(pf)
+    logger.warn(s"Partial failure for ${transferType.toString} submission $submissionId - errors stored in bulk service status repository.")
+    bulkStatusService.markAsPartiallyFailed(submissionId, failures)
+  }
+  
+  private def extractFailures(pf: SubmissionCreateResponsePartialFailure): Map[Int, String] = {
+    pf.failedRecords.map(_ -> "Failed").toMap // TODO: PF type needs error messages.
+  }
+  
+  private def handleBulkFailure(transferType: TransferType, submissionId: SubmissionId): Future[Unit] = Future {
+    logger.warn(s"Submission failure for ${transferType.toString} submission ${submissionId}")
+  }
 }
+
 
 object TransactionSubmissionService {
   val clearedUserAnswers: StcDataRequest[?] => UserAnswers = { req =>

@@ -38,6 +38,7 @@ trait SubmissionCreateResponse:
     case _                                  => false
   }
 
+// TODO: How would this work for bulk??? Or is this only needed for the confirmation page??
 final case class SubmissionCreateResponseSuccess(
   submissionId: SubmissionId,
   utrn: String,
