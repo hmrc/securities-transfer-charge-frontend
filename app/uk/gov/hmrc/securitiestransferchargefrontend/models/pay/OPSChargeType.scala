@@ -18,13 +18,13 @@ package uk.gov.hmrc.securitiestransferchargefrontend.models.pay
 
 import play.api.libs.json._
 
-sealed trait ChargeType
-object ChargeType {
-  case object SecurityTransferCharge extends ChargeType
-  case object LatePaymentPenalty extends ChargeType
-  case object LatePaymentInterest extends ChargeType
+sealed trait OPSChargeType
+object OPSChargeType {
+  case object SecurityTransferCharge extends OPSChargeType
+  case object LatePaymentPenalty extends OPSChargeType
+  case object LatePaymentInterest extends OPSChargeType
 
-  implicit val writes: Writes[ChargeType] = Writes {
+  implicit val writes: Writes[OPSChargeType] = Writes {
     case SecurityTransferCharge => JsString("SecurityTransferCharge")
     case LatePaymentPenalty     => JsString("LatePaymentPenalty")
     case LatePaymentInterest    => JsString("LatePaymentInterest")
@@ -35,7 +35,7 @@ final case class BasketItem(
                              buyerName: String,
                              sellerName: String,
                              chargeReference: String,
-                             chargeType: ChargeType,
+                             chargeType: OPSChargeType,
                              amountInPence: Long
                            )
 

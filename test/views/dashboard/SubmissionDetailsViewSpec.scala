@@ -22,6 +22,7 @@ import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
 import play.api.Application
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.dashboard.routes
+import uk.gov.hmrc.securitiestransferchargefrontend.controllers.pay.routes as paymentRoutes
 import uk.gov.hmrc.securitiestransferchargefrontend.domain.TransferType.{Other, SH03, STF}
 import uk.gov.hmrc.securitiestransferchargefrontend.models.search.SttSubmission
 import uk.gov.hmrc.securitiestransferchargefrontend.models.search.SubmissionStatus.{Overdue, ReadyToPay}
@@ -192,7 +193,7 @@ class SubmissionDetailsViewSpec extends ViewBaseSpec {
 
       "have the pay for submission button linking to the correct destination" in {
         val button = doc.select(".govuk-button").last()
-        button.attr("href") mustBe "#"
+        button.attr("href") mustBe paymentRoutes.PaymentController.startPayment(submission.submissionId).url
       }
 
       "have the correct class on the pay for submission button" in {

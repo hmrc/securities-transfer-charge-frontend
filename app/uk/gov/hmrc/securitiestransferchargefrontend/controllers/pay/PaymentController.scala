@@ -25,6 +25,8 @@ import uk.gov.hmrc.securitiestransferchargefrontend.connectors.PayApiConnector
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.actions._
 import uk.gov.hmrc.securitiestransferchargefrontend.domain.SubmissionId
 import uk.gov.hmrc.securitiestransferchargefrontend.models.pay._
+import uk.gov.hmrc.securitiestransferchargefrontend.models.search.EtmpChargeDetail
+import uk.gov.hmrc.securitiestransferchargefrontend.models.search.EtmpSuccessResponseExtensions.*
 import uk.gov.hmrc.securitiestransferchargefrontend.services.DashboardService
 
 import javax.inject.Inject
@@ -51,7 +53,7 @@ class PaymentController @Inject()(
             buyerName = transfer.buyerNames,
             sellerName = transfer.sellerNames.getOrElse("Not provided"),
             chargeReference = charge.chargeReference,
-            chargeType = mapToOPSChargeType(charge.chargeTypeDescription),
+            chargeType = mapToOPSChargeType(charge),
             amountInPence = charge.chargeAmountPending.setScale(2).underlying().movePointRight(2).longValueExact()
           )
         }
@@ -60,7 +62,7 @@ class PaymentController @Inject()(
       val paymentRequest = StartPaymentJourneyRequest(
         returnUrl = appConfig.paymentReturnUrl,
         backUrl = appConfig.paymentBackUrl(submissionId),
-        customerId = submissionId,
+        customerId = subscriptionId.value,
         submissionId = submissionId,
         basketDetails = BasketDetails(basketItems)
       )
@@ -71,14 +73,13 @@ class PaymentController @Inject()(
     }
   }
 
-  private def mapToOPSChargeType(etmpDescription: String): ChargeType = {
-    val description = etmpDescription.toLowerCase
-    if (description.contains("penalty")) {
-      ChargeType.LatePaymentPenalty
-    } else if (description.contains("interest")) {
-      ChargeType.LatePaymentInterest
+  private def mapToOPSChargeType(charge: EtmpChargeDetail): OPSChargeType = {
+    if (charge.isLatePaymentPenalty || charge.isLateFilingPenalty) {
+      OPSChargeType.LatePaymentPenalty
+    } else if (charge.isLatePaymentInterest) {
+      OPSChargeType.LatePaymentInterest
     } else {
-      ChargeType.SecurityTransferCharge
+      OPSChargeType.SecurityTransferCharge
     }
   }
 }
