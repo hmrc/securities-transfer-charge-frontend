@@ -56,8 +56,17 @@ final case class SttTransfer(
 }
 
 object SttTransfer:
-  val totalPending  : Seq[EtmpChargeDetail] => BigDecimal = _.map(_.chargeAmountPending).sum
-  val totalOriginal : Seq[EtmpChargeDetail] => BigDecimal = _.map(_.chargeAmountTotal).sum
+  val totalPending: Seq[EtmpChargeDetail] => BigDecimal = _.map(_.chargeAmountPending).sum
+  val totalOriginal: Seq[EtmpChargeDetail] => BigDecimal = _.map(_.chargeAmountTotal).sum
+
+  def statusPriority(transfer: SttTransfer): Int = transfer.status match
+    case Overdue => 0
+    case ReadyToPay => 1
+    case _ => 2
+
+  def sorted(transfers: Seq[SttTransfer]): Seq[SttTransfer] =
+    transfers.sortBy(transfer => (statusPriority(transfer), transfer.paymentDueByDate))
+
 
   given OFormat[SttTransfer] = Json.format[SttTransfer]
 

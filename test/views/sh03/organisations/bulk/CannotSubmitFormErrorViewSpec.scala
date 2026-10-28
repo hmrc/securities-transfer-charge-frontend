@@ -19,7 +19,7 @@ package views.sh03.organisations.bulk
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
 import play.api.Application
-import uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.shared.routes
+import uk.gov.hmrc.securitiestransferchargefrontend.controllers.dashboard.routes
 import uk.gov.hmrc.securitiestransferchargefrontend.views.html.sh03.organisations.bulk.CannotSubmitFormErrorView
 import views.ViewBaseSpec
 
@@ -107,10 +107,10 @@ class CannotSubmitFormErrorViewSpec extends ViewBaseSpec {
         cannotSubmitFormErrorView.select(".govuk-back-link").attr("href") mustBe testBackLinkRoute.url
       }
 
-      "have a link to return back to the submission dashboard page" in {
+      "have a link to return back to the dashboard page" in {
         val returnLink = cannotSubmitFormErrorView.select("p.govuk-body a.govuk-link").first()
         returnLink.text() mustBe ExpectedContent.returnLink
-        returnLink.attr("href") mustBe routes.SubmissionsDashboardController.onPageLoad().url
+        returnLink.attr("href") mustBe routes.DashboardController.onPageLoad().url
       }
     }
   }

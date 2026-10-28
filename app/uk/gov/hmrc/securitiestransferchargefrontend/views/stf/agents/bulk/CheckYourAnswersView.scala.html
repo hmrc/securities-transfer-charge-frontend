@@ -20,7 +20,7 @@
 @import uk.gov.hmrc.securitiestransferchargefrontend.views.html.templates.Layout
 @import uk.gov.hmrc.securitiestransferchargefrontend.viewmodels.stf.agents.bulk.CurrencyFormatter
 @import uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.agents.bulk.routes as agentRoutes
-@import uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.shared.routes as sharedRoutes
+@import uk.gov.hmrc.securitiestransferchargefrontend.controllers.dashboard.routes as dashboardRoutes
 @import views.html.helper.CSPNonce
 
 @this(
@@ -101,7 +101,7 @@
                 )
             )
 
-            <a class="govuk-link govuk-!-margin-top-2" href="@sharedRoutes.SubmissionsDashboardController.onPageLoad().url">
+            <a class="govuk-link govuk-!-margin-top-2" href="@dashboardRoutes.DashboardController.onPageLoad().url">
             @messages("return-to-dashboard.link")
             </a>
         }

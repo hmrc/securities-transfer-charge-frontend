@@ -20,7 +20,7 @@ import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
 import play.api.Application
 import play.api.test.FakeRequest
-import uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.shared.routes
+import uk.gov.hmrc.securitiestransferchargefrontend.controllers.dashboard.routes
 import uk.gov.hmrc.securitiestransferchargefrontend.models.JourneyType
 import uk.gov.hmrc.securitiestransferchargefrontend.models.stf.upscan.UploadRequest
 import uk.gov.hmrc.securitiestransferchargefrontend.views.html.fileUpload.FileUploadView
@@ -92,10 +92,10 @@ class FileUploadViewSpec extends ViewBaseSpec {
         doc.select(".govuk-button").text() mustBe ExpectedContent.button
       }
 
-      "have a link to return back to the submission dashboard page" in {
+      "have a link to return back to the dashboard page" in {
         val returnLink = doc.select(".govuk-button-group a.govuk-link").first()
         returnLink.text() mustBe ExpectedContent.returnToDashboard
-        returnLink.attr("href") mustBe routes.SubmissionsDashboardController.onPageLoad().url
+        returnLink.attr("href") mustBe routes.DashboardController.onPageLoad().url
       }
 
       "have the correct form action" in {

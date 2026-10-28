@@ -17,7 +17,7 @@
 @import uk.gov.hmrc.securitiestransferchargefrontend.models.sh03.HowToNotifyAboutShareBuyback
 @import uk.gov.hmrc.securitiestransferchargefrontend.viewmodels.LegendSize.Large
 @import uk.gov.hmrc.securitiestransferchargefrontend.views.html.templates
-@import uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.shared.routes
+@import uk.gov.hmrc.securitiestransferchargefrontend.controllers.dashboard.routes
 @import uk.gov.hmrc.securitiestransferchargefrontend.controllers.sh03.agents.routes as agentsRoutes
 
 @this(
@@ -51,7 +51,7 @@
                 ButtonViewModel(messages("site.continue"))
             )
 
-            <a class="govuk-link" href="@routes.SubmissionsDashboardController.onPageLoad().url">
+            <a class="govuk-link" href="@routes.DashboardController.onPageLoad().url">
             @messages("return-to-dashboard.link")
             </a>
 

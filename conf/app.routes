@@ -49,9 +49,6 @@ POST       /stf/confirm-address                           uk.gov.hmrc.securities
 GET        /stf/change/confirm-address                    uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.individuals.single.ConfirmAddressController.onPageLoad()
 POST       /stf/change/confirm-address                    uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.individuals.single.ConfirmAddressController.onSubmit(mode: Mode = CheckMode)
 
-GET        /submissions-dashboard                         uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.shared.SubmissionsDashboardController.onPageLoad()
-POST       /submissions-dashboard                         uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.shared.SubmissionsDashboardController.onSubmit()
-
 GET        /stf/how-many-transfers                        uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.individuals.HowToNotifyAboutSecuritiesTransferController.onPageLoad()
 POST       /stf/how-many-transfers                        uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.individuals.HowToNotifyAboutSecuritiesTransferController.onSubmit()
 
@@ -315,8 +312,6 @@ POST       /stf/agent/bulk/add-reference                   uk.gov.hmrc.securitie
 GET        /stf/agent/bulk/change/add-reference            uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.agents.bulk.AgentReferenceController.onPageLoad(mode: Mode = CheckMode, reference: String)
 POST       /stf/agent/bulk/change/add-reference            uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.agents.bulk.AgentReferenceController.onSubmit(mode: Mode = CheckMode)
 
-GET         /submissions-dashboard/sh03                      uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.shared.SubmissionsDashboardController.startSh03()
-
 GET        /sh03/before-you-start                          uk.gov.hmrc.securitiestransferchargefrontend.controllers.sh03.shared.BeforeYouStartController.onPageLoad()
 POST       /sh03/before-you-start                          uk.gov.hmrc.securitiestransferchargefrontend.controllers.sh03.shared.BeforeYouStartController.onSubmit()
 
@@ -512,3 +507,6 @@ GET       /dashboard/start-sh03                         uk.gov.hmrc.securitiestr
 GET        /recent-submissions                          uk.gov.hmrc.securitiestransferchargefrontend.controllers.dashboard.RecentSubmissionsController.onPageLoad()
 
 GET        /submission-details/:submissionId                       uk.gov.hmrc.securitiestransferchargefrontend.controllers.dashboard.SubmissionDetailsController.onPageLoad(submissionId: String)
+
+# Payment Journey Routes
+GET        /dashboard/submissions/:submissionId/pay       uk.gov.hmrc.securitiestransferchargefrontend.controllers.pay.PaymentController.startPayment(submissionId: String)

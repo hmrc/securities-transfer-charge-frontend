@@ -15,7 +15,7 @@
  *@
 
 @import uk.gov.hmrc.securitiestransferchargefrontend.views.html.templates
-@import uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.shared.routes
+@import uk.gov.hmrc.securitiestransferchargefrontend.controllers.dashboard.routes
 @import uk.gov.hmrc.securitiestransferchargefrontend.models.NormalMode
 
 @this(
@@ -43,7 +43,7 @@
     </ul>
 
     <p class="govuk-body">
-        <a class="govuk-link" href="@routes.SubmissionsDashboardController.onPageLoad().url">
+        <a class="govuk-link" href="@routes.DashboardController.onPageLoad().url">
         @messages("return-to-dashboard.link")
         </a>
     </p>

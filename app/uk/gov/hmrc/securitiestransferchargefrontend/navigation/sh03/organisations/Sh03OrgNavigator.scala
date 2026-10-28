@@ -24,7 +24,7 @@ import uk.gov.hmrc.securitiestransferchargefrontend.config.FrontendAppConfig
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.routes
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.sh03.organisations.single.routes as sh03OrgSingleRoutes
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.sh03.organisations.bulk.routes as sh03OrgBulkRoutes
-import uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.shared.routes as sharedRoutes
+import uk.gov.hmrc.securitiestransferchargefrontend.controllers.dashboard.routes as dashboardRoutes
 import uk.gov.hmrc.securitiestransferchargefrontend.domain.{SubmissionId, UserId}
 import uk.gov.hmrc.securitiestransferchargefrontend.models.{Mode, UserAnswers}
 import uk.gov.hmrc.securitiestransferchargefrontend.navigation.*
@@ -46,7 +46,7 @@ class Sh03OrgNavigator @Inject()(
                                   sessionRepo: SessionRepository
                                 )(implicit ec: ExecutionContext) extends AbstractModeNavigator with PersistentNavigator {
 
-  override lazy val dashboardPage: Call = sharedRoutes.SubmissionsDashboardController.onPageLoad()
+  override lazy val dashboardPage: Call = dashboardRoutes.DashboardController.onPageLoad()
   override val sessionRepository: SessionRepository = sessionRepo
   val defaultPage: Call = routes.JourneyRecoveryController.onPageLoad()
   val errorPages: List[Call] = List(defaultPage)
