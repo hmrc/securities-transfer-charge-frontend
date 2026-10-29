@@ -23,6 +23,7 @@ import uk.gov.hmrc.securitiestransferchargefrontend.models.UserAnswersSummary
 import uk.gov.hmrc.securitiestransferchargefrontend.models.search.EtmpSuccessResponseExtensions.*
 import uk.gov.hmrc.securitiestransferchargefrontend.models.search.SubmissionStatus.*
 import uk.gov.hmrc.securitiestransferchargefrontend.models.search.*
+import uk.gov.hmrc.securitiestransferchargefrontend.repositories.ProcessingStatusRepository
 import uk.gov.hmrc.securitiestransferchargefrontend.services.DashboardService.draftToSubmissionSummary
 import uk.gov.hmrc.securitiestransferchargefrontend.utils.DateTimeFormats
 
@@ -43,7 +44,8 @@ trait DashboardService:
 
 final class DashboardServiceImpl @Inject()(
   saveAndReturnClient: SaveAndReturnClient,
-  @Named("cache") dashboardClient: DashboardClient
+  @Named("cache") dashboardClient: DashboardClient,
+  processingStatusRepository:ProcessingStatusRepository                                    
 )(using
   ec: ExecutionContext
 ) extends DashboardService {
@@ -70,7 +72,8 @@ final class DashboardServiceImpl @Inject()(
     recent   <- dashboardClient.getRecentTransactions(subscriptionId)
     drafts   <- getDrafts(userId, groupId)
     summaries = toSummaryList(recent)
-  } yield sorted(drafts ++ summaries)
+    updated  <- updateProcessingStatuses(summaries) 
+  } yield sorted(drafts ++ updated)
 
   override def getCounts(userId: UserId, groupId: GroupIdentifier, subscriptionId: SubscriptionId)(implicit hc: HeaderCarrier): Future[DashboardCounts] = for {
     drafts          <- getDrafts(userId, groupId)
@@ -87,6 +90,14 @@ final class DashboardServiceImpl @Inject()(
     subs = toSttSubmissionList(response)
   } yield subs.head
 
+  private def updateProcessingStatuses(summaries: Seq[SubmissionSummary]): Future[Seq[SubmissionSummary]] =
+    processingStatusRepository
+      .findBySubmissionIds(summaries.map(_.submissionId))
+      .map { processingSubmissionIds =>
+        summaries.map { summary =>
+          if (processingSubmissionIds.contains(SubmissionId(summary.submissionId))) summary.copy(status = SubmissionStatus.Processing) else summary
+        }
+      }
 }
 
 object DashboardService:

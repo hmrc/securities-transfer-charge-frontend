@@ -18,6 +18,7 @@ package uk.gov.hmrc.securitiestransferchargefrontend.services
 
 import base.Fixtures.{buildEtmpSuccessResponse, buildSubmissionDetails, buildTaxCharge}
 import base.{Fixtures, SpecBase}
+import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.when
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatestplus.mockito.MockitoSugar
@@ -29,6 +30,7 @@ import uk.gov.hmrc.securitiestransferchargefrontend.domain.{SubmissionId, Transf
 import uk.gov.hmrc.securitiestransferchargefrontend.models.UserAnswersSummary
 import uk.gov.hmrc.securitiestransferchargefrontend.models.search.SubmissionStatus.{Draft, Overdue, ReadyToPay}
 import uk.gov.hmrc.securitiestransferchargefrontend.models.search.{DashboardCounts, EtmpTransactionDetail, EtmpTransactionSummaryResponse, SttSubmission, SubmissionSummary}
+import uk.gov.hmrc.securitiestransferchargefrontend.repositories.ProcessingStatusRepository
 
 import java.time.Instant
 import scala.concurrent.Future
@@ -38,7 +40,8 @@ class DashboardServiceSpec extends SpecBase with ScalaFutures with MockitoSugar 
   trait TestSetup {
     val mockSaveAndReturnClient: SaveAndReturnClient = mock[SaveAndReturnClient]
     val mockDashboardClient: DashboardClient = mock[DashboardClient]
-    val dashboardService: DashboardService = new DashboardServiceImpl(mockSaveAndReturnClient, mockDashboardClient)
+    val mockProcessingStatusRepository: ProcessingStatusRepository = mock[ProcessingStatusRepository]
+    val dashboardService: DashboardService = new DashboardServiceImpl(mockSaveAndReturnClient, mockDashboardClient,mockProcessingStatusRepository)
     implicit val mockHc: HeaderCarrier = mock[HeaderCarrier]
 
     def baseDetail: EtmpTransactionDetail =
@@ -129,6 +132,7 @@ class DashboardServiceSpec extends SpecBase with ScalaFutures with MockitoSugar 
             )
           )
         )
+      when(mockProcessingStatusRepository.findBySubmissionIds(any[Seq[String]])).thenReturn(Future.successful(Set.empty))
 
       val outcome: Future[Seq[SubmissionSummary]] = dashboardService.getRecent(Fixtures.testInternalId, Fixtures.testGroupIdentifier, Fixtures.testSubscriptionId)
       whenReady(outcome) { summaries =>

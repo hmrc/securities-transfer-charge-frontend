@@ -30,7 +30,7 @@ import uk.gov.hmrc.securitiestransferchargefrontend.navigation.stf.agents.StfAge
 import uk.gov.hmrc.securitiestransferchargefrontend.navigation.stf.individuals.StfNavigator
 import uk.gov.hmrc.securitiestransferchargefrontend.navigation.stf.organisations.StfOrgNavigator
 import uk.gov.hmrc.securitiestransferchargefrontend.navigation.{Navigator, PersistentNavigator}
-import uk.gov.hmrc.securitiestransferchargefrontend.repositories.{ChecksumRepository, ChecksumRepositoryImpl, CyaHtmlRepository, CyaHtmlRepositoryImpl, DashboardClientDataRepository, ParsedStcRowsRepository, ParsedStcRowsRepositoryImpl, SessionRepository, SessionRepositoryImpl, SubscriptionDataRepository, SubscriptionDataRepositoryImpl, TransactionResponseRepository, TransactionResponseRepositoryImpl, UpscanJourneyRepository, UpscanJourneyRepositoryImpl, ValidationErrorRepository, ValidationErrorRepositoryImpl}
+import uk.gov.hmrc.securitiestransferchargefrontend.repositories.{ChecksumRepository, ChecksumRepositoryImpl, CyaHtmlRepository, CyaHtmlRepositoryImpl, DashboardClientDataRepository, ParsedStcRowsRepository, ParsedStcRowsRepositoryImpl, ProcessingStatusRepository, ProcessingStatusRepositoryImpl, SessionRepository, SessionRepositoryImpl, SubscriptionDataRepository, SubscriptionDataRepositoryImpl, TransactionResponseRepository, TransactionResponseRepositoryImpl, UpscanJourneyRepository, UpscanJourneyRepositoryImpl, ValidationErrorRepository, ValidationErrorRepositoryImpl}
 import uk.gov.hmrc.securitiestransferchargefrontend.services.*
 import uk.gov.hmrc.securitiestransferchargefrontend.services.fileupload.*
 import uk.gov.hmrc.securitiestransferchargefrontend.services.fileupload.processing.{DefaultFileProcessingRefreshCounterFactory, FileProcessingRefreshCounterFactory}
@@ -130,6 +130,8 @@ class Module extends AbstractModule {
       .to(classOf[DashboardClientDataRepository])
     bind(classOf[SubscriptionService])
       .to(classOf[SubscriptionServiceImpl])
+    bind(classOf[ProcessingStatusRepository])
+      .to(classOf[ProcessingStatusRepositoryImpl])
     
   }
 }
