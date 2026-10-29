@@ -90,7 +90,7 @@ class FileUploadControllerSpec extends SpecBase with MockitoSugar {
 
         "onUploadError" - {
 
-          "must delete the mongo document and return the upload page with an error message" in {
+          "must return the upload page with an error message" in {
 
             val mockRepository = mock[UpscanJourneyRepository]
             val mockUpscanInitiateConnector = mock[UpscanInitiateConnector]
