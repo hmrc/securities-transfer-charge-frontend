@@ -108,7 +108,8 @@ class FrontendAppConfig @Inject() (configuration: Configuration, servicesConfig:
   val checksumTtl: Long = configuration.get[Int]("mongodb.checksumTimeToLiveInDays")
   val cyaHtmlTtl: Long = configuration.get[Int]("mongodb.cyaHtmlTimeToLiveInDays")
   val dashboardClientCacheTtlMins: Long = configuration.get[Int]("mongodb.dashboardClientCacheTimeToLiveInMinutes")
-  
+  val processingStatusTtl: Long = configuration.get[Int]("mongodb.processingStatusTimeToLiveInDays")
+
   private val saveAndReturnService =
     configuration.get[Service]("microservice.services.securities-transfer-charge-save-and-return")
 

@@ -26,6 +26,7 @@ object StatusTag {
     case SubmissionStatus.Draft       => "govuk-tag--grey"
     case SubmissionStatus.Overdue     => "govuk-tag--orange"
     case SubmissionStatus.Paid        => "govuk-tag--green"
+    case SubmissionStatus.Processing  => "govuk-tag--yellow"
     case _                            => "govuk-tag--white"
   }
 
