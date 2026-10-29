@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package controllers.stf.shared.bulk
+package controllers.fileUpload
 
 import base.SpecBase
 import org.mockito.ArgumentMatchers.any
@@ -23,14 +23,14 @@ import org.scalatestplus.mockito.MockitoSugar
 import play.api.inject
 import play.api.mvc.Result
 import play.api.test.FakeRequest
-import play.api.test.Helpers.*
+import play.api.test.Helpers.{status, *}
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.securitiestransferchargefrontend.connectors.UpscanInitiateConnector
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.fileUpload.routes
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.routes.JourneyRecoveryController
 import uk.gov.hmrc.securitiestransferchargefrontend.models.JourneyType
 import uk.gov.hmrc.securitiestransferchargefrontend.models.stf.upscan.UpscanJourneyStatus.Failed
-import uk.gov.hmrc.securitiestransferchargefrontend.models.stf.upscan.{FileUpload, UploadRequest, UpscanInitiateResponse}
+import uk.gov.hmrc.securitiestransferchargefrontend.models.stf.upscan.{FileUpload, UploadRequest, UpscanDocument, UpscanInitiateResponse}
 import uk.gov.hmrc.securitiestransferchargefrontend.repositories.UpscanJourneyRepository
 import uk.gov.hmrc.securitiestransferchargefrontend.services.fileupload.processing.{FileProcessingRefreshCounter, FileProcessingRefreshCounterFactory}
 import uk.gov.hmrc.securitiestransferchargefrontend.views.html.fileUpload.FileUploadView
@@ -90,34 +90,110 @@ class FileUploadControllerSpec extends SpecBase with MockitoSugar {
 
         "onUploadError" - {
 
-          "must delete the mongo document and redirect to the BulkUploadErrorController" in {
+          "must return the upload page with an error message" in {
 
             val mockRepository = mock[UpscanJourneyRepository]
+            val mockUpscanInitiateConnector = mock[UpscanInitiateConnector]
 
             when(mockRepository.find("1234"))
-              .thenReturn(Future.successful(Some(FileUpload(reference = "1234",status = Failed,journeyType = journeyType))))
-            when(mockRepository.delete("1234"))
-              .thenReturn(Future.successful(()))
+              .thenReturn(
+                Future.successful(
+                  Some(
+                    FileUpload(
+                      reference = "1234",
+                      status = Failed,
+                      journeyType = journeyType
+                    )
+                  )
+                )
+              )
+            
+            when(mockUpscanInitiateConnector.initiate()(any[HeaderCarrier]()))
+              .thenReturn(Future.successful(upscanInitiateResponse))
+
+
+            when(mockRepository.insert(any[UpscanDocument])).thenReturn(Future.successful(()))
+
 
             val application = applicationBuilder(userAnswers = Some(emptyUserAnswers))
               .overrides(
-                inject.bind[UpscanJourneyRepository].toInstance(mockRepository)
+                inject.bind[UpscanJourneyRepository].toInstance(mockRepository),
+                inject.bind[UpscanInitiateConnector].to(mockUpscanInitiateConnector)
               )
               .build()
 
             running(application) {
 
               val request =
-                FakeRequest(GET, s"$onUploadErrorRoute?key=1234")
+                FakeRequest(
+                  GET,
+                  s"$onUploadErrorRoute?key=1234&errorCode=EntityTooLarge&errorMessage=TooBig"
+                )
 
               val result = route(application, request).value
 
-              status(result) mustEqual SEE_OTHER
+              val view = application.injector.instanceOf[FileUploadView]
 
-              redirectLocation(result).value mustEqual
-                routes.BulkUploadErrorController.onPageLoad(journeyType).url
+              status(result) mustEqual BAD_REQUEST
 
-              verify(mockRepository).delete("1234")
+              contentAsString(result) mustEqual
+                view(
+                  uploadRequest,
+                  Some(messages(application)("fileUpload.redirectError.EntityTooLarge")),
+                  journeyType
+                )(request, messages(application)).toString
+
+              verify(mockUpscanInitiateConnector).initiate()(any[HeaderCarrier]())
+            }
+          }
+
+          "must show the generic upload error when an unknown error code is supplied" in {
+
+            val mockRepository = mock[UpscanJourneyRepository]
+            val mockUpscanInitiateConnector = mock[UpscanInitiateConnector]
+
+            when(mockRepository.find("1234"))
+              .thenReturn(
+                Future.successful(
+                  Some(
+                    FileUpload(
+                      reference = "1234",
+                      status = Failed,
+                      journeyType = journeyType
+                    )
+                  )
+                )
+              )
+            
+            when(mockUpscanInitiateConnector.initiate()(any[HeaderCarrier]()))
+              .thenReturn(Future.successful(upscanInitiateResponse))
+
+            when(mockRepository.insert(any[UpscanDocument])).thenReturn(Future.successful(()))
+
+            val application = applicationBuilder(userAnswers = Some(emptyUserAnswers))
+              .overrides(
+                inject.bind[UpscanJourneyRepository].toInstance(mockRepository),
+                inject.bind[UpscanInitiateConnector].to(mockUpscanInitiateConnector),
+              )
+              .build()
+
+            running(application) {
+
+              val request =
+                FakeRequest(
+                  GET,
+                  s"$onUploadErrorRoute?key=1234&errorCode=SomeUnknownError&errorMessage=SomethingWentWrong"
+                )
+
+              val result = route(application, request).value
+
+              val view = application.injector.instanceOf[FileUploadView]
+
+              status(result) mustEqual BAD_REQUEST
+
+              contentAsString(result) mustEqual view(uploadRequest, Some(messages(application)("fileUpload.redirectError.generic")), journeyType)(request, messages(application)).toString
+              
+              verify(mockUpscanInitiateConnector).initiate()(any[HeaderCarrier]())
             }
           }
 
