@@ -22,7 +22,7 @@ import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.securitiestransferchargefrontend.clients.SaveAndReturnClient
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.actions.requests.StcDataRequest
 import uk.gov.hmrc.securitiestransferchargefrontend.domain.TransferType.*
-import uk.gov.hmrc.securitiestransferchargefrontend.domain.{CredentialId, SubmissionId, SubscriptionId, TransferType}
+import uk.gov.hmrc.securitiestransferchargefrontend.domain.{CredentialId, GroupIdentifier, SubmissionId, SubscriptionId, TransferType}
 import uk.gov.hmrc.securitiestransferchargefrontend.models.UserAnswers
 import uk.gov.hmrc.securitiestransferchargefrontend.models.audit.JourneyStatus.{SubmissionFailure, SubmissionSuccess}
 import uk.gov.hmrc.securitiestransferchargefrontend.models.audit.{AuditModel, AuditType}
@@ -89,8 +89,9 @@ final class TransactionSubmissionServiceImpl @Inject()(
     implicit val hc: HeaderCarrier = headerCarrierCreator.create(request)
     val submissionId = request.userAnswers.submissionId
     val submit = bulkSubmitFunctionFor(transferType)
+    val group = GroupIdentifier(request.request.groupIdentifier)
     for {
-      _ <- bulkStatusService.markAsProcessing(submissionId)
+      _ <- bulkStatusService.markAsProcessing(group, submissionId)
       response <- submit(
         request.request.subscriptionId,
         rows,
@@ -180,19 +181,22 @@ final class TransactionSubmissionServiceImpl @Inject()(
     }
   }
 
-  private def handleBulkPartialFailure(transferType: TransferType)(pf: SubmissionCreateResponsePartialFailure): Future[Unit] = {
+  private def handleBulkPartialFailure(transferType: TransferType)(pf: SubmissionCreateResponsePartialFailure)(using req: StcDataRequest[?]) : Future[Unit] = {
     val submissionId = pf.submissionId
     val failures = extractFailures(pf)
     logger.warn(s"Partial failure for ${transferType.toString} submission $submissionId - errors stored in bulk service status repository.")
-    bulkStatusService.markAsPartiallyFailed(submissionId, failures)
+    val group = GroupIdentifier(req.request.groupIdentifier)
+    bulkStatusService.markAsPartiallyFailed(group, submissionId, failures)
   }
   
   private def extractFailures(pf: SubmissionCreateResponsePartialFailure): Map[Int, String] = {
     pf.failedRecords.map(_ -> "Failed").toMap // TODO: PF type needs error messages.
   }
   
-  private def handleBulkFailure(transferType: TransferType, submissionId: SubmissionId): Future[Unit] = Future {
+  private def handleBulkFailure(transferType: TransferType, submissionId: SubmissionId)(using req: StcDataRequest[?]): Future[Unit] = Future {
     logger.warn(s"Submission failure for ${transferType.toString} submission ${submissionId}")
+    val group = GroupIdentifier(req.request.groupIdentifier)
+    bulkStatusService.markAsFailed(group, submissionId)
   }
 }
 

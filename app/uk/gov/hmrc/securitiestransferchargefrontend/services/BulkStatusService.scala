@@ -16,41 +16,42 @@
 
 package uk.gov.hmrc.securitiestransferchargefrontend.services
 
-import uk.gov.hmrc.securitiestransferchargefrontend.domain.SubmissionId
-import uk.gov.hmrc.securitiestransferchargefrontend.repositories.{ProcessingStatusRepository, Status}
-import uk.gov.hmrc.securitiestransferchargefrontend.repositories.Status.{Failed, PartiallyFailed, Processing}
+import uk.gov.hmrc.securitiestransferchargefrontend.domain.{GroupIdentifier, SubmissionId}
+import uk.gov.hmrc.securitiestransferchargefrontend.models.submission.Status
+import uk.gov.hmrc.securitiestransferchargefrontend.models.submission.Status.*
+import uk.gov.hmrc.securitiestransferchargefrontend.repositories.ProcessingStatusRepository
 
 import javax.inject.Inject
-import scala.concurrent.{ExecutionContext, Future}
+import scala.concurrent.Future
 
 type RowNumber = Int
 type FailureReason = String
+type RowToFailureMap = Map[RowNumber, FailureReason]
 
 trait BulkStatusService {
-  def getStatus(submissionId: SubmissionId): Future[Status]
-  def markAsProcessing(submissionId: SubmissionId): Future[Unit]
+  def getStatus(groupId: GroupIdentifier, submissionId: SubmissionId): Future[Option[Status]]
+  def markAsProcessing(groupId: GroupIdentifier, submissionId: SubmissionId): Future[Unit]
   def markAsSuccessful(submissionId: SubmissionId): Future[Unit]
-  def markAsFailed(submissionId: SubmissionId): Future[Unit]
-  def markAsPartiallyFailed(submissionId: SubmissionId, failures: Map[RowNumber, FailureReason]): Future[Unit]
+  def markAsFailed(groupId: GroupIdentifier, submissionId: SubmissionId): Future[Unit]
+  def markAsPartiallyFailed(groupId: GroupIdentifier, submissionId: SubmissionId, failures: RowToFailureMap): Future[Unit]
 }
 
 private[services] final class BulkStatusServiceImpl @Inject() 
-  (processingStatusRepository: ProcessingStatusRepository)
-  (implicit ec: ExecutionContext) extends BulkStatusService {
+  (processingStatusRepository: ProcessingStatusRepository) extends BulkStatusService {
 
-  override def getStatus(submissionId: SubmissionId): Future[Status] =
-    Future { Status.Failed } // TODO: Need a new method on processingStatusRepository
+  override def getStatus(groupId: GroupIdentifier, submissionId: SubmissionId): Future[Option[Status]] =
+    processingStatusRepository.findBySubmissionId(groupId, submissionId)
 
-  override def markAsProcessing(submissionId: SubmissionId): Future[Unit] =
-    processingStatusRepository.insert(submissionId, Processing)
+  override def markAsProcessing(groupId: GroupIdentifier, submissionId: SubmissionId): Future[Unit] =
+    processingStatusRepository.insert(groupId, submissionId, Processing)
 
   override def markAsSuccessful(submissionId: SubmissionId): Future[Unit] =
     processingStatusRepository.delete(submissionId)
 
-  override def markAsFailed(submissionId: SubmissionId): Future[Unit] =
-    processingStatusRepository.update(submissionId, Failed)
+  override def markAsFailed(groupId: GroupIdentifier, submissionId: SubmissionId): Future[Unit] =
+    processingStatusRepository.update(groupId, submissionId, Failed)
 
-  override def markAsPartiallyFailed(submissionId: SubmissionId, failures: Map[RowNumber, FailureReason]): Future[Unit] =
-    processingStatusRepository.update(submissionId, PartiallyFailed(failures))
+  override def markAsPartiallyFailed(groupId: GroupIdentifier, submissionId: SubmissionId, failures: RowToFailureMap): Future[Unit] =
+    processingStatusRepository.update(groupId, submissionId, PartiallyFailed(failures))
 }
 
