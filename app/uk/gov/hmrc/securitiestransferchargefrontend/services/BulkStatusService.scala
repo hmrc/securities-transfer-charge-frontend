@@ -36,7 +36,7 @@ trait BulkStatusService {
   def markAsPartiallyFailed(groupId: GroupIdentifier, submissionId: SubmissionId, failures: RowToFailureMap): Future[Unit]
 }
 
-private[services] final class BulkStatusServiceImpl @Inject() 
+final class BulkStatusServiceImpl @Inject() 
   (processingStatusRepository: ProcessingStatusRepository) extends BulkStatusService {
 
   override def getStatus(groupId: GroupIdentifier, submissionId: SubmissionId): Future[Option[Status]] =

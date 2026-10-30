@@ -24,7 +24,7 @@ object RowTransforms {
 
   import DataExtractors.*
 
-  def fromValidatedStcRowToStfRequest(parsedRow: ParsedStcRow, affinityData: AffinityData,agentReference:Option[String]): SingleTransferRequest =
+  def fromValidatedStcRowToStfRequest(parsedRow: ParsedStcRow, affinityData: AffinityData, agentReference:Option[String]): SingleTransferRequest =
 
     def getDescriptionOfSecurity: String =
       val shType = shareType(parsedRow)
@@ -115,5 +115,5 @@ object RowTransforms {
       otherBuyers = None,
       agentDetails = agentDetails(agentReference).lift(affinityData)
     )
-  
+
 }

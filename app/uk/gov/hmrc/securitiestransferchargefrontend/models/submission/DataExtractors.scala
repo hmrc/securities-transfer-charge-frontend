@@ -130,5 +130,6 @@ object DataExtractors {
       case (true, false) => PurchasedForCancellation
       case (false, _) => PurchasedToPlaceIntoTreasury
     }
-    
+
+
 }

@@ -16,6 +16,7 @@
 
 package services
 
+import base.stubs.StubBulkStatusService
 import base.{AuditTestSupport, Fixtures, SpecBase}
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.*
@@ -67,7 +68,7 @@ class TransactionSubmissionServiceSpec extends AnyFreeSpec with Matchers with Sp
     val mockUserAnswers: UserAnswers = mock[UserAnswers]
     val mockStcAuthorisedRequest: StcAuthorisedRequest[AnyContent] = mock[StcAuthorisedRequest[AnyContent]]
     val mockSession: Session = mock[Session]
-
+    val stubBulkStatusService = new StubBulkStatusService
     val mockAuditService: AuditService = mock[AuditService]
 
     when(dataRequest.userAnswers).thenReturn(mockUserAnswers)
@@ -100,7 +101,7 @@ class TransactionSubmissionServiceSpec extends AnyFreeSpec with Matchers with Sp
   "The service should" - {
     "Call NRS if ETMP succeeds" in new TestSetup {
       when(mockEtmpSubmissionService.submitSingleStf(any[SubscriptionId], any[UserAnswers], any[AffinityData])(any[HeaderCarrier])).thenReturn(Future.successful(success))
-      val service = new TransactionSubmissionServiceImpl(mockHeaderCarrierCreator, mockEtmpSubmissionService, mockSaveAndReturnClient, mockNrsService, mockCyaHtmlRepository, mockTransactionResponseRepository, mockAuditService)
+      val service = new TransactionSubmissionServiceImpl(mockHeaderCarrierCreator, mockEtmpSubmissionService, mockSaveAndReturnClient, mockNrsService, mockCyaHtmlRepository, mockTransactionResponseRepository, stubBulkStatusService, mockAuditService)
       val outcome = service.submitSingleStf
       whenReady(outcome) { r =>
         verify(mockNrsService, times(1)).singleSubmissionNotableEvent(any[CyaHtmlData], any[String])(any[StcDataRequest[?]], any[HeaderCarrier])
@@ -109,7 +110,7 @@ class TransactionSubmissionServiceSpec extends AnyFreeSpec with Matchers with Sp
     }
     "Do not call NRS if ETMP fails" in new TestSetup {
       when(mockEtmpSubmissionService.submitSingleStf(any[SubscriptionId], any[UserAnswers], any[AffinityData])(any[HeaderCarrier])).thenReturn(Future.successful(failure))
-      val service = new TransactionSubmissionServiceImpl(mockHeaderCarrierCreator, mockEtmpSubmissionService, mockSaveAndReturnClient, mockNrsService, mockCyaHtmlRepository, mockTransactionResponseRepository, mockAuditService)
+      val service = new TransactionSubmissionServiceImpl(mockHeaderCarrierCreator, mockEtmpSubmissionService, mockSaveAndReturnClient, mockNrsService, mockCyaHtmlRepository, mockTransactionResponseRepository, stubBulkStatusService, mockAuditService)
       val outcome = service.submitSingleStf
       whenReady(outcome) { r =>
         verify(mockNrsService, never).singleSubmissionNotableEvent(any[CyaHtmlData], any[String])(any[StcDataRequest[?]], any[HeaderCarrier])
@@ -118,7 +119,7 @@ class TransactionSubmissionServiceSpec extends AnyFreeSpec with Matchers with Sp
     }
     "Call NRS if ETMP succeeds (SH03)" in new TestSetup {
       when(mockEtmpSubmissionService.submitSingleSh03(any[SubscriptionId], any[UserAnswers], any[AffinityData])(any[HeaderCarrier])).thenReturn(Future.successful(success))
-      val service = new TransactionSubmissionServiceImpl(mockHeaderCarrierCreator, mockEtmpSubmissionService, mockSaveAndReturnClient, mockNrsService, mockCyaHtmlRepository, mockTransactionResponseRepository, mockAuditService)
+      val service = new TransactionSubmissionServiceImpl(mockHeaderCarrierCreator, mockEtmpSubmissionService, mockSaveAndReturnClient, mockNrsService, mockCyaHtmlRepository, mockTransactionResponseRepository, stubBulkStatusService, mockAuditService)
       val outcome = service.submitSingleSh03
       whenReady(outcome) { r =>
         verify(mockNrsService, times(1)).singleSubmissionNotableEvent(any[CyaHtmlData], any[String])(any[StcDataRequest[?]], any[HeaderCarrier])
@@ -127,7 +128,7 @@ class TransactionSubmissionServiceSpec extends AnyFreeSpec with Matchers with Sp
     }
     "Do not call NRS if ETMP fails (SH03)" in new TestSetup {
       when(mockEtmpSubmissionService.submitSingleSh03(any[SubscriptionId], any[UserAnswers], any[AffinityData])(any[HeaderCarrier])).thenReturn(Future.successful(failure))
-      val service = new TransactionSubmissionServiceImpl(mockHeaderCarrierCreator, mockEtmpSubmissionService, mockSaveAndReturnClient, mockNrsService, mockCyaHtmlRepository, mockTransactionResponseRepository, mockAuditService)
+      val service = new TransactionSubmissionServiceImpl(mockHeaderCarrierCreator, mockEtmpSubmissionService, mockSaveAndReturnClient, mockNrsService, mockCyaHtmlRepository, mockTransactionResponseRepository, stubBulkStatusService, mockAuditService)
       val outcome = service.submitSingleSh03
       whenReady(outcome) { r =>
         verify(mockNrsService, never).singleSubmissionNotableEvent(any[CyaHtmlData], any[String])(any[StcDataRequest[?]], any[HeaderCarrier])

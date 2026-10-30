@@ -130,7 +130,9 @@ class Module extends AbstractModule {
       .to(classOf[DashboardClientDataRepository])
     bind(classOf[SubscriptionService])
       .to(classOf[SubscriptionServiceImpl])
-    
+
     bind(classOf[ProcessingStatusRepository]).to(classOf[ProcessingStatusRepositoryImpl])
+    bind(classOf[BulkStatusService]).to(classOf[BulkStatusServiceImpl])
+    
   }
 }
