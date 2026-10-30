@@ -69,11 +69,11 @@ object SubmissionDetailsSummary {
       row("submissionDetails.submission.type", transferType)
     ) ++ dynamicRows
 
-    SummaryList(rows = rows)
+    SummaryList(rows = rows, classes = if isFullyPaid then "govuk-!-margin-bottom-0" else "")
   }
 
   def getSummary(submission: SttSubmission, formatter: FormattingService, isAgent: Boolean)(implicit messages: Messages): SubmissionDetailsSummary = {
-    val isFullyPaid = SubmissionStatus.aggregateStatus(submission.transfers.map(_.status)) == SubmissionStatus.Paid
+    val isFullyPaid = submission.submissionStatus == SubmissionStatus.Paid
 
     SubmissionDetailsSummary(
       total = formatter.formatCurrency(submission.totalToPay),

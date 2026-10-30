@@ -16,7 +16,7 @@
 
 package views.dashboard
 
-import base.Fixtures.{singleSubmissionReadyToPay, singleSubmissionReadyToPayWithLateFilingCharge}
+import base.Fixtures.*
 import uk.gov.hmrc.securitiestransferchargefrontend.services.stf.shared.FormattingService
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
@@ -267,6 +267,43 @@ class SubmissionDetailsViewSpec extends ViewBaseSpec {
             }
         }
       }
+    }
+  }
+
+  "The SubmissionDetailsView for a fully paid submission should" - {
+
+    val paidTransfer = readyToPaySttTransferTaxOnly.copy(
+      charges = Seq(buildTaxCharge(testUtrn, false, true))
+    )
+    val paidSubmission = singleSubmissionReadyToPay.copy(transfers = Seq(paidTransfer))
+    val doc = view(paidSubmission)
+
+    "not display the total tax heading inside the tax card" in {
+      doc.select(".tax-card .govuk-heading-m").size() mustBe 0
+    }
+
+    "not display the payment due by date inside the tax card" in {
+      doc.select(".tax-card .govuk-body-s").size() mustBe 0
+    }
+
+    "not display the 'Total tax due' row in the summary list" in {
+      val summaryListKeys = doc.select(".govuk-summary-list__key").asScala.map(_.text()).toList
+      summaryListKeys must not contain messages("submissionDetails.submission.totalTaxDue")
+    }
+
+    "not display the 'Pay for submission' button" in {
+      val buttons = doc.select(".tax-card .govuk-button").asScala.map(_.text()).toList
+      buttons must not contain messages("submissionDetails.submission.payForSubmission")
+    }
+
+    "apply the no-bottom-border class to the 'Transfers in this submission' row" in {
+      val summaryListRows = doc.select(".govuk-summary-list__row").asScala
+
+      val transfersRow = summaryListRows.find { row =>
+        row.select(".govuk-summary-list__key").text() == messages("submissionDetails.submission.transfers")
+      }.get
+
+      transfersRow.hasClass("no-bottom-border") mustBe true
     }
   }
 }
