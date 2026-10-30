@@ -53,7 +53,7 @@ object UserAnswersTransforms {
 
     val uniqueId: AffinityData => Option[String] = {
       case Individual(_, _, _, nino) => Some(nino)
-      case Organisation(_, _, _, utr) => Some(utr)
+      case Organisation(_, _, _, utr) => utr
       case _ => None // Agents don't have to provide a unique ID for themselves or their clients, so we return None.
     }
 
@@ -140,7 +140,7 @@ object UserAnswersTransforms {
 
     val uniqueId: AffinityData => Option[String] = {
       case Individual(_, _, _, nino) => Some(nino)
-      case Organisation(_, _, _, utr) => Some(utr)
+      case Organisation(_, _, _, utr) => utr
       case _ => None // Agents don't have to provide a unique ID for themselves or their clients, so we return None.
     }
 

@@ -20,7 +20,8 @@ import play.api.Logging
 import uk.gov.hmrc.auth.core.AffinityGroup
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.securitiestransferchargefrontend.clients.SaveAndReturnClient
-import uk.gov.hmrc.securitiestransferchargefrontend.controllers.actions.requests.StcDataRequest
+import uk.gov.hmrc.securitiestransferchargefrontend.clients.registration.Subscription
+import uk.gov.hmrc.securitiestransferchargefrontend.controllers.actions.requests.{StcDataRequest, UniqueIdentifier}
 import uk.gov.hmrc.securitiestransferchargefrontend.domain.TransferType.*
 import uk.gov.hmrc.securitiestransferchargefrontend.domain.{CredentialId, GroupIdentifier, SubmissionId, SubscriptionId, TransferType}
 import uk.gov.hmrc.securitiestransferchargefrontend.models.UserAnswers
@@ -32,6 +33,7 @@ import uk.gov.hmrc.securitiestransferchargefrontend.models.submission.{AffinityD
 import uk.gov.hmrc.securitiestransferchargefrontend.repositories.{CyaHtmlRepository, TransactionResponseRepository}
 import uk.gov.hmrc.securitiestransferchargefrontend.services.TransactionSubmissionService.*
 import uk.gov.hmrc.securitiestransferchargefrontend.utils.HeaderCarrierCreator
+import uk.gov.hmrc.securitiestransferchargefrontend.controllers.actions.requests.*
 
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
@@ -41,7 +43,7 @@ trait TransactionSubmissionService:
   def submitSingleSh03(implicit request: StcDataRequest[?]): Future[Boolean]
   def submitBulkStf(rows: Seq[ValidatedStcRow])(using request: StcDataRequest[?]): Future[Boolean]
   def submitBulkSh03(rows: Seq[ValidatedStcRow])(using request: StcDataRequest[?]): Future[Boolean]
-  
+
 final class TransactionSubmissionServiceImpl @Inject()(
   headerCarrierCreator          : HeaderCarrierCreator,
   etmpSubmissionService         : EtmpSubmissionService,
@@ -50,6 +52,7 @@ final class TransactionSubmissionServiceImpl @Inject()(
   cyaHtmlRepository             : CyaHtmlRepository,
   transactionResponseRepository : TransactionResponseRepository,
   bulkStatusService             : BulkStatusService,
+  subscriptionService           : SubscriptionService,
   auditService                  : AuditService)(
   implicit ec                   : ExecutionContext
 ) extends TransactionSubmissionService with Logging {
@@ -65,10 +68,11 @@ final class TransactionSubmissionServiceImpl @Inject()(
     val submissionId = request.userAnswers.submissionId
     val submit = submitFunctionFor(transferType)
     for {
+      subscription <- subscriptionService.getSubscription(request.request.subscriptionId)
       response <- submit(
         request.request.subscriptionId,
         request.userAnswers,
-        getAffinityData(request.request.affinityGroup)
+        getAffinityData(subscription)(request.request.affinityGroup)
       )
 
       _ = response.fold(
@@ -79,8 +83,9 @@ final class TransactionSubmissionServiceImpl @Inject()(
     } yield response.isSuccessful
   }
 
-  override def submitBulkStf(rows: Seq[ValidatedStcRow])(using request: StcDataRequest[?]): Future[Boolean] =
+  override def submitBulkStf(rows: Seq[ValidatedStcRow])(using request: StcDataRequest[?]): Future[Boolean] = {
     submitBulk(STF, rows)
+  }
 
   override def submitBulkSh03(rows: Seq[ValidatedStcRow])(using request: StcDataRequest[?]): Future[Boolean] =
     submitBulk(SH03, rows)
@@ -92,11 +97,12 @@ final class TransactionSubmissionServiceImpl @Inject()(
     val group = GroupIdentifier(request.request.groupIdentifier)
     for {
       _ <- bulkStatusService.markAsProcessing(group, submissionId)
+      subscription <- subscriptionService.getSubscription(request.request.subscriptionId)
       response <- submit(
         request.request.subscriptionId,
         rows,
         request.userAnswers,
-        getAffinityData(request.request.affinityGroup)
+        getAffinityData(subscription)(request.request.affinityGroup)
       )
 
       _ = response.fold(
@@ -188,11 +194,11 @@ final class TransactionSubmissionServiceImpl @Inject()(
     val group = GroupIdentifier(req.request.groupIdentifier)
     bulkStatusService.markAsPartiallyFailed(group, submissionId, failures)
   }
-  
+
   private def extractFailures(pf: SubmissionCreateResponsePartialFailure): Map[Int, String] = {
     pf.failedRecords.map(_ -> "Failed").toMap // TODO: PF type needs error messages.
   }
-  
+
   private def handleBulkFailure(transferType: TransferType, submissionId: SubmissionId)(using req: StcDataRequest[?]): Future[Unit] = Future {
     logger.warn(s"Submission failure for ${transferType.toString} submission ${submissionId}")
     val group = GroupIdentifier(req.request.groupIdentifier)
@@ -207,52 +213,59 @@ object TransactionSubmissionService {
     UserAnswers.empty(currentUserAnswers.userId)(currentUserAnswers.groupIdentifier)(currentUserAnswers.submissionId)(currentUserAnswers.journeyType)
   }
 
-  private[services] val getAffinityData: AffinityGroup => AffinityData = {
-    case AffinityGroup.Agent => getAgentAffinityData
-    case AffinityGroup.Individual => getIndividualAffinityData
-    case AffinityGroup.Organisation => getOrganisationAffinityData
+  private[services] def getAffinityData(subscription: Subscription)(affinityGroup: AffinityGroup)(using req: StcDataRequest[?]): AffinityData = affinityGroup match {
+    case AffinityGroup.Agent        => getAgentAffinityData(subscription)
+    case AffinityGroup.Individual   => getIndividualAffinityData(subscription, getNino(req.request.uniqueIdentifier))
+    case AffinityGroup.Organisation => getOrganisationAffinityData(subscription, getUtr(req.request.uniqueIdentifier))
   }
 
-  // TODO: Some of this should come from new screens not yet developed.
-  private[services] val getIndividualAffinityData: AffinityData =
+  val getNino: PartialFunction[UniqueIdentifier, String] = {
+    case IndividualUniqueIdentifier(nino) => nino
+  }
+
+  val getUtr: PartialFunction[UniqueIdentifier, Option[String]] = {
+    case OrganisationUniqueIdentifier(utr) => utr
+  }
+  
+  private[services] def getIndividualAffinityData(sub: Subscription, nino: String): AffinityData =
     Individual(
-      name = "John Smith",
+      name = sub.contactName,
       address = Address(
-        addressLine1 = "10 High Street",
-        addressLine2 = Some("Bolton"),
-        addressLine3 = None,
-        postcode = "BL1 2TG",
-        countryCode = "UK"
+        addressLine1 = sub.addressLine1,
+        addressLine2 = sub.addressLine2,
+        addressLine3 = sub.addressLine3,
+        postcode = sub.postcode,
+        countryCode = sub.countryCode
       ),
-      email = "jsmith@foo.com",
-      nino = "NX787356B"
+      email = sub.emailAddress,
+      nino = nino
     )
 
-  private[services] val getAgentAffinityData: AffinityData =
+  private[services] def getAgentAffinityData(sub: Subscription): AffinityData =
     Agent(
-      name = "Agent 1",
+      name = sub.contactName,
       address = Address(
-        addressLine1 = "10 High Street",
-        addressLine2 = Some("Bolton"),
-        addressLine3 = None,
-        postcode = "BL1 2TG",
-        countryCode = "UK"
+        addressLine1 = sub.addressLine1,
+        addressLine2 = sub.addressLine2,
+        addressLine3 = sub.addressLine3,
+        postcode = sub.postcode,
+        countryCode = sub.countryCode
       ),
-      phone = "07777777777",
-      email = "someemal@foo.com"
+      phone = sub.telephoneNumber,
+      email = sub.emailAddress
     )
 
-  private[services] val getOrganisationAffinityData: AffinityData =
+  private[services] def getOrganisationAffinityData(sub: Subscription, maybeUtr: Option[String]): AffinityData =
     Organisation(
-      name = "Business",
+      name = sub.contactName,
       address = Address(
-        addressLine1 = "10 High Street",
-        addressLine2 = Some("Bolton"),
-        addressLine3 = None,
-        postcode = "BL1 2TG",
-        countryCode = "UK"
+        addressLine1 = sub.addressLine1,
+        addressLine2 = sub.addressLine2,
+        addressLine3 = sub.addressLine3,
+        postcode = sub.postcode,
+        countryCode = sub.countryCode
       ),
-      email = "someemal@foo.com",
-      utr = "some utr" // retrieve from Auth
+      email = sub.emailAddress,
+      utr = maybeUtr
     )
 }

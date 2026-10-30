@@ -21,7 +21,7 @@ import play.api.http.MimeTypes
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.securitiestransferchargefrontend.clients.registration.NrsClient
 import uk.gov.hmrc.securitiestransferchargefrontend.config.FrontendAppConfig
-import uk.gov.hmrc.securitiestransferchargefrontend.controllers.actions.requests.StcDataRequest
+import uk.gov.hmrc.securitiestransferchargefrontend.controllers.actions.requests.{AgentUniqueIdentifier, StcDataRequest, UniqueIdentifier}
 import uk.gov.hmrc.securitiestransferchargefrontend.domain.SubmissionId
 import uk.gov.hmrc.securitiestransferchargefrontend.models.nrs.{IdentityData, NrsMetadata, NrsSingleSubmissionRequest}
 import uk.gov.hmrc.securitiestransferchargefrontend.repositories.CyaHtmlData
@@ -104,11 +104,15 @@ class NrsServiceImpl @Inject()(
     }
   }
 
+  private val getArn: PartialFunction[UniqueIdentifier, Option[String]] = {
+    case AgentUniqueIdentifier(maybeArn) => maybeArn
+  }
+  
   private val agentTaxIdentifier: StcDataRequest[?] => Option[(String, String)] = req => {
-    req
-      .request
-      .maybeArn
-      .map(arn => NrsSearchKeys.Arn -> arn)
+    getArn.lift(req.request.uniqueIdentifier) match {
+      case Some(Some(arn)) => Some(NrsSearchKeys.Arn -> arn)
+      case _               => None
+    }
   }
 
   private[services] def searchKeys(request: StcDataRequest[?], identityData: IdentityData, utrn: String): Map[String, String] = {
