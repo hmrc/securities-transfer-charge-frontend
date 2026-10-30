@@ -19,27 +19,27 @@ package uk.gov.hmrc.securitiestransferchargefrontend.models.submission
 import play.api.i18n.Messages
 import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.{SummaryList, SummaryListRow}
 import uk.gov.hmrc.securitiestransferchargefrontend.domain.TransferType.{Other, SH03, STF}
-import uk.gov.hmrc.securitiestransferchargefrontend.models.search.SttSubmission
+import uk.gov.hmrc.securitiestransferchargefrontend.models.search.{SttSubmission, SubmissionStatus}
 import uk.gov.hmrc.securitiestransferchargefrontend.services.stf.shared.FormattingService
 import uk.gov.hmrc.securitiestransferchargefrontend.viewmodels.govuk.all.SummaryListRowViewModel
 import uk.gov.hmrc.securitiestransferchargefrontend.viewmodels.implicits.*
 import uk.gov.hmrc.securitiestransferchargefrontend.viewmodels.govuk.summarylist.*
 
-
 case class SubmissionDetailsSummary(total: String,
                                     paymentDueBy: String,
-                                    summaryList: SummaryList
+                                    summaryList: SummaryList,
+                                    isFullyPaid: Boolean
                                    )
 object SubmissionDetailsSummary {
-  
+
   private def row(keyMessage: String, value: String)(implicit messages: Messages): SummaryListRow = {
     SummaryListRowViewModel(
       key = KeyViewModel(messages(keyMessage)).withCssClass("govuk-!-width-one-half"),
       value = ValueViewModel(value)
     )
   }
-  
-  private def summaryList(submission: SttSubmission, formatter: FormattingService, isAgent:Boolean)(implicit messages: Messages): SummaryList = {
+
+  private def summaryList(submission: SttSubmission, formatter: FormattingService, isAgent:Boolean, isFullyPaid: Boolean)(implicit messages: Messages): SummaryList = {
     val submissionDate = formatter.formatDate(submission.submissionDate)
     val transferType = submission.submissionType match {
       case STF    => messages("submissionDetails.transferType.stf")
@@ -53,21 +53,33 @@ object SubmissionDetailsSummary {
       row("submissionDetails.submission.agent.reference", reference)
     }.toSeq
 
+    val transfersRow = row("submissionDetails.submission.transfers", numOfTransfers)
+
+    val dynamicRows = if (isFullyPaid) {
+      Seq(transfersRow.copy(classes = "no-bottom-border"))
+    } else {
+      Seq(
+        transfersRow,
+        row("submissionDetails.submission.totalTaxDue", totalTaxDue).copy(classes = "no-bottom-border")
+      )
+    }
+
     val rows = maybeYourReferenceRow ++ Seq(
       row("submissionDetails.submission.date", submissionDate),
-      row("submissionDetails.submission.type", transferType),
-      row("submissionDetails.submission.transfers", numOfTransfers),
-      row("submissionDetails.submission.totalTaxDue", totalTaxDue).copy(classes = "no-bottom-border")
-    )
+      row("submissionDetails.submission.type", transferType)
+    ) ++ dynamicRows
 
-    SummaryList(rows = rows)
+    SummaryList(rows = rows, classes = if isFullyPaid then "govuk-!-margin-bottom-0" else "")
   }
 
-  def getSummary(submission: SttSubmission, formatter: FormattingService, isAgent: Boolean)(implicit messages: Messages): SubmissionDetailsSummary =
+  def getSummary(submission: SttSubmission, formatter: FormattingService, isAgent: Boolean)(implicit messages: Messages): SubmissionDetailsSummary = {
+    val isFullyPaid = submission.submissionStatus == SubmissionStatus.Paid
+
     SubmissionDetailsSummary(
       total = formatter.formatCurrency(submission.totalToPay),
       paymentDueBy = formatter.formatDate(submission.paymentDueByDate),
-      summaryList = summaryList(submission, formatter, isAgent)
+      summaryList = summaryList(submission, formatter, isAgent, isFullyPaid),
+      isFullyPaid = isFullyPaid
     )
-
+  }
 }
