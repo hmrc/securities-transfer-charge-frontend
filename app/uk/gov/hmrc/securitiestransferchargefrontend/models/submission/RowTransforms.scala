@@ -18,242 +18,102 @@ package uk.gov.hmrc.securitiestransferchargefrontend.models.submission
 
 import uk.gov.hmrc.securitiestransferchargefrontend.domain.TransferType
 import uk.gov.hmrc.securitiestransferchargefrontend.models.sh03.bulk.CompanyDetails
-import uk.gov.hmrc.securitiestransferchargefrontend.models.stf
 import uk.gov.hmrc.securitiestransferchargefrontend.models.stf.fileupload.ParsedStcRow
-import uk.gov.hmrc.securitiestransferchargefrontend.models.submission.ReasonForPurchase.{Both, PurchasedForCancellation, PurchasedToPlaceIntoTreasury}
 
 object RowTransforms {
 
+  import DataExtractors.*
+
   def fromValidatedStcRowToStfRequest(parsedRow: ParsedStcRow, affinityData: AffinityData,agentReference:Option[String]): SingleTransferRequest =
 
-    val row = parsedRow
-
-    val connectedPersons = required(row.connectedPersons, "connectedPersons", row.rowNumber)
-    val marketValue = conditional(connectedPersons)(row.totalMarketValue, "totalMarketValue", row.rowNumber)
-
-    val shareType = required(row.whatTypeOfSecurities, "whatTypeOfSecurities", row.rowNumber)
-    val getDescriptionOfSecurity =
-      if shareType.equalsIgnoreCase("Shares") then required(row.typeOfShares, "typeOfShares", row.rowNumber) else shareType
-
-    val reliefClaimed = required(row.applyingForRelief, "applyingForRelief", row.rowNumber)
-    val reliefPercentage = if reliefClaimed then Some(100) else None // TODO: Get correct percentage based on what relief is being claimed
-
-    val buyerName: String = affinityData match
-      case Individual(name, _, _, _) => name
-      case Organisation(name, _, _, _) => name
-      case _ => ??? // ToDo: For agents this will be in the spreadsheet in a location tbd
-
-    val buyerAddress: stf.Address = affinityData match
-      case Individual(_, address, _, _) => address
-      case Organisation(_, address, _, _) => address
-      case _ => ??? // ToDo: ToDo: For agents this will be in the spreadsheet in a location tbd
-
-    val buyerEmail: String = affinityData match
-      case Individual(_, _, email, _) => email
-      case Organisation(_, _, email, _) => email
-      case _ => ??? // ToDo: For agents this will be in the spreadsheet in a location tbd
-
-    val uniqueId: AffinityData => Option[String] = {
-      case Individual(_, _, _, nino) => Some(nino)
-      case Organisation(_, _, _, utr) => Some(utr)
-      case _ => None // Agents don't have to provide a unique ID for themselves or their clients, so we return None.
-    }
-
-    val agentDetails: PartialFunction[AffinityData, SingleTransferAgentDetails] =
-      case Agent(name, address, phone, email) => SingleTransferAgentDetails(
-        name = name,
-        addr1 = Some(address.addressLine1),
-        addr2 = address.addressLine2,
-        addr3 = address.addressLine3,
-        addr4 = None,
-        postcode = address.postcode,
-        country = address.countryCode,
-        phone = phone,
-        email = email,
-        clientReference = agentReference
-      )
+    def getDescriptionOfSecurity: String =
+      val shType = shareType(parsedRow)
+      if shType.equalsIgnoreCase("Shares")
+        then required(parsedRow.typeOfShares, "typeOfShares", parsedRow.rowNumber)
+        else shType
 
     SingleTransferRequest(
-      recordId = row.rowNumber,
+      recordId = parsedRow.rowNumber,
       transactionDetails = SingleTransferTransactionDetails(
         transactionType = TransferType.STF,
         reasonForPurchase = None, // SH03 only
         typeOfSecurity = getDescriptionOfSecurity,
-        numberOfShares = required(row.securitiesQuantity, "securitiesQuantity", row.rowNumber).toInt,
+        numberOfShares = getNumberOfShares(parsedRow),
         nominalValue = None, // SH03 only
-        marketValue = marketValue.map(s=> BigDecimal(s)),
+        marketValue = marketValue(parsedRow),
         qualifyAsTreasuryShares = None, // SH03 only
         maxPricePaid = None, // // SH03 only
         minPricePaid = None, // // SH03 only
-        originalChargingPoint = required(row.chargingPoint.toOption, "chargingPoint", row.rowNumber),
-        considerationActual = required(row.amountPaidForSecurities.map(s => BigDecimal(s)), "amountPaidForSecurities", row.rowNumber),
-        isConnectedPartiesTransactions = connectedPersons,
-        companyName = required(row.securitiesTarget, "securitiesTarget", row.rowNumber),
-        companyRegistrationNumber = row.companyRegistrationNumber,
-        reliefClaimedName = conditional(reliefClaimed)(row.whatReliefAreYouApplyingFor, "whatReliefAreYouApplyingFor", row.rowNumber),
-        reliefPercentage = reliefPercentage
+        originalChargingPoint = getOriginalChargingPoint(parsedRow),
+        considerationActual = getConsiderationActual(parsedRow),
+        isConnectedPartiesTransactions = connectedPersons(parsedRow),
+        companyName = required(parsedRow.securitiesTarget, "securitiesTarget", parsedRow.rowNumber),
+        companyRegistrationNumber = parsedRow.companyRegistrationNumber,
+        reliefClaimedName = getReliefClaimedName(parsedRow),
+        reliefPercentage = reliefPercentage(parsedRow)
       ),
       contingentDetails = None, // Needed once we do C&D
-      mainSellerDetails = Some(SingleTransferSellerDetails(
-        sellerName = required(row.sellerName, "sellerName", row.rowNumber),
-        addr1 = required(row.sellerAddressLine1, "sellerAddressLine1", row.rowNumber),
-        addr2 = row.sellerAddressLine2,
-        addr3 = row.sellerAddressLine3,
-        addr4 = row.sellerAddressLine4,
-        postcode = required(row.sellerPostcode, "sellerPostcode", row.rowNumber),
-        country = sellerCountry(row.sellerAddressInUK,row.sellerCountry,row.rowNumber)
-      )),
+      mainSellerDetails = Some(getMainSellerDetails(parsedRow)),
       otherSellers = None, // No way to enter multiple sellers atm
       mainBuyerDetails = SingleTransferBuyerDetails(
-        buyerName = buyerName,
-        addr1 = buyerAddress.addressLine1,
-        addr2 = buyerAddress.addressLine2,
-        addr3 = buyerAddress.addressLine3,
+        buyerName = buyerName(affinityData),
+        addr1 = buyerAddress(affinityData).addressLine1,
+        addr2 = buyerAddress(affinityData).addressLine2,
+        addr3 = buyerAddress(affinityData).addressLine3,
         addr4 = None,
-        postcode = buyerAddress.postcode,
-        country = buyerAddress.countryCode,
-        email = buyerEmail,
+        postcode = buyerAddress(affinityData).postcode,
+        country = buyerAddress(affinityData).countryCode,
+        email = buyerEmail(affinityData),
         uniqueId = uniqueId(affinityData),
-        taxRate = taxRateFrom(required(row.taxRate, "taxRate", row.rowNumber)),
+        taxRate = taxRateFrom(required(parsedRow.taxRate, "taxRate", parsedRow.rowNumber)),
         isPLC = None
       ),
       otherBuyers = None, // No way to enter multiple buyers atm
-      agentDetails = agentDetails.lift(affinityData)
+      agentDetails = agentDetails(agentReference).lift(affinityData)
     )
 
   def fromValidatedStcRowToSh03Request(companyDetails: CompanyDetails)(parsedRow: ParsedStcRow, affinityData: AffinityData,agentReference: Option[String] = None): SingleTransferRequest =
 
-    val row = parsedRow
-
-    val connectedPersons = required(row.connectedPersons, "connectedPersons", row.rowNumber)
-    val marketValue = conditional(connectedPersons)(row.totalMarketValue, "totalMarketValue", row.rowNumber)
-
-    val shareType = required(row.whatTypeOfSecurities, "whatTypeOfSecurities", row.rowNumber)
-    val reliefClaimed = required(row.applyingForRelief, "applyingForRelief", row.rowNumber)
-    val reliefPercentage = if reliefClaimed then Some(100) else None // TODO: Get correct percentage based on what relief is being claimed
-
-    val buyerName: String = affinityData match
-      case Individual(name, _, _, _) => name
-      case Organisation(name, _, _, _) => name
-      case _ => ??? // ToDo: For agents this will be in the spreadsheet in a location tbd
-
-    val buyerAddress: stf.Address = affinityData match
-      case Individual(_, address, _, _) => address
-      case Organisation(_, address, _, _) => address
-      case _ => ??? // ToDo: ToDo: For agents this will be in the spreadsheet in a location tbd
-
-    val buyerEmail: String = affinityData match
-      case Individual(_, _, email, _) => email
-      case Organisation(_, _, email, _) => email
-      case _ => ??? // ToDo: For agents this will be in the spreadsheet in a location tbd
-
-    val uniqueId: AffinityData => Option[String] = {
-      case Individual(_, _, _, nino) => Some(nino)
-      case Organisation(_, _, _, utr) => Some(utr)
-      case _ => None // Agents don't have to provide a unique ID for themselves or their clients, so we return None.
-    }
-
-    val agentDetails: PartialFunction[AffinityData, SingleTransferAgentDetails] =
-      case Agent(name, address, phone, email) => SingleTransferAgentDetails(
-        name = name,
-        addr1 = Some(address.addressLine1),
-        addr2 = address.addressLine2,
-        addr3 = address.addressLine3,
-        addr4 = None,
-        postcode = address.postcode,
-        country = address.countryCode,
-        phone = phone,
-        email = email,
-        clientReference = agentReference
-      )
-
     SingleTransferRequest(
-      recordId = row.rowNumber,
+      recordId = parsedRow.rowNumber,
       transactionDetails = SingleTransferTransactionDetails(
         transactionType = TransferType.SH03,
-        reasonForPurchase = row.sharePurchaseReason.map { reason =>
-          reasonForPurchaseFrom(reason, required(row.purchaseForCancellation, "purchaseForCancellation", row.rowNumber))
+        reasonForPurchase = parsedRow.sharePurchaseReason.map { reason =>
+          reasonForPurchaseFrom(reason, required(parsedRow.purchaseForCancellation, "purchaseForCancellation", parsedRow.rowNumber))
         },
-        typeOfSecurity = shareType,
-        numberOfShares = required(row.securitiesQuantity, "securitiesQuantity", row.rowNumber).toInt,
+        typeOfSecurity = shareType(parsedRow),
+        numberOfShares = getNumberOfShares(parsedRow),
         nominalValue = None,
-        marketValue = marketValue.map(s => BigDecimal(s)),
-        qualifyAsTreasuryShares = row.purchaseForCancellation,
-        maxPricePaid = row.maxSharePrice.map(s => BigDecimal(s)),
-        minPricePaid = row.minSharePrice.map(s => BigDecimal(s)),
-        originalChargingPoint = required(row.chargingPoint.toOption, "chargingPoint", row.rowNumber),
-        considerationActual = required(row.amountPaidForSecurities.map(s => BigDecimal(s)), "amountPaidForSecurities", row.rowNumber),
-        isConnectedPartiesTransactions = connectedPersons,
+        marketValue = marketValue(parsedRow),
+        qualifyAsTreasuryShares = parsedRow.purchaseForCancellation,
+        maxPricePaid = parsedRow.maxSharePrice.map(s => BigDecimal(s)),
+        minPricePaid = parsedRow.minSharePrice.map(s => BigDecimal(s)),
+        originalChargingPoint = getOriginalChargingPoint(parsedRow),
+        considerationActual = getConsiderationActual(parsedRow),
+        isConnectedPartiesTransactions = connectedPersons(parsedRow),
         companyName = companyDetails.companyName,
         companyRegistrationNumber = Some(companyDetails.companyRegistrationNumber),
-        reliefClaimedName = conditional(reliefClaimed)(row.whatReliefAreYouApplyingFor, "whatReliefAreYouApplyingFor", row.rowNumber),
-        reliefPercentage = reliefPercentage
+        reliefClaimedName = getReliefClaimedName(parsedRow),
+        reliefPercentage = reliefPercentage(parsedRow)
       ),
       contingentDetails = None, // Needed once we do C&D
-      mainSellerDetails = Some(SingleTransferSellerDetails(
-        sellerName = required(row.sellerName, "sellerName", row.rowNumber),
-        addr1 = required(row.sellerAddressLine1, "sellerAddressLine1", row.rowNumber),
-        addr2 = row.sellerAddressLine2,
-        addr3 = row.sellerAddressLine3,
-        addr4 = row.sellerAddressLine4,
-        postcode = required(row.sellerPostcode, "sellerPostcode", row.rowNumber),
-        country = sellerCountry(row.sellerAddressInUK, row.sellerCountry, row.rowNumber)
-      )),
+      mainSellerDetails = Some(getMainSellerDetails(parsedRow)),
       otherSellers = None, 
       mainBuyerDetails = SingleTransferBuyerDetails(
-        buyerName = buyerName,
-        addr1 = buyerAddress.addressLine1,
-        addr2 = buyerAddress.addressLine2,
-        addr3 = buyerAddress.addressLine3,
+        buyerName = buyerName(affinityData),
+        addr1 = buyerAddress(affinityData).addressLine1,
+        addr2 = buyerAddress(affinityData).addressLine2,
+        addr3 = buyerAddress(affinityData).addressLine3,
         addr4 = None,
-        postcode = buyerAddress.postcode,
-        country = buyerAddress.countryCode,
-        email = buyerEmail,
+        postcode = buyerAddress(affinityData).postcode,
+        country = buyerAddress(affinityData).countryCode,
+        email = buyerEmail(affinityData),
         uniqueId = uniqueId(affinityData),
         taxRate = BuyerTaxRate.HalfPercent,
         isPLC = None // this will come from the company details page
       ),
       otherBuyers = None,
-      agentDetails = agentDetails.lift(affinityData)
+      agentDetails = agentDetails(agentReference).lift(affinityData)
     )
-
-  private def required[A](value: Option[A], fieldName: String, rowNumber: Int): A =
-    value.getOrElse(
-      throw new IllegalArgumentException(s"Missing field '$fieldName' on row $rowNumber")
-    )
-  
-  private def conditional[A](
-                              required: => Boolean
-                            )(
-                              value: Option[A],
-                              fieldName: String,
-                              rowNumber: Int
-                            ): Option[A] = {
-
-    value match {
-      case Some(v) => Some(v)
-
-      case None if !required =>
-        None
-
-      case None =>
-        throw new IllegalArgumentException(
-          s"Missing field '$fieldName' on row $rowNumber"
-        )
-    }
-  }
-
-  private def sellerCountry(sellerAddressInUK: Option[Boolean], sellerCountry: Option[String], rowNumber: Int): String =
-    if (sellerAddressInUK.contains(true)) "United Kingdom" else required(sellerCountry, "sellerCountry", rowNumber)
-    
-  private def taxRateFrom(rate: BigDecimal): BuyerTaxRate =
-    if rate == BigDecimal("1.5") then BuyerTaxRate.OneAndHalfPercent else BuyerTaxRate.HalfPercent
-
-  private def reasonForPurchaseFrom(reasonForPurchase: String, qualifyAsTreasuryShares: Boolean): ReasonForPurchase =
-    (reasonForPurchase.equalsIgnoreCase("cancellation"), qualifyAsTreasuryShares) match {
-      case (true, true)  => Both
-      case (true, false) => PurchasedForCancellation
-      case (false, _)    => PurchasedToPlaceIntoTreasury
-    }
   
 }
