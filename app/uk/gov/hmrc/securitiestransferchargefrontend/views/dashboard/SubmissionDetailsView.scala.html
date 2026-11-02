@@ -61,16 +61,20 @@
     <div class="govuk-grid-row">
         <div class="govuk-grid-column-two-thirds">
             <div class="tax-card govuk-!-margin-bottom-7">
-                <h2 class="govuk-heading-m">@messages("submissionDetails.total.heading", viewModel.summary.total)</h2>
-                <p class="govuk-body-s">@messages("submissionDetails.paymentDueBy") <strong>@viewModel.summary.paymentDueBy</strong></p>
+                @if(!viewModel.summary.isFullyPaid) {
+                    <h2 class="govuk-heading-m">@messages("submissionDetails.total.heading", viewModel.summary.total)</h2>
+                    <p class="govuk-body-s">@messages("submissionDetails.paymentDueBy") <strong>@viewModel.summary.paymentDueBy</strong></p>
+                }
                 @govUkSummaryList(viewModel.summary.summaryList)
-                @govukButton(
-                    Button(
-                        href = Some(paymentRoutes.PaymentController.startPayment(viewModel.submissionId).url),
-                        content = Text(messages("submissionDetails.submission.payForSubmission")),
-                        classes = "govuk-!-margin-bottom-0"
+                @if(!viewModel.summary.isFullyPaid) {
+                    @govukButton(
+                        Button(
+                            href = Some(paymentRoutes.PaymentController.startPayment(viewModel.submissionId).url),
+                            content = Text(messages("submissionDetails.submission.payForSubmission")),
+                            classes = "govuk-!-margin-bottom-0"
+                        )
                     )
-                )
+                }
             </div>
         </div>
     </div>

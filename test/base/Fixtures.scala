@@ -209,6 +209,16 @@ object Fixtures {
     )
   )
 
+  val paidSubmission: Seq[SubmissionSummary] = List(
+    SubmissionSummary(
+      submissionId = "STC-00000099",
+      maybePaymentDueBy = Some("2026-10-22"),
+      maybeAgentReference = None,
+      status = Paid,
+      sortDate = LocalDate.parse("2026-09-22")
+    )
+  )
+
   class FakeAuthConnectorSuccess(value: Any) extends AuthConnector {
 
     override def authorise[A](predicate: Predicate, retrieval: Retrieval[A])(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[A] =
