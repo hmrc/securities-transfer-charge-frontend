@@ -34,6 +34,7 @@ import uk.gov.hmrc.securitiestransferchargefrontend.models.search.SubmissionStat
 import uk.gov.hmrc.securitiestransferchargefrontend.models.search.{EtmpChargeDetail, EtmpSuccessResponse, EtmpTransactionDetail, SttSubmission, SttTransfer, SubmissionSummary}
 import uk.gov.hmrc.securitiestransferchargefrontend.models.sh03.shared.{CompanyDetails, DetailsOfThisSharePurchase}
 import uk.gov.hmrc.securitiestransferchargefrontend.models.shared.AgentReference
+import uk.gov.hmrc.securitiestransferchargefrontend.models.stf.fileupload.{ParsedStcRow, ParsedValue, ValidatedStcRow}
 import uk.gov.hmrc.securitiestransferchargefrontend.models.submission.ReasonForPurchase.PurchasedForCancellation
 import uk.gov.hmrc.securitiestransferchargefrontend.models.submission.{Agent, Individual, Organisation}
 
@@ -59,6 +60,7 @@ object Fixtures {
   val testExternalId = Some("ext-456")
   val testName = "Test Name"
   val testUtrn = "10080869"
+  val testFileUploadReference = "17af-9982-bba5-2aa1-de40"
   
   val testSubscription = Subscription(
     subsValidTo = LocalDate.now().plusYears(1),
@@ -221,6 +223,45 @@ object Fixtures {
     )
   )
 
+  private val testParsedStcRow = ParsedStcRow(
+    rowNumber = 3,
+    buyerName = Some("Bob buyer"),
+    buyerAddressInUK = Some(true),
+    buyerAddressLine1 = Some("1 Seller Street"),
+    buyerAddressLine2 = Some("Seller District"),
+    buyerAddressLine3 = Some("Seller City"),
+    buyerAddressLine4 = None,
+    buyerPostcode = Some("AA1 1AA"),
+    buyerCountry = Some("United Kingdom"),
+    sellerName = Some("Bob Seller"),
+    sellerAddressInUK = Some(true),
+    sellerAddressLine1 = Some("1 Seller Street"),
+    sellerAddressLine2 = Some("Seller District"),
+    sellerAddressLine3 = Some("Seller City"),
+    sellerAddressLine4 = None,
+    sellerPostcode = Some("LS1 1AA"),
+    sellerCountry = Some("United Kingdom"),
+    connectedPersons = Some(true),
+    applyingForRelief = Some(true),
+    whatReliefAreYouApplyingFor = Some("Group relief"),
+    securitiesTarget = Some("Example Holdings Ltd"),
+    companyRegistrationNumber = Some("12345678"),
+    chargingPoint = ParsedValue.Valid(LocalDate.of(2026, 3, 23)),
+    taxRate = Some(BigDecimal("1.5")),
+    whatTypeOfSecurities = Some("Shares"),
+    typeOfShares = Some("Ordinary Shares"),
+    securitiesQuantity = Some("1000"),
+    amountPaidForSecurities = Some("5000.25"),
+    totalMarketValue = Some("6000"),
+    minSharePrice = Some("100"),
+    maxSharePrice = Some("1000"),
+    sharePurchaseReason = Some("cancellation"),
+    purchaseForCancellation = Some(true)
+  )
+  
+  val testValidatedStcRow = ValidatedStcRow(testParsedStcRow, List.empty)
+  
+  
   class FakeAuthConnectorSuccess(value: Any) extends AuthConnector {
 
     override def authorise[A](predicate: Predicate, retrieval: Retrieval[A])(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[A] =
