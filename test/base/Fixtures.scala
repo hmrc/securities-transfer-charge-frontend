@@ -61,20 +61,20 @@ object Fixtures {
   val testName = "Test Name"
   val testUtrn = "10080869"
   val testFileUploadReference = "17af-9982-bba5-2aa1-de40"
-  
+
   val testSubscription = Subscription(
     subsValidTo = LocalDate.now().plusYears(1),
     contactName = "Bob Hoskins",
     addressLine1 = "1 High Street",
-    addressLine2 = Some("Burnley"), 
-    addressLine3 = None, 
+    addressLine2 = Some("Burnley"),
+    addressLine3 = None,
     postcode = "BB1 6TT",
     countryCode = "GB",
     telephoneNumber = "01665 767 221",
     mobileNumber = None,
     emailAddress = "bob.hoskins.aol.com"
   )
-  
+
   val testIdentityData: IdentityData = IdentityData(
     internalId = Some("int-123"),
     externalId = testExternalId,
@@ -223,6 +223,16 @@ object Fixtures {
     )
   )
 
+  val paidSubmission: Seq[SubmissionSummary] = List(
+    SubmissionSummary(
+      submissionId = "STC-00000099",
+      maybePaymentDueBy = Some("2026-10-22"),
+      maybeAgentReference = None,
+      status = Paid,
+      sortDate = LocalDate.parse("2026-09-22")
+    )
+  )
+
   private val testParsedStcRow = ParsedStcRow(
     rowNumber = 3,
     buyerName = Some("Bob buyer"),
@@ -258,10 +268,10 @@ object Fixtures {
     sharePurchaseReason = Some("cancellation"),
     purchaseForCancellation = Some(true)
   )
-  
+
   val testValidatedStcRow = ValidatedStcRow(testParsedStcRow, List.empty)
-  
-  
+
+
   class FakeAuthConnectorSuccess(value: Any) extends AuthConnector {
 
     override def authorise[A](predicate: Predicate, retrieval: Retrieval[A])(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[A] =
@@ -362,6 +372,28 @@ object Fixtures {
       clientReference = None,
       declareeName = None,
       transfers = Seq(readyToPaySttTransferWithLateFilingCharge)
+    )
+
+  val overDueSttTransferWithPenaltiesAndInterest: SttTransfer = SttTransfer(
+    utrn = testUtrn,
+    buyerNames = "Buyer One",
+    sellerNames = Some("Seller One"),
+    companyName = "Company",
+    charges = Seq(buildTaxCharge(testUtrn, false, false),
+      buildLateFilingCharge(testUtrn, false, false),
+      buildLatePaymentCharge(testUtrn, false, false),
+      buildLatePaymentInterestCharge(testUtrn, false, false)
+    ),
+    numberOfShares = 45
+  )
+
+  val singleSubmissionOverDueWithPenaltiesAndInterest: SttSubmission =
+    SttSubmission(
+      submissionId = testSubmissionId.toString,
+      submissionDate = LocalDate.now().minusDays(5),
+      clientReference = None,
+      declareeName = None,
+      transfers = Seq(overDueSttTransferWithPenaltiesAndInterest)
     )
 
 }

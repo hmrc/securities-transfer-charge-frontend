@@ -19,6 +19,7 @@
 @import uk.gov.hmrc.govukfrontend.views.html.components.GovukFileUpload
 @import uk.gov.hmrc.securitiestransferchargefrontend.controllers.dashboard.routes
 @import uk.gov.hmrc.securitiestransferchargefrontend.models.JourneyType
+@import uk.gov.hmrc.securitiestransferchargefrontend.viewmodels.UploadErrorSummaryViewModel
 
 
 
@@ -43,6 +44,12 @@
     <h1 class="govuk-heading-l">
         @messages("fileUpload.heading")
     </h1>
+
+    @error.map { err =>
+        @govukErrorSummary(
+            UploadErrorSummaryViewModel(err)
+        )
+    }
 
     <form action="@upscanInitiateResponse.href" method="post" enctype="multipart/form-data">
 

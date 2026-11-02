@@ -44,10 +44,13 @@ class UpscanInitiateConnectorImpl @Inject()(http: HttpClientV2,
   private final class UpscanException(msg: String) extends RuntimeException(msg)
 
   private val logInfoAndFail = CommonHelpers.logInfoAndFail(logger)
-  
-  val request: UpscanInitiateRequest = UpscanInitiateRequest(config.upscanCallbackUrl,
-    Some(config.upscanUploadSuccessfulUrl),
-    Some(config.upscanUploadFailureUrl))
+
+  val request: UpscanInitiateRequest = UpscanInitiateRequest(
+    callbackUrl = config.upscanCallbackUrl,
+    successRedirect = Some(config.upscanUploadSuccessfulUrl),
+    errorRedirect = Some(config.upscanUploadFailureUrl),
+    maximumFileSize = Some(config.upscanMaxFileSize)
+  )
 
 
   def initiate()(implicit hc: HeaderCarrier): Future[UpscanInitiateResponse] =
@@ -56,9 +59,8 @@ class UpscanInitiateConnectorImpl @Inject()(http: HttpClientV2,
       .withBody(Json.toJson(request))
       .execute[HttpResponse]
       .flatMap(handleUpscanResponse)
-  
-  
-  
+
+
   private def handleUpscanResponse(response: HttpResponse): Future[UpscanInitiateResponse] =
     response.status match {
 

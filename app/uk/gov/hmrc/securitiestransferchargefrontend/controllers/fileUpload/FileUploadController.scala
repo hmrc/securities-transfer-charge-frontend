@@ -16,12 +16,11 @@
 
 package uk.gov.hmrc.securitiestransferchargefrontend.controllers.fileUpload
 
-import play.api.i18n.{I18nSupport, MessagesApi}
-import play.api.mvc.{Action, AnyContent, MessagesControllerComponents, Request}
+import play.api.i18n.{I18nSupport, Messages, MessagesApi}
+import play.api.mvc.*
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import uk.gov.hmrc.securitiestransferchargefrontend.connectors.UpscanInitiateConnector
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.actions.*
-import uk.gov.hmrc.securitiestransferchargefrontend.controllers.fileUpload.routes
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.routes.JourneyRecoveryController
 import uk.gov.hmrc.securitiestransferchargefrontend.models.JourneyType
 import uk.gov.hmrc.securitiestransferchargefrontend.models.stf.upscan.*
@@ -45,28 +44,31 @@ class FileUploadController @Inject()(
 
   def onPageLoad(journeyType: JourneyType): Action[AnyContent] = stcAuthEnrolled.async { implicit request =>
     prepareUpload(journeyType).map { response =>
-      val uploadView = view(response.uploadRequest,journeyType = journeyType)
+      val uploadView = view(response.uploadRequest, journeyType = journeyType)
       val counter = fileProcessingRefreshCounterFactory(request)
       counter.reset(Ok(uploadView))
     }
   }
 
-  def onUploadError(): Action[AnyContent] =
-    stcAuthEnrolled.async { implicit request =>
-      request.getQueryString("key") match {
-        case Some(reference) =>
-          upscanJourneyRepository.find(reference).flatMap {
-            case Some(fileUpload) =>
-              upscanJourneyRepository.delete(reference).map { _ =>
-                Redirect(routes.BulkUploadErrorController.onPageLoad(fileUpload.journeyType))
-              }
-            case None =>
-              Future.successful(Redirect(JourneyRecoveryController.onPageLoad()))
-          }
-        case None =>
-          Future.successful(Redirect(JourneyRecoveryController.onPageLoad()))
-      }
+  def onUploadError(): Action[AnyContent] = stcAuthEnrolled.async { implicit request =>
+    val recovery = Future.successful(Redirect(JourneyRecoveryController.onPageLoad()))
+
+    request.getQueryString("key") match {
+      case None => recovery
+      
+      case Some(reference) =>
+        upscanJourneyRepository.find(reference).flatMap {
+          case None => recovery
+
+          case Some(fileUpload) =>
+            for {
+              initiateResponse <- prepareUpload(fileUpload.journeyType)
+            } yield {
+              BadRequest(view(initiateResponse.uploadRequest, uploadErrorMessage, fileUpload.journeyType))
+            }
+        }
     }
+  }
 
   private def prepareUpload(journeyType: JourneyType)(implicit request: Request[_]): Future[UpscanInitiateResponse] =
     for {
@@ -83,5 +85,12 @@ class FileUploadController @Inject()(
       )
 
     } yield initiateResponse
+
+
+  private def uploadErrorMessage(implicit request: RequestHeader, messages: Messages): Option[String] =
+    request.getQueryString("errorCode").map {
+      case "EntityTooLarge" => messages("fileUpload.redirectError.EntityTooLarge")
+      case _ => messages("fileUpload.redirectError.generic")
+    }
 
 }
