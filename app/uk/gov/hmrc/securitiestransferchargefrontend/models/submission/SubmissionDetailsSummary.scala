@@ -52,13 +52,18 @@ object SubmissionDetailsSummary {
     val maybeYourReferenceRow = Option.when(isAgent) {
       row("submissionDetails.submission.agent.reference", reference)
     }.toSeq
+    val maybePenaltiesRows = Seq(
+      "submissionDetails.submission.filingPenalties" -> submission.lateFilingPenaltiesToPay,
+      "submissionDetails.submission.paymentPenalties" -> submission.latePaymentPenaltiesToPay,
+      "submissionDetails.submission.paymentInterest" -> submission.latePaymentInterestToPay
+    ).collect { case (key, amount) if amount > 0 => row(key,formatter.formatCurrency(amount))}
 
     val rows = maybeYourReferenceRow ++ Seq(
       row("submissionDetails.submission.date", submissionDate),
       row("submissionDetails.submission.type", transferType),
       row("submissionDetails.submission.transfers", numOfTransfers),
       row("submissionDetails.submission.totalTaxDue", totalTaxDue).copy(classes = "no-bottom-border")
-    )
+    ) ++ maybePenaltiesRows
 
     SummaryList(rows = rows)
   }

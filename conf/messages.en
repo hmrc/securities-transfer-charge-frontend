@@ -1395,6 +1395,9 @@ submissionDetails.submission.transfers = Transfers in this submission
 submissionDetails.submission.totalTaxDue = Total tax due
 submissionDetails.submission.agent.reference = Your reference
 submissionDetails.submission.agent.reference.notProvided = Not provided
+submissionDetails.submission.filingPenalties = Total late filing penalties
+submissionDetails.submission.paymentPenalties = Total late payment penalties
+submissionDetails.submission.paymentInterest = Total late payment interest
 
 submissionDetails.submission.payForSubmission = Pay for submission
 
