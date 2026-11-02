@@ -68,6 +68,14 @@ class SubmissionDetailsViewSpec extends ViewBaseSpec {
       case Other => messages("submissionDetails.transferType.other")
     }
 
+    val penaltyRows: Seq[(String, String)] = Seq(
+      "submissionDetails.submission.filingPenalties" -> submission.lateFilingPenaltiesToPay,
+      "submissionDetails.submission.paymentPenalties" -> submission.latePaymentPenaltiesToPay,
+      "submissionDetails.submission.paymentInterest" -> submission.latePaymentInterestToPay
+    ).collect {
+      case (key, amount) if amount > 0 => messages(key) -> formatter.formatCurrency(amount)
+    }
+
     val submissionTypeLabel: String = messages("submissionDetails.submission.type")
 
     val numberOfTransfers: String = submission.numberOfTransfers.toString
@@ -179,8 +187,8 @@ class SubmissionDetailsViewSpec extends ViewBaseSpec {
         rows.get(3).select(".govuk-summary-list__value").text() mustBe expected.totalTax
       }
 
-      "have four rows in the summary list" in {
-        doc.select(".govuk-summary-list__row").size() mustBe 4
+      "have the correct number of rows in the summary list" in {
+        doc.select(".govuk-summary-list__row").size() mustBe 4 + expected.penaltyRows.size
       }
 
       "have the no-bottom-border class on the total tax due row" in {
