@@ -23,6 +23,7 @@ import uk.gov.hmrc.auth.core.*
 import uk.gov.hmrc.auth.core.authorise.Predicate
 import uk.gov.hmrc.auth.core.retrieve.{AgentInformation, Credentials, ItmpName, Name, Retrieval}
 import uk.gov.hmrc.http.HeaderCarrier
+import uk.gov.hmrc.securitiestransferchargefrontend.clients.registration.Subscription
 import uk.gov.hmrc.securitiestransferchargefrontend.connectors.AlfAddressConnector
 import uk.gov.hmrc.securitiestransferchargefrontend.domain.{CredentialId, GroupIdentifier, SubmissionId, SubscriptionId, UserId}
 import uk.gov.hmrc.securitiestransferchargefrontend.models.JourneyType.STF
@@ -58,7 +59,20 @@ object Fixtures {
   val testExternalId = Some("ext-456")
   val testName = "Test Name"
   val testUtrn = "10080869"
-
+  
+  val testSubscription = Subscription(
+    subsValidTo = LocalDate.now().plusYears(1),
+    contactName = "Bob Hoskins",
+    addressLine1 = "1 High Street",
+    addressLine2 = Some("Burnley"), 
+    addressLine3 = None, 
+    postcode = "BB1 6TT",
+    countryCode = "GB",
+    telephoneNumber = "01665 767 221",
+    mobileNumber = None,
+    emailAddress = "bob.hoskins.aol.com"
+  )
+  
   val testIdentityData: IdentityData = IdentityData(
     internalId = Some("int-123"),
     externalId = testExternalId,
@@ -145,7 +159,7 @@ object Fixtures {
       countryCode = "GBR"
     ),
     email = "foo@bar.com",
-    utr = "CT111111")
+    utr = Some("CT111111"))
 
   val agentAffinityData: Agent = Agent(
     name = "Good Agent",
