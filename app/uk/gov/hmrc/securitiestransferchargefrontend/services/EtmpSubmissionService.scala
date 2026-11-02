@@ -113,7 +113,6 @@ class EtmpSubmissionServiceImpl @Inject() (etmpSubmissionsClient: EtmpSubmission
     case _                                   => SubmissionCreateResponseFailure
   }
 
-  // TODO: Not going to work for bulk.
   private def toSubmissionCreateResponseSuccess(userAnswers: UserAnswers, processed: StcTransactionCreateProcessedBody): SubmissionCreateResponse = {
     val charges   = processed.charges
     val successes = charges.collect(getStcChargeSuccess)
