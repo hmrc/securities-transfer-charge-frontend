@@ -321,4 +321,26 @@ object Fixtures {
       transfers = Seq(readyToPaySttTransferWithLateFilingCharge)
     )
 
+  val overDueSttTransferWithPenaltiesAndInterest: SttTransfer = SttTransfer(
+    utrn = testUtrn,
+    buyerNames = "Buyer One",
+    sellerNames = Some("Seller One"),
+    companyName = "Company",
+    charges = Seq(buildTaxCharge(testUtrn, false, false), 
+      buildLateFilingCharge(testUtrn, false, false),
+      buildLatePaymentCharge(testUtrn, false, false),
+      buildLatePaymentInterestCharge(testUtrn, false, false)
+    ),
+    numberOfShares = 45
+  )
+  
+  val singleSubmissionOverDueWithPenaltiesAndInterest: SttSubmission =
+    SttSubmission(
+      submissionId = testSubmissionId.toString,
+      submissionDate = LocalDate.now().minusDays(5),
+      clientReference = None,
+      declareeName = None,
+      transfers = Seq(overDueSttTransferWithPenaltiesAndInterest)
+    )
+
 }

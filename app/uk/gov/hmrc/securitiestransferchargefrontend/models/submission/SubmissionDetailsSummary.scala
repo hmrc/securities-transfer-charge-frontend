@@ -64,10 +64,17 @@ object SubmissionDetailsSummary {
       )
     }
 
+    val maybePenaltiesRows = Seq(
+      "submissionDetails.submission.filingPenalties" -> submission.lateFilingPenaltiesToPay,
+      "submissionDetails.submission.paymentPenalties" -> submission.latePaymentPenaltiesToPay,
+      "submissionDetails.submission.paymentInterest" -> submission.latePaymentInterestToPay
+    ).collect { case (key, amount) if amount > 0 => row(key, formatter.formatCurrency(amount)) }
+
+
     val rows = maybeYourReferenceRow ++ Seq(
       row("submissionDetails.submission.date", submissionDate),
       row("submissionDetails.submission.type", transferType)
-    ) ++ dynamicRows
+    ) ++ dynamicRows ++ maybePenaltiesRows
 
     SummaryList(rows = rows, classes = if isFullyPaid then "govuk-!-margin-bottom-0" else "")
   }

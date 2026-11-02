@@ -72,6 +72,23 @@ class SubmissionDetailsViewModelSpec extends SpecBase with GuiceOneAppPerSuite {
       model.summary mustBe SubmissionDetailsSummary.getSummary(submission, formatter, isAgent = false)
     }
 
+    "build the submission summary with penalties and interest rows" in {
+      val submission = Fixtures.singleSubmissionOverDueWithPenaltiesAndInterest
+      val model      = SubmissionDetailsViewModel.build(submission,formatter)
+
+      val rows = model.summary.summaryList.rows
+
+      rows.map(_.key.content.asHtml.toString) must contain allOf (
+        messages("submissionDetails.submission.date"),
+        messages("submissionDetails.submission.type"),
+        messages("submissionDetails.submission.transfers"),
+        messages("submissionDetails.submission.totalTaxDue"),
+        messages("submissionDetails.submission.filingPenalties"),
+        messages("submissionDetails.submission.paymentPenalties"),
+        messages("submissionDetails.submission.paymentInterest"),
+      )
+    }
+
     "build all three tabs in the correct order" in {
       val model = build()
 
