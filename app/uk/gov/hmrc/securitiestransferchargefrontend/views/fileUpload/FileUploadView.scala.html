@@ -35,6 +35,12 @@
 
 @layout(pageTitle = titleNoForm(messages("fileUpload.title"),Some(messages("transfer.details.caption")))) {
 
+    @error.map { err =>
+        @govukErrorSummary(
+            UploadErrorSummaryViewModel(err)
+        )
+    }
+
     @if(journeyType == JourneyType.STF) {
     <span class="govuk-caption-l">
         @messages("transfer.details.caption")
@@ -44,12 +50,6 @@
     <h1 class="govuk-heading-l">
         @messages("fileUpload.heading")
     </h1>
-
-    @error.map { err =>
-        @govukErrorSummary(
-            UploadErrorSummaryViewModel(err)
-        )
-    }
 
     <form action="@upscanInitiateResponse.href" method="post" enctype="multipart/form-data">
 
