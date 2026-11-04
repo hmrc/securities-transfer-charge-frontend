@@ -16,6 +16,7 @@
 
 package uk.gov.hmrc.securitiestransferchargefrontend.repositories
 
+import org.mongodb.scala.bson.conversions.Bson
 import org.mongodb.scala.model.*
 import uk.gov.hmrc.mongo.MongoComponent
 import uk.gov.hmrc.mongo.play.json.PlayMongoRepository
@@ -56,21 +57,21 @@ class ProcessingStatusRepositoryImpl @Inject()(mongoComponent: MongoComponent, a
   )
     with ProcessingStatusRepository {
 
-  private def bySubmissionId(submissionId: SubmissionId) = Filters.equal("submissionId", submissionId.value)
+  private def bySubmissionId(submissionId: SubmissionId): Bson = Filters.equal("submissionId", submissionId.value)
   private def byGroupId(group: GroupIdentifier) = Filters.equal("groupId", group.value)
-
+  private def bySubmissionIdAndGroupId(submissionId: SubmissionId,group: GroupIdentifier) = 
+    Filters.and(bySubmissionId(submissionId), byGroupId(group))
+    
   override def insert(groupId: GroupIdentifier,submissionId: SubmissionId, status: Status): Future[Unit] = {
-    val processingStatus = ProcessingStatus(groupId= groupId,submissionId = submissionId, status = status)
-
     collection
-      .insertOne(processingStatus)
+      .insertOne(ProcessingStatus(groupId, submissionId, status))
       .toFuture()
       .map(_ => ())
   }
 
   override def update(groupId: GroupIdentifier, submissionId: SubmissionId, status: Status): Future[Unit] =
     collection
-      .updateOne(bySubmissionId(submissionId), Updates.set("status", status.toString))
+      .replaceOne(bySubmissionId(submissionId), ProcessingStatus(groupId, submissionId, status))
       .toFuture()
       .map(_ => ())
 
@@ -82,8 +83,7 @@ class ProcessingStatusRepositoryImpl @Inject()(mongoComponent: MongoComponent, a
 
   override def findBySubmissionId(groupId: GroupIdentifier, submissionId: SubmissionId): Future[Option[Status]] =
     collection
-      .find(bySubmissionId(submissionId))
-      .filter(byGroupId(groupId))
+      .find(bySubmissionIdAndGroupId(submissionId, groupId))
       .map(_.status)
       .headOption()
 
