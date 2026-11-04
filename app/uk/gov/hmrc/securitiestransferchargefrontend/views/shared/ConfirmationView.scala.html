@@ -29,6 +29,19 @@
 
 @(viewModel: ConfirmationViewModel)(implicit request: Request[_], messages: Messages)
 
+@formAction = @{
+if(viewModel.isBulk) dashboardRoutes.SubmissionDetailsController.onPageLoad(viewModel.submissionId)
+else routes.PaySubmissionController.onPageLoad()
+}
+
+@buttonKey = @{
+if(viewModel.isBulk) "confirmation.button.viewSubmission" else "confirmation.button.pay"
+}
+
+@link = @{
+s"""<a class="govuk-link" rel="noreferrer noopener" target="_blank" href="${dashboardRoutes.DashboardController.onPageLoad().url}">${messages("confirmation.heading.transferReference.link")}</a>"""
+}
+
 @layout(pageTitle = titleNoForm(messages("confirmation.title")), showBackLink = false) {
 
     @govukNotificationBanner(NotificationBanner(title = HtmlContent(messages("confirmation.banner.title")), content = HtmlContent(messages("confirmation.banner.p1", viewModel.paymentDueBy) + messages("confirmation.banner.p2")), classes="govuk-notification-banner__heading govuk-!-margin-bottom-8"))
@@ -42,7 +55,13 @@
     </h2>
 
     <p class="govuk-body govuk-!-margin-bottom-7">
-        @messages("confirmation.heading.transferReference.p1") <a class="govuk-link" rel="noreferrer noopener" target="_blank" href="@dashboardRoutes.DashboardController.onPageLoad().url">@messages("confirmation.heading.transferReference.link")</a> @messages("confirmation.heading.transferReference.p2")
+        @if(viewModel.isBulk) {
+            @messages("bulkConfirmation.transferReference.p1")
+            @messages("bulkConfirmation.transferReference.p2")
+        } else {
+            @Html(messages("confirmation.heading.transferReference.p1", link))
+        }
+        @messages(viewModel.useReferencesKey)
     </p>
 
     <h2 class="govuk-heading-m">
@@ -97,11 +116,11 @@
         firstCellIsHeader = true
     ))
 
-    @formHelper(action = routes.PaySubmissionController.onPageLoad()) {
+    @formHelper(action = formAction) {
         <div class="govuk-button-group">
 
             @govukButton(
-                ButtonViewModel(messages("confirmation.button.pay"))
+                ButtonViewModel(messages(buttonKey))
             )
 
             <a class="govuk-link" href="@dashboardRoutes.DashboardController.onPageLoad().url">

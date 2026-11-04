@@ -22,8 +22,9 @@ import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.actions.{StcAuthEnrolledAction, StcDataRetrievalAction}
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.routes
 import uk.gov.hmrc.securitiestransferchargefrontend.models.ConfirmationViewModel
+import uk.gov.hmrc.securitiestransferchargefrontend.pages.stf.single.NameOfSellerPage
 import uk.gov.hmrc.securitiestransferchargefrontend.repositories.{SessionRepository, TransactionResponseRepository}
-import uk.gov.hmrc.securitiestransferchargefrontend.views.html.sh03.shared.single.ConfirmationView
+import uk.gov.hmrc.securitiestransferchargefrontend.views.html.shared.ConfirmationView
 
 import javax.inject.Inject
 import scala.concurrent.ExecutionContext
@@ -39,7 +40,14 @@ class ConfirmationController @Inject()(
 
   def onPageLoad(): Action[AnyContent] = (stcAuthEnrolled andThen getData).async {implicit request =>
 
+    val userAnswers = request.userAnswers.getOrElse(
+      throw new IllegalStateException("No UserAnswers found")
+    )
+
     val isAgent = request.request.affinityGroupKey.contains("agent")
+    val journeyType = userAnswers.journeyType
+    val isBulk = request.userAnswers.flatMap(_.get(NameOfSellerPage)).isDefined
+
     val submissionId = request.userAnswers.map(_.submissionId).getOrElse(
       throw new IllegalStateException("Submission ID not found in UserAnswers")
     )
@@ -52,7 +60,10 @@ class ConfirmationController @Inject()(
         paymentDueBy = responseDetails.paymentDueBy,
         reference = responseDetails.agentReference,
         taxDue = responseDetails.taxDue,
-        isAgent = isAgent
+        isAgent = isAgent,
+        journeyType = journeyType,
+        isBulk = isBulk
+
       )(messagesApi.preferred(request))
       
       Ok(view(viewModel)(request, messagesApi.preferred(request)))

@@ -23,7 +23,7 @@ import uk.gov.hmrc.securitiestransferchargefrontend.controllers.actions.{StcAuth
 import uk.gov.hmrc.securitiestransferchargefrontend.models.ConfirmationViewModel
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.routes
 import uk.gov.hmrc.securitiestransferchargefrontend.repositories.{SessionRepository, TransactionResponseRepository}
-import uk.gov.hmrc.securitiestransferchargefrontend.views.html.stf.shared.ConfirmationView
+import uk.gov.hmrc.securitiestransferchargefrontend.views.html.shared.ConfirmationView
 
 import javax.inject.Inject
 import scala.concurrent.ExecutionContext
@@ -52,7 +52,8 @@ class ConfirmationController @Inject()(
         paymentDueBy = responseDetails.paymentDueBy,
         reference = responseDetails.agentReference,
         taxDue = responseDetails.taxDue,
-        isAgent = isAgent
+        isAgent = isAgent,
+        isBulk = false
       )
       
       Ok(view(viewModel))

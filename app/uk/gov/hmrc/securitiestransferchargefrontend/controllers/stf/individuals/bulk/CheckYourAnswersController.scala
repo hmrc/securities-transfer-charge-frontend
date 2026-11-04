@@ -14,6 +14,22 @@
  * limitations under the License.
  */
 
+/*
+ * Copyright 2026 HM Revenue & Customs
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.individuals.bulk
 
 import com.google.inject.Inject
@@ -28,7 +44,8 @@ import uk.gov.hmrc.securitiestransferchargefrontend.domain.{GroupIdentifier, Use
 import uk.gov.hmrc.securitiestransferchargefrontend.models.{JourneyType, Mode, NormalMode, UserAnswers}
 import uk.gov.hmrc.securitiestransferchargefrontend.navigation.Navigator
 import uk.gov.hmrc.securitiestransferchargefrontend.pages.stf.bulk.BulkCheckYourAnswersPage
-import uk.gov.hmrc.securitiestransferchargefrontend.repositories.ParsedStcRowsRepository
+import uk.gov.hmrc.securitiestransferchargefrontend.repositories.{ParsedStcRowsRepository, SessionRepository}
+import uk.gov.hmrc.securitiestransferchargefrontend.services.SubmissionCreateResponseSuccess
 import uk.gov.hmrc.securitiestransferchargefrontend.services.stf.bulk.CheckYourAnswersService
 import uk.gov.hmrc.securitiestransferchargefrontend.views.html.stf.individuals.bulk.CheckYourAnswersView
 
@@ -44,6 +61,7 @@ class CheckYourAnswersController @Inject()(
                                             view: CheckYourAnswersView,
                                             checkYourAnswersService: CheckYourAnswersService,
                                             parsedStcRowsRepository: ParsedStcRowsRepository,
+                                            sessionRepository: SessionRepository,
                                             idClient: SubmissionIdClient
                                           )(implicit ec: ExecutionContext)
   extends FrontendBaseController with I18nSupport {
@@ -67,13 +85,17 @@ class CheckYourAnswersController @Inject()(
 
   def onSubmit(): Action[AnyContent] = (stcAuthEnrolled andThen getData).async {
     implicit request =>
+      val response = SubmissionCreateResponseSuccess()
 
       val userId = UserId(request.request.internalId)
       val group = GroupIdentifier(request.request.groupIdentifier)
       for {
-        submissionId <- idClient.nextSubmissionId()
-        answers = UserAnswers.empty(userId)(group)(submissionId)(JourneyType.STF)
-        nextPage <- navigator.nextPage(BulkCheckYourAnswersPage, NormalMode, answers, isReturn(request))
+        submissionId  <- idClient.nextSubmissionId()
+        transactionResponseRepository.store(submissionId, stfResponse)
+        answers       = UserAnswers.empty(userId)(group)(submissionId)(JourneyType.STF)
+        // submit and store answers here so that confirmation controller can retrieve it
+        _             <- sessionRepository.set(answers)
+        nextPage      <- navigator.nextPage(BulkCheckYourAnswersPage, NormalMode, answers, isReturn(request))
       } yield Redirect(nextPage)
   }
 }
