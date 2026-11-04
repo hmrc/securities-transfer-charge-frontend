@@ -19,6 +19,7 @@
 @import uk.gov.hmrc.govukfrontend.views.html.components.GovukFileUpload
 @import uk.gov.hmrc.securitiestransferchargefrontend.controllers.dashboard.routes
 @import uk.gov.hmrc.securitiestransferchargefrontend.models.JourneyType
+@import uk.gov.hmrc.securitiestransferchargefrontend.viewmodels.UploadErrorSummaryViewModel
 
 
 
@@ -33,6 +34,12 @@
 @(upscanInitiateResponse: UploadRequest, error: Option[String] = None,journeyType:JourneyType)(implicit request: Request[_],messages: Messages)
 
 @layout(pageTitle = titleNoForm(messages("fileUpload.title"),Some(messages("transfer.details.caption")))) {
+
+    @error.map { err =>
+        @govukErrorSummary(
+            UploadErrorSummaryViewModel(err)
+        )
+    }
 
     @if(journeyType == JourneyType.STF) {
     <span class="govuk-caption-l">

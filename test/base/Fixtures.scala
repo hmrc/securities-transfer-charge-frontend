@@ -23,6 +23,7 @@ import uk.gov.hmrc.auth.core.*
 import uk.gov.hmrc.auth.core.authorise.Predicate
 import uk.gov.hmrc.auth.core.retrieve.{AgentInformation, Credentials, ItmpName, Name, Retrieval}
 import uk.gov.hmrc.http.HeaderCarrier
+import uk.gov.hmrc.securitiestransferchargefrontend.clients.registration.Subscription
 import uk.gov.hmrc.securitiestransferchargefrontend.connectors.AlfAddressConnector
 import uk.gov.hmrc.securitiestransferchargefrontend.domain.{CredentialId, GroupIdentifier, SubmissionId, SubscriptionId, UserId}
 import uk.gov.hmrc.securitiestransferchargefrontend.models.JourneyType.STF
@@ -33,6 +34,7 @@ import uk.gov.hmrc.securitiestransferchargefrontend.models.search.SubmissionStat
 import uk.gov.hmrc.securitiestransferchargefrontend.models.search.{EtmpChargeDetail, EtmpSuccessResponse, EtmpTransactionDetail, SttSubmission, SttTransfer, SubmissionSummary}
 import uk.gov.hmrc.securitiestransferchargefrontend.models.sh03.shared.{CompanyDetails, DetailsOfThisSharePurchase}
 import uk.gov.hmrc.securitiestransferchargefrontend.models.shared.AgentReference
+import uk.gov.hmrc.securitiestransferchargefrontend.models.stf.fileupload.{ParsedStcRow, ParsedValue, ValidatedStcRow}
 import uk.gov.hmrc.securitiestransferchargefrontend.models.submission.ReasonForPurchase.PurchasedForCancellation
 import uk.gov.hmrc.securitiestransferchargefrontend.models.submission.{Agent, Individual, Organisation}
 
@@ -58,6 +60,20 @@ object Fixtures {
   val testExternalId = Some("ext-456")
   val testName = "Test Name"
   val testUtrn = "10080869"
+  val testFileUploadReference = "17af-9982-bba5-2aa1-de40"
+
+  val testSubscription = Subscription(
+    subsValidTo = LocalDate.now().plusYears(1),
+    contactName = "Bob Hoskins",
+    addressLine1 = "1 High Street",
+    addressLine2 = Some("Burnley"),
+    addressLine3 = None,
+    postcode = "BB1 6TT",
+    countryCode = "GB",
+    telephoneNumber = "01665 767 221",
+    mobileNumber = None,
+    emailAddress = "bob.hoskins.aol.com"
+  )
 
   val testIdentityData: IdentityData = IdentityData(
     internalId = Some("int-123"),
@@ -131,7 +147,6 @@ object Fixtures {
       postcode = "SW1A 2AA",
       countryCode = "GBR"
     ),
-    phone = "01234567890",
     email = "foo@bar.com",
     nino = "NY054388A"
   )
@@ -145,9 +160,8 @@ object Fixtures {
       postcode = "LS1 111",
       countryCode = "GBR"
     ),
-    phone = "07777777777",
     email = "foo@bar.com",
-    utr = "CT111111")
+    utr = Some("CT111111"))
 
   val agentAffinityData: Agent = Agent(
     name = "Good Agent",
@@ -208,6 +222,55 @@ object Fixtures {
       sortDate = LocalDate.parse("2026-08-30")
     )
   )
+
+  val paidSubmission: Seq[SubmissionSummary] = List(
+    SubmissionSummary(
+      submissionId = "STC-00000099",
+      maybePaymentDueBy = Some("2026-10-22"),
+      maybeAgentReference = None,
+      status = Paid,
+      sortDate = LocalDate.parse("2026-09-22")
+    )
+  )
+
+  private val testParsedStcRow = ParsedStcRow(
+    rowNumber = 3,
+    buyerName = Some("Bob buyer"),
+    buyerAddressInUK = Some(true),
+    buyerAddressLine1 = Some("1 Seller Street"),
+    buyerAddressLine2 = Some("Seller District"),
+    buyerAddressLine3 = Some("Seller City"),
+    buyerAddressLine4 = None,
+    buyerPostcode = Some("AA1 1AA"),
+    buyerCountry = Some("United Kingdom"),
+    sellerName = Some("Bob Seller"),
+    sellerAddressInUK = Some(true),
+    sellerAddressLine1 = Some("1 Seller Street"),
+    sellerAddressLine2 = Some("Seller District"),
+    sellerAddressLine3 = Some("Seller City"),
+    sellerAddressLine4 = None,
+    sellerPostcode = Some("LS1 1AA"),
+    sellerCountry = Some("United Kingdom"),
+    connectedPersons = Some(true),
+    applyingForRelief = Some(true),
+    whatReliefAreYouApplyingFor = Some("Group relief"),
+    securitiesTarget = Some("Example Holdings Ltd"),
+    companyRegistrationNumber = Some("12345678"),
+    chargingPoint = ParsedValue.Valid(LocalDate.of(2026, 3, 23)),
+    taxRate = Some(BigDecimal("1.5")),
+    whatTypeOfSecurities = Some("Shares"),
+    typeOfShares = Some("Ordinary Shares"),
+    securitiesQuantity = Some("1000"),
+    amountPaidForSecurities = Some("5000.25"),
+    totalMarketValue = Some("6000"),
+    minSharePrice = Some("100"),
+    maxSharePrice = Some("1000"),
+    sharePurchaseReason = Some("cancellation"),
+    purchaseForCancellation = Some(true)
+  )
+
+  val testValidatedStcRow = ValidatedStcRow(testParsedStcRow, List.empty)
+
 
   class FakeAuthConnectorSuccess(value: Any) extends AuthConnector {
 
@@ -309,6 +372,28 @@ object Fixtures {
       clientReference = None,
       declareeName = None,
       transfers = Seq(readyToPaySttTransferWithLateFilingCharge)
+    )
+
+  val overDueSttTransferWithPenaltiesAndInterest: SttTransfer = SttTransfer(
+    utrn = testUtrn,
+    buyerNames = "Buyer One",
+    sellerNames = Some("Seller One"),
+    companyName = "Company",
+    charges = Seq(buildTaxCharge(testUtrn, false, false),
+      buildLateFilingCharge(testUtrn, false, false),
+      buildLatePaymentCharge(testUtrn, false, false),
+      buildLatePaymentInterestCharge(testUtrn, false, false)
+    ),
+    numberOfShares = 45
+  )
+
+  val singleSubmissionOverDueWithPenaltiesAndInterest: SttSubmission =
+    SttSubmission(
+      submissionId = testSubmissionId.toString,
+      submissionDate = LocalDate.now().minusDays(5),
+      clientReference = None,
+      declareeName = None,
+      transfers = Seq(overDueSttTransferWithPenaltiesAndInterest)
     )
 
 }

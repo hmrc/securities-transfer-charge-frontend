@@ -16,7 +16,7 @@
 
 package views.dashboard
 
-import base.Fixtures.{drafts, overdue, readyToPay, testSubmissionId}
+import base.Fixtures.{drafts, overdue, paidSubmission, readyToPay, testSubmissionId}
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
 import play.api.Application
@@ -372,7 +372,7 @@ class SubmissionsViewSpec extends ViewBaseSpec {
 
   "when rendered with recent submissions" - {
 
-    val recent = readyToPay ++ drafts ++ overdue
+    val recent = readyToPay ++ drafts ++ overdue ++ paidSubmission
     val doc = view(buildViewModel(recent = recent))
 
     val recentPanel = doc.select("#recent-submissions")
@@ -580,7 +580,7 @@ class SubmissionsViewSpec extends ViewBaseSpec {
       )
     }
 
-    "display Not provided as the agent reference for each draft" in {
+    "display the agent reference for each draft" in {
       val rows = draftsPanel.select("tbody .govuk-table__row")
 
       rows.size() mustBe drafts.size

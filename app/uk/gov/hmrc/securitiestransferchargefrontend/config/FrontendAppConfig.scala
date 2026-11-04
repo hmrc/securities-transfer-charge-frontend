@@ -108,6 +108,7 @@ class FrontendAppConfig @Inject() (configuration: Configuration, servicesConfig:
   val checksumTtl: Long = configuration.get[Int]("mongodb.checksumTimeToLiveInDays")
   val cyaHtmlTtl: Long = configuration.get[Int]("mongodb.cyaHtmlTimeToLiveInDays")
   val dashboardClientCacheTtlMins: Long = configuration.get[Int]("mongodb.dashboardClientCacheTimeToLiveInMinutes")
+  val processingStatusTtl: Long = configuration.get[Int]("mongodb.processingStatusTimeToLiveInDays") 
   
   private val saveAndReturnService =
     configuration.get[Service]("microservice.services.securities-transfer-charge-save-and-return")
@@ -150,6 +151,7 @@ class FrontendAppConfig @Inject() (configuration: Configuration, servicesConfig:
   val upscanCallbackUrl: String =  s"$stfBaseUrl$basePath/upscan-callback"
   val upscanUploadSuccessfulUrl: String = s"$host$basePath/bulk-processing"
   val upscanUploadFailureUrl: String = s"$host$basePath/upload-template/problem"
+  val upscanMaxFileSize: Int = configuration.get[Int]("upscan.maxFileSize")
 
   // File streamer
   val rowCacheSize: Int = configuration.get[Int]("file-upload.xlsx.row-cache-size")
@@ -163,5 +165,11 @@ class FrontendAppConfig @Inject() (configuration: Configuration, servicesConfig:
   val reliefsGuidanceUrl: String = configuration.get[String]("urls.external.reliefsGuidance")
   
   // Tax calculation
-  val taxRateSH03: BigDecimal = BigDecimal(configuration.get[String]("tax-rate.sh03")) 
+  val taxRateSH03: BigDecimal = BigDecimal(configuration.get[String]("tax-rate.sh03"))
+
+  // OPS pay-api
+  lazy val payApiBaseUrl: String = servicesConfig.baseUrl("pay-api")
+
+  def paymentReturnUrl: String = s"$host$basePath/dashboard"
+  def paymentBackUrl(submissionId: String): String = s"$host$basePath/submission-details/$submissionId"
 }

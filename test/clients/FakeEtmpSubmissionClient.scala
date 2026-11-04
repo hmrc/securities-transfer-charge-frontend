@@ -24,8 +24,8 @@ import uk.gov.hmrc.securitiestransferchargefrontend.models.submission.{StcTransa
 import scala.concurrent.Future
 
 class FakeEtmpSubmissionClient(toReturn: StcTransactionCreateResponse) extends EtmpSubmissionClient:
-  def submitSingleTransfer(
-                       subscriptionId: SubscriptionId,
-                       submissionId: SubmissionId,
-                       payload: SubmissionBatchPayload
-                     )(implicit hc: HeaderCarrier): Future[StcTransactionCreateResponse] = Future.successful(toReturn)
+  def submitBatchTransfer(
+    subscriptionId: SubscriptionId,
+    submissionId: SubmissionId,
+    payload: SubmissionBatchPayload
+  )(implicit hc: HeaderCarrier): Future[StcTransactionCreateResponse] = Future.successful(toReturn)

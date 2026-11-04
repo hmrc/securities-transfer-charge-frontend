@@ -24,7 +24,7 @@ import play.api.http.MimeTypes
 import play.api.mvc.Headers
 import uk.gov.hmrc.securitiestransferchargefrontend.clients.registration.NrsClient
 import uk.gov.hmrc.securitiestransferchargefrontend.config.FrontendAppConfig
-import uk.gov.hmrc.securitiestransferchargefrontend.controllers.actions.requests.{StcAuthorisedRequest, StcDataRequest}
+import uk.gov.hmrc.securitiestransferchargefrontend.controllers.actions.requests.{AgentUniqueIdentifier, IndividualUniqueIdentifier, OrganisationUniqueIdentifier, StcAuthorisedRequest, StcDataRequest}
 import uk.gov.hmrc.securitiestransferchargefrontend.models.UserAnswers
 import uk.gov.hmrc.securitiestransferchargefrontend.models.nrs.IdentityData
 import uk.gov.hmrc.securitiestransferchargefrontend.services.NrsServiceImpl
@@ -54,13 +54,8 @@ class NrsServiceSpec extends SpecBase with BeforeAndAfterEach with MockitoSugar 
       when(request.userAnswers).thenReturn(answers)
       when(answers.submissionId).thenReturn(submissionId)
 
-      val mockIdentityData = mock[IdentityData]
-      when(mockIdentityData.nino).thenReturn(None)
-      when(mockIdentityData.saUtr).thenReturn(None)
-      when(authReq.maybeArn).thenReturn(None)
-      when(authReq.identityData).thenReturn(mockIdentityData)
 
-      val keys = service.searchKeys(request, mockIdentityData, testUtrn)
+      val keys = service.searchKeys(request, testUtrn)
       keys(NrsSearchKeys.SubmissionId) mustBe submissionId.value
       keys(NrsSearchKeys.SubscriptionId) mustBe subscriptionId.value
       keys(NrsSearchKeys.Utrn) mustBe testUtrn
@@ -78,13 +73,9 @@ class NrsServiceSpec extends SpecBase with BeforeAndAfterEach with MockitoSugar 
       when(request.userAnswers).thenReturn(answers)
       when(answers.submissionId).thenReturn(submissionId)
 
-      val mockIdentityData = mock[IdentityData]
-      when(mockIdentityData.nino).thenReturn(Some(Fixtures.testNino))
-      when(mockIdentityData.saUtr).thenReturn(None)
-      when(authReq.maybeArn).thenReturn(None)
-      when(authReq.identityData).thenReturn(mockIdentityData)
+      when(authReq.uniqueIdentifier).thenReturn(IndividualUniqueIdentifier(Fixtures.testNino))
 
-      val keys = service.searchKeys(request, mockIdentityData, testUtrn)
+      val keys = service.searchKeys(request, testUtrn)
       keys(NrsSearchKeys.SubmissionId) mustBe submissionId.value
       keys(NrsSearchKeys.SubscriptionId) mustBe subscriptionId.value
       keys(NrsSearchKeys.Utrn) mustBe testUtrn
@@ -102,13 +93,9 @@ class NrsServiceSpec extends SpecBase with BeforeAndAfterEach with MockitoSugar 
       when(request.userAnswers).thenReturn(answers)
       when(answers.submissionId).thenReturn(submissionId)
 
-      val mockIdentityData = mock[IdentityData]
-      when(mockIdentityData.nino).thenReturn(None)
-      when(mockIdentityData.saUtr).thenReturn(Some(Fixtures.testUtr))
-      when(authReq.maybeArn).thenReturn(None)
-      when(authReq.identityData).thenReturn(mockIdentityData)
+      when(authReq.uniqueIdentifier).thenReturn(OrganisationUniqueIdentifier(Some(Fixtures.testUtr)))
 
-      val keys = service.searchKeys(request, mockIdentityData, testUtrn)
+      val keys = service.searchKeys(request, testUtrn)
       keys(NrsSearchKeys.SubmissionId) mustBe submissionId.value
       keys(NrsSearchKeys.SubscriptionId) mustBe subscriptionId.value
       keys(NrsSearchKeys.Utrn) mustBe testUtrn
@@ -125,14 +112,9 @@ class NrsServiceSpec extends SpecBase with BeforeAndAfterEach with MockitoSugar 
       val answers = mock[UserAnswers]
       when(request.userAnswers).thenReturn(answers)
       when(answers.submissionId).thenReturn(submissionId)
+      when(authReq.uniqueIdentifier).thenReturn(AgentUniqueIdentifier(Some(Fixtures.testArn)))
 
-      val mockIdentityData = mock[IdentityData]
-      when(mockIdentityData.nino).thenReturn(None)
-      when(mockIdentityData.saUtr).thenReturn(None)
-      when(authReq.maybeArn).thenReturn(Some(Fixtures.testArn))
-      when(authReq.identityData).thenReturn(mockIdentityData)
-
-      val keys = service.searchKeys(request, mockIdentityData, testUtrn)
+      val keys = service.searchKeys(request, testUtrn)
       keys(NrsSearchKeys.SubmissionId) mustBe submissionId.value
       keys(NrsSearchKeys.SubscriptionId) mustBe subscriptionId.value
       keys(NrsSearchKeys.Utrn) mustBe testUtrn
@@ -150,13 +132,10 @@ class NrsServiceSpec extends SpecBase with BeforeAndAfterEach with MockitoSugar 
       when(request.headers).thenReturn(Headers())
       when(authReq.subscriptionId).thenReturn(subscriptionId)
       when(authReq.identityData).thenReturn(mockIdentityData)
-      when(authReq.maybeArn).thenReturn(None)
+      when(authReq.uniqueIdentifier).thenReturn(AgentUniqueIdentifier(None))
 
       when(request.userAnswers).thenReturn(answers)
       when(answers.submissionId).thenReturn(submissionId)
-
-      when(mockIdentityData.nino).thenReturn(None)
-      when(mockIdentityData.saUtr).thenReturn(None)
 
       when(mockConfig.nrsBusinessId).thenReturn("stc")
 

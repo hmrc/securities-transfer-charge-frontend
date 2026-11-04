@@ -21,6 +21,11 @@ import uk.gov.hmrc.auth.core.AffinityGroup
 import uk.gov.hmrc.securitiestransferchargefrontend.domain.{CredentialId, SubscriptionId}
 import uk.gov.hmrc.securitiestransferchargefrontend.models.nrs.IdentityData
 
+sealed trait UniqueIdentifier
+final case class IndividualUniqueIdentifier(nino: String) extends UniqueIdentifier
+final case class OrganisationUniqueIdentifier(maybeUtr: Option[String]) extends UniqueIdentifier
+final case class AgentUniqueIdentifier(maybeArn: Option[String]) extends UniqueIdentifier
+
 case class StcAuthorisedRequest[A](
                                           request: Request[A],
                                           internalId: String,
@@ -29,7 +34,7 @@ case class StcAuthorisedRequest[A](
                                           subscriptionId: SubscriptionId,
                                           credentialId: CredentialId,
                                           identityData: IdentityData,
-                                          maybeArn: Option[String]
+                                          uniqueIdentifier: UniqueIdentifier
                                         ) extends WrappedRequest[A](request) {
   lazy val affinityGroupKey: String =
     affinityGroup match {
@@ -40,4 +45,5 @@ case class StcAuthorisedRequest[A](
 
   val isIndividual: Boolean = affinityGroup == AffinityGroup.Individual
   val isAgent: Boolean = affinityGroup == AffinityGroup.Agent
+  
 }
