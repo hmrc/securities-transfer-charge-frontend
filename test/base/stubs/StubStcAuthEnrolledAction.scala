@@ -16,11 +16,12 @@
 
 package base.stubs
 
+import base.Fixtures
 import base.Fixtures.*
 import play.api.mvc.*
 import uk.gov.hmrc.auth.core.AffinityGroup
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.actions.StcAuthEnrolledAction
-import uk.gov.hmrc.securitiestransferchargefrontend.controllers.actions.requests.StcAuthorisedRequest
+import uk.gov.hmrc.securitiestransferchargefrontend.controllers.actions.requests.{AgentUniqueIdentifier, IndividualUniqueIdentifier, OrganisationUniqueIdentifier, StcAuthorisedRequest, UniqueIdentifier}
 
 import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
@@ -32,6 +33,9 @@ class StubStcAuthEnrolledAction @Inject() (
   
   protected val affinityGroup: AffinityGroup =
     AffinityGroup.Individual
+
+  protected val uniqueIdentifier: UniqueIdentifier =
+    IndividualUniqueIdentifier(Fixtures.testNino)
 
   override val parser: BodyParser[AnyContent] =
     playBodyParsers.defaultBodyParser
@@ -52,7 +56,7 @@ class StubStcAuthEnrolledAction @Inject() (
         testSubscriptionId,
         testCredentialId,
         testIdentityData,
-        None
+        uniqueIdentifier
       )
     )
 }
@@ -62,6 +66,10 @@ class OrganisationStubStcAuthEnrolledAction @Inject() (
 
   override protected val affinityGroup: AffinityGroup =
     AffinityGroup.Organisation
+
+  override val uniqueIdentifier: UniqueIdentifier =
+    OrganisationUniqueIdentifier(Some(Fixtures.testUtr))
+
 }
 
 class AgentStubStcAuthEnrolledAction @Inject() (
@@ -70,4 +78,7 @@ class AgentStubStcAuthEnrolledAction @Inject() (
 
   override protected val affinityGroup: AffinityGroup =
     AffinityGroup.Agent
+
+  override val uniqueIdentifier: UniqueIdentifier =
+    AgentUniqueIdentifier(Some(Fixtures.testArn))
 }

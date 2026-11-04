@@ -102,15 +102,18 @@ final class StcAuthEnrolledActionImpl @Inject()(
             maybeDoB, maybeEmail, Some(agentInfo), maybeGroupId, maybeCredentialRole.map(_.toString), maybeMdtpInfo, maybeItmpName,
             maybeItmpDoB, maybeItmpAddress, maybeAffinityGroup.map(_.toString), maybeCredentialStrength, Some(loginTimes)
         )
+        
         val maybeRequest =
           for {
-            groupIdentifier <- retrievalFilter.isPresent(maybeGroupIdentifier)
-            internalId      <- retrievalFilter.isPresent(maybeInternalId)
-            affinityGroup   <- retrievalFilter.isPresent(maybeAffinityGroup)
-            _               <- retrievalFilter.enrolledForStc(enrolments)
-            subscriptionId  <- retrievalFilter.subscriptionIdPresent(enrolments)
-            rawCredentialId <- retrievalFilter.providerIdPresentFilter(maybeCredentials)
-            credentialId    =  CredentialId(rawCredentialId)
+            groupIdentifier  <- retrievalFilter.isPresent(maybeGroupIdentifier)
+            internalId       <- retrievalFilter.isPresent(maybeInternalId)
+            affinityGroup    <- retrievalFilter.isPresent(maybeAffinityGroup)
+            _                <- retrievalFilter.enrolledForStc(enrolments)
+            subscriptionId   <- retrievalFilter.subscriptionIdPresent(enrolments)
+            rawCredentialId  <- retrievalFilter.providerIdPresentFilter(maybeCredentials)
+            maybeArn          = getArn(affinityGroup)(enrolments)
+            uniqueIdentifier <- retrievalFilter.getUniqueIdentifier(affinityGroup)(identityData.nino, identityData.saUtr, maybeArn)
+            credentialId     =  CredentialId(rawCredentialId)
           } yield StcAuthorisedRequest(
             request,
             internalId,
@@ -119,7 +122,7 @@ final class StcAuthEnrolledActionImpl @Inject()(
             subscriptionId,
             credentialId,
             identityData,
-            getArn(affinityGroup)(enrolments)
+            uniqueIdentifier
           )
 
         maybeRequest.fold(identity, block)

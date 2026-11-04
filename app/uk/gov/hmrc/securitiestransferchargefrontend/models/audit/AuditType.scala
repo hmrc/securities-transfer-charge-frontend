@@ -16,6 +16,8 @@
 
 package uk.gov.hmrc.securitiestransferchargefrontend.models.audit
 
+import uk.gov.hmrc.securitiestransferchargefrontend.domain.TransferType
+
 sealed trait AuditType {
   def value: String
 }
@@ -37,5 +39,8 @@ object AuditType {
     override val value: String = "BulkUploadProcessed"
   }
 
-
+  val fromTransferType: TransferType => AuditType = {
+    case TransferType.STF  => Stf
+    case _                 => Sh03
+  }
 }

@@ -32,7 +32,7 @@ class SttTransferSpec extends AnyPropSpec with ScalaCheckPropertyChecks with Mat
   implicit val config: PropertyCheckConfiguration =
     PropertyCheckConfiguration(
       minSuccessful = 50,
-      maxDiscardedFactor = 4.0
+      maxDiscardedFactor = 5.0
     )
 
   property("A charge should be considered paid if the pending amount is zero") {

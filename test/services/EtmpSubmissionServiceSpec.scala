@@ -93,9 +93,8 @@ class EtmpSubmissionServiceSpec extends AnyFreeSpec with Matchers with SpecBase 
       postcode = "BL1 2TG",
       countryCode = "UK"
     ),
-    phone = "01234 567890",
     email = "jsmith@foo.com",
-    nino = "NX787356B" // Can come from subscription
+    nino = "NX787356B" // Can come from GG
   )
 
   val successfulChargeGen: Gen[StcCharge] = for {

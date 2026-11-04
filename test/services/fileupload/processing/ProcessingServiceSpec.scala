@@ -28,7 +28,7 @@ import play.api.test.FakeRequest
 import play.api.test.Helpers.{await, defaultAwaitTimeout, running}
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.securitiestransferchargefrontend.connectors.{SubscriptionConnector, UpscanDownloadException}
-import uk.gov.hmrc.securitiestransferchargefrontend.controllers.actions.requests.StcAuthorisedRequest
+import uk.gov.hmrc.securitiestransferchargefrontend.controllers.actions.requests.{AgentUniqueIdentifier, StcAuthorisedRequest}
 import uk.gov.hmrc.securitiestransferchargefrontend.domain.{CredentialId, SubscriptionId}
 import uk.gov.hmrc.securitiestransferchargefrontend.models.JourneyType.STF
 import uk.gov.hmrc.securitiestransferchargefrontend.models.JourneyType
@@ -97,7 +97,7 @@ class ProcessingServiceSpec extends SpecBase with MockitoSugar with BeforeAndAft
       subscriptionId = SubscriptionId("STC-GFGF"),
       credentialId = CredentialId("some id"),
       identityData = Fixtures.testIdentityData,
-      maybeArn = None
+      uniqueIdentifier = AgentUniqueIdentifier(Some(Fixtures.testArn))
     )
 
   "processReadyUpload" - {
@@ -322,7 +322,7 @@ class ProcessingServiceSpec extends SpecBase with MockitoSugar with BeforeAndAft
           subscriptionId = SubscriptionId("STC-GFGF"),
           credentialId = CredentialId("some id"),
           identityData = Fixtures.testIdentityData,
-          maybeArn = None
+          uniqueIdentifier = AgentUniqueIdentifier(Some(Fixtures.testArn))
         )
 
       implicit val hc: HeaderCarrier = HeaderCarrier()
