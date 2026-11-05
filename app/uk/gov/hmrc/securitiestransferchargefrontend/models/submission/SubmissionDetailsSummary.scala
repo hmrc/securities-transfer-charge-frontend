@@ -55,26 +55,35 @@ object SubmissionDetailsSummary {
 
     val transfersRow = row("submissionDetails.submission.transfers", numOfTransfers)
 
-    val dynamicRows = if (isFullyPaid) {
-      Seq(transfersRow.copy(classes = "no-bottom-border"))
-    } else {
-      Seq(
-        transfersRow,
-        row("submissionDetails.submission.totalTaxDue", totalTaxDue).copy(classes = "no-bottom-border")
-      )
-    }
-
     val maybePenaltiesRows = Seq(
       "submissionDetails.submission.filingPenalties" -> submission.lateFilingPenaltiesToPay,
       "submissionDetails.submission.paymentPenalties" -> submission.latePaymentPenaltiesToPay,
       "submissionDetails.submission.paymentInterest" -> submission.latePaymentInterestToPay
     ).collect { case (key, amount) if amount > 0 => row(key, formatter.formatCurrency(amount)) }
 
+    val border = if maybePenaltiesRows.isEmpty then "no-bottom-border" else ""
+
+    val maybePenaltiesRowsWithNoBorder = maybePenaltiesRows match {
+      case rows :+ last => rows :+ last.copy(classes = "no-bottom-border")
+      case _ => Seq.empty
+    }
+
+    val dynamicRows = if (isFullyPaid) {
+      Seq(transfersRow.copy(classes = "no-bottom-border"))
+    } else {
+      Seq(
+        transfersRow,
+        row("submissionDetails.submission.totalTaxDue", totalTaxDue).copy(classes = border)
+      )
+    }
+
+  
 
     val rows = maybeYourReferenceRow ++ Seq(
       row("submissionDetails.submission.date", submissionDate),
       row("submissionDetails.submission.type", transferType)
-    ) ++ dynamicRows ++ maybePenaltiesRows
+    ) ++ dynamicRows ++ maybePenaltiesRowsWithNoBorder
+
 
     SummaryList(rows = rows, classes = if isFullyPaid then "govuk-!-margin-bottom-0" else "")
   }
