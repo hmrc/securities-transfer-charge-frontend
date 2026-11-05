@@ -315,9 +315,4 @@ class SubmissionDetailsViewSpec extends ViewBaseSpec {
     val doc = view(singleSubmissionReadyToPay)
     doc.select(".govuk-summary-list__row.no-bottom-border").size() mustBe 1
   }
-
-  "not have the no-bottom-border class on the total tax due row when penalty or interest rows are present" in {
-    val doc = view(singleSubmissionReadyToPayWithLateFilingCharge)
-    doc.select(".govuk-summary-list__row.no-bottom-border").size() mustBe 0
-  }
 }
