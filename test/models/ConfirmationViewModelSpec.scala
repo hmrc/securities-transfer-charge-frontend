@@ -20,6 +20,7 @@ import base.SpecBase
 import play.api.i18n.Messages
 import uk.gov.hmrc.securitiestransferchargefrontend.domain.SubmissionId
 import uk.gov.hmrc.securitiestransferchargefrontend.models.ConfirmationViewModel
+import uk.gov.hmrc.securitiestransferchargefrontend.models.JourneyType.STF
 
 import java.time.LocalDate
 
@@ -39,7 +40,9 @@ class ConfirmationViewModelSpec extends SpecBase {
         paymentDueBy = paymentDueBy,
         reference = None,
         taxDue = taxDue,
-        isAgent = false
+        isAgent = false,
+        journeyType = STF,
+        isBulk = false
       )
 
       viewModel.submissionId mustEqual submissionId.value
@@ -59,7 +62,9 @@ class ConfirmationViewModelSpec extends SpecBase {
         paymentDueBy = paymentDueBy,
         reference = agentReference,
         taxDue = taxDue,
-        isAgent = true
+        isAgent = true,
+        journeyType = STF,
+        isBulk = false
       )
 
       viewModel.submissionId mustEqual submissionId.value
@@ -73,7 +78,9 @@ class ConfirmationViewModelSpec extends SpecBase {
         paymentDueBy = LocalDate.now(),
         reference = None,
         taxDue = BigDecimal("1000.50"),
-        isAgent = false
+        isAgent = false,
+        journeyType = STF,
+        isBulk = false
       )
 
       viewModel.taxDue must include("£")
@@ -88,7 +95,9 @@ class ConfirmationViewModelSpec extends SpecBase {
           paymentDueBy = LocalDate.now(),
           reference = None,
           taxDue = BigDecimal("9999.999"),
-          isAgent = false
+          isAgent = false,
+          journeyType = STF,
+          isBulk = false
         )
         result.taxDue mustBe "£9,999.99"
       }
@@ -99,7 +108,9 @@ class ConfirmationViewModelSpec extends SpecBase {
           paymentDueBy = LocalDate.now(),
           reference = None,
           taxDue = BigDecimal("1234.567"),
-          isAgent = false
+          isAgent = false,
+          journeyType = STF,
+          isBulk = false
         )
         result.taxDue mustBe "£1,234.56"
       }
@@ -110,7 +121,9 @@ class ConfirmationViewModelSpec extends SpecBase {
           paymentDueBy = LocalDate.now(),
           reference = None,
           taxDue = BigDecimal("9999.19"),
-          isAgent = false
+          isAgent = false,
+          journeyType = STF,
+          isBulk = false
         )
         result.taxDue mustBe "£9,999.19"
       }
@@ -121,7 +134,9 @@ class ConfirmationViewModelSpec extends SpecBase {
           paymentDueBy = LocalDate.now(),
           reference = None,
           taxDue = BigDecimal("9000"),
-          isAgent = false
+          isAgent = false,
+          journeyType = STF,
+          isBulk = false
         )
         result.taxDue mustBe "£9,000"
       }
@@ -132,7 +147,9 @@ class ConfirmationViewModelSpec extends SpecBase {
           paymentDueBy = LocalDate.now(),
           reference = None,
           taxDue = BigDecimal("0.0000"),
-          isAgent = false
+          isAgent = false,
+          journeyType = STF,
+          isBulk = false
         )
         result.taxDue mustBe "£0"
       }
@@ -143,7 +160,9 @@ class ConfirmationViewModelSpec extends SpecBase {
           paymentDueBy = LocalDate.now(),
           reference = None,
           taxDue = BigDecimal("9999999"),
-          isAgent = false
+          isAgent = false,
+          journeyType = STF,
+          isBulk = false
         )
         result.taxDue mustBe "£9,999,999"
       }
@@ -154,7 +173,9 @@ class ConfirmationViewModelSpec extends SpecBase {
           paymentDueBy = LocalDate.now(),
           reference = None,
           taxDue = BigDecimal("1234.5"),
-          isAgent = false
+          isAgent = false,
+          journeyType = STF,
+          isBulk = false
         )
         result.taxDue mustBe "£1,234.50"
       }
@@ -165,7 +186,9 @@ class ConfirmationViewModelSpec extends SpecBase {
           paymentDueBy = LocalDate.now(),
           reference = None,
           taxDue = BigDecimal("0.99"),
-          isAgent = false
+          isAgent = false,
+          journeyType = STF,
+          isBulk = false
         )
         result.taxDue mustBe "£0.99"
       }
@@ -176,7 +199,9 @@ class ConfirmationViewModelSpec extends SpecBase {
           paymentDueBy = LocalDate.now(),
           reference = None,
           taxDue = BigDecimal("0.0099"),
-          isAgent = false
+          isAgent = false,
+          journeyType = STF,
+          isBulk = false
         )
         result.taxDue mustBe "£0"
       }
@@ -187,7 +212,9 @@ class ConfirmationViewModelSpec extends SpecBase {
           paymentDueBy = LocalDate.now(),
           reference = None,
           taxDue = BigDecimal("100.999"),
-          isAgent = false
+          isAgent = false,
+          journeyType = STF,
+          isBulk = false
         )
         result.taxDue mustBe "£100.99"
       }

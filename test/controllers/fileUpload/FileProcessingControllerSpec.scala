@@ -30,7 +30,6 @@ import uk.gov.hmrc.securitiestransferchargefrontend.controllers.fileUpload.route
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.routes.JourneyRecoveryController
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.sh03.agents.bulk.routes as sh03BulkRoutes
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.sh03.organisations.bulk.routes as sh03OrgBulkRoutes
-import uk.gov.hmrc.securitiestransferchargefrontend.controllers.sh03.shared.bulk.routes as sh03CyaRoutes
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.agents.bulk.routes as stfBulkRoutes
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.individuals.bulk.routes as individualBulkRoutes
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.organisations.bulk.routes as orgBulkRoutes
@@ -500,7 +499,7 @@ class FileProcessingControllerSpec extends SpecBase with MockitoSugar with Audit
 
                 case (_, JourneyType.STF) => redirectLocation(result).value mustEqual orgBulkRoutes.CheckYourAnswersController.onPageLoad(reference).url
 
-                case (_, JourneyType.SH03) => redirectLocation(result).value mustEqual sh03CyaRoutes.CheckYourAnswersController.onPageLoad().url
+                case (_, JourneyType.SH03) => redirectLocation(result).value mustEqual JourneyRecoveryController.onPageLoad().url
               }
             }
           }

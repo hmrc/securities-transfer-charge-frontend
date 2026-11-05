@@ -33,6 +33,12 @@ case class ConfirmationViewModel(
                                   journeyType: JourneyType,
                                   isBulk: Boolean
                                 ) {
+
+  val singleReferencesKey: String = journeyType match {
+    case STF => "confirmation.heading.transferReference.p1"
+    case SH03 => "confirmation.heading.shareBuyBack.p1"
+  }
+
   val useReferencesKey: String = journeyType match {
     case STF  => "confirmation.heading.transferReference.p2"
     case SH03 => "confirmation.heading.shareBuyBack.p2"
@@ -50,7 +56,7 @@ object ConfirmationViewModel {
              reference: Option[String],
              taxDue: BigDecimal,
              isAgent: Boolean,
-             journeyType: JourneyType = STF,
+             journeyType: JourneyType,
              isBulk: Boolean
            )(implicit messages: Messages): ConfirmationViewModel = {
     

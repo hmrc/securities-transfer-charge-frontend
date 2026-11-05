@@ -18,12 +18,13 @@ package uk.gov.hmrc.securitiestransferchargefrontend.services.stf.agents.bulk
 
 import play.api.i18n.Messages
 import uk.gov.hmrc.govukfrontend.views.Aliases.SummaryList
-import uk.gov.hmrc.securitiestransferchargefrontend.models. UserAnswers
-import uk.gov.hmrc.securitiestransferchargefrontend.models.stf.fileupload. ParsedStcRowsDocument
+import uk.gov.hmrc.securitiestransferchargefrontend.models.UserAnswers
+import uk.gov.hmrc.securitiestransferchargefrontend.models.stf.fileupload.ParsedStcRowsDocument
 import uk.gov.hmrc.securitiestransferchargefrontend.models.stf.cya.StfAgentRowBuilder
 import uk.gov.hmrc.securitiestransferchargefrontend.services.stf.agents.TaxDueCalculationService
 import uk.gov.hmrc.securitiestransferchargefrontend.viewmodels.stf.agents.bulk.CheckYourAnswersViewModel
 
+import java.time.LocalDate
 import javax.inject.{Inject, Singleton}
 
 @Singleton
@@ -47,4 +48,10 @@ class CheckYourAnswersService @Inject()(
     
   }
 
+  def totalTaxDue(doc: ParsedStcRowsDocument): BigDecimal =
+    doc.rows.flatMap(taxDueCalculationService.calculateTaxDueForRow).sum
+
+  def paymentDueBy(doc: ParsedStcRowsDocument): LocalDate =
+    taxDueCalculationService.calculatePaymentDueDate(doc.rows)
+  
 }

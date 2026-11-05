@@ -22,12 +22,12 @@ import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.actions.{StcAuthEnrolledAction, StcDataRetrievalAction}
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.routes
 import uk.gov.hmrc.securitiestransferchargefrontend.models.ConfirmationViewModel
-import uk.gov.hmrc.securitiestransferchargefrontend.pages.stf.single.NameOfSellerPage
+import uk.gov.hmrc.securitiestransferchargefrontend.models.submission.BulkConfirmationDetails
 import uk.gov.hmrc.securitiestransferchargefrontend.repositories.{SessionRepository, TransactionResponseRepository}
 import uk.gov.hmrc.securitiestransferchargefrontend.views.html.shared.ConfirmationView
 
 import javax.inject.Inject
-import scala.concurrent.ExecutionContext
+import scala.concurrent.{ExecutionContext, Future}
 
 class ConfirmationController @Inject()(
                                         val controllerComponents: MessagesControllerComponents,
@@ -38,39 +38,44 @@ class ConfirmationController @Inject()(
                                         view: ConfirmationView
                                       )(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport {
 
-  def onPageLoad(): Action[AnyContent] = (stcAuthEnrolled andThen getData).async {implicit request =>
+  def onPageLoad(): Action[AnyContent] = (stcAuthEnrolled andThen getData).async { implicit request =>
 
+    val isAgent = request.request.affinityGroupKey.contains("agent")
     val userAnswers = request.userAnswers.getOrElse(
       throw new IllegalStateException("No UserAnswers found")
     )
-    
-    val isAgent = request.request.affinityGroupKey.contains("agent")
-    val journeyType = userAnswers.journeyType
-    val isBulk = request.userAnswers.flatMap(_.get(NameOfSellerPage)).isDefined
 
-    val submissionId = request.userAnswers.map(_.submissionId).getOrElse(
-      throw new IllegalStateException("Submission ID not found in UserAnswers")
-    )
     sessionRepository.clear(request.userAnswers.get.userId)
 
+    (userAnswers.data \ BulkConfirmationDetails.key).asOpt[BulkConfirmationDetails] match {
+      case Some(details) =>
+        Future.successful(Ok(view(ConfirmationViewModel(
+          submissionId = details.submissionId,
+          paymentDueBy = details.paymentDueBy,
+          reference = details.agentReference,
+          taxDue = details.taxDue,
+          isAgent = isAgent,
+          journeyType = userAnswers.journeyType,
+          isBulk = true
+        ))))
 
-    transactionResponseRepository.retrieve(submissionId).map { responseDetails =>
-      val viewModel = ConfirmationViewModel(
-        submissionId = submissionId,
-        paymentDueBy = responseDetails.paymentDueBy,
-        reference = responseDetails.agentReference,
-        taxDue = responseDetails.taxDue,
-        isAgent = isAgent,
-        journeyType = journeyType,
-        isBulk = isBulk
+      case None =>
+        transactionResponseRepository.retrieve(userAnswers.submissionId).map { responseDetails =>
+          val viewModel = ConfirmationViewModel(
+            submissionId = userAnswers.submissionId,
+            paymentDueBy = responseDetails.paymentDueBy,
+            reference = responseDetails.agentReference,
+            taxDue = responseDetails.taxDue,
+            isAgent = isAgent,
+            journeyType = userAnswers.journeyType,
+            isBulk = false
+          )
 
-      )(messagesApi.preferred(request))
-      
-      Ok(view(viewModel)(request, messagesApi.preferred(request)))
-    }.recover {
-      case _: NoSuchElementException =>
-        println(Console.BLUE + "NO SUCH ELEMENT EXCEPTION - NOT FINDING SUBMISSION ID" + Console.RESET)
-        Redirect(routes.JourneyRecoveryController.onPageLoad())
+          Ok(view(viewModel))
+        }.recover {
+          case _: NoSuchElementException =>
+            Redirect(routes.JourneyRecoveryController.onPageLoad())
+        }
     }
   }
 }

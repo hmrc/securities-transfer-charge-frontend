@@ -14,25 +14,26 @@
  * limitations under the License.
  */
 
-package controllers.stf.shared
+package controllers
 
 import base.SpecBase
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.*
+import org.scalatest.BeforeAndAfterEach
 import org.scalatestplus.mockito.MockitoSugar
 import play.api.inject.bind
 import play.api.test.FakeRequest
 import play.api.test.Helpers.*
-import uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.shared.routes
-import uk.gov.hmrc.securitiestransferchargefrontend.models.ConfirmationViewModel
+import uk.gov.hmrc.securitiestransferchargefrontend.controllers.routes
+import uk.gov.hmrc.securitiestransferchargefrontend.models.{ConfirmationViewModel, JourneyType}
 import uk.gov.hmrc.securitiestransferchargefrontend.repositories.TransactionResponseRepository
 import uk.gov.hmrc.securitiestransferchargefrontend.services.SubmissionCreateResponseSuccess
-import uk.gov.hmrc.securitiestransferchargefrontend.views.html.stf.shared.ConfirmationView
+import uk.gov.hmrc.securitiestransferchargefrontend.views.html.shared.ConfirmationView
 
 import java.time.LocalDate
 import scala.concurrent.Future
 
-class ConfirmationControllerSpec extends SpecBase with MockitoSugar {
+class ConfirmationControllerSpec extends SpecBase with MockitoSugar with BeforeAndAfterEach {
 
   private val mockTransactionResponseRepository = mock[TransactionResponseRepository]
 
@@ -69,7 +70,9 @@ class ConfirmationControllerSpec extends SpecBase with MockitoSugar {
           paymentDueBy = paymentDueBy,
           reference = None,
           taxDue = taxDue,
-          isAgent = false
+          journeyType = JourneyType.STF,
+          isAgent = false,
+          isBulk = false
         )(messages(application))
 
         status(result) mustEqual OK
