@@ -28,7 +28,7 @@ import views.ViewBaseSpec
 class MaximumAmountPaidViewSpec extends ViewBaseSpec {
 
   override def fakeApplication(): Application =
-    applicationBuilder(affinityGroup = agentAffinity).build()
+    applicationBuilder().build()
 
   private val viewInstance = app.injector.instanceOf[MaximumAmountPaidView]
   private val formProvider = new MaximumAmountPaidFormProvider()

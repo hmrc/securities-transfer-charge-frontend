@@ -26,12 +26,12 @@ import uk.gov.hmrc.securitiestransferchargefrontend.services.stf.shared.Formatti
 import uk.gov.hmrc.securitiestransferchargefrontend.viewmodels.dashboard.SubmissionDetailsViewModel
 import uk.gov.hmrc.securitiestransferchargefrontend.views.html.dashboard.SubmissionDetailsView
 
-import javax.inject.Inject
+import javax.inject.{Inject, Named}
 import scala.concurrent.ExecutionContext
 
 class SubmissionDetailsController @Inject()(
                                        override val messagesApi: MessagesApi,
-                                       auth: StcAuthEnrolledAction,
+                                       @Named("any") auth: StcAuthEnrolledAction,
                                        getData: StcDataRetrievalAction,
                                        val controllerComponents: MessagesControllerComponents,
                                        view: SubmissionDetailsView,

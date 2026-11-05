@@ -16,7 +16,6 @@
 
 package controllers.sh03.organisations.bulk
 
-import base.Fixtures.organisationAffinity
 import base.{FileUploadFixtures, SpecBase}
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.when
@@ -79,7 +78,7 @@ class CheckYourAnswersControllerSpec extends SpecBase with MockitoSugar with Fil
       when(parsedStcRowsRepository.findDocumentByReference(reference))
         .thenReturn(Future.successful(Some(parsedStcRowsDocument)))
 
-      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers), affinityGroup = organisationAffinity)
+      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers))
         .overrides(
           bind[Navigator].qualifiedWith("orgSh03").toInstance(getNavigator),
           bind[CheckYourAnswersService].toInstance(checkYourAnswersService),
@@ -106,7 +105,7 @@ class CheckYourAnswersControllerSpec extends SpecBase with MockitoSugar with Fil
       when(parsedStcRowsRepository.findDocumentByReference(reference))
         .thenReturn(Future.successful(None))
 
-      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers), affinityGroup = organisationAffinity)
+      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers))
         .overrides(
           bind[Navigator].qualifiedWith("orgSh03").toInstance(getNavigator),
           bind[ParsedStcRowsRepository].toInstance(parsedStcRowsRepository)
@@ -126,7 +125,7 @@ class CheckYourAnswersControllerSpec extends SpecBase with MockitoSugar with Fil
     "must redirect to the next page when valid data is submitted" in {
 
       val application =
-        applicationBuilder(userAnswers = Some(emptyUserAnswers), affinityGroup = organisationAffinity)
+        applicationBuilder(userAnswers = Some(emptyUserAnswers))
           .overrides(
             bind[Navigator].qualifiedWith("orgSh03").toInstance(getNavigator)
           )

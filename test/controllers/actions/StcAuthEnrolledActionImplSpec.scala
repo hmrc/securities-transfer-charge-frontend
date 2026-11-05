@@ -26,7 +26,7 @@ import uk.gov.hmrc.auth.core.*
 import uk.gov.hmrc.auth.core.retrieve.*
 import uk.gov.hmrc.securitiestransferchargefrontend.config.FrontendAppConfig
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.actions.filters.RetrievalFilter
-import uk.gov.hmrc.securitiestransferchargefrontend.controllers.actions.{StcAuthEnrolledAction, StcAuthEnrolledActionImpl}
+import uk.gov.hmrc.securitiestransferchargefrontend.controllers.actions.*
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.{Redirects, routes}
 
 import java.time.{Instant, LocalDate}
@@ -56,12 +56,13 @@ class StcAuthEnrolledActionImplSpec extends SpecBase {
   val itmpAddress: Option[ItmpAddress] = None
   val credentialStrength: Option[String] = None
   val loginTimes = LoginTimes(Instant.now(), None)
+  implicit val affinityGroup: AffinityGroup = AffinityGroup.Organisation
 
   def buildRetrieval(
                       maybeInternalId: Option[String] = Some(Fixtures.testInternalId.value),
                       maybeGroupIdentifier: Option[String] = Some(Fixtures.testGroupIdentifier.value),
                       enrolments: Enrolments = Fixtures.enrolledForStc,
-                      maybeAffinityGroup: Option[AffinityGroup] = Some(AffinityGroup.Organisation),
+                      maybeAffinityGroup: Option[AffinityGroup] = Some(affinityGroup),
                       maybeCredentials: Option[Credentials] = Some(Credentials(Fixtures.testCredentialId.value, "providerType"))
                     ): RetrievalType =
 
@@ -118,7 +119,7 @@ class StcAuthEnrolledActionImplSpec extends SpecBase {
     val redirects = application.injector.instanceOf[Redirects]
     val retrievalFilter = application.injector.instanceOf[RetrievalFilter]
 
-    new StcAuthEnrolledActionImpl(
+    new OrgStcAuthEnrolledAction(
       authConnector,
       appConfig,
       retrievalFilter,

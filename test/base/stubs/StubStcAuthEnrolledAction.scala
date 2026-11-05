@@ -26,12 +26,11 @@ import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
-class StubStcAuthEnrolledAction @Inject() (
+abstract class StubStcAuthEnrolledAction @Inject() (
                                             playBodyParsers: PlayBodyParsers
                                           ) extends StcAuthEnrolledAction {
-  
-  protected val affinityGroup: AffinityGroup =
-    AffinityGroup.Individual
+
+  protected val affinityGroup: AffinityGroup
 
   override val parser: BodyParser[AnyContent] =
     playBodyParsers.defaultBodyParser
@@ -56,18 +55,27 @@ class StubStcAuthEnrolledAction @Inject() (
       )
     )
 }
-class OrganisationStubStcAuthEnrolledAction @Inject() (
-                                                        playBodyParsers: PlayBodyParsers
-                                                      ) extends StubStcAuthEnrolledAction(playBodyParsers) {
 
-  override protected val affinityGroup: AffinityGroup =
-    AffinityGroup.Organisation
+class IndividualStubStcAuthEnrolledAction @Inject() (playBodyParsers: PlayBodyParsers) extends StubStcAuthEnrolledAction(playBodyParsers) {
+
+  protected val affinityGroup: AffinityGroup = AffinityGroup.Individual
+  override val expectedAffinityGroup: Option[AffinityGroup] = Some(affinityGroup)
 }
 
-class AgentStubStcAuthEnrolledAction @Inject() (
-                                                        playBodyParsers: PlayBodyParsers
-                                                      ) extends StubStcAuthEnrolledAction(playBodyParsers) {
+class OrganisationStubStcAuthEnrolledAction @Inject() (playBodyParsers: PlayBodyParsers) extends StubStcAuthEnrolledAction(playBodyParsers) {
 
-  override protected val affinityGroup: AffinityGroup =
-    AffinityGroup.Agent
+  protected val affinityGroup: AffinityGroup = AffinityGroup.Organisation
+  override val expectedAffinityGroup: Option[AffinityGroup] = Some(affinityGroup)
+}
+
+class AgentStubStcAuthEnrolledAction @Inject() (playBodyParsers: PlayBodyParsers) extends StubStcAuthEnrolledAction(playBodyParsers) {
+
+  protected val affinityGroup: AffinityGroup = AffinityGroup.Agent
+  override val expectedAffinityGroup: Option[AffinityGroup] = Some(affinityGroup)
+}
+
+class AnyStubStcAuthEnrolledAction @Inject() (playBodyParsers: PlayBodyParsers, affinity: AffinityGroup) extends StubStcAuthEnrolledAction(playBodyParsers) {
+
+  protected val affinityGroup: AffinityGroup = affinity
+  override val expectedAffinityGroup: Option[AffinityGroup] = Some(affinity)
 }

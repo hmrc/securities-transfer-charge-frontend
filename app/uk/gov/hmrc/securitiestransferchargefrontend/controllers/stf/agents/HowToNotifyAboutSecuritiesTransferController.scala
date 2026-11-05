@@ -37,7 +37,7 @@ import scala.language.postfixOps
 class HowToNotifyAboutSecuritiesTransferController @Inject()(
                                                               override val messagesApi: MessagesApi,
                                                               @Named("agents") navigator: Navigator,
-                                                              stcAuthEnrolled: StcAuthEnrolledAction,
+                                                              @Named("agents") stcAuthEnrolled: StcAuthEnrolledAction,
                                                               getData: StcDataRetrievalAction,
                                                               formProvider: HowToNotifyAboutSecuritiesTransferFormProvider,
                                                               val controllerComponents: MessagesControllerComponents,

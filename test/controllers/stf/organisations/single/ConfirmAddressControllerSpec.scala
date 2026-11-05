@@ -51,7 +51,7 @@ class ConfirmAddressControllerSpec extends SpecBase {
       when(mockAddressService.extractConfirmableAddress(subscription))
         .thenReturn(confirmableAddress)
 
-      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers), affinityGroup = orgAffinity)
+      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers))
         .overrides(
           inject.bind[SubscriptionService].toInstance(mockSubscriptionService),
           inject.bind[AddressService].toInstance(mockAddressService)
@@ -77,7 +77,7 @@ class ConfirmAddressControllerSpec extends SpecBase {
       when(mockSubscriptionService.getSubscription(any())(any()))
         .thenReturn(Future.failed(new RuntimeException("Subscription error")))
 
-      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers), affinityGroup = orgAffinity)
+      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers))
         .overrides(
           inject.bind[SubscriptionService].toInstance(mockSubscriptionService)
         )
@@ -107,7 +107,7 @@ class ConfirmAddressControllerSpec extends SpecBase {
         .thenReturn(confirmableAddress)
 
       val application =
-        applicationBuilder(userAnswers = Some(emptyUserAnswers), affinityGroup = orgAffinity)
+        applicationBuilder(userAnswers = Some(emptyUserAnswers))
           .overrides(
             inject.bind[SubscriptionService].toInstance(mockSubscriptionService),
             inject.bind[AddressService].toInstance(mockAddressService),
@@ -138,7 +138,7 @@ class ConfirmAddressControllerSpec extends SpecBase {
       when(mockIdClient.nextSubmissionId()(any[HeaderCarrier]))
         .thenReturn(Future.successful(SubmissionId("STC-000000001")))
 
-      val application = applicationBuilder(userAnswers = None, affinityGroup = orgAffinity)
+      val application = applicationBuilder(userAnswers = None)
         .overrides(
           inject.bind[SubscriptionService].toInstance(StubSubscriptionService()),
           inject.bind[AddressService].toInstance(mockAddressService),
@@ -164,7 +164,7 @@ class ConfirmAddressControllerSpec extends SpecBase {
       when(mockSubscriptionService.getSubscription(any())(any()))
         .thenReturn(Future.failed(new RuntimeException("Subscription error")))
 
-      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers), affinityGroup = orgAffinity)
+      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers))
         .overrides(
           inject.bind[SubscriptionService].toInstance(mockSubscriptionService)
         )

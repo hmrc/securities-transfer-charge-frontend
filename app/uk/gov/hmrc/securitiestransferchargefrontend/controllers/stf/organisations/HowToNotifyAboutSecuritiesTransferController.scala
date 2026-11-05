@@ -36,7 +36,7 @@ import scala.concurrent.Future
 class HowToNotifyAboutSecuritiesTransferController @Inject()(
                                                               override val messagesApi: MessagesApi,
                                                               @Named("organisations") orgNavigator: Navigator,
-                                                              stcAuthEnrolled: StcAuthEnrolledAction,
+                                                              @Named("organisations") stcAuthEnrolled: StcAuthEnrolledAction,
                                                               getData: StcDataRetrievalAction,
                                                               formProvider: HowToNotifyAboutSecuritiesTransferFormProvider,
                                                               val controllerComponents: MessagesControllerComponents,

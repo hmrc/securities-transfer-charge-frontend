@@ -24,11 +24,11 @@ import uk.gov.hmrc.securitiestransferchargefrontend.views.html.sh03.organisation
 import uk.gov.hmrc.securitiestransferchargefrontend.utils.CommonHelpers.linkToTemplateFor
 import uk.gov.hmrc.securitiestransferchargefrontend.models.JourneyType.SH03
 
-import javax.inject.Inject
+import javax.inject.{Inject, Named}
 
 class TemplateInstructionsController @Inject()(
                                                 override val messagesApi: MessagesApi,
-                                                stcAuthEnrolled: StcAuthEnrolledAction,
+                                                @Named("organisations") stcAuthEnrolled: StcAuthEnrolledAction,
                                                 val controllerComponents: MessagesControllerComponents,
                                                 view: TemplateInstructionsView
                                               ) extends FrontendBaseController with I18nSupport {

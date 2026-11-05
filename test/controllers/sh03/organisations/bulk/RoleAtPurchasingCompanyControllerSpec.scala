@@ -55,7 +55,7 @@ class RoleAtPurchasingCompanyControllerSpec extends SpecBase with MockitoSugar {
       val mockAnswerPersistenceService = mock[AnswerPersistenceService]
       when(mockAnswerPersistenceService.save(any())(any())).thenReturn(Future.successful(()))
 
-      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers), affinityGroup = orgAffinity)
+      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers))
         .overrides(
           bind[Navigator].qualifiedWith("orgSh03").toInstance(getNavigator),
           bind[AnswerPersistenceService].toInstance(mockAnswerPersistenceService)
@@ -82,7 +82,7 @@ class RoleAtPurchasingCompanyControllerSpec extends SpecBase with MockitoSugar {
 
       val userAnswers = emptyUserAnswers.set(BulkRoleAtPurchasingCompanyPage, validData).success.value
 
-      val application = applicationBuilder(userAnswers = Some(userAnswers), affinityGroup = orgAffinity)
+      val application = applicationBuilder(userAnswers = Some(userAnswers))
         .overrides(
           bind[Navigator].qualifiedWith("orgSh03").toInstance(getNavigator),
           bind[AnswerPersistenceService].toInstance(mockAnswerPersistenceService)
@@ -109,7 +109,7 @@ class RoleAtPurchasingCompanyControllerSpec extends SpecBase with MockitoSugar {
 
       val userAnswers = emptyUserAnswers.set(BulkRoleAtPurchasingCompanyPage, validUkSocietasData).success.value
 
-      val application = applicationBuilder(userAnswers = Some(userAnswers), affinityGroup = orgAffinity)
+      val application = applicationBuilder(userAnswers = Some(userAnswers))
         .overrides(
           bind[Navigator].qualifiedWith("orgSh03").toInstance(getNavigator),
           bind[AnswerPersistenceService].toInstance(mockAnswerPersistenceService)
@@ -136,7 +136,7 @@ class RoleAtPurchasingCompanyControllerSpec extends SpecBase with MockitoSugar {
 
       val userAnswersWithRef = emptyUserAnswers.setFileUploadReference(testReference)
 
-      val application = applicationBuilder(userAnswers = Some(userAnswersWithRef), affinityGroup = orgAffinity)
+      val application = applicationBuilder(userAnswers = Some(userAnswersWithRef))
         .overrides(
           bind[Navigator].qualifiedWith("orgSh03").toInstance(getNavigator),
           bind[AnswerPersistenceService].toInstance(mockAnswerPersistenceService)
@@ -162,7 +162,7 @@ class RoleAtPurchasingCompanyControllerSpec extends SpecBase with MockitoSugar {
 
       val userAnswersWithRef = emptyUserAnswers.setFileUploadReference(testReference)
 
-      val application = applicationBuilder(userAnswers = Some(userAnswersWithRef), affinityGroup = orgAffinity)
+      val application = applicationBuilder(userAnswers = Some(userAnswersWithRef))
         .overrides(
           bind[Navigator].qualifiedWith("orgSh03").toInstance(getNavigator),
           bind[AnswerPersistenceService].toInstance(mockAnswerPersistenceService)
@@ -185,7 +185,7 @@ class RoleAtPurchasingCompanyControllerSpec extends SpecBase with MockitoSugar {
 
       val userAnswersWithRef = emptyUserAnswers.setFileUploadReference(testReference)
 
-      val application = applicationBuilder(userAnswers = Some(userAnswersWithRef), affinityGroup = orgAffinity)
+      val application = applicationBuilder(userAnswers = Some(userAnswersWithRef))
         .overrides(bind[Navigator].qualifiedWith("orgSh03").toInstance(getNavigator))
         .build()
 
@@ -209,7 +209,7 @@ class RoleAtPurchasingCompanyControllerSpec extends SpecBase with MockitoSugar {
 
       val userAnswersWithRef = emptyUserAnswers.setFileUploadReference(testReference)
 
-      val application = applicationBuilder(userAnswers = Some(userAnswersWithRef), affinityGroup = orgAffinity)
+      val application = applicationBuilder(userAnswers = Some(userAnswersWithRef))
         .overrides(bind[Navigator].qualifiedWith("orgSh03").toInstance(getNavigator))
         .build()
 
@@ -231,7 +231,7 @@ class RoleAtPurchasingCompanyControllerSpec extends SpecBase with MockitoSugar {
 
     "must redirect to Journey Recovery for a GET if no existing data is found" in {
 
-      val application = applicationBuilder(userAnswers = None, affinityGroup = orgAffinity).build()
+      val application = applicationBuilder(userAnswers = None).build()
 
       running(application) {
         val request = FakeRequest(GET, roleAtPurchasingCompanyRoute)
@@ -244,7 +244,7 @@ class RoleAtPurchasingCompanyControllerSpec extends SpecBase with MockitoSugar {
 
     "must redirect to Journey Recovery for a POST if no existing data is found" in {
 
-      val application = applicationBuilder(userAnswers = None, affinityGroup = orgAffinity).build()
+      val application = applicationBuilder(userAnswers = None).build()
 
       running(application) {
         val request =
@@ -260,7 +260,7 @@ class RoleAtPurchasingCompanyControllerSpec extends SpecBase with MockitoSugar {
 
     "must redirect to Journey Recovery for a GET if fileUploadReference is missing from both the query string and UserAnswers" in {
 
-      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers), affinityGroup = orgAffinity).build()
+      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers)).build()
 
       running(application) {
         val request = FakeRequest(GET, roleAtPurchasingCompanyRoute)
@@ -274,7 +274,7 @@ class RoleAtPurchasingCompanyControllerSpec extends SpecBase with MockitoSugar {
 
     "must redirect to Journey Recovery for a POST if fileUploadReference is missing from UserAnswers" in {
 
-      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers), affinityGroup = orgAffinity).build()
+      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers)).build()
 
       running(application) {
         val request =

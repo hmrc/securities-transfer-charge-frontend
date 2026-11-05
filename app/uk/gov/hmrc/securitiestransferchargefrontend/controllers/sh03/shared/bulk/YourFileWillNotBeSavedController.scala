@@ -23,10 +23,12 @@ import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.actions.*
 import uk.gov.hmrc.securitiestransferchargefrontend.views.html.sh03.shared.YourFileWillNotBeSavedView
 
+import javax.inject.Named
+
 
 class YourFileWillNotBeSavedController @Inject()(
                                             override val messagesApi: MessagesApi,
-                                            stcAuthEnrolled: StcAuthEnrolledAction,
+                                            @Named("any") stcAuthEnrolled: StcAuthEnrolledAction,
                                             val controllerComponents: MessagesControllerComponents,
                                             view: YourFileWillNotBeSavedView
                                           ) extends FrontendBaseController with I18nSupport {

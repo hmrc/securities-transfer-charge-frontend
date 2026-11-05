@@ -17,7 +17,7 @@
 package uk.gov.hmrc.securitiestransferchargefrontend.controllers.actions.filters
 
 import play.api.mvc.Result
-import uk.gov.hmrc.auth.core.Enrolments
+import uk.gov.hmrc.auth.core.{AffinityGroup, Enrolments}
 import uk.gov.hmrc.auth.core.retrieve.{Credentials, ItmpName}
 import uk.gov.hmrc.securitiestransferchargefrontend.config.FrontendAppConfig
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.Redirects
@@ -65,4 +65,15 @@ class RetrievalFilter @Inject()(
     case _ => Left(redirectToUnauthorisedF)
   }
 
+  def checkCorrectAffinity(requiredAffinity: Option[AffinityGroup]): RetrievalFilterFunction[Option[AffinityGroup], AffinityGroup] = {
+    requiredAffinity
+      .map(checkRequiredAffinity)
+      .getOrElse(isPresent)
+  }
+
+  def checkRequiredAffinity(requiredAffinity: AffinityGroup): RetrievalFilterFunction[Option[AffinityGroup], AffinityGroup] = {
+    case Some(affinity) if affinity == requiredAffinity => Right(affinity)
+    case Some(_)                                        => Left(redirectToJourneyRecoveryF) // TODO: STOSB-2127 - redirect to KO page.
+    case None                                           => Left(redirectToUnauthorisedF)
+  }
 }

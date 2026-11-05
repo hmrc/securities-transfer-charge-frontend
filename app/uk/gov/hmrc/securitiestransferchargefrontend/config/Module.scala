@@ -52,7 +52,20 @@ class Module extends AbstractModule {
 
     bind(classOf[Clock]).toInstance(Clock.systemDefaultZone.withZone(ZoneOffset.UTC))
     bind(classOf[HttpErrorHandler]).to(classOf[ErrorHandler])
-    bind(classOf[StcAuthEnrolledAction]).to(classOf[StcAuthEnrolledActionImpl]).asEagerSingleton()
+    
+    bind(classOf[StcAuthEnrolledAction])
+      .annotatedWith(Names.named("individuals"))
+      .to(classOf[IndividualStcAuthEnrolledAction]).asEagerSingleton()
+    bind(classOf[StcAuthEnrolledAction])
+      .annotatedWith(Names.named("organisations"))
+      .to(classOf[OrgStcAuthEnrolledAction]).asEagerSingleton()
+    bind(classOf[StcAuthEnrolledAction])
+      .annotatedWith(Names.named("agents"))
+      .to(classOf[AgentStcAuthEnrolledAction]).asEagerSingleton()
+    bind(classOf[StcAuthEnrolledAction])
+      .annotatedWith(Names.named("any"))
+      .to(classOf[AnyStcAuthEnrolledAction]).asEagerSingleton()
+    
     bind(classOf[StcDataRetrievalAction]).to(classOf[StcDataRetrievalActionImpl])
     bind(classOf[StcDataRequiredAction]).to(classOf[StcDataRequiredActionImpl])
     bind(classOf[StcIndividualAuthEnrolledAction]).to(classOf[StcIndividualAuthEnrolledActionImpl])

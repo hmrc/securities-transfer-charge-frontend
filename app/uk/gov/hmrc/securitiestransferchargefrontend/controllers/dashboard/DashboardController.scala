@@ -27,12 +27,12 @@ import uk.gov.hmrc.securitiestransferchargefrontend.services.DashboardService
 import uk.gov.hmrc.securitiestransferchargefrontend.viewmodels.dashboard.DashboardViewModel
 import uk.gov.hmrc.securitiestransferchargefrontend.views.html.dashboard.DashboardView
 
-import javax.inject.Inject
+import javax.inject.{Inject, Named}
 import scala.concurrent.ExecutionContext
 
 class DashboardController @Inject()(
                                      override val messagesApi: MessagesApi,
-                                     stcAuthEnrolled: StcAuthEnrolledAction,
+                                     @Named("any") stcAuthEnrolled: StcAuthEnrolledAction,
                                      val controllerComponents: MessagesControllerComponents,
                                      dashboardService: DashboardService,
                                      view: DashboardView

@@ -31,11 +31,11 @@ import uk.gov.hmrc.securitiestransferchargefrontend.models.audit.JourneyStatus.S
 import uk.gov.hmrc.securitiestransferchargefrontend.services.AuditService
 
 import scala.concurrent.Future
-import javax.inject.Inject
+import javax.inject.{Inject, Named}
 
 class BeforeYouStartController @Inject()(
                                           override val messagesApi: MessagesApi,
-                                          stcAuthEnrolled: StcAuthEnrolledAction,
+                                          @Named("any") stcAuthEnrolled: StcAuthEnrolledAction,
                                           getData: StcDataRetrievalAction,
                                           val controllerComponents: MessagesControllerComponents,
                                           view: BeforeYouStartView,

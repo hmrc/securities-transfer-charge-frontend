@@ -33,7 +33,7 @@ import scala.concurrent.ExecutionContext
 
 class SaveAndReturnController @Inject()(override val messagesApi: MessagesApi,
                                         val controllerComponents: MessagesControllerComponents,
-                                        stcAuthEnrolled: StcAuthEnrolledAction,
+                                        @Named("any") stcAuthEnrolled: StcAuthEnrolledAction,
                                         @Named("individuals") navigator: PersistentNavigator,
                                         auditService: AuditService)
                                        (implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport:

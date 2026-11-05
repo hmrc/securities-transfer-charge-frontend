@@ -34,7 +34,7 @@ import scala.concurrent.{ExecutionContext, Future}
 class WhatReliefAreYouApplyingForController @Inject()(
                                         override val messagesApi: MessagesApi,
                                         @Named("individuals") navigator: Navigator,
-                                        stcAuthEnrolled: StcAuthEnrolledAction,
+                                        @Named("individuals") stcAuthEnrolled: StcAuthEnrolledAction,
                                         getData: StcDataRetrievalAction,
                                         requireData: StcDataRequiredAction,
                                         formProvider: WhatReliefAreYouApplyingForFormProvider,

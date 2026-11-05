@@ -33,7 +33,7 @@ import scala.concurrent.{ExecutionContext, Future}
 
 class CompanyDetailsController @Inject()(
                                           override val messagesApi: MessagesApi,
-                                          stcAuthEnrolled: StcAuthEnrolledAction,
+                                          @Named("agents") stcAuthEnrolled: StcAuthEnrolledAction,
                                           getData: StcDataRetrievalAction,
                                           requireData: StcDataRequiredAction,
                                           formProvider: CompanyDetailsFormProvider,

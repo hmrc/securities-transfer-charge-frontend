@@ -126,7 +126,7 @@ class StcIndividualAuthEnrolledActionImplSpec extends SpecBase {
         )
 
       val application =
-        applicationBuilder(affinityGroup = individualAffinity).build()
+        applicationBuilder().build()
 
       running(application) {
 
