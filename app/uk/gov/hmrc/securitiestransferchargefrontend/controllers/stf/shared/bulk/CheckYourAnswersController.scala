@@ -36,7 +36,7 @@ class CheckYourAnswersController @Inject()(
                                             view: CheckYourAnswersView
                                           ) extends FrontendBaseController with I18nSupport {
 
-  def onPageLoad(): Action[AnyContent] =  (stcAuthEnrolled andThen getData andThen requireData) {
+  def onPageLoad(): Action[AnyContent] = (stcAuthEnrolled andThen getData andThen requireData) {
     implicit request =>
 
       val list = SummaryListViewModel(

@@ -22,6 +22,7 @@
 @import uk.gov.hmrc.govukfrontend.views.html.components._
 @import uk.gov.hmrc.hmrcfrontend.views.viewmodels.hmrcstandardpage._
 @import uk.gov.hmrc.securitiestransferchargefrontend.controllers.auth.{routes => authRoutes}
+@import uk.gov.hmrc.securitiestransferchargefrontend.controllers.dashboard.routes.DashboardController
 @import uk.gov.hmrc.hmrcfrontend.views.html.helpers.{HmrcAccessibleAutocompleteCss, HmrcAccessibleAutocompleteJavascript}
 
 
@@ -82,7 +83,7 @@
         mainContentLayout = mainContentLayout
     ),
     serviceURLs = ServiceURLs(
-        serviceUrl = Some(IndexController.onPageLoad().url),
+        serviceUrl = Some(DashboardController.onPageLoad().url),
         signOutUrl = if(showSignOut) Some(authRoutes.AuthController.signOut().url) else None
     ),
     serviceName = Some(""),

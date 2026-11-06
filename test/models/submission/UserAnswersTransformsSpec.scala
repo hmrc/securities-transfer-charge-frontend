@@ -87,7 +87,7 @@ class UserAnswersTransformsSpec extends SpecBase {
       val result =
         UserAnswersTransforms.toStfRequest(baseStfTransaction, organisationAffinityData)
 
-      result.mainBuyerDetails.uniqueId mustBe Some(organisationAffinityData.utr)
+      result.mainBuyerDetails.uniqueId mustBe organisationAffinityData.utr
       result.agentDetails mustBe None
     }
 

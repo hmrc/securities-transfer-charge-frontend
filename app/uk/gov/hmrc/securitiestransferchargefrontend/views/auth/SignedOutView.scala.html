@@ -14,7 +14,7 @@
  * limitations under the License.
  *@
 
-@import uk.gov.hmrc.securitiestransferchargefrontend.controllers.routes.IndexController
+@import uk.gov.hmrc.securitiestransferchargefrontend.controllers.dashboard.routes.DashboardController
 @import uk.gov.hmrc.securitiestransferchargefrontend.views.html.templates
 
 @this(
@@ -38,7 +38,7 @@
     <p class="govuk-body">
         @govukButton(
             ButtonViewModel(messages("site.signIn"))
-                .asLink(IndexController.onPageLoad().url)
+                .asLink(DashboardController.onPageLoad().url)
         )
     </p>
 }

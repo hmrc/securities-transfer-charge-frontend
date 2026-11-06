@@ -72,7 +72,7 @@ final class AnyStcAuthEnrolledAction @Inject()(
                                                   parser: BodyParsers.Default
                                                 )(implicit executionContext: ExecutionContext) extends StcAuthEnrolledActionImpl(authConnector, appConfig, retrievalFilter, redirects, parser):
   val expectedAffinityGroup: Option[AffinityGroup] = None
-  
+
 @Singleton
 protected abstract class StcAuthEnrolledActionImpl @Inject()(
                                                  override val authConnector: AuthConnector,
@@ -138,15 +138,18 @@ protected abstract class StcAuthEnrolledActionImpl @Inject()(
             maybeDoB, maybeEmail, Some(agentInfo), maybeGroupId, maybeCredentialRole.map(_.toString), maybeMdtpInfo, maybeItmpName,
             maybeItmpDoB, maybeItmpAddress, maybeAffinityGroup.map(_.toString), maybeCredentialStrength, Some(loginTimes)
         )
+
         val maybeRequest =
           for {
-            groupIdentifier <- retrievalFilter.isPresent(maybeGroupIdentifier)
-            internalId      <- retrievalFilter.isPresent(maybeInternalId)
+            groupIdentifier  <- retrievalFilter.isPresent(maybeGroupIdentifier)
+            internalId       <- retrievalFilter.isPresent(maybeInternalId)
             affinityGroup   <- retrievalFilter.checkCorrectAffinity(expectedAffinityGroup)(maybeAffinityGroup)
-            _               <- retrievalFilter.enrolledForStc(enrolments)
-            subscriptionId  <- retrievalFilter.subscriptionIdPresent(enrolments)
-            rawCredentialId <- retrievalFilter.providerIdPresentFilter(maybeCredentials)
-            credentialId    =  CredentialId(rawCredentialId)
+            _                <- retrievalFilter.enrolledForStc(enrolments)
+            subscriptionId   <- retrievalFilter.subscriptionIdPresent(enrolments)
+            rawCredentialId  <- retrievalFilter.providerIdPresentFilter(maybeCredentials)
+            maybeArn          = getArn(affinityGroup)(enrolments)
+            uniqueIdentifier <- retrievalFilter.getUniqueIdentifier(affinityGroup)(identityData.nino, identityData.saUtr, maybeArn)
+            credentialId     =  CredentialId(rawCredentialId)
           } yield StcAuthorisedRequest(
             request,
             internalId,
@@ -155,7 +158,7 @@ protected abstract class StcAuthEnrolledActionImpl @Inject()(
             subscriptionId,
             credentialId,
             identityData,
-            getArn(affinityGroup)(enrolments)
+            uniqueIdentifier
           )
 
         maybeRequest.fold(identity, block)

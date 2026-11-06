@@ -191,10 +191,6 @@ class SubmissionDetailsViewSpec extends ViewBaseSpec {
         doc.select(".govuk-summary-list__row").size() mustBe 4 + expected.penaltyRows.size
       }
 
-      "have the no-bottom-border class on the total tax due row" in {
-        doc.select(".govuk-summary-list__row.no-bottom-border").size() mustBe 1
-      }
-
       "have a pay for submission button" in {
         val buttons = doc.select(".govuk-button")
         buttons.last().text() mustBe expected.payForSubmission
@@ -313,5 +309,10 @@ class SubmissionDetailsViewSpec extends ViewBaseSpec {
 
       transfersRow.hasClass("no-bottom-border") mustBe true
     }
+  }
+
+  "have the no-bottom-border class on the total tax due row when no penalty or interest rows are present" in {
+    val doc = view(singleSubmissionReadyToPay)
+    doc.select(".govuk-summary-list__row.no-bottom-border").size() mustBe 1
   }
 }

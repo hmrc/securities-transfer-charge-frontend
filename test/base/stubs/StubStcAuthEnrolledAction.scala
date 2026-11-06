@@ -16,11 +16,13 @@
 
 package base.stubs
 
+import base.Fixtures
 import base.Fixtures.*
 import play.api.mvc.*
 import uk.gov.hmrc.auth.core.AffinityGroup
+import uk.gov.hmrc.auth.core.AffinityGroup.*
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.actions.StcAuthEnrolledAction
-import uk.gov.hmrc.securitiestransferchargefrontend.controllers.actions.requests.StcAuthorisedRequest
+import uk.gov.hmrc.securitiestransferchargefrontend.controllers.actions.requests.{AgentUniqueIdentifier, IndividualUniqueIdentifier, OrganisationUniqueIdentifier, StcAuthorisedRequest, UniqueIdentifier}
 
 import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
@@ -31,6 +33,9 @@ abstract class StubStcAuthEnrolledAction @Inject() (
                                           ) extends StcAuthEnrolledAction {
 
   protected val affinityGroup: AffinityGroup
+
+  protected val uniqueIdentifier: UniqueIdentifier =
+    IndividualUniqueIdentifier(Fixtures.testNino)
 
   override val parser: BodyParser[AnyContent] =
     playBodyParsers.defaultBodyParser
@@ -51,7 +56,7 @@ abstract class StubStcAuthEnrolledAction @Inject() (
         testSubscriptionId,
         testCredentialId,
         testIdentityData,
-        None
+        uniqueIdentifier
       )
     )
 }
@@ -60,22 +65,31 @@ class IndividualStubStcAuthEnrolledAction @Inject() (playBodyParsers: PlayBodyPa
 
   protected val affinityGroup: AffinityGroup = AffinityGroup.Individual
   override val expectedAffinityGroup: Option[AffinityGroup] = Some(affinityGroup)
+  override val uniqueIdentifier: UniqueIdentifier = IndividualUniqueIdentifier(Fixtures.testNino)
 }
 
 class OrganisationStubStcAuthEnrolledAction @Inject() (playBodyParsers: PlayBodyParsers) extends StubStcAuthEnrolledAction(playBodyParsers) {
 
   protected val affinityGroup: AffinityGroup = AffinityGroup.Organisation
   override val expectedAffinityGroup: Option[AffinityGroup] = Some(affinityGroup)
+  override val uniqueIdentifier: UniqueIdentifier = OrganisationUniqueIdentifier(Some(Fixtures.testUtr))
 }
 
 class AgentStubStcAuthEnrolledAction @Inject() (playBodyParsers: PlayBodyParsers) extends StubStcAuthEnrolledAction(playBodyParsers) {
 
   protected val affinityGroup: AffinityGroup = AffinityGroup.Agent
   override val expectedAffinityGroup: Option[AffinityGroup] = Some(affinityGroup)
+  override val uniqueIdentifier: UniqueIdentifier = AgentUniqueIdentifier(Some(Fixtures.testArn))
+
 }
 
 class AnyStubStcAuthEnrolledAction @Inject() (playBodyParsers: PlayBodyParsers, affinity: AffinityGroup) extends StubStcAuthEnrolledAction(playBodyParsers) {
 
   protected val affinityGroup: AffinityGroup = affinity
   override val expectedAffinityGroup: Option[AffinityGroup] = Some(affinity)
+  override val uniqueIdentifier: UniqueIdentifier = affinityGroup match {
+    case Agent => AgentUniqueIdentifier(Some(Fixtures.testArn))
+    case Individual => IndividualUniqueIdentifier(Fixtures.testNino)
+    case Organisation => OrganisationUniqueIdentifier(Some(Fixtures.testUtr))
+  }
 }

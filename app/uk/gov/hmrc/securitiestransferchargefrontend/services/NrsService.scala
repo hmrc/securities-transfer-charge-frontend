@@ -21,8 +21,9 @@ import play.api.http.MimeTypes
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.securitiestransferchargefrontend.clients.registration.NrsClient
 import uk.gov.hmrc.securitiestransferchargefrontend.config.FrontendAppConfig
-import uk.gov.hmrc.securitiestransferchargefrontend.controllers.actions.requests.StcDataRequest
-import uk.gov.hmrc.securitiestransferchargefrontend.models.nrs.{IdentityData, NrsMetadata, NrsSingleSubmissionRequest}
+import uk.gov.hmrc.securitiestransferchargefrontend.controllers.actions.requests.*
+import uk.gov.hmrc.securitiestransferchargefrontend.domain.SubmissionId
+import uk.gov.hmrc.securitiestransferchargefrontend.models.nrs.{NrsMetadata, NrsSingleSubmissionRequest}
 import uk.gov.hmrc.securitiestransferchargefrontend.repositories.CyaHtmlData
 import uk.gov.hmrc.securitiestransferchargefrontend.utils.CommonHelpers.authToken
 
@@ -40,6 +41,11 @@ trait NrsService:
   )(implicit
     request    : StcDataRequest[?],
     hc         : HeaderCarrier): Future[Unit]
+
+  def bulkSubmissionNotableEvent(
+    submissionId: SubmissionId,
+    uploadRef   : String
+  )(implicit hc : HeaderCarrier): Future[Unit]
 
 class NrsServiceImpl @Inject()(
   nrsClient: NrsClient,
@@ -65,6 +71,12 @@ class NrsServiceImpl @Inject()(
     nrsClient.postSinglePayload(nrsRequest)
   }
 
+  override def bulkSubmissionNotableEvent(submissionId: SubmissionId, uploadRef: String)
+                                         (implicit hc: HeaderCarrier): Future[Unit] = {
+    // TODO: Implementation
+    Future.successful(())
+  }
+
   private[services] def createMetadata(
     checksum    : String,
     notableEvent: String,
@@ -81,32 +93,25 @@ class NrsServiceImpl @Inject()(
       identityData            = request.request.identityData,
       userAuthToken           = authToken(hc),
       headerData              = request.headers.toSimpleMap,
-      searchKeys              = searchKeys(request, request.request.identityData, utrn)
+      searchKeys              = searchKeys(request, utrn)
     )
   }
 
-  private val taxIdentifier: PartialFunction[IdentityData, (String, String)] = {
-    Function.unlift { (data: IdentityData) =>
-      data.nino.map(NrsSearchKeys.Nino -> _) orElse
-        data.saUtr.map(NrsSearchKeys.Utr -> _)
-    }
+  private val taxIdentifier: PartialFunction[UniqueIdentifier, (String, String)] = {
+    case AgentUniqueIdentifier(Some(arn))        => NrsSearchKeys.Arn -> arn
+    case OrganisationUniqueIdentifier(Some(utr)) => NrsSearchKeys.Utr -> utr
+    case IndividualUniqueIdentifier(nino)        => NrsSearchKeys.Nino -> nino
   }
 
-  private val agentTaxIdentifier: StcDataRequest[?] => Option[(String, String)] = req => {
-    req
-      .request
-      .maybeArn
-      .map(arn => NrsSearchKeys.Arn -> arn)
-  }
-
-  private[services] def searchKeys(request: StcDataRequest[?], identityData: IdentityData, utrn: String): Map[String, String] = {
+  private[services] def searchKeys(request: StcDataRequest[?], utrn: String): Map[String, String] = {
     val pairs = ListBuffer.empty[(String, String)]
     pairs.addOne(NrsSearchKeys.SubscriptionId -> request.request.subscriptionId.value)
     pairs.addOne(NrsSearchKeys.SubmissionId   -> request.userAnswers.submissionId.value)
     pairs.addOne(NrsSearchKeys.Utrn           -> utrn)
 
-    val taxId = taxIdentifier.lift(identityData).orElse(agentTaxIdentifier(request))
-    taxId.foreach(pair => pairs.addOne(pair))
+    taxIdentifier
+      .lift(request.request.uniqueIdentifier)
+      .foreach(pair => pairs.addOne(pair))
 
     pairs.toMap
   }

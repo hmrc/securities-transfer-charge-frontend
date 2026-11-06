@@ -17,10 +17,12 @@
 package uk.gov.hmrc.securitiestransferchargefrontend.controllers.actions.filters
 
 import play.api.mvc.Result
+import uk.gov.hmrc.auth.core.AffinityGroup.*
 import uk.gov.hmrc.auth.core.{AffinityGroup, Enrolments}
 import uk.gov.hmrc.auth.core.retrieve.{Credentials, ItmpName}
 import uk.gov.hmrc.securitiestransferchargefrontend.config.FrontendAppConfig
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.Redirects
+import uk.gov.hmrc.securitiestransferchargefrontend.controllers.actions.requests.{AgentUniqueIdentifier, IndividualUniqueIdentifier, OrganisationUniqueIdentifier, UniqueIdentifier}
 import uk.gov.hmrc.securitiestransferchargefrontend.domain.SubscriptionId
 
 import javax.inject.Inject
@@ -63,6 +65,13 @@ class RetrievalFilter @Inject()(
   val providerIdPresentFilter: RetrievalFilterFunction[Option[Credentials], String] = {
     case Some(Credentials(providerId, _)) => Right(providerId)
     case _ => Left(redirectToUnauthorisedF)
+  }
+
+  def getUniqueIdentifier(affinityGroup: AffinityGroup)(nino: Option[String], saUtr: Option[String], arn: Option[String]): RetrievalFilterResult[UniqueIdentifier] = affinityGroup match {
+    case Agent => Right(AgentUniqueIdentifier(arn))
+    case Organisation => Right(OrganisationUniqueIdentifier(saUtr))
+    case Individual =>
+      nino.fold(Left(redirectToUnauthorisedF))(nino => Right(IndividualUniqueIdentifier(nino)))
   }
 
   def checkCorrectAffinity(requiredAffinity: Option[AffinityGroup]): RetrievalFilterFunction[Option[AffinityGroup], AffinityGroup] = {

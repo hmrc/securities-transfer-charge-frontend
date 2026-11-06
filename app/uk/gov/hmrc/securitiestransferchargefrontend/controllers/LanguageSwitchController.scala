@@ -21,6 +21,7 @@ import play.api.i18n.Lang
 import play.api.mvc.*
 import uk.gov.hmrc.play.language.{LanguageController, LanguageUtils}
 import uk.gov.hmrc.securitiestransferchargefrontend.config.FrontendAppConfig
+import uk.gov.hmrc.securitiestransferchargefrontend.controllers.routes
 
 class LanguageSwitchController @Inject()(
                                           appConfig: FrontendAppConfig,
@@ -28,7 +29,7 @@ class LanguageSwitchController @Inject()(
                                           cc: ControllerComponents
                                         ) extends LanguageController(languageUtils, cc) {
 
-  override def fallbackURL: String = routes.IndexController.onPageLoad().url
+  override def fallbackURL: String = routes.JourneyRecoveryController.onPageLoad().url
 
   override def languageMap: Map[String, Lang] = appConfig.languageMap
 }
