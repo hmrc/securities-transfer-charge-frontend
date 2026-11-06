@@ -28,7 +28,7 @@ import views.ViewBaseSpec
 
 class CheckYourAnswersViewSpec extends ViewBaseSpec {
 
-  override def fakeApplication(): Application = applicationBuilder(affinityGroup = agentAffinity).build()
+  override def fakeApplication(): Application = applicationBuilder().build()
 
   private val viewInstance = app.injector.instanceOf[CheckYourAnswersView]
   private val testBackLinkRoute: Call = Call("GET", "/back-link")

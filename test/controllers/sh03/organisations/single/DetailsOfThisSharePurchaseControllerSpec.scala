@@ -53,7 +53,7 @@ class DetailsOfThisSharePurchaseControllerSpec extends SpecBase with MockitoSuga
     "must return OK and the correct view for a GET" in {
       val updatedAnswers = emptyUserAnswers.set(ConnectedPersonsPage,true).success.value
 
-      val application = applicationBuilder(userAnswers = Some(updatedAnswers), affinityGroup = orgAffinity)
+      val application = applicationBuilder(userAnswers = Some(updatedAnswers))
         .overrides(bind[Navigator].qualifiedWith("orgSh03").toInstance(getNavigator))
         .build()
 
@@ -73,7 +73,7 @@ class DetailsOfThisSharePurchaseControllerSpec extends SpecBase with MockitoSuga
       val answers = userAnswers.set(DetailsOfThisSharePurchasePage, detailsOfThisSharePurchase).success.value
       val updatedAnswers = answers.set(ConnectedPersonsPage,true).success.value
 
-      val application = applicationBuilder(userAnswers = Some(updatedAnswers), affinityGroup = orgAffinity)
+      val application = applicationBuilder(userAnswers = Some(updatedAnswers))
         .overrides(bind[Navigator].qualifiedWith("orgSh03").toInstance(getNavigator))
         .build()
 
@@ -93,7 +93,7 @@ class DetailsOfThisSharePurchaseControllerSpec extends SpecBase with MockitoSuga
       val updatedAnswers = emptyUserAnswers.set(ConnectedPersonsPage, true).success.value
 
       val application =
-        applicationBuilder(userAnswers = Some(updatedAnswers), affinityGroup = orgAffinity)
+        applicationBuilder(userAnswers = Some(updatedAnswers))
           .overrides(bind[Navigator].qualifiedWith("orgSh03").toInstance(getNavigator))
           .build()
 
@@ -119,7 +119,7 @@ class DetailsOfThisSharePurchaseControllerSpec extends SpecBase with MockitoSuga
 
       val updatedAnswers = emptyUserAnswers.set(ConnectedPersonsPage, true).success.value
 
-      val application = applicationBuilder(userAnswers = Some(updatedAnswers), affinityGroup = orgAffinity)
+      val application = applicationBuilder(userAnswers = Some(updatedAnswers))
         .overrides(bind[Navigator].qualifiedWith("orgSh03").toInstance(getNavigator))
         .build()
 
@@ -140,7 +140,7 @@ class DetailsOfThisSharePurchaseControllerSpec extends SpecBase with MockitoSuga
     }
 
     "must redirect to Journey Recovery for a GET if no existing data is found" in {
-      val application = applicationBuilder(userAnswers = None, affinityGroup = orgAffinity).build()
+      val application = applicationBuilder(userAnswers = None).build()
 
       running(application) {
         val request = FakeRequest(GET, detailsOfThisSharePurchaseRoute)
@@ -153,7 +153,7 @@ class DetailsOfThisSharePurchaseControllerSpec extends SpecBase with MockitoSuga
     }
 
     "must redirect to Journey Recovery for a POST if no existing data is found" in {
-      val application = applicationBuilder(userAnswers = None, affinityGroup = orgAffinity).build()
+      val application = applicationBuilder(userAnswers = None).build()
 
       running(application) {
         val request =

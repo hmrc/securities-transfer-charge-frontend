@@ -17,7 +17,7 @@
 package controllers.stf.shared
 
 import base.Fixtures.{testCredentialId, testInternalId, testSubmissionId, testSubscriptionId}
-import base.stubs.{AgentStubStcAuthEnrolledAction, OrganisationStubStcAuthEnrolledAction, StubStcAuthEnrolledAction}
+import base.stubs.*
 import base.{AuditTestSupport, SpecBase}
 import org.mockito.ArgumentMatchers.{any, eq as eqTo}
 import org.mockito.Mockito.{doReturn, reset, when}
@@ -63,7 +63,7 @@ class SaveAndReturnControllerSpec extends SpecBase with MockitoSugar with ScalaF
     val authAction = affinityGroup match {
       case AffinityGroup.Organisation => OrganisationStubStcAuthEnrolledAction(mockBodyParsers)
       case AffinityGroup.Agent => AgentStubStcAuthEnrolledAction(mockBodyParsers)
-      case _ => StubStcAuthEnrolledAction(mockBodyParsers)
+      case _ => IndividualStubStcAuthEnrolledAction(mockBodyParsers)
     }
 
     new SaveAndReturnController(mockMessagesApi, mockControllerComponents, authAction, mockNavigator, mockAuditService)(ec)

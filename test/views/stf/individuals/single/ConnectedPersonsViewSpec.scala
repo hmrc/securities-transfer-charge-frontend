@@ -28,7 +28,7 @@ import views.ViewBaseSpec
 class ConnectedPersonsViewSpec extends ViewBaseSpec {
 
   override def fakeApplication(): Application =
-    applicationBuilder(affinityGroup = individualAffinity).build()
+    applicationBuilder().build()
 
   private val viewInstance = app.injector.instanceOf[ConnectedPersonsView]
   private val formProvider = new ConnectedPersonsFormProvider()

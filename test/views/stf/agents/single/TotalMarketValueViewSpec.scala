@@ -29,7 +29,7 @@ import views.ViewBaseSpec
 
 class TotalMarketValueViewSpec extends ViewBaseSpec {
 
-  override def fakeApplication(): Application = applicationBuilder(affinityGroup = agentAffinity).build()
+  override def fakeApplication(): Application = applicationBuilder().build()
 
   private val viewInstance = app.injector.instanceOf[TotalMarketValueView]
 

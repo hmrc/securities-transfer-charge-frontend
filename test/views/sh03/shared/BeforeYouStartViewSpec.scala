@@ -27,7 +27,7 @@ import views.ViewBaseSpec
 class BeforeYouStartViewSpec extends ViewBaseSpec {
 
   override def fakeApplication(): Application =
-    applicationBuilder(affinityGroup = agentAffinity).build()
+    applicationBuilder().build()
 
   private val viewInstance = app.injector.instanceOf[BeforeYouStartView]
 

@@ -28,7 +28,7 @@ import views.ViewBaseSpec
 class RoleAtPurchasingCompanyViewSpec extends ViewBaseSpec {
 
   override def fakeApplication(): Application =
-    applicationBuilder(affinityGroup = agentAffinity).build()
+    applicationBuilder().build()
 
   private val messageKeyPrefix = "agent.sh03.roleAtPurchasingCompany"
 

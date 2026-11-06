@@ -28,7 +28,7 @@ import scala.language.postfixOps
 
 class AgentReferenceViewSpec extends ViewBaseSpec {
 
-  override def fakeApplication(): Application = applicationBuilder(affinityGroup = agentAffinity).build()
+  override def fakeApplication(): Application = applicationBuilder().build()
   
   private val viewInstance         = app.injector.instanceOf[AgentReferenceView]
   private val formProvider         = new AgentReferenceFormProvider()

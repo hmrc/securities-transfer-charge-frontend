@@ -36,7 +36,7 @@ import scala.concurrent.Future
 class HowToNotifyAboutShareBuybackController @Inject()(
                                                         override val messagesApi: MessagesApi,
                                                         @Named("orgSh03") navigator: Navigator,
-                                                        stcAuthEnrolled: StcAuthEnrolledAction,
+                                                        @Named("organisations") stcAuthEnrolled: StcAuthEnrolledAction,
                                                         getData: StcDataRetrievalAction,
                                                         formProvider: HowToNotifyAboutShareBuybackFormProvider,
                                                         val controllerComponents: MessagesControllerComponents,

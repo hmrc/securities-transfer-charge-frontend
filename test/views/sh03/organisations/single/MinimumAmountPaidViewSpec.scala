@@ -28,7 +28,7 @@ import views.ViewBaseSpec
 class MinimumAmountPaidViewSpec extends ViewBaseSpec {
 
   override def fakeApplication(): Application =
-    applicationBuilder(affinityGroup = orgAffinity).build()
+    applicationBuilder().build()
 
   private val viewInstance = app.injector.instanceOf[MinimumAmountPaidView]
   private val formProvider = new MinimumAmountPaidFormProvider()

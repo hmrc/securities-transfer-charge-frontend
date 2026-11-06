@@ -25,7 +25,7 @@ import views.ViewBaseSpec
 
 class CannotSubmitFormErrorViewSpec extends ViewBaseSpec {
 
-  override def fakeApplication(): Application = applicationBuilder(affinityGroup = agentAffinity).build()
+  override def fakeApplication(): Application = applicationBuilder().build()
 
   private val viewInstance         = app.injector.instanceOf[CannotSubmitFormErrorView]
 

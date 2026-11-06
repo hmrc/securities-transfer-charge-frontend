@@ -28,7 +28,7 @@ import views.ViewBaseSpec
 class PurchasingSharesViewSpec extends ViewBaseSpec {
 
   override def fakeApplication(): Application =
-    applicationBuilder(affinityGroup = agentAffinity).build()
+    applicationBuilder().build()
 
   private val viewInstance = app.injector.instanceOf[PurchasingSharesView]
   private val formProvider = new PurchasingSharesFormProvider()

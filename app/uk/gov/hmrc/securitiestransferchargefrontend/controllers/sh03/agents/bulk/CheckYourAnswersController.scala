@@ -37,7 +37,7 @@ import scala.concurrent.ExecutionContext
 class CheckYourAnswersController @Inject()(
                                             override val messagesApi: MessagesApi,
                                             @Named("agentsSh03") navigator: Navigator,
-                                            stcAuthEnrolled: StcAuthEnrolledAction,
+                                            @Named("agents") stcAuthEnrolled: StcAuthEnrolledAction,
                                             getData: StcDataRetrievalAction,
                                             requireData: StcDataRequiredAction,
                                             val controllerComponents: MessagesControllerComponents,

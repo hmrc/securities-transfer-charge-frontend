@@ -45,7 +45,7 @@ class RecentSubmissionsControllerSpec extends SpecBase with MockitoSugar {
       when(mockDashboardService.getRecent(any(), any(), any())(any[HeaderCarrier]))
         .thenReturn(Future.successful(Seq.empty))
 
-      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers), affinityGroup = individualAffinity)
+      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers))
         .overrides(inject.bind[DashboardService].toInstance(mockDashboardService))
         .build()
 
@@ -70,7 +70,7 @@ class RecentSubmissionsControllerSpec extends SpecBase with MockitoSugar {
       when(mockDashboardService.getRecent(any(), any(), any())(any[HeaderCarrier]))
         .thenReturn(Future.successful(recentSummaries))
 
-      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers), affinityGroup = individualAffinity)
+      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers))
         .overrides(inject.bind[DashboardService].toInstance(mockDashboardService))
         .build()
 

@@ -53,7 +53,7 @@ object Fixtures {
   val testAuditType = "StockTransferFormStatus"
   val testSubmissionId: SubmissionId = SubmissionId("STC-424242424")
   val testUserAnswers: UserAnswers = UserAnswers.empty(testInternalId)(testGroupIdentifier)(testSubmissionId)(STF)
-  val affinityGroupIndividual: AffinityGroup.Individual.type = AffinityGroup.Individual
+  val affinityGroupIndividual: AffinityGroup = AffinityGroup.Individual
   val testNino = "NX762551B"
   val testUtr = "123-456-789"
   val testArn = "ARN890901"

@@ -27,7 +27,7 @@ import views.ViewBaseSpec
 
 class ChargingPointViewSpec extends ViewBaseSpec {
 
-  override def fakeApplication(): Application = applicationBuilder(affinityGroup = agentAffinity).build()
+  override def fakeApplication(): Application = applicationBuilder().build()
 
   private val viewInstance = app.injector.instanceOf[ChargingPointView]
   private val formProvider = new ChargingPointFormProvider()

@@ -25,13 +25,12 @@ import uk.gov.hmrc.securitiestransferchargefrontend.viewmodels.stf.fileupload.Up
 import uk.gov.hmrc.securitiestransferchargefrontend.views.html.fileUpload.UploadedFileErrorView
 import uk.gov.hmrc.securitiestransferchargefrontend.models.JourneyType
 
-
-import javax.inject.Inject
+import javax.inject.{Inject, Named}
 import scala.concurrent.ExecutionContext
 
 class UploadedFileErrorController @Inject()(
                                              override val messagesApi: MessagesApi,
-                                             stcAuthEnrolled: StcAuthEnrolledAction,
+                                             @Named("any") stcAuthEnrolled: StcAuthEnrolledAction,
                                              val controllerComponents: MessagesControllerComponents,
                                              validationErrorRepository: ValidationErrorRepository,
                                              

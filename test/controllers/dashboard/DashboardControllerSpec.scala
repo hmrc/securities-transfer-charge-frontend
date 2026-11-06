@@ -54,7 +54,7 @@ class DashboardControllerSpec extends SpecBase with MockitoSugar {
       mockCounts()
 
       val application =
-        applicationBuilder(userAnswers = Some(emptyUserAnswers), affinityGroup = AffinityGroup.Individual)
+        applicationBuilder(userAnswers = Some(emptyUserAnswers))
           .overrides(inject.bind[DashboardService].toInstance(mockDashboardService))
           .build()
 

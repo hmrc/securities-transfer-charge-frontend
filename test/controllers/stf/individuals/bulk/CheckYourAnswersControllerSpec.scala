@@ -76,7 +76,7 @@ class CheckYourAnswersControllerSpec extends SpecBase with MockitoSugar with Fil
       when(parsedStcRowsRepository.findDocumentByReference(reference))
         .thenReturn(Future.successful(Some(parsedStcRowsDocument)))
 
-      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers), affinityGroup = individualAffinity)
+      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers))
           .overrides(
             bind[Navigator].qualifiedWith("individuals").toInstance(getNavigator),
             bind[CheckYourAnswersService].toInstance(checkYourAnswersService),
@@ -103,7 +103,7 @@ class CheckYourAnswersControllerSpec extends SpecBase with MockitoSugar with Fil
       when(parsedStcRowsRepository.findDocumentByReference(reference))
         .thenReturn(Future.successful(None))
 
-      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers), affinityGroup = individualAffinity)
+      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers))
           .overrides(
             bind[Navigator].qualifiedWith("individuals").toInstance(getNavigator),
             bind[ParsedStcRowsRepository].toInstance(parsedStcRowsRepository)
@@ -126,7 +126,7 @@ class CheckYourAnswersControllerSpec extends SpecBase with MockitoSugar with Fil
 
       when(mockSubmissionIdClient.nextSubmissionId()(any())).thenReturn(Future.successful(submissionId))
       val application =
-        applicationBuilder(userAnswers = Some(emptyUserAnswers), affinityGroup = individualAffinity)
+        applicationBuilder(userAnswers = Some(emptyUserAnswers))
           .overrides(
             bind[Navigator].qualifiedWith("individuals").toInstance(getNavigator),
             bind[SubmissionIdClient].toInstance(mockSubmissionIdClient)

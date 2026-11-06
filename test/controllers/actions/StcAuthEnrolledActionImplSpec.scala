@@ -23,14 +23,15 @@ import play.api.mvc.*
 import play.api.test.Helpers.*
 import play.api.test.{FakeRequest, Helpers}
 import uk.gov.hmrc.auth.core.*
+import uk.gov.hmrc.auth.core.AffinityGroup.{Agent, Individual, Organisation}
 import uk.gov.hmrc.auth.core.retrieve.*
 import uk.gov.hmrc.securitiestransferchargefrontend.config.FrontendAppConfig
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.actions.filters.RetrievalFilter
-import uk.gov.hmrc.securitiestransferchargefrontend.controllers.actions.{StcAuthEnrolledAction, StcAuthEnrolledActionImpl}
+import uk.gov.hmrc.securitiestransferchargefrontend.controllers.actions.{OrgStcAuthEnrolledAction, *}
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.{Redirects, routes}
 
 import java.time.{Instant, LocalDate}
-import scala.concurrent.Future
+import scala.concurrent.{ExecutionContext, Future}
 
 class StcAuthEnrolledActionImplSpec extends SpecBase {
 
@@ -56,12 +57,13 @@ class StcAuthEnrolledActionImplSpec extends SpecBase {
   val itmpAddress: Option[ItmpAddress] = None
   val credentialStrength: Option[String] = None
   val loginTimes = LoginTimes(Instant.now(), None)
+  val affinityGroup: AffinityGroup = AffinityGroup.Organisation
 
   def buildRetrieval(
                       maybeInternalId: Option[String] = Some(Fixtures.testInternalId.value),
                       maybeGroupIdentifier: Option[String] = Some(Fixtures.testGroupIdentifier.value),
                       enrolments: Enrolments = Fixtures.enrolledForStc,
-                      maybeAffinityGroup: Option[AffinityGroup] = Some(AffinityGroup.Organisation),
+                      maybeAffinityGroup: Option[AffinityGroup] = Some(affinityGroup),
                       maybeCredentials: Option[Credentials] = Some(Credentials(Fixtures.testCredentialId.value, "providerType"))
                     ): RetrievalType =
 
@@ -105,9 +107,18 @@ class StcAuthEnrolledActionImplSpec extends SpecBase {
         maybeGroupIdentifier),
       enrolments)
 
+  type StcAuthEnrolledActionCtor = (
+    AuthConnector,
+    FrontendAppConfig,
+    RetrievalFilter,
+    Redirects,
+    BodyParsers.Default
+  ) => ExecutionContext => StcAuthEnrolledAction
+
   def testSetup(
                  application: Application,
-                 retrievals: RetrievalType
+                 retrievals: RetrievalType,
+                 affinityGroupForAction: Option[AffinityGroup] = Some(AffinityGroup.Organisation)
                )(
                  authConnector: AuthConnector =
                  new FakeAuthConnectorSuccess(retrievals)
@@ -118,12 +129,40 @@ class StcAuthEnrolledActionImplSpec extends SpecBase {
     val redirects = application.injector.instanceOf[Redirects]
     val retrievalFilter = application.injector.instanceOf[RetrievalFilter]
 
-    new StcAuthEnrolledActionImpl(
-      authConnector,
-      appConfig,
-      retrievalFilter,
-      redirects,
-      bodyParsers
+    affinityGroupForAction.map {
+      case Organisation =>
+        new OrgStcAuthEnrolledAction (
+          authConnector,
+          appConfig,
+          retrievalFilter,
+          redirects,
+          bodyParsers
+        )
+      case Individual =>
+        new IndividualStcAuthEnrolledAction (
+          authConnector,
+          appConfig,
+          retrievalFilter,
+          redirects,
+          bodyParsers
+        )
+
+      case Agent =>
+        new AgentStcAuthEnrolledAction (
+          authConnector,
+          appConfig,
+          retrievalFilter,
+          redirects,
+          bodyParsers
+        )
+    }.getOrElse(
+      new AnyStcAuthEnrolledAction(
+        authConnector,
+        appConfig,
+        retrievalFilter,
+        redirects,
+        bodyParsers
+      )
     )
   }
 
@@ -203,6 +242,40 @@ class StcAuthEnrolledActionImplSpec extends SpecBase {
         status(result) mustBe SEE_OTHER
         redirectLocation(result).value mustBe
           routes.UnauthorisedController.onPageLoad().url
+      }
+    }
+
+    "must redirect when affinity does not match" in {
+
+      val application = applicationBuilder().build()
+
+      running(application) {
+
+        // Use Individual affinity to create the error.
+        val action =
+          testSetup(application, buildRetrieval(maybeAffinityGroup = Some(Organisation)), affinityGroupForAction = Some(Individual))()
+
+        val result =
+          action.invokeBlock(FakeRequest(), _ => Future.successful(Results.Ok))
+
+        status(result) mustBe SEE_OTHER
+        // TODO: STOSB-2127 - check this redirects to the KO page.
+      }
+    }
+
+    "must not redirect when affinity is not checked" in {
+
+      val application = applicationBuilder().build()
+
+      running(application) {
+
+        val action =
+          testSetup(application, buildRetrieval(maybeAffinityGroup = Some(Organisation)), affinityGroupForAction = None)()
+
+        val result =
+          action.invokeBlock(FakeRequest(), _ => Future.successful(Results.Ok))
+
+        status(result) mustBe OK
       }
     }
 

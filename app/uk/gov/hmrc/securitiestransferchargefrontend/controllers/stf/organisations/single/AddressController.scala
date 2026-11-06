@@ -35,7 +35,7 @@ import scala.concurrent.{ExecutionContext, Future}
 
 class AddressController @Inject()(val controllerComponents: MessagesControllerComponents,
                                   alf: AlfAddressConnector,
-                                  auth: StcAuthEnrolledAction,
+                                  @Named("organisations") auth: StcAuthEnrolledAction,
                                   getData: StcDataRetrievalAction, 
                                   @Named("organisations") val navigator: Navigator,
                                   config: FrontendAppConfig,

@@ -48,7 +48,7 @@ class CannotSubmitFormErrorControllerSpec extends SpecBase {
     }
     "must redirect to Journey Recovery for a GET if no existing data is found" in {
 
-      val application = applicationBuilder(userAnswers = None, affinityGroup = orgAffinity)
+      val application = applicationBuilder(userAnswers = None)
         .overrides(bind[Navigator].qualifiedWith("orgSh03").toInstance(getNavigator))
         .build()
 

@@ -33,7 +33,7 @@ import scala.concurrent.{ExecutionContext, Future}
 class ChargingPointController @Inject()(
                                         override val messagesApi: MessagesApi,
                                         @Named("organisations") navigator: Navigator,
-                                        stcAuthEnrolled: StcAuthEnrolledAction,
+                                        @Named("organisations") stcAuthEnrolled: StcAuthEnrolledAction,
                                         getData: StcDataRetrievalAction,
                                         requireData: StcDataRequiredAction,
                                         formProvider: ChargingPointFormProvider,
@@ -44,7 +44,8 @@ class ChargingPointController @Inject()(
   lazy val backLinkCall: Mode => UserAnswers => Call =
     mode => userAnswers => navigator.previousPage(ChargingPointPage, mode, userAnswers)
   
-  def onPageLoad(mode: Mode): Action[AnyContent] = (stcAuthEnrolled andThen getData andThen requireData).async {
+  def onPageLoad(mode: Mode): Action[AnyContent] = 
+    (stcAuthEnrolled andThen getData andThen requireData).async {
     implicit request =>
 
       val form = formProvider()

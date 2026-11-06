@@ -28,7 +28,7 @@ import views.ViewBaseSpec
 class TaxRateViewSpec extends ViewBaseSpec {
 
   override def fakeApplication(): Application =
-    applicationBuilder(affinityGroup = individualAffinity).build()
+    applicationBuilder().build()
 
   private val viewInstance = app.injector.instanceOf[TaxRateView]
   private val formProvider = new TaxRateFormProvider()
