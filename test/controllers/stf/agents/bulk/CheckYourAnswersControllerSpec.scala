@@ -19,31 +19,42 @@ package controllers.stf.agents.bulk
 import base.SpecBase
 import base.stubs.StubPersistentNavigator
 import com.google.inject.name.Names
-import org.mockito.ArgumentMatchers.anyString
+import org.mockito.ArgumentCaptor
+import org.mockito.ArgumentMatchers.{any, anyBoolean, anyString, eq => eqTo}
+import org.mockito.Mockito.{never, reset, verify, when}
+import org.scalatest.BeforeAndAfterEach
 import org.scalatestplus.mockito.MockitoSugar.mock
-import org.mockito.Mockito.when
 import play.api.inject.bind
 import play.api.test.FakeRequest
 import play.api.test.Helpers.*
+import uk.gov.hmrc.securitiestransferchargefrontend.controllers.actions.requests.StcDataRequest
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.agents.bulk.routes
+import uk.gov.hmrc.securitiestransferchargefrontend.models.{NormalMode, UserAnswers}
 import uk.gov.hmrc.securitiestransferchargefrontend.models.shared.AgentReference
 import uk.gov.hmrc.securitiestransferchargefrontend.models.stf.HowToNotifyAboutSecuritiesTransfer
-import uk.gov.hmrc.securitiestransferchargefrontend.models.stf.fileupload.{ParsedStcRow, ParsedStcRowsDocument, ParsedValue}
+import uk.gov.hmrc.securitiestransferchargefrontend.models.stf.fileupload.{ParsedStcRow, ParsedStcRowsDocument, ParsedValue, ValidatedStcRow}
+import uk.gov.hmrc.securitiestransferchargefrontend.models.submission.BulkConfirmationDetails
 import uk.gov.hmrc.securitiestransferchargefrontend.navigation.{Navigator, PersistentNavigator}
-import uk.gov.hmrc.securitiestransferchargefrontend.pages.stf.shared.{AgentReferencePage, HowToNotifyAboutSecuritiesTransferPage}
+import uk.gov.hmrc.securitiestransferchargefrontend.pages.BulkConfirmationDetailsPage
+import uk.gov.hmrc.securitiestransferchargefrontend.pages.stf.bulk.{BulkAgentReferencePage, BulkCheckYourAnswersPage}
+import uk.gov.hmrc.securitiestransferchargefrontend.pages.stf.shared.HowToNotifyAboutSecuritiesTransferPage
 import uk.gov.hmrc.securitiestransferchargefrontend.repositories.ParsedStcRowsRepository
+import uk.gov.hmrc.securitiestransferchargefrontend.services.TransactionSubmissionService
+import uk.gov.hmrc.securitiestransferchargefrontend.services.stf.agents.bulk.CheckYourAnswersService
 
 import java.time.{Instant, LocalDate}
 import scala.concurrent.Future
 
-class CheckYourAnswersControllerSpec extends SpecBase {
+class CheckYourAnswersControllerSpec extends SpecBase with BeforeAndAfterEach {
 
-  private def completeUserAnswers = {
+  private def answersWithoutAgentRef: UserAnswers =
     emptyUserAnswers
-      .set(HowToNotifyAboutSecuritiesTransferPage,HowToNotifyAboutSecuritiesTransfer.MoreThanOneAtATime).success.value
-      .set(AgentReferencePage,AgentReference(Some("Reference1"))).success.value
+      .set(HowToNotifyAboutSecuritiesTransferPage, HowToNotifyAboutSecuritiesTransfer.MoreThanOneAtATime).success.value
       .setFileUploadReference("testReference")
-  }
+
+  private def completeUserAnswers: UserAnswers =
+    answersWithoutAgentRef
+      .set(BulkAgentReferencePage, AgentReference(Some("Reference1"))).success.value
 
   private val validRow: ParsedStcRow =
     ParsedStcRow(
@@ -82,85 +93,204 @@ class CheckYourAnswersControllerSpec extends SpecBase {
       purchaseForCancellation = None
     )
 
-  private val mockRepository = mock[ParsedStcRowsRepository]
   private val rows: Seq[ParsedStcRow] = Seq(validRow)
-
   private val someTestDoc: ParsedStcRowsDocument = ParsedStcRowsDocument(_id = "id", rows = rows, createdAt = Instant.now, fileName = "testFile")
 
+  private val expectedRows: Seq[ValidatedStcRow] = someTestDoc.rows.map(ValidatedStcRow.withNoErrors)
+  private val testPaymentDueBy: LocalDate = LocalDate.of(2026, 3, 22)
+  private val testTaxDue: BigDecimal = BigDecimal(75.00)
 
-  "Check Your Answers Controller" - {
+  private val mockRepository = mock[ParsedStcRowsRepository]
+  private val mockCyaService = mock[CheckYourAnswersService]
+  private val mockTransactionSubmissionService = mock[TransactionSubmissionService]
+  private val mockNavigator = mock[Navigator]
 
-    "must return OK and the correct view for a GET" in {
-      val stubNavigator = new StubPersistentNavigator(testNextPage, completeUserAnswers, "stf", "")
-      when(mockRepository.findDocumentByReference("testReference")).thenReturn(Future.successful(Some(someTestDoc)))
+  private val withRefStubNavigator = new StubPersistentNavigator(testNextPage, completeUserAnswers, "stf", "")
+  private val withoutRefStubNavigator = new StubPersistentNavigator(testNextPage, answersWithoutAgentRef, "stf", "")
 
-      val application = applicationBuilder(userAnswers = Some(completeUserAnswers))
-        .overrides(
-          bind[Navigator].qualifiedWith(Names.named("agents")).toInstance(stubNavigator),
-          bind[PersistentNavigator].qualifiedWith(Names.named("agents")).toInstance(stubNavigator),
-          bind[ParsedStcRowsRepository].toInstance(mockRepository)
-        ).build()
+  override def beforeEach(): Unit = {
+    super.beforeEach()
+    reset(mockRepository, mockCyaService, mockTransactionSubmissionService, mockNavigator)
+  }
 
-      running(application) {
-        val request = FakeRequest(GET, routes.CheckYourAnswersController.onPageLoad().url)
-        val result = route(application, request).value
+  private def capturedNavigatorAnswers(): UserAnswers = {
+    val captor = ArgumentCaptor.forClass(classOf[UserAnswers])
+    verify(mockNavigator).nextPage(eqTo(BulkCheckYourAnswersPage), eqTo(NormalMode), captor.capture(), anyBoolean())(any())
+    captor.getValue
+  }
 
-        status(result) mustEqual OK
-        contentAsString(result) must include("Check your answers")
-        contentAsString(result) must include("File details")
+  "STF Agent Bulk CheckYourAnswersController" - {
+
+    "onPageLoad" - {
+      "must return OK and the correct view for a GET" in {
+        when(mockRepository.findDocumentByReference("testReference")).thenReturn(Future.successful(Some(someTestDoc)))
+
+        val application = applicationBuilder(userAnswers = Some(completeUserAnswers))
+          .overrides(
+            bind[Navigator].qualifiedWith(Names.named("agents")).toInstance(withRefStubNavigator),
+            bind[PersistentNavigator].qualifiedWith(Names.named("agents")).toInstance(withRefStubNavigator),
+            bind[ParsedStcRowsRepository].toInstance(mockRepository)
+          ).build()
+
+        running(application) {
+          val request = FakeRequest(GET, routes.CheckYourAnswersController.onPageLoad().url)
+          val result = route(application, request).value
+
+          status(result) mustEqual OK
+          contentAsString(result) must include("Check your answers")
+          contentAsString(result) must include("File details")
+        }
+      }
+
+      "must redirect to Journey Recovery for a GET if findDocumentByReference does not find a document" in {
+        when(mockRepository.findDocumentByReference(anyString())).thenReturn(Future.successful(None))
+
+        val application = applicationBuilder(userAnswers = Some(completeUserAnswers))
+          .overrides(
+            bind[Navigator].qualifiedWith(Names.named("agents")).toInstance(withRefStubNavigator),
+            bind[PersistentNavigator].qualifiedWith(Names.named("agents")).toInstance(withRefStubNavigator),
+            bind[ParsedStcRowsRepository].toInstance(mockRepository)
+          ).build()
+
+        running(application) {
+          val request = FakeRequest(GET, routes.CheckYourAnswersController.onPageLoad().url)
+          val result = route(application, request).value
+
+          status(result) mustEqual SEE_OTHER
+          redirectLocation(result).value mustEqual uk.gov.hmrc.securitiestransferchargefrontend.controllers.routes.JourneyRecoveryController.onPageLoad().url
+        }
+      }
+
+      "must redirect to Journey Recovery for a GET if no existing data is found" in {
+        val application = applicationBuilder(userAnswers = None).build()
+
+        running(application) {
+          val request = FakeRequest(GET, routes.CheckYourAnswersController.onPageLoad().url)
+          val result = route(application, request).value
+
+          status(result) mustEqual SEE_OTHER
+          redirectLocation(result).value mustEqual uk.gov.hmrc.securitiestransferchargefrontend.controllers.routes.JourneyRecoveryController.onPageLoad().url
+        }
       }
     }
 
-    "must redirect to Journey Recovery for a GET if findDocumentByReference does not find a document" in {
-      val stubNavigator = new StubPersistentNavigator(testNextPage, completeUserAnswers, "stf", "")
-      when(mockRepository.findDocumentByReference(anyString())).thenReturn(Future.successful(None))
+    "onSubmit" - {
+      "must save the bulk confirmation details, start the STF submission and redirect to the next page" in {
+        when(mockRepository.findDocumentByReference("testReference")).thenReturn(Future.successful(Some(someTestDoc)))
+        when(mockCyaService.paymentDueBy(someTestDoc)).thenReturn(testPaymentDueBy)
+        when(mockCyaService.totalTaxDue(someTestDoc)).thenReturn(testTaxDue)
+        when(mockNavigator.nextPage(any(), any(), any(), anyBoolean())(any())).thenReturn(Future.successful(testNextPage))
+        when(mockTransactionSubmissionService.submitBulkStf(any())(using any[StcDataRequest[?]]())).thenReturn(Future.successful(true))
 
-      val application = applicationBuilder(userAnswers = Some(completeUserAnswers))
-        .overrides(
-          bind[Navigator].qualifiedWith(Names.named("agents")).toInstance(stubNavigator),
-          bind[PersistentNavigator].qualifiedWith(Names.named("agents")).toInstance(stubNavigator),
-          bind[ParsedStcRowsRepository].toInstance(mockRepository)
-        ).build()
+        val application = applicationBuilder(userAnswers = Some(completeUserAnswers))
+          .overrides(
+            bind[Navigator].qualifiedWith(Names.named("agents")).toInstance(mockNavigator),
+            bind[PersistentNavigator].qualifiedWith(Names.named("agents")).toInstance(withRefStubNavigator),
+            bind[ParsedStcRowsRepository].toInstance(mockRepository),
+            bind[CheckYourAnswersService].toInstance(mockCyaService),
+            bind[TransactionSubmissionService].toInstance(mockTransactionSubmissionService)
+          )
+          .build()
 
-      running(application) {
-        val request = FakeRequest(GET, routes.CheckYourAnswersController.onPageLoad().url)
-        val result = route(application, request).value
+        running(application) {
+          val request = FakeRequest(POST, routes.CheckYourAnswersController.onSubmit().url)
+          val result = route(application, request).value
 
-        status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual uk.gov.hmrc.securitiestransferchargefrontend.controllers.routes.JourneyRecoveryController.onPageLoad().url
+          status(result) mustEqual SEE_OTHER
+          redirectLocation(result).value mustEqual testNextPage.url
+
+          capturedNavigatorAnswers().get(BulkConfirmationDetailsPage).value mustEqual
+            BulkConfirmationDetails(
+              submissionId = completeUserAnswers.submissionId,
+              paymentDueBy = testPaymentDueBy,
+              taxDue = testTaxDue,
+              agentReference = Some("Reference1")
+            )
+
+          verify(mockTransactionSubmissionService).submitBulkStf(eqTo(expectedRows))(using any[StcDataRequest[?]]())
+        }
+      }
+
+      "must save no agent reference when one has not been provided" in {
+        when(mockRepository.findDocumentByReference("testReference")).thenReturn(Future.successful(Some(someTestDoc)))
+        when(mockCyaService.paymentDueBy(someTestDoc)).thenReturn(testPaymentDueBy)
+        when(mockCyaService.totalTaxDue(someTestDoc)).thenReturn(testTaxDue)
+        when(mockNavigator.nextPage(any(), any(), any(), anyBoolean())(any())).thenReturn(Future.successful(testNextPage))
+        when(mockTransactionSubmissionService.submitBulkStf(any())(using any[StcDataRequest[?]]())).thenReturn(Future.successful(true))
+
+        val application = applicationBuilder(userAnswers = Some(answersWithoutAgentRef))
+          .overrides(
+            bind[Navigator].qualifiedWith(Names.named("agents")).toInstance(mockNavigator),
+            bind[PersistentNavigator].qualifiedWith(Names.named("agents")).toInstance(withoutRefStubNavigator),
+            bind[ParsedStcRowsRepository].toInstance(mockRepository),
+            bind[CheckYourAnswersService].toInstance(mockCyaService),
+            bind[TransactionSubmissionService].toInstance(mockTransactionSubmissionService)
+          )
+          .build()
+
+        running(application) {
+          val request = FakeRequest(POST, routes.CheckYourAnswersController.onSubmit().url)
+          val result = route(application, request).value
+
+          status(result) mustEqual SEE_OTHER
+          redirectLocation(result).value mustEqual testNextPage.url
+
+          capturedNavigatorAnswers().get(BulkConfirmationDetailsPage).value mustEqual
+            BulkConfirmationDetails(
+              submissionId = answersWithoutAgentRef.submissionId,
+              paymentDueBy = testPaymentDueBy,
+              taxDue = testTaxDue,
+              agentReference = None
+            )
+
+          verify(mockTransactionSubmissionService).submitBulkStf(eqTo(expectedRows))(using any[StcDataRequest[?]]())
+        }
+      }
+
+      "must redirect to Journey Recovery and not navigate or submit anything if findDocumentByReference does not find a document" in {
+        when(mockRepository.findDocumentByReference(anyString())).thenReturn(Future.successful(None))
+
+        val application = applicationBuilder(userAnswers = Some(completeUserAnswers))
+          .overrides(
+            bind[Navigator].qualifiedWith(Names.named("agents")).toInstance(mockNavigator),
+            bind[PersistentNavigator].qualifiedWith(Names.named("agents")).toInstance(withRefStubNavigator),
+            bind[ParsedStcRowsRepository].toInstance(mockRepository),
+            bind[CheckYourAnswersService].toInstance(mockCyaService),
+            bind[TransactionSubmissionService].toInstance(mockTransactionSubmissionService)
+          )
+          .build()
+
+        running(application) {
+          val request = FakeRequest(POST, routes.CheckYourAnswersController.onSubmit().url)
+          val result = route(application, request).value
+
+          status(result) mustEqual SEE_OTHER
+          redirectLocation(result).value mustEqual uk.gov.hmrc.securitiestransferchargefrontend.controllers.routes.JourneyRecoveryController.onPageLoad().url
+
+          verify(mockNavigator, never()).nextPage(any(), any(), any(), anyBoolean())(any())
+          verify(mockTransactionSubmissionService, never()).submitBulkStf(any())(using any[StcDataRequest[?]]())
+        }
+      }
+
+      "must redirect to Journey Recovery for a POST if no existing data is found" in {
+        val application = applicationBuilder(userAnswers = None)
+          .overrides(
+            bind[Navigator].qualifiedWith(Names.named("agents")).toInstance(mockNavigator),
+            bind[TransactionSubmissionService].toInstance(mockTransactionSubmissionService)
+          )
+          .build()
+
+        running(application) {
+          val request = FakeRequest(POST, routes.CheckYourAnswersController.onSubmit().url)
+          val result = route(application, request).value
+
+          status(result) mustEqual SEE_OTHER
+          redirectLocation(result).value mustEqual uk.gov.hmrc.securitiestransferchargefrontend.controllers.routes.JourneyRecoveryController.onPageLoad().url
+
+          verify(mockNavigator, never()).nextPage(any(), any(), any(), anyBoolean())(any())
+          verify(mockTransactionSubmissionService, never()).submitBulkStf(any())(using any[StcDataRequest[?]]())
+        }
       }
     }
-
-    "must redirect to Journey Recovery for a GET if no existing data is found" in {
-      val application = applicationBuilder(userAnswers = None).build()
-
-      running(application) {
-        val request = FakeRequest(GET, routes.CheckYourAnswersController.onPageLoad().url)
-        val result = route(application, request).value
-
-        status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual uk.gov.hmrc.securitiestransferchargefrontend.controllers.routes.JourneyRecoveryController.onPageLoad().url
-      }
-    }
-
-    "must redirect to next page for a POST" in {
-      val stubNavigator = new StubPersistentNavigator(testNextPage, completeUserAnswers, "stf", "")
-
-      val application = applicationBuilder(userAnswers = Some(completeUserAnswers))
-        .overrides(
-          bind[Navigator].qualifiedWith(Names.named("agents")).toInstance(stubNavigator),
-          bind[PersistentNavigator].qualifiedWith(Names.named("agents")).toInstance(stubNavigator)
-        )
-        .build()
-
-      running(application) {
-        val request = FakeRequest(POST, routes.CheckYourAnswersController.onSubmit().url)
-        val result = route(application, request).value
-
-        status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual testNextPage.url
-      }
-    }
-
   }
 }

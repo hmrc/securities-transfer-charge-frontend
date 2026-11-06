@@ -22,44 +22,46 @@ import uk.gov.hmrc.securitiestransferchargefrontend.models.stf.fileupload.Parsed
 import uk.gov.hmrc.securitiestransferchargefrontend.services.stf.shared.FormattingService
 import uk.gov.hmrc.securitiestransferchargefrontend.viewmodels.stf.fileupload.{CheckYourAnswersViewModel, Transfer}
 
+import java.time.LocalDate
+
 class CheckYourAnswersService @Inject()(
                                          taxDueCalculationService: TaxDueCalculationService,
                                          formattingService: FormattingService
                                        ) {
 
-  def buildViewModel(parsedStcRowsDocument:  ParsedStcRowsDocument)(implicit lang: Lang): CheckYourAnswersViewModel = {
-
-    val transfers: Seq[Transfer] =
-      parsedStcRowsDocument.rows.flatMap { row =>
-        for {
-          seller             <- row.sellerName
-          securitiesBoughtIn <- row.securitiesTarget
-          amountPaid         <- row.amountPaidForSecurities
-          taxDue             <- taxDueCalculationService.calculateTaxDue(row)
-        } yield Transfer(
-          seller = seller,
-          securitiesBoughtIn = securitiesBoughtIn,
-          consideration = BigDecimal(amountPaid),
-          taxDue = taxDue
-        )
-      }
-
-    val paymentDueBy: String =
-      parsedStcRowsDocument.rows
-        .flatMap(_.chargingPoint.toOption)
-        .minOption
-        .map(_.plusDays(30))
-        .map(formattingService.formatPaymentDueDate)
-        .getOrElse("")
-
-    val totalTaxDue: BigDecimal = transfers.map(_.taxDue).sum
+  def buildViewModel(parsedStcRowsDocument: ParsedStcRowsDocument)(implicit lang: Lang): CheckYourAnswersViewModel = {
+    val transfers = buildTransfers(parsedStcRowsDocument)
 
     CheckYourAnswersViewModel(
       fileName = parsedStcRowsDocument.fileName,
       numberOfTransfers = transfers.size,
-      taxDue = taxDueCalculationService.formatCurrency(totalTaxDue),
-      paymentDueBy = paymentDueBy,
+      taxDue = taxDueCalculationService.formatCurrency(transfers.map(_.taxDue).sum),
+      paymentDueBy = formattingService.formatPaymentDueDate(paymentDueBy(parsedStcRowsDocument)),
       transfers = transfers
     )
   }
+
+  def totalTaxDue(parsedStcRowsDocument: ParsedStcRowsDocument): BigDecimal =
+    buildTransfers(parsedStcRowsDocument).map(_.taxDue).sum
+
+  def paymentDueBy(parsedStcRowsDocument: ParsedStcRowsDocument): LocalDate =
+    parsedStcRowsDocument.rows
+      .flatMap(_.chargingPoint.toOption)
+      .min
+      .plusDays(30)
+
+  private def buildTransfers(parsedStcRowsDocument: ParsedStcRowsDocument): Seq[Transfer] =
+    parsedStcRowsDocument.rows.flatMap { row =>
+      for {
+        seller             <- row.sellerName
+        securitiesBoughtIn <- row.securitiesTarget
+        amountPaid         <- row.amountPaidForSecurities
+        taxDue             <- taxDueCalculationService.calculateTaxDue(row)
+      } yield Transfer(
+        seller = seller,
+        securitiesBoughtIn = securitiesBoughtIn,
+        consideration = BigDecimal(amountPaid),
+        taxDue = taxDue
+      )
+    }
 }

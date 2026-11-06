@@ -25,6 +25,7 @@ import uk.gov.hmrc.securitiestransferchargefrontend.services.stf.shared.Formatti
 import uk.gov.hmrc.securitiestransferchargefrontend.utils.CommonHelpers
 import uk.gov.hmrc.securitiestransferchargefrontend.viewmodels.sh03.organisations.bulk.{CheckYourAnswersViewModel, CompanyDetailsSummary, RoleAtPurchasingCompanySummary, Sh03Transfer}
 
+import java.time.LocalDate
 import scala.util.Try
 
 class CheckYourAnswersService @Inject()(
@@ -33,54 +34,51 @@ class CheckYourAnswersService @Inject()(
                                        ) {
 
   def buildViewModel(parsedStcRowsDocument: ParsedStcRowsDocument, userAnswers: UserAnswers)(implicit lang: Lang, messages: Messages): CheckYourAnswersViewModel = {
-
-    val transfers: Seq[Sh03Transfer] =
-      parsedStcRowsDocument.rows.map { row =>
-
-        val amountOfShares = row.securitiesQuantity.getOrElse("0")
-
-        val amountPaidStr = row.amountPaidForSecurities
-          .orElse(row.totalMarketValue)
-          .orElse(row.maxSharePrice)
-          .getOrElse("0")
-
-        val consideration = Try(BigDecimal(amountPaidStr)).getOrElse(BigDecimal(0))
-
-        val taxDue = taxDueCalculationService.calculateTaxDue(row)
-        
-        val reasonFor = row.sharePurchaseReason.map(_.trim.toLowerCase) match {
-          case Some("treasury") => "Treasury"
-          case _                => "Cancellation"
-        }
-
-        Sh03Transfer(
-          amountOfShares = formatAmountOfShares(amountOfShares),
-          reasonFor      = reasonFor,
-          consideration  = consideration,
-          taxDue         = taxDue
-        )
-      }
-
-    val paymentDueBy: String =
-      parsedStcRowsDocument.rows
-        .flatMap(_.chargingPoint.toOption)
-        .minOption
-        .map(_.plusDays(30))
-        .map(formattingService.formatPaymentDueDate)
-        .getOrElse("")
-
-    val totalTaxDue: BigDecimal = transfers.map(_.taxDue).sum
+    val transfers = buildTransfers(parsedStcRowsDocument)
 
     CheckYourAnswersViewModel(
       companyDetailsRows = CompanyDetailsSummary.rows(userAnswers),
-      fileName = parsedStcRowsDocument.fileName,
-      numberOfTransfers = transfers.size,
-      taxDue = taxDueCalculationService.formatCurrency(totalTaxDue),
-      paymentDueBy = paymentDueBy,
-      transfers = transfers,
-      declarationRows = RoleAtPurchasingCompanySummary.rows(userAnswers)
+      fileName           = parsedStcRowsDocument.fileName,
+      numberOfTransfers  = transfers.size,
+      taxDue             = taxDueCalculationService.formatCurrency(transfers.map(_.taxDue).sum),
+      paymentDueBy       = formattingService.formatPaymentDueDate(paymentDueBy(parsedStcRowsDocument)),
+      transfers          = transfers,
+      declarationRows    = RoleAtPurchasingCompanySummary.rows(userAnswers)
     )
   }
+
+  def totalTaxDue(parsedStcRowsDocument: ParsedStcRowsDocument): BigDecimal =
+    parsedStcRowsDocument.rows.map(taxDueCalculationService.calculateTaxDue).sum
+
+  def paymentDueBy(parsedStcRowsDocument: ParsedStcRowsDocument): LocalDate =
+    parsedStcRowsDocument.rows
+      .flatMap(_.chargingPoint.toOption)
+      .min
+      .plusDays(30)
+
+  private def buildTransfers(parsedStcRowsDocument: ParsedStcRowsDocument): Seq[Sh03Transfer] =
+    parsedStcRowsDocument.rows.map { row =>
+      val amountOfShares = row.securitiesQuantity.getOrElse("0")
+
+      val amountPaidStr = row.amountPaidForSecurities
+        .orElse(row.totalMarketValue)
+        .orElse(row.maxSharePrice)
+        .getOrElse("0")
+
+      val consideration = Try(BigDecimal(amountPaidStr)).getOrElse(BigDecimal(0))
+
+      val reasonFor = row.sharePurchaseReason.map(_.trim.toLowerCase) match {
+        case Some("treasury") => "Treasury"
+        case _                => "Cancellation"
+      }
+
+      Sh03Transfer(
+        amountOfShares = formatAmountOfShares(amountOfShares),
+        reasonFor      = reasonFor,
+        consideration  = consideration,
+        taxDue         = taxDueCalculationService.calculateTaxDue(row)
+      )
+    }
 
   private def formatAmountOfShares(quantity: String): String =
     Try(quantity.toInt).toOption.map(CommonHelpers.formatWithCommas).getOrElse(quantity)

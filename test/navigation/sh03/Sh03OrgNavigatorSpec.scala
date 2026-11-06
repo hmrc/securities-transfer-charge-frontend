@@ -28,9 +28,7 @@ import uk.gov.hmrc.securitiestransferchargefrontend.controllers.routes as common
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.sh03.organisations.bulk.routes as sh03OrgBulkRoutes
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.sh03.organisations.routes as sh03OrgRoutes
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.sh03.organisations.single.routes as sh03OrgSingleRoutes
-import uk.gov.hmrc.securitiestransferchargefrontend.controllers.sh03.shared.bulk.routes as bulkRoutes
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.sh03.shared.routes as sharedRoutes
-import uk.gov.hmrc.securitiestransferchargefrontend.controllers.sh03.shared.single.routes as sh03SharedSingleRoutes
 import uk.gov.hmrc.securitiestransferchargefrontend.models.JourneyType.SH03
 import uk.gov.hmrc.securitiestransferchargefrontend.models.sh03.shared.*
 import uk.gov.hmrc.securitiestransferchargefrontend.models.{CheckMode, NormalMode, UserAnswers}
@@ -210,7 +208,7 @@ class Sh03OrgNavigatorSpec extends SpecBase with ScalaFutures {
       "must go from CheckYourAnswersPage to ConfirmationPage" in {
         val result = navigator.nextPage(CheckYourAnswersPage, NormalMode, emptyUserAnswers)(fakeRequest)
         whenReady(result) { res =>
-          res mustBe sh03SharedSingleRoutes.ConfirmationController.onPageLoad()
+          res mustBe commonRoutes.ConfirmationController.onPageLoad()
         }
       }
 
@@ -236,7 +234,7 @@ class Sh03OrgNavigatorSpec extends SpecBase with ScalaFutures {
       "must go from BulkCheckYourAnswersPage to ConfirmationPage" in {
         val result = navigator.nextPage(BulkCheckYourAnswersPage, NormalMode, emptyUserAnswers)(fakeRequest)
         whenReady(result) { res =>
-          res mustBe bulkRoutes.ConfirmationController.onPageLoad()
+          res mustBe commonRoutes.ConfirmationController.onPageLoad()
         }
       }
 
