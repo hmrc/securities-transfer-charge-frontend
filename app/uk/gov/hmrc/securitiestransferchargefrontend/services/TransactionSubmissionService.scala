@@ -26,10 +26,10 @@ import uk.gov.hmrc.securitiestransferchargefrontend.domain.TransferType.*
 import uk.gov.hmrc.securitiestransferchargefrontend.domain.{CredentialId, GroupIdentifier, SubmissionId, SubscriptionId, TransferType}
 import uk.gov.hmrc.securitiestransferchargefrontend.models.UserAnswers
 import uk.gov.hmrc.securitiestransferchargefrontend.models.audit.JourneyStatus.{SubmissionFailure, SubmissionSuccess}
-import uk.gov.hmrc.securitiestransferchargefrontend.models.audit.{AuditModel, AuditType}
+import uk.gov.hmrc.securitiestransferchargefrontend.models.audit.{AuditModel, AuditType, SH03PostSubmissionAuditModelBuilder, STFPostSubmissionAuditModelBuilder}
 import uk.gov.hmrc.securitiestransferchargefrontend.models.stf.Address
 import uk.gov.hmrc.securitiestransferchargefrontend.models.stf.fileupload.ValidatedStcRow
-import uk.gov.hmrc.securitiestransferchargefrontend.models.submission.{AffinityData, Agent, Individual, Organisation}
+import uk.gov.hmrc.securitiestransferchargefrontend.models.submission.{AffinityData, Agent, Individual, Organisation, SingleTransferAgentDetails, SingleTransferDeclaration, SingleTransferRequest, StfTransaction}
 import uk.gov.hmrc.securitiestransferchargefrontend.repositories.{CyaHtmlRepository, TransactionResponseRepository}
 import uk.gov.hmrc.securitiestransferchargefrontend.services.TransactionSubmissionService.*
 import uk.gov.hmrc.securitiestransferchargefrontend.utils.HeaderCarrierCreator
@@ -69,14 +69,15 @@ final class TransactionSubmissionServiceImpl @Inject()(
     val submit = submitFunctionFor(transferType)
     for {
       subscription <- subscriptionService.getSubscription(request.request.subscriptionId)
+      affinityData = getAffinityData(subscription)(request.request.affinityGroup)
       response <- submit(
         request.request.subscriptionId,
         request.userAnswers,
-        getAffinityData(subscription)(request.request.affinityGroup)
+        affinityData
       )
 
       _ = response.fold(
-        onSuccess        = handleSingleSuccess(transferType),
+        onSuccess        = handleSingleSuccess(transferType, affinityData),
         onPartialFailure = handleSinglePartialFailure(transferType),
         onFailure        = handleSingleFailure(transferType, submissionId)
       )
@@ -98,15 +99,16 @@ final class TransactionSubmissionServiceImpl @Inject()(
     for {
       _ <- bulkStatusService.markAsProcessing(group, submissionId)
       subscription <- subscriptionService.getSubscription(request.request.subscriptionId)
+      affinityData = getAffinityData(subscription)(request.request.affinityGroup)
       response <- submit(
         request.request.subscriptionId,
         rows,
         request.userAnswers,
-        getAffinityData(subscription)(request.request.affinityGroup)
+        affinityData
       )
 
       _ = response.fold(
-        onSuccess        = handleBulkSuccess(transferType),
+        onSuccess        = handleBulkSuccess(transferType, affinityData, rows.size),
         onPartialFailure = handleBulkPartialFailure(transferType),
         onFailure        = handleBulkFailure(transferType, submissionId)
       )
@@ -135,7 +137,7 @@ final class TransactionSubmissionServiceImpl @Inject()(
     req.request.credentialId
   )
 
-  private def handleSingleSuccess(transferType: TransferType)(successResponse: SubmissionCreateResponseSuccess)
+  private def handleSingleSuccess(transferType: TransferType, affinityData: AffinityData)(successResponse: SubmissionCreateResponseSuccess)
                                  (implicit hc: HeaderCarrier, request: StcDataRequest[?]): Unit = {
     val (subscriptionId, affinityGroup, credentialId) = extractComponentsFrom(request)
     val submissionId = successResponse.submissionId
@@ -144,6 +146,7 @@ final class TransactionSubmissionServiceImpl @Inject()(
     transactionResponseRepository.store(submissionId, successResponse)
     saveAndReturnClient.deleteDraft(submissionId)
     sendSingleSubmissionDataToNRS(submissionId, successResponse.utrn)
+    sendSingleSubmissionDataToAudit(transferType, affinityData, successResponse)
   }
 
   private def handleSinglePartialFailure(transferType: TransferType)(pf: SubmissionCreateResponsePartialFailure): Unit = {
@@ -166,7 +169,7 @@ final class TransactionSubmissionServiceImpl @Inject()(
       }
   }
 
-  private def handleBulkSuccess(transferType: TransferType)(successResponse: SubmissionCreateResponseSuccess)
+  private def handleBulkSuccess(transferType: TransferType, affinityData: AffinityData, totalTransfers: Int)(successResponse: SubmissionCreateResponseSuccess)
                                  (implicit hc: HeaderCarrier, request: StcDataRequest[?]): Unit = {
     val (subscriptionId, affinityGroup, credentialId) = extractComponentsFrom(request)
     val submissionId = successResponse.submissionId
@@ -175,6 +178,7 @@ final class TransactionSubmissionServiceImpl @Inject()(
     auditService.audit(AuditModel(SubmissionSuccess, subscriptionId, affinityGroup, credentialId, Some(submissionId), AuditType.fromTransferType(transferType)))
     saveAndReturnClient.deleteDraft(submissionId)
     sendBulkSubmissionDataToNRS(submissionId)
+    sendBulkSubmissionDataToAudit(transferType, affinityData, successResponse, totalTransfers)
   }
   
   private def sendBulkSubmissionDataToNRS(submissionId: SubmissionId)(using request: StcDataRequest[?], hc: HeaderCarrier): Future[Unit] = {
@@ -203,6 +207,119 @@ final class TransactionSubmissionServiceImpl @Inject()(
     logger.warn(s"Submission failure for ${transferType.toString} submission ${submissionId}")
     val group = GroupIdentifier(req.request.groupIdentifier)
     bulkStatusService.markAsFailed(group, submissionId)
+  }
+
+  private def sendSingleSubmissionDataToAudit(
+    transferType: TransferType,
+    affinityData: AffinityData,
+    successResponse: SubmissionCreateResponseSuccess
+  )(implicit hc: HeaderCarrier, request: StcDataRequest[?]): Unit = {
+    transferType match {
+      case STF =>
+        etmpSubmissionService.getSubmissionDataStf(request.userAnswers, affinityData).foreach {
+          case (declaration, stfRequest, stfTransaction) =>
+            sendAuditSTF(Seq(stfRequest), Seq(successResponse), declaration, stfRequest.agentDetails, stfTransaction)
+        }
+      case SH03 =>
+        etmpSubmissionService.getSubmissionDataSh03(request.userAnswers, affinityData).foreach {
+          case (declaration, sh03Request) =>
+            sendAuditSH03(Seq(sh03Request), Seq(successResponse), declaration, sh03Request.agentDetails)
+        }
+      case _ => ()
+    }
+  }
+
+  private def sendBulkSubmissionDataToAudit(
+    transferType: TransferType,
+    affinityData: AffinityData,
+    successResponse: SubmissionCreateResponseSuccess,
+    totalTransfers: Int
+  )(implicit hc: HeaderCarrier, request: StcDataRequest[?]): Unit = {
+    transferType match {
+      case STF =>
+        etmpSubmissionService.getSubmissionDataStf(request.userAnswers, affinityData).foreach {
+          case (declaration, stfRequest, stfTransaction) =>
+            val stfRequests = (0 until totalTransfers).map(_ => stfRequest)
+            val etmpResponses = (0 until totalTransfers).map(_ => successResponse)
+            sendAuditSTF(stfRequests, etmpResponses, declaration, stfRequest.agentDetails, stfTransaction)
+        }
+      case SH03 =>
+        etmpSubmissionService.getSubmissionDataSh03(request.userAnswers, affinityData).foreach {
+          case (declaration, sh03Request) =>
+            val sh03Requests = (0 until totalTransfers).map(_ => sh03Request)
+            val etmpResponses = (0 until totalTransfers).map(_ => successResponse)
+            sendAuditSH03(sh03Requests, etmpResponses, declaration, sh03Request.agentDetails)
+        }
+      case _ => ()
+    }
+  }
+
+  private def sendAuditSTF(
+    stfRequests: Seq[SingleTransferRequest],
+    etmpResponses: Seq[SubmissionCreateResponseSuccess],
+    declaration: SingleTransferDeclaration,
+    agentDetails: Option[SingleTransferAgentDetails],
+    stfTransaction: StfTransaction
+  )(implicit hc: HeaderCarrier, request: StcDataRequest[?]): Unit = {
+    val totalRequests = stfRequests.size
+    val maxTransfersPerBatch = 100
+    val totalBatches = Math.ceil(totalRequests.toDouble / maxTransfersPerBatch).toInt
+    
+    (0 until totalBatches).foreach { batchIndex =>
+      val batchStart = batchIndex * maxTransfersPerBatch
+      val batchEnd = Math.min(batchStart + maxTransfersPerBatch, totalRequests)
+      val batchRequests = stfRequests.slice(batchStart, batchEnd)
+      val batchResponses = etmpResponses.slice(batchStart, batchEnd)
+      val currentBatch = batchIndex + 1
+      
+      val auditModel = STFPostSubmissionAuditModelBuilder.buildSubmissionAuditModel(
+        declaration = declaration,
+        agentDetails = agentDetails,
+        stfRequests = batchRequests,
+        etmpResponses = batchResponses,
+        stfTransaction = stfTransaction,
+        request = request,
+        totalBatches = totalBatches,
+        totalTransfers = totalRequests,
+        currentBatch = currentBatch,
+        batchStartIndex = batchStart
+      )
+      
+      auditService.audit(auditModel)
+    }
+  }
+
+  private def sendAuditSH03(
+    sh03Requests: Seq[SingleTransferRequest],
+    etmpResponses: Seq[SubmissionCreateResponseSuccess],
+    declaration: SingleTransferDeclaration,
+    agentDetails: Option[SingleTransferAgentDetails]
+  )(implicit hc: HeaderCarrier, request: StcDataRequest[?]): Unit = {
+    val totalRequests = sh03Requests.size
+    val maxTransfersPerBatch = 100
+    val totalBatches = Math.ceil(totalRequests.toDouble / maxTransfersPerBatch).toInt
+    
+    (0 until totalBatches).foreach { batchIndex =>
+      val batchStart = batchIndex * maxTransfersPerBatch
+      val batchEnd = Math.min(batchStart + maxTransfersPerBatch, totalRequests)
+      val batchRequests = sh03Requests.slice(batchStart, batchEnd)
+      val batchResponses = etmpResponses.slice(batchStart, batchEnd)
+      val currentBatch = batchIndex + 1
+      
+      val auditModel = SH03PostSubmissionAuditModelBuilder.buildSubmissionAuditModel(
+        declaration = declaration,
+        agentDetails = agentDetails,
+        sh03Requests = batchRequests,
+        etmpResponses = batchResponses,
+        request = request,
+        totalBatches = totalBatches,
+        totalTransfers = totalRequests,
+        currentBatch = currentBatch,
+        batchStartIndex = batchStart
+      )
+      
+      auditService.audit(auditModel)
+    }
   }
 }
 
