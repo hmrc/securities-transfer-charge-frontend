@@ -16,13 +16,8 @@
 
 package uk.gov.hmrc.securitiestransferchargefrontend.models
 
-import play.api.i18n.Messages
-import uk.gov.hmrc.securitiestransferchargefrontend.domain.SubmissionId
 import uk.gov.hmrc.securitiestransferchargefrontend.models.JourneyType.{SH03, STF}
-import uk.gov.hmrc.securitiestransferchargefrontend.services.stf.shared.FormattingService
-import uk.gov.hmrc.securitiestransferchargefrontend.utils.DateTimeFormats
 
-import java.time.LocalDate
 
 case class ConfirmationViewModel(
                                   submissionId: String,
@@ -44,31 +39,4 @@ case class ConfirmationViewModel(
     case SH03 => "confirmation.heading.shareBuyBack.p2"
   }
   
-}
-  
-object ConfirmationViewModel {
-  
-  val formatter = FormattingService()
-
-  def apply(
-             submissionId: SubmissionId,
-             paymentDueBy: LocalDate,
-             reference: Option[String],
-             taxDue: BigDecimal,
-             isAgent: Boolean,
-             journeyType: JourneyType,
-             isBulk: Boolean
-           )(implicit messages: Messages): ConfirmationViewModel = {
-    
-    
-    new ConfirmationViewModel(
-      submissionId = submissionId.value,
-      paymentDueBy = DateTimeFormats.formatDate(paymentDueBy)(messages.lang),
-      reference = reference,
-      taxDue = formatter.formatCurrency(taxDue),
-      isAgent = isAgent,
-      journeyType = journeyType,
-      isBulk = isBulk
-    )
-  }
 }

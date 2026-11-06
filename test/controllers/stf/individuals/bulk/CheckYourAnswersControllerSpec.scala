@@ -18,7 +18,7 @@ package controllers.stf.individuals.bulk
 
 import base.{FileUploadFixtures, SpecBase}
 import org.mockito.ArgumentCaptor
-import org.mockito.ArgumentMatchers.{any, eq as eqTo}
+import org.mockito.ArgumentMatchers.{any, anyBoolean, eq as eqTo}
 import org.mockito.Mockito.{never, reset, verify, when}
 import org.scalatest.BeforeAndAfterEach
 import org.scalatestplus.mockito.MockitoSugar
@@ -31,11 +31,13 @@ import uk.gov.hmrc.securitiestransferchargefrontend.controllers.actions.requests
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.routes
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.individuals.bulk.routes as bulkRoutes
 import uk.gov.hmrc.securitiestransferchargefrontend.models.JourneyType.STF
-import uk.gov.hmrc.securitiestransferchargefrontend.models.UserAnswers
+import uk.gov.hmrc.securitiestransferchargefrontend.models.{NormalMode, UserAnswers}
 import uk.gov.hmrc.securitiestransferchargefrontend.models.stf.fileupload.{ParsedStcRow, ParsedStcRowsDocument, ValidatedStcRow}
 import uk.gov.hmrc.securitiestransferchargefrontend.models.submission.BulkConfirmationDetails
 import uk.gov.hmrc.securitiestransferchargefrontend.navigation.Navigator
-import uk.gov.hmrc.securitiestransferchargefrontend.repositories.{ParsedStcRowsRepository, SessionRepository}
+import uk.gov.hmrc.securitiestransferchargefrontend.pages.BulkConfirmationDetailsPage
+import uk.gov.hmrc.securitiestransferchargefrontend.pages.stf.bulk.BulkCheckYourAnswersPage
+import uk.gov.hmrc.securitiestransferchargefrontend.repositories.ParsedStcRowsRepository
 import uk.gov.hmrc.securitiestransferchargefrontend.services.TransactionSubmissionService
 import uk.gov.hmrc.securitiestransferchargefrontend.services.stf.bulk.CheckYourAnswersService
 import uk.gov.hmrc.securitiestransferchargefrontend.viewmodels.stf.fileupload.{CheckYourAnswersViewModel, Transfer}
@@ -54,9 +56,9 @@ class CheckYourAnswersControllerSpec extends SpecBase with MockitoSugar with Fil
 
   private val mockRepository = mock[ParsedStcRowsRepository]
   private val mockCyaService = mock[CheckYourAnswersService]
-  private val mockSessionRepository = mock[SessionRepository]
   private val mockTransactionSubmissionService = mock[TransactionSubmissionService]
   private val mockSubmissionIdClient = mock[SubmissionIdClient]
+  private val mockNavigator = mock[Navigator]
 
   private val parsedStcRowsDocument = ParsedStcRowsDocument(
     _id = reference,
@@ -64,13 +66,19 @@ class CheckYourAnswersControllerSpec extends SpecBase with MockitoSugar with Fil
     fileName = testFileName
   )
 
-  private val expectedRows: Seq[ValidatedStcRow] = parsedStcRowsDocument.rows.map(row => ValidatedStcRow(row, Seq.empty))
+  private val expectedRows: Seq[ValidatedStcRow] = parsedStcRowsDocument.rows.map(ValidatedStcRow.withNoErrors)
   private val testPaymentDueBy: LocalDate = LocalDate.of(2026, 3, 22)
   private val testTaxDue: BigDecimal = BigDecimal(100.00)
 
   override def beforeEach(): Unit = {
     super.beforeEach()
-    reset(mockRepository, mockCyaService, mockSessionRepository, mockTransactionSubmissionService, mockSubmissionIdClient)
+    reset(mockRepository, mockCyaService, mockTransactionSubmissionService, mockSubmissionIdClient, mockNavigator)
+  }
+
+  private def capturedNavigatorAnswers(): UserAnswers = {
+    val captor = ArgumentCaptor.forClass(classOf[UserAnswers])
+    verify(mockNavigator).nextPage(eqTo(BulkCheckYourAnswersPage), eqTo(NormalMode), captor.capture(), anyBoolean())(any())
+    captor.getValue
   }
 
   "STF Individual Bulk CheckYourAnswersController" - {
@@ -139,17 +147,13 @@ class CheckYourAnswersControllerSpec extends SpecBase with MockitoSugar with Fil
         when(mockSubmissionIdClient.nextSubmissionId()(any())).thenReturn(Future.successful(submissionId))
         when(mockCyaService.paymentDueBy(parsedStcRowsDocument)).thenReturn(testPaymentDueBy)
         when(mockCyaService.totalTaxDue(parsedStcRowsDocument)).thenReturn(testTaxDue)
-        when(mockSessionRepository.set(any())).thenReturn(Future.unit)
+        when(mockNavigator.nextPage(any(), any(), any(), anyBoolean())(any())).thenReturn(Future.successful(testNextPage))
         when(mockTransactionSubmissionService.submitBulkStf(any())(using any[StcDataRequest[?]]())).thenReturn(Future.successful(true))
 
         val application =
-          applicationBuilder(
-            userAnswers = None,
-            affinityGroup = individualAffinity,
-            sessionRepository = mockSessionRepository
-          )
+          applicationBuilder(userAnswers = None, affinityGroup = individualAffinity)
             .overrides(
-              bind[Navigator].qualifiedWith("individuals").toInstance(getNavigator),
+              bind[Navigator].qualifiedWith("individuals").toInstance(mockNavigator),
               bind[ParsedStcRowsRepository].toInstance(mockRepository),
               bind[CheckYourAnswersService].toInstance(mockCyaService),
               bind[TransactionSubmissionService].toInstance(mockTransactionSubmissionService),
@@ -163,14 +167,12 @@ class CheckYourAnswersControllerSpec extends SpecBase with MockitoSugar with Fil
           status(result) mustEqual SEE_OTHER
           redirectLocation(result).value mustEqual testNextPage.url
 
-          val answersCaptor = ArgumentCaptor.forClass(classOf[UserAnswers])
-          verify(mockSessionRepository).set(answersCaptor.capture())
-          val savedAnswers = answersCaptor.getValue
+          val answers = capturedNavigatorAnswers()
 
-          savedAnswers.submissionId mustEqual submissionId
-          savedAnswers.journeyType mustEqual STF
-          savedAnswers.fileUploadReference mustBe Some(reference)
-          (savedAnswers.data \ BulkConfirmationDetails.key).as[BulkConfirmationDetails] mustEqual
+          answers.submissionId mustEqual submissionId
+          answers.journeyType mustEqual STF
+          answers.fileUploadReference mustBe Some(reference)
+          answers.get(BulkConfirmationDetailsPage).value mustEqual
             BulkConfirmationDetails(
               submissionId = submissionId,
               paymentDueBy = testPaymentDueBy,
@@ -184,17 +186,13 @@ class CheckYourAnswersControllerSpec extends SpecBase with MockitoSugar with Fil
         }
       }
 
-      "must redirect to Journey Recovery and not generate an ID, save or submit anything if findDocumentByReference does not find a document" in {
+      "must redirect to Journey Recovery and not generate an ID, navigate or submit anything if findDocumentByReference does not find a document" in {
         when(mockRepository.findDocumentByReference(reference)).thenReturn(Future.successful(None))
 
         val application =
-          applicationBuilder(
-            userAnswers = None,
-            affinityGroup = individualAffinity,
-            sessionRepository = mockSessionRepository
-          )
+          applicationBuilder(userAnswers = None, affinityGroup = individualAffinity)
             .overrides(
-              bind[Navigator].qualifiedWith("individuals").toInstance(getNavigator),
+              bind[Navigator].qualifiedWith("individuals").toInstance(mockNavigator),
               bind[ParsedStcRowsRepository].toInstance(mockRepository),
               bind[TransactionSubmissionService].toInstance(mockTransactionSubmissionService),
               bind[SubmissionIdClient].toInstance(mockSubmissionIdClient)
@@ -208,7 +206,7 @@ class CheckYourAnswersControllerSpec extends SpecBase with MockitoSugar with Fil
           redirectLocation(result).value mustEqual routes.JourneyRecoveryController.onPageLoad().url
 
           verify(mockSubmissionIdClient, never()).nextSubmissionId()(any())
-          verify(mockSessionRepository, never()).set(any())
+          verify(mockNavigator, never()).nextPage(any(), any(), any(), anyBoolean())(any())
           verify(mockTransactionSubmissionService, never()).submitBulkStf(any())(using any[StcDataRequest[?]]())
         }
       }

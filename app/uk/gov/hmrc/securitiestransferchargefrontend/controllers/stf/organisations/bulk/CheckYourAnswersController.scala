@@ -18,7 +18,6 @@ package uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.organisatio
 
 import com.google.inject.Inject
 import play.api.i18n.{I18nSupport, Lang, Messages, MessagesApi}
-import play.api.libs.json.Json
 import play.api.mvc.{Action, AnyContent, Call, MessagesControllerComponents}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import uk.gov.hmrc.securitiestransferchargefrontend.clients.SubmissionIdClient
@@ -31,8 +30,9 @@ import uk.gov.hmrc.securitiestransferchargefrontend.models.stf.fileupload.Valida
 import uk.gov.hmrc.securitiestransferchargefrontend.models.submission.BulkConfirmationDetails
 import uk.gov.hmrc.securitiestransferchargefrontend.models.{JourneyType, Mode, NormalMode, UserAnswers}
 import uk.gov.hmrc.securitiestransferchargefrontend.navigation.Navigator
+import uk.gov.hmrc.securitiestransferchargefrontend.pages.BulkConfirmationDetailsPage
 import uk.gov.hmrc.securitiestransferchargefrontend.pages.stf.bulk.BulkCheckYourAnswersPage
-import uk.gov.hmrc.securitiestransferchargefrontend.repositories.{ParsedStcRowsRepository, SessionRepository}
+import uk.gov.hmrc.securitiestransferchargefrontend.repositories.ParsedStcRowsRepository
 import uk.gov.hmrc.securitiestransferchargefrontend.services.TransactionSubmissionService
 import uk.gov.hmrc.securitiestransferchargefrontend.services.stf.bulk.CheckYourAnswersService
 import uk.gov.hmrc.securitiestransferchargefrontend.views.html.stf.organisations.bulk.CheckYourAnswersView
@@ -49,7 +49,6 @@ class CheckYourAnswersController @Inject()(
                                             view: CheckYourAnswersView,
                                             checkYourAnswersService: CheckYourAnswersService,
                                             parsedStcRowsRepository: ParsedStcRowsRepository,
-                                            sessionRepository: SessionRepository,
                                             transactionSubmissionService: TransactionSubmissionService,
                                             idClient: SubmissionIdClient
                                           )(implicit ec: ExecutionContext)
@@ -79,26 +78,21 @@ class CheckYourAnswersController @Inject()(
 
       parsedStcRowsRepository.findDocumentByReference(reference).flatMap {
         case Some(parsedStcRowsDocument) =>
-          // Seq.empty as the only way we could get to this point would be if there are no validation errors
-          val rows = parsedStcRowsDocument.rows.map(row => ValidatedStcRow(row, Seq.empty))
+          val rows = parsedStcRowsDocument.rows.map(ValidatedStcRow.withNoErrors)
 
           for {
-            submissionId <- idClient.nextSubmissionId()
-            userAnswers = UserAnswers.empty(userId)(group)(submissionId)(JourneyType.STF)
-            details = BulkConfirmationDetails(
+            submissionId  <- idClient.nextSubmissionId()
+            details        = BulkConfirmationDetails(
               submissionId = submissionId,
               paymentDueBy = checkYourAnswersService.paymentDueBy(parsedStcRowsDocument),
               taxDue = checkYourAnswersService.totalTaxDue(parsedStcRowsDocument),
               agentReference = None
             )
-            answers = userAnswers.copy(
-              fileUploadReference = Some(reference),
-              data = userAnswers.data + (BulkConfirmationDetails.key -> Json.toJson(details))
-            )
-            _ <- sessionRepository.set(answers)
-            dataRequest = StcDataRequest(request.request, answers)
-            _ = transactionSubmissionService.submitBulkStf(rows)(using dataRequest)
-            nextPage <- navigator.nextPage(BulkCheckYourAnswersPage, NormalMode, answers, isReturn(request))
+            answers       <- Future.fromTry(UserAnswers.empty(userId)(group)(submissionId)(JourneyType.STF)
+              .copy(fileUploadReference = Some(reference))
+              .set(BulkConfirmationDetailsPage, details))
+            nextPage      <- navigator.nextPage(BulkCheckYourAnswersPage, NormalMode, answers, isReturn(request))
+            _              = transactionSubmissionService.submitBulkStf(rows)(using StcDataRequest(request.request, answers))
           } yield Redirect(nextPage)
 
         case None =>

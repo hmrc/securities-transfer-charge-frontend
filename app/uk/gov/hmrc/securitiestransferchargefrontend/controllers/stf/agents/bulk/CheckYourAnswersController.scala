@@ -18,7 +18,6 @@ package uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.agents.bulk
 
 import com.google.inject.Inject
 import play.api.i18n.{I18nSupport, Messages, MessagesApi}
-import play.api.libs.json.Json
 import play.api.mvc.{Action, AnyContent, Call, MessagesControllerComponents}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.actions.*
@@ -28,8 +27,9 @@ import uk.gov.hmrc.securitiestransferchargefrontend.models.stf.fileupload.Valida
 import uk.gov.hmrc.securitiestransferchargefrontend.models.submission.BulkConfirmationDetails
 import uk.gov.hmrc.securitiestransferchargefrontend.models.{Mode, NormalMode, UserAnswers}
 import uk.gov.hmrc.securitiestransferchargefrontend.navigation.Navigator
+import uk.gov.hmrc.securitiestransferchargefrontend.pages.BulkConfirmationDetailsPage
 import uk.gov.hmrc.securitiestransferchargefrontend.pages.stf.bulk.{BulkAgentReferencePage, BulkCheckYourAnswersPage}
-import uk.gov.hmrc.securitiestransferchargefrontend.repositories.{ParsedStcRowsRepository, SessionRepository}
+import uk.gov.hmrc.securitiestransferchargefrontend.repositories.ParsedStcRowsRepository
 import uk.gov.hmrc.securitiestransferchargefrontend.services.TransactionSubmissionService
 import uk.gov.hmrc.securitiestransferchargefrontend.services.stf.agents.bulk.CheckYourAnswersService
 import uk.gov.hmrc.securitiestransferchargefrontend.views.html.stf.agents.bulk.CheckYourAnswersView
@@ -47,7 +47,6 @@ class CheckYourAnswersController @Inject()(
                                             view: CheckYourAnswersView,
                                             parsedStcRowsRepository: ParsedStcRowsRepository,
                                             checkYourAnswersService: CheckYourAnswersService,
-                                            sessionRepository: SessionRepository,
                                             transactionSubmissionService: TransactionSubmissionService
                                           )(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport {
 
@@ -58,13 +57,13 @@ class CheckYourAnswersController @Inject()(
       implicit val messages: Messages = messagesApi.preferred(request)
       val fileUploadRef = request.userAnswers.getFileUploadReference()
       parsedStcRowsRepository.findDocumentByReference(fileUploadRef).map {
-        case Some(doc) => {
+        case Some(doc) => 
           val viewModel = checkYourAnswersService.buildViewModel(request.userAnswers, doc)
           Ok(view(viewModel, backLinkCall(NormalMode)(request.userAnswers)))
-        }
-        case _ => {
+          
+        case _ => 
           Redirect(JourneyRecoveryController.onPageLoad())
-        }
+        
       }
   }
 
@@ -74,8 +73,7 @@ class CheckYourAnswersController @Inject()(
 
       parsedStcRowsRepository.findDocumentByReference(fileUploadRef).flatMap {
         case Some(doc) =>
-          val rows = doc.rows.map(row => ValidatedStcRow(row, Seq.empty))
-          // Seq.empty above as we could only get to this point if there are no validation errors
+          val rows = doc.rows.map(ValidatedStcRow.withNoErrors)
 
           val details = BulkConfirmationDetails(
             submissionId = request.userAnswers.submissionId,
@@ -84,14 +82,10 @@ class CheckYourAnswersController @Inject()(
             agentReference = request.userAnswers.get(BulkAgentReferencePage).flatMap(_.agentReference)
           )
 
-          val answers = request.userAnswers.copy(
-            data = request.userAnswers.data + (BulkConfirmationDetails.key -> Json.toJson(details))
-          )
-
           for {
-            _         <-  sessionRepository.set(answers)
-            _         =   transactionSubmissionService.submitBulkStf(rows)
+            answers   <- Future.fromTry(request.userAnswers.set(BulkConfirmationDetailsPage, details))
             nextPage  <-  navigator.nextPage(BulkCheckYourAnswersPage, NormalMode, answers, isReturn(request))
+            _         =   transactionSubmissionService.submitBulkStf(rows)
           } yield Redirect(nextPage)
 
         case None => Future.successful(Redirect(JourneyRecoveryController.onPageLoad()))

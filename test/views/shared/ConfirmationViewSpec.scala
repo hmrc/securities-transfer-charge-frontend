@@ -26,7 +26,6 @@ import uk.gov.hmrc.securitiestransferchargefrontend.models.{ConfirmationViewMode
 import uk.gov.hmrc.securitiestransferchargefrontend.views.html.shared.ConfirmationView
 import views.ViewBaseSpec
 
-import java.time.LocalDate
 import scala.jdk.CollectionConverters.*
 
 class ConfirmationViewSpec extends ViewBaseSpec {
@@ -46,10 +45,10 @@ class ConfirmationViewSpec extends ViewBaseSpec {
                          reference: Option[String] = None
                        ): ConfirmationViewModel =
     ConfirmationViewModel(
-      submissionId = submissionId,
-      paymentDueBy = LocalDate.of(2026, 1, 25),
+      submissionId = submissionId.value,
+      paymentDueBy = "25 January 2026",
       reference    = reference,
-      taxDue       = BigDecimal(500),
+      taxDue       = "£500",
       isAgent      = isAgent,
       journeyType  = journeyType,
       isBulk       = isBulk

@@ -94,8 +94,7 @@ class ForwardRoutes(answerPersistenceService: AnswerPersistenceService,
           agentSingleRoutes.OtherSecuritiesTypeController.onPageLoad(NormalMode)
       }
     case DetailsOfThisTransferPage => userAnswers => dataRequired(DetailsOfThisTransferPage, userAnswers, cyaPage)
-    case CheckYourAnswersPage => userAnswers => goTo(routes.ConfirmationController.onPageLoad(), Some(userAnswers))
-    case BulkCheckYourAnswersPage => _ => Future.successful(routes.ConfirmationController.onPageLoad())
+    case CheckYourAnswersPage | BulkCheckYourAnswersPage => userAnswers => goTo(routes.ConfirmationController.onPageLoad(), Some(userAnswers))
 
     case BulkAgentReferencePage  => userAnswers => goTo(bulkCyaPage, Some(userAnswers))
     case _ => _ => Future.successful(defaultPage)

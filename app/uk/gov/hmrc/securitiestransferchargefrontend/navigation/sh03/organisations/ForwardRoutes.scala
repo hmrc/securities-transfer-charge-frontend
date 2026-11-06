@@ -105,7 +105,7 @@ class ForwardRoutes(answerPersistenceService: AnswerPersistenceService,
             cyaPage
       }
 
-    case CheckYourAnswersPage | BulkCheckYourAnswersPage => _ => goTo(routes.ConfirmationController.onPageLoad())
+    case CheckYourAnswersPage | BulkCheckYourAnswersPage => userAnswers => goTo(routes.ConfirmationController.onPageLoad(), Some(userAnswers))
 
     case BulkCompanyDetailsPage => userAnswers =>
       dataRequired(BulkCompanyDetailsPage, userAnswers, sh03OrgBulkRoutes.TemplateInstructionsController.onPageLoad())

@@ -16,14 +16,16 @@
 
 package uk.gov.hmrc.securitiestransferchargefrontend.controllers
 
-import play.api.i18n.I18nSupport
+import play.api.i18n.{I18nSupport, Lang, Messages}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
-import uk.gov.hmrc.securitiestransferchargefrontend.controllers.actions.{StcAuthEnrolledAction, StcDataRetrievalAction}
+import uk.gov.hmrc.securitiestransferchargefrontend.controllers.actions.{StcAuthEnrolledAction, StcDataRequiredAction, StcDataRetrievalAction}
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.routes
 import uk.gov.hmrc.securitiestransferchargefrontend.models.ConfirmationViewModel
 import uk.gov.hmrc.securitiestransferchargefrontend.models.submission.BulkConfirmationDetails
+import uk.gov.hmrc.securitiestransferchargefrontend.pages.BulkConfirmationDetailsPage
 import uk.gov.hmrc.securitiestransferchargefrontend.repositories.{SessionRepository, TransactionResponseRepository}
+import uk.gov.hmrc.securitiestransferchargefrontend.services.stf.shared.FormattingService
 import uk.gov.hmrc.securitiestransferchargefrontend.views.html.shared.ConfirmationView
 
 import javax.inject.Inject
@@ -33,27 +35,29 @@ class ConfirmationController @Inject()(
                                         val controllerComponents: MessagesControllerComponents,
                                         stcAuthEnrolled: StcAuthEnrolledAction,
                                         getData: StcDataRetrievalAction,
+                                        requireData: StcDataRequiredAction,
                                         sessionRepository: SessionRepository,
                                         transactionResponseRepository: TransactionResponseRepository,
-                                        view: ConfirmationView
+                                        view: ConfirmationView,
+                                        formatter: FormattingService
                                       )(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport {
 
-  def onPageLoad(): Action[AnyContent] = (stcAuthEnrolled andThen getData).async { implicit request =>
+  def onPageLoad(): Action[AnyContent] = (stcAuthEnrolled andThen getData andThen requireData).async { implicit request =>
+    implicit val messages: Messages = messagesApi.preferred(request)
+    implicit val lang: Lang = messages.lang
 
     val isAgent = request.request.affinityGroupKey.contains("agent")
-    val userAnswers = request.userAnswers.getOrElse(
-      throw new IllegalStateException("No UserAnswers found")
-    )
+    val userAnswers = request.userAnswers
 
-    sessionRepository.clear(request.userAnswers.get.userId)
+    sessionRepository.clear(request.userAnswers.userId)
 
-    (userAnswers.data \ BulkConfirmationDetails.key).asOpt[BulkConfirmationDetails] match {
+    userAnswers.get(BulkConfirmationDetailsPage) match {
       case Some(details) =>
         Future.successful(Ok(view(ConfirmationViewModel(
-          submissionId = details.submissionId,
-          paymentDueBy = details.paymentDueBy,
+          submissionId = details.submissionId.value,
+          paymentDueBy = formatter.formatPaymentDueDate(details.paymentDueBy),
           reference = details.agentReference,
-          taxDue = details.taxDue,
+          taxDue = formatter.formatCurrency(details.taxDue),
           isAgent = isAgent,
           journeyType = userAnswers.journeyType,
           isBulk = true
@@ -62,10 +66,10 @@ class ConfirmationController @Inject()(
       case None =>
         transactionResponseRepository.retrieve(userAnswers.submissionId).map { responseDetails =>
           val viewModel = ConfirmationViewModel(
-            submissionId = userAnswers.submissionId,
-            paymentDueBy = responseDetails.paymentDueBy,
+            submissionId = userAnswers.submissionId.value,
+            paymentDueBy = formatter.formatPaymentDueDate(responseDetails.paymentDueBy),
             reference = responseDetails.agentReference,
-            taxDue = responseDetails.taxDue,
+            taxDue = formatter.formatCurrency(responseDetails.taxDue),
             isAgent = isAgent,
             journeyType = userAnswers.journeyType,
             isBulk = false

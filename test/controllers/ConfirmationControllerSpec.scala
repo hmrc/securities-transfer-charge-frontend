@@ -21,6 +21,7 @@ import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.*
 import org.scalatest.BeforeAndAfterEach
 import org.scalatestplus.mockito.MockitoSugar
+import play.api.i18n.{Lang, Messages}
 import play.api.inject.bind
 import play.api.test.FakeRequest
 import play.api.test.Helpers.*
@@ -28,6 +29,7 @@ import uk.gov.hmrc.securitiestransferchargefrontend.controllers.routes
 import uk.gov.hmrc.securitiestransferchargefrontend.models.{ConfirmationViewModel, JourneyType}
 import uk.gov.hmrc.securitiestransferchargefrontend.repositories.TransactionResponseRepository
 import uk.gov.hmrc.securitiestransferchargefrontend.services.SubmissionCreateResponseSuccess
+import uk.gov.hmrc.securitiestransferchargefrontend.services.stf.shared.FormattingService
 import uk.gov.hmrc.securitiestransferchargefrontend.views.html.shared.ConfirmationView
 
 import java.time.LocalDate
@@ -59,21 +61,25 @@ class ConfirmationControllerSpec extends SpecBase with MockitoSugar with BeforeA
           bind[TransactionResponseRepository].toInstance(mockTransactionResponseRepository)
         )
         .build()
+      val formatter = application.injector.instanceOf[FormattingService]
 
       running(application) {
+        implicit val msgs: Messages = messages(application)
+        implicit val lang: Lang = msgs.lang
+
         val request = FakeRequest(GET, routes.ConfirmationController.onPageLoad().url)
         val view = application.injector.instanceOf[ConfirmationView]
         val result = route(application, request).value
 
         val viewModel = ConfirmationViewModel(
-          submissionId = submissionId,
-          paymentDueBy = paymentDueBy,
+          submissionId = submissionId.value,
+          paymentDueBy = formatter.formatPaymentDueDate(paymentDueBy),
           reference = None,
-          taxDue = taxDue,
+          taxDue = formatter.formatCurrency(taxDue),
           journeyType = JourneyType.STF,
           isAgent = false,
           isBulk = false
-        )(messages(application))
+        )
 
         status(result) mustEqual OK
         contentAsString(result) mustEqual view(viewModel)(request, messages(application)).toString
@@ -96,6 +102,18 @@ class ConfirmationControllerSpec extends SpecBase with MockitoSugar with BeforeA
 
         status(result) mustEqual SEE_OTHER
         redirectLocation(result).value must include("there-is-a-problem")
+      }
+    }
+
+    "must redirect to Journey Recovery if there are no user answers" in {
+      val application = applicationBuilder(userAnswers = None).build()
+
+      running(application) {
+        val request = FakeRequest(GET, routes.ConfirmationController.onPageLoad().url)
+        val result = route(application, request).value
+
+        status(result) mustEqual SEE_OTHER
+        redirectLocation(result).value mustEqual routes.JourneyRecoveryController.onPageLoad().url
       }
     }
   }

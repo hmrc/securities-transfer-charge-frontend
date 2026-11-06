@@ -16,11 +16,11 @@
 
 package controllers.sh03.agents.bulk
 
-import base.SpecBase
+import base.{FileUploadFixtures, SpecBase}
 import base.stubs.StubPersistentNavigator
 import com.google.inject.name.Names
 import org.mockito.ArgumentCaptor
-import org.mockito.ArgumentMatchers.{any, anyString, eq => eqTo}
+import org.mockito.ArgumentMatchers.{any, anyBoolean, anyString, eq as eqTo}
 import org.mockito.Mockito.{never, reset, verify, when}
 import org.scalatest.BeforeAndAfterEach
 import org.scalatestplus.mockito.MockitoSugar.mock
@@ -29,13 +29,15 @@ import play.api.test.FakeRequest
 import play.api.test.Helpers.*
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.actions.requests.StcDataRequest
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.sh03.agents.bulk.routes
-import uk.gov.hmrc.securitiestransferchargefrontend.models.UserAnswers
+import uk.gov.hmrc.securitiestransferchargefrontend.models.JourneyType.SH03
+import uk.gov.hmrc.securitiestransferchargefrontend.models.{NormalMode, UserAnswers}
 import uk.gov.hmrc.securitiestransferchargefrontend.models.shared.AgentReference
 import uk.gov.hmrc.securitiestransferchargefrontend.models.stf.HowToNotifyAboutSecuritiesTransfer
 import uk.gov.hmrc.securitiestransferchargefrontend.models.stf.fileupload.{ParsedStcRow, ParsedStcRowsDocument, ParsedValue, ValidatedStcRow}
 import uk.gov.hmrc.securitiestransferchargefrontend.models.submission.BulkConfirmationDetails
 import uk.gov.hmrc.securitiestransferchargefrontend.navigation.{Navigator, PersistentNavigator}
-import uk.gov.hmrc.securitiestransferchargefrontend.pages.sh03.bulk.BulkAgentReferencePage
+import uk.gov.hmrc.securitiestransferchargefrontend.pages.BulkConfirmationDetailsPage
+import uk.gov.hmrc.securitiestransferchargefrontend.pages.sh03.bulk.{BulkAgentReferencePage, BulkCheckYourAnswersPage}
 import uk.gov.hmrc.securitiestransferchargefrontend.pages.stf.shared.HowToNotifyAboutSecuritiesTransferPage
 import uk.gov.hmrc.securitiestransferchargefrontend.repositories.{ParsedStcRowsRepository, SessionRepository}
 import uk.gov.hmrc.securitiestransferchargefrontend.services.TransactionSubmissionService
@@ -45,17 +47,17 @@ import java.time.{Instant, LocalDate}
 import scala.concurrent.Future
 
 
-class CheckYourAnswersControllerSpec extends SpecBase with BeforeAndAfterEach {
+class CheckYourAnswersControllerSpec extends SpecBase with FileUploadFixtures with BeforeAndAfterEach {
 
   override def beforeEach(): Unit = {
     super.beforeEach()
-    reset(mockRepository, mockCyaService, mockSessionRepository, mockTransactionSubmissionService)
+    reset(mockRepository, mockCyaService, mockSessionRepository, mockTransactionSubmissionService, mockNavigator)
   }
 
   private def answersWithoutAgentRef: UserAnswers =
-    emptyUserAnswers
+    UserAnswers.empty(testUserId)(testGroupIdentifier)(submissionId)(SH03)
       .set(HowToNotifyAboutSecuritiesTransferPage, HowToNotifyAboutSecuritiesTransfer.MoreThanOneAtATime).success.value
-      .setFileUploadReference("testReference")
+      .setFileUploadReference(reference)
 
   private def completeUserAnswers: UserAnswers =
     answersWithoutAgentRef
@@ -103,6 +105,8 @@ class CheckYourAnswersControllerSpec extends SpecBase with BeforeAndAfterEach {
   private val mockCyaService = mock[CheckYourAnswersService]
   private val mockSessionRepository = mock[SessionRepository]
   private val mockTransactionSubmissionService = mock[TransactionSubmissionService]
+  private val mockNavigator = mock[Navigator]
+
 
   private val withRefStubNavigator = new StubPersistentNavigator(testNextPage, completeUserAnswers, "sh03", "")
   private val withoutRefStubNavigator = new StubPersistentNavigator(testNextPage, answersWithoutAgentRef, "sh03", "")
@@ -110,15 +114,21 @@ class CheckYourAnswersControllerSpec extends SpecBase with BeforeAndAfterEach {
   private val rows: Seq[ParsedStcRow] = Seq(validSh03Row)
 
   private val someTestDoc: ParsedStcRowsDocument = ParsedStcRowsDocument(_id = "id", rows = rows, createdAt = Instant.now, fileName = "testFile")
-  private val expectedRows: Seq[ValidatedStcRow] = rows.map(row => ValidatedStcRow(row, Seq.empty))
+  private val expectedRows: Seq[ValidatedStcRow] = someTestDoc.rows.map(ValidatedStcRow.withNoErrors)
   private val testPaymentDueBy: LocalDate = LocalDate.of(2026, 3, 22)
   private val testTaxDue: BigDecimal = BigDecimal(75.00)
+
+  private def capturedNavigatorAnswers(): UserAnswers = {
+    val captor = ArgumentCaptor.forClass(classOf[UserAnswers])
+    verify(mockNavigator).nextPage(eqTo(BulkCheckYourAnswersPage), eqTo(NormalMode), captor.capture(), anyBoolean())(any())
+    captor.getValue
+  }
 
   "SH03 Agent Bulk CheckYourAnswersController" - {
     
     "onPageLoad" - {
       "must return OK and the correct view for a GET" in {
-        when(mockRepository.findDocumentByReference("testReference")).thenReturn(Future.successful(Some(someTestDoc)))
+        when(mockRepository.findDocumentByReference(reference)).thenReturn(Future.successful(Some(someTestDoc)))
 
         val application = applicationBuilder(userAnswers = Some(completeUserAnswers))
           .overrides(
@@ -171,15 +181,15 @@ class CheckYourAnswersControllerSpec extends SpecBase with BeforeAndAfterEach {
     
     "onSubmit" - {
       "must save the bulk confirmation details, start the SH03 submission and redirect to the next page" in {
-        when(mockRepository.findDocumentByReference("testReference")).thenReturn(Future.successful(Some(someTestDoc)))
+        when(mockRepository.findDocumentByReference(reference)).thenReturn(Future.successful(Some(someTestDoc)))
         when(mockCyaService.paymentDueBy(someTestDoc)).thenReturn(testPaymentDueBy)
         when(mockCyaService.totalTaxDue(someTestDoc)).thenReturn(testTaxDue)
-        when(mockSessionRepository.set(any())).thenReturn(Future.unit)
+        when(mockNavigator.nextPage(any(), any(), any(), anyBoolean())(any())).thenReturn(Future.successful(testNextPage))
         when(mockTransactionSubmissionService.submitBulkSh03(any())(using any[StcDataRequest[?]]())).thenReturn(Future.successful(true))
 
         val application = applicationBuilder(userAnswers = Some(completeUserAnswers), sessionRepository = mockSessionRepository)
           .overrides(
-            bind[Navigator].qualifiedWith(Names.named("agentsSh03")).toInstance(withRefStubNavigator),
+            bind[Navigator].qualifiedWith(Names.named("agentsSh03")).toInstance(mockNavigator),
             bind[PersistentNavigator].qualifiedWith(Names.named("agentsSh03")).toInstance(withRefStubNavigator),
             bind[ParsedStcRowsRepository].toInstance(mockRepository),
             bind[CheckYourAnswersService].toInstance(mockCyaService),
@@ -194,10 +204,12 @@ class CheckYourAnswersControllerSpec extends SpecBase with BeforeAndAfterEach {
           status(result) mustEqual SEE_OTHER
           redirectLocation(result).value mustEqual testNextPage.url
 
-          val captor = ArgumentCaptor.forClass(classOf[UserAnswers])
-          verify(mockSessionRepository).set(captor.capture())
+          val answers = capturedNavigatorAnswers()
 
-          (captor.getValue.data \ BulkConfirmationDetails.key).as[BulkConfirmationDetails] mustEqual
+          answers.submissionId mustEqual submissionId
+          answers.journeyType mustEqual SH03
+          answers.fileUploadReference mustBe Some(reference)
+          answers.get(BulkConfirmationDetailsPage).value mustEqual
             BulkConfirmationDetails(
               submissionId = completeUserAnswers.submissionId,
               paymentDueBy = testPaymentDueBy,
@@ -210,15 +222,15 @@ class CheckYourAnswersControllerSpec extends SpecBase with BeforeAndAfterEach {
       }
 
       "must save no agent reference when one has not been provided" in {
-        when(mockRepository.findDocumentByReference("testReference")).thenReturn(Future.successful(Some(someTestDoc)))
+        when(mockRepository.findDocumentByReference(reference)).thenReturn(Future.successful(Some(someTestDoc)))
         when(mockCyaService.paymentDueBy(someTestDoc)).thenReturn(testPaymentDueBy)
         when(mockCyaService.totalTaxDue(someTestDoc)).thenReturn(testTaxDue)
-        when(mockSessionRepository.set(any())).thenReturn(Future.unit)
+        when(mockNavigator.nextPage(any(), any(), any(), anyBoolean())(any())).thenReturn(Future.successful(testNextPage))
         when(mockTransactionSubmissionService.submitBulkSh03(any())(using any[StcDataRequest[?]]())).thenReturn(Future.successful(true))
 
         val application = applicationBuilder(userAnswers = Some(answersWithoutAgentRef), sessionRepository = mockSessionRepository)
           .overrides(
-            bind[Navigator].qualifiedWith(Names.named("agentsSh03")).toInstance(withoutRefStubNavigator),
+            bind[Navigator].qualifiedWith(Names.named("agentsSh03")).toInstance(mockNavigator),
             bind[PersistentNavigator].qualifiedWith(Names.named("agentsSh03")).toInstance(withoutRefStubNavigator),
             bind[ParsedStcRowsRepository].toInstance(mockRepository),
             bind[CheckYourAnswersService].toInstance(mockCyaService),
@@ -233,10 +245,12 @@ class CheckYourAnswersControllerSpec extends SpecBase with BeforeAndAfterEach {
           status(result) mustEqual SEE_OTHER
           redirectLocation(result).value mustEqual testNextPage.url
 
-          val captor = ArgumentCaptor.forClass(classOf[UserAnswers])
-          verify(mockSessionRepository).set(captor.capture())
+          val answers = capturedNavigatorAnswers()
 
-          (captor.getValue.data \ BulkConfirmationDetails.key).as[BulkConfirmationDetails] mustEqual
+          answers.submissionId mustEqual submissionId
+          answers.journeyType mustEqual SH03
+          answers.fileUploadReference mustBe Some(reference)
+          answers.get(BulkConfirmationDetailsPage).value mustEqual
             BulkConfirmationDetails(
               submissionId = answersWithoutAgentRef.submissionId,
               paymentDueBy = testPaymentDueBy,

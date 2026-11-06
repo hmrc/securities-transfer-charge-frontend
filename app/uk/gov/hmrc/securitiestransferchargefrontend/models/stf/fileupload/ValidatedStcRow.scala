@@ -27,4 +27,8 @@ final case class ValidatedStcRow(
 
 object ValidatedStcRow {
   implicit val format: OFormat[ValidatedStcRow] = Json.format[ValidatedStcRow]
+
+  /** For rows that have already passed validation (e.g. read back from a stored document). */
+  def withNoErrors(row: ParsedStcRow): ValidatedStcRow = ValidatedStcRow(row, Seq.empty)
+
 }

@@ -90,8 +90,7 @@ class ForwardRoutes(answerPersistenceService: AnswerPersistenceService,
           }
       }
     case TotalMarketValuePage => userAnswers => dataRequired(TotalMarketValuePage, userAnswers, cyaPage)
-    case CheckYourAnswersPage => userAnswers => goTo(routes.ConfirmationController.onPageLoad(), Some(userAnswers))
-    case BulkCheckYourAnswersPage => _ => Future.successful(routes.ConfirmationController.onPageLoad())
+    case CheckYourAnswersPage | BulkCheckYourAnswersPage => userAnswers => goTo(routes.ConfirmationController.onPageLoad(), Some(userAnswers))
     case _ => _ => Future.successful(defaultPage)
   }
 
