@@ -26,7 +26,9 @@ import uk.gov.hmrc.securitiestransferchargefrontend.models.JourneyType.SH03
 import uk.gov.hmrc.securitiestransferchargefrontend.models.UserAnswers
 import uk.gov.hmrc.securitiestransferchargefrontend.models.audit.SH03PostSubmissionAuditModelBuilder
 import uk.gov.hmrc.securitiestransferchargefrontend.models.nrs.IdentityData
+import uk.gov.hmrc.securitiestransferchargefrontend.models.sh03.HowToNotifyAboutShareBuyback
 import uk.gov.hmrc.securitiestransferchargefrontend.models.submission._
+import uk.gov.hmrc.securitiestransferchargefrontend.pages.sh03.HowToNotifyAboutShareBuybackPage
 import uk.gov.hmrc.securitiestransferchargefrontend.services.SubmissionCreateResponseSuccess
 
 import java.time.LocalDate
@@ -154,11 +156,20 @@ class SH03PostSubmissionAuditModelBuilderSpec extends SpecBase {
     uniqueIdentifier = testUniqueIdentifier
   )
 
-  val testUserAnswers = UserAnswers.empty(testUserId)(testGroupId)(testSubmissionId)(SH03)
+  val testUserAnswers: UserAnswers = UserAnswers.empty(testUserId)(testGroupId)(testSubmissionId)(SH03)
+
+  val testUserAnswersWithOneAtATime: UserAnswers = testUserAnswers.set(HowToNotifyAboutShareBuybackPage, HowToNotifyAboutShareBuyback.OneAtATime).success.value
+  
+  val testUserAnswersWithMoreThanOneAtATime: UserAnswers = testUserAnswers.set(HowToNotifyAboutShareBuybackPage, HowToNotifyAboutShareBuyback.MoreThanOneAtATime).success.value
 
   val testDataRequest = StcDataRequest(
     request = testAuthorisedRequest,
-    userAnswers = testUserAnswers
+    userAnswers = testUserAnswersWithOneAtATime
+  )
+  
+  val testDataRequestBulk = StcDataRequest(
+    request = testAuthorisedRequest,
+    userAnswers = testUserAnswersWithMoreThanOneAtATime
   )
 
   "SH03PostSubmissionAuditModelBuilder" - {
@@ -194,7 +205,7 @@ class SH03PostSubmissionAuditModelBuilderSpec extends SpecBase {
         agentDetails = testAgentDetails,
         sh03Requests = Seq(testSH03Request, testSH03Request.copy(recordId = 2)),
         etmpResponses = Seq(testEtmpResponse, testEtmpResponse.copy(utrn = "UTRN124")),
-        request = testDataRequest,
+        request = testDataRequestBulk,
         totalBatches = 1,
         totalTransfers = 2,
         currentBatch = 1,

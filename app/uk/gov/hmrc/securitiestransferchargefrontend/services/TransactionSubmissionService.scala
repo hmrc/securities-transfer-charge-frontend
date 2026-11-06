@@ -146,7 +146,7 @@ final class TransactionSubmissionServiceImpl @Inject()(
     transactionResponseRepository.store(submissionId, successResponse)
     saveAndReturnClient.deleteDraft(submissionId)
     sendSingleSubmissionDataToNRS(submissionId, successResponse.utrn)
-    sendSingleSubmissionDataToAudit(transferType, affinityData, successResponse)
+    sendSubmissionDataToAudit(transferType, affinityData, successResponse)
   }
 
   private def handleSinglePartialFailure(transferType: TransferType)(pf: SubmissionCreateResponsePartialFailure): Unit = {
@@ -178,7 +178,7 @@ final class TransactionSubmissionServiceImpl @Inject()(
     auditService.audit(AuditModel(SubmissionSuccess, subscriptionId, affinityGroup, credentialId, Some(submissionId), AuditType.fromTransferType(transferType)))
     saveAndReturnClient.deleteDraft(submissionId)
     sendBulkSubmissionDataToNRS(submissionId)
-    sendBulkSubmissionDataToAudit(transferType, affinityData, successResponse, totalTransfers)
+    sendSubmissionDataToAudit(transferType, affinityData, successResponse, totalTransfers)
   }
   
   private def sendBulkSubmissionDataToNRS(submissionId: SubmissionId)(using request: StcDataRequest[?], hc: HeaderCarrier): Future[Unit] = {
@@ -209,31 +209,11 @@ final class TransactionSubmissionServiceImpl @Inject()(
     bulkStatusService.markAsFailed(group, submissionId)
   }
 
-  private def sendSingleSubmissionDataToAudit(
-    transferType: TransferType,
-    affinityData: AffinityData,
-    successResponse: SubmissionCreateResponseSuccess
-  )(implicit hc: HeaderCarrier, request: StcDataRequest[?]): Unit = {
-    transferType match {
-      case STF =>
-        etmpSubmissionService.getSubmissionDataStf(request.userAnswers, affinityData).foreach {
-          case (declaration, stfRequest, stfTransaction) =>
-            sendAuditSTF(Seq(stfRequest), Seq(successResponse), declaration, stfRequest.agentDetails, stfTransaction)
-        }
-      case SH03 =>
-        etmpSubmissionService.getSubmissionDataSh03(request.userAnswers, affinityData).foreach {
-          case (declaration, sh03Request) =>
-            sendAuditSH03(Seq(sh03Request), Seq(successResponse), declaration, sh03Request.agentDetails)
-        }
-      case _ => ()
-    }
-  }
-
-  private def sendBulkSubmissionDataToAudit(
+  private def sendSubmissionDataToAudit(
     transferType: TransferType,
     affinityData: AffinityData,
     successResponse: SubmissionCreateResponseSuccess,
-    totalTransfers: Int
+    totalTransfers: Int = 1
   )(implicit hc: HeaderCarrier, request: StcDataRequest[?]): Unit = {
     transferType match {
       case STF =>

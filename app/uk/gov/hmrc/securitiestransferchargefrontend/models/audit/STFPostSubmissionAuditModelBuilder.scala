@@ -19,7 +19,8 @@ package uk.gov.hmrc.securitiestransferchargefrontend.models.audit
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.actions.requests.StcDataRequest
 import uk.gov.hmrc.securitiestransferchargefrontend.models.search.EtmpSuccessResponseExtensions.ChargeType
 import uk.gov.hmrc.securitiestransferchargefrontend.models.sh03.HowToNotifyAboutShareBuyback
-import uk.gov.hmrc.securitiestransferchargefrontend.models.submission._
+import uk.gov.hmrc.securitiestransferchargefrontend.models.submission.*
+import uk.gov.hmrc.securitiestransferchargefrontend.pages.sh03.HowToNotifyAboutShareBuybackPage
 import uk.gov.hmrc.securitiestransferchargefrontend.services.SubmissionCreateResponseSuccess
 
 import java.time.format.DateTimeFormatter
@@ -40,7 +41,7 @@ object STFPostSubmissionAuditModelBuilder {
     currentBatch: Int = 1,
     batchStartIndex: Int = 0,
     versionNumber: Int = 0,
-    chargeType: String = "STC",
+    chargeType: String = "STT",
     chargeTypeDescription: String = ChargeType.tax
   ): STFPostSubmissionAuditModel = {
     
@@ -55,11 +56,10 @@ object STFPostSubmissionAuditModelBuilder {
       )
     }
 
-    val transferMethod = if (totalTransfers == 1) {
-      HowToNotifyAboutShareBuyback.OneAtATime.toString
-    } else {
-      HowToNotifyAboutShareBuyback.MoreThanOneAtATime.toString
-    }
+    val transferMethod = request.userAnswers
+      .get(HowToNotifyAboutShareBuybackPage)
+      .map(_.toString)
+      .getOrElse("")
 
     val auditDetail = STFPostSubmissionAuditDetail(
       declarantName = declaration.name,

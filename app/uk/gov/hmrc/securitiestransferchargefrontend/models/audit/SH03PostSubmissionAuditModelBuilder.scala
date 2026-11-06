@@ -17,7 +17,9 @@
 package uk.gov.hmrc.securitiestransferchargefrontend.models.audit
 
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.actions.requests.StcDataRequest
-import uk.gov.hmrc.securitiestransferchargefrontend.models.submission._
+import uk.gov.hmrc.securitiestransferchargefrontend.models.sh03.HowToNotifyAboutShareBuyback
+import uk.gov.hmrc.securitiestransferchargefrontend.models.submission.*
+import uk.gov.hmrc.securitiestransferchargefrontend.pages.sh03.HowToNotifyAboutShareBuybackPage
 import uk.gov.hmrc.securitiestransferchargefrontend.services.SubmissionCreateResponseSuccess
 
 import java.time.format.DateTimeFormatter
@@ -47,7 +49,10 @@ object SH03PostSubmissionAuditModelBuilder {
       )
     }
 
-    val transferMethod = if (totalTransfers == 1) "oneAtATime" else "moreThanOneAtATime"
+    val transferMethod = request.userAnswers
+      .get(HowToNotifyAboutShareBuybackPage)
+      .map(_.toString)
+      .getOrElse("")
 
     val auditDetail = SH03PostSubmissionAuditDetail(
       declarantRole1 = declaration.role1.map(_.toString).getOrElse(""),
