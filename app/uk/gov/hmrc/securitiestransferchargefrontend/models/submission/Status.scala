@@ -18,9 +18,13 @@ package uk.gov.hmrc.securitiestransferchargefrontend.models.submission
 
 import play.api.libs.json.*
 
+type RowNumber = Int
+type FailureReason = String
+type RowToFailureMap = Map[RowNumber, FailureReason]
+
 enum Status:
   case Processing, Failed
-  case PartiallyFailed(rowFailures: Map[Int, String])
+  case PartiallyFailed(rowFailures: RowToFailureMap)
 
 object Status:
 

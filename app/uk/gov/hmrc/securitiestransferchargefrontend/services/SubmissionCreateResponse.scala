@@ -17,6 +17,7 @@
 package uk.gov.hmrc.securitiestransferchargefrontend.services
 
 import uk.gov.hmrc.securitiestransferchargefrontend.domain.SubmissionId
+import uk.gov.hmrc.securitiestransferchargefrontend.models.submission.RowToFailureMap
 
 import java.time.LocalDate
 
@@ -38,7 +39,11 @@ trait SubmissionCreateResponse:
     case _                                  => false
   }
 
-// TODO: How would this work for bulk??? Or is this only needed for the confirmation page??
+/* TODO: For bulk the utrn is just the first returned, the others are not collected.
+ *  This is fine for now since bulk does not have a confirmation page, but if we
+ *  change that we will have to do something else here.
+ */
+
 final case class SubmissionCreateResponseSuccess(
   submissionId: SubmissionId,
   utrn: String,
@@ -50,7 +55,7 @@ final case class SubmissionCreateResponseSuccess(
 final case class SubmissionCreateResponsePartialFailure(
   submissionId: SubmissionId,
   successfulChargeReferences: Seq[ChargeReference],
-  failedRecords: Seq[Int],
+  failedRecords: RowToFailureMap,
   taxDue: BigDecimal,
   paymentDueBy: LocalDate,
   agentReference: Option[String]) extends SubmissionCreateResponse
