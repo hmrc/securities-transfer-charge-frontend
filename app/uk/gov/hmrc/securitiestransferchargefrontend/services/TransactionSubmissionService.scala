@@ -189,14 +189,9 @@ final class TransactionSubmissionServiceImpl @Inject()(
 
   private def handleBulkPartialFailure(transferType: TransferType)(pf: SubmissionCreateResponsePartialFailure)(using req: StcDataRequest[?]) : Future[Unit] = {
     val submissionId = pf.submissionId
-    val failures = extractFailures(pf)
     logger.warn(s"Partial failure for ${transferType.toString} submission $submissionId - errors stored in bulk service status repository.")
     val group = GroupIdentifier(req.request.groupIdentifier)
-    bulkStatusService.markAsPartiallyFailed(group, submissionId, failures)
-  }
-
-  private def extractFailures(pf: SubmissionCreateResponsePartialFailure): Map[Int, String] = {
-    pf.failedRecords.map(_ -> "Failed").toMap // TODO: PF type needs error messages.
+    bulkStatusService.markAsPartiallyFailed(group, submissionId, pf.failedRecords)
   }
 
   private def handleBulkFailure(transferType: TransferType, submissionId: SubmissionId)(using req: StcDataRequest[?]): Future[Unit] = Future {
