@@ -209,5 +209,59 @@ class EtmpSubmissionServiceSpec extends AnyFreeSpec with Matchers with SpecBase 
         r mustBe SubmissionCreateResponseFailure
       }
     }
+
+    "getSubmissionDataStf should return Some with correct data when StfTransaction exists" in {
+      val fakeClient = FakeEtmpSubmissionClient(successfulChargesResponseGen.sample.get)
+      val service = new EtmpSubmissionServiceImpl(fakeClient)
+      val result = service.getSubmissionDataStf(mockUserAnswers, affinityData)
+      
+      result mustBe defined
+      result.foreach { case (declaration, request, transaction) =>
+        declaration mustBe a[SingleTransferDeclaration]
+        request mustBe a[SingleTransferRequest]
+        transaction mustBe stfTransaction
+      }
+    }
+
+    "getSubmissionDataStf should return None when StfTransaction does not exist" in {
+      val mockEmptyUserAnswers = mock[UserAnswers]
+      when(mockEmptyUserAnswers.get(StfTransaction)).thenReturn(None)
+      when(mockEmptyUserAnswers.get(RoleAtPurchasingCompanyPage)).thenReturn(None)
+      when(mockEmptyUserAnswers.get(AgentReferencePage)).thenReturn(None)
+      when(mockEmptyUserAnswers.submissionId).thenReturn(submissionId)
+      
+      val fakeClient = FakeEtmpSubmissionClient(successfulChargesResponseGen.sample.get)
+      val service = new EtmpSubmissionServiceImpl(fakeClient)
+      val result = service.getSubmissionDataStf(mockEmptyUserAnswers, affinityData)
+      
+      result mustBe None
+    }
+
+    "getSubmissionDataSh03 should return Some with correct data when Sh03Transaction exists" in {
+      val fakeClient = FakeEtmpSubmissionClient(successfulChargesResponseGen.sample.get)
+      val service = new EtmpSubmissionServiceImpl(fakeClient)
+      val result = service.getSubmissionDataSh03(mockUserAnswers, affinityData)
+      
+      result mustBe defined
+      result.foreach { case (declaration, request) =>
+        declaration mustBe a[SingleTransferDeclaration]
+        request mustBe a[SingleTransferRequest]
+      }
+    }
+
+    "getSubmissionDataSh03 should return None when Sh03Transaction does not exist" in {
+      val mockEmptyUserAnswers = mock[UserAnswers]
+      when(mockEmptyUserAnswers.get(StfTransaction)).thenReturn(None)
+      when(mockEmptyUserAnswers.get(Sh03Transaction)).thenReturn(None)
+      when(mockEmptyUserAnswers.get(RoleAtPurchasingCompanyPage)).thenReturn(None)
+      when(mockEmptyUserAnswers.get(AgentReferencePage)).thenReturn(None)
+      when(mockEmptyUserAnswers.submissionId).thenReturn(submissionId)
+      
+      val fakeClient = FakeEtmpSubmissionClient(successfulChargesResponseGen.sample.get)
+      val service = new EtmpSubmissionServiceImpl(fakeClient)
+      val result = service.getSubmissionDataSh03(mockEmptyUserAnswers, affinityData)
+      
+      result mustBe None
+    }
   }
 }
