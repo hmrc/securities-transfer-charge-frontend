@@ -18,178 +18,47 @@ package models
 
 import base.SpecBase
 import play.api.i18n.Messages
-import uk.gov.hmrc.securitiestransferchargefrontend.domain.SubmissionId
 import uk.gov.hmrc.securitiestransferchargefrontend.models.ConfirmationViewModel
+import uk.gov.hmrc.securitiestransferchargefrontend.models.JourneyType.{STF, SH03}
+import uk.gov.hmrc.securitiestransferchargefrontend.models.JourneyType
 
-import java.time.LocalDate
 
 class ConfirmationViewModelSpec extends SpecBase {
 
   implicit val messages: Messages = messages(applicationBuilder().build())
 
+  private def viewModel(journeyType: JourneyType): ConfirmationViewModel =
+    ConfirmationViewModel(
+      submissionId = "STC-123456789",
+      paymentDueBy = "25 January 2026",
+      reference = None,
+      taxDue = "£500",
+      isAgent = false,
+      journeyType = journeyType,
+      isBulk = false
+    )
+
   "ConfirmationViewModel" - {
 
-    "must create view model with all required fields for individual" in {
-      val submissionId = SubmissionId("STC-123456789")
-      val paymentDueBy = LocalDate.of(2024, 12, 31)
-      val taxDue = BigDecimal("1000.50")
+    "singleReferencesKey" - {
 
-      val viewModel = ConfirmationViewModel(
-        submissionId = submissionId,
-        paymentDueBy = paymentDueBy,
-        reference = None,
-        taxDue = taxDue,
-        isAgent = false
-      )
+      "must use the transfer reference key for STF" in {
+        viewModel(STF).singleReferencesKey mustBe "confirmation.heading.transferReference.p1"
+      }
 
-      viewModel.submissionId mustEqual submissionId.value
-      viewModel.taxDue must include("1,000.50")
-      viewModel.isAgent mustEqual false
-      viewModel.reference mustBe None
+      "must use the share buyback key for SH03" in {
+        viewModel(SH03).singleReferencesKey mustBe "confirmation.heading.shareBuyBack.p1"
+      }
     }
 
-    "must create view model with agent reference for agent" in {
-      val submissionId = SubmissionId("STC-987654321")
-      val paymentDueBy = LocalDate.of(2025, 6, 15)
-      val agentReference = Some("AGENT-REF-123")
-      val taxDue = BigDecimal("2500.75")
+    "useReferencesKey" - {
 
-      val viewModel = ConfirmationViewModel(
-        submissionId = submissionId,
-        paymentDueBy = paymentDueBy,
-        reference = agentReference,
-        taxDue = taxDue,
-        isAgent = true
-      )
-
-      viewModel.submissionId mustEqual submissionId.value
-      viewModel.isAgent mustEqual true
-      viewModel.reference mustBe agentReference
-    }
-
-    "must format tax amounts correctly" in {
-      val viewModel = ConfirmationViewModel(
-        submissionId = SubmissionId("STC-123456789"),
-        paymentDueBy = LocalDate.now(),
-        reference = None,
-        taxDue = BigDecimal("1000.50"),
-        isAgent = false
-      )
-
-      viewModel.taxDue must include("£")
-      viewModel.taxDue must include("1,000.50")
-    }
-
-    "must format tax due correctly" - {
-
-      "must truncate to 2 decimal places without rounding up" in {
-        val result = ConfirmationViewModel(
-          submissionId = SubmissionId("ABC123"),
-          paymentDueBy = LocalDate.now(),
-          reference = None,
-          taxDue = BigDecimal("9999.999"),
-          isAgent = false
-        )
-        result.taxDue mustBe "£9,999.99"
+      "must use the transfer reference key for STF" in {
+        viewModel(STF).useReferencesKey mustBe "confirmation.heading.transferReference.p2"
       }
 
-      "must truncate values with more than 2 decimal places" in {
-        val result = ConfirmationViewModel(
-          submissionId = SubmissionId("ABC123"),
-          paymentDueBy = LocalDate.now(),
-          reference = None,
-          taxDue = BigDecimal("1234.567"),
-          isAgent = false
-        )
-        result.taxDue mustBe "£1,234.56"
-      }
-
-      "must display pence when present" in {
-        val result = ConfirmationViewModel(
-          submissionId = SubmissionId("ABC123"),
-          paymentDueBy = LocalDate.now(),
-          reference = None,
-          taxDue = BigDecimal("9999.19"),
-          isAgent = false
-        )
-        result.taxDue mustBe "£9,999.19"
-      }
-
-      "must not display .00 for whole numbers" in {
-        val result = ConfirmationViewModel(
-          submissionId = SubmissionId("ABC123"),
-          paymentDueBy = LocalDate.now(),
-          reference = None,
-          taxDue = BigDecimal("9000"),
-          isAgent = false
-        )
-        result.taxDue mustBe "£9,000"
-      }
-
-      "must not display .00 for zero" in {
-        val result = ConfirmationViewModel(
-          submissionId = SubmissionId("ABC123"),
-          paymentDueBy = LocalDate.now(),
-          reference = None,
-          taxDue = BigDecimal("0.0000"),
-          isAgent = false
-        )
-        result.taxDue mustBe "£0"
-      }
-
-      "must format large amounts with commas and no .00" in {
-        val result = ConfirmationViewModel(
-          submissionId = SubmissionId("ABC123"),
-          paymentDueBy = LocalDate.now(),
-          reference = None,
-          taxDue = BigDecimal("9999999"),
-          isAgent = false
-        )
-        result.taxDue mustBe "£9,999,999"
-      }
-
-      "must format amounts with single penny" in {
-        val result = ConfirmationViewModel(
-          submissionId = SubmissionId("ABC123"),
-          paymentDueBy = LocalDate.now(),
-          reference = None,
-          taxDue = BigDecimal("1234.5"),
-          isAgent = false
-        )
-        result.taxDue mustBe "£1,234.50"
-      }
-
-      "must handle small amounts with pence" in {
-        val result = ConfirmationViewModel(
-          submissionId = SubmissionId("ABC123"),
-          paymentDueBy = LocalDate.now(),
-          reference = None,
-          taxDue = BigDecimal("0.99"),
-          isAgent = false
-        )
-        result.taxDue mustBe "£0.99"
-      }
-
-      "must handle small amounts with fraction less than pence" in {
-        val result = ConfirmationViewModel(
-          submissionId = SubmissionId("ABC123"),
-          paymentDueBy = LocalDate.now(),
-          reference = None,
-          taxDue = BigDecimal("0.0099"),
-          isAgent = false
-        )
-        result.taxDue mustBe "£0"
-      }
-
-      "must truncate even when third decimal would round up" in {
-        val result = ConfirmationViewModel(
-          submissionId = SubmissionId("ABC123"),
-          paymentDueBy = LocalDate.now(),
-          reference = None,
-          taxDue = BigDecimal("100.999"),
-          isAgent = false
-        )
-        result.taxDue mustBe "£100.99"
+      "must use the share buyback key for SH03" in {
+        viewModel(SH03).useReferencesKey mustBe "confirmation.heading.shareBuyBack.p2"
       }
     }
   }

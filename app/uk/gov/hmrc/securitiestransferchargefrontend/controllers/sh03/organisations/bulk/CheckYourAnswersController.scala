@@ -23,15 +23,19 @@ import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.actions.*
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.routes
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.shared.SaveAndReturnButton.isReturn
+import uk.gov.hmrc.securitiestransferchargefrontend.models.stf.fileupload.ValidatedStcRow
+import uk.gov.hmrc.securitiestransferchargefrontend.models.submission.BulkConfirmationDetails
 import uk.gov.hmrc.securitiestransferchargefrontend.models.{Mode, NormalMode, UserAnswers}
 import uk.gov.hmrc.securitiestransferchargefrontend.navigation.Navigator
+import uk.gov.hmrc.securitiestransferchargefrontend.pages.BulkConfirmationDetailsPage
 import uk.gov.hmrc.securitiestransferchargefrontend.pages.sh03.bulk.BulkCheckYourAnswersPage
 import uk.gov.hmrc.securitiestransferchargefrontend.repositories.ParsedStcRowsRepository
+import uk.gov.hmrc.securitiestransferchargefrontend.services.TransactionSubmissionService
 import uk.gov.hmrc.securitiestransferchargefrontend.services.sh03.organisations.bulk.CheckYourAnswersService
 import uk.gov.hmrc.securitiestransferchargefrontend.views.html.sh03.organisations.bulk.CheckYourAnswersView
 
 import javax.inject.Named
-import scala.concurrent.ExecutionContext
+import scala.concurrent.{ExecutionContext, Future}
 
 class CheckYourAnswersController @Inject()(
                                             override val messagesApi: MessagesApi,
@@ -42,7 +46,8 @@ class CheckYourAnswersController @Inject()(
                                             val controllerComponents: MessagesControllerComponents,
                                             view: CheckYourAnswersView,
                                             checkYourAnswersService: CheckYourAnswersService,
-                                            parsedStcRowsRepository: ParsedStcRowsRepository
+                                            parsedStcRowsRepository: ParsedStcRowsRepository,
+                                            transactionSubmissionService: TransactionSubmissionService
                                           )(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport {
 
   lazy val backLinkCall: Mode => Option[UserAnswers] => Call = mode => userAnswers => navigator.previousPage(BulkCheckYourAnswersPage, mode, userAnswers)
@@ -61,10 +66,30 @@ class CheckYourAnswersController @Inject()(
         Redirect(routes.JourneyRecoveryController.onPageLoad())
     }
   }
+
   def onSubmit(): Action[AnyContent] = (stcAuthEnrolled andThen getData andThen requireData).async {
     implicit request =>
-      for {
-        nextPage <- navigator.nextPage(BulkCheckYourAnswersPage, NormalMode, request.userAnswers, isReturn(request))
-      } yield Redirect(nextPage)
+      val fileUploadRef = request.userAnswers.getFileUploadReference()
+
+      parsedStcRowsRepository.findDocumentByReference(fileUploadRef).flatMap {
+        case Some(parsedStcRowsDocument) =>
+          val rows = parsedStcRowsDocument.rows.map(ValidatedStcRow.withNoErrors)
+
+          val details = BulkConfirmationDetails(
+            submissionId = request.userAnswers.submissionId,
+            paymentDueBy = checkYourAnswersService.paymentDueBy(parsedStcRowsDocument),
+            taxDue = checkYourAnswersService.totalTaxDue(parsedStcRowsDocument),
+            agentReference = None
+          )
+          
+          for {
+            answers   <- Future.fromTry(request.userAnswers.set(BulkConfirmationDetailsPage, details))
+            nextPage  <- navigator.nextPage(BulkCheckYourAnswersPage, NormalMode, answers, isReturn(request))
+            _          = transactionSubmissionService.submitBulkSh03(rows)
+          } yield Redirect(nextPage)
+
+        case None =>
+          Future.successful(Redirect(routes.JourneyRecoveryController.onPageLoad()))
+      }
   }
 }

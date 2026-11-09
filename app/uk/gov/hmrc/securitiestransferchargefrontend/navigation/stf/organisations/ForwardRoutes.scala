@@ -21,8 +21,6 @@ import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.securitiestransferchargefrontend.config.FrontendAppConfig
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.routes
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.organisations.single.routes as orgSingleRoutes
-import uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.shared.bulk.routes as bulkRoutes
-import uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.shared.routes as stfSharedRoutes
 import uk.gov.hmrc.securitiestransferchargefrontend.models.{CheckMode, Mode, NormalMode, UserAnswers}
 import uk.gov.hmrc.securitiestransferchargefrontend.navigation.PersistentNavigationHelper
 import uk.gov.hmrc.securitiestransferchargefrontend.pages.*
@@ -86,8 +84,7 @@ class ForwardRoutes(answerPersistenceService: AnswerPersistenceService,
         else cyaPage
       }
     case TotalMarketValuePage => userAnswers => dataRequired(TotalMarketValuePage, userAnswers, cyaPage)
-    case CheckYourAnswersPage => userAnswers => goTo(stfSharedRoutes.ConfirmationController.onPageLoad(), Some(userAnswers))
-    case BulkCheckYourAnswersPage => _ => Future.successful(bulkRoutes.ConfirmationController.onPageLoad())
+    case CheckYourAnswersPage | BulkCheckYourAnswersPage => userAnswers => goTo(routes.ConfirmationController.onPageLoad(), Some(userAnswers))
     case _ => _ => Future.successful(defaultPage)
   }
 

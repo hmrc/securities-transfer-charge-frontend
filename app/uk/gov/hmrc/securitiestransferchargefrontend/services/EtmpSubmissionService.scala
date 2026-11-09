@@ -43,6 +43,8 @@ trait EtmpSubmissionService:
   def submitBulkStf(subscriptionId: SubscriptionId, rows: Seq[ValidatedStcRow], userAnswers: UserAnswers, affinityData: AffinityData)(implicit hc: HeaderCarrier): Future[SubmissionCreateResponse]
   def submitBulkSH03(subscriptionId: SubscriptionId, rows: Seq[ValidatedStcRow], userAnswers: UserAnswers, affinityData: AffinityData)(implicit hc: HeaderCarrier): Future[SubmissionCreateResponse]
 
+  def getSubmissionDataStf(userAnswers: UserAnswers, affinityData: AffinityData): Option[(SingleTransferDeclaration, SingleTransferRequest, StfTransaction)]
+  def getSubmissionDataSh03(userAnswers: UserAnswers, affinityData: AffinityData): Option[(SingleTransferDeclaration, SingleTransferRequest)]
 
 class EtmpSubmissionServiceImpl @Inject() (etmpSubmissionsClient: EtmpSubmissionClient)(implicit ec: ExecutionContext) extends EtmpSubmissionService with Logging:
   override def submitSingleStf (subscriptionId: SubscriptionId, userAnswers: UserAnswers, affinityData: AffinityData)
@@ -169,3 +171,19 @@ class EtmpSubmissionServiceImpl @Inject() (etmpSubmissionsClient: EtmpSubmission
     etmpSubmissionsClient
       .submitBatchTransfer(subscriptionId, userAnswers.submissionId, etmpPayload)
       .map(toSubmissionCreateResponse(userAnswers))
+
+  def getSubmissionDataStf(userAnswers: UserAnswers, affinityData: AffinityData): Option[(SingleTransferDeclaration, SingleTransferRequest, StfTransaction)] = {
+    userAnswers.get(StfTransaction).map { stfSingleReq =>
+      val stfRequest = UserAnswersTransforms.toStfRequest(stfSingleReq, affinityData)
+      val declaration = createDeclaration(userAnswers)
+      (declaration, stfRequest, stfSingleReq)
+    }
+  }
+
+  def getSubmissionDataSh03(userAnswers: UserAnswers, affinityData: AffinityData): Option[(SingleTransferDeclaration, SingleTransferRequest)] = {
+    userAnswers.get(Sh03Transaction).map { sh03SingleReq =>
+      val sh03Request = UserAnswersTransforms.toSh03Request(sh03SingleReq, affinityData)
+      val declaration = createDeclaration(userAnswers)
+      (declaration, sh03Request)
+    }
+  }

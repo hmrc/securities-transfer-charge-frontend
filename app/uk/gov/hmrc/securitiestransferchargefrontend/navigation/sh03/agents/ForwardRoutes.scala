@@ -21,8 +21,7 @@ import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.securitiestransferchargefrontend.config.FrontendAppConfig
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.sh03.agents.bulk.routes as sh03AgentBulkRoutes
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.sh03.agents.single.routes as sh03AgentSingleRoutes
-import uk.gov.hmrc.securitiestransferchargefrontend.controllers.sh03.shared.single.routes as sh03SharedSingleRoutes
-import uk.gov.hmrc.securitiestransferchargefrontend.controllers.sh03.shared.bulk.routes as bulkRoutes
+import uk.gov.hmrc.securitiestransferchargefrontend.controllers.routes
 import uk.gov.hmrc.securitiestransferchargefrontend.models.sh03.shared.{ReasonForPurchase, RoleAtPurchasingCompany}
 import uk.gov.hmrc.securitiestransferchargefrontend.models.{CheckMode, Mode, NormalMode, UserAnswers}
 import uk.gov.hmrc.securitiestransferchargefrontend.navigation.PersistentNavigationHelper
@@ -108,7 +107,7 @@ class ForwardRoutes(answerPersistenceService: AnswerPersistenceService,
             cyaPage
       }
 
-    case CheckYourAnswersPage => _ => goTo(sh03SharedSingleRoutes.ConfirmationController.onPageLoad())
+    case CheckYourAnswersPage | BulkCheckYourAnswersPage => userAnswers => goTo(routes.ConfirmationController.onPageLoad(), Some(userAnswers))
 
     case BulkAgentReferencePage => userAnswers =>
       dataRequired(BulkAgentReferencePage, userAnswers, sh03AgentBulkRoutes.CompanyDetailsController.onPageLoad(NormalMode))
@@ -124,7 +123,6 @@ class ForwardRoutes(answerPersistenceService: AnswerPersistenceService,
           else 
             sh03AgentBulkRoutes.CheckYourAnswersController.onPageLoad()
       }
-    case BulkCheckYourAnswersPage => _ => Future.successful(bulkRoutes.ConfirmationController.onPageLoad())
 
     case _ => _ => Future.successful(defaultPage)
   }
