@@ -32,7 +32,7 @@ class STFPostSubmissionAuditModelSpec extends SpecBase {
       buyerAddressLine1 = "1 High Street",
       buyerAddressLine2 = "District",
       buyerAddressLine3 = "Town",
-      buyerAddressCity = "City",
+      buyerAddressLine4 = "City",
       buyerAddressPostcode = "AB1 2CD"
     )
 
@@ -43,7 +43,7 @@ class STFPostSubmissionAuditModelSpec extends SpecBase {
       sellerAddressLine1 = "10 Main Road",
       sellerAddressLine2 = "Area",
       sellerAddressLine3 = "Region",
-      sellerAddressCity = "London",
+      sellerAddressLine4 = "London",
       sellerAddressPostcode = "SW1A 1AA"
     )
 
@@ -86,7 +86,7 @@ class STFPostSubmissionAuditModelSpec extends SpecBase {
       declarantAddressLine1 = "10 Main Road",
       declarantAddressLine2 = "Area",
       declarantAddressLine3 = "Region",
-      declarantAddressCity = "London",
+      declarantAddressLine4 = "London",
       declarantAddressPostcode = "SW1A 1AA",
       declarantCountry = "GB",
       transferMethod = "OneAtATime",
