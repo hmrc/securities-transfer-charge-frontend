@@ -17,16 +17,12 @@
 package uk.gov.hmrc.securitiestransferchargefrontend.services
 
 import uk.gov.hmrc.securitiestransferchargefrontend.domain.{GroupIdentifier, SubmissionId}
-import uk.gov.hmrc.securitiestransferchargefrontend.models.submission.Status
+import uk.gov.hmrc.securitiestransferchargefrontend.models.submission.{RowToFailureMap, Status}
 import uk.gov.hmrc.securitiestransferchargefrontend.models.submission.Status.*
 import uk.gov.hmrc.securitiestransferchargefrontend.repositories.ProcessingStatusRepository
 
 import javax.inject.Inject
 import scala.concurrent.Future
-
-type RowNumber = Int
-type FailureReason = String
-type RowToFailureMap = Map[RowNumber, FailureReason]
 
 trait BulkStatusService {
   def getStatus(groupId: GroupIdentifier, submissionId: SubmissionId): Future[Option[Status]]

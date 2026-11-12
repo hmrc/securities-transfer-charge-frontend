@@ -22,18 +22,23 @@ import play.api.mvc.{Action, AnyContent, Call, MessagesControllerComponents}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import uk.gov.hmrc.securitiestransferchargefrontend.clients.SubmissionIdClient
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.actions.*
+import uk.gov.hmrc.securitiestransferchargefrontend.controllers.actions.requests.StcDataRequest
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.routes
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.shared.SaveAndReturnButton.isReturn
 import uk.gov.hmrc.securitiestransferchargefrontend.domain.{GroupIdentifier, UserId}
+import uk.gov.hmrc.securitiestransferchargefrontend.models.stf.fileupload.ValidatedStcRow
+import uk.gov.hmrc.securitiestransferchargefrontend.models.submission.BulkConfirmationDetails
 import uk.gov.hmrc.securitiestransferchargefrontend.models.{JourneyType, Mode, NormalMode, UserAnswers}
 import uk.gov.hmrc.securitiestransferchargefrontend.navigation.Navigator
+import uk.gov.hmrc.securitiestransferchargefrontend.pages.BulkConfirmationDetailsPage
 import uk.gov.hmrc.securitiestransferchargefrontend.pages.stf.bulk.BulkCheckYourAnswersPage
 import uk.gov.hmrc.securitiestransferchargefrontend.repositories.ParsedStcRowsRepository
+import uk.gov.hmrc.securitiestransferchargefrontend.services.TransactionSubmissionService
 import uk.gov.hmrc.securitiestransferchargefrontend.services.stf.bulk.CheckYourAnswersService
 import uk.gov.hmrc.securitiestransferchargefrontend.views.html.stf.organisations.bulk.CheckYourAnswersView
 
 import javax.inject.Named
-import scala.concurrent.ExecutionContext
+import scala.concurrent.{ExecutionContext, Future}
 
 class CheckYourAnswersController @Inject()(
                                             override val messagesApi: MessagesApi,
@@ -44,6 +49,7 @@ class CheckYourAnswersController @Inject()(
                                             view: CheckYourAnswersView,
                                             checkYourAnswersService: CheckYourAnswersService,
                                             parsedStcRowsRepository: ParsedStcRowsRepository,
+                                            transactionSubmissionService: TransactionSubmissionService,
                                             idClient: SubmissionIdClient
                                           )(implicit ec: ExecutionContext)
   extends FrontendBaseController with I18nSupport {
@@ -58,22 +64,39 @@ class CheckYourAnswersController @Inject()(
       case Some(parsedStcRowsDocument) =>
         val viewModel = checkYourAnswersService.buildViewModel(parsedStcRowsDocument)
 
-        Ok(view(viewModel, backLinkCall(NormalMode)(request.userAnswers)))
+        Ok(view(viewModel, backLinkCall(NormalMode)(request.userAnswers), reference))
 
       case None => Redirect(routes.JourneyRecoveryController.onPageLoad())
     }
   }
 
 
-  def onSubmit(): Action[AnyContent] = (stcAuthEnrolled andThen getData).async {
+  def onSubmit(reference: String): Action[AnyContent] = (stcAuthEnrolled andThen getData).async {
     implicit request =>
-
       val userId = UserId(request.request.internalId)
       val group = GroupIdentifier(request.request.groupIdentifier)
-      for {
-        submissionId <- idClient.nextSubmissionId()
-        answers = UserAnswers.empty(userId)(group)(submissionId)(JourneyType.STF)
-        nextPage <- navigator.nextPage(BulkCheckYourAnswersPage, NormalMode, answers, isReturn(request))
-      } yield Redirect(nextPage)
+
+      parsedStcRowsRepository.findDocumentByReference(reference).flatMap {
+        case Some(parsedStcRowsDocument) =>
+          val rows = parsedStcRowsDocument.rows.map(ValidatedStcRow.withNoErrors)
+
+          for {
+            submissionId  <- idClient.nextSubmissionId()
+            details        = BulkConfirmationDetails(
+              submissionId = submissionId,
+              paymentDueBy = checkYourAnswersService.paymentDueBy(parsedStcRowsDocument),
+              taxDue = checkYourAnswersService.totalTaxDue(parsedStcRowsDocument),
+              agentReference = None
+            )
+            answers       <- Future.fromTry(UserAnswers.empty(userId)(group)(submissionId)(JourneyType.STF)
+              .copy(fileUploadReference = Some(reference))
+              .set(BulkConfirmationDetailsPage, details))
+            nextPage      <- navigator.nextPage(BulkCheckYourAnswersPage, NormalMode, answers, isReturn(request))
+            _              = transactionSubmissionService.submitBulkStf(rows)(using StcDataRequest(request.request, answers))
+          } yield Redirect(nextPage)
+
+        case None =>
+          Future.successful(Redirect(routes.JourneyRecoveryController.onPageLoad()))
+      }
   }
 }

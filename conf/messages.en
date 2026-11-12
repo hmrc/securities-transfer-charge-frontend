@@ -1296,12 +1296,15 @@ confirmation.banner.title = Important
 confirmation.title = Submission confirmation
 confirmation.banner.p1 = Payment due by: {0} <br><br>
 confirmation.banner.p2 = Your transfers have been submitted and are being processed but you still need to pay.
+
 confirmation.heading.nextSteps = Next steps
+
 confirmation.heading.transferReference = Share the transfer references
-confirmation.heading.transferReference.p1 = A transfer reference has been created for each transfer, you can see them in
+confirmation.heading.transferReference.p1 = A transfer reference has been created for each transfer, you can see them in {0}
+confirmation.heading.shareBuyBack.p1 = A transfer reference has been created for each share purchase, you can see them in {0}
 confirmation.heading.transferReference.p2 = Use these references to confirm that HMRC has been notified about your transfers.
 confirmation.heading.shareBuyBack.p2 = Use these references to confirm that HMRC has been notified about this share buyback.
-confirmation.heading.transferReference.link = your submission (opens in new tab).
+confirmation.submission.link = your submission (opens in new tab).
 confirmation.heading.deadline = Pay the tax due by the deadline
 confirmation.heading.deadline.p1 = Do not use any of the reference numbers on this page as your payment reference, this will delay your payment being processed.
 confirmation.table.caption = Submission details
@@ -1309,6 +1312,10 @@ confirmation.table.heading.submissionId = Submission ID
 confirmation.table.heading.reference = Your reference
 confirmation.table.heading.taxDue = Tax due
 confirmation.button.pay = Pay for this submission
+confirmation.button.viewSubmission = View your submission
+
+bulkConfirmation.transferReference.p1 = A transfer reference number is being created for each transfer.
+bulkConfirmation.transferReference.p2 = You will be able to see them in your submission once it has finished processing.
 
 
 checkYourAnswers.sh03.bulk.taxDue.section.amount.heading = Amount

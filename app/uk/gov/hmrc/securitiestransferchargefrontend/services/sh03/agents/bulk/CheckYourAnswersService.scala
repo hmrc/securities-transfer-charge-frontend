@@ -24,6 +24,7 @@ import uk.gov.hmrc.securitiestransferchargefrontend.models.stf.fileupload.Parsed
 import uk.gov.hmrc.securitiestransferchargefrontend.services.sh03.TaxDueCalculationService
 import uk.gov.hmrc.securitiestransferchargefrontend.viewmodels.sh03.agents.bulk.CheckYourAnswersViewModel
 
+import java.time.LocalDate
 import javax.inject.{Inject, Singleton}
 
 @Singleton
@@ -55,4 +56,10 @@ class CheckYourAnswersService @Inject()(
     
   }
   
+  def totalTaxDue(doc: ParsedStcRowsDocument): BigDecimal =
+    doc.rows.flatMap(taxDueCalculationService.calculateTaxDueForRow).sum
+
+  def paymentDueBy(doc: ParsedStcRowsDocument): LocalDate =
+    taxDueCalculationService.calculatePaymentDueDate(doc.rows)
+
 }
