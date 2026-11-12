@@ -31,7 +31,7 @@ import uk.gov.hmrc.securitiestransferchargefrontend.controllers.actions.{OrgStcA
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.{Redirects, routes}
 
 import java.time.{Instant, LocalDate}
-import scala.concurrent.{ExecutionContext, Future}
+import scala.concurrent.Future
 
 class StcAuthEnrolledActionImplSpec extends SpecBase {
 
@@ -106,14 +106,6 @@ class StcAuthEnrolledActionImplSpec extends SpecBase {
           loginTimes),
         maybeGroupIdentifier),
       enrolments)
-
-  type StcAuthEnrolledActionCtor = (
-    AuthConnector,
-    FrontendAppConfig,
-    RetrievalFilter,
-    Redirects,
-    BodyParsers.Default
-  ) => ExecutionContext => StcAuthEnrolledAction
 
   def testSetup(
                  application: Application,

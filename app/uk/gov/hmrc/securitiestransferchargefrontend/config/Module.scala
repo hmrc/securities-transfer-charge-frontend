@@ -68,7 +68,6 @@ class Module extends AbstractModule {
     
     bind(classOf[StcDataRetrievalAction]).to(classOf[StcDataRetrievalActionImpl])
     bind(classOf[StcDataRequiredAction]).to(classOf[StcDataRequiredActionImpl])
-    bind(classOf[StcIndividualAuthEnrolledAction]).to(classOf[StcIndividualAuthEnrolledActionImpl])
     bind(classOf[SessionRepository]).to(classOf[SessionRepositoryImpl])
     bind(classOf[SubmissionIdClient]).to(classOf[SubmissionIdClientImpl])
     bind(classOf[SaveAndReturnClient]).to(classOf[SaveAndReturnClientImpl])
