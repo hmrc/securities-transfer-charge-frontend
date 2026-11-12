@@ -29,7 +29,7 @@ class StfSellerAddressControllerSpec extends SpecBase with MockitoSugar {
 
     "onPageLoad should return the result from Alf.initAlfJourneyRequest" in {
 
-      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers), affinityGroup = individualAffinity)
+      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers))
         .build()
 
       running(application) {
@@ -41,7 +41,7 @@ class StfSellerAddressControllerSpec extends SpecBase with MockitoSugar {
     }
 
     "onReturn should retrieve address from Alf, store it and redirect to the next page" in {
-      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers), affinityGroup = individualAffinity)
+      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers))
         .build()
 
       running(application) {

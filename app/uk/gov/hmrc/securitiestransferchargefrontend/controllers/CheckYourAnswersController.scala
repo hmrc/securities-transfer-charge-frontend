@@ -24,9 +24,11 @@ import uk.gov.hmrc.securitiestransferchargefrontend.controllers.actions.StcAuthE
 import uk.gov.hmrc.securitiestransferchargefrontend.viewmodels.govuk.summarylist.*
 import uk.gov.hmrc.securitiestransferchargefrontend.views.html.CheckYourAnswersView
 
+import javax.inject.Named
+
 class CheckYourAnswersController @Inject()(
                                             override val messagesApi: MessagesApi,
-                                            stcAuthEnrolled: StcAuthEnrolledAction,
+                                            @Named("any") stcAuthEnrolled: StcAuthEnrolledAction,
                                             val controllerComponents: MessagesControllerComponents,
                                             view: CheckYourAnswersView
                                           ) extends FrontendBaseController with I18nSupport {

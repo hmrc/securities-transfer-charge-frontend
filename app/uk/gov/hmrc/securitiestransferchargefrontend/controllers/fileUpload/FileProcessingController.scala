@@ -39,13 +39,13 @@ import uk.gov.hmrc.securitiestransferchargefrontend.services.fileupload.processi
 import uk.gov.hmrc.securitiestransferchargefrontend.services.fileupload.processing.{FileProcessingRefreshCounter, FileProcessingRefreshCounterFactory, ProcessingService}
 import uk.gov.hmrc.securitiestransferchargefrontend.views.html.fileUpload.{BulkUploadErrorView, FileProcessingView}
 
-import javax.inject.Inject
+import javax.inject.{Inject, Named}
 import scala.concurrent.{ExecutionContext, Future}
 import scala.language.postfixOps
 
 class FileProcessingController @Inject()(
                                           override val messagesApi: MessagesApi,
-                                          stcAuthEnrolled: StcAuthEnrolledAction,
+                                          @Named("any") stcAuthEnrolled: StcAuthEnrolledAction,
                                           spinnerView: FileProcessingView,
                                           timeoutView: BulkUploadErrorView,
                                           createCounter: FileProcessingRefreshCounterFactory,

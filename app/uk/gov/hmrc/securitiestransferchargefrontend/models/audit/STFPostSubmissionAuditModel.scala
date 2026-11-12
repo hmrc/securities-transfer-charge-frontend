@@ -26,7 +26,7 @@ case class MainBuyersDetails(
   buyerAddressLine1: String,
   buyerAddressLine2: String,
   buyerAddressLine3: String,
-  buyerAddressCity: String,
+  buyerAddressLine4: String,
   buyerAddressPostcode: String
 )
 
@@ -41,7 +41,7 @@ case class MainSellerDetails(
   sellerAddressLine1: String,
   sellerAddressLine2: String,
   sellerAddressLine3: String,
-  sellerAddressCity: String,
+  sellerAddressLine4: String,
   sellerAddressPostcode: String
 )
 
@@ -100,7 +100,7 @@ case class STFPostSubmissionAuditDetail(
   declarantAddressLine1: String,
   declarantAddressLine2: String,
   declarantAddressLine3: String,
-  declarantAddressCity: String,
+  declarantAddressLine4: String,
   declarantAddressPostcode: String,
   declarantCountry: String,
   transferMethod: String,

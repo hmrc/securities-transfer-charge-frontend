@@ -52,8 +52,7 @@ class HowToNotifyAboutSecuritiesTransferControllerSpec extends SpecBase {
 
       val application =
         applicationBuilder(
-          userAnswers = Some(emptyUserAnswers),
-          affinityGroup = orgAffinity
+          userAnswers = Some(emptyUserAnswers)
         )
           .overrides(bind[Navigator].qualifiedWith("organisations").toInstance(getNavigator))
           .build()
@@ -75,8 +74,7 @@ class HowToNotifyAboutSecuritiesTransferControllerSpec extends SpecBase {
       val userAnswers = UserAnswers(testUserId, testGroupIdentifier, submissionId,STF).set(HowToNotifyAboutSecuritiesTransferPage, HowToNotifyAboutSecuritiesTransfer.values.head).success.value
       val application =
         applicationBuilder(
-          userAnswers = Some(userAnswers),
-          affinityGroup = orgAffinity
+          userAnswers = Some(userAnswers)
         )
           .overrides(bind[Navigator].qualifiedWith("organisations").toInstance(getNavigator))
           .build()
@@ -97,8 +95,7 @@ class HowToNotifyAboutSecuritiesTransferControllerSpec extends SpecBase {
 
       val application =
         applicationBuilder(
-          userAnswers = Some(emptyUserAnswers),
-          affinityGroup = orgAffinity
+          userAnswers = Some(emptyUserAnswers)
         )
           .overrides(bind[Navigator].qualifiedWith("organisations").toInstance(getNavigator))
           .build()
@@ -122,8 +119,7 @@ class HowToNotifyAboutSecuritiesTransferControllerSpec extends SpecBase {
 
       val application =
         applicationBuilder(
-          userAnswers = Some(emptyUserAnswers),
-          affinityGroup = orgAffinity
+          userAnswers = Some(emptyUserAnswers)
         )
           .overrides(bind[Navigator].qualifiedWith("organisations").toInstance(getNavigator))
           .build()
@@ -143,7 +139,7 @@ class HowToNotifyAboutSecuritiesTransferControllerSpec extends SpecBase {
     "must redirect to agent reference page when one at a time is selected" in {
       val saveAndReturnClient = mock[SaveAndReturnClient]
 
-      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers), saveAndReturnClient = saveAndReturnClient, affinityGroup = orgAffinity)
+      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers), saveAndReturnClient = saveAndReturnClient)
         .build()
 
       when(saveAndReturnClient.save(any[UserAnswers]())(any[HeaderCarrier]()))
@@ -164,7 +160,7 @@ class HowToNotifyAboutSecuritiesTransferControllerSpec extends SpecBase {
     "must redirect to Template instruction page when more than one at a time is selected" in {
       val saveAndReturnClient = mock[SaveAndReturnClient]
 
-      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers), saveAndReturnClient = saveAndReturnClient, affinityGroup = orgAffinity)
+      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers), saveAndReturnClient = saveAndReturnClient)
         .build()
 
       when(saveAndReturnClient.save(any[UserAnswers]())(any[HeaderCarrier]()))

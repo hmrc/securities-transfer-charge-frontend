@@ -73,7 +73,8 @@ class StcFileValidationServiceSpec extends SpecBase {
         minSharePrice = None,
         maxSharePrice = None,
         sharePurchaseReason = None,
-        purchaseForCancellation = None
+        purchaseForCancellation = None,
+        purchasingShares = None
       ),
       validationErrors = Seq.empty
     )
@@ -113,7 +114,8 @@ class StcFileValidationServiceSpec extends SpecBase {
         minSharePrice = None,
         maxSharePrice = None,
         sharePurchaseReason = None,
-        purchaseForCancellation = None
+        purchaseForCancellation = None,
+        purchasingShares = None
       ),
       validationErrors = Seq(
         StcRowValidationError(

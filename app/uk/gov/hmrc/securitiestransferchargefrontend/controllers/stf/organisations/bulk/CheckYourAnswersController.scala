@@ -42,7 +42,7 @@ import scala.concurrent.{ExecutionContext, Future}
 class CheckYourAnswersController @Inject()(
                                             override val messagesApi: MessagesApi,
                                             @Named("organisations") navigator: Navigator,
-                                            stcAuthEnrolled: StcAuthEnrolledAction,
+                                            @Named("organisations") stcAuthEnrolled: StcAuthEnrolledAction,
                                             getData: StcDataRetrievalAction,
                                             val controllerComponents: MessagesControllerComponents,
                                             view: CheckYourAnswersView,

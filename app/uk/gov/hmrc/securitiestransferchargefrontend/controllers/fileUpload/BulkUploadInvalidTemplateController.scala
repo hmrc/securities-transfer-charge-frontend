@@ -24,11 +24,11 @@ import uk.gov.hmrc.securitiestransferchargefrontend.models.JourneyType
 import uk.gov.hmrc.securitiestransferchargefrontend.utils.CommonHelpers.linkToTemplateFor
 import uk.gov.hmrc.securitiestransferchargefrontend.views.html.fileUpload.BulkUploadInvalidTemplateView
 
-import javax.inject.Inject
+import javax.inject.{Inject, Named}
 
 class BulkUploadInvalidTemplateController @Inject()(
                                                override val messagesApi: MessagesApi,
-                                               stcAuthEnrolled: StcAuthEnrolledAction,
+                                               @Named("any") stcAuthEnrolled: StcAuthEnrolledAction,
                                                view: BulkUploadInvalidTemplateView,
                                                val controllerComponents: MessagesControllerComponents
                                              ) extends FrontendBaseController with I18nSupport {

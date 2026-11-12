@@ -36,7 +36,7 @@ class SubscriptionDataNotFoundException(msg: String) extends RuntimeException(ms
 
 class ConfirmAddressController @Inject()(
                                           override val messagesApi: MessagesApi,
-                                          stcAuthEnrolled: StcAuthEnrolledAction,
+                                          @Named("individuals") stcAuthEnrolled: StcAuthEnrolledAction,
                                           getData: StcDataRetrievalAction,
                                           subscriptionService: SubscriptionService,
                                           val controllerComponents: MessagesControllerComponents,

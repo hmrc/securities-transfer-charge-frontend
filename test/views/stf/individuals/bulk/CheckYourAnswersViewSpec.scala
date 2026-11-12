@@ -31,7 +31,7 @@ import scala.jdk.CollectionConverters.*
 class CheckYourAnswersViewSpec extends ViewBaseSpec {
 
   override def fakeApplication(): Application =
-    applicationBuilder(affinityGroup = individualAffinity).build()
+    applicationBuilder().build()
 
   private val viewInstance = app.injector.instanceOf[CheckYourAnswersView]
 

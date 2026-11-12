@@ -93,7 +93,8 @@ class CheckYourAnswersControllerSpec extends SpecBase with BeforeAndAfterEach {
       minSharePrice = None,
       maxSharePrice = None,
       sharePurchaseReason = None,
-      purchaseForCancellation = None
+      purchaseForCancellation = None,
+      purchasingShares = None
     )
 
   private val rows: Seq[ParsedStcRow] = Seq(validRow)

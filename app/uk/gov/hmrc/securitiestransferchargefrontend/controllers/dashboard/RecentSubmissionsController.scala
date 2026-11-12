@@ -24,12 +24,12 @@ import uk.gov.hmrc.securitiestransferchargefrontend.domain.{GroupIdentifier, Use
 import uk.gov.hmrc.securitiestransferchargefrontend.services.DashboardService
 import uk.gov.hmrc.securitiestransferchargefrontend.views.html.dashboard.RecentSubmissionsView
 
-import javax.inject.Inject
+import javax.inject.{Inject, Named}
 import scala.concurrent.ExecutionContext
 
 class RecentSubmissionsController @Inject()(
                                              override val messagesApi: MessagesApi,
-                                             stcAuthEnrolled: StcAuthEnrolledAction,
+                                             @Named("any") stcAuthEnrolled: StcAuthEnrolledAction,
                                              val controllerComponents: MessagesControllerComponents,
                                              dashboardService: DashboardService,
                                              view: RecentSubmissionsView

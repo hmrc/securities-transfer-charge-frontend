@@ -64,6 +64,7 @@ class StcBasicRowValidatorSpec extends SpecBase {
       chargingPoint = ParsedValue.Valid(LocalDate.of(2026, 2, 20)),
       taxRate = Some(BigDecimal("0.5")),
       whatTypeOfSecurities = Some("Shares"),
+      purchasingShares = Some(true),
       typeOfShares = Some("Ordinary"),
       securitiesQuantity = Some("10000"),
       amountPaidForSecurities = Some("15000"),
@@ -99,7 +100,8 @@ class StcBasicRowValidatorSpec extends SpecBase {
       "sharePurchaseReason",
       "purchasedForCancellation",
       "minSharePrice",
-      "maxSharePrice"
+      "maxSharePrice",
+      "purchasingShares"
     ))
 
   "StcBasicRowValidator.validate" - {
@@ -212,13 +214,13 @@ class StcBasicRowValidatorSpec extends SpecBase {
       result.exists(_.fieldName == "taxRate") mustBe true
     }
 
-    "return what type of securities required error" in {
+    "return purchasing shares required error" in {
       val result = validator.validate(
-        validRow.copy(whatTypeOfSecurities = None),
+        validRow.copy(purchasingShares = None),
         StcTemplate.STF, affinityGroupKeyInd, JourneyType.STF
       )
 
-      result.exists(_.fieldName == "whatTypeOfSecurities") mustBe true
+      result.exists(_.fieldName == "purchasingShares") mustBe true
     }
 
     "return securities quantity required error" in {
@@ -267,15 +269,6 @@ class StcBasicRowValidatorSpec extends SpecBase {
     }
 
     "Agent STF" - {
-
-      "return type of shares required error" in {
-        val result = validator.validate(
-          validRow.copy(typeOfShares = None),
-          StcTemplate.STFAgent, affinityGroupKeyAgent, JourneyType.STF
-        )
-
-        result.exists(_.fieldName == "typeOfShares") mustBe true
-      }
 
       "return seller name required error" in {
         val result = validator.validate(
@@ -374,6 +367,15 @@ class StcBasicRowValidatorSpec extends SpecBase {
         )
 
         result.exists(_.fieldName == "securitiesTarget") mustBe true
+      }
+
+      "return purchasing shares required error" in {
+        val result = validator.validate(
+          validRow.copy(purchasingShares = None),
+          StcTemplate.STFAgent, affinityGroupKeyAgent, JourneyType.STF
+        )
+
+        result.exists(_.fieldName == "purchasingShares") mustBe true
       }
     }
 

@@ -31,7 +31,7 @@ import scala.concurrent.{ExecutionContext, Future}
 
 class StfSellerAddressController @Inject()(val controllerComponents: MessagesControllerComponents,
                                            alf: AlfAddressConnector,
-                                           auth: StcAuthEnrolledAction,
+                                           @Named("individuals") auth: StcAuthEnrolledAction,
                                            getData: StcDataRetrievalAction,
                                            requireData: StcDataRequiredAction,
                                            @Named("individuals") val navigator: Navigator,

@@ -74,7 +74,8 @@ class RowTransformsSpec extends AnyWordSpec with Matchers {
       minSharePrice = Some("100"), 
       maxSharePrice = Some("1000"), 
       sharePurchaseReason = Some("cancellation"), 
-      purchaseForCancellation = Some(true)
+      purchaseForCancellation = Some(true),
+      purchasingShares = Some(true)
     )
 
   "fromValidatedStcRow" should {
@@ -203,6 +204,37 @@ class RowTransformsSpec extends AnyWordSpec with Matchers {
 
       an[IllegalArgumentException] shouldBe thrownBy {
         RowTransforms.fromValidatedStcRowToStfRequest(rowMissingMarketValue, individualData,None)
+      }
+    }
+
+    "use whatTypeOfSecurities as the type of security when not purchasing shares (STF)" in {
+      val row = parsedStcRow.copy(purchasingShares = Some(false), whatTypeOfSecurities = Some("Bonds"))
+
+      RowTransforms.fromValidatedStcRowToStfRequest(row, individualData, None)
+        .transactionDetails.typeOfSecurity shouldBe "Bonds"
+    }
+
+    "throw when not purchasing shares and whatTypeOfSecurities is missing (STF)" in {
+      val row = parsedStcRow.copy(purchasingShares = Some(false), whatTypeOfSecurities = None)
+
+      an[IllegalArgumentException] shouldBe thrownBy {
+        RowTransforms.fromValidatedStcRowToStfRequest(row, individualData, None)
+      }
+    }
+
+    "throw when purchasing shares and typeOfShares is missing (STF)" in {
+      val row = parsedStcRow.copy(purchasingShares = Some(true), typeOfShares = None)
+
+      an[IllegalArgumentException] shouldBe thrownBy {
+        RowTransforms.fromValidatedStcRowToStfRequest(row, individualData, None)
+      }
+    }
+
+    "throw when purchasingShares is missing (STF)" in {
+      val row = parsedStcRow.copy(purchasingShares = None)
+
+      an[IllegalArgumentException] shouldBe thrownBy {
+        RowTransforms.fromValidatedStcRowToStfRequest(row, individualData, None)
       }
     }
   }

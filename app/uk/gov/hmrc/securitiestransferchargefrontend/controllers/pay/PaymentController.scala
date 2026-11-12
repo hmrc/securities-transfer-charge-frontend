@@ -22,19 +22,19 @@ import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import uk.gov.hmrc.securitiestransferchargefrontend.config.FrontendAppConfig
 import uk.gov.hmrc.securitiestransferchargefrontend.connectors.PayApiConnector
-import uk.gov.hmrc.securitiestransferchargefrontend.controllers.actions._
+import uk.gov.hmrc.securitiestransferchargefrontend.controllers.actions.*
 import uk.gov.hmrc.securitiestransferchargefrontend.domain.SubmissionId
-import uk.gov.hmrc.securitiestransferchargefrontend.models.pay._
+import uk.gov.hmrc.securitiestransferchargefrontend.models.pay.*
 import uk.gov.hmrc.securitiestransferchargefrontend.models.search.EtmpChargeDetail
 import uk.gov.hmrc.securitiestransferchargefrontend.models.search.EtmpSuccessResponseExtensions.*
 import uk.gov.hmrc.securitiestransferchargefrontend.services.DashboardService
 
-import javax.inject.Inject
+import javax.inject.{Inject, Named}
 import scala.concurrent.ExecutionContext
 
 class PaymentController @Inject()(
                                    val controllerComponents: MessagesControllerComponents,
-                                   auth: StcAuthEnrolledAction,
+                                   @Named("any") auth: StcAuthEnrolledAction,
                                    getData: StcDataRetrievalAction,
                                    dashboardService: DashboardService,
                                    payApiConnector: PayApiConnector,

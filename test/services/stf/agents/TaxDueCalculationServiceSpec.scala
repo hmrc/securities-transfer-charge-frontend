@@ -63,7 +63,8 @@ class TaxDueCalculationServiceSpec extends SpecBase with MockitoSugar {
       minSharePrice = None,
       maxSharePrice = None,
       sharePurchaseReason = None,
-      purchaseForCancellation = None
+      purchaseForCancellation = None,
+      purchasingShares = None
     )
 
   "TaxDueCalculationService" - {

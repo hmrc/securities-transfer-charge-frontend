@@ -55,7 +55,7 @@ class RoleAtPurchasingCompanyControllerSpec extends SpecBase {
 
       when(mockAnswerPersistenceService.save(any())(any())).thenReturn(Future.successful(()))
 
-      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers), affinityGroup = agentAffinity)
+      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers))
         .overrides(
           bind[Navigator].qualifiedWith("agentsSh03").toInstance(getNavigator),
           bind[AnswerPersistenceService].toInstance(mockAnswerPersistenceService))
@@ -77,7 +77,7 @@ class RoleAtPurchasingCompanyControllerSpec extends SpecBase {
       when(mockAnswerPersistenceService.save(any())(any())).thenReturn(Future.successful(()))
       val userAnswers = emptyUserAnswers.set(BulkRoleAtPurchasingCompanyPage, validData).success.value
 
-      val application = applicationBuilder(userAnswers = Some(userAnswers), affinityGroup = agentAffinity)
+      val application = applicationBuilder(userAnswers = Some(userAnswers))
         .overrides(
           bind[Navigator].qualifiedWith("agentsSh03").toInstance(getNavigator),
           bind[AnswerPersistenceService].toInstance(mockAnswerPersistenceService))
@@ -100,7 +100,7 @@ class RoleAtPurchasingCompanyControllerSpec extends SpecBase {
       when(mockAnswerPersistenceService.save(any())(any())).thenReturn(Future.successful(()))
       val userAnswers = emptyUserAnswers.set(BulkRoleAtPurchasingCompanyPage, validUkSocietasData).success.value
 
-      val application = applicationBuilder(userAnswers = Some(userAnswers), affinityGroup = agentAffinity)
+      val application = applicationBuilder(userAnswers = Some(userAnswers))
         .overrides(
           bind[Navigator].qualifiedWith("agentsSh03").toInstance(getNavigator),
           bind[AnswerPersistenceService].toInstance(mockAnswerPersistenceService))
@@ -122,7 +122,7 @@ class RoleAtPurchasingCompanyControllerSpec extends SpecBase {
       
       when(mockAnswerPersistenceService.save(any())(any())).thenReturn(Future.successful(()))
       val userAnswersWithRef = emptyUserAnswers.setFileUploadReference(reference)
-      val application = applicationBuilder(userAnswers = Some(userAnswersWithRef), affinityGroup = agentAffinity)
+      val application = applicationBuilder(userAnswers = Some(userAnswersWithRef))
         .overrides(
           bind[Navigator].qualifiedWith("agentsSh03").toInstance(getNavigator),
           bind[AnswerPersistenceService].toInstance(mockAnswerPersistenceService))
@@ -144,7 +144,7 @@ class RoleAtPurchasingCompanyControllerSpec extends SpecBase {
 
       when(mockAnswerPersistenceService.save(any())(any())).thenReturn(Future.successful(()))
       val userAnswersWithRef = emptyUserAnswers.setFileUploadReference(reference)
-      val application = applicationBuilder(userAnswers = Some(userAnswersWithRef), affinityGroup = agentAffinity)
+      val application = applicationBuilder(userAnswers = Some(userAnswersWithRef))
         .overrides(
           bind[Navigator].qualifiedWith("agentsSh03").toInstance(getNavigator),
           bind[AnswerPersistenceService].toInstance(mockAnswerPersistenceService))
@@ -165,7 +165,7 @@ class RoleAtPurchasingCompanyControllerSpec extends SpecBase {
     "must return a Bad Request and errors when invalid data is submitted (missing role)" in {
 
       val userAnswersWithRef = emptyUserAnswers.setFileUploadReference(reference)
-      val application = applicationBuilder(userAnswers = Some(userAnswersWithRef), affinityGroup = agentAffinity)
+      val application = applicationBuilder(userAnswers = Some(userAnswersWithRef))
         .overrides(bind[Navigator].qualifiedWith("agentsSh03").toInstance(getNavigator))
         .build()
 
@@ -188,7 +188,7 @@ class RoleAtPurchasingCompanyControllerSpec extends SpecBase {
     "must return a Bad Request and errors when invalid data is submitted (UK Societas missing organ name)" in {
 
       val userAnswersWithRef = emptyUserAnswers.setFileUploadReference(reference)
-      val application = applicationBuilder(userAnswers = Some(userAnswersWithRef), affinityGroup = agentAffinity)
+      val application = applicationBuilder(userAnswers = Some(userAnswersWithRef))
         .overrides(bind[Navigator].qualifiedWith("agentsSh03").toInstance(getNavigator))
         .build()
 
@@ -210,7 +210,7 @@ class RoleAtPurchasingCompanyControllerSpec extends SpecBase {
 
     "must redirect to Journey Recovery for a GET if no existing data is found" in {
 
-      val application = applicationBuilder(userAnswers = None, affinityGroup = agentAffinity).build()
+      val application = applicationBuilder(userAnswers = None).build()
 
       running(application) {
         val request = FakeRequest(GET, roleAtPurchasingCompanyRoute)
@@ -224,7 +224,7 @@ class RoleAtPurchasingCompanyControllerSpec extends SpecBase {
 
     "must redirect to Journey Recovery for a POST if no existing data is found" in {
 
-      val application = applicationBuilder(userAnswers = None, affinityGroup = agentAffinity).build()
+      val application = applicationBuilder(userAnswers = None).build()
 
       running(application) {
         val request =
@@ -240,7 +240,7 @@ class RoleAtPurchasingCompanyControllerSpec extends SpecBase {
 
     "must redirect to Journey Recovery for a GET if fileUploadReference is missing from both the query string and UserAnswers" in {
 
-      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers), affinityGroup = agentAffinity).build()
+      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers)).build()
 
       running(application) {
         val request = FakeRequest(GET, roleAtPurchasingCompanyRoute)
@@ -254,7 +254,7 @@ class RoleAtPurchasingCompanyControllerSpec extends SpecBase {
 
     "must redirect to Journey Recovery for a POST if fileUploadReference is missing from UserAnswers" in {
 
-      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers), affinityGroup = agentAffinity).build()
+      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers)).build()
 
       running(application) {
         val request =

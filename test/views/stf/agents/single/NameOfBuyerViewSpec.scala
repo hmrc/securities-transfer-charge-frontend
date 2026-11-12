@@ -29,7 +29,7 @@ import scala.language.postfixOps
 
 class NameOfBuyerViewSpec extends ViewBaseSpec {
 
-  override def fakeApplication(): Application = applicationBuilder(affinityGroup = agentAffinity).build()
+  override def fakeApplication(): Application = applicationBuilder().build()
   
   private val viewInstance         = app.injector.instanceOf[NameOfBuyerView]
   private val formProvider = new NameOfBuyerFormProvider()

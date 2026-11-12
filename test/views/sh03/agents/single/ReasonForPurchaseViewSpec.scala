@@ -27,7 +27,7 @@ import views.ViewBaseSpec
 class ReasonForPurchaseViewSpec extends ViewBaseSpec {
 
   override def fakeApplication(): Application =
-    applicationBuilder(affinityGroup = agentAffinity).build()
+    applicationBuilder().build()
 
   private val viewInstance = app.injector.instanceOf[ReasonForPurchaseView]
   private val formProvider = new ReasonForPurchaseFormProvider()

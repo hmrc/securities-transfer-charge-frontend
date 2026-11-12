@@ -23,7 +23,7 @@ import org.scalatest.concurrent.ScalaFutures
 import org.scalatestplus.mockito.MockitoSugar.mock
 import uk.gov.hmrc.securitiestransferchargefrontend.config.FrontendAppConfig
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.dashboard.routes as dashboardroutes
-import uk.gov.hmrc.securitiestransferchargefrontend.controllers.fileUpload.routes as bulkSharedRoutes
+import uk.gov.hmrc.securitiestransferchargefrontend.controllers.fileUpload.routes as fileUploadRoutes
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.routes
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.agents.bulk.routes as agentBulkRoutes
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.agents.routes as agentRoutes
@@ -34,7 +34,7 @@ import uk.gov.hmrc.securitiestransferchargefrontend.models.stf.*
 import uk.gov.hmrc.securitiestransferchargefrontend.models.{CheckMode, NormalMode, UserAnswers}
 import uk.gov.hmrc.securitiestransferchargefrontend.navigation.stf.agents.StfAgentNavigator
 import uk.gov.hmrc.securitiestransferchargefrontend.pages.Page
-import uk.gov.hmrc.securitiestransferchargefrontend.pages.stf.bulk.BulkCheckYourAnswersPage
+import uk.gov.hmrc.securitiestransferchargefrontend.pages.stf.bulk.{BulkAgentReferencePage, BulkCheckYourAnswersPage}
 import uk.gov.hmrc.securitiestransferchargefrontend.pages.stf.shared.{AgentReferencePage, HowToNotifyAboutSecuritiesTransferPage}
 import uk.gov.hmrc.securitiestransferchargefrontend.pages.stf.single.*
 
@@ -296,15 +296,13 @@ class StfAgentNavigatorSpec extends SpecBase with ScalaFutures {
         result mustBe dashboardroutes.DashboardController.onPageLoad()
       }
 
-      "must go from the AgentReferencePage to HowToNotifyAboutSecuritiesTransferPage if it is in single journey" in {
-        val answers = emptyUserAnswers.set(HowToNotifyAboutSecuritiesTransferPage, HowToNotifyAboutSecuritiesTransfer.OneAtATime).get
-        val result = navigator.previousPage(AgentReferencePage, NormalMode, answers)
+      "must go from the AgentReferencePage to HowToNotifyAboutSecuritiesTransferPage" in {
+        val result = navigator.previousPage(AgentReferencePage, NormalMode, emptyUserAnswers)
         result mustBe agentRoutes.HowToNotifyAboutSecuritiesTransferController.onPageLoad()
       }
-      "must go from the AgentReferencePage to HowToNotifyAboutSecuritiesTransferPage if it is in bulk journey" in {
-        val answers = emptyUserAnswers.set(HowToNotifyAboutSecuritiesTransferPage, HowToNotifyAboutSecuritiesTransfer.MoreThanOneAtATime).get
-        val result = navigator.previousPage(AgentReferencePage, NormalMode, answers)
-        result mustBe bulkSharedRoutes.FileUploadController.onPageLoad(STF)
+      "must go from the BulkAgentReferencePage to FileUploadPage" in {
+        val result = navigator.previousPage(BulkAgentReferencePage, NormalMode, emptyUserAnswers)
+        result mustBe fileUploadRoutes.FileUploadController.onPageLoad(STF)
       }
 
       "must go from the NameOfBuyerPage to AgentReferencePage" in {
@@ -395,7 +393,6 @@ class StfAgentNavigatorSpec extends SpecBase with ScalaFutures {
         val result = navigator.previousPage(BulkCheckYourAnswersPage, NormalMode, userAnswersWithUploadRef)
         result mustBe agentBulkRoutes.AgentReferenceController.onPageLoad(NormalMode, fileUploadRef)
       }
-
     }
   }
 }

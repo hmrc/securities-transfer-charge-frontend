@@ -30,12 +30,12 @@ import uk.gov.hmrc.securitiestransferchargefrontend.repositories.{SessionReposit
 import uk.gov.hmrc.securitiestransferchargefrontend.services.fileupload.processing.FileProcessingRefreshCounterFactory
 import uk.gov.hmrc.securitiestransferchargefrontend.views.html.fileUpload.FileUploadView
 
-import javax.inject.Inject
+import javax.inject.{Inject, Named}
 import scala.concurrent.{ExecutionContext, Future}
 
 class FileUploadController @Inject()(
                                       override val messagesApi: MessagesApi,
-                                      stcAuthEnrolled: StcAuthEnrolledAction,
+                                      @Named("any") stcAuthEnrolled: StcAuthEnrolledAction,
                                       val controllerComponents: MessagesControllerComponents,
                                       view: FileUploadView,
                                       upscanInitiateConnector: UpscanInitiateConnector,

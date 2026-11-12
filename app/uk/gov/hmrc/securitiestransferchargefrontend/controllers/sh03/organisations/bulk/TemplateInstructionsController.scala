@@ -29,10 +29,11 @@ import uk.gov.hmrc.securitiestransferchargefrontend.repositories.SessionReposito
 
 import javax.inject.Inject
 import scala.concurrent.ExecutionContext
+import javax.inject.{Inject, Named}
 
 class TemplateInstructionsController @Inject()(
                                                 override val messagesApi: MessagesApi,
-                                                stcAuthEnrolled: StcAuthEnrolledAction,
+                                                @Named("organisations") stcAuthEnrolled: StcAuthEnrolledAction,
                                                 val controllerComponents: MessagesControllerComponents,
                                                 sessionRepository: SessionRepository,
                                                 view: TemplateInstructionsView

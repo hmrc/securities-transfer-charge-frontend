@@ -72,7 +72,7 @@ class StcBasicRowValidator @Inject()(
       validateSecuritiesTarget(row, affinityKey) ++
       validateChargingPoint(row, affinityKey) ++
       validateTaxRate(row) ++
-      validateWhatTypeOfSecurities(row, affinityKey, journeyTypeString) ++
+      validatePurchasingShares(row,affinityKey) ++
       validateSecuritiesQuantity(row, affinityKey, journeyTypeString) ++
       validateAmountPaidForSecurities(row, affinityKey)
 
@@ -97,8 +97,8 @@ class StcBasicRowValidator @Inject()(
       validateApplyingForRelief(row, affinityKey) ++
       validateSecuritiesTarget(row, affinityKey) ++
       validateChargingPoint(row, affinityKey) ++
+      validatePurchasingShares(row, affinityKey) ++
       validateTaxRate(row) ++
-      validateTypeOfShares(row, affinityKey) ++
       validateSecuritiesQuantity(row, affinityKey, journeyTypeString) ++
       validateAmountPaidForSecurities(row, affinityKey)
 
@@ -549,19 +549,12 @@ class StcBasicRowValidator @Inject()(
         )
     }
   }
-
-  private def validateTypeOfShares(row: ParsedStcRow, affinityKey: String)(implicit cols: ColumnIndexBuilder): Seq[StcRowValidationError] =
-    row.typeOfShares match {
-
-      case None  =>
-        Seq(
-          support.error(
-            row.rowNumber,
-            "typeOfShares",
-            messages(s"$affinityKey.fileUpload.error.typeOfSecurities.required")
-          )
-        )
-
-      case _ => Seq.empty
+  
+  private def validatePurchasingShares(row: ParsedStcRow, affinityKey: String)(implicit cols: ColumnIndexBuilder): Seq[StcRowValidationError] = {
+    row.purchasingShares match {
+      case Some(_) => Seq.empty
+      case None => Seq(support.error(row.rowNumber, "purchasingShares", messages(s"$affinityKey.fileUpload.error.purchasingShares.invalid")))
     }
+  }
 }
+

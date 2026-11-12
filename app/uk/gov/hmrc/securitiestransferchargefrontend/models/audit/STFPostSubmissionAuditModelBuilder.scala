@@ -66,7 +66,7 @@ object STFPostSubmissionAuditModelBuilder {
       declarantAddressLine1 = declaration.addr1,
       declarantAddressLine2 = declaration.addr2.getOrElse(""),
       declarantAddressLine3 = declaration.addr3.getOrElse(""),
-      declarantAddressCity = declaration.addr4.getOrElse(""),
+      declarantAddressLine4 = declaration.addr4.getOrElse(""),
       declarantAddressPostcode = declaration.postcode,
       declarantCountry = declaration.country,
       transferMethod = transferMethod,
@@ -121,7 +121,7 @@ object STFPostSubmissionAuditModelBuilder {
       buyerAddressLine1 = buyerDetails.addr1,
       buyerAddressLine2 = buyerDetails.addr2.getOrElse(""),
       buyerAddressLine3 = buyerDetails.addr3.getOrElse(""),
-      buyerAddressCity = buyerDetails.addr4.getOrElse(""),
+      buyerAddressLine4 = buyerDetails.addr4.getOrElse(""),
       buyerAddressPostcode = buyerDetails.postcode
     )
   }
@@ -139,7 +139,7 @@ object STFPostSubmissionAuditModelBuilder {
           sellerAddressLine1 = sellerDetails.addr1,
           sellerAddressLine2 = sellerDetails.addr2.getOrElse(""),
           sellerAddressLine3 = sellerDetails.addr3.getOrElse(""),
-          sellerAddressCity = sellerDetails.addr4.getOrElse(""),
+          sellerAddressLine4 = sellerDetails.addr4.getOrElse(""),
           sellerAddressPostcode = sellerDetails.postcode
         )
       case None =>
@@ -150,7 +150,7 @@ object STFPostSubmissionAuditModelBuilder {
           sellerAddressLine1 = "",
           sellerAddressLine2 = "",
           sellerAddressLine3 = "",
-          sellerAddressCity = "",
+          sellerAddressLine4 = "",
           sellerAddressPostcode = ""
         )
     }

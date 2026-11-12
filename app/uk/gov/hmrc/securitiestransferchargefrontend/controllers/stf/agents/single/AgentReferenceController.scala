@@ -39,7 +39,7 @@ import scala.concurrent.{ExecutionContext, Future}
 class AgentReferenceController @Inject()(
                                         override val messagesApi: MessagesApi,
                                         @Named("agents") navigator: Navigator,
-                                        stcAuthEnrolled: StcAuthEnrolledAction,
+                                        @Named("agents") stcAuthEnrolled: StcAuthEnrolledAction,
                                         getData: StcDataRetrievalAction,
                                         formProvider: AgentReferenceFormProvider,
                                         val controllerComponents: MessagesControllerComponents,

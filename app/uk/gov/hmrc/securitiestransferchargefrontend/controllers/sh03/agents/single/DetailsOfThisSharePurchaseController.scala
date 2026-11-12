@@ -35,7 +35,7 @@ import scala.concurrent.{ExecutionContext, Future}
 class DetailsOfThisSharePurchaseController @Inject()(
                                       override val messagesApi: MessagesApi,
                                       @Named("agentsSh03") navigator: Navigator,
-                                      stcAuthEnrolled: StcAuthEnrolledAction,
+                                      @Named("agents") stcAuthEnrolled: StcAuthEnrolledAction,
                                       getData: StcDataRetrievalAction,
                                       requireData: StcDataRequiredAction,
                                       formProvider: DetailsOfThisSharePurchaseFormProvider,

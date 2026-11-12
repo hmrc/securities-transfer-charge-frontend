@@ -53,7 +53,7 @@ object Fixtures {
   val testAuditType = "StockTransferFormStatus"
   val testSubmissionId: SubmissionId = SubmissionId("STC-424242424")
   val testUserAnswers: UserAnswers = UserAnswers.empty(testInternalId)(testGroupIdentifier)(testSubmissionId)(STF)
-  val affinityGroupIndividual: AffinityGroup.Individual.type = AffinityGroup.Individual
+  val affinityGroupIndividual: AffinityGroup = AffinityGroup.Individual
   val testNino = "NX762551B"
   val testUtr = "123-456-789"
   val testArn = "ARN890901"
@@ -266,7 +266,8 @@ object Fixtures {
     minSharePrice = Some("100"),
     maxSharePrice = Some("1000"),
     sharePurchaseReason = Some("cancellation"),
-    purchaseForCancellation = Some(true)
+    purchaseForCancellation = Some(true),
+    purchasingShares = Some(true)
   )
 
   val testValidatedStcRow = ValidatedStcRow(testParsedStcRow, List.empty)

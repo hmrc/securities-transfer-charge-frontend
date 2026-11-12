@@ -34,11 +34,47 @@ import uk.gov.hmrc.securitiestransferchargefrontend.models.nrs.IdentityData
 import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
 
-trait StcAuthEnrolledAction
-  extends ActionBuilder[StcAuthorisedRequest, AnyContent]
+trait StcAuthEnrolledAction extends ActionBuilder[StcAuthorisedRequest, AnyContent]:
+  val expectedAffinityGroup: Option[AffinityGroup]
+
+final class IndividualStcAuthEnrolledAction @Inject()(
+    override val authConnector: AuthConnector,
+    appConfig: FrontendAppConfig,
+    retrievalFilter: RetrievalFilter,
+    redirects: Redirects,
+    parser: BodyParsers.Default
+  )(implicit executionContext: ExecutionContext) extends StcAuthEnrolledActionImpl(authConnector, appConfig, retrievalFilter, redirects, parser):
+  val expectedAffinityGroup: Option[AffinityGroup] = Some(AffinityGroup.Individual)
+
+final class OrgStcAuthEnrolledAction @Inject()(
+    override val authConnector: AuthConnector,
+    appConfig: FrontendAppConfig,
+    retrievalFilter: RetrievalFilter,
+    redirects: Redirects,
+    parser: BodyParsers.Default
+  )(implicit executionContext: ExecutionContext) extends StcAuthEnrolledActionImpl(authConnector, appConfig, retrievalFilter, redirects, parser):
+  val expectedAffinityGroup: Option[AffinityGroup] = Some(AffinityGroup.Organisation)
+
+final class AgentStcAuthEnrolledAction @Inject()(
+  override val authConnector: AuthConnector,
+  appConfig: FrontendAppConfig,
+  retrievalFilter: RetrievalFilter,
+  redirects: Redirects,
+  parser: BodyParsers.Default
+)(implicit executionContext: ExecutionContext) extends StcAuthEnrolledActionImpl(authConnector, appConfig, retrievalFilter, redirects, parser):
+  val expectedAffinityGroup: Option[AffinityGroup] = Some(AffinityGroup.Agent)
+
+final class AnyStcAuthEnrolledAction @Inject()(
+                                                  override val authConnector: AuthConnector,
+                                                  appConfig: FrontendAppConfig,
+                                                  retrievalFilter: RetrievalFilter,
+                                                  redirects: Redirects,
+                                                  parser: BodyParsers.Default
+                                                )(implicit executionContext: ExecutionContext) extends StcAuthEnrolledActionImpl(authConnector, appConfig, retrievalFilter, redirects, parser):
+  val expectedAffinityGroup: Option[AffinityGroup] = None
 
 @Singleton
-final class StcAuthEnrolledActionImpl @Inject()(
+protected abstract class StcAuthEnrolledActionImpl @Inject()(
                                                  override val authConnector: AuthConnector,
                                                  appConfig: FrontendAppConfig,
                                                  retrievalFilter: RetrievalFilter,
@@ -102,12 +138,12 @@ final class StcAuthEnrolledActionImpl @Inject()(
             maybeDoB, maybeEmail, Some(agentInfo), maybeGroupId, maybeCredentialRole.map(_.toString), maybeMdtpInfo, maybeItmpName,
             maybeItmpDoB, maybeItmpAddress, maybeAffinityGroup.map(_.toString), maybeCredentialStrength, Some(loginTimes)
         )
-        
+
         val maybeRequest =
           for {
             groupIdentifier  <- retrievalFilter.isPresent(maybeGroupIdentifier)
             internalId       <- retrievalFilter.isPresent(maybeInternalId)
-            affinityGroup    <- retrievalFilter.isPresent(maybeAffinityGroup)
+            affinityGroup   <- retrievalFilter.checkCorrectAffinity(expectedAffinityGroup)(maybeAffinityGroup)
             _                <- retrievalFilter.enrolledForStc(enrolments)
             subscriptionId   <- retrievalFilter.subscriptionIdPresent(enrolments)
             rawCredentialId  <- retrievalFilter.providerIdPresentFilter(maybeCredentials)

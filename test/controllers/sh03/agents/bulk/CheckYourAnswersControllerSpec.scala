@@ -101,7 +101,8 @@ class CheckYourAnswersControllerSpec extends SpecBase with FileUploadFixtures wi
       minSharePrice = None,
       maxSharePrice = None,
       sharePurchaseReason = Some("treasury"),
-      purchaseForCancellation = Some(false)
+      purchaseForCancellation = Some(false),
+      purchasingShares = None
     )
 
   private val mockRepository = mock[ParsedStcRowsRepository]

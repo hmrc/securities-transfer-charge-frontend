@@ -19,6 +19,7 @@ package controllers.sh03.shared
 import base.SpecBase
 import play.api.test.FakeRequest
 import play.api.test.Helpers.*
+import uk.gov.hmrc.auth.core.AffinityGroup
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.sh03.shared.routes as sharedSH03Route
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.sh03.agents.routes as agentSH03Route
 import uk.gov.hmrc.securitiestransferchargefrontend.views.html.sh03.shared.BeforeYouStartView
@@ -34,8 +35,7 @@ class BeforeYouStartControllerSpec extends SpecBase {
 
       val application =
         applicationBuilder(
-          userAnswers = Some(emptyUserAnswers),
-          affinityGroup = agentAffinity
+          userAnswers = Some(emptyUserAnswers)
         ).build()
 
       running(application) {
@@ -57,7 +57,7 @@ class BeforeYouStartControllerSpec extends SpecBase {
       val application =
         applicationBuilder(
           userAnswers = Some(emptyUserAnswers),
-          affinityGroup = agentAffinity
+          affinityGroup = AffinityGroup.Agent
         ).build()
 
       running(application) {

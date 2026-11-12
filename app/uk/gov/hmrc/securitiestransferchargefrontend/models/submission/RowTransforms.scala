@@ -26,18 +26,12 @@ object RowTransforms {
 
   def fromValidatedStcRowToStfRequest(parsedRow: ParsedStcRow, affinityData: AffinityData, agentReference:Option[String]): SingleTransferRequest =
 
-    def getDescriptionOfSecurity: String =
-      val shType = shareType(parsedRow)
-      if shType.equalsIgnoreCase("Shares")
-        then required(parsedRow.typeOfShares, "typeOfShares", parsedRow.rowNumber)
-        else shType
-
     SingleTransferRequest(
       recordId = parsedRow.rowNumber,
       transactionDetails = SingleTransferTransactionDetails(
         transactionType = TransferType.STF,
         reasonForPurchase = None, // SH03 only
-        typeOfSecurity = getDescriptionOfSecurity,
+        typeOfSecurity = descriptionOfSecurity(parsedRow),
         numberOfShares = getNumberOfShares(parsedRow),
         nominalValue = None, // SH03 only
         marketValue = marketValue(parsedRow),

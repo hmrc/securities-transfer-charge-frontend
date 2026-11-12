@@ -39,7 +39,7 @@ class StartSubmissionControllerSpec extends SpecBase {
 
       "must redirect an Individual to the individual STF journey" in {
 
-        val application = applicationBuilder(affinityGroup = AffinityGroup.Individual).build()
+        val application = applicationBuilder().build()
 
         running(application) {
 
@@ -124,7 +124,7 @@ class StartSubmissionControllerSpec extends SpecBase {
 
       "must redirect an Individual to Journey Recovery" in {
 
-        val application = applicationBuilder(affinityGroup = AffinityGroup.Individual).build()
+        val application = applicationBuilder().build()
 
         running(application) {
 
