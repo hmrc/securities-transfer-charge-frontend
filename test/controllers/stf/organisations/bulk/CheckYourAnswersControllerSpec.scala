@@ -103,9 +103,9 @@ class CheckYourAnswersControllerSpec extends SpecBase with MockitoSugar with Fil
         when(mockCyaService.buildViewModel(any())(any[Lang])).thenReturn(viewModel)
         when(mockRepository.findDocumentByReference(reference)).thenReturn(Future.successful(Some(parsedStcRowsDocument)))
 
-      val parsedStcRowsRepository = mock[ParsedStcRowsRepository]
-      when(parsedStcRowsRepository.findDocumentByReference(reference))
-        .thenReturn(Future.successful(Some(parsedStcRowsDocument)))
+        val parsedStcRowsRepository = mock[ParsedStcRowsRepository]
+        when(parsedStcRowsRepository.findDocumentByReference(reference))
+          .thenReturn(Future.successful(Some(parsedStcRowsDocument)))
 
         val application = applicationBuilder(userAnswers = None, affinityGroup = orgAffinity)
           .overrides(

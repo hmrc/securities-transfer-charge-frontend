@@ -16,6 +16,7 @@
 
 package controllers.sh03.organisations.bulk
 
+import base.Fixtures.organisationAffinity
 import base.{FileUploadFixtures, SpecBase}
 import org.mockito.ArgumentCaptor
 import org.mockito.ArgumentMatchers.{any, anyBoolean, anyString, eq as eqTo}
@@ -26,6 +27,7 @@ import play.api.i18n.{Lang, Messages}
 import play.api.inject.bind
 import play.api.test.FakeRequest
 import play.api.test.Helpers.*
+import uk.gov.hmrc.auth.core.AffinityGroup
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.actions.requests.StcDataRequest
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.routes
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.sh03.organisations.bulk.routes as sh03OrgBulkRoutes
@@ -104,8 +106,8 @@ class CheckYourAnswersControllerSpec extends SpecBase with MockitoSugar with Fil
         when(mockCyaService.buildViewModel(any(), any())(any[Lang], any[Messages])).thenReturn(viewModel)
         when(mockRepository.findDocumentByReference(reference)).thenReturn(Future.successful(Some(parsedStcRowsDocument)))
 
-      val parsedStcRowsRepository = mock[ParsedStcRowsRepository]
-      when(parsedStcRowsRepository.findDocumentByReference(reference))
+        val parsedStcRowsRepository = mock[ParsedStcRowsRepository]
+        when(parsedStcRowsRepository.findDocumentByReference(reference))
         .thenReturn(Future.successful(Some(parsedStcRowsDocument)))
 
         val application = applicationBuilder(userAnswers = Some(userAnswersWithFileRef), affinityGroup = organisationAffinity)
@@ -129,8 +131,8 @@ class CheckYourAnswersControllerSpec extends SpecBase with MockitoSugar with Fil
       "must redirect to Journey Recovery for a GET when no document exists" in {
         when(mockRepository.findDocumentByReference(reference)).thenReturn(Future.successful(None))
 
-      when(parsedStcRowsRepository.findDocumentByReference(reference))
-        .thenReturn(Future.successful(None))
+        when(mockRepository.findDocumentByReference(reference))
+          .thenReturn(Future.successful(None))
 
         val application = applicationBuilder(userAnswers = Some(userAnswersWithFileRef), affinityGroup = organisationAffinity)
           .overrides(
@@ -158,7 +160,7 @@ class CheckYourAnswersControllerSpec extends SpecBase with MockitoSugar with Fil
         when(mockTransactionSubmissionService.submitBulkSh03(any())(using any[StcDataRequest[?]]())).thenReturn(Future.successful(true))
 
         val application =
-          applicationBuilder(userAnswers = Some(userAnswersWithFileRef), affinityGroup = organisationAffinity)
+          applicationBuilder(userAnswers = Some(userAnswersWithFileRef), affinityGroup = AffinityGroup.Organisation)
             .overrides(
               bind[Navigator].qualifiedWith("orgSh03").toInstance(mockNavigator),
               bind[ParsedStcRowsRepository].toInstance(mockRepository),
@@ -189,7 +191,7 @@ class CheckYourAnswersControllerSpec extends SpecBase with MockitoSugar with Fil
         when(mockRepository.findDocumentByReference(anyString())).thenReturn(Future.successful(None))
 
         val application =
-          applicationBuilder(userAnswers = Some(userAnswersWithFileRef), affinityGroup = organisationAffinity)
+          applicationBuilder(userAnswers = Some(userAnswersWithFileRef), affinityGroup = AffinityGroup.Organisation)
             .overrides(
               bind[Navigator].qualifiedWith("orgSh03").toInstance(mockNavigator),
               bind[ParsedStcRowsRepository].toInstance(mockRepository),
@@ -210,7 +212,7 @@ class CheckYourAnswersControllerSpec extends SpecBase with MockitoSugar with Fil
 
       "must redirect to Journey Recovery for a POST if no existing data is found" in {
         val application =
-          applicationBuilder(userAnswers = None, affinityGroup = organisationAffinity)
+          applicationBuilder(userAnswers = None, affinityGroup = AffinityGroup.Organisation)
             .overrides(
               bind[Navigator].qualifiedWith("orgSh03").toInstance(mockNavigator),
               bind[TransactionSubmissionService].toInstance(mockTransactionSubmissionService)

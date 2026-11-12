@@ -103,8 +103,8 @@ class CheckYourAnswersControllerSpec extends SpecBase with MockitoSugar with Fil
         when(mockCyaService.buildViewModel(any())(any[Lang])).thenReturn(viewModel)
         when(mockRepository.findDocumentByReference(reference)).thenReturn(Future.successful(Some(parsedStcRowsDocument)))
 
-      val parsedStcRowsRepository = mock[ParsedStcRowsRepository]
-      when(parsedStcRowsRepository.findDocumentByReference(reference))
+        val parsedStcRowsRepository = mock[ParsedStcRowsRepository]
+        when(parsedStcRowsRepository.findDocumentByReference(reference))
         .thenReturn(Future.successful(Some(parsedStcRowsDocument)))
 
         val application = applicationBuilder(userAnswers = None, affinityGroup = individualAffinity)
@@ -128,7 +128,7 @@ class CheckYourAnswersControllerSpec extends SpecBase with MockitoSugar with Fil
       "must redirect to Journey Recovery for a GET when no document exists" in {
         when(mockRepository.findDocumentByReference(reference)).thenReturn(Future.successful(None))
 
-      when(parsedStcRowsRepository.findDocumentByReference(reference))
+        when(mockRepository.findDocumentByReference(reference))
         .thenReturn(Future.successful(None))
 
         val application = applicationBuilder(userAnswers = None, affinityGroup = individualAffinity)
