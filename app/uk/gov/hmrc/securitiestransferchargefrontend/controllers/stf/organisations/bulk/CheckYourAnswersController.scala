@@ -24,7 +24,6 @@ import uk.gov.hmrc.securitiestransferchargefrontend.clients.SubmissionIdClient
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.actions.*
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.actions.requests.StcDataRequest
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.routes
-import uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.shared.SaveAndReturnButton.isReturn
 import uk.gov.hmrc.securitiestransferchargefrontend.domain.{GroupIdentifier, UserId}
 import uk.gov.hmrc.securitiestransferchargefrontend.models.stf.fileupload.ValidatedStcRow
 import uk.gov.hmrc.securitiestransferchargefrontend.models.submission.BulkConfirmationDetails
@@ -91,12 +90,12 @@ class CheckYourAnswersController @Inject()(
             answers       <- Future.fromTry(UserAnswers.empty(userId)(group)(submissionId)(JourneyType.STF)
               .copy(fileUploadReference = Some(reference))
               .set(BulkConfirmationDetailsPage, details))
-            nextPage      <- navigator.nextPage(BulkCheckYourAnswersPage, NormalMode, answers, isReturn(request))
+            nextPage      <- navigator.nextPage(BulkCheckYourAnswersPage, NormalMode, answers)
             _              = transactionSubmissionService.submitBulkStf(rows)(using StcDataRequest(request.request, answers))
           } yield Redirect(nextPage)
 
         case None =>
           Future.successful(Redirect(routes.JourneyRecoveryController.onPageLoad()))
-      }
+    }
   }
 }

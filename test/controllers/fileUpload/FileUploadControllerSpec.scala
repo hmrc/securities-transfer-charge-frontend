@@ -27,11 +27,12 @@ import play.api.test.Helpers.{status, *}
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.securitiestransferchargefrontend.connectors.UpscanInitiateConnector
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.fileUpload.routes
+import uk.gov.hmrc.securitiestransferchargefrontend.controllers.dashboard.routes as dashboardRoutes
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.routes.JourneyRecoveryController
 import uk.gov.hmrc.securitiestransferchargefrontend.models.JourneyType
 import uk.gov.hmrc.securitiestransferchargefrontend.models.stf.upscan.UpscanJourneyStatus.Failed
 import uk.gov.hmrc.securitiestransferchargefrontend.models.stf.upscan.{FileUpload, UploadRequest, UpscanDocument, UpscanInitiateResponse}
-import uk.gov.hmrc.securitiestransferchargefrontend.repositories.UpscanJourneyRepository
+import uk.gov.hmrc.securitiestransferchargefrontend.repositories.{SessionRepository, UpscanJourneyRepository}
 import uk.gov.hmrc.securitiestransferchargefrontend.services.fileupload.processing.{FileProcessingRefreshCounter, FileProcessingRefreshCounterFactory}
 import uk.gov.hmrc.securitiestransferchargefrontend.views.html.fileUpload.FileUploadView
 
@@ -221,6 +222,40 @@ class FileUploadControllerSpec extends SpecBase with MockitoSugar {
               verify(mockRepository, never()).delete(any[String])
             }
           }
+        }
+      }
+    }
+
+    "onReturnToDashboard" - {
+
+      "must clear the user answers and redirect to the dashboard" in {
+        val mockSessionRepository = mock[SessionRepository]
+        when(mockSessionRepository.clear(any())).thenReturn(Future.successful(()))
+
+        val application = applicationBuilder(userAnswers = Some(emptyUserAnswers), sessionRepository = mockSessionRepository).build()
+
+        running(application) {
+          val request = FakeRequest(GET, routes.FileUploadController.onReturnToDashboard().url)
+          val result = route(application, request).value
+
+          status(result) mustEqual SEE_OTHER
+          redirectLocation(result).value mustEqual dashboardRoutes.DashboardController.onPageLoad().url
+
+          verify(mockSessionRepository).clear(any())
+        }
+      }
+
+      "must fail if clearing the user answers fails" in {
+        val mockSessionRepository = mock[SessionRepository]
+        when(mockSessionRepository.clear(any())).thenReturn(Future.failed(new RuntimeException("boom")))
+
+        val application = applicationBuilder(userAnswers = Some(emptyUserAnswers), sessionRepository = mockSessionRepository).build()
+
+        running(application) {
+          val request = FakeRequest(GET, routes.FileUploadController.onReturnToDashboard().url)
+          val result = route(application, request).value
+
+          whenReady(result.failed)(_ mustBe a[RuntimeException])
         }
       }
     }

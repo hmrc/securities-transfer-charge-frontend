@@ -22,6 +22,7 @@ import play.api.mvc.{Action, AnyContent, Call, MessagesControllerComponents}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.actions.*
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.routes.JourneyRecoveryController
+import uk.gov.hmrc.securitiestransferchargefrontend.controllers.dashboard.routes as dashboardRoutes
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.shared.SaveAndReturnButton.isReturn
 import uk.gov.hmrc.securitiestransferchargefrontend.models.stf.fileupload.ValidatedStcRow
 import uk.gov.hmrc.securitiestransferchargefrontend.models.submission.BulkConfirmationDetails
@@ -90,5 +91,11 @@ class CheckYourAnswersController @Inject()(
 
         case None => Future.successful(Redirect(JourneyRecoveryController.onPageLoad()))
       }
+  }
+
+  def onReturnToDashboard(): Action[AnyContent] = (stcAuthEnrolled andThen getData).async { implicit request =>
+    request.userAnswers match
+      case Some(answers) => navigator.returnToDashboard(answers).map(Redirect)
+      case None => Future.successful(Redirect(dashboardRoutes.DashboardController.onPageLoad()))
   }
 }

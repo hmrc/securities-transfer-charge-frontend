@@ -77,7 +77,7 @@ class CheckYourAnswersControllerSpec extends SpecBase with MockitoSugar with Fil
 
   private def capturedNavigatorAnswers(): UserAnswers = {
     val captor = ArgumentCaptor.forClass(classOf[UserAnswers])
-    verify(mockNavigator).nextPage(eqTo(BulkCheckYourAnswersPage), eqTo(NormalMode), captor.capture(), anyBoolean())(any())
+    verify(mockNavigator).nextPage(eqTo(BulkCheckYourAnswersPage), eqTo(NormalMode), captor.capture(), eqTo(false))(any())
     captor.getValue
   }
 

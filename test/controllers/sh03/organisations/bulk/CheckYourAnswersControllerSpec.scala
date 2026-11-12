@@ -30,13 +30,14 @@ import play.api.test.Helpers.*
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.actions.requests.StcDataRequest
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.routes
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.sh03.organisations.bulk.routes as sh03OrgBulkRoutes
+import uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.shared.SaveAndReturnButton.saveAndReturnButtonName
 import uk.gov.hmrc.securitiestransferchargefrontend.models.{NormalMode, UserAnswers}
 import uk.gov.hmrc.securitiestransferchargefrontend.models.stf.fileupload.{ParsedStcRow, ParsedStcRowsDocument, ValidatedStcRow}
 import uk.gov.hmrc.securitiestransferchargefrontend.models.submission.BulkConfirmationDetails
 import uk.gov.hmrc.securitiestransferchargefrontend.navigation.Navigator
 import uk.gov.hmrc.securitiestransferchargefrontend.pages.BulkConfirmationDetailsPage
 import uk.gov.hmrc.securitiestransferchargefrontend.pages.sh03.bulk.BulkCheckYourAnswersPage
-import uk.gov.hmrc.securitiestransferchargefrontend.repositories.ParsedStcRowsRepository
+import uk.gov.hmrc.securitiestransferchargefrontend.repositories.{ParsedStcRowsRepository, SessionRepository}
 import uk.gov.hmrc.securitiestransferchargefrontend.services.TransactionSubmissionService
 import uk.gov.hmrc.securitiestransferchargefrontend.services.sh03.organisations.bulk.CheckYourAnswersService
 import uk.gov.hmrc.securitiestransferchargefrontend.viewmodels.sh03.organisations.bulk.{CheckYourAnswersViewModel, Sh03Transfer}
@@ -57,6 +58,7 @@ class CheckYourAnswersControllerSpec extends SpecBase with MockitoSugar with Fil
   private val mockCyaService = mock[CheckYourAnswersService]
   private val mockTransactionSubmissionService = mock[TransactionSubmissionService]
   private val mockNavigator = mock[Navigator]
+  private val mockSessionRepository = mock[SessionRepository]
 
   private val userAnswersWithFileRef: UserAnswers = emptyUserAnswers.setFileUploadReference(reference)
 
@@ -72,14 +74,33 @@ class CheckYourAnswersControllerSpec extends SpecBase with MockitoSugar with Fil
 
   override def beforeEach(): Unit = {
     super.beforeEach()
-    reset(mockRepository, mockCyaService, mockTransactionSubmissionService, mockNavigator)
+    reset(mockRepository, mockCyaService, mockTransactionSubmissionService, mockNavigator, mockSessionRepository)
   }
 
   private def capturedNavigatorAnswers(): UserAnswers = {
     val captor = ArgumentCaptor.forClass(classOf[UserAnswers])
-    verify(mockNavigator).nextPage(eqTo(BulkCheckYourAnswersPage), eqTo(NormalMode), captor.capture(), anyBoolean())(any())
+    verify(mockNavigator).nextPage(eqTo(BulkCheckYourAnswersPage), eqTo(NormalMode), captor.capture(), eqTo(false))(any())
     captor.getValue
   }
+
+  private def onPageLoadApp() =
+    applicationBuilder(userAnswers = Some(userAnswersWithFileRef), affinityGroup = organisationAffinity)
+      .overrides(
+        bind[Navigator].qualifiedWith("orgSh03").toInstance(getNavigator),
+        bind[CheckYourAnswersService].toInstance(mockCyaService),
+        bind[ParsedStcRowsRepository].toInstance(mockRepository)
+      )
+      .build()
+
+  private def onSubmitApp(answers: Option[UserAnswers]) =
+    applicationBuilder(userAnswers = answers, affinityGroup = organisationAffinity, sessionRepository = mockSessionRepository)
+      .overrides(
+        bind[Navigator].qualifiedWith("orgSh03").toInstance(mockNavigator),
+        bind[ParsedStcRowsRepository].toInstance(mockRepository),
+        bind[CheckYourAnswersService].toInstance(mockCyaService),
+        bind[TransactionSubmissionService].toInstance(mockTransactionSubmissionService)
+      )
+      .build()
 
   "SH03 Organisation Bulk CheckYourAnswersController" - {
 
@@ -105,13 +126,7 @@ class CheckYourAnswersControllerSpec extends SpecBase with MockitoSugar with Fil
         when(mockCyaService.buildViewModel(any(), any())(any[Lang], any[Messages])).thenReturn(viewModel)
         when(mockRepository.findDocumentByReference(reference)).thenReturn(Future.successful(Some(parsedStcRowsDocument)))
 
-        val application = applicationBuilder(userAnswers = Some(userAnswersWithFileRef), affinityGroup = organisationAffinity)
-          .overrides(
-            bind[Navigator].qualifiedWith("orgSh03").toInstance(getNavigator),
-            bind[CheckYourAnswersService].toInstance(mockCyaService),
-            bind[ParsedStcRowsRepository].toInstance(mockRepository)
-          )
-          .build()
+        val application = onPageLoadApp()
 
         running(application) {
           val request = FakeRequest(GET, checkYourAnswersRoute)
@@ -126,12 +141,7 @@ class CheckYourAnswersControllerSpec extends SpecBase with MockitoSugar with Fil
       "must redirect to Journey Recovery for a GET when no document exists" in {
         when(mockRepository.findDocumentByReference(reference)).thenReturn(Future.successful(None))
 
-        val application = applicationBuilder(userAnswers = Some(userAnswersWithFileRef), affinityGroup = organisationAffinity)
-          .overrides(
-            bind[Navigator].qualifiedWith("orgSh03").toInstance(getNavigator),
-            bind[ParsedStcRowsRepository].toInstance(mockRepository)
-          )
-          .build()
+        val application = onPageLoadApp()
 
         running(application) {
           val request = FakeRequest(GET, checkYourAnswersRoute)
@@ -151,15 +161,7 @@ class CheckYourAnswersControllerSpec extends SpecBase with MockitoSugar with Fil
         when(mockNavigator.nextPage(any(), any(), any(), anyBoolean())(any())).thenReturn(Future.successful(testNextPage))
         when(mockTransactionSubmissionService.submitBulkSh03(any())(using any[StcDataRequest[?]]())).thenReturn(Future.successful(true))
 
-        val application =
-          applicationBuilder(userAnswers = Some(userAnswersWithFileRef), affinityGroup = organisationAffinity)
-            .overrides(
-              bind[Navigator].qualifiedWith("orgSh03").toInstance(mockNavigator),
-              bind[ParsedStcRowsRepository].toInstance(mockRepository),
-              bind[CheckYourAnswersService].toInstance(mockCyaService),
-              bind[TransactionSubmissionService].toInstance(mockTransactionSubmissionService)
-            )
-            .build()
+        val application = onSubmitApp(Some(userAnswersWithFileRef))
 
         running(application) {
           val result = route(application, FakeRequest(POST, onSubmitRoute)).value
@@ -174,22 +176,38 @@ class CheckYourAnswersControllerSpec extends SpecBase with MockitoSugar with Fil
               taxDue = testTaxDue,
               agentReference = None
             )
-
+          verify(mockSessionRepository, never()).clear(any())
           verify(mockTransactionSubmissionService).submitBulkSh03(eqTo(expectedRows))(using any[StcDataRequest[?]]())
+        }
+      }
+
+      "must clear the user answers and redirect to Your File Will Not Be Saved when Save and return is clicked, without submitting" in {
+        //TODO: This test will need updated when the deletion of user answers is moved to the YourFileWillNotBeSavedController - see ticket STOSB-2156
+        when(mockSessionRepository.clear(any())).thenReturn(Future.successful(()))
+
+        val application = onSubmitApp(Some(userAnswersWithFileRef))
+
+        running(application) {
+          val request =
+            FakeRequest(POST, onSubmitRoute)
+              .withFormUrlEncodedBody(saveAndReturnButtonName -> "")
+
+          val result = route(application, request).value
+
+          status(result) mustEqual SEE_OTHER
+          redirectLocation(result).value mustEqual routes.YourFileWillNotBeSavedController.onPageLoad().url
+
+          verify(mockSessionRepository).clear(eqTo(userAnswersWithFileRef.userId))
+          verify(mockRepository, never()).findDocumentByReference(anyString())
+          verify(mockNavigator, never()).nextPage(any(), any(), any(), anyBoolean())(any())
+          verify(mockTransactionSubmissionService, never()).submitBulkSh03(any())(using any[StcDataRequest[?]]())
         }
       }
 
       "must redirect to Journey Recovery and not navigate or submit anything if findDocumentByReference does not find a document" in {
         when(mockRepository.findDocumentByReference(anyString())).thenReturn(Future.successful(None))
 
-        val application =
-          applicationBuilder(userAnswers = Some(userAnswersWithFileRef), affinityGroup = organisationAffinity)
-            .overrides(
-              bind[Navigator].qualifiedWith("orgSh03").toInstance(mockNavigator),
-              bind[ParsedStcRowsRepository].toInstance(mockRepository),
-              bind[TransactionSubmissionService].toInstance(mockTransactionSubmissionService)
-            )
-            .build()
+        val application = onSubmitApp(Some(userAnswersWithFileRef))
 
         running(application) {
           val result = route(application, FakeRequest(POST, onSubmitRoute)).value
@@ -198,18 +216,13 @@ class CheckYourAnswersControllerSpec extends SpecBase with MockitoSugar with Fil
           redirectLocation(result).value mustEqual routes.JourneyRecoveryController.onPageLoad().url
 
           verify(mockNavigator, never()).nextPage(any(), any(), any(), anyBoolean())(any())
+          verify(mockSessionRepository, never()).clear(any())
           verify(mockTransactionSubmissionService, never()).submitBulkSh03(any())(using any[StcDataRequest[?]]())
         }
       }
 
       "must redirect to Journey Recovery for a POST if no existing data is found" in {
-        val application =
-          applicationBuilder(userAnswers = None, affinityGroup = organisationAffinity)
-            .overrides(
-              bind[Navigator].qualifiedWith("orgSh03").toInstance(mockNavigator),
-              bind[TransactionSubmissionService].toInstance(mockTransactionSubmissionService)
-            )
-            .build()
+        val application = onSubmitApp(None)
 
         running(application) {
           val result = route(application, FakeRequest(POST, onSubmitRoute)).value
@@ -218,6 +231,7 @@ class CheckYourAnswersControllerSpec extends SpecBase with MockitoSugar with Fil
           redirectLocation(result).value mustEqual routes.JourneyRecoveryController.onPageLoad().url
 
           verify(mockNavigator, never()).nextPage(any(), any(), any(), anyBoolean())(any())
+          verify(mockSessionRepository, never()).clear(any())
           verify(mockTransactionSubmissionService, never()).submitBulkSh03(any())(using any[StcDataRequest[?]]())
         }
       }

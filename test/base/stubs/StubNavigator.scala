@@ -30,6 +30,8 @@ class StubNavigator(desiredCall: Call)(implicit ec: scala.concurrent.ExecutionCo
     Future.successful(desiredCall)
   }
 
+  override def returnToDashboard(userAnswers: UserAnswers): Future[Call] = Future.successful(desiredCall)
+
   override def errorPage(forPage: Page): Call = desiredCall
 
   override def previousPage(page: Page, mode: Mode, userAnswers: UserAnswers): Call = desiredCall

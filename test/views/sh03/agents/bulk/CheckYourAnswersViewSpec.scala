@@ -111,10 +111,6 @@ class CheckYourAnswersViewSpec extends ViewBaseSpec {
       saveAndReturnButton.hasClass("govuk-button--secondary") mustBe true
     }
 
-    "should have the correct save and return href" in {
-      view().select(".govuk-button").get(1).attr("href") mustBe YourFileWillNotBeSavedController.onPageLoad().url
-    }
-
     "should have the correct back link" in {
       view().select("a.govuk-back-link").attr("href") mustBe testBackLinkRoute.url
     }

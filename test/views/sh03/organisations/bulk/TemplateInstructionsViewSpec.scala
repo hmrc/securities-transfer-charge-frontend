@@ -20,7 +20,7 @@ import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
 import play.api.Application
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.fileUpload.routes as bulkRoutes
-import uk.gov.hmrc.securitiestransferchargefrontend.controllers.dashboard.routes
+import uk.gov.hmrc.securitiestransferchargefrontend.controllers.sh03.organisations.bulk.routes as sh03OrgBulkRoutes
 import uk.gov.hmrc.securitiestransferchargefrontend.models.JourneyType.SH03
 import uk.gov.hmrc.securitiestransferchargefrontend.utils.CommonHelpers
 import uk.gov.hmrc.securitiestransferchargefrontend.views.html.sh03.organisations.bulk.TemplateInstructionsView
@@ -110,7 +110,7 @@ class TemplateInstructionsViewSpec extends ViewBaseSpec {
       "have a link to return back to the dashboard page" in {
         val returnLink = templateInstructionsView.select(".govuk-button-group a.govuk-link").first()
         returnLink.text() mustBe ExpectedContent.returnLink
-        returnLink.attr("href") mustBe routes.DashboardController.onPageLoad().url
+        returnLink.attr("href") mustBe sh03OrgBulkRoutes.TemplateInstructionsController.onReturnToDashboard().url
       }
     }
   }
