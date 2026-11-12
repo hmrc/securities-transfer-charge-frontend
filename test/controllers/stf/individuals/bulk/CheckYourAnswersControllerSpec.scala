@@ -190,8 +190,6 @@ private def capturedCyaHtml(): CyaHtmlData = {
       when(mockCyaService.buildViewModel(any())(any[Lang])).thenReturn(viewModel)
       when(mockRepository.findDocumentByReference(reference)).thenReturn(Future.successful(Some(parsedStcRowsDocument)))
 
-        when(mockRepository.findDocumentByReference(reference))
-        .thenReturn(Future.successful(None))
 
       val application = pageLoadApplication(userAnswers = Some(answersForThisUpload))
 
