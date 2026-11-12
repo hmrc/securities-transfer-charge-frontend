@@ -82,7 +82,7 @@ class RetrievalFilter @Inject()(
 
   def checkRequiredAffinity(requiredAffinity: AffinityGroup): RetrievalFilterFunction[Option[AffinityGroup], AffinityGroup] = {
     case Some(affinity) if affinity == requiredAffinity => Right(affinity)
-    case Some(_)                                        => Left(redirectToJourneyRecoveryF) // TODO: STOSB-2127 - redirect to KO page.
+    case Some(_)                                        => Left(redirectToCannotAccessPageF)
     case None                                           => Left(redirectToUnauthorisedF)
   }
 }

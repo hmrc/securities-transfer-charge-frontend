@@ -251,7 +251,9 @@ class StcAuthEnrolledActionImplSpec extends SpecBase {
           action.invokeBlock(FakeRequest(), _ => Future.successful(Results.Ok))
 
         status(result) mustBe SEE_OTHER
-        // TODO: STOSB-2127 - check this redirects to the KO page.
+        redirectLocation(result).value mustBe {
+          routes.CannotAccessPageController.onPageLoad().url
+        }
       }
     }
 
