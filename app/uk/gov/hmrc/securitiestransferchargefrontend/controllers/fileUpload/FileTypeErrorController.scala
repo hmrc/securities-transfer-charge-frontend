@@ -23,12 +23,11 @@ import uk.gov.hmrc.securitiestransferchargefrontend.controllers.actions.*
 import uk.gov.hmrc.securitiestransferchargefrontend.views.html.fileUpload.FileTypeErrorView
 import uk.gov.hmrc.securitiestransferchargefrontend.models.JourneyType
 
-
-import javax.inject.Inject
+import javax.inject.{Inject, Named}
 
 class FileTypeErrorController @Inject()(
                                        override val messagesApi: MessagesApi,
-                                       stcAuthEnrolled: StcAuthEnrolledAction,
+                                       @Named("any") stcAuthEnrolled: StcAuthEnrolledAction,
                                        val controllerComponents: MessagesControllerComponents,
                                        view: FileTypeErrorView,
                                      ) extends FrontendBaseController with I18nSupport {

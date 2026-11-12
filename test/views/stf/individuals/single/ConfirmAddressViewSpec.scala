@@ -25,7 +25,7 @@ import views.ViewBaseSpec
 
 class ConfirmAddressViewSpec extends ViewBaseSpec {
 
-  override def fakeApplication(): Application = applicationBuilder(affinityGroup = individualAffinity).build()
+  override def fakeApplication(): Application = applicationBuilder().build()
 
   private val viewInstance = app.injector.instanceOf[ConfirmAddressView]
 

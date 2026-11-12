@@ -16,7 +16,6 @@
 
 package controllers.sh03.organisations.single
 
-import base.Fixtures.organisationAffinity
 import base.SpecBase
 import play.api.i18n.Messages
 import play.api.inject.bind
@@ -62,7 +61,7 @@ class ChargingPointControllerSpec extends SpecBase {
 
     "must return OK and the correct view for a GET" in {
 
-      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers), affinityGroup = organisationAffinity)
+      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers))
         .overrides(bind[Navigator].qualifiedWith("orgSh03").toInstance(getNavigator))
         .build()
 
@@ -80,7 +79,7 @@ class ChargingPointControllerSpec extends SpecBase {
 
       val userAnswers = UserAnswers(testUserId, testGroupIdentifier, submissionId,SH03).set(ChargingPointPage, validAnswer).success.value
 
-      val application = applicationBuilder(userAnswers = Some(userAnswers), affinityGroup = organisationAffinity)
+      val application = applicationBuilder(userAnswers = Some(userAnswers))
         .overrides(bind[Navigator].qualifiedWith("orgSh03").toInstance(getNavigator))
         .build()
 
@@ -96,7 +95,7 @@ class ChargingPointControllerSpec extends SpecBase {
 
     "must redirect to the next page when valid data is submitted" in {
 
-      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers), affinityGroup = organisationAffinity)
+      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers))
         .overrides(bind[Navigator].qualifiedWith("orgSh03").toInstance(getNavigator))
         .build()
 
@@ -110,7 +109,7 @@ class ChargingPointControllerSpec extends SpecBase {
 
     "must return a Bad Request and errors when invalid data is submitted" in {
 
-      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers), affinityGroup = organisationAffinity)
+      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers))
         .overrides(bind[Navigator].qualifiedWith("orgSh03").toInstance(getNavigator))
         .build()
 
@@ -132,7 +131,7 @@ class ChargingPointControllerSpec extends SpecBase {
 
     "must redirect to Journey Recovery for a GET if no existing data is found" in {
 
-      val application = applicationBuilder(userAnswers = None, affinityGroup = organisationAffinity).build()
+      val application = applicationBuilder(userAnswers = None).build()
 
       running(application) {
         val result = route(application, getRequest()).value
@@ -144,7 +143,7 @@ class ChargingPointControllerSpec extends SpecBase {
 
     "must redirect to Journey Recovery for a POST if no existing data is found" in {
 
-      val application = applicationBuilder(userAnswers = None, affinityGroup = organisationAffinity).build()
+      val application = applicationBuilder(userAnswers = None).build()
 
       running(application) {
         val result = route(application, postRequest()).value

@@ -46,7 +46,7 @@ class RetrievalFilter @Inject()(
   val namePresentFilter: RetrievalFilterFunction[Option[ItmpName], String] =
     case Some(ItmpName(Some(fn), _, Some(ln))) => Right(s"$fn $ln")
     case _ => Right("Securities Transfer Tax")
-  
+
   val enrolledForStc: RetrievalFilterFunction[Enrolments, Unit] = enrolments =>
     enrolments
       .getEnrolment(appConfig.stcEnrolmentKey)
@@ -73,5 +73,16 @@ class RetrievalFilter @Inject()(
     case Individual =>
       nino.fold(Left(redirectToUnauthorisedF))(nino => Right(IndividualUniqueIdentifier(nino)))
   }
-   
+
+  def checkCorrectAffinity(requiredAffinity: Option[AffinityGroup]): RetrievalFilterFunction[Option[AffinityGroup], AffinityGroup] = {
+    requiredAffinity
+      .map(checkRequiredAffinity)
+      .getOrElse(isPresent)
+  }
+
+  def checkRequiredAffinity(requiredAffinity: AffinityGroup): RetrievalFilterFunction[Option[AffinityGroup], AffinityGroup] = {
+    case Some(affinity) if affinity == requiredAffinity => Right(affinity)
+    case Some(_)                                        => Left(redirectToJourneyRecoveryF) // TODO: STOSB-2127 - redirect to KO page.
+    case None                                           => Left(redirectToUnauthorisedF)
+  }
 }

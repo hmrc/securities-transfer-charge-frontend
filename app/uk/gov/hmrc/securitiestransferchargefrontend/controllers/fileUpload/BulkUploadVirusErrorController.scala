@@ -23,12 +23,11 @@ import uk.gov.hmrc.securitiestransferchargefrontend.controllers.actions.*
 import uk.gov.hmrc.securitiestransferchargefrontend.views.html.fileUpload.BulkUploadVirusErrorView
 import uk.gov.hmrc.securitiestransferchargefrontend.models.JourneyType
 
-
-import javax.inject.Inject
+import javax.inject.{Inject, Named}
 
 class BulkUploadVirusErrorController @Inject()(
                                                override val messagesApi: MessagesApi,
-                                               stcAuthEnrolled: StcAuthEnrolledAction,
+                                               @Named("any") stcAuthEnrolled: StcAuthEnrolledAction,
                                                view: BulkUploadVirusErrorView,
                                                val controllerComponents: MessagesControllerComponents
                                              ) extends FrontendBaseController with I18nSupport {

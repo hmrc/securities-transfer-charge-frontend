@@ -43,7 +43,7 @@ class TaxRateControllerSpec extends SpecBase with MockitoSugar {
 
     "must return OK and the correct view for a GET" in {
 
-      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers), affinityGroup = orgAffinity)
+      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers))
         .overrides(bind[Navigator].qualifiedWith("organisations").toInstance(getNavigator))
         .build()
 
@@ -63,7 +63,7 @@ class TaxRateControllerSpec extends SpecBase with MockitoSugar {
 
       val userAnswers = UserAnswers(testUserId, testGroupIdentifier, submissionId,STF).set(TaxRatePage, TaxRate.values.head).success.value
 
-      val application = applicationBuilder(userAnswers = Some(userAnswers), affinityGroup = orgAffinity)
+      val application = applicationBuilder(userAnswers = Some(userAnswers))
         .overrides(bind[Navigator].qualifiedWith("organisations").toInstance(getNavigator))
         .build()
 
@@ -85,7 +85,7 @@ class TaxRateControllerSpec extends SpecBase with MockitoSugar {
       
 
       val application =
-        applicationBuilder(userAnswers = Some(userAnswers),affinityGroup = orgAffinity)
+        applicationBuilder(userAnswers = Some(userAnswers))
           .overrides(bind[Navigator].qualifiedWith("organisations").toInstance(getNavigator))
           .build()
 
@@ -103,7 +103,7 @@ class TaxRateControllerSpec extends SpecBase with MockitoSugar {
 
     "must return a Bad Request and errors when invalid data is submitted" in {
 
-      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers), affinityGroup = orgAffinity)
+      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers))
         .overrides(bind[Navigator].qualifiedWith("organisations").toInstance(getNavigator))
         .build()
 
@@ -125,7 +125,7 @@ class TaxRateControllerSpec extends SpecBase with MockitoSugar {
 
     "must redirect to Journey Recovery for a GET if no existing data is found" in {
 
-      val application = applicationBuilder(userAnswers = None, affinityGroup = orgAffinity).build()
+      val application = applicationBuilder(userAnswers = None).build()
 
       running(application) {
         val request = FakeRequest(GET, taxRateRoute)
@@ -139,7 +139,7 @@ class TaxRateControllerSpec extends SpecBase with MockitoSugar {
 
     "redirect to Journey Recovery for a POST if no existing data is found" in {
 
-      val application = applicationBuilder(userAnswers = None, affinityGroup = orgAffinity).build()
+      val application = applicationBuilder(userAnswers = None).build()
 
       running(application) {
         val request =

@@ -23,11 +23,13 @@ import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.actions.StcAuthEnrolledAction
 import uk.gov.hmrc.securitiestransferchargefrontend.views.html.fileUpload.ChangeFileCheckView
 
+import javax.inject.Named
+
 
 
 class ChangeFileCheckController @Inject()(
                                             override val messagesApi: MessagesApi,
-                                            stcAuthEnrolled: StcAuthEnrolledAction,
+                                            @Named("any") stcAuthEnrolled: StcAuthEnrolledAction,
                                             val controllerComponents: MessagesControllerComponents,
                                             view: ChangeFileCheckView
                                           ) extends FrontendBaseController with I18nSupport {

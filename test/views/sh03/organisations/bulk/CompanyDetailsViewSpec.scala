@@ -27,7 +27,7 @@ import views.ViewBaseSpec
 class CompanyDetailsViewSpec extends ViewBaseSpec {
 
   override def fakeApplication(): Application =
-    applicationBuilder(affinityGroup = orgAffinity).build()
+    applicationBuilder().build()
 
   private val messageKeyPrefix = "org.sh03.bulk.companyDetails"
 

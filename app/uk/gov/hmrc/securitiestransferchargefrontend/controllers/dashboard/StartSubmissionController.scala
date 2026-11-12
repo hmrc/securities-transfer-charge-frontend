@@ -24,15 +24,14 @@ import uk.gov.hmrc.securitiestransferchargefrontend.controllers.sh03.shared.rout
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.agents.routes as stfAgentRoutes
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.individuals.routes as stfIndividualRoutes
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.organisations.routes as stfOrganisationRoutes
-
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.routes
 
-import javax.inject.{Inject, Singleton}
+import javax.inject.{Inject, Named, Singleton}
 
 @Singleton
 class StartSubmissionController @Inject()(
                                            val controllerComponents: MessagesControllerComponents,
-                                           stcAuthEnrolled: StcAuthEnrolledAction
+                                           @Named("any") stcAuthEnrolled: StcAuthEnrolledAction
                                          ) extends FrontendBaseController {
 
   def startStf(): Action[AnyContent] = stcAuthEnrolled { implicit request =>

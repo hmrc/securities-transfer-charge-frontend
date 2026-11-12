@@ -46,7 +46,7 @@ class AgentReferenceControllerSpec extends SpecBase {
   "AgentReferenceController" - {
 
     "must return OK and the correct view for a GET" in {
-      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers), affinityGroup = agentAffinity)
+      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers))
         .overrides(
           bind[Navigator].qualifiedWith("agentsSh03").toInstance(getNavigator))
         .build()
@@ -70,7 +70,7 @@ class AgentReferenceControllerSpec extends SpecBase {
         .success
         .value
 
-      val application = applicationBuilder(userAnswers = Some(userAnswers), affinityGroup = agentAffinity)
+      val application = applicationBuilder(userAnswers = Some(userAnswers))
           .overrides(
             bind[Navigator].qualifiedWith("agentsSh03").toInstance(getNavigator)
           )
@@ -96,7 +96,7 @@ class AgentReferenceControllerSpec extends SpecBase {
         .thenReturn(Future.successful(submissionId))
 
       val application =
-        applicationBuilder(userAnswers = Some(emptyUserAnswers), agentAffinity)
+        applicationBuilder(userAnswers = Some(emptyUserAnswers))
           .overrides(bind[Navigator].qualifiedWith("agentsSh03").toInstance(getNavigator), bind[SubmissionIdClient].toInstance(mockIdClient))
           .build()
 
@@ -114,7 +114,7 @@ class AgentReferenceControllerSpec extends SpecBase {
 
     "must return a Bad Request and errors when invalid data is submitted" in {
 
-      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers), affinityGroup = agentAffinity)
+      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers))
         .overrides(bind[Navigator].qualifiedWith("agentsSh03").toInstance(getNavigator))
         .build()
 

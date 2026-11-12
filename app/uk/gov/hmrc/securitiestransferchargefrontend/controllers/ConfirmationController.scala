@@ -28,12 +28,12 @@ import uk.gov.hmrc.securitiestransferchargefrontend.repositories.{SessionReposit
 import uk.gov.hmrc.securitiestransferchargefrontend.services.stf.shared.FormattingService
 import uk.gov.hmrc.securitiestransferchargefrontend.views.html.shared.ConfirmationView
 
-import javax.inject.Inject
+import javax.inject.{Inject, Named}
 import scala.concurrent.{ExecutionContext, Future}
 
 class ConfirmationController @Inject()(
                                         val controllerComponents: MessagesControllerComponents,
-                                        stcAuthEnrolled: StcAuthEnrolledAction,
+                                        @Named("any") stcAuthEnrolled: StcAuthEnrolledAction,
                                         getData: StcDataRetrievalAction,
                                         requireData: StcDataRequiredAction,
                                         sessionRepository: SessionRepository,

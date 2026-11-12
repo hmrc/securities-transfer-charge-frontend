@@ -19,6 +19,7 @@ package base
 import base.Fixtures.FakeAlfConnector
 import base.stubs.*
 import clients.FakeSaveAndReturnClient
+import com.google.inject.name.Names
 import controllers.actions.*
 import org.scalatest.concurrent.{IntegrationPatience, ScalaFutures}
 import org.scalatest.freespec.AnyFreeSpec
@@ -115,32 +116,34 @@ trait SpecBase
 
   def messages(app: Application): Messages = app.injector.instanceOf[MessagesApi].preferred(FakeRequest())
 
-  private def stcAuthEnrolledActionClass(
-                                          affinityGroup: AffinityGroup
-                                        ): Class[_ <: StcAuthEnrolledAction] =
-    affinityGroup match {
-      case AffinityGroup.Agent => classOf[AgentStubStcAuthEnrolledAction]
-      case AffinityGroup.Individual => classOf[StubStcAuthEnrolledAction]
-      case AffinityGroup.Organisation => classOf[OrganisationStubStcAuthEnrolledAction]
-    }
-
   protected def applicationBuilder(userAnswers: Option[UserAnswers] = None,
-                                   affinityGroup: AffinityGroup = AffinityGroup.Individual,
                                    saveAndReturnClient: SaveAndReturnClient = FakeSaveAndReturnClient(),
-                                   sessionRepository: SessionRepository = StubSessionRepository()
+                                   sessionRepository: SessionRepository = StubSessionRepository(),
+                                   affinityGroup: AffinityGroup = AffinityGroup.Individual
                                   ): GuiceApplicationBuilder =
     new GuiceApplicationBuilder()
       .overrides(
+        bind[AffinityGroup].toInstance(affinityGroup),
         bind[IdentifierAction].to[FakeIdentifierAction],
-        bind[StcAuthEnrolledAction].to(stcAuthEnrolledActionClass(affinityGroup)),
+        bind[StcAuthEnrolledAction]
+          .qualifiedWith(Names.named("individuals"))
+          .to(classOf[IndividualStubStcAuthEnrolledAction]),
+        bind[StcAuthEnrolledAction]
+          .qualifiedWith(Names.named("organisations"))
+          .to(classOf[OrganisationStubStcAuthEnrolledAction]),
+        bind[StcAuthEnrolledAction]
+          .qualifiedWith(Names.named("agents"))
+          .to(classOf[AgentStubStcAuthEnrolledAction]),
+        bind[StcAuthEnrolledAction]
+          .qualifiedWith(Names.named("any"))
+          .to(classOf[AnyStubStcAuthEnrolledAction]),
         bind[StcDataRetrievalAction].toInstance(StubStcDataRetrievalAction(userAnswers)),
         bind[DataRequiredAction].to[DataRequiredActionImpl],
         bind[StcDataRequiredAction].toInstance(StubStcDataRequiredAction(userAnswers)),
         bind[DataRetrievalAction].toInstance(new FakeDataRetrievalAction(userAnswers)),
         bind[SaveAndReturnClient].toInstance(saveAndReturnClient),
         bind[AlfAddressConnector].to[FakeAlfConnector],
-        bind[SessionRepository].toInstance(sessionRepository),
-        bind[StcIndividualAuthEnrolledAction].to[StubStcIndividualEnrolledAction]
+        bind[SessionRepository].toInstance(sessionRepository)
       )
 
   // Helper methods for creating common UserAnswers scenarios for STF

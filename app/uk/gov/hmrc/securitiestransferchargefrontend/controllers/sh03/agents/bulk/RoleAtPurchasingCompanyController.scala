@@ -37,7 +37,7 @@ import scala.util.Try
 class RoleAtPurchasingCompanyController @Inject()(
                                                    override val messagesApi: MessagesApi,
                                                    @Named("agentsSh03") navigator: Navigator,
-                                                   stcAuthEnrolled: StcAuthEnrolledAction,
+                                                   @Named("agents") stcAuthEnrolled: StcAuthEnrolledAction,
                                                    getData: StcDataRetrievalAction,
                                                    requireData: StcDataRequiredAction,
                                                    formProvider: RoleAtPurchasingCompanyFormProvider,

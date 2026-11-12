@@ -50,7 +50,7 @@ class HowToNotifyAboutSecuritiesTransferControllerSpec extends SpecBase {
 
     "must return OK and the correct view for a GET" in {
 
-      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers), affinityGroup = individualAffinity)
+      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers))
         .overrides(bind[Navigator].qualifiedWith("individuals").toInstance(getNavigator))
         .build()
 
@@ -69,7 +69,7 @@ class HowToNotifyAboutSecuritiesTransferControllerSpec extends SpecBase {
     "must populate the view correctly on a GET when the question has previously been answered" in {
 
       val userAnswers = UserAnswers(testUserId, testGroupIdentifier, submissionId,STF).set(HowToNotifyAboutSecuritiesTransferPage, HowToNotifyAboutSecuritiesTransfer.values.head).success.value
-      val application = applicationBuilder(userAnswers = Some(userAnswers), affinityGroup = individualAffinity)
+      val application = applicationBuilder(userAnswers = Some(userAnswers))
         .overrides(bind[Navigator].qualifiedWith("individuals").toInstance(getNavigator))
         .build()
 
@@ -87,7 +87,7 @@ class HowToNotifyAboutSecuritiesTransferControllerSpec extends SpecBase {
 
     "must return a Bad Request and errors when invalid data is submitted" in {
 
-      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers), affinityGroup = individualAffinity)
+      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers))
         .overrides(bind[Navigator].qualifiedWith("individuals").toInstance(getNavigator))
         .build()
 
@@ -109,7 +109,7 @@ class HowToNotifyAboutSecuritiesTransferControllerSpec extends SpecBase {
     "must redirect to confirm your address page when one at a time is selected" in {
       val saveAndReturnClient = mock[SaveAndReturnClient]
 
-      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers), saveAndReturnClient = saveAndReturnClient, affinityGroup = individualAffinity)
+      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers), saveAndReturnClient = saveAndReturnClient)
         .build()
 
       when(saveAndReturnClient.save(any[UserAnswers]())(any[HeaderCarrier]()))
@@ -130,7 +130,7 @@ class HowToNotifyAboutSecuritiesTransferControllerSpec extends SpecBase {
     "must redirect to Template instruction page when more than one at a time is selected" in {
       val saveAndReturnClient = mock[SaveAndReturnClient]
 
-      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers), affinityGroup = individualAffinity, saveAndReturnClient = saveAndReturnClient)
+      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers), saveAndReturnClient = saveAndReturnClient)
         .build()
 
       when(saveAndReturnClient.save(any[UserAnswers]())(any[HeaderCarrier]()))

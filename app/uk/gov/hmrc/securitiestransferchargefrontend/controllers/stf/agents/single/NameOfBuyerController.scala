@@ -35,7 +35,7 @@ import scala.language.postfixOps
 class NameOfBuyerController @Inject()(
                                         override val messagesApi: MessagesApi,
                                         @Named("agents") navigator: Navigator,
-                                        stcAuthEnrolled: StcAuthEnrolledAction,
+                                        @Named("agents") stcAuthEnrolled: StcAuthEnrolledAction,
                                         getData: StcDataRetrievalAction,
                                         requireData: StcDataRequiredAction,
                                         formProvider: NameOfBuyerFormProvider,

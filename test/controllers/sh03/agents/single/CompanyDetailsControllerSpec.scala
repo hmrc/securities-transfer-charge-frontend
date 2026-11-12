@@ -45,7 +45,7 @@ class CompanyDetailsControllerSpec extends SpecBase with MockitoSugar {
 
     "must return OK and the correct view for a GET" in {
 
-      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers), affinityGroup = agentAffinity)
+      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers))
         .overrides(bind[Navigator].qualifiedWith("agentsSh03").toInstance(getNavigator))
         .build()
 
@@ -66,7 +66,7 @@ class CompanyDetailsControllerSpec extends SpecBase with MockitoSugar {
       val userAnswers = UserAnswers(testUserId, testGroupIdentifier, submissionId,SH03)
         .set(CompanyDetailsPage, validAnswer).success.value
 
-      val application = applicationBuilder(userAnswers = Some(userAnswers), affinityGroup = agentAffinity)
+      val application = applicationBuilder(userAnswers = Some(userAnswers))
         .overrides(bind[Navigator].qualifiedWith("agentsSh03").toInstance(getNavigator))
         .build()
 
@@ -83,7 +83,7 @@ class CompanyDetailsControllerSpec extends SpecBase with MockitoSugar {
     }
 
     "must redirect to next page when valid data is submitted" in {
-      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers), affinityGroup = agentAffinity)
+      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers))
         .overrides(bind[Navigator].qualifiedWith("agentsSh03").toInstance(getNavigator))
         .build()
 
@@ -105,7 +105,7 @@ class CompanyDetailsControllerSpec extends SpecBase with MockitoSugar {
 
     "must return a Bad Request and errors when invalid data is submitted" in {
 
-      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers), affinityGroup = agentAffinity)
+      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers))
         .overrides(bind[Navigator].qualifiedWith("agentsSh03").toInstance(getNavigator))
         .build()
 
@@ -127,7 +127,7 @@ class CompanyDetailsControllerSpec extends SpecBase with MockitoSugar {
 
     "must return a Bad Request when company name is empty" in {
 
-      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers), affinityGroup = agentAffinity)
+      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers))
         .overrides(bind[Navigator].qualifiedWith("agentsSh03").toInstance(getNavigator))
         .build()
 
@@ -148,7 +148,7 @@ class CompanyDetailsControllerSpec extends SpecBase with MockitoSugar {
 
     "must return a Bad Request when CRN is not 8 characters" in {
 
-      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers), affinityGroup = agentAffinity)
+      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers))
         .overrides(bind[Navigator].qualifiedWith("agentsSh03").toInstance(getNavigator))
         .build()
 
@@ -169,7 +169,7 @@ class CompanyDetailsControllerSpec extends SpecBase with MockitoSugar {
 
     "must return a Bad Request when CRN contains invalid characters" in {
 
-      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers), affinityGroup = agentAffinity)
+      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers))
         .overrides(bind[Navigator].qualifiedWith("agentsSh03").toInstance(getNavigator))
         .build()
 
@@ -190,7 +190,7 @@ class CompanyDetailsControllerSpec extends SpecBase with MockitoSugar {
 
     "must redirect to Journey Recovery for a GET if no existing data is found" in {
 
-      val application = applicationBuilder(userAnswers = None, affinityGroup = agentAffinity).build()
+      val application = applicationBuilder(userAnswers = None).build()
 
       running(application) {
         val request = FakeRequest(GET, companyDetailsRoute)
@@ -204,7 +204,7 @@ class CompanyDetailsControllerSpec extends SpecBase with MockitoSugar {
 
     "must redirect to Journey Recovery for a POST if no existing data is found" in {
 
-      val application = applicationBuilder(userAnswers = None, affinityGroup = agentAffinity).build()
+      val application = applicationBuilder(userAnswers = None).build()
 
       running(application) {
         val request =

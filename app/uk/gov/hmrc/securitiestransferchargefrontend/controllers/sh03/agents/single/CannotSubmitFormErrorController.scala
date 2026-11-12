@@ -22,11 +22,11 @@ import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.actions.*
 import uk.gov.hmrc.securitiestransferchargefrontend.views.html.sh03.agents.single.CannotSubmitFormErrorView
 
-import javax.inject.Inject
+import javax.inject.{Inject, Named}
 
 class CannotSubmitFormErrorController @Inject()(
                                        override val messagesApi: MessagesApi,
-                                       stcAuthEnrolled: StcAuthEnrolledAction,
+                                       @Named("agents") stcAuthEnrolled: StcAuthEnrolledAction,
                                        val controllerComponents: MessagesControllerComponents,
                                        view: CannotSubmitFormErrorView
                                      ) extends FrontendBaseController with I18nSupport {

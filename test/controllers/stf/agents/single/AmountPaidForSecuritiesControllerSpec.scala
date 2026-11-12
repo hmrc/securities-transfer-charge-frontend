@@ -44,7 +44,7 @@ class AmountPaidForSecuritiesControllerSpec extends SpecBase with MockitoSugar {
 
     "must return OK and the correct view for a GET" in {
 
-      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers), affinityGroup = agentAffinity)
+      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers))
         .overrides(bind[Navigator].qualifiedWith("agents").toInstance(getNavigator))
         .build()
 
@@ -64,7 +64,7 @@ class AmountPaidForSecuritiesControllerSpec extends SpecBase with MockitoSugar {
 
       val userAnswers = UserAnswers(testUserId, testGroupIdentifier, submissionId,STF).set(AmountPaidForSecuritiesPage, validAnswer).success.value
 
-      val application = applicationBuilder(userAnswers = Some(userAnswers), affinityGroup = agentAffinity)
+      val application = applicationBuilder(userAnswers = Some(userAnswers))
         .overrides(bind[Navigator].qualifiedWith("agents").toInstance(getNavigator))
         .build()
 
@@ -83,7 +83,7 @@ class AmountPaidForSecuritiesControllerSpec extends SpecBase with MockitoSugar {
     "must redirect to the next page when valid data is submitted and connected persons is false" in {
       val updatedAnswers = emptyUserAnswers.set(ConnectedPersonsPage,false).success.value
       val application =
-        applicationBuilder(userAnswers = Some(updatedAnswers), affinityGroup = agentAffinity)
+        applicationBuilder(userAnswers = Some(updatedAnswers))
           .overrides(bind[Navigator].qualifiedWith("agents").toInstance(getNavigator))
           .build()
 
@@ -102,7 +102,7 @@ class AmountPaidForSecuritiesControllerSpec extends SpecBase with MockitoSugar {
     "must redirect to the next page when valid data is submitted and connected persons is true" in {
       val updatedAnswers = emptyUserAnswers.set(ConnectedPersonsPage, true).success.value
       val application =
-        applicationBuilder(userAnswers = Some(updatedAnswers), affinityGroup = agentAffinity)
+        applicationBuilder(userAnswers = Some(updatedAnswers))
           .build()
 
       running(application) {
@@ -119,7 +119,7 @@ class AmountPaidForSecuritiesControllerSpec extends SpecBase with MockitoSugar {
 
     "must return a Bad Request and errors when invalid data is submitted" in {
 
-      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers), affinityGroup = agentAffinity)
+      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers))
         .overrides(bind[Navigator].qualifiedWith("agents").toInstance(getNavigator))
         .build()
 
@@ -141,7 +141,7 @@ class AmountPaidForSecuritiesControllerSpec extends SpecBase with MockitoSugar {
 
     "must redirect to Journey Recovery for a GET if no existing data is found" in {
 
-      val application = applicationBuilder(userAnswers = None, affinityGroup = agentAffinity).build()
+      val application = applicationBuilder(userAnswers = None).build()
 
       running(application) {
         val request = FakeRequest(GET, amountPaidForSecuritiesRoute)
@@ -155,7 +155,7 @@ class AmountPaidForSecuritiesControllerSpec extends SpecBase with MockitoSugar {
 
     "must redirect to Journey Recovery for a POST if no existing data is found" in {
 
-      val application = applicationBuilder(userAnswers = None, affinityGroup = agentAffinity).build()
+      val application = applicationBuilder(userAnswers = None).build()
 
       running(application) {
         val request =

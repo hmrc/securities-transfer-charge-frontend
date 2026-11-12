@@ -32,7 +32,7 @@ import scala.concurrent.{ExecutionContext, Future}
 
 class AddressController @Inject()(val controllerComponents: MessagesControllerComponents,
                                   alf: AlfAddressConnector,
-                                  auth: StcAuthEnrolledAction,
+                                  @Named("agents") auth: StcAuthEnrolledAction,
                                   getData: StcDataRetrievalAction,
                                   requireData: StcDataRequiredAction,
                                   @Named("agents") val navigator: Navigator,

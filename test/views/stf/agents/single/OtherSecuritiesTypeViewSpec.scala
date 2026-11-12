@@ -29,7 +29,7 @@ import views.ViewBaseSpec
 class OtherSecuritiesTypeViewSpec extends ViewBaseSpec {
 
   override def fakeApplication(): Application =
-    applicationBuilder(affinityGroup = agentAffinity).build()
+    applicationBuilder().build()
 
   private val viewInstance = app.injector.instanceOf[OtherSecuritiesTypeView]
   private val formProvider = new OtherSecuritiesTypeFormProvider()

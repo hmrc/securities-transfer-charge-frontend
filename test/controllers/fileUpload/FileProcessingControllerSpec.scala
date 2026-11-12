@@ -59,10 +59,10 @@ class FileProcessingControllerSpec extends SpecBase with MockitoSugar with Audit
                         counter: FileProcessingRefreshCounter,
                         repository: UpscanJourneyRepository,
                         service: ProcessingService,
-                        affinityGroup: AffinityGroup = AffinityGroup.Individual,
+                        affinityGroup: AffinityGroup,
                         auditService: AuditService = mockAuditService
                       ) =
-    applicationBuilder(userAnswers = Some(emptyUserAnswers), affinityGroup)
+    applicationBuilder(userAnswers = Some(emptyUserAnswers), affinityGroup = affinityGroup)
       .overrides(
         bind[FileProcessingRefreshCounterFactory]
           .toInstance(new MockFileProcessingRefreshCounterFactory(counter)),
@@ -101,7 +101,7 @@ class FileProcessingControllerSpec extends SpecBase with MockitoSugar with Audit
             .thenReturn(Future.successful(Some(fakeUpload(UpscanJourneyStatus.Initiated))))
 
 
-          val app = buildApp(counter, repository, service)
+          val app = buildApp(counter, repository, service, AffinityGroup.Individual)
 
           running(app) {
 
@@ -128,7 +128,7 @@ class FileProcessingControllerSpec extends SpecBase with MockitoSugar with Audit
           val repository = mock[UpscanJourneyRepository]
           val service = mock[ProcessingService]
 
-          val app = buildApp(counter, repository, service)
+          val app = buildApp(counter, repository, service, AffinityGroup.Individual)
 
           running(app) {
 
@@ -199,7 +199,7 @@ class FileProcessingControllerSpec extends SpecBase with MockitoSugar with Audit
           when(repository.find(reference))
             .thenReturn(Future.successful(Some(fakeUpload(UpscanJourneyStatus.Processing))))
 
-          val app = buildApp(counter, repository, service)
+          val app = buildApp(counter, repository, service, AffinityGroup.Individual)
 
           running(app) {
 
@@ -221,7 +221,7 @@ class FileProcessingControllerSpec extends SpecBase with MockitoSugar with Audit
           when(repository.find(reference))
             .thenReturn(Future.successful(Some(fakeUpload(UpscanJourneyStatus.RowLimitExceeded))))
 
-          val app = buildApp(counter, repository, service)
+          val app = buildApp(counter, repository, service, AffinityGroup.Individual)
 
           running(app) {
 
@@ -242,7 +242,7 @@ class FileProcessingControllerSpec extends SpecBase with MockitoSugar with Audit
           when(repository.find(reference))
             .thenReturn(Future.successful(Some(fakeUpload(UpscanJourneyStatus.EmptyFile))))
 
-          val app = buildApp(counter, repository, service)
+          val app = buildApp(counter, repository, service, AffinityGroup.Individual)
 
           running(app) {
 
@@ -263,7 +263,7 @@ class FileProcessingControllerSpec extends SpecBase with MockitoSugar with Audit
           when(repository.find(reference))
             .thenReturn(Future.successful(Some(fakeUpload(UpscanJourneyStatus.TooManyErrors))))
 
-          val app = buildApp(counter, repository, service)
+          val app = buildApp(counter, repository, service, AffinityGroup.Individual)
 
           running(app) {
 
@@ -284,7 +284,7 @@ class FileProcessingControllerSpec extends SpecBase with MockitoSugar with Audit
           when(repository.find(reference))
             .thenReturn(Future.successful(Some(fakeUpload(UpscanJourneyStatus.FormatingErrors))))
 
-          val app = buildApp(counter, repository, service)
+          val app = buildApp(counter, repository, service, AffinityGroup.Individual)
 
           running(app) {
 
@@ -305,7 +305,7 @@ class FileProcessingControllerSpec extends SpecBase with MockitoSugar with Audit
           when(repository.find(reference))
             .thenReturn(Future.successful(Some(fakeUpload(UpscanJourneyStatus.UpscanDownloadError))))
 
-          val app = buildApp(counter, repository, service)
+          val app = buildApp(counter, repository, service, AffinityGroup.Individual)
 
           running(app) {
 
@@ -326,7 +326,7 @@ class FileProcessingControllerSpec extends SpecBase with MockitoSugar with Audit
           when(repository.find(reference))
             .thenReturn(Future.successful(Some(fakeUpload(UpscanJourneyStatus.InvalidTemplate))))
 
-          val app = buildApp(counter, repository, service)
+          val app = buildApp(counter, repository, service, AffinityGroup.Individual)
 
           running(app) {
 
@@ -347,7 +347,7 @@ class FileProcessingControllerSpec extends SpecBase with MockitoSugar with Audit
           when(repository.find(reference))
             .thenReturn(Future.successful(Some(fakeUpload(UpscanJourneyStatus.FileParseError))))
 
-          val app = buildApp(counter, repository, service)
+          val app = buildApp(counter, repository, service, AffinityGroup.Individual)
 
           running(app) {
 
@@ -369,7 +369,7 @@ class FileProcessingControllerSpec extends SpecBase with MockitoSugar with Audit
           when(repository.find(reference))
             .thenReturn(Future.successful(Some(upload)))
 
-          val app = buildApp(counter, repository, service)
+          val app = buildApp(counter, repository, service, AffinityGroup.Individual)
 
           running(app) {
 
@@ -514,7 +514,7 @@ class FileProcessingControllerSpec extends SpecBase with MockitoSugar with Audit
           when(repository.find(reference))
             .thenReturn(Future.successful(None))
 
-          val app = buildApp(counter, repository, service)
+          val app = buildApp(counter, repository, service, AffinityGroup.Individual)
 
           running(app) {
 
@@ -582,7 +582,7 @@ class FileProcessingControllerSpec extends SpecBase with MockitoSugar with Audit
 
           when(repository.find(reference)).thenReturn(Future.successful(Some(upload)))
 
-          val app = buildApp(counter, repository, service)
+          val app = buildApp(counter, repository, service, AffinityGroup.Individual)
 
           running(app) {
 
