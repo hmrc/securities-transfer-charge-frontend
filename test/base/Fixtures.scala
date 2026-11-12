@@ -266,7 +266,8 @@ object Fixtures {
     minSharePrice = Some("100"),
     maxSharePrice = Some("1000"),
     sharePurchaseReason = Some("cancellation"),
-    purchaseForCancellation = Some(true)
+    purchaseForCancellation = Some(true),
+    purchasingShares = Some(true)
   )
 
   val testValidatedStcRow = ValidatedStcRow(testParsedStcRow, List.empty)

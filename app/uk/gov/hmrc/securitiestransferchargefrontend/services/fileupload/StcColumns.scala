@@ -28,6 +28,7 @@ object StcColumns {
   val chargingPoint = "chargingPoint"
   val taxRate = "taxRate"
   val whatTypeOfSecurities = "whatTypeOfSecurities"
+  val purchasingShares = "purchasingShares"
   val securitiesQuantity = "securitiesQuantity"
   val amountPaidForSecurities = "amountPaidForSecurities"
   val totalMarketValue = "totalMarketValue"

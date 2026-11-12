@@ -98,6 +98,8 @@ class StcRowMapper(columnIndex: ColumnIndexBuilder) {
 
       whatTypeOfSecurities =
         readString(row, columnIndex.find(StcColumns.whatTypeOfSecurities)),
+      
+      purchasingShares =  readBoolean(row, columnIndex.find(StcColumns.purchasingShares)),
 
       typeOfShares =
         readString(row, columnIndex.find(StcColumns.typeOfShares)),

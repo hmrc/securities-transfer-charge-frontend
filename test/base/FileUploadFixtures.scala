@@ -92,7 +92,8 @@ trait FileUploadFixtures {
       minSharePrice = Some("1"),
       maxSharePrice = Some("1"),
       sharePurchaseReason = Some(""),
-      purchaseForCancellation = Some(false)
+      purchaseForCancellation = Some(false),
+      purchasingShares = Some(true)
     )
 
   def validationResponseWithErrors(errors: Seq[StcRowValidationError]): StcFileValidationResponse =

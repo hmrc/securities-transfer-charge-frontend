@@ -46,6 +46,7 @@ case class ParsedStcRow(
                          chargingPoint: ParsedValue[LocalDate],
                          taxRate: Option[BigDecimal],
                          whatTypeOfSecurities: Option[String],
+                         purchasingShares: Option[Boolean],
                          typeOfShares: Option[String],
                          securitiesQuantity: Option[String],
                          amountPaidForSecurities: Option[String],
