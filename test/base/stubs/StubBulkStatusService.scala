@@ -17,8 +17,8 @@
 package base.stubs
 
 import uk.gov.hmrc.securitiestransferchargefrontend.domain.{GroupIdentifier, SubmissionId}
-import uk.gov.hmrc.securitiestransferchargefrontend.models.submission.Status
-import uk.gov.hmrc.securitiestransferchargefrontend.services.{BulkStatusService, RowToFailureMap}
+import uk.gov.hmrc.securitiestransferchargefrontend.models.submission.{RowToFailureMap, Status}
+import uk.gov.hmrc.securitiestransferchargefrontend.services.BulkStatusService
 
 import scala.concurrent.Future
 import uk.gov.hmrc.securitiestransferchargefrontend.models.submission.Status.*

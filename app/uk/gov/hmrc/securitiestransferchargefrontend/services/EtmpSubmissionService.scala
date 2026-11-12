@@ -120,7 +120,10 @@ class EtmpSubmissionServiceImpl @Inject() (etmpSubmissionsClient: EtmpSubmission
     val successes = charges.collect(getStcChargeSuccess)
     val failures  = charges.collect(getStcChargeFailure)
 
-    lazy val failedRecords = failures.map(_.recordId)
+    lazy val failedRecords: RowToFailureMap =
+      failures
+        .map(f => f.recordId -> s"${f.errorCode}: ${f.errorText}")
+        .toMap
 
     if successes.isEmpty then
       return SubmissionCreateResponseFailure
