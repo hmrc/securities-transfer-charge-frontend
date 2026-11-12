@@ -35,7 +35,8 @@ object NrsSingleSubmissionRequest {
  */
 case class NrsBulkSubmissionRequest(
   payload: String,
-  metadata: NrsMetadata
+  metadata: NrsMetadata,
+  attachments: NrsAttachment
 )
 
 object NrsBulkSubmissionRequest {

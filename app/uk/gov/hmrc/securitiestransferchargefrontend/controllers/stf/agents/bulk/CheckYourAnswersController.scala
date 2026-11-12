@@ -29,7 +29,7 @@ import uk.gov.hmrc.securitiestransferchargefrontend.models.{Mode, NormalMode, Us
 import uk.gov.hmrc.securitiestransferchargefrontend.navigation.Navigator
 import uk.gov.hmrc.securitiestransferchargefrontend.pages.BulkConfirmationDetailsPage
 import uk.gov.hmrc.securitiestransferchargefrontend.pages.stf.bulk.{BulkAgentReferencePage, BulkCheckYourAnswersPage}
-import uk.gov.hmrc.securitiestransferchargefrontend.repositories.ParsedStcRowsRepository
+import uk.gov.hmrc.securitiestransferchargefrontend.repositories.{CyaHtmlData, CyaHtmlRepository, ParsedStcRowsRepository}
 import uk.gov.hmrc.securitiestransferchargefrontend.services.TransactionSubmissionService
 import uk.gov.hmrc.securitiestransferchargefrontend.services.stf.agents.bulk.CheckYourAnswersService
 import uk.gov.hmrc.securitiestransferchargefrontend.views.html.stf.agents.bulk.CheckYourAnswersView
@@ -47,7 +47,8 @@ class CheckYourAnswersController @Inject()(
                                             view: CheckYourAnswersView,
                                             parsedStcRowsRepository: ParsedStcRowsRepository,
                                             checkYourAnswersService: CheckYourAnswersService,
-                                            transactionSubmissionService: TransactionSubmissionService
+                                            transactionSubmissionService: TransactionSubmissionService,
+                                            cyaHtmlRepository: CyaHtmlRepository
                                           )(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport {
 
   lazy val backLinkCall: Mode => UserAnswers => Call = mode => userAnswers => navigator.previousPage(BulkCheckYourAnswersPage, mode, userAnswers)
@@ -59,7 +60,9 @@ class CheckYourAnswersController @Inject()(
       parsedStcRowsRepository.findDocumentByReference(fileUploadRef).map {
         case Some(doc) => 
           val viewModel = checkYourAnswersService.buildViewModel(request.userAnswers, doc)
-          Ok(view(viewModel, backLinkCall(NormalMode)(request.userAnswers)))
+          val html = view(viewModel, backLinkCall(NormalMode)(request.userAnswers))
+          cyaHtmlRepository.store(CyaHtmlData(request.userAnswers.submissionId,html))
+          Ok(html)
           
         case _ => 
           Redirect(JourneyRecoveryController.onPageLoad())
