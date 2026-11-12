@@ -20,14 +20,14 @@ import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
 import play.api.Application
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.dashboard.routes as dashboardRoutes
-import uk.gov.hmrc.securitiestransferchargefrontend.views.html.CanNotAccessPageView
+import uk.gov.hmrc.securitiestransferchargefrontend.views.html.CannotAccessPageView
 
 class CannotAccessPageViewSpec extends ViewBaseSpec {
 
   override def fakeApplication(): Application =
     applicationBuilder().build()
 
-  private val viewInstance = app.injector.instanceOf[CanNotAccessPageView]
+  private val viewInstance = app.injector.instanceOf[CannotAccessPageView]
 
   def view(): Document =
     Jsoup.parse(
