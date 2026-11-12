@@ -53,7 +53,15 @@ object DataExtractors {
 
   private[submission] val shareType: DataExtractor[String] =
     row => required(row.whatTypeOfSecurities, "whatTypeOfSecurities", row.rowNumber)
-    
+
+  private[submission] val purchasingShares: DataExtractor[Boolean] =
+    row => required(row.purchasingShares, "purchasingShares", row.rowNumber)
+
+  private[submission] val descriptionOfSecurity: DataExtractor[String] =
+    row =>
+      if purchasingShares(row) then required(row.typeOfShares, "typeOfShares", row.rowNumber)
+      else shareType(row)
+
   private[submission] val reliefClaimed: DataExtractor[Boolean] =
     row => required(row.applyingForRelief, "applyingForRelief", row.rowNumber)
     

@@ -62,7 +62,8 @@ class StcConditionalRowValidator @Inject()(
       validateTypeOfSecurities(row, affinityKey) ++
       validateBuyerAddress(row) ++
       validateSellerAddress(row) ++
-      validateTotalMarketValue(row, affinityKey, journeyType)
+      validateTotalMarketValue(row, affinityKey, journeyType) ++
+      validateWhatTypeOfSecurities(row, affinityKey)
 
 
   def validateSTF(
@@ -73,7 +74,8 @@ class StcConditionalRowValidator @Inject()(
     validateReliefType(row, affinityKey) ++
       validateTypeOfSecurities(row, affinityKey) ++
       validateSellerAddress(row) ++
-      validateTotalMarketValue(row, affinityKey, journeyType)
+      validateTotalMarketValue(row, affinityKey, journeyType) ++
+      validateWhatTypeOfSecurities(row,affinityKey)
 
   def validateSH03(
                     row: ParsedStcRow,
@@ -413,7 +415,7 @@ class StcConditionalRowValidator @Inject()(
 
     Seq(
       // If we are dealing with shares, we need a share type
-      Option.when(row.whatTypeOfSecurities.exists(_.equalsIgnoreCase("shares")) && row.typeOfShares.isEmpty) {
+      Option.when(row.purchasingShares.contains(true) && row.typeOfShares.isEmpty) {
         support.error(
           row.rowNumber,
           "typeOfShares",
@@ -425,6 +427,29 @@ class StcConditionalRowValidator @Inject()(
           row.rowNumber,
           "typeOfShares",
           messages(s"$affinityKey.fileUpload.error.typeOfShares.maxLength")
+        )
+      }
+    ).flatten
+  }
+
+  private def validateWhatTypeOfSecurities(
+                                        row: ParsedStcRow,
+                                        affinityKey: String
+                                      )(implicit cols: ColumnIndexBuilder): Seq[StcRowValidationError] = {
+
+    Seq(
+      Option.when(row.purchasingShares.contains(false) && row.whatTypeOfSecurities.isEmpty) {
+        support.error(
+          row.rowNumber,
+          "whatTypeOfSecurities",
+          messages(s"$affinityKey.fileUpload.error.securityType.required")
+        )
+      },
+      Option.when(row.whatTypeOfSecurities.exists(_.length > support.typeOfShareMaxLength)) {
+        support.error(
+          row.rowNumber,
+          "whatTypeOfSecurities",
+          messages("fileUpload.error.securityType.invalid.length")
         )
       }
     ).flatten

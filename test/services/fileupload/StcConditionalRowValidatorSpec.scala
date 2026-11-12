@@ -63,7 +63,8 @@ class StcConditionalRowValidatorSpec extends SpecBase {
       minSharePrice = None,
       maxSharePrice = None,
       sharePurchaseReason = None,
-      purchaseForCancellation = None
+      purchaseForCancellation = None,
+      purchasingShares = Some(true)
     )
 
   private val app = applicationBuilder().build()
@@ -117,20 +118,10 @@ class StcConditionalRowValidatorSpec extends SpecBase {
       result.exists(_.fieldName == "whatReliefAreYouApplyingFor") mustBe false
     }
 
-    "require the type of shares when purchasing shares" in {
-      val result = validator.validate(
-        validParsedRow.copy(
-          whatTypeOfSecurities = Some("shares"),
-          typeOfShares = None
-        ), StcTemplate.STF,affinityGroupKeyInd, STF
-      )
-
-      result.exists(_.fieldName == "typeOfShares") mustBe true
-    }
-
     "not require type of shares when security type is not shares" in {
       val result = validator.validate(
         validParsedRow.copy(
+          purchasingShares = Some(false),
           whatTypeOfSecurities = Some("Loan notes"),
           typeOfShares = None
         ), StcTemplate.STF,affinityGroupKeyInd, STF
@@ -327,6 +318,41 @@ class StcConditionalRowValidatorSpec extends SpecBase {
 
       result.exists(_.fieldName == "totalMarketValue") mustBe false
     }
+
+    "require type of share when purchasing shares" in {
+      val result = validator.validate(
+        validParsedRow.copy(
+          purchasingShares = Some(true),
+          typeOfShares = None
+        ), StcTemplate.STF, affinityGroupKeyInd, STF
+      )
+
+      result.exists(_.fieldName == "typeOfShares") mustBe true
+    }
+
+    "require type of security when purchasing shares is false" in {
+      val result = validator.validate(
+        validParsedRow.copy(
+          purchasingShares = Some(false),
+          whatTypeOfSecurities = None
+        ), StcTemplate.STF, affinityGroupKeyInd, STF
+      )
+
+      result.exists(_.fieldName == "whatTypeOfSecurities") mustBe true
+    }
+
+    "reject type of security for invalid length" in {
+      val invalidSecurityTypeLength = "a" * 270
+      val result = validator.validate(
+        validParsedRow.copy(
+          purchasingShares = Some(false),
+          whatTypeOfSecurities = Some(invalidSecurityTypeLength)
+        ), StcTemplate.STF, affinityGroupKeyInd, STF
+      )
+
+      result.exists(_.fieldName == "whatTypeOfSecurities") mustBe true
+    }
+
   }
 
   "Agent STF"- {
@@ -557,6 +583,40 @@ class StcConditionalRowValidatorSpec extends SpecBase {
       )
 
       result.exists(_.fieldName == "whatReliefAreYouApplyingFor") mustBe true
+    }
+
+    "require type of share when purchasing shares" in {
+      val result = validator.validate(
+        validParsedRow.copy(
+          purchasingShares = Some(true),
+          typeOfShares = None
+        ), StcTemplate.STFAgent, affinityGroupKeyInd, STF
+      )
+
+      result.exists(_.fieldName == "typeOfShares") mustBe true
+    }
+
+    "require type of security when purchasing shares is false" in {
+      val result = validator.validate(
+        validParsedRow.copy(
+          purchasingShares = Some(false),
+          whatTypeOfSecurities = None
+        ), StcTemplate.STFAgent, affinityGroupKeyInd, STF
+      )
+
+      result.exists(_.fieldName == "whatTypeOfSecurities") mustBe true
+    }
+
+    "reject type of security for invalid length" in {
+      val invalidSecurityTypeLength = "a" * 270
+      val result = validator.validate(
+        validParsedRow.copy(
+          purchasingShares = Some(false),
+          whatTypeOfSecurities = Some(invalidSecurityTypeLength)
+        ), StcTemplate.STFAgent, affinityGroupKeyInd, STF
+      )
+
+      result.exists(_.fieldName == "whatTypeOfSecurities") mustBe true
     }
   }
 

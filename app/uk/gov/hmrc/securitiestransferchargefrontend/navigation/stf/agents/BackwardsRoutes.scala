@@ -18,7 +18,7 @@ package uk.gov.hmrc.securitiestransferchargefrontend.navigation.stf.agents
 
 import play.api.mvc.Call
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.dashboard.routes as dashboardRoutes
-import uk.gov.hmrc.securitiestransferchargefrontend.controllers.fileUpload.routes as bulkSharedRoutes
+import uk.gov.hmrc.securitiestransferchargefrontend.controllers.fileUpload.routes as fileUploadRoutes
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.agents.bulk.routes as agentBulkRoutes
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.agents.routes as agentRoutes
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.agents.single.routes as agentSingleRoutes
@@ -26,7 +26,7 @@ import uk.gov.hmrc.securitiestransferchargefrontend.models.stf.HowToNotifyAboutS
 import uk.gov.hmrc.securitiestransferchargefrontend.models.{CheckMode, JourneyType, Mode, NormalMode, UserAnswers}
 import uk.gov.hmrc.securitiestransferchargefrontend.navigation.NavigationHelper
 import uk.gov.hmrc.securitiestransferchargefrontend.pages.*
-import uk.gov.hmrc.securitiestransferchargefrontend.pages.stf.bulk.BulkCheckYourAnswersPage
+import uk.gov.hmrc.securitiestransferchargefrontend.pages.stf.bulk.{BulkAgentReferencePage, BulkCheckYourAnswersPage}
 import uk.gov.hmrc.securitiestransferchargefrontend.pages.stf.shared.{AgentReferencePage, CheckYourAnswersPage, HowToNotifyAboutSecuritiesTransferPage}
 import uk.gov.hmrc.securitiestransferchargefrontend.pages.stf.single.*
 
@@ -44,12 +44,7 @@ class BackwardsRoutes(defaultPage: Call):
   def normalRoutes(page: Page): Option[UserAnswers] => Call = page match {
 
     case HowToNotifyAboutSecuritiesTransferPage => _ => dashboardRoutes.DashboardController.onPageLoad()
-    case AgentReferencePage => _.fold(defaultPage) { userAnswers =>
-      dataDependent(HowToNotifyAboutSecuritiesTransferPage, userAnswers) {
-        case OneAtATime => agentRoutes.HowToNotifyAboutSecuritiesTransferController.onPageLoad()
-        case MoreThanOneAtATime => bulkSharedRoutes.FileUploadController.onPageLoad(JourneyType.STF)
-      }
-    }
+    case AgentReferencePage => _ => agentRoutes.HowToNotifyAboutSecuritiesTransferController.onPageLoad()
     case NameOfBuyerPage => _ => agentSingleRoutes.AgentReferenceController.onPageLoad(NormalMode)
     case StfBuyersAddressPage => _ => agentSingleRoutes.NameOfBuyerController.onPageLoad(NormalMode)
     case NameOfSellerPage => _ => agentSingleRoutes.AddressController.onPageLoad(NormalMode)
@@ -88,6 +83,8 @@ class BackwardsRoutes(defaultPage: Call):
       val fileUploadRef = getFileUploadRef(userAnswers)
       agentBulkRoutes.AgentReferenceController.onPageLoad(NormalMode, fileUploadRef)
     }
+    
+    case BulkAgentReferencePage => _ => fileUploadRoutes.FileUploadController.onPageLoad(JourneyType.STF)
 
     case _ => _ => defaultPage
   }

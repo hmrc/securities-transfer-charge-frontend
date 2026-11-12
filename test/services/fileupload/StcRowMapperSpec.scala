@@ -50,6 +50,7 @@ class StcRowMapperSpec extends AnyWordSpec with Matchers {
     StcColumns.chargingPoint,
     StcColumns.taxRate,
     StcColumns.whatTypeOfSecurities,
+    StcColumns.purchasingShares,
     StcColumns.typeOfShares,
     StcColumns.securitiesQuantity,
     StcColumns.amountPaidForSecurities,
@@ -96,14 +97,15 @@ class StcRowMapperSpec extends AnyWordSpec with Matchers {
           ParsedCell(21, "2026-03-23"),
           ParsedCell(22, "0.5%"),
           ParsedCell(23, "Shares"),
-          ParsedCell(24, "Ordinary"),
-          ParsedCell(25, "1000"),
-          ParsedCell(26, "5000.25"),
-          ParsedCell(27, "6000"),
-          ParsedCell(28, "7000"),
-          ParsedCell(29, "8000"),
-          ParsedCell(30, "treasury"),
-          ParsedCell(31, "false")
+          ParsedCell(24, "true"),
+          ParsedCell(25, "Ordinary"),
+          ParsedCell(26, "1000"),
+          ParsedCell(27, "5000.25"),
+          ParsedCell(28, "6000"),
+          ParsedCell(29, "7000"),
+          ParsedCell(30, "8000"),
+          ParsedCell(31, "treasury"),
+          ParsedCell(32, "false")
         )
       )
 
@@ -140,6 +142,7 @@ class StcRowMapperSpec extends AnyWordSpec with Matchers {
       result.maxSharePrice mustBe Some("8000")
       result.sharePurchaseReason mustBe Some("treasury")
       result.purchaseForCancellation mustBe Some(false)
+      result.purchasingShares mustBe Some(true)
     }
 
     "map blank values to Missing" in {

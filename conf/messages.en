@@ -733,6 +733,15 @@ individual.fileUpload.chargingPoint.error.futureDate = The day you bought the se
 org.fileUpload.chargingPoint.error.futureDate = The charging point must be today’s date or a date in the past
 agent.fileUpload.chargingPoint.error.futureDate = The day the buyer purchased the securities must be today’s date or a date in the past
 
+individual.fileUpload.error.purchasingShares.invalid = Enter ‘yes’ if shares are the type of security you’re buying, or ‘no’ if they are not shares
+org.fileUpload.error.purchasingShares.invalid = Enter ‘yes’ if shares are the type of security being transferred, or ‘no’ if they are not shares
+agent.fileUpload.error.purchasingShares.invalid = Enter ‘yes’ if shares are the type of security being transferred, or ‘no’ if they are not shares
+
+fileUpload.error.securityType.invalid.length = The type of securities must be 100 characters or fewer
+individual.fileUpload.error.securityType.required = Enter the type of securities you are buying
+org.fileUpload.error.securityType.required = Enter the type of securities the business is buying
+agent.fileUpload.error.securityType.required = Enter the type of securities the buyer is purchasing
+
 minSharePrice.error.invalid = The minimum amount paid for the shares must be a number and can include up to two decimal places, like £30 or £28.60
 minSharePrice.error.minimum = The minimum amount paid for the shares must be £0.01 or more
 minSharePrice.error.maximum = The minimum amount paid for the shares must be £999,999,999 or less

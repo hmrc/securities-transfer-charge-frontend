@@ -71,7 +71,7 @@ class StcRowValidationServiceSpec extends SpecBase {
       StcColumns.amountPaidForSecurities,
       StcColumns.totalMarketValue,
       StcColumns.typeOfShares,
-      StcColumns.typeOfShares
+      StcColumns.purchasingShares
     )
 
   implicit val columnIndex: ColumnIndexBuilder = new ColumnIndexBuilder(headers)
@@ -97,7 +97,8 @@ class StcRowValidationServiceSpec extends SpecBase {
           ParsedCell(columnIndex.find(StcColumns.typeOfShares).getOrElse(-1), "ordinary"),
           ParsedCell(columnIndex.find(StcColumns.securitiesQuantity).getOrElse(-1), "100"),
           ParsedCell(columnIndex.find(StcColumns.amountPaidForSecurities).getOrElse(-1), "1000"),
-          ParsedCell(columnIndex.find(StcColumns.totalMarketValue).getOrElse(-1), "1500")
+          ParsedCell(columnIndex.find(StcColumns.totalMarketValue).getOrElse(-1), "1500"),
+          ParsedCell(columnIndex.find(StcColumns.purchasingShares).getOrElse(-1), "yes")
         )
       )
 
@@ -126,7 +127,8 @@ class StcRowValidationServiceSpec extends SpecBase {
           ParsedCell(columnIndex.find(StcColumns.typeOfShares).getOrElse(-1), "shares"),
           ParsedCell(columnIndex.find(StcColumns.securitiesQuantity).getOrElse(-1), "100"),
           ParsedCell(columnIndex.find(StcColumns.amountPaidForSecurities).getOrElse(-1), "1000"),
-          ParsedCell(columnIndex.find(StcColumns.totalMarketValue).getOrElse(-1), "")
+          ParsedCell(columnIndex.find(StcColumns.totalMarketValue).getOrElse(-1), ""),
+          ParsedCell(columnIndex.find(StcColumns.purchasingShares).getOrElse(-1), "maybe")
         )
       )
 
@@ -141,7 +143,7 @@ class StcRowValidationServiceSpec extends SpecBase {
         "sellerPostcode",
         "whatReliefAreYouApplyingFor",
         "totalMarketValue",
-        "whatTypeOfSecurities"
+        "purchasingShares"
       )
     }
 
