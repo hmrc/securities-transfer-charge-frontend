@@ -215,7 +215,7 @@ class TransactionSubmissionServiceSpec extends AnyFreeSpec with Matchers with Sp
       when(mockEtmpSubmissionService.submitBulkStf(any[SubscriptionId], any[Seq[ValidatedStcRow]], any[UserAnswers], any[AffinityData])(any[HeaderCarrier])).thenReturn(Future.successful(success))
       val service = new TransactionSubmissionServiceImpl(mockHeaderCarrierCreator, mockEtmpSubmissionService, mockSaveAndReturnClient, mockNrsService, mockCyaHtmlRepository, mockTransactionResponseRepository, stubBulkStatusService, mockSubscriptionService, mockAuditService, mockUpscanJourneyRepository, mockChecksumService)
       whenReady(service.submitBulkStf(List(Fixtures.testValidatedStcRow))) { r =>
-        verify(mockUpscanJourneyRepository, Mockito.timeout(1000)).find(Fixtures.testFileUploadReference)
+        verify(mockUpscanJourneyRepository, Mockito.timeout(1000).times(2)).find(Fixtures.testFileUploadReference)
         verify(mockNrsService, Mockito.timeout(1000)).bulkSubmissionNotableEvent(
           any[CyaHtmlData], org.mockito.ArgumentMatchers.eq(testUtrn), org.mockito.ArgumentMatchers.eq(submissionId), org.mockito.ArgumentMatchers.eq(readyFileUpload(Fixtures.testFileUploadReference))
         )(any[StcDataRequest[?]], any[HeaderCarrier])
@@ -240,7 +240,7 @@ class TransactionSubmissionServiceSpec extends AnyFreeSpec with Matchers with Sp
       val service = new TransactionSubmissionServiceImpl(mockHeaderCarrierCreator, mockEtmpSubmissionService, mockSaveAndReturnClient, mockNrsService, mockCyaHtmlRepository, mockTransactionResponseRepository, stubBulkStatusService, mockSubscriptionService, mockAuditService, mockUpscanJourneyRepository, mockChecksumService)
       whenReady(service.submitBulkStf(List(Fixtures.testValidatedStcRow))) { r =>
         verify(mockCyaHtmlRepository, Mockito.timeout(1000)).retrieve(submissionId)
-        verify(mockUpscanJourneyRepository, Mockito.after(500).never()).find(any[String])
+        verify(mockUpscanJourneyRepository, Mockito.after(500).times(1)).find(any[String])
         verify(mockNrsService, never).bulkSubmissionNotableEvent(any[CyaHtmlData], any[String], any[SubmissionId], any[FileUpload])(any[StcDataRequest[?]], any[HeaderCarrier])
         r mustBe true
       }
@@ -251,7 +251,7 @@ class TransactionSubmissionServiceSpec extends AnyFreeSpec with Matchers with Sp
       when(mockUpscanJourneyRepository.find(any[String])).thenReturn(Future.successful(None))
       val service = new TransactionSubmissionServiceImpl(mockHeaderCarrierCreator, mockEtmpSubmissionService, mockSaveAndReturnClient, mockNrsService, mockCyaHtmlRepository, mockTransactionResponseRepository, stubBulkStatusService, mockSubscriptionService, mockAuditService, mockUpscanJourneyRepository, mockChecksumService)
       whenReady(service.submitBulkStf(List(Fixtures.testValidatedStcRow))) { r =>
-        verify(mockUpscanJourneyRepository, Mockito.timeout(1000)).find(Fixtures.testFileUploadReference)
+        verify(mockUpscanJourneyRepository, Mockito.timeout(1000).times(2)).find(Fixtures.testFileUploadReference)
         verify(mockNrsService, Mockito.after(500).never()).bulkSubmissionNotableEvent(any[CyaHtmlData], any[String], any[SubmissionId], any[FileUpload])(any[StcDataRequest[?]], any[HeaderCarrier])
         r mustBe true
       }
