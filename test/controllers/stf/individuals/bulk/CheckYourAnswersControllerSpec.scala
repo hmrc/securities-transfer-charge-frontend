@@ -50,7 +50,7 @@ import scala.concurrent.Future
 class CheckYourAnswersControllerSpec extends SpecBase with MockitoSugar with FileUploadFixtures with BeforeAndAfterEach {
 
 lazy val checkYourAnswersRoute: String = bulkRoutes.CheckYourAnswersController.onPageLoad(reference).url
-lazy val onSubmitRoute: String = bulkRoutes.CheckYourAnswersController.onSubmit(reference).url
+lazy val onSubmitRoute: String = bulkRoutes.CheckYourAnswersController.onSubmit().url
 
 val row1: ParsedStcRow = parsedStcRow(1)
 val testFileName: String = "test-file.csv"
@@ -160,7 +160,7 @@ private def capturedCyaHtml(): CyaHtmlData = {
         val view = application.injector.instanceOf[CheckYourAnswersView]
 
         status(result) mustEqual OK
-        contentAsString(result) mustEqual view(viewModel, testBackLinkRoute, reference)(request, messages(application)).toString
+        contentAsString(result) mustEqual view(viewModel, testBackLinkRoute)(request, messages(application)).toString
       }
     }
 

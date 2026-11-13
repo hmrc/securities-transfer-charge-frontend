@@ -92,7 +92,7 @@ class CheckYourAnswersController @Inject()(
             idClient.nextSubmissionId().map { submissionId =>UserAnswers.empty(userId)(group)(submissionId)(STF).setFileUploadReference(reference)}
           }(Future.successful)
           _       <- answerPersistenceService.save(answers)
-          html     = view(viewModel, backLinkCall(NormalMode)(Some(answers)), reference)
+          html     = view(viewModel, backLinkCall(NormalMode)(Some(answers)))
           _       <- cyaHtmlRepository.store(CyaHtmlData(answers.submissionId, html))
         } yield Ok(html)
 
@@ -100,9 +100,10 @@ class CheckYourAnswersController @Inject()(
     }
   }
 
-  def onSubmit(reference: String): Action[AnyContent] = (stcAuthEnrolled andThen getData andThen requireData).async {
+  def onSubmit(): Action[AnyContent] = (stcAuthEnrolled andThen getData andThen requireData).async {
     implicit request =>
-      parsedStcRowsRepository.findDocumentByReference(reference).flatMap {
+      val fileReference = request.userAnswers.getFileUploadReference()
+      parsedStcRowsRepository.findDocumentByReference(fileReference).flatMap {
         case Some(parsedStcRowsDocument) =>
           val rows = parsedStcRowsDocument.rows.map(ValidatedStcRow.withNoErrors)
           val details = BulkConfirmationDetails(

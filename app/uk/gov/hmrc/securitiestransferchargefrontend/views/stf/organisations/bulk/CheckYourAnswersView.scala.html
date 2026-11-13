@@ -30,7 +30,7 @@
     formHelper: FormWithCSRF
 )
 
-@(viewModel: CheckYourAnswersViewModel, backLinkCall: Call, reference: String)(implicit request: Request[_],messages: Messages)
+@(viewModel: CheckYourAnswersViewModel, backLinkCall: Call)(implicit request: Request[_],messages: Messages)
 
 @layout(pageTitle = titleNoForm(messages("checkYourAnswers.title"),Some(messages("sectionTitle.stf"))),backLinkUrl = Some(backLinkCall.url)) {
 
@@ -119,7 +119,7 @@
     <div class="govuk-button-group">
 
         @formHelper(
-            action = routes.CheckYourAnswersController.onSubmit(reference)
+            action = routes.CheckYourAnswersController.onSubmit()
         ) {
             @govukButton(
                 ButtonViewModel(

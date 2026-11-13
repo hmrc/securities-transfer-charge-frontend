@@ -189,7 +189,7 @@ final class TransactionSubmissionServiceImpl @Inject()(
       case Some(reference) =>
         cyaHtmlRepository.retrieve(submissionId).flatMap {
           case None =>
-            logMissingBulkSubmissionData(submissionId, "Cya html data not found")
+            logMissingBulkSubmissionData(submissionId, s"Cya html data not found for submissionId $submissionId")
           case Some(html) =>
             upscanJourneyRepository.find(reference).flatMap {
               case Some(fileUpload) => nrsService.bulkSubmissionNotableEvent(html, utrn, submissionId, fileUpload)
