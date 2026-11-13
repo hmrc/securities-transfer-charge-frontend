@@ -36,6 +36,10 @@ error.summary.title = There is a problem
 section.caption.hidden = This section is
 details.caption = Your details
 
+cannotAccessPage.title = You cannot access this page
+cannotAccessPage.heading = You cannot access this page
+cannotAccessPage.p1 = You do not have permission to access this page.
+
 index.title = securities-transfer-charge-frontend
 index.heading = securities-transfer-charge-frontend
 index.guidance = Welcome to your new frontend. Please see the README file for a guide to getting started.

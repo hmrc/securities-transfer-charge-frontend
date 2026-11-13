@@ -39,4 +39,7 @@ class Redirects @Inject()(appConfig: FrontendAppConfig) {
 
   def redirectToLogin(continueUrl: String): Result =
     Redirect(appConfig.loginUrl, Map("continue" -> Seq(continueUrl)))
+    
+  def redirectToCannotAccessPageF: Future[Result] =
+    toFuture(Redirect(routes.CannotAccessPageController.onPageLoad()))
 }
