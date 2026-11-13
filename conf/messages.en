@@ -1,4 +1,6 @@
 service.name = Tell us about a security transfer
+service.navigation.name = Report and pay for a securities transfer
+service.navigation.dashboard = Dashboard
 
 site.back = Back
 site.remove = Remove
