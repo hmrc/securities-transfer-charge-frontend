@@ -155,15 +155,7 @@ class RowTransformsSpec extends AnyWordSpec with Matchers {
           reliefPercentage = Some(100)
         ),
         contingentDetails = None,
-        mainSellerDetails = Some(SingleTransferSellerDetails(
-          sellerName = "Bob Seller",
-          addr1 = "1 Seller Street",
-          addr2 = Some("Seller District"),
-          addr3 = Some("Seller City"),
-          addr4 = None,
-          postcode = "LS1 1AA",
-          country = "United Kingdom"
-        )),
+        mainSellerDetails = None,
         otherSellers = None,
         mainBuyerDetails = SingleTransferBuyerDetails(
           buyerName = "John Doe",

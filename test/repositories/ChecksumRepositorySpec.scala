@@ -20,6 +20,7 @@ import base.SpecBase
 import org.scalatest.BeforeAndAfterEach
 import play.api.Application
 import play.api.test.Helpers.await
+import uk.gov.hmrc.securitiestransferchargefrontend.domain.GroupIdentifier
 import uk.gov.hmrc.securitiestransferchargefrontend.models.stf.fileupload.UploadedFileChecksum
 import uk.gov.hmrc.securitiestransferchargefrontend.repositories.ChecksumRepositoryImpl
 import play.api.test.Helpers.defaultAwaitTimeout
@@ -41,6 +42,8 @@ class ChecksumRepositorySpec extends SpecBase with BeforeAndAfterEach {
 
   private lazy val repository = application.injector.instanceOf[ChecksumRepositoryImpl]
 
+  private val otherGroupIdentifier = GroupIdentifier("other-group")
+
   override protected def beforeEach(): Unit = {
     super.beforeEach()
 
@@ -54,6 +57,7 @@ class ChecksumRepositorySpec extends SpecBase with BeforeAndAfterEach {
       val record =
         UploadedFileChecksum(
           checksum = "checksum-123",
+          userGroup = testGroupIdentifier,
           uploadedAt = Instant.now()
         )
 
@@ -64,25 +68,43 @@ class ChecksumRepositorySpec extends SpecBase with BeforeAndAfterEach {
 
   "exists" - {
 
-    "return true when checksum exists" in {
+    "return true when checksum exists for the user group" in {
 
       val checksum = "existing-checksum"
 
       await(
         repository.insert(
           UploadedFileChecksum(
-            checksum = checksum
+            checksum = checksum,
+            userGroup = testGroupIdentifier
           )
         )
       )
 
-      await(repository.exists(checksum)) mustBe true
+      await(repository.exists(testGroupIdentifier, checksum)) mustBe true
 
     }
 
     "return false when checksum does not exist" in {
 
-      await(repository.exists("missing-checksum")) mustBe false
+      await(repository.exists(testGroupIdentifier, "missing-checksum")) mustBe false
+
+    }
+
+    "return false when checksum exists only for a different user group" in {
+
+      val checksum = "existing-checksum"
+
+      await(
+        repository.insert(
+          UploadedFileChecksum(
+            checksum = checksum,
+            userGroup = otherGroupIdentifier
+          )
+        )
+      )
+
+      await(repository.exists(testGroupIdentifier, checksum)) mustBe false
 
     }
   }

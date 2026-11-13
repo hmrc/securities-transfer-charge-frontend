@@ -20,6 +20,7 @@ import org.mongodb.scala.model.*
 import uk.gov.hmrc.mongo.MongoComponent
 import uk.gov.hmrc.mongo.play.json.PlayMongoRepository
 import uk.gov.hmrc.securitiestransferchargefrontend.config.FrontendAppConfig
+import uk.gov.hmrc.securitiestransferchargefrontend.domain.GroupIdentifier
 import uk.gov.hmrc.securitiestransferchargefrontend.models.stf.fileupload.UploadedFileChecksum
 
 import java.util.concurrent.TimeUnit
@@ -28,7 +29,7 @@ import scala.concurrent.{ExecutionContext, Future}
 
 trait ChecksumRepository {
 
-  def exists(checksum: String): Future[Boolean]
+  def exists(userGroup: GroupIdentifier, checksum: String): Future[Boolean]
 
   def insert(record: UploadedFileChecksum): Future[Unit]
 }
@@ -50,16 +51,19 @@ class ChecksumRepositoryImpl @Inject()(
           .expireAfter(appConfig.checksumTtl, TimeUnit.DAYS)
       ),
       IndexModel(
-        Indexes.ascending("checksum"),
+        Indexes.ascending("userGroup", "checksum"),
         IndexOptions()
-          .name("checksum_idx")
+          .name("userGroup_checksum_idx")
       )
     )
   )
     with ChecksumRepository {
 
-  private def byChecksum(checksum: String) =
-    Filters.equal("checksum", checksum)
+  private def byUserGroupAndChecksum(userGroup: GroupIdentifier, checksum: String) =
+    Filters.and(
+      Filters.equal("userGroup", userGroup.value),
+      Filters.equal("checksum", checksum)
+    )
 
   override def insert(record: UploadedFileChecksum): Future[Unit] =
     collection
@@ -68,10 +72,10 @@ class ChecksumRepositoryImpl @Inject()(
       .map(_ => ())
 
 
-  override def exists(checksum: String): Future[Boolean] =
+  override def exists(userGroup: GroupIdentifier, checksum: String): Future[Boolean] =
     collection
       .countDocuments(
-        byChecksum(checksum)
+        byUserGroupAndChecksum(userGroup, checksum)
       ).toFuture().map(_ > 0)
 
   def dropCollection(): Future[Unit] =
