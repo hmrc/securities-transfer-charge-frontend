@@ -105,4 +105,9 @@ class CheckYourAnswersController @Inject()(
         case _ => Future.successful(Redirect(routes.JourneyRecoveryController.onPageLoad()))
       }
   }
+
+  def onReturnToDashboard(): Action[AnyContent] = (stcAuthEnrolled andThen getData andThen requireData).async { implicit request =>
+    navigator.returnToDashboard(request.userAnswers)
+      .map(Redirect)
+  }
 }

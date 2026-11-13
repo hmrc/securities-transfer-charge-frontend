@@ -17,12 +17,12 @@
 package controllers.sh03.organisations.bulk
 
 import base.SpecBase
-import base.Fixtures.testInternalId
 import org.mockito.ArgumentMatchers.{any, eq as eqTo}
 import org.mockito.Mockito.{verify, when}
 import org.scalatestplus.mockito.MockitoSugar.mock
 import play.api.test.FakeRequest
 import play.api.test.Helpers.*
+import uk.gov.hmrc.securitiestransferchargefrontend.controllers.routes.JourneyRecoveryController
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.dashboard.routes as dashboardRoutes
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.sh03.organisations.bulk.routes
 import uk.gov.hmrc.securitiestransferchargefrontend.models.JourneyType.SH03
@@ -38,7 +38,7 @@ class TemplateInstructionsControllerSpec extends SpecBase {
 
     "onPageLoad" - {
       "must return OK and the correct view for a GET" in {
-        val application = applicationBuilder(affinityGroup = orgAffinity).build()
+        val application = applicationBuilder(userAnswers = Some(emptyUserAnswers), affinityGroup = orgAffinity).build()
 
         running(application) {
           val request = FakeRequest(GET, routes.TemplateInstructionsController.onPageLoad().url)
@@ -50,6 +50,18 @@ class TemplateInstructionsControllerSpec extends SpecBase {
           contentAsString(result) mustEqual view(templateUrl)(request, messages(application)).toString
         }
       }
+
+      "must redirect to journey recovery if there are no user answers" in {
+        val application = applicationBuilder(affinityGroup = orgAffinity).build()
+
+        running(application) {
+          val request = FakeRequest(GET, routes.TemplateInstructionsController.onReturnToDashboard().url)
+          val result = route(application, request).value
+
+          status(result) mustEqual SEE_OTHER
+          redirectLocation(result).value mustEqual JourneyRecoveryController.onPageLoad().url
+        }
+      }
     }
 
     "onReturnToDashboard" - {
@@ -57,7 +69,7 @@ class TemplateInstructionsControllerSpec extends SpecBase {
         val mockSessionRepository = mock[SessionRepository]
         when(mockSessionRepository.clear(any())).thenReturn(Future.successful(()))
 
-        val application = applicationBuilder(affinityGroup = orgAffinity, sessionRepository = mockSessionRepository).build()
+        val application = applicationBuilder(userAnswers = Some(emptyUserAnswers), affinityGroup = orgAffinity, sessionRepository = mockSessionRepository).build()
 
         running(application) {
           val request = FakeRequest(GET, routes.TemplateInstructionsController.onReturnToDashboard().url)
@@ -66,11 +78,11 @@ class TemplateInstructionsControllerSpec extends SpecBase {
           status(result) mustEqual SEE_OTHER
           redirectLocation(result).value mustEqual dashboardRoutes.DashboardController.onPageLoad().url
 
-          verify(mockSessionRepository).clear(eqTo(testInternalId))
+          verify(mockSessionRepository).clear(eqTo(testUserId))
         }
       }
 
-      "must fail if clearing the user answers fails" in {
+      "must redirect to journey recovery if there are no user answers" in {
         val mockSessionRepository = mock[SessionRepository]
         when(mockSessionRepository.clear(any())).thenReturn(Future.failed(new RuntimeException("boom")))
 
@@ -80,7 +92,8 @@ class TemplateInstructionsControllerSpec extends SpecBase {
           val request = FakeRequest(GET, routes.TemplateInstructionsController.onReturnToDashboard().url)
           val result = route(application, request).value
 
-          whenReady(result.failed)(_ mustBe a[RuntimeException])
+          status(result) mustEqual SEE_OTHER
+          redirectLocation(result).value mustEqual JourneyRecoveryController.onPageLoad().url
         }
       }
     }

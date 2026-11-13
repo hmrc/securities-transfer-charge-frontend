@@ -310,7 +310,7 @@ class CheckYourAnswersControllerSpec extends SpecBase with BeforeAndAfterEach {
         }
       }
 
-      "must redirect to the dashboard without clearing anything when there are no user answers" in {
+      "must redirect to the journey recovery page when there are no user answers" in {
         val application = mockedApp(None)
 
         running(application) {
@@ -318,7 +318,7 @@ class CheckYourAnswersControllerSpec extends SpecBase with BeforeAndAfterEach {
           val result = route(application, request).value
 
           status(result) mustEqual SEE_OTHER
-          redirectLocation(result).value mustEqual dashboardRoutes.DashboardController.onPageLoad().url
+          redirectLocation(result).value mustEqual JourneyRecoveryController.onPageLoad().url
 
           verify(mockNavigator, never()).returnToDashboard(any())
           verify(mockSessionRepository, never()).clear(any())

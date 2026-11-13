@@ -20,10 +20,8 @@ import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.actions.*
-import uk.gov.hmrc.securitiestransferchargefrontend.controllers.dashboard.routes
-import uk.gov.hmrc.securitiestransferchargefrontend.domain.UserId
 import uk.gov.hmrc.securitiestransferchargefrontend.models.JourneyType.SH03
-import uk.gov.hmrc.securitiestransferchargefrontend.repositories.SessionRepository
+import uk.gov.hmrc.securitiestransferchargefrontend.navigation.Navigator
 import uk.gov.hmrc.securitiestransferchargefrontend.utils.CommonHelpers.linkToTemplateFor
 import uk.gov.hmrc.securitiestransferchargefrontend.views.html.sh03.agents.bulk.TemplateInstructionsView
 
@@ -33,19 +31,20 @@ import javax.inject.{Inject, Named}
 class TemplateInstructionsController @Inject()(
                                                 override val messagesApi: MessagesApi,
                                                 @Named("agents") stcAuthEnrolled: StcAuthEnrolledAction,
+                                                getData: StcDataRetrievalAction,
+                                                requireData: StcDataRequiredAction,
+                                                @Named("agents") navigator: Navigator,
                                                 val controllerComponents: MessagesControllerComponents,
-                                                sessionRepository: SessionRepository,
                                                 view: TemplateInstructionsView
                                               )(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport {
 
-  def onPageLoad(): Action[AnyContent] = stcAuthEnrolled { implicit request =>
-    val templateUrl = linkToTemplateFor(SH03)(request.affinityGroup)
+  def onPageLoad(): Action[AnyContent] = (stcAuthEnrolled andThen getData andThen requireData) { implicit request =>
+    val templateUrl = linkToTemplateFor(SH03)(request.request.affinityGroup)
     Ok(view(templateUrl))
   }
 
-  def onReturnToDashboard(): Action[AnyContent] = stcAuthEnrolled.async { implicit request =>
-    sessionRepository
-      .clear(UserId(request.internalId))
-      .map(_ => Redirect(routes.DashboardController.onPageLoad()))
+  def onReturnToDashboard(): Action[AnyContent] = (stcAuthEnrolled andThen getData andThen requireData).async { implicit request =>
+    navigator.returnToDashboard(request.userAnswers)
+      .map(Redirect)
   }
 }
