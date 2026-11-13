@@ -30,7 +30,7 @@ import uk.gov.hmrc.securitiestransferchargefrontend.models.audit.{AuditModel, Au
 import uk.gov.hmrc.securitiestransferchargefrontend.models.stf.Address
 import uk.gov.hmrc.securitiestransferchargefrontend.models.stf.fileupload.ValidatedStcRow
 import uk.gov.hmrc.securitiestransferchargefrontend.models.submission.{AffinityData, Agent, Individual, Organisation, SingleTransferAgentDetails, SingleTransferDeclaration, SingleTransferRequest, StfTransaction}
-import uk.gov.hmrc.securitiestransferchargefrontend.repositories.{CyaHtmlRepository, TransactionResponseRepository}
+import uk.gov.hmrc.securitiestransferchargefrontend.repositories.{CyaHtmlRepository, TransactionResponseRepository, UpscanJourneyRepository}
 import uk.gov.hmrc.securitiestransferchargefrontend.services.TransactionSubmissionService.*
 import uk.gov.hmrc.securitiestransferchargefrontend.utils.HeaderCarrierCreator
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.actions.requests.*
@@ -53,7 +53,8 @@ final class TransactionSubmissionServiceImpl @Inject()(
   transactionResponseRepository : TransactionResponseRepository,
   bulkStatusService             : BulkStatusService,
   subscriptionService           : SubscriptionService,
-  auditService                  : AuditService)(
+  auditService                  : AuditService,
+  upscanJourneyRepository       : UpscanJourneyRepository)(
   implicit ec                   : ExecutionContext
 ) extends TransactionSubmissionService with Logging {
 
@@ -177,18 +178,29 @@ final class TransactionSubmissionServiceImpl @Inject()(
     bulkStatusService.markAsSuccessful(submissionId)
     auditService.audit(AuditModel(SubmissionSuccess, subscriptionId, affinityGroup, credentialId, Some(submissionId), AuditType.fromTransferType(transferType)))
     saveAndReturnClient.deleteDraft(submissionId)
-    sendBulkSubmissionDataToNRS(submissionId)
+    sendBulkSubmissionDataToNRS(submissionId,successResponse.utrn)
     sendSubmissionDataToAudit(transferType, affinityData, successResponse, totalTransfers)
   }
-  
-  private def sendBulkSubmissionDataToNRS(submissionId: SubmissionId)(using request: StcDataRequest[?], hc: HeaderCarrier): Future[Unit] = {
-    request.userAnswers.fileUploadReference.map { uploadRef =>
-      nrsService.bulkSubmissionNotableEvent(submissionId, uploadRef)
-    }.getOrElse {
-      Future {
-        logger.warn(s"Failed to send bulk data to NRS for submission $submissionId - no file reference found in user answers.")
-      }
+
+  private def sendBulkSubmissionDataToNRS(submissionId: SubmissionId, utrn: String)(using request: StcDataRequest[?], hc: HeaderCarrier): Future[Unit] =
+    request.userAnswers.fileUploadReference match {
+      case None =>
+        logMissingBulkSubmissionData(submissionId, "file upload reference not found")
+      case Some(reference) =>
+        cyaHtmlRepository.retrieve(submissionId).flatMap {
+          case None =>
+            logMissingBulkSubmissionData(submissionId, s"Cya html data not found for submissionId $submissionId")
+          case Some(html) =>
+            upscanJourneyRepository.find(reference).flatMap {
+              case Some(fileUpload) => nrsService.bulkSubmissionNotableEvent(html, utrn, submissionId, fileUpload)
+              case None             => logMissingBulkSubmissionData(submissionId, s"Upscan file upload not found for reference $reference")
+            }
+        }
     }
+
+  private def logMissingBulkSubmissionData(submissionId: SubmissionId, message: String): Future[Unit] = {
+    logger.warn(s"Unable to send bulk submission $submissionId to NRS: $message")
+    Future.successful(())
   }
 
   private def handleBulkPartialFailure(transferType: TransferType)(pf: SubmissionCreateResponsePartialFailure)(using req: StcDataRequest[?]) : Future[Unit] = {

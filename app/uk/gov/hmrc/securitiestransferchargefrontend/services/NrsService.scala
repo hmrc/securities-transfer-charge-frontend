@@ -17,13 +17,15 @@
 package uk.gov.hmrc.securitiestransferchargefrontend.services
 
 import org.apache.commons.codec.digest.DigestUtils.sha256Hex
+import play.api.Logging
 import play.api.http.MimeTypes
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.securitiestransferchargefrontend.clients.registration.NrsClient
 import uk.gov.hmrc.securitiestransferchargefrontend.config.FrontendAppConfig
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.actions.requests.*
 import uk.gov.hmrc.securitiestransferchargefrontend.domain.SubmissionId
-import uk.gov.hmrc.securitiestransferchargefrontend.models.nrs.{NrsMetadata, NrsSingleSubmissionRequest}
+import uk.gov.hmrc.securitiestransferchargefrontend.models.nrs.{NrsAttachment, NrsBulkSubmissionRequest, NrsMetadata, NrsSingleSubmissionRequest}
+import uk.gov.hmrc.securitiestransferchargefrontend.models.stf.upscan.FileUpload
 import uk.gov.hmrc.securitiestransferchargefrontend.repositories.CyaHtmlData
 import uk.gov.hmrc.securitiestransferchargefrontend.utils.CommonHelpers.authToken
 
@@ -42,15 +44,16 @@ trait NrsService:
     request    : StcDataRequest[?],
     hc         : HeaderCarrier): Future[Unit]
 
-  def bulkSubmissionNotableEvent(
-    submissionId: SubmissionId,
-    uploadRef   : String
-  )(implicit hc : HeaderCarrier): Future[Unit]
+  def bulkSubmissionNotableEvent(cyaHtml: CyaHtmlData,
+                                  utrn: String,
+                                  submissionId: SubmissionId,
+                                  fileUpload: FileUpload
+                                )(implicit request: StcDataRequest[?], hc: HeaderCarrier): Future[Unit]
 
 class NrsServiceImpl @Inject()(
   nrsClient: NrsClient,
   config: FrontendAppConfig
-) extends NrsService {
+) extends NrsService with Logging {
 
   override def singleSubmissionNotableEvent(
     cyaHtml     : CyaHtmlData,
@@ -59,22 +62,44 @@ class NrsServiceImpl @Inject()(
     request     : StcDataRequest[?],
     hc          : HeaderCarrier): Future[Unit] = {
 
-    val htmlPayload = cyaHtml.html.toString
-    val checksum = sha256Hex(htmlPayload)
-    val encodedPayload: String = Base64.getEncoder.encodeToString(htmlPayload.getBytes(StandardCharsets.UTF_8))
+    val htmlPayload = createHtmlPayload(cyaHtml)
+    val checksum = createPayloadChecksum(htmlPayload)
+    val encodedPayload = encodePayload(htmlPayload)
 
     val nrsRequest = NrsSingleSubmissionRequest(
-      payload  = encodedPayload,
+      payload = encodedPayload,
       metadata = createMetadata(checksum, config.nrsNotableEventSingleSubmission, request, hc, utrn)
     )
 
     nrsClient.postSinglePayload(nrsRequest)
   }
 
-  override def bulkSubmissionNotableEvent(submissionId: SubmissionId, uploadRef: String)
-                                         (implicit hc: HeaderCarrier): Future[Unit] = {
-    // TODO: Implementation
-    Future.successful(())
+  override def bulkSubmissionNotableEvent(
+                                           cyaHtml: CyaHtmlData,
+                                           utrn: String,
+                                           submissionId: SubmissionId,
+                                           fileUpload: FileUpload
+                                         )(implicit request: StcDataRequest[?], hc: HeaderCarrier): Future[Unit] = {
+
+    val htmlPayload = createHtmlPayload(cyaHtml)
+    val checksum = createPayloadChecksum(htmlPayload)
+    val encodedPayload = encodePayload(htmlPayload)
+
+    createAttachmentData(fileUpload) match {
+      case Some(attachment) =>
+        val nrsRequest = NrsBulkSubmissionRequest(
+          payload = encodedPayload,
+          metadata = createMetadata(checksum, config.nrsNotableEventBulkSubmission, request, hc, utrn)
+            .copy(attachmentIds = Some(Seq(attachment.attachmentId))),
+          attachments = attachment
+        )
+
+        nrsClient.postBulkPayload(nrsRequest)
+
+      case None =>
+        logger.warn("Could not create NRS attachment data for bulk submission")
+        Future.successful(())
+    }
   }
 
   private[services] def createMetadata(
@@ -116,6 +141,23 @@ class NrsServiceImpl @Inject()(
     pairs.toMap
   }
 
+  private[services] def createAttachmentData(fileUpload: FileUpload): Option[NrsAttachment] =
+    for {
+      attachmentUrl <- fileUpload.downloadUrl
+      uploadDetails <- fileUpload.uploadDetails
+    } yield NrsAttachment(
+      attachmentUrl = attachmentUrl,
+      attachmentId = fileUpload.reference,
+      attachmentSha256Checksum = uploadDetails.checksum,
+      attachmentContentType = uploadDetails.fileMimeType
+    )
+
+  private def createHtmlPayload(cyaHtml: CyaHtmlData): String = cyaHtml.html.toString
+
+  private def encodePayload(payload: String): String =
+    Base64.getEncoder.encodeToString(payload.getBytes(StandardCharsets.UTF_8))
+
+  private def createPayloadChecksum(payload: String): String = sha256Hex(payload)
 }
 
 object NrsSearchKeys:

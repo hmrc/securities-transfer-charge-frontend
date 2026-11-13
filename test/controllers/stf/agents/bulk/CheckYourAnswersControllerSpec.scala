@@ -38,7 +38,7 @@ import uk.gov.hmrc.securitiestransferchargefrontend.navigation.{Navigator, Persi
 import uk.gov.hmrc.securitiestransferchargefrontend.pages.BulkConfirmationDetailsPage
 import uk.gov.hmrc.securitiestransferchargefrontend.pages.stf.bulk.{BulkAgentReferencePage, BulkCheckYourAnswersPage}
 import uk.gov.hmrc.securitiestransferchargefrontend.pages.stf.shared.HowToNotifyAboutSecuritiesTransferPage
-import uk.gov.hmrc.securitiestransferchargefrontend.repositories.ParsedStcRowsRepository
+import uk.gov.hmrc.securitiestransferchargefrontend.repositories.{CyaHtmlData, CyaHtmlRepository, ParsedStcRowsRepository}
 import uk.gov.hmrc.securitiestransferchargefrontend.services.TransactionSubmissionService
 import uk.gov.hmrc.securitiestransferchargefrontend.services.stf.agents.bulk.CheckYourAnswersService
 
@@ -105,13 +105,15 @@ class CheckYourAnswersControllerSpec extends SpecBase with BeforeAndAfterEach {
   private val mockCyaService = mock[CheckYourAnswersService]
   private val mockTransactionSubmissionService = mock[TransactionSubmissionService]
   private val mockNavigator = mock[Navigator]
+  private val mockCyaHtmlRepository = mock[CyaHtmlRepository]
 
   private val withRefStubNavigator = new StubPersistentNavigator(testNextPage, completeUserAnswers, "stf", "")
   private val withoutRefStubNavigator = new StubPersistentNavigator(testNextPage, answersWithoutAgentRef, "stf", "")
 
   override def beforeEach(): Unit = {
     super.beforeEach()
-    reset(mockRepository, mockCyaService, mockTransactionSubmissionService, mockNavigator)
+    reset(mockRepository, mockCyaService, mockTransactionSubmissionService, mockNavigator, mockCyaHtmlRepository)
+    when(mockCyaHtmlRepository.store(any[CyaHtmlData]())).thenReturn(Future.successful(()))
   }
 
   private def capturedNavigatorAnswers(): UserAnswers = {
@@ -130,7 +132,8 @@ class CheckYourAnswersControllerSpec extends SpecBase with BeforeAndAfterEach {
           .overrides(
             bind[Navigator].qualifiedWith(Names.named("agents")).toInstance(withRefStubNavigator),
             bind[PersistentNavigator].qualifiedWith(Names.named("agents")).toInstance(withRefStubNavigator),
-            bind[ParsedStcRowsRepository].toInstance(mockRepository)
+            bind[ParsedStcRowsRepository].toInstance(mockRepository),
+            bind[CyaHtmlRepository].toInstance(mockCyaHtmlRepository)
           ).build()
 
         running(application) {
@@ -140,17 +143,23 @@ class CheckYourAnswersControllerSpec extends SpecBase with BeforeAndAfterEach {
           status(result) mustEqual OK
           contentAsString(result) must include("Check your answers")
           contentAsString(result) must include("File details")
+
+          val captor = ArgumentCaptor.forClass(classOf[CyaHtmlData])
+          verify(mockCyaHtmlRepository).store(captor.capture())
+          captor.getValue.submissionId mustEqual completeUserAnswers.submissionId
+          captor.getValue.html.toString mustEqual contentAsString(result)
         }
       }
 
-      "must redirect to Journey Recovery for a GET if findDocumentByReference does not find a document" in {
+      "must redirect to Journey Recovery and not store the CYA HTML for a GET if findDocumentByReference does not find a document" in {
         when(mockRepository.findDocumentByReference(anyString())).thenReturn(Future.successful(None))
 
         val application = applicationBuilder(userAnswers = Some(completeUserAnswers))
           .overrides(
             bind[Navigator].qualifiedWith(Names.named("agents")).toInstance(withRefStubNavigator),
             bind[PersistentNavigator].qualifiedWith(Names.named("agents")).toInstance(withRefStubNavigator),
-            bind[ParsedStcRowsRepository].toInstance(mockRepository)
+            bind[ParsedStcRowsRepository].toInstance(mockRepository),
+            bind[CyaHtmlRepository].toInstance(mockCyaHtmlRepository)
           ).build()
 
         running(application) {
@@ -159,6 +168,8 @@ class CheckYourAnswersControllerSpec extends SpecBase with BeforeAndAfterEach {
 
           status(result) mustEqual SEE_OTHER
           redirectLocation(result).value mustEqual uk.gov.hmrc.securitiestransferchargefrontend.controllers.routes.JourneyRecoveryController.onPageLoad().url
+
+          verify(mockCyaHtmlRepository, never()).store(any[CyaHtmlData]())
         }
       }
 

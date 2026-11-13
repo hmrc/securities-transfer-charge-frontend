@@ -36,9 +36,7 @@ class CheckYourAnswersViewSpec extends ViewBaseSpec {
   private val viewInstance = app.injector.instanceOf[CheckYourAnswersView]
 
   private val testBackLinkRoute: Call = Call("GET", "/back-link")
-
-  private val fileUploadRef = "ref"
-
+  
   val fileName = "test-file.csv"
 
   private val transfers = Seq(
@@ -65,7 +63,7 @@ class CheckYourAnswersViewSpec extends ViewBaseSpec {
       transfers = transfers
     )
 
-  def view(): Document = Jsoup.parse(viewInstance(viewModel, testBackLinkRoute, fileUploadRef)(fakeRequest, messages).body)
+  def view(): Document = Jsoup.parse(viewInstance(viewModel, testBackLinkRoute)(fakeRequest, messages).body)
 
   object ExpectedContent {
 
@@ -254,7 +252,7 @@ class CheckYourAnswersViewSpec extends ViewBaseSpec {
       view()
         .select("form")
         .attr("action") mustBe
-        routes.CheckYourAnswersController.onSubmit(fileUploadRef).url
+        routes.CheckYourAnswersController.onSubmit().url
     }
 
     "should have the correct summary list" in {
