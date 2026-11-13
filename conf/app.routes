@@ -13,16 +13,19 @@ GET         /refresh-session                              uk.gov.hmrc.securities
 GET         /there-is-a-problem                           uk.gov.hmrc.securitiestransferchargefrontend.controllers.JourneyRecoveryController.onPageLoad(continueUrl: Option[RedirectUrl] ?= None)
 GET        /check-your-answers                            uk.gov.hmrc.securitiestransferchargefrontend.controllers.CheckYourAnswersController.onPageLoad()
 
+GET        /cant-access-page                              uk.gov.hmrc.securitiestransferchargefrontend.controllers.CannotAccessPageController.onPageLoad()
+
+
 GET        /bulk/change-file                                uk.gov.hmrc.securitiestransferchargefrontend.controllers.ChangeFileCheckController.onPageLoad()
 GET        /bulk/file-not-saved                             uk.gov.hmrc.securitiestransferchargefrontend.controllers.YourFileWillNotBeSavedController.onPageLoad()
 
 GET        /submissions                                 uk.gov.hmrc.securitiestransferchargefrontend.controllers.dashboard.SubmissionsController.onPageLoad(draftsPage: Option[Int] ?= None, readyToPayPage: Option[Int] ?= None, overduePage: Option[Int] ?= None, recentPage: Option[Int] ?= None)
 
 GET        /stf/bulk/check-your-answers/:reference      uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.individuals.bulk.CheckYourAnswersController.onPageLoad(reference: String)
-POST       /stf/bulk/check-your-answers/:reference      uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.individuals.bulk.CheckYourAnswersController.onSubmit(reference: String)
+POST       /stf/bulk/check-your-answers                 uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.individuals.bulk.CheckYourAnswersController.onSubmit()
 
 GET        /stf/org/bulk/check-your-answers/:reference      uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.organisations.bulk.CheckYourAnswersController.onPageLoad(reference: String)
-POST       /stf/org/bulk/check-your-answers/:reference      uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.organisations.bulk.CheckYourAnswersController.onSubmit(reference: String)
+POST       /stf/org/bulk/check-your-answers                uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.organisations.bulk.CheckYourAnswersController.onSubmit()
 
 
 GET        /stf/check-your-answers                      uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.individuals.single.CheckYourAnswersController.onPageLoad()

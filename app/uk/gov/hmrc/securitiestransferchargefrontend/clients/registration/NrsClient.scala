@@ -19,7 +19,7 @@ package uk.gov.hmrc.securitiestransferchargefrontend.clients.registration
 import play.api.libs.json.Json
 import uk.gov.hmrc.http.{HeaderCarrier, HttpResponse, StringContextOps}
 import uk.gov.hmrc.http.client.HttpClientV2
-import uk.gov.hmrc.securitiestransferchargefrontend.models.nrs.NrsSingleSubmissionRequest
+import uk.gov.hmrc.securitiestransferchargefrontend.models.nrs.{NrsBulkSubmissionRequest, NrsSingleSubmissionRequest}
 import play.api.libs.ws.JsonBodyWritables.writeableOf_JsValue
 import uk.gov.hmrc.securitiestransferchargefrontend.config.FrontendAppConfig
 import uk.gov.hmrc.http.HttpReads.Implicits.*
@@ -30,6 +30,7 @@ import scala.concurrent.{ExecutionContext, Future}
 
 trait NrsClient:
   def postSinglePayload(request: NrsSingleSubmissionRequest)(using hc: HeaderCarrier): Future[Unit]
+  def postBulkPayload(request: NrsBulkSubmissionRequest)(using hc: HeaderCarrier): Future[Unit]
 
 final class NrsClientImpl @Inject() (
   http: HttpClientV2,
@@ -40,6 +41,15 @@ final class NrsClientImpl @Inject() (
   
   override def postSinglePayload(request: NrsSingleSubmissionRequest)(using hc: HeaderCarrier): Future[Unit] = {
     val url: URL = url"${config.submissionsServiceUrl}/nrs/single"
+    http
+      .post(url)
+      .withBody(Json.toJson(request))
+      .execute[HttpResponse]
+      .map(_ => ())
+  }
+
+  override def postBulkPayload(request: NrsBulkSubmissionRequest)(using hc: HeaderCarrier): Future[Unit] = {
+    val url: URL = url"${config.submissionsServiceUrl}/nrs/bulk"
     http
       .post(url)
       .withBody(Json.toJson(request))

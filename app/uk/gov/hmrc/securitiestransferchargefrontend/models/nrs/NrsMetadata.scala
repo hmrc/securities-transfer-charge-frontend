@@ -27,7 +27,8 @@ case class NrsMetadata(
   identityData: IdentityData,
   userAuthToken: String,
   headerData: Map[String, String],
-  searchKeys: Map[String, String]
+  searchKeys: Map[String, String],
+  attachmentIds: Option[Seq[String]] = None
 )
 
 object NrsMetadata:

@@ -27,7 +27,6 @@ import uk.gov.hmrc.securitiestransferchargefrontend.utils.CommonHelpers.linkToTe
 import uk.gov.hmrc.securitiestransferchargefrontend.models.JourneyType.SH03
 import uk.gov.hmrc.securitiestransferchargefrontend.repositories.SessionRepository
 
-import javax.inject.Inject
 import scala.concurrent.ExecutionContext
 import javax.inject.{Inject, Named}
 
