@@ -81,6 +81,7 @@ class Module extends AbstractModule {
     bind(classOf[UpscanFileDownloadConnector]).to(classOf[UpscanFileDownloadConnectorImpl])
     bind(classOf[UpscanJourneyRepository]).to(classOf[UpscanJourneyRepositoryImpl])
     bind(classOf[ChecksumRepository]).to(classOf[ChecksumRepositoryImpl])
+    bind(classOf[ChecksumService]).to(classOf[ChecksumServiceImpl])
     bind(classOf[RegistrationClient]).to(classOf[RegistrationClientImpl]).asEagerSingleton()
     bind(classOf[AnswerPersistenceService]).to(classOf[AnswerPersistenceServiceImpl])
     bind(classOf[StcUpscanProcessingService]).to(classOf[StcUpscanProcessingServiceImpl])

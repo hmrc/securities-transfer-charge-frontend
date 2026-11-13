@@ -19,8 +19,9 @@ package uk.gov.hmrc.securitiestransferchargefrontend.models.stf.fileupload
 import java.time.Instant
 import play.api.libs.json.{Format, Json, OFormat}
 import uk.gov.hmrc.mongo.play.json.formats.MongoJavatimeFormats
+import uk.gov.hmrc.securitiestransferchargefrontend.domain.GroupIdentifier
 
-final case class UploadedFileChecksum(checksum: String, uploadedAt: Instant = Instant.now())
+final case class UploadedFileChecksum(checksum: String, userGroup: GroupIdentifier, uploadedAt: Instant = Instant.now())
 
 object UploadedFileChecksum {
   implicit val instantFormat: Format[Instant] = MongoJavatimeFormats.instantFormat

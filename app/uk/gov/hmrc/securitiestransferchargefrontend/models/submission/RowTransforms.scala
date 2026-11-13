@@ -91,7 +91,7 @@ object RowTransforms {
         reliefPercentage = reliefPercentage(parsedRow)
       ),
       contingentDetails = None, // Needed once we do C&D
-      mainSellerDetails = Some(getMainSellerDetails(parsedRow)),
+      mainSellerDetails = None,
       otherSellers = None, 
       mainBuyerDetails = SingleTransferBuyerDetails(
         buyerName = buyerName(affinityData),

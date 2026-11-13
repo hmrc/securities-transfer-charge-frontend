@@ -30,11 +30,12 @@ import uk.gov.hmrc.securitiestransferchargefrontend.controllers.sh03.organisatio
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.agents.bulk.routes as stfBulkRoutes
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.individuals.bulk.routes as stfBulkIndRoutes
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.organisations.bulk.routes as stfBulkOrgRoutes
+import uk.gov.hmrc.securitiestransferchargefrontend.domain.GroupIdentifier
 import uk.gov.hmrc.securitiestransferchargefrontend.models.audit.{AuditType, UpscanValidationAuditModel}
 import uk.gov.hmrc.securitiestransferchargefrontend.models.stf.upscan.{FileUpload, UpscanJourneyStatus}
 import uk.gov.hmrc.securitiestransferchargefrontend.models.{JourneyType, NormalMode}
 import uk.gov.hmrc.securitiestransferchargefrontend.repositories.UpscanJourneyRepository
-import uk.gov.hmrc.securitiestransferchargefrontend.services.AuditService
+import uk.gov.hmrc.securitiestransferchargefrontend.services.{AuditService, ChecksumService}
 import uk.gov.hmrc.securitiestransferchargefrontend.services.fileupload.processing.FileProcessingHelper.*
 import uk.gov.hmrc.securitiestransferchargefrontend.services.fileupload.processing.{FileProcessingRefreshCounter, FileProcessingRefreshCounterFactory, ProcessingService}
 import uk.gov.hmrc.securitiestransferchargefrontend.views.html.fileUpload.{BulkUploadErrorView, FileProcessingView}
@@ -50,6 +51,7 @@ class FileProcessingController @Inject()(
                                           timeoutView: BulkUploadErrorView,
                                           createCounter: FileProcessingRefreshCounterFactory,
                                           upscanJourneyRepository: UpscanJourneyRepository,
+                                          checksumService: ChecksumService,
                                           val controllerComponents: MessagesControllerComponents,
                                           appConfig: FrontendAppConfig,
                                           processingService: ProcessingService,
@@ -118,6 +120,12 @@ class FileProcessingController @Inject()(
     )
   }
 
+  private def isDuplicateUpload(fileUpload: FileUpload)(implicit request: StcAuthorisedRequest[_]): Future[Boolean] =
+    fileUpload.uploadDetails match {
+      case Some(details) => checksumService.isDuplicate(GroupIdentifier(request.groupIdentifier), details.checksum)
+      case None          => Future.successful(false)
+    }
+
   private def handleStatus(
                             reference: String,
                             fileUpload: FileUpload,
@@ -132,8 +140,14 @@ class FileProcessingController @Inject()(
 
       case UpscanJourneyStatus.Ready =>
         auditUpscanSuccess(reference, fileUpload)
-        processingService.processReadyUpload(reference, fileUpload, affinityKey, journeyType)
-        Future.successful(spinnerPage(counter))
+        isDuplicateUpload(fileUpload).map { isDuplicate =>
+          if (isDuplicate) {
+            Redirect(routes.BulkDuplicateErrorController.onPageLoad(journeyType))
+          } else {
+            processingService.processReadyUpload(reference, fileUpload, affinityKey, journeyType)
+            spinnerPage(counter)
+          }
+        }
 
       case UpscanJourneyStatus.Processing | UpscanJourneyStatus.Initiated => Future.successful(spinnerPage(counter))
 
