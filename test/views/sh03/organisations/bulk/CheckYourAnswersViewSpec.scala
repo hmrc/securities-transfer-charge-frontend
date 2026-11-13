@@ -21,7 +21,7 @@ import org.jsoup.nodes.Document
 import play.api.Application
 import play.api.mvc.Call
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.sh03.organisations.bulk.routes
-import uk.gov.hmrc.securitiestransferchargefrontend.controllers.sh03.shared.bulk.routes.YourFileWillNotBeSavedController
+import uk.gov.hmrc.securitiestransferchargefrontend.controllers.routes.YourFileWillNotBeSavedController
 import uk.gov.hmrc.securitiestransferchargefrontend.viewmodels.sh03.organisations.bulk.{CheckYourAnswersViewModel, Sh03Transfer}
 import uk.gov.hmrc.securitiestransferchargefrontend.views.html.sh03.organisations.bulk.CheckYourAnswersView
 import views.ViewBaseSpec

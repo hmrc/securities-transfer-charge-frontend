@@ -30,6 +30,7 @@ import uk.gov.hmrc.securitiestransferchargefrontend.clients.SubmissionIdClient
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.actions.requests.StcDataRequest
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.routes
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.organisations.bulk.routes as bulkRoutes
+import uk.gov.hmrc.securitiestransferchargefrontend.controllers.dashboard.routes as dashboardRoutes
 import uk.gov.hmrc.securitiestransferchargefrontend.domain.SubmissionId
 import uk.gov.hmrc.securitiestransferchargefrontend.models.JourneyType.STF
 import uk.gov.hmrc.securitiestransferchargefrontend.models.{NormalMode, UserAnswers}
@@ -51,6 +52,7 @@ class CheckYourAnswersControllerSpec extends SpecBase with MockitoSugar with Fil
 
   lazy val checkYourAnswersRoute: String = bulkRoutes.CheckYourAnswersController.onPageLoad(reference).url
   lazy val onSubmitRoute: String = bulkRoutes.CheckYourAnswersController.onSubmit().url
+  lazy val onReturnToDashboardRoute: String = bulkRoutes.CheckYourAnswersController.onReturnToDashboard().url
 
   val row1: ParsedStcRow = parsedStcRow(1)
   val testFileName: String = "test-file.csv"
@@ -129,7 +131,7 @@ class CheckYourAnswersControllerSpec extends SpecBase with MockitoSugar with Fil
 
   private def capturedNavigatorAnswers(): UserAnswers = {
     val captor = ArgumentCaptor.forClass(classOf[UserAnswers])
-    verify(mockNavigator).nextPage(eqTo(BulkCheckYourAnswersPage), eqTo(NormalMode), captor.capture(), anyBoolean())(any())
+    verify(mockNavigator).nextPage(eqTo(BulkCheckYourAnswersPage), eqTo(NormalMode), captor.capture(), eqTo(false))(any())
     captor.getValue
   }
 
@@ -288,6 +290,41 @@ class CheckYourAnswersControllerSpec extends SpecBase with MockitoSugar with Fil
 
           verify(mockNavigator, never()).nextPage(any(), any(), any(), anyBoolean())(any())
           verify(mockTransactionSubmissionService, never()).submitBulkStf(any())(using any[StcDataRequest[?]]())
+        }
+      }
+    }
+
+    "onReturnToDashboard" - {
+      val testDashboardCall = dashboardRoutes.DashboardController.onPageLoad()
+
+      "must redirect to the dashboard when user answers exist" in {
+        when(mockNavigator.returnToDashboard(any())).thenReturn(Future.successful(testDashboardCall))
+
+        val application = submitApplication(Some(answersForThisUpload))
+
+        running(application) {
+          val request = FakeRequest(GET, onReturnToDashboardRoute)
+          val result = route(application, request).value
+
+          status(result) mustEqual SEE_OTHER
+          redirectLocation(result).value mustEqual testDashboardCall.url
+
+          verify(mockNavigator).returnToDashboard(eqTo(answersForThisUpload))
+          verify(mockTransactionSubmissionService, never()).submitBulkStf(any())(using any[StcDataRequest[?]]())
+        }
+      }
+
+      "must redirect to the journey recovery page when there are no user answers" in {
+        val application = submitApplication(None)
+
+        running(application) {
+          val request = FakeRequest(GET, onReturnToDashboardRoute)
+          val result = route(application, request).value
+
+          status(result) mustEqual SEE_OTHER
+          redirectLocation(result).value mustEqual routes.JourneyRecoveryController.onPageLoad().url
+
+          verify(mockNavigator, never()).returnToDashboard(any())
         }
       }
     }

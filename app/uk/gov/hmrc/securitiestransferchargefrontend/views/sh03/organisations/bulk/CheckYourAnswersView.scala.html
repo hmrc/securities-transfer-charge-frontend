@@ -22,7 +22,7 @@
 @import uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.shared.routes as sharedRoutes
 @import uk.gov.hmrc.securitiestransferchargefrontend.controllers.sh03.organisations.bulk.routes
 @import uk.gov.hmrc.securitiestransferchargefrontend.views.html.components.SaveAndReturnButton
-@import uk.gov.hmrc.securitiestransferchargefrontend.controllers.sh03.shared.bulk.routes.YourFileWillNotBeSavedController
+@import uk.gov.hmrc.securitiestransferchargefrontend.controllers.routes.YourFileWillNotBeSavedController
 
 @this(
     layout: uk.gov.hmrc.securitiestransferchargefrontend.views.html.templates.Layout,
@@ -115,19 +115,13 @@
         @messages("checkYourAnswers.bulk.declaration.body")
     </p>
 
-    <div class="govuk-button-group">
-        @formHelper(
-            action = routes.CheckYourAnswersController.onSubmit()
-        ) {
-            @govukButton(
-                ButtonViewModel(messages("checkYourAnswers.acceptAndSend"))
-            )
+        @formHelper(action = routes.CheckYourAnswersController.onSubmit()) {
+            @govukButton(ButtonViewModel(messages("checkYourAnswers.acceptAndSend")))
 
-        @govukButton(
-            ButtonViewModel(messages("site.save-and-return.button"))
-                .asSecondaryButton()
-                .copy(href = Some(YourFileWillNotBeSavedController.onPageLoad().url))
+        @govukButton(ButtonViewModel(messages("site.save-and-return.button"))
+            .asSecondaryButton()
+            .copy(href = Some(YourFileWillNotBeSavedController.onPageLoad().url))
         )
         }
-    </div>
+
 }

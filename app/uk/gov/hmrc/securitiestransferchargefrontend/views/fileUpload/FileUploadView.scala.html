@@ -17,7 +17,7 @@
 @import uk.gov.hmrc.securitiestransferchargefrontend.models.stf.upscan.UploadRequest
 @import uk.gov.hmrc.securitiestransferchargefrontend.views.html.templates
 @import uk.gov.hmrc.govukfrontend.views.html.components.GovukFileUpload
-@import uk.gov.hmrc.securitiestransferchargefrontend.controllers.dashboard.routes
+@import uk.gov.hmrc.securitiestransferchargefrontend.controllers.fileUpload.routes
 @import uk.gov.hmrc.securitiestransferchargefrontend.models.JourneyType
 @import uk.gov.hmrc.securitiestransferchargefrontend.viewmodels.UploadErrorSummaryViewModel
 
@@ -83,7 +83,7 @@
              ButtonViewModel(messages("site.continue"))
             )
 
-            <a class="govuk-link" href="@routes.DashboardController.onPageLoad().url">
+            <a class="govuk-link" href="@routes.FileUploadController.onReturnToDashboard().url">
                 @messages("return-to-dashboard.link")
             </a>
         </div>

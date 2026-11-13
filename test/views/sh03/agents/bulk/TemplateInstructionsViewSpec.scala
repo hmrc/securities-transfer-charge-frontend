@@ -20,7 +20,7 @@ import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
 import play.api.Application
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.fileUpload.routes as bulkRoutes
-import uk.gov.hmrc.securitiestransferchargefrontend.controllers.dashboard.routes
+import uk.gov.hmrc.securitiestransferchargefrontend.controllers.sh03.agents.bulk.routes as sh03BulkRoutes
 import uk.gov.hmrc.securitiestransferchargefrontend.models.JourneyType.SH03
 import uk.gov.hmrc.securitiestransferchargefrontend.utils.CommonHelpers
 import uk.gov.hmrc.securitiestransferchargefrontend.views.html.sh03.agents.bulk.TemplateInstructionsView
@@ -56,62 +56,60 @@ class TemplateInstructionsViewSpec extends ViewBaseSpec {
   }
 
   "The TemplateInstructionsView" - {
-    "the user is an Individual" - {
-      val templateInstructionsView = view()
+    val templateInstructionsView = view()
 
-      "have the correct title" in {
-        templateInstructionsView.title must include(ExpectedContent.title)
-      }
+    "have the correct title" in {
+      templateInstructionsView.title must include(ExpectedContent.title)
+    }
 
-      "have the correct heading" in {
-        templateInstructionsView.select("h1").text() mustBe ExpectedContent.heading
-      }
+    "have the correct heading" in {
+      templateInstructionsView.select("h1").text() mustBe ExpectedContent.heading
+    }
 
-      "display the correct of first paragraph content" in {
-        templateInstructionsView.para(1) mustBe Some(ExpectedContent.para1Value)
-      }
+    "display the correct of first paragraph content" in {
+      templateInstructionsView.para(1) mustBe Some(ExpectedContent.para1Value)
+    }
 
-      "display a numbered list with 3 items" in {
-        templateInstructionsView.select("ol.govuk-list.govuk-list--number li").size() mustBe 3
-      }
+    "display a numbered list with 3 items" in {
+      templateInstructionsView.select("ol.govuk-list.govuk-list--number li").size() mustBe 3
+    }
 
-      "display the correct step 1 download link" in {
-        val downloadLink = templateInstructionsView.select("ol.govuk-list.govuk-list--number li a.govuk-link").first()
-        downloadLink.text() mustBe ExpectedContent.step1
-        downloadLink.attr("href") mustBe ExpectedContent.downloadHref
-        downloadLink.hasAttr("download") mustBe true
-        downloadLink.attr("download") mustBe ExpectedContent.downloadFileName
-      }
+    "display the correct step 1 download link" in {
+      val downloadLink = templateInstructionsView.select("ol.govuk-list.govuk-list--number li a.govuk-link").first()
+      downloadLink.text() mustBe ExpectedContent.step1
+      downloadLink.attr("href") mustBe ExpectedContent.downloadHref
+      downloadLink.hasAttr("download") mustBe true
+      downloadLink.attr("download") mustBe ExpectedContent.downloadFileName
+    }
 
-      "display the correct step 2 text" in {
-        templateInstructionsView.select("ol.govuk-list.govuk-list--number li").get(1).text() mustBe ExpectedContent.step2
-      }
+    "display the correct step 2 text" in {
+      templateInstructionsView.select("ol.govuk-list.govuk-list--number li").get(1).text() mustBe ExpectedContent.step2
+    }
 
-      "display the correct step 3 text" in {
-        templateInstructionsView.select("ol.govuk-list.govuk-list--number li").get(2).text() mustBe ExpectedContent.step3
-      }
+    "display the correct step 3 text" in {
+      templateInstructionsView.select("ol.govuk-list.govuk-list--number li").get(2).text() mustBe ExpectedContent.step3
+    }
 
-      "display the correct second paragraph" in {
-        templateInstructionsView.para(2) mustBe Some(ExpectedContent.para2Value)
-      }
+    "display the correct second paragraph" in {
+      templateInstructionsView.para(2) mustBe Some(ExpectedContent.para2Value)
+    }
 
-      "display the correct third paragraph " in {
-        val paragraph = templateInstructionsView.select("p.govuk-body").last()
-        val spans = paragraph.select("span")
-        spans.get(0).text() mustBe ExpectedContent.para3Value
-      }
+    "display the correct third paragraph " in {
+      val paragraph = templateInstructionsView.select("p.govuk-body").last()
+      val spans = paragraph.select("span")
+      spans.get(0).text() mustBe ExpectedContent.para3Value
+    }
 
-      "have a continue button" in {
-        val continueButton = templateInstructionsView.select(".govuk-button").first()
-        continueButton.text() mustBe ExpectedContent.continue
-        continueButton.attr("href") mustBe bulkRoutes.FileUploadController.onPageLoad(SH03).url
-      }
+    "have a continue button" in {
+      val continueButton = templateInstructionsView.select(".govuk-button").first()
+      continueButton.text() mustBe ExpectedContent.continue
+      continueButton.attr("href") mustBe bulkRoutes.FileUploadController.onPageLoad(SH03).url
+    }
 
-      "have a link to return back to the dashboard page" in {
-        val returnLink = templateInstructionsView.select(".govuk-button-group a.govuk-link").first()
-        returnLink.text() mustBe ExpectedContent.returnLink
-        returnLink.attr("href") mustBe routes.DashboardController.onPageLoad().url
-      }
+    "have a link to return back to the dashboard page" in {
+      val returnLink = templateInstructionsView.select(".govuk-button-group a.govuk-link").first()
+      returnLink.text() mustBe ExpectedContent.returnLink
+      returnLink.attr("href") mustBe sh03BulkRoutes.TemplateInstructionsController.onReturnToDashboard().url
     }
   }
 }

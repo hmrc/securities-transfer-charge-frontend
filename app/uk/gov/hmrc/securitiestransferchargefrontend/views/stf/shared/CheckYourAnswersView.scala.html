@@ -52,21 +52,9 @@
     <h2 class="govuk-heading-m govuk-!-margin-top-9">@messages(CheckYourAnswersViewModel.MessageKeys.declarationHeading)</h2>
     <p class="govuk-body govuk-!-margin-bottom-9">@messages(CheckYourAnswersViewModel.MessageKeys.declarationBody)</p>
 
-    <div class="govuk-button-group">
-
-        @formHelper(action = submitAction) {
-
-        @govukButton(
-            ButtonViewModel(
-                messages(CheckYourAnswersViewModel.MessageKeys.acceptAndSend)
-                )
-            )
-        }
-
-        <a class="govuk-link" href="@dashboardRoutes.DashboardController.onPageLoad().url" style="margin-left: -11px">
-            @saveAndReturnButton()
-        </a>
-
-    </div>
+    @formHelper(action = submitAction) {
+        @govukButton(ButtonViewModel(messages(CheckYourAnswersViewModel.MessageKeys.acceptAndSend)))
+        @saveAndReturnButton()
+    }
 
 }

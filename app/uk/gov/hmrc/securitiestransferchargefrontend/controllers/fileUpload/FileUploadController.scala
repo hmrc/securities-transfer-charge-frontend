@@ -22,9 +22,11 @@ import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import uk.gov.hmrc.securitiestransferchargefrontend.connectors.UpscanInitiateConnector
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.actions.*
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.routes.JourneyRecoveryController
+import uk.gov.hmrc.securitiestransferchargefrontend.controllers.dashboard.routes as dashboardRoutes
+import uk.gov.hmrc.securitiestransferchargefrontend.domain.UserId
 import uk.gov.hmrc.securitiestransferchargefrontend.models.JourneyType
 import uk.gov.hmrc.securitiestransferchargefrontend.models.stf.upscan.*
-import uk.gov.hmrc.securitiestransferchargefrontend.repositories.UpscanJourneyRepository
+import uk.gov.hmrc.securitiestransferchargefrontend.repositories.{SessionRepository, UpscanJourneyRepository}
 import uk.gov.hmrc.securitiestransferchargefrontend.services.fileupload.processing.FileProcessingRefreshCounterFactory
 import uk.gov.hmrc.securitiestransferchargefrontend.views.html.fileUpload.FileUploadView
 
@@ -38,6 +40,7 @@ class FileUploadController @Inject()(
                                       view: FileUploadView,
                                       upscanInitiateConnector: UpscanInitiateConnector,
                                       upscanJourneyRepository: UpscanJourneyRepository,
+                                      sessionRepository: SessionRepository,
                                       fileProcessingRefreshCounterFactory: FileProcessingRefreshCounterFactory,
 
                                     )(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport {
@@ -68,6 +71,12 @@ class FileUploadController @Inject()(
             }
         }
     }
+  }
+
+  def onReturnToDashboard(): Action[AnyContent] = stcAuthEnrolled.async { implicit request =>
+    sessionRepository
+      .clear(UserId(request.internalId))
+      .map(_ => Redirect(dashboardRoutes.DashboardController.onPageLoad()))
   }
 
   private def prepareUpload(journeyType: JourneyType)(implicit request: Request[_]): Future[UpscanInitiateResponse] =

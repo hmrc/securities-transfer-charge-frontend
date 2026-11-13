@@ -168,7 +168,7 @@ class TransactionSubmissionServiceSpec extends AnyFreeSpec with Matchers with Sp
       val service = new TransactionSubmissionServiceImpl(mockHeaderCarrierCreator, mockEtmpSubmissionService, mockSaveAndReturnClient, mockNrsService, mockCyaHtmlRepository, mockTransactionResponseRepository, stubBulkStatusService, mockSubscriptionService, mockAuditService, mockUpscanJourneyRepository)
       val outcome = service.submitBulkStf(List(Fixtures.testValidatedStcRow))
       whenReady(outcome) { r =>
-        verify(mockNrsService, times(1)).bulkSubmissionNotableEvent(any[CyaHtmlData], any[String], any[SubmissionId], any[FileUpload])(any[StcDataRequest[?]], any[HeaderCarrier])
+        verify(mockNrsService, org.mockito.Mockito.timeout(2000).times(1)).bulkSubmissionNotableEvent(any[CyaHtmlData], any[String], any[SubmissionId], any[FileUpload])(any[StcDataRequest[?]], any[HeaderCarrier])
         r mustBe true
       }
     }
