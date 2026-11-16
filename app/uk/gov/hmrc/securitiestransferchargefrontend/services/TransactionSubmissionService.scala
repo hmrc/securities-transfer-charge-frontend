@@ -37,6 +37,7 @@ import uk.gov.hmrc.securitiestransferchargefrontend.controllers.actions.requests
 
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
+import scala.util.control.NonFatal
 
 trait TransactionSubmissionService:
   def submitSingleStf(implicit request: StcDataRequest[?]): Future[Boolean]
@@ -54,7 +55,8 @@ final class TransactionSubmissionServiceImpl @Inject()(
   bulkStatusService             : BulkStatusService,
   subscriptionService           : SubscriptionService,
   auditService                  : AuditService,
-  upscanJourneyRepository       : UpscanJourneyRepository)(
+  upscanJourneyRepository       : UpscanJourneyRepository,
+  checksumService               : ChecksumService)(
   implicit ec                   : ExecutionContext
 ) extends TransactionSubmissionService with Logging {
 
@@ -113,6 +115,7 @@ final class TransactionSubmissionServiceImpl @Inject()(
         onPartialFailure = handleBulkPartialFailure(transferType),
         onFailure        = handleBulkFailure(transferType, submissionId)
       )
+      _ <- if (response.hasAcceptedTransfers) storeUploadedFileChecksum(group) else Future.unit
     } yield response.isSuccessful
   }
 
@@ -169,6 +172,24 @@ final class TransactionSubmissionServiceImpl @Inject()(
         case None       => logger.warn(s"Nothing to send to NRS for submission $submissionId - no data in CYA repository.")
       }
   }
+
+  private def storeUploadedFileChecksum(group: GroupIdentifier)(using request: StcDataRequest[?]): Future[Unit] = {
+    val submissionId = request.userAnswers.submissionId
+    uploadedFileChecksum
+      .flatMap {
+        case Some(checksum) => checksumService.storeHash(group, checksum)
+        case None           => Future.successful(logger.warn(s"No checksum stored for bulk submission $submissionId - upload details not found."))
+      }
+      .recover { case NonFatal(e) =>
+        logger.warn(s"Failed to store the checksum of the uploaded file for bulk submission $submissionId", e)
+      }
+  }
+
+  private def uploadedFileChecksum(using request: StcDataRequest[?]): Future[Option[String]] =
+    request.userAnswers.fileUploadReference match {
+      case Some(reference) => upscanJourneyRepository.find(reference).map(_.flatMap(_.uploadDetails).map(_.checksum))
+      case None            => Future.successful(None)
+    }
 
   private def handleBulkSuccess(transferType: TransferType, affinityData: AffinityData, totalTransfers: Int)(successResponse: SubmissionCreateResponseSuccess)
                                  (implicit hc: HeaderCarrier, request: StcDataRequest[?]): Unit = {

@@ -39,6 +39,12 @@ trait SubmissionCreateResponse:
     case _                                  => false
   }
 
+  def hasAcceptedTransfers: Boolean = this match {
+    case _: SubmissionCreateResponseSuccess        => true
+    case _: SubmissionCreateResponsePartialFailure => true
+    case _                                         => false
+  }
+
 /* TODO: For bulk the utrn is just the first returned, the others are not collected.
  *  This is fine for now since bulk does not have a confirmation page, but if we
  *  change that we will have to do something else here.

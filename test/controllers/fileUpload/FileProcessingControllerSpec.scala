@@ -16,7 +16,7 @@
 
 package controllers.fileUpload
 
-import base.{AuditTestSupport, SpecBase}
+import base.{AuditTestSupport, Fixtures, SpecBase}
 import org.mockito.ArgumentMatchers.{any, eq as eqTo}
 import org.mockito.Mockito.*
 import org.scalatestplus.mockito.MockitoSugar
@@ -37,7 +37,7 @@ import uk.gov.hmrc.securitiestransferchargefrontend.models.stf.upscan.UpscanCall
 import uk.gov.hmrc.securitiestransferchargefrontend.models.stf.upscan.{FileUpload, UpscanJourneyStatus}
 import uk.gov.hmrc.securitiestransferchargefrontend.models.{JourneyType, NormalMode}
 import uk.gov.hmrc.securitiestransferchargefrontend.repositories.UpscanJourneyRepository
-import uk.gov.hmrc.securitiestransferchargefrontend.services.AuditService
+import uk.gov.hmrc.securitiestransferchargefrontend.services.{AuditService, ChecksumService}
 import uk.gov.hmrc.securitiestransferchargefrontend.services.fileupload.processing.{FileProcessingRefreshCounter, FileProcessingRefreshCounterFactory, ProcessingService}
 import uk.gov.hmrc.securitiestransferchargefrontend.views.html.fileUpload.FileProcessingView
 
@@ -55,12 +55,19 @@ class FileProcessingControllerSpec extends SpecBase with MockitoSugar with Audit
   private val reference = "ref"
   private val mockAuditService = mock[AuditService]
 
+  private def mockChecksumService(isDuplicate: Boolean): ChecksumService = {
+    val checksumService = mock[ChecksumService]
+    when(checksumService.isDuplicate(any(), any())).thenReturn(Future.successful(isDuplicate))
+    checksumService
+  }
+
   private def buildApp(
                         counter: FileProcessingRefreshCounter,
                         repository: UpscanJourneyRepository,
                         service: ProcessingService,
                         affinityGroup: AffinityGroup,
-                        auditService: AuditService = mockAuditService
+                        auditService: AuditService = mockAuditService,
+                        checksumService: ChecksumService = mockChecksumService(isDuplicate = false)
                       ) =
     applicationBuilder(userAnswers = Some(emptyUserAnswers), affinityGroup = affinityGroup)
       .overrides(
@@ -68,7 +75,8 @@ class FileProcessingControllerSpec extends SpecBase with MockitoSugar with Audit
           .toInstance(new MockFileProcessingRefreshCounterFactory(counter)),
         bind[UpscanJourneyRepository].toInstance(repository),
         bind[ProcessingService].toInstance(service),
-        bind[AuditService].toInstance(auditService)
+        bind[AuditService].toInstance(auditService),
+        bind[ChecksumService].toInstance(checksumService)
       )
       .build()
 
@@ -180,6 +188,49 @@ class FileProcessingControllerSpec extends SpecBase with MockitoSugar with Audit
               .processReadyUpload(eqTo(reference), eqTo(upload), any[String], eqTo(journeyType))(any(), any(), any())
 
             verify(counter).withIncrementedCounter(any[Result])
+
+            verifyUpscanAudit(
+              auditService,
+              expectedStatus = "Success",
+              expectedReference = reference,
+              expectedFileName = Some("test-file.xlsx")
+            )
+          }
+        }
+
+        "must redirect to the duplicate file page and not process the upload when the file has been submitted before" in {
+
+          val counter = mockCounter()
+          val repository = mock[UpscanJourneyRepository]
+          val service = mock[ProcessingService]
+          val auditService = mock[AuditService]
+          val checksumService = mockChecksumService(isDuplicate = true)
+
+          val upload = fakeUpload(UpscanJourneyStatus.Ready)
+            .copy(uploadDetails = Some(UploadDetails(
+              uploadTimestamp = Instant.now(),
+              checksum = "test-checksum",
+              fileMimeType = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+              fileName = "test-file.xlsx",
+              size = 1024
+            )))
+
+          when(repository.find(reference))
+            .thenReturn(Future.successful(Some(upload)))
+
+          val app = buildApp(counter, repository, service, AffinityGroup.Individual, auditService, checksumService)
+
+          running(app) {
+
+            val result =
+              route(app, FakeRequest(GET, routes.FileProcessingController.onPageLoad(reference).url)).value
+
+            status(result) mustEqual SEE_OTHER
+            redirectLocation(result).value mustEqual routes.BulkDuplicateErrorController.onPageLoad(journeyType).url
+
+            verify(checksumService).isDuplicate(eqTo(Fixtures.testGroupIdentifier), eqTo("test-checksum"))
+            verify(service, never())
+              .processReadyUpload(any(), any(), any(), any())(any(), any(), any())
 
             verifyUpscanAudit(
               auditService,
