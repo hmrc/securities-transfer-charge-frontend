@@ -26,7 +26,7 @@ import play.api.i18n.Lang
 import play.api.inject.bind
 import play.api.test.FakeRequest
 import play.api.test.Helpers.*
-import uk.gov.hmrc.securitiestransferchargefrontend.clients.SubmissionIdClient
+import uk.gov.hmrc.securitiestransferchargefrontend.clients.{SaveAndReturnClient, SubmissionIdClient}
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.actions.requests.StcDataRequest
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.routes
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.organisations.bulk.routes as bulkRoutes
@@ -64,6 +64,7 @@ class CheckYourAnswersControllerSpec extends SpecBase with MockitoSugar with Fil
   private val mockNavigator = mock[Navigator]
   private val mockCyaHtmlRepository = mock[CyaHtmlRepository]
   private val mockAnswerPersistenceService = mock[AnswerPersistenceService]
+  private val mockSaveAndReturnClient = mock[SaveAndReturnClient]
 
   private val parsedStcRowsDocument = ParsedStcRowsDocument(
     _id = reference,
@@ -93,13 +94,9 @@ class CheckYourAnswersControllerSpec extends SpecBase with MockitoSugar with Fil
   private val testPaymentDueBy: LocalDate = LocalDate.of(2026, 3, 22)
   private val testTaxDue: BigDecimal = BigDecimal(100.00)
 
-        val parsedStcRowsRepository = mock[ParsedStcRowsRepository]
-        when(parsedStcRowsRepository.findDocumentByReference(reference))
-          .thenReturn(Future.successful(Some(parsedStcRowsDocument)))
-
   override def beforeEach(): Unit = {
     super.beforeEach()
-    reset(mockRepository, mockCyaService, mockTransactionSubmissionService, mockSubmissionIdClient, mockNavigator, mockCyaHtmlRepository, mockAnswerPersistenceService)
+    reset(mockRepository, mockCyaService, mockTransactionSubmissionService, mockSubmissionIdClient, mockNavigator, mockCyaHtmlRepository, mockAnswerPersistenceService, mockSaveAndReturnClient)
     when(mockCyaHtmlRepository.store(any[CyaHtmlData]())).thenReturn(Future.successful(()))
     when(mockAnswerPersistenceService.save(any[UserAnswers]())(any())).thenReturn(Future.successful(()))
     when(mockSubmissionIdClient.nextSubmissionId()(any())).thenReturn(Future.successful(newSubmissionId))
@@ -118,7 +115,7 @@ class CheckYourAnswersControllerSpec extends SpecBase with MockitoSugar with Fil
       .build()
 
   private def submitApplication(userAnswers: Option[UserAnswers]) =
-    applicationBuilder(userAnswers = userAnswers, affinityGroup = orgAffinity)
+    applicationBuilder(userAnswers = userAnswers, affinityGroup = orgAffinity, saveAndReturnClient = mockSaveAndReturnClient)
       .overrides(
         bind[Navigator].qualifiedWith("organisations").toInstance(mockNavigator),
         bind[ParsedStcRowsRepository].toInstance(mockRepository),
@@ -297,7 +294,8 @@ class CheckYourAnswersControllerSpec extends SpecBase with MockitoSugar with Fil
     "onReturnToDashboard" - {
       val testDashboardCall = dashboardRoutes.DashboardController.onPageLoad()
 
-      "must redirect to the dashboard when user answers exist" in {
+      "must delete the draft and redirect to the dashboard when user answers exist" in {
+        when(mockSaveAndReturnClient.deleteDraft(any())(using any())).thenReturn(Future.unit)
         when(mockNavigator.returnToDashboard(any())).thenReturn(Future.successful(testDashboardCall))
 
         val application = submitApplication(Some(answersForThisUpload))
@@ -309,6 +307,7 @@ class CheckYourAnswersControllerSpec extends SpecBase with MockitoSugar with Fil
           status(result) mustEqual SEE_OTHER
           redirectLocation(result).value mustEqual testDashboardCall.url
 
+          verify(mockSaveAndReturnClient).deleteDraft(eqTo(answersForThisUpload.submissionId))(using any())
           verify(mockNavigator).returnToDashboard(eqTo(answersForThisUpload))
           verify(mockTransactionSubmissionService, never()).submitBulkStf(any())(using any[StcDataRequest[?]]())
         }
@@ -324,6 +323,7 @@ class CheckYourAnswersControllerSpec extends SpecBase with MockitoSugar with Fil
           status(result) mustEqual SEE_OTHER
           redirectLocation(result).value mustEqual routes.JourneyRecoveryController.onPageLoad().url
 
+          verify(mockSaveAndReturnClient, never()).deleteDraft(any())(using any())
           verify(mockNavigator, never()).returnToDashboard(any())
         }
       }

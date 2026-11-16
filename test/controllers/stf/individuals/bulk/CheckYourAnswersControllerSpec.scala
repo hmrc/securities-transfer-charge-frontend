@@ -26,7 +26,7 @@ import play.api.i18n.Lang
 import play.api.inject.bind
 import play.api.test.FakeRequest
 import play.api.test.Helpers.*
-import uk.gov.hmrc.securitiestransferchargefrontend.clients.SubmissionIdClient
+import uk.gov.hmrc.securitiestransferchargefrontend.clients.{SaveAndReturnClient, SubmissionIdClient}
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.actions.requests.StcDataRequest
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.dashboard.routes as dashboardRoutes
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.routes
@@ -65,6 +65,7 @@ class CheckYourAnswersControllerSpec extends SpecBase with MockitoSugar with Fil
   private val mockNavigator = mock[Navigator]
   private val mockCyaHtmlRepository = mock[CyaHtmlRepository]
   private val mockAnswerPersistenceService = mock[AnswerPersistenceService]
+  private val mockSaveAndReturnClient = mock[SaveAndReturnClient]
 
   private val parsedStcRowsDocument = ParsedStcRowsDocument(
     _id = reference,
@@ -96,7 +97,8 @@ class CheckYourAnswersControllerSpec extends SpecBase with MockitoSugar with Fil
 
   override def beforeEach(): Unit = {
     super.beforeEach()
-    reset(mockRepository, mockCyaService, mockTransactionSubmissionService, mockSubmissionIdClient, mockNavigator, mockCyaHtmlRepository, mockAnswerPersistenceService)
+    reset(mockRepository, mockCyaService, mockTransactionSubmissionService, mockSubmissionIdClient, mockNavigator,
+      mockCyaHtmlRepository, mockAnswerPersistenceService, mockSaveAndReturnClient)
     when(mockCyaHtmlRepository.store(any[CyaHtmlData]())).thenReturn(Future.successful(()))
     when(mockAnswerPersistenceService.save(any[UserAnswers]())(any())).thenReturn(Future.successful(()))
     when(mockSubmissionIdClient.nextSubmissionId()(any())).thenReturn(Future.successful(newSubmissionId))
@@ -115,7 +117,7 @@ class CheckYourAnswersControllerSpec extends SpecBase with MockitoSugar with Fil
       .build()
 
   private def submitApplication(userAnswers: Option[UserAnswers]) =
-    applicationBuilder(userAnswers = userAnswers, affinityGroup = individualAffinity)
+    applicationBuilder(userAnswers = userAnswers, affinityGroup = individualAffinity, saveAndReturnClient = mockSaveAndReturnClient)
       .overrides(
         bind[Navigator].qualifiedWith("individuals").toInstance(mockNavigator),
         bind[ParsedStcRowsRepository].toInstance(mockRepository),
@@ -150,10 +152,6 @@ class CheckYourAnswersControllerSpec extends SpecBase with MockitoSugar with Fil
       "must return OK and the correct view for a GET when a document exists" in {
         when(mockCyaService.buildViewModel(any())(any[Lang])).thenReturn(viewModel)
         when(mockRepository.findDocumentByReference(reference)).thenReturn(Future.successful(Some(parsedStcRowsDocument)))
-
-        val parsedStcRowsRepository = mock[ParsedStcRowsRepository]
-        when(parsedStcRowsRepository.findDocumentByReference(reference))
-        .thenReturn(Future.successful(Some(parsedStcRowsDocument)))
 
         val application = pageLoadApplication(userAnswers = None)
 
@@ -299,6 +297,7 @@ class CheckYourAnswersControllerSpec extends SpecBase with MockitoSugar with Fil
       val testDashboardCall = dashboardRoutes.DashboardController.onPageLoad()
 
       "must redirect to the dashboard when user answers exist" in {
+        when(mockSaveAndReturnClient.deleteDraft(any())(using any())).thenReturn(Future.unit)
         when(mockNavigator.returnToDashboard(any())).thenReturn(Future.successful(testDashboardCall))
 
         val application = submitApplication(Some(answersForThisUpload))
@@ -310,6 +309,7 @@ class CheckYourAnswersControllerSpec extends SpecBase with MockitoSugar with Fil
           status(result) mustEqual SEE_OTHER
           redirectLocation(result).value mustEqual testDashboardCall.url
 
+          verify(mockSaveAndReturnClient).deleteDraft(eqTo(answersForThisUpload.submissionId))(using any())
           verify(mockNavigator).returnToDashboard(eqTo(answersForThisUpload))
           verify(mockTransactionSubmissionService, never()).submitBulkStf(any())(using any[StcDataRequest[?]]())
         }
@@ -325,6 +325,7 @@ class CheckYourAnswersControllerSpec extends SpecBase with MockitoSugar with Fil
           status(result) mustEqual SEE_OTHER
           redirectLocation(result).value mustEqual JourneyRecoveryController.onPageLoad().url
 
+          verify(mockSaveAndReturnClient, never()).deleteDraft(any())(using any())
           verify(mockNavigator, never()).returnToDashboard(any())
         }
       }
