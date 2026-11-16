@@ -16,6 +16,7 @@
 
 package uk.gov.hmrc.securitiestransferchargefrontend.services.stf
 
+import uk.gov.hmrc.securitiestransferchargefrontend.config.CurrencyFormatter
 import uk.gov.hmrc.securitiestransferchargefrontend.models.{ReliefsDataSource, UserAnswers}
 import uk.gov.hmrc.securitiestransferchargefrontend.models.stf.TaxRate
 import uk.gov.hmrc.securitiestransferchargefrontend.pages.stf.single._
@@ -76,7 +77,7 @@ class TaxDueCalculationService @Inject()(reliefsDataSource: ReliefsDataSource) {
   }
 
   def formatTaxDue(taxDue: BigDecimal): String = {
-    f"£$taxDue%.2f"
+    CurrencyFormatter.currencyFormat(taxDue)
   }
 
   def formatDate(date: LocalDate): String = {

@@ -16,6 +16,7 @@
 
 package uk.gov.hmrc.securitiestransferchargefrontend.services.stf.bulk
 
+import uk.gov.hmrc.securitiestransferchargefrontend.config.CurrencyFormatter
 import uk.gov.hmrc.securitiestransferchargefrontend.models.ReliefsDataSource
 import uk.gov.hmrc.securitiestransferchargefrontend.models.stf.fileupload.ParsedStcRow
 
@@ -62,7 +63,7 @@ class TaxDueCalculationService @Inject()(reliefsDataSource: ReliefsDataSource) {
   }
 
   def formatCurrency(amount: BigDecimal): String = {
-    f"£$amount%,.2f"
+    CurrencyFormatter.currencyFormat(amount)
   }
   
 }

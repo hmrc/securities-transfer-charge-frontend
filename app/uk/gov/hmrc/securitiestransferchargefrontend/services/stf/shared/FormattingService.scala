@@ -16,6 +16,7 @@
 
 package uk.gov.hmrc.securitiestransferchargefrontend.services.stf.shared
 
+import uk.gov.hmrc.securitiestransferchargefrontend.config.CurrencyFormatter
 import play.api.i18n.Lang
 import uk.gov.hmrc.securitiestransferchargefrontend.utils.DateTimeFormats
 
@@ -29,7 +30,7 @@ import javax.inject.{Inject, Singleton}
 class FormattingService @Inject() {
 
   def formatTaxDue(taxDue: BigDecimal): String = {
-    f"£$taxDue%.2f"
+    CurrencyFormatter.currencyFormat(taxDue)
   }
 
   def formatPaymentDueDate(paymentDueDate: LocalDate)(implicit lang: Lang): String = {

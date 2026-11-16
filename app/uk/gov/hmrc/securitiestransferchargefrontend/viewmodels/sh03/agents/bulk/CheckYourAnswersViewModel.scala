@@ -16,6 +16,7 @@
 
 package uk.gov.hmrc.securitiestransferchargefrontend.viewmodels.sh03.agents.bulk
 
+import uk.gov.hmrc.securitiestransferchargefrontend.config.CurrencyFormatter
 import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.SummaryList
 
 case class SummarySection(
@@ -98,6 +99,6 @@ object CheckYourAnswersViewModel {
 }
 
 object Formatter {
-  def formatCurrency(amount: BigDecimal): String = f"£$amount%,.2f"
+  def formatCurrency(amount: BigDecimal): String = CurrencyFormatter.currencyFormat(amount)
   def formatAmount(amount: BigDecimal): String = f"$amount%,.0f"
 }

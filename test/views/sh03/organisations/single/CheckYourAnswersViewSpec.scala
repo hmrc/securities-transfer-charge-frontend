@@ -93,7 +93,7 @@ class CheckYourAnswersViewSpec extends ViewBaseSpec {
         val emptyViewModel = dummyViewModel.copy(taxDueFormatted = None, paymentDueDateFormatted = None)
         val emptyView = view(emptyViewModel)
 
-        val emptyTaxHeading = messages(CheckYourAnswersViewModel.MessageKeys.taxDueHeading, "£0.00")
+        val emptyTaxHeading = messages(CheckYourAnswersViewModel.MessageKeys.taxDueHeading, "£0")
 
         emptyView.select(".tax-card h2").text() mustBe emptyTaxHeading
         emptyView.select(".tax-card p.govuk-body").get(1).text() must include(ExpectedContent.defaultPaymentDueDate)

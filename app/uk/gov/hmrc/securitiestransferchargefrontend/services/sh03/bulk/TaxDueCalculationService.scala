@@ -16,12 +16,11 @@
 
 package uk.gov.hmrc.securitiestransferchargefrontend.services.sh03.bulk
 
+import uk.gov.hmrc.securitiestransferchargefrontend.config.CurrencyFormatter
 import uk.gov.hmrc.securitiestransferchargefrontend.config.FrontendAppConfig
 import uk.gov.hmrc.securitiestransferchargefrontend.models.ReliefsDataSource
 import uk.gov.hmrc.securitiestransferchargefrontend.models.stf.fileupload.ParsedStcRow
 
-import java.text.NumberFormat
-import java.util.Locale
 import javax.inject.{Inject, Singleton}
 import scala.math.BigDecimal.RoundingMode
 import scala.util.Try
@@ -58,7 +57,6 @@ class TaxDueCalculationService @Inject()(
   }
   
   def formatCurrency(amount: BigDecimal): String = {
-    val formatter = NumberFormat.getCurrencyInstance(Locale.UK)
-    formatter.format(amount)
+    CurrencyFormatter.currencyFormat(amount)
   }
 }

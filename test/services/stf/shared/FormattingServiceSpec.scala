@@ -29,28 +29,28 @@ class FormattingServiceSpec extends SpecBase {
   "FormattingService" - {
 
     "formatTaxDue" - {
-      "must format tax due with pound sign and two decimal places" in {
+      "must format tax due with pound sign, commas and two decimal places" in {
         val taxDue = BigDecimal("1234.56")
         val result = service.formatTaxDue(taxDue)
-        result mustBe "£1234.56"
+        result mustBe "£1,234.56"
       }
 
-      "must format whole numbers with two decimal places" in {
+      "must format whole numbers without decimal places" in {
         val taxDue = BigDecimal("1000")
         val result = service.formatTaxDue(taxDue)
-        result mustBe "£1000.00"
+        result mustBe "£1,000"
       }
 
       "must format zero correctly" in {
         val taxDue = BigDecimal("0")
         val result = service.formatTaxDue(taxDue)
-        result mustBe "£0.00"
+        result mustBe "£0"
       }
 
       "must format large amounts correctly" in {
         val taxDue = BigDecimal("999999.99")
         val result = service.formatTaxDue(taxDue)
-        result mustBe "£999999.99"
+        result mustBe "£999,999.99"
       }
 
       "must format small amounts correctly" in {

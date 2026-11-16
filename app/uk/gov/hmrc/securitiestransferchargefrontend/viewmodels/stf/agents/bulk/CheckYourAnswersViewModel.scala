@@ -93,5 +93,5 @@ object CheckYourAnswersViewModel {
 }
 
 object CurrencyFormatter {
-  def formatCurrency(amount: BigDecimal): String = f"£$amount%,.2f"
+  def formatCurrency(amount: BigDecimal): String = uk.gov.hmrc.securitiestransferchargefrontend.config.CurrencyFormatter.currencyFormat(amount)
 }

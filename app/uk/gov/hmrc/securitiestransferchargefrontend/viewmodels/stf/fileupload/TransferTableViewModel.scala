@@ -16,6 +16,7 @@
 
 package uk.gov.hmrc.securitiestransferchargefrontend.viewmodels.stf.fileupload
 
+import uk.gov.hmrc.securitiestransferchargefrontend.config.CurrencyFormatter
 import uk.gov.hmrc.govukfrontend.views.viewmodels.table.TableRow
 import uk.gov.hmrc.securitiestransferchargefrontend.viewmodels.govuk.table._
 import uk.gov.hmrc.securitiestransferchargefrontend.viewmodels.stf.fileupload.Transfer
@@ -45,5 +46,5 @@ object TransferTableViewModel {
     }
 
   private def formatCurrency(value: BigDecimal): String =
-    f"£${value.setScale(2)}%,.2f"
+    CurrencyFormatter.currencyFormat(value)
 }

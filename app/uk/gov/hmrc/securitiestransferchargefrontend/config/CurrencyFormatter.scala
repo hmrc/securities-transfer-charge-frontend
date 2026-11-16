@@ -16,8 +16,21 @@
 
 package uk.gov.hmrc.securitiestransferchargefrontend.config
 
+import java.util.Locale
+import scala.math.BigDecimal.RoundingMode
+
 trait CurrencyFormatter {
-  def currencyFormat(amt: BigDecimal): String = f"£$amt%,1.2f".replace(".00","")
+
+  /**
+   * Formats an amount in GBP for display, e.g. £10.10, £100, £1,000, £3,000,000.50.
+   * Up to 2 decimal places are shown, unless the pence are zero, in which case no decimals are shown.
+   * Amounts over 3 digits are grouped with commas every three digits.
+   */
+  def currencyFormat(amt: BigDecimal): String = {
+    val rounded = amt.setScale(2, RoundingMode.HALF_UP)
+    if (rounded.isWhole) String.format(Locale.UK, "£%,.0f", rounded.bigDecimal)
+    else String.format(Locale.UK, "£%,.2f", rounded.bigDecimal)
+  }
 }
 
 object CurrencyFormatter extends CurrencyFormatter
