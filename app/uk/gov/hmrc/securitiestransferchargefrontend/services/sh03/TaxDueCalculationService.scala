@@ -16,7 +16,6 @@
 
 package uk.gov.hmrc.securitiestransferchargefrontend.services.sh03
 
-import uk.gov.hmrc.securitiestransferchargefrontend.config.CurrencyFormatter
 import uk.gov.hmrc.securitiestransferchargefrontend.config.FrontendAppConfig
 import uk.gov.hmrc.securitiestransferchargefrontend.models.stf.fileupload.ParsedStcRow
 import uk.gov.hmrc.securitiestransferchargefrontend.models.{ReliefsDataSource, UserAnswers}
@@ -93,17 +92,6 @@ class TaxDueCalculationService @Inject()(
 
       taxAfterRelief.setScale(2, RoundingMode.HALF_UP)
     }
-  }
-
-  def formatCurrency(amount: BigDecimal): String = {
-    CurrencyFormatter.currencyFormat(amount)
-  }
-  
-  def formatDate(date: LocalDate): String = {
-    val day = date.getDayOfMonth
-    val month = date.getMonth.toString.toLowerCase.capitalize
-    val year = date.getYear
-    s"$day $month $year"
   }
 
   private def getReliefPercentageForRow(row: ParsedStcRow): Option[BigDecimal] = {

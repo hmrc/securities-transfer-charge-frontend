@@ -16,7 +16,6 @@
 
 package uk.gov.hmrc.securitiestransferchargefrontend.services.sh03.bulk
 
-import uk.gov.hmrc.securitiestransferchargefrontend.config.CurrencyFormatter
 import uk.gov.hmrc.securitiestransferchargefrontend.config.FrontendAppConfig
 import uk.gov.hmrc.securitiestransferchargefrontend.models.ReliefsDataSource
 import uk.gov.hmrc.securitiestransferchargefrontend.models.stf.fileupload.ParsedStcRow
@@ -54,9 +53,5 @@ class TaxDueCalculationService @Inject()(
       reliefName <- row.whatReliefAreYouApplyingFor
       reliefData <- reliefsDataSource.reliefs.find(_.name == reliefName)
     } yield BigDecimal(reliefData.rate) / 100
-  }
-  
-  def formatCurrency(amount: BigDecimal): String = {
-    CurrencyFormatter.currencyFormat(amount)
   }
 }

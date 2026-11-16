@@ -37,14 +37,11 @@ object TransferTableViewModel {
           content = Text(transfer.securitiesBoughtIn)
         ),
         TableRowViewModel(
-          content = HtmlContent(formatCurrency(transfer.consideration))
+          content = HtmlContent(CurrencyFormatter.currencyFormat(transfer.consideration))
         ).withCssClass("govuk-table__cell--numeric"),
         TableRowViewModel(
-          content = HtmlContent(formatCurrency(transfer.taxDue))
+          content = HtmlContent(CurrencyFormatter.currencyFormat(transfer.taxDue))
         ).withCssClass("govuk-table__cell--numeric")
       )
     }
-
-  private def formatCurrency(value: BigDecimal): String =
-    CurrencyFormatter.currencyFormat(value)
 }

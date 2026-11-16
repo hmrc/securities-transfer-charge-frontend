@@ -17,7 +17,6 @@
 package services.sh03.organisations.bulk
 
 import base.{FileUploadFixtures, SpecBase}
-import org.mockito.ArgumentMatchers.eq => eqTo
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.when
 import org.scalatest.matchers.should.Matchers.shouldBe
@@ -27,7 +26,6 @@ import uk.gov.hmrc.securitiestransferchargefrontend.models.stf.fileupload.Parsed
 import uk.gov.hmrc.securitiestransferchargefrontend.models.stf.fileupload.{ParsedStcRow, ParsedStcRowsDocument}
 import uk.gov.hmrc.securitiestransferchargefrontend.services.sh03.bulk.TaxDueCalculationService
 import uk.gov.hmrc.securitiestransferchargefrontend.services.sh03.organisations.bulk.CheckYourAnswersService
-import uk.gov.hmrc.securitiestransferchargefrontend.services.stf.shared.FormattingService
 import uk.gov.hmrc.securitiestransferchargefrontend.viewmodels.sh03.organisations.bulk.{CheckYourAnswersViewModel, CompanyDetailsSummary, RoleAtPurchasingCompanySummary, Sh03Transfer}
 
 import java.time.LocalDate
@@ -37,8 +35,7 @@ class CheckYourAnswersServiceSpec extends SpecBase with FileUploadFixtures {
   implicit val lang: Lang = Lang("en")
 
   private val taxDueCalculationService = mock[TaxDueCalculationService]
-  private val formattingService = mock[FormattingService]
-  private val service = new CheckYourAnswersService(taxDueCalculationService, formattingService)
+  private val service = new CheckYourAnswersService(taxDueCalculationService)
 
   val chargingPoint: Valid[LocalDate] = Valid(LocalDate.of(2026, 5, 16))
 
@@ -72,19 +69,13 @@ class CheckYourAnswersServiceSpec extends SpecBase with FileUploadFixtures {
       when(taxDueCalculationService.calculateTaxDue(row2))
         .thenReturn(BigDecimal("125.00"))
 
-      when(taxDueCalculationService.formatCurrency(BigDecimal("200.00")))
-        .thenReturn("£200.00")
-
-      when(formattingService.formatPaymentDueDate(any[LocalDate])(any()))
-        .thenReturn("15 June 2026")
-
       val result = service.buildViewModel(document, emptyUserAnswers)(lang, messages(applicationBuilder().build()))
 
       result shouldBe CheckYourAnswersViewModel(
         companyDetailsRows = CompanyDetailsSummary.rows(emptyUserAnswers)(messages(applicationBuilder().build())),
         fileName = "test.csv",
         numberOfTransfers = 2,
-        taxDue = "£200.00",
+        taxDue = "£200",
         paymentDueBy = "15 June 2026",
         transfers = Seq(
           Sh03Transfer(
@@ -118,12 +109,6 @@ class CheckYourAnswersServiceSpec extends SpecBase with FileUploadFixtures {
       when(taxDueCalculationService.calculateTaxDue(any()))
         .thenReturn(BigDecimal("10.00"))
 
-      when(taxDueCalculationService.formatCurrency(any()))
-        .thenReturn("£20.00")
-
-      when(formattingService.formatPaymentDueDate(eqTo(LocalDate.of(2026, 1, 31)))(any()))
-        .thenReturn("31 January 2026")
-
       val result = service.buildViewModel(document, emptyUserAnswers)(lang, messages(applicationBuilder().build()))
 
       result.paymentDueBy shouldBe "31 January 2026"
@@ -142,12 +127,6 @@ class CheckYourAnswersServiceSpec extends SpecBase with FileUploadFixtures {
 
       when(taxDueCalculationService.calculateTaxDue(row2))
         .thenReturn(BigDecimal("25.75"))
-
-      when(taxDueCalculationService.formatCurrency(BigDecimal("38.25")))
-        .thenReturn("£38.25")
-
-      when(formattingService.formatPaymentDueDate(any())(any()))
-        .thenReturn("15 June 2026")
 
       val result = service.buildViewModel(document, emptyUserAnswers)(lang, messages(applicationBuilder().build()))
 

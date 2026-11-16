@@ -153,18 +153,4 @@ class TaxDueCalculationServiceSpec extends AnyWordSpec with Matchers with FileUp
     }
   }
 
-  "TaxDueCalculationService.formatCurrency" should {
-
-    "format a whole amount without decimal places" in {
-      service.formatCurrency(BigDecimal("100.00")) shouldBe "£100"
-    }
-
-    "format a large amount with commas" in {
-      service.formatCurrency(BigDecimal("1234567.89")) shouldBe "£1,234,567.89"
-    }
-
-    "format zero correctly" in {
-      service.formatCurrency(BigDecimal("0")) shouldBe "£0"
-    }
-  }
 }

@@ -16,6 +16,7 @@
 
 package viewmodels.dashboard
 
+import uk.gov.hmrc.securitiestransferchargefrontend.utils.DateTimeFormats
 import base.{Fixtures, SpecBase}
 import org.scalatestplus.play.guice.GuiceOneAppPerSuite
 import play.api.i18n.{Messages, MessagesApi}
@@ -25,14 +26,11 @@ import uk.gov.hmrc.securitiestransferchargefrontend.domain.TransferType.{SH03, S
 import uk.gov.hmrc.securitiestransferchargefrontend.models.search.*
 import uk.gov.hmrc.securitiestransferchargefrontend.models.search.SubmissionStatus.{Overdue, ReadyToPay}
 import uk.gov.hmrc.securitiestransferchargefrontend.models.submission.SubmissionDetailsSummary
-import uk.gov.hmrc.securitiestransferchargefrontend.services.stf.shared.FormattingService
 import uk.gov.hmrc.securitiestransferchargefrontend.viewmodels.dashboard.*
 
 class SubmissionDetailsViewModelSpec extends SpecBase with GuiceOneAppPerSuite {
 
   implicit private val messages: Messages = app.injector.instanceOf[MessagesApi].preferred(fakeRequest)
-
-  private val formatter = app.injector.instanceOf[FormattingService]
 
   private val readyToPayTransfer = Fixtures.readyToPaySttTransferTaxOnly
 
@@ -50,7 +48,6 @@ class SubmissionDetailsViewModelSpec extends SpecBase with GuiceOneAppPerSuite {
         transfers = transfers,
         declareeName = if (transferType == SH03) Some("James White") else None
       ),
-      formatter,
       isAgent
     )
 
@@ -69,12 +66,12 @@ class SubmissionDetailsViewModelSpec extends SpecBase with GuiceOneAppPerSuite {
       val submission = Fixtures.singleSubmissionReadyToPay
       val model = build()
 
-      model.summary mustBe SubmissionDetailsSummary.getSummary(submission, formatter, isAgent = false)
+      model.summary mustBe SubmissionDetailsSummary.getSummary(submission, isAgent = false)
     }
 
     "build the submission summary with penalties and interest rows" in {
       val submission = Fixtures.singleSubmissionOverDueWithPenaltiesAndInterest
-      val model      = SubmissionDetailsViewModel.build(submission,formatter)
+      val model      = SubmissionDetailsViewModel.build(submission)
 
       val rows = model.summary.summaryList.rows
 
@@ -319,7 +316,6 @@ class SubmissionDetailsViewModelSpec extends SpecBase with GuiceOneAppPerSuite {
 
         model.summary mustBe SubmissionDetailsSummary.getSummary(
           Fixtures.singleSubmissionReadyToPay,
-          formatter,
           isAgent = true
         )
       }
@@ -329,7 +325,6 @@ class SubmissionDetailsViewModelSpec extends SpecBase with GuiceOneAppPerSuite {
           Fixtures.singleSubmissionReadyToPay.copy(
             clientReference = Some("Reference/1234")
           ),
-          formatter,
           isAgent = true
         )
 
@@ -345,7 +340,6 @@ class SubmissionDetailsViewModelSpec extends SpecBase with GuiceOneAppPerSuite {
           Fixtures.singleSubmissionReadyToPay.copy(
             clientReference = None
           ),
-          formatter,
           isAgent = true
         )
 
@@ -389,7 +383,7 @@ class SubmissionDetailsViewModelSpec extends SpecBase with GuiceOneAppPerSuite {
       val table = tab(model, "allTransfers").table.get
 
       table.rows.head(3).content mustBe Text(
-        formatter.formatDate(readyToPayTransfer.paymentDueByDate)
+        DateTimeFormats.formatDate(readyToPayTransfer.paymentDueByDate)(messages.lang)
       )
     }
 

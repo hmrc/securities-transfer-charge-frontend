@@ -91,7 +91,3 @@ object CheckYourAnswersViewModel {
   }
   
 }
-
-object CurrencyFormatter {
-  def formatCurrency(amount: BigDecimal): String = uk.gov.hmrc.securitiestransferchargefrontend.config.CurrencyFormatter.currencyFormat(amount)
-}

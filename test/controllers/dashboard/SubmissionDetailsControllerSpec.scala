@@ -26,7 +26,6 @@ import play.api.test.FakeRequest
 import play.api.test.Helpers.*
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.dashboard.routes
 import uk.gov.hmrc.securitiestransferchargefrontend.services.DashboardService
-import uk.gov.hmrc.securitiestransferchargefrontend.services.stf.shared.FormattingService
 import uk.gov.hmrc.securitiestransferchargefrontend.viewmodels.dashboard.SubmissionDetailsViewModel
 import uk.gov.hmrc.securitiestransferchargefrontend.views.html.dashboard.SubmissionDetailsView
 
@@ -51,10 +50,9 @@ class SubmissionDetailsControllerSpec extends SpecBase {
       running(application) {
         val request = FakeRequest(GET, routes.SubmissionDetailsController.onPageLoad(testSubmissionId.toString).url)
 
-        val formatter = application.injector.instanceOf[FormattingService]
         val view = application.injector.instanceOf[SubmissionDetailsView]
         val viewModel: SubmissionDetailsViewModel =
-          SubmissionDetailsViewModel.build(singleSubmissionReadyToPay, formatter)(messages(application))
+          SubmissionDetailsViewModel.build(singleSubmissionReadyToPay)(messages(application))
 
         val result = route(application, request).value
 

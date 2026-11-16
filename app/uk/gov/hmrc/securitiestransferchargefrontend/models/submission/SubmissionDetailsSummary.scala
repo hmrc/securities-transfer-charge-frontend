@@ -16,11 +16,12 @@
 
 package uk.gov.hmrc.securitiestransferchargefrontend.models.submission
 
+import uk.gov.hmrc.securitiestransferchargefrontend.utils.DateTimeFormats
+import uk.gov.hmrc.securitiestransferchargefrontend.config.CurrencyFormatter
 import play.api.i18n.Messages
 import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.{SummaryList, SummaryListRow}
 import uk.gov.hmrc.securitiestransferchargefrontend.domain.TransferType.{Other, SH03, STF}
 import uk.gov.hmrc.securitiestransferchargefrontend.models.search.{SttSubmission, SubmissionStatus}
-import uk.gov.hmrc.securitiestransferchargefrontend.services.stf.shared.FormattingService
 import uk.gov.hmrc.securitiestransferchargefrontend.viewmodels.govuk.all.SummaryListRowViewModel
 import uk.gov.hmrc.securitiestransferchargefrontend.viewmodels.implicits.*
 import uk.gov.hmrc.securitiestransferchargefrontend.viewmodels.govuk.summarylist.*
@@ -39,15 +40,15 @@ object SubmissionDetailsSummary {
     )
   }
 
-  private def summaryList(submission: SttSubmission, formatter: FormattingService, isAgent:Boolean, isFullyPaid: Boolean)(implicit messages: Messages): SummaryList = {
-    val submissionDate = formatter.formatDate(submission.submissionDate)
+  private def summaryList(submission: SttSubmission, isAgent: Boolean, isFullyPaid: Boolean)(implicit messages: Messages): SummaryList = {
+    val submissionDate = DateTimeFormats.formatDate(submission.submissionDate)(messages.lang)
     val transferType = submission.submissionType match {
       case STF    => messages("submissionDetails.transferType.stf")
       case SH03   => messages("submissionDetails.transferType.sh03")
       case Other  => "TBC" // TODO: what do we display if transfer type is other?
     }
     val numOfTransfers = submission.numberOfTransfers.toString
-    val totalTaxDue = formatter.formatCurrency(submission.taxToPay)
+    val totalTaxDue = CurrencyFormatter.currencyFormat(submission.taxToPay)
     val reference = submission.clientReference.getOrElse(messages("submissionDetails.submission.agent.reference.notProvided"))
     val maybeYourReferenceRow = Option.when(isAgent) {
       row("submissionDetails.submission.agent.reference", reference)
@@ -59,7 +60,7 @@ object SubmissionDetailsSummary {
       "submissionDetails.submission.filingPenalties" -> submission.lateFilingPenaltiesToPay,
       "submissionDetails.submission.paymentPenalties" -> submission.latePaymentPenaltiesToPay,
       "submissionDetails.submission.paymentInterest" -> submission.latePaymentInterestToPay
-    ).collect { case (key, amount) if amount > 0 => row(key, formatter.formatCurrency(amount)) }
+    ).collect { case (key, amount) if amount > 0 => row(key, CurrencyFormatter.currencyFormat(amount)) }
 
     val border = if maybePenaltiesRows.isEmpty then "no-bottom-border" else ""
 
@@ -88,13 +89,13 @@ object SubmissionDetailsSummary {
     SummaryList(rows = rows, classes = if isFullyPaid then "govuk-!-margin-bottom-0" else "")
   }
 
-  def getSummary(submission: SttSubmission, formatter: FormattingService, isAgent: Boolean)(implicit messages: Messages): SubmissionDetailsSummary = {
+  def getSummary(submission: SttSubmission, isAgent: Boolean)(implicit messages: Messages): SubmissionDetailsSummary = {
     val isFullyPaid = submission.submissionStatus == SubmissionStatus.Paid
 
     SubmissionDetailsSummary(
-      total = formatter.formatCurrency(submission.totalToPay),
-      paymentDueBy = formatter.formatDate(submission.paymentDueByDate),
-      summaryList = summaryList(submission, formatter, isAgent, isFullyPaid),
+      total = CurrencyFormatter.currencyFormat(submission.totalToPay),
+      paymentDueBy = DateTimeFormats.formatDate(submission.paymentDueByDate)(messages.lang),
+      summaryList = summaryList(submission, isAgent, isFullyPaid),
       isFullyPaid = isFullyPaid
     )
   }

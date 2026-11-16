@@ -16,8 +16,9 @@
 
 package views.dashboard
 
+import uk.gov.hmrc.securitiestransferchargefrontend.utils.DateTimeFormats
+import uk.gov.hmrc.securitiestransferchargefrontend.config.CurrencyFormatter
 import base.Fixtures.*
-import uk.gov.hmrc.securitiestransferchargefrontend.services.stf.shared.FormattingService
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
 import play.api.Application
@@ -36,13 +37,12 @@ import scala.jdk.CollectionConverters.*
 class SubmissionDetailsViewSpec extends ViewBaseSpec {
 
   private val viewInstance = app.injector.instanceOf[SubmissionDetailsView]
-  private val formatter = app.injector.instanceOf[FormattingService]
 
   override def fakeApplication(): Application =
     applicationBuilder().build()
 
   def view(submission: SttSubmission): Document = Jsoup.parse(
-    viewInstance(SubmissionDetailsViewModel.build(submission, formatter))(fakeRequest, messages).body
+    viewInstance(SubmissionDetailsViewModel.build(submission))(fakeRequest, messages).body
   )
 
   class ExpectedContent(submission: SttSubmission) {
@@ -53,13 +53,13 @@ class SubmissionDetailsViewSpec extends ViewBaseSpec {
     val submissionsBreadcrumb: String = messages("breadcrumbs.submissions")
 
     val print: String = messages("submissionDetails.print")
-    val total: String = formatter.formatCurrency(submission.totalToPay)
+    val total: String = CurrencyFormatter.currencyFormat(submission.totalToPay)
     val totalHeading: String = messages("submissionDetails.total.heading", total)
 
     val paymentDueBy: String = messages("submissionDetails.paymentDueBy")
-    val dueDate: String = formatter.formatDate(submission.paymentDueByDate)
+    val dueDate: String = DateTimeFormats.formatDate(submission.paymentDueByDate)(messages.lang)
 
-    val submissionDate: String = formatter.formatDate(submission.submissionDate)
+    val submissionDate: String = DateTimeFormats.formatDate(submission.submissionDate)(messages.lang)
     val submissionDateLabel: String = messages("submissionDetails.submission.date")
 
     val submissionType: String = submission.submissionType match {
@@ -73,7 +73,7 @@ class SubmissionDetailsViewSpec extends ViewBaseSpec {
       "submissionDetails.submission.paymentPenalties" -> submission.latePaymentPenaltiesToPay,
       "submissionDetails.submission.paymentInterest" -> submission.latePaymentInterestToPay
     ).collect {
-      case (key, amount) if amount > 0 => messages(key) -> formatter.formatCurrency(amount)
+      case (key, amount) if amount > 0 => messages(key) -> CurrencyFormatter.currencyFormat(amount)
     }
 
     val submissionTypeLabel: String = messages("submissionDetails.submission.type")
@@ -81,7 +81,7 @@ class SubmissionDetailsViewSpec extends ViewBaseSpec {
     val numberOfTransfers: String = submission.numberOfTransfers.toString
     val transfersLabel: String = messages("submissionDetails.submission.transfers")
 
-    val totalTax: String = formatter.formatCurrency(submission.taxToPay)
+    val totalTax: String = CurrencyFormatter.currencyFormat(submission.taxToPay)
     val totalTaxDueLabel: String = messages("submissionDetails.submission.totalTaxDue")
 
     val payForSubmission: String = messages("submissionDetails.submission.payForSubmission")

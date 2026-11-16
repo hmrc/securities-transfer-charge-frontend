@@ -16,6 +16,8 @@
 
 package uk.gov.hmrc.securitiestransferchargefrontend.controllers
 
+import uk.gov.hmrc.securitiestransferchargefrontend.utils.DateTimeFormats
+import uk.gov.hmrc.securitiestransferchargefrontend.config.CurrencyFormatter
 import play.api.i18n.{I18nSupport, Lang, Messages}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
@@ -25,7 +27,6 @@ import uk.gov.hmrc.securitiestransferchargefrontend.models.ConfirmationViewModel
 import uk.gov.hmrc.securitiestransferchargefrontend.models.submission.BulkConfirmationDetails
 import uk.gov.hmrc.securitiestransferchargefrontend.pages.BulkConfirmationDetailsPage
 import uk.gov.hmrc.securitiestransferchargefrontend.repositories.{SessionRepository, TransactionResponseRepository}
-import uk.gov.hmrc.securitiestransferchargefrontend.services.stf.shared.FormattingService
 import uk.gov.hmrc.securitiestransferchargefrontend.views.html.shared.ConfirmationView
 
 import javax.inject.{Inject, Named}
@@ -38,8 +39,7 @@ class ConfirmationController @Inject()(
                                         requireData: StcDataRequiredAction,
                                         sessionRepository: SessionRepository,
                                         transactionResponseRepository: TransactionResponseRepository,
-                                        view: ConfirmationView,
-                                        formatter: FormattingService
+                                        view: ConfirmationView
                                       )(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport {
 
   def onPageLoad(): Action[AnyContent] = (stcAuthEnrolled andThen getData andThen requireData).async { implicit request =>
@@ -55,9 +55,9 @@ class ConfirmationController @Inject()(
       case Some(details) =>
         Future.successful(Ok(view(ConfirmationViewModel(
           submissionId = details.submissionId.value,
-          paymentDueBy = formatter.formatPaymentDueDate(details.paymentDueBy),
+          paymentDueBy = DateTimeFormats.formatDate(details.paymentDueBy),
           reference = details.agentReference,
-          taxDue = formatter.formatCurrency(details.taxDue),
+          taxDue = CurrencyFormatter.currencyFormat(details.taxDue),
           isAgent = isAgent,
           journeyType = userAnswers.journeyType,
           isBulk = true
@@ -67,9 +67,9 @@ class ConfirmationController @Inject()(
         transactionResponseRepository.retrieve(userAnswers.submissionId).map { responseDetails =>
           val viewModel = ConfirmationViewModel(
             submissionId = userAnswers.submissionId.value,
-            paymentDueBy = formatter.formatPaymentDueDate(responseDetails.paymentDueBy),
+            paymentDueBy = DateTimeFormats.formatDate(responseDetails.paymentDueBy),
             reference = responseDetails.agentReference,
-            taxDue = formatter.formatCurrency(responseDetails.taxDue),
+            taxDue = CurrencyFormatter.currencyFormat(responseDetails.taxDue),
             isAgent = isAgent,
             journeyType = userAnswers.journeyType,
             isBulk = false

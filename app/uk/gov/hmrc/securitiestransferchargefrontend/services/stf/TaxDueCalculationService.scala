@@ -16,7 +16,6 @@
 
 package uk.gov.hmrc.securitiestransferchargefrontend.services.stf
 
-import uk.gov.hmrc.securitiestransferchargefrontend.config.CurrencyFormatter
 import uk.gov.hmrc.securitiestransferchargefrontend.models.{ReliefsDataSource, UserAnswers}
 import uk.gov.hmrc.securitiestransferchargefrontend.models.stf.TaxRate
 import uk.gov.hmrc.securitiestransferchargefrontend.pages.stf.single._
@@ -74,16 +73,5 @@ class TaxDueCalculationService @Inject()(reliefsDataSource: ReliefsDataSource) {
 
   def calculatePaymentDueDate(userAnswers: UserAnswers): Option[LocalDate] = {
     userAnswers.get(ChargingPointPage).map(_.plusDays(30))
-  }
-
-  def formatTaxDue(taxDue: BigDecimal): String = {
-    CurrencyFormatter.currencyFormat(taxDue)
-  }
-
-  def formatDate(date: LocalDate): String = {
-    val day = date.getDayOfMonth
-    val month = date.getMonth.toString.toLowerCase.capitalize
-    val year = date.getYear
-    s"$day $month $year"
   }
 }
