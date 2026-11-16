@@ -24,6 +24,7 @@
 @import uk.gov.hmrc.securitiestransferchargefrontend.controllers.auth.{routes => authRoutes}
 @import uk.gov.hmrc.securitiestransferchargefrontend.controllers.dashboard.routes.DashboardController
 @import uk.gov.hmrc.hmrcfrontend.views.html.helpers.{HmrcAccessibleAutocompleteCss, HmrcAccessibleAutocompleteJavascript}
+@import uk.gov.hmrc.govukfrontend.views.Implicits.RichServiceNavigation
 
 
 @this(
@@ -60,6 +61,32 @@
 <link @{CSPNonce.attr} href="@routes.Assets.versioned("stylesheets/application.css").url" media="screen" rel="stylesheet" type="text/css" />
 }
 
+@dashboardUrl = @{ DashboardController.onPageLoad().url }
+
+@isDashboardPage = @{
+    val dashboardBase = dashboardUrl.stripSuffix("/")
+    Set(dashboardBase, s"$dashboardBase/dashboard").contains(rh.path.stripSuffix("/"))
+}
+
+@baseServiceNavigation = @{
+    ServiceNavigation(
+        serviceName = Some(messages("service.navigation.name")),
+        serviceUrl  = Some(dashboardUrl),
+        navigation  = Seq(
+            ServiceNavigationItem(
+                content = Text(messages("service.navigation.dashboard")),
+                href    = dashboardUrl,
+                current = isDashboardPage
+            )
+        )
+    )
+}
+
+@serviceNavigation = @{
+    if (appConfig.languageTranslationEnabled) baseServiceNavigation.withLanguageToggle()
+    else baseServiceNavigation
+}
+
 @content = {
     @contentBlock
     @hmrcReportTechnicalIssueHelper()
@@ -83,10 +110,10 @@
         mainContentLayout = mainContentLayout
     ),
     serviceURLs = ServiceURLs(
-        serviceUrl = Some(DashboardController.onPageLoad().url),
+        serviceUrl = Some(dashboardUrl),
         signOutUrl = if(showSignOut) Some(authRoutes.AuthController.signOut().url) else None
     ),
-    serviceName = Some(""),
+    serviceNavigation = Some(serviceNavigation),
     banners = Banners(
         displayHmrcBanner = showHmrcBanner,
         phaseBanner = Some(betaBanner(appConfig.feedbackUrl))
