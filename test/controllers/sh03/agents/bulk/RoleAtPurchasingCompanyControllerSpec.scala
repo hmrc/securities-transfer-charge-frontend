@@ -17,20 +17,25 @@
 package controllers.sh03.agents.bulk
 
 import base.SpecBase
+import org.mockito.ArgumentCaptor
 import org.mockito.ArgumentMatchers.any
-import org.mockito.Mockito.when
+import org.mockito.Mockito.{never, verify, when}
 import org.scalatestplus.mockito.MockitoSugar.mock
 import play.api.data.Form
 import play.api.inject.bind
 import play.api.test.FakeRequest
 import play.api.test.Helpers.*
+import uk.gov.hmrc.http.HeaderCarrier
+import uk.gov.hmrc.securitiestransferchargefrontend.controllers.dashboard.routes as dashboardRoutes
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.routes.JourneyRecoveryController
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.sh03.agents.bulk.routes
+import uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.shared.SaveAndReturnButton.saveAndReturnButtonName
 import uk.gov.hmrc.securitiestransferchargefrontend.forms.sh03.shared.RoleAtPurchasingCompanyFormProvider
-import uk.gov.hmrc.securitiestransferchargefrontend.models.NormalMode
+import uk.gov.hmrc.securitiestransferchargefrontend.models.{NormalMode, UserAnswers}
 import uk.gov.hmrc.securitiestransferchargefrontend.models.sh03.shared.RoleAtPurchasingCompany
 import uk.gov.hmrc.securitiestransferchargefrontend.navigation.Navigator
 import uk.gov.hmrc.securitiestransferchargefrontend.pages.sh03.bulk.BulkRoleAtPurchasingCompanyPage
+import uk.gov.hmrc.securitiestransferchargefrontend.repositories.SessionRepository
 import uk.gov.hmrc.securitiestransferchargefrontend.services.AnswerPersistenceService
 import uk.gov.hmrc.securitiestransferchargefrontend.views.html.sh03.agents.bulk.RoleAtPurchasingCompanyView
 
@@ -48,6 +53,12 @@ class RoleAtPurchasingCompanyControllerSpec extends SpecBase {
 
   val validData: RoleAtPurchasingCompany = RoleAtPurchasingCompany("director", None)
   val validUkSocietasData: RoleAtPurchasingCompany = RoleAtPurchasingCompany("ukSocietas", Some("Management Board"))
+
+  private def savedAnswers(answerPersistenceService: AnswerPersistenceService): UserAnswers = {
+    val captor = ArgumentCaptor.forClass(classOf[UserAnswers])
+    verify(answerPersistenceService).save(captor.capture())(any[HeaderCarrier])
+    captor.getValue
+  }
 
   "RoleAtPurchasingCompany Controller" - {
 
@@ -265,6 +276,81 @@ class RoleAtPurchasingCompanyControllerSpec extends SpecBase {
 
         status(result) mustEqual SEE_OTHER
         redirectLocation(result).value mustEqual JourneyRecoveryController.onPageLoad().url
+      }
+    }
+
+    "when an unsupported role is submitted" - {
+
+      val unsupportedRoleData = RoleAtPurchasingCompany(RoleAtPurchasingCompany.unsupportedRole, None)
+
+      "must remove the role and redirect to the cannot submit page with Save and continue" in {
+
+        val answerPersistenceService = mock[AnswerPersistenceService]
+        when(answerPersistenceService.save(any[UserAnswers])(any[HeaderCarrier])).thenReturn(Future.unit)
+        val sessionRepository = mock[SessionRepository]
+        val navigator = mock[Navigator]
+
+        val userAnswers = emptyUserAnswers
+          .set(BulkRoleAtPurchasingCompanyPage, unsupportedRoleData).success.value
+          .setFileUploadReference(reference)
+
+        val application = applicationBuilder(userAnswers = Some(userAnswers), sessionRepository = sessionRepository)
+          .overrides(
+            bind[Navigator].qualifiedWith("agentsSh03").toInstance(navigator),
+            bind[AnswerPersistenceService].toInstance(answerPersistenceService)
+          )
+          .build()
+
+        running(application) {
+          val request =
+            FakeRequest(POST, roleAtPurchasingCompanyRoute)
+              .withFormUrlEncodedBody(("role", RoleAtPurchasingCompany.unsupportedRole))
+
+          val result = route(application, request).value
+
+          status(result) mustEqual SEE_OTHER
+          redirectLocation(result).value mustEqual routes.CannotSubmitFormErrorController.onPageLoad().url
+
+          val saved = savedAnswers(answerPersistenceService)
+          saved.get(BulkRoleAtPurchasingCompanyPage) mustBe None
+          saved.fileUploadReference mustBe Some(reference)
+          saved.nextPage mustBe Some(routes.CannotSubmitFormErrorController.onPageLoad())
+          verify(navigator, never()).nextPage(any(), any(), any(), any())(any())
+          verify(sessionRepository, never()).clear(any())
+        }
+      }
+
+      "must remove the role, clear the session and redirect to the dashboard with Save and return to dashboard" in {
+
+        val answerPersistenceService = mock[AnswerPersistenceService]
+        when(answerPersistenceService.save(any[UserAnswers])(any[HeaderCarrier])).thenReturn(Future.unit)
+        val sessionRepository = mock[SessionRepository]
+        when(sessionRepository.clear(any())).thenReturn(Future.unit)
+
+        val userAnswersWithRef = emptyUserAnswers.setFileUploadReference(reference)
+
+        val application = applicationBuilder(userAnswers = Some(userAnswersWithRef), sessionRepository = sessionRepository)
+          .overrides(
+            bind[Navigator].qualifiedWith("agentsSh03").toInstance(getNavigator),
+            bind[AnswerPersistenceService].toInstance(answerPersistenceService)
+          )
+          .build()
+
+        running(application) {
+          val request =
+            FakeRequest(POST, roleAtPurchasingCompanyRoute)
+              .withFormUrlEncodedBody(("role", RoleAtPurchasingCompany.unsupportedRole), (saveAndReturnButtonName, ""))
+
+          val result = route(application, request).value
+
+          status(result) mustEqual SEE_OTHER
+          redirectLocation(result).value mustEqual dashboardRoutes.DashboardController.onPageLoad().url
+
+          val saved = savedAnswers(answerPersistenceService)
+          saved.get(BulkRoleAtPurchasingCompanyPage) mustBe None
+          saved.fileUploadReference mustBe Some(reference)
+          verify(sessionRepository).clear(userAnswersWithRef.userId)
+        }
       }
     }
     

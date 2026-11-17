@@ -17,16 +17,19 @@
 package uk.gov.hmrc.securitiestransferchargefrontend.controllers.sh03.organisations.bulk
 
 import play.api.i18n.{I18nSupport, MessagesApi}
-import play.api.mvc.{Action, AnyContent, Call, MessagesControllerComponents}
+import play.api.mvc.{Action, AnyContent, Call, MessagesControllerComponents, Result}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.actions.*
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.actions.requests.StcDataRequest
+import uk.gov.hmrc.securitiestransferchargefrontend.controllers.dashboard.routes as dashboardRoutes
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.routes.JourneyRecoveryController
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.shared.SaveAndReturnButton.isReturn
 import uk.gov.hmrc.securitiestransferchargefrontend.forms.sh03.shared.RoleAtPurchasingCompanyFormProvider
+import uk.gov.hmrc.securitiestransferchargefrontend.models.sh03.shared.RoleAtPurchasingCompany
 import uk.gov.hmrc.securitiestransferchargefrontend.models.{Mode, UserAnswers}
 import uk.gov.hmrc.securitiestransferchargefrontend.navigation.Navigator
 import uk.gov.hmrc.securitiestransferchargefrontend.pages.sh03.bulk.BulkRoleAtPurchasingCompanyPage
+import uk.gov.hmrc.securitiestransferchargefrontend.repositories.SessionRepository
 import uk.gov.hmrc.securitiestransferchargefrontend.services.AnswerPersistenceService
 import uk.gov.hmrc.securitiestransferchargefrontend.views.html.sh03.organisations.bulk.RoleAtPurchasingCompanyView
 
@@ -43,7 +46,8 @@ class RoleAtPurchasingCompanyController @Inject()(
                                                    formProvider: RoleAtPurchasingCompanyFormProvider,
                                                    val controllerComponents: MessagesControllerComponents,
                                                    view: RoleAtPurchasingCompanyView,
-                                                   answerPersistenceService: AnswerPersistenceService
+                                                   answerPersistenceService: AnswerPersistenceService,
+                                                   sessionRepository: SessionRepository
                                                  )(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport {
 
   private def form(implicit request: StcDataRequest[_]) =
@@ -81,6 +85,9 @@ class RoleAtPurchasingCompanyController @Inject()(
 
         value =>
           Try(request.userAnswers.getFileUploadReference()).toOption match {
+            case Some(_) if value.role == RoleAtPurchasingCompany.unsupportedRole =>
+              removeRoleAndRedirect
+
             case Some(_) =>
               for {
                 updatedAnswers <- Future.fromTry(request.userAnswers.set(BulkRoleAtPurchasingCompanyPage, value))
@@ -92,5 +99,14 @@ class RoleAtPurchasingCompanyController @Inject()(
               Future.successful(Redirect(JourneyRecoveryController.onPageLoad()))
           }
       )
+  }
+
+  private def removeRoleAndRedirect(implicit request: StcDataRequest[AnyContent]): Future[Result] = {
+    val cannotSubmitPage = routes.CannotSubmitFormErrorController.onPageLoad()
+    for {
+      updatedAnswers <- Future.fromTry(request.userAnswers.remove(BulkRoleAtPurchasingCompanyPage))
+      _              <- answerPersistenceService.save(updatedAnswers.setNextPage(cannotSubmitPage))
+      _              <- if (isReturn(request)) sessionRepository.clear(updatedAnswers.userId) else Future.unit
+    } yield Redirect(if (isReturn(request)) dashboardRoutes.DashboardController.onPageLoad() else cannotSubmitPage)
   }
 }
