@@ -97,7 +97,8 @@ object DashboardService:
       maybePaymentDueBy   = None,
       maybeAgentReference = uas.maybeAgentReference,
       status              = Draft,
-      sortDate            = LocalDate.ofInstant(uas.lastUpdated, DateTimeFormats.ukZoneId)
+      sortDate            = LocalDate.ofInstant(uas.lastUpdated, DateTimeFormats.ukZoneId),
+      lastUpdated         = Some(uas.lastUpdated)
     )
 
   private[services] val submissionDueBy: Seq[EtmpChargeDetail] => Option[LocalDate] = charges =>
