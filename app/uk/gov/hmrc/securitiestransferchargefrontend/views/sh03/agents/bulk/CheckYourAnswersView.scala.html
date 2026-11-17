@@ -90,22 +90,9 @@
     </ul>
     </div>
 
-    <div class="govuk-button-group">
+    @formHelper(action = agentRoutes.CheckYourAnswersController.onSubmit()) {
 
-        @formHelper(action = agentRoutes.CheckYourAnswersController.onSubmit()) {
-
-            @govukButton(
-                ButtonViewModel(
-                    messages(CheckYourAnswersViewModel.MessageKeys.acceptAndSend)
-                )
-            )
-            @govukButton(
-                ButtonViewModel(
-                    messages(CheckYourAnswersViewModel.MessageKeys.saveAndReturn)
-                )
-                .asSecondaryButton()
-                .asLink(sharedRoutes.YourFileWillNotBeSavedController.onPageLoad().url)
-            )
-        }
-    </div>
+            @govukButton(ButtonViewModel(messages(CheckYourAnswersViewModel.MessageKeys.acceptAndSend)))
+            @saveAndReturnButton()
+    }
 }

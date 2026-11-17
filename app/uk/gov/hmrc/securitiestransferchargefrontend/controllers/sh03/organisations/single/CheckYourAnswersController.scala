@@ -23,6 +23,7 @@ import play.twirl.api.HtmlFormat
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.actions.*
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.actions.requests.StcDataRequest
+import uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.shared.SaveAndReturnButton.isReturn
 import uk.gov.hmrc.securitiestransferchargefrontend.models.{Mode, NormalMode, UserAnswers}
 import uk.gov.hmrc.securitiestransferchargefrontend.navigation.Navigator
 import uk.gov.hmrc.securitiestransferchargefrontend.pages.sh03.shared.CheckYourAnswersPage
@@ -94,6 +95,9 @@ class CheckYourAnswersController @Inject()(
   }
 
   def onSubmit(): Action[AnyContent] = (stcAuthEnrolled andThen getData andThen requireData).async { implicit request =>
+    if isReturn(request) then
+      navigator.returnToDashboard(request.userAnswers).map(Redirect)
+    else
     transactionSubmissionService
       .submitSingleSh03
       .flatMap(nextUrl)

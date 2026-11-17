@@ -24,6 +24,7 @@ import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.SummaryListRow
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.actions.*
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.actions.requests.StcDataRequest
+import uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.shared.SaveAndReturnButton.isReturn
 import uk.gov.hmrc.securitiestransferchargefrontend.models.{Mode, NormalMode, UserAnswers}
 import uk.gov.hmrc.securitiestransferchargefrontend.navigation.Navigator
 import uk.gov.hmrc.securitiestransferchargefrontend.pages.stf.shared.*
@@ -100,18 +101,19 @@ class CheckYourAnswersController @Inject()(
   }
   
   def onSubmit(): Action[AnyContent] = (stcAuthEnrolled andThen getData andThen requireData).async { implicit request =>
-    transactionSubmissionService
-      .submitSingleStf
-      .flatMap(nextUrl)
-      .map(Redirect)
+    if isReturn(request) then
+      navigator.returnToDashboard(request.userAnswers).map(Redirect)
+    else
+      transactionSubmissionService
+        .submitSingleStf
+        .flatMap(nextUrl)
+        .map(Redirect)
   }
   
   private def nextUrl(success: Boolean)(implicit request: StcDataRequest[?]): Future[Call] =
     if success then navigator.nextPage(CheckYourAnswersPage, NormalMode, TransactionSubmissionService.clearedUserAnswers(request))
     else Future.successful(navigator.errorPage(CheckYourAnswersPage))
-  
-  
-  
+
   def buildYourDetailsRows(userAnswers: UserAnswers)(implicit messages: Messages): Seq[SummaryListRow] = {
     val addressRow = userAnswers.get(ConfirmAddressPage)
       .map(_ => ConfirmAddressSummary.row(userAnswers))

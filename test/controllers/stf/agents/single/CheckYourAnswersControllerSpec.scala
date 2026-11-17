@@ -20,18 +20,26 @@ import base.SpecBase
 import base.stubs.StubPersistentNavigator
 import clients.StubEtmpSubmissionClient
 import com.google.inject.name.Names
+import org.mockito.ArgumentMatchers.{any, anyBoolean, eq as eqTo}
+import org.mockito.Mockito.{never, verify, when}
+import org.scalatestplus.mockito.MockitoSugar.mock
 import play.api.inject.bind
+import play.api.mvc.Call
 import play.api.test.FakeRequest
 import play.api.test.Helpers.*
 import uk.gov.hmrc.securitiestransferchargefrontend.clients.EtmpSubmissionClient
+import uk.gov.hmrc.securitiestransferchargefrontend.controllers.actions.requests.StcDataRequest
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.agents.single.routes
+import uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.shared.SaveAndReturnButton.saveAndReturnButtonName
 import uk.gov.hmrc.securitiestransferchargefrontend.models.CheckMode
 import uk.gov.hmrc.securitiestransferchargefrontend.models.stf.*
-import uk.gov.hmrc.securitiestransferchargefrontend.navigation.{Navigator, PersistentNavigator}
-import uk.gov.hmrc.securitiestransferchargefrontend.pages.stf.shared.HowToNotifyAboutSecuritiesTransferPage
+import uk.gov.hmrc.securitiestransferchargefrontend.navigation.Navigator
+import uk.gov.hmrc.securitiestransferchargefrontend.pages.stf.shared.{CheckYourAnswersPage, HowToNotifyAboutSecuritiesTransferPage}
 import uk.gov.hmrc.securitiestransferchargefrontend.pages.stf.single.*
+import uk.gov.hmrc.securitiestransferchargefrontend.services.TransactionSubmissionService
 
 import java.time.LocalDate
+import scala.concurrent.Future
 
 class CheckYourAnswersControllerSpec extends SpecBase {
 
@@ -63,8 +71,7 @@ class CheckYourAnswersControllerSpec extends SpecBase {
 
       val application = applicationBuilder(userAnswers = Some(completeUserAnswers))
         .overrides(
-          bind[Navigator].qualifiedWith(Names.named("agents")).toInstance(stubNavigator),
-          bind[PersistentNavigator].qualifiedWith(Names.named("agents")).toInstance(stubNavigator)
+          bind[Navigator].qualifiedWith(Names.named("agents")).toInstance(stubNavigator)
         )
         .build()
 
@@ -96,7 +103,6 @@ class CheckYourAnswersControllerSpec extends SpecBase {
       val application = applicationBuilder(userAnswers = Some(completeUserAnswers))
         .overrides(
           bind[Navigator].qualifiedWith(Names.named("agents")).toInstance(stubNavigator),
-          bind[PersistentNavigator].qualifiedWith(Names.named("agents")).toInstance(stubNavigator),
           bind[EtmpSubmissionClient].toInstance(stubEtmpSubmissionClient)
         )
         .build()
@@ -107,6 +113,65 @@ class CheckYourAnswersControllerSpec extends SpecBase {
 
         status(result) mustEqual SEE_OTHER
         redirectLocation(result).value mustEqual testNextPage.url
+      }
+    }
+
+    "must return to the dashboard without submitting when Save and return is clicked" in {
+      val mockNavigator = mock[Navigator]
+      val mockTransactionSubmissionService = mock[TransactionSubmissionService]
+      val testDashboardCall = Call("GET", "/test-dashboard")
+
+      when(mockNavigator.returnToDashboard(any())).thenReturn(Future.successful(testDashboardCall))
+
+      val application = applicationBuilder(userAnswers = Some(completeUserAnswers))
+        .overrides(
+          bind[Navigator].qualifiedWith(Names.named("agents")).toInstance(mockNavigator),
+          bind[TransactionSubmissionService].toInstance(mockTransactionSubmissionService)
+        )
+        .build()
+
+      running(application) {
+        val request =
+          FakeRequest(POST, routes.CheckYourAnswersController.onSubmit().url)
+            .withFormUrlEncodedBody(saveAndReturnButtonName -> "")
+
+        val result = route(application, request).value
+
+        status(result) mustEqual SEE_OTHER
+        redirectLocation(result).value mustEqual testDashboardCall.url
+
+        verify(mockNavigator).returnToDashboard(any())
+        verify(mockNavigator, never()).nextPage(any(), any(), any(), anyBoolean())(any())
+        verify(mockTransactionSubmissionService, never()).submitSingleStf(using any[StcDataRequest[?]]())
+      }
+    }
+
+    "must redirect to the error page when the submission fails" in {
+      val mockNavigator = mock[Navigator]
+      val mockTransactionSubmissionService = mock[TransactionSubmissionService]
+
+      when(mockTransactionSubmissionService.submitSingleStf(using any[StcDataRequest[?]]()))
+        .thenReturn(Future.successful(false))
+      when(mockNavigator.errorPage(any())).thenReturn(testErrorPage)
+
+      val application = applicationBuilder(userAnswers = Some(completeUserAnswers))
+        .overrides(
+          bind[Navigator].qualifiedWith(Names.named("agents")).toInstance(mockNavigator),
+          bind[TransactionSubmissionService].toInstance(mockTransactionSubmissionService)
+        )
+        .build()
+
+      running(application) {
+        val request = FakeRequest(POST, routes.CheckYourAnswersController.onSubmit().url)
+        val result = route(application, request).value
+
+        status(result) mustEqual SEE_OTHER
+        redirectLocation(result).value mustEqual testErrorPage.url
+
+        verify(mockTransactionSubmissionService).submitSingleStf(using any[StcDataRequest[?]]())
+        verify(mockNavigator).errorPage(eqTo(CheckYourAnswersPage))
+        verify(mockNavigator, never()).nextPage(any(), any(), any(), anyBoolean())(any())
+        verify(mockNavigator, never()).returnToDashboard(any())
       }
     }
 
@@ -284,8 +349,7 @@ class CheckYourAnswersControllerSpec extends SpecBase {
 
       val application = applicationBuilder(userAnswers = Some(answersWithNoCRN))
         .overrides(
-          bind[Navigator].qualifiedWith(Names.named("agents")).toInstance(stubNavigator),
-          bind[PersistentNavigator].qualifiedWith(Names.named("agents")).toInstance(stubNavigator)
+          bind[Navigator].qualifiedWith(Names.named("agents")).toInstance(stubNavigator)
         )
         .build()
 

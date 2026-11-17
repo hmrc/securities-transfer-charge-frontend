@@ -20,17 +20,26 @@ import base.SpecBase
 import base.stubs.StubPersistentNavigator
 import clients.StubEtmpSubmissionClient
 import com.google.inject.name.Names
+import org.mockito.ArgumentMatchers.{any, anyBoolean, eq as eqTo}
+import org.mockito.Mockito.{never, verify, when}
+import org.scalatestplus.mockito.MockitoSugar.mock
 import play.api.inject.bind
+import play.api.mvc.Call
 import play.api.test.FakeRequest
 import play.api.test.Helpers.*
 import uk.gov.hmrc.securitiestransferchargefrontend.clients.EtmpSubmissionClient
+import uk.gov.hmrc.securitiestransferchargefrontend.controllers.actions.requests.StcDataRequest
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.individuals.single.routes
+import uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.shared.SaveAndReturnButton.saveAndReturnButtonName
 import uk.gov.hmrc.securitiestransferchargefrontend.models.CheckMode
 import uk.gov.hmrc.securitiestransferchargefrontend.models.stf.*
-import uk.gov.hmrc.securitiestransferchargefrontend.navigation.{Navigator, PersistentNavigator}
+import uk.gov.hmrc.securitiestransferchargefrontend.navigation.Navigator
+import uk.gov.hmrc.securitiestransferchargefrontend.pages.stf.shared.CheckYourAnswersPage
 import uk.gov.hmrc.securitiestransferchargefrontend.pages.stf.single.*
+import uk.gov.hmrc.securitiestransferchargefrontend.services.TransactionSubmissionService
 
 import java.time.LocalDate
+import scala.concurrent.Future
 
 class CheckYourAnswersControllerSpec extends SpecBase {
 
@@ -55,388 +64,446 @@ class CheckYourAnswersControllerSpec extends SpecBase {
   }
 
   "CheckYourAnswersController" - {
-
-    "must return OK and the correct view for a GET" in {
-      val stubNavigator = new StubPersistentNavigator(testNextPage, completeUserAnswers, "stf", "")
-
-      val application = applicationBuilder(userAnswers = Some(completeUserAnswers))
-        .overrides(
-          bind[Navigator].qualifiedWith(Names.named("individuals")).toInstance(stubNavigator),
-          bind[PersistentNavigator].qualifiedWith(Names.named("individuals")).toInstance(stubNavigator)
-        )
-        .build()
-
-      running(application) {
-        val request = FakeRequest(GET, routes.CheckYourAnswersController.onPageLoad().url)
-        val result = route(application, request).value
-
-        status(result) mustEqual OK
-        contentAsString(result) must include("Check your answers")
-      }
-    }
-
-    "must redirect to Journey Recovery for a GET if no existing data is found" in {
-      val application = applicationBuilder(userAnswers = None).build()
-
-      running(application) {
-        val request = FakeRequest(GET, routes.CheckYourAnswersController.onPageLoad().url)
-        val result = route(application, request).value
-
-        status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual uk.gov.hmrc.securitiestransferchargefrontend.controllers.routes.JourneyRecoveryController.onPageLoad().url
-      }
-    }
-
-    "must redirect to next page for a POST" in {
-      val stubNavigator = new StubPersistentNavigator(testNextPage, completeUserAnswers, "stf", "")
-      val stubEtmpSubmissionClient = new StubEtmpSubmissionClient()
-
-
-      val application = applicationBuilder(userAnswers = Some(completeUserAnswers))
-        .overrides(
-          bind[Navigator].qualifiedWith(Names.named("individuals")).toInstance(stubNavigator),
-          bind[PersistentNavigator].qualifiedWith(Names.named("individuals")).toInstance(stubNavigator),
-          bind[EtmpSubmissionClient].toInstance(stubEtmpSubmissionClient)
-        )
-        .build()
-
-      running(application) {
-        val request = FakeRequest(POST, routes.CheckYourAnswersController.onSubmit().url)
-        val result = route(application, request).value
-
-        status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual testNextPage.url
-      }
-    }
-
-    "must redirect to Journey Recovery for a POST if no existing data is found" in {
-      val application = applicationBuilder(userAnswers = None).build()
-
-      running(application) {
-        val request = FakeRequest(POST, routes.CheckYourAnswersController.onSubmit().url)
-        val result = route(application, request).value
-
-        status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual uk.gov.hmrc.securitiestransferchargefrontend.controllers.routes.JourneyRecoveryController.onPageLoad().url
-      }
-    }
-
-    "must redirect to NameOfSellerPage when NameOfSellerPage data is missing" in {
-      val incompleteAnswers = completeUserAnswers.remove(NameOfSellerPage).success.value
-
-      val application = applicationBuilder(userAnswers = Some(incompleteAnswers)).build()
-
-      running(application) {
-        val request = FakeRequest(GET, routes.CheckYourAnswersController.onPageLoad().url)
-        val result = route(application, request).value
-
-        status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual routes.NameOfSellerController.onPageLoad(CheckMode).url
-      }
-    }
-
-    "must redirect to StfSellerAddressPage when StfSellerAddressPage data is missing" in {
-      val incompleteAnswers = completeUserAnswers.remove(StfSellerAddressPage).success.value
-
-      val application = applicationBuilder(userAnswers = Some(incompleteAnswers)).build()
-
-      running(application) {
-        val request = FakeRequest(GET, routes.CheckYourAnswersController.onPageLoad().url)
-        val result = route(application, request).value
-
-        status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual routes.StfSellerAddressController.onPageLoad(CheckMode).url
-      }
-    }
-
-    "must redirect to ConnectedPersonsPage when ConnectedPersonsPage data is missing" in {
-      val incompleteAnswers = completeUserAnswers.remove(ConnectedPersonsPage).success.value
-
-      val application = applicationBuilder(userAnswers = Some(incompleteAnswers)).build()
-
-      running(application) {
-        val request = FakeRequest(GET, routes.CheckYourAnswersController.onPageLoad().url)
-        val result = route(application, request).value
-
-        status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual routes.ConnectedPersonsController.onPageLoad(CheckMode).url
-      }
-    }
-
-    "must redirect to ApplyingForReliefPage when ApplyingForReliefPage data is missing" in {
-      val incompleteAnswers = completeUserAnswers.remove(ApplyingForReliefPage).success.value
-
-      val application = applicationBuilder(userAnswers = Some(incompleteAnswers)).build()
-
-      running(application) {
-        val request = FakeRequest(GET, routes.CheckYourAnswersController.onPageLoad().url)
-        val result = route(application, request).value
-
-        status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual routes.ApplyingForReliefController.onPageLoad(CheckMode).url
-      }
-    }
-
-    "must redirect to SecuritiesTargetPage when SecuritiesTargetPage data is missing" in {
-      val incompleteAnswers = completeUserAnswers.remove(SecuritiesTargetPage).success.value
-
-      val application = applicationBuilder(userAnswers = Some(incompleteAnswers)).build()
-
-      running(application) {
-        val request = FakeRequest(GET, routes.CheckYourAnswersController.onPageLoad().url)
-        val result = route(application, request).value
-
-        status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual routes.SecuritiesTargetController.onPageLoad(CheckMode).url
-      }
-    }
-
-    "must redirect to ChargingPointPage when ChargingPointPage data is missing" in {
-      val incompleteAnswers = completeUserAnswers.remove(ChargingPointPage).success.value
-
-      val application = applicationBuilder(userAnswers = Some(incompleteAnswers)).build()
-
-      running(application) {
-        val request = FakeRequest(GET, routes.CheckYourAnswersController.onPageLoad().url)
-        val result = route(application, request).value
-
-        status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual routes.ChargingPointController.onPageLoad(CheckMode).url
-      }
-    }
-
-    "must redirect to TaxRatePage when TaxRatePage data is missing" in {
-      val incompleteAnswers = completeUserAnswers.remove(TaxRatePage).success.value
-
-      val application = applicationBuilder(userAnswers = Some(incompleteAnswers)).build()
-
-      running(application) {
-        val request = FakeRequest(GET, routes.CheckYourAnswersController.onPageLoad().url)
-        val result = route(application, request).value
-
-        status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual routes.TaxRateController.onPageLoad(CheckMode).url
-      }
-    }
-
-    "must redirect to PurchasingSharesPage when PurchasingSharesPage data is missing" in {
-      val incompleteAnswers = completeUserAnswers.remove(PurchasingSharesPage).success.value
-
-      val application = applicationBuilder(userAnswers = Some(incompleteAnswers)).build()
-
-      running(application) {
-        val request = FakeRequest(GET, routes.CheckYourAnswersController.onPageLoad().url)
-        val result = route(application, request).value
-
-        status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual routes.PurchasingSharesController.onPageLoad(CheckMode).url
-      }
-    }
-
-    "must redirect to DetailsOfThisTransferPage when ConnectedPersons is true but marketValue is missing" in {
-      val incompleteAnswers = completeUserAnswers
-        .set(DetailsOfThisTransferPage, DetailsOfThisTransfer(
-          numberOfShares = 100,
-          typeOfShares = "ordinary shares",
-          amountPaid = BigDecimal("8000.00"),
-          marketValue = None
-        )).success.value
-
-      val application = applicationBuilder(userAnswers = Some(incompleteAnswers)).build()
-
-      running(application) {
-        val request = FakeRequest(GET, routes.CheckYourAnswersController.onPageLoad().url)
-        val result = route(application, request).value
-
-        status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual routes.DetailsOfThisTransferController.onPageLoad(CheckMode).url
-      }
-    }
-
-    "must redirect to SecuritiesTargetPage when SecuritiesTarget businessName is empty" in {
-      val incompleteAnswers = completeUserAnswers
-        .set(SecuritiesTargetPage, SecuritiesTarget("", Some("12345678"))).success.value
-
-      val application = applicationBuilder(userAnswers = Some(incompleteAnswers)).build()
-
-      running(application) {
-        val request = FakeRequest(GET, routes.CheckYourAnswersController.onPageLoad().url)
-        val result = route(application, request).value
-
-        status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual routes.SecuritiesTargetController.onPageLoad(CheckMode).url
-      }
-    }
-
-    "must return OK when SecuritiesTarget has businessName but CRN is None (CRN is optional)" in {
-      val answersWithNoCRN = completeUserAnswers
-        .set(ConnectedPersonsPage, false).success.value
-        .set(SecuritiesTargetPage, SecuritiesTarget("Company ABC Ltd", None)).success.value
-        .set(DetailsOfThisTransferPage, DetailsOfThisTransfer(
-          numberOfShares = 100,
-          typeOfShares = "ordinary shares",
-          amountPaid = BigDecimal("8000.00"),
-          marketValue = None
-        )).success.value
-
-      val stubNavigator = new StubPersistentNavigator(testNextPage, answersWithNoCRN, "stf", "")
-
-      val application = applicationBuilder(userAnswers = Some(answersWithNoCRN))
-        .overrides(
-          bind[Navigator].qualifiedWith(Names.named("individuals")).toInstance(stubNavigator),
-          bind[PersistentNavigator].qualifiedWith(Names.named("individuals")).toInstance(stubNavigator)
-        )
-        .build()
-
-      running(application) {
-        val request = FakeRequest(GET, routes.CheckYourAnswersController.onPageLoad().url)
-        val result = route(application, request).value
-
-        status(result) mustEqual OK
-        contentAsString(result) must include("Check your answers")
-      }
-    }
-
-    "must redirect to DetailsOfThisTransferPage when DetailsOfThisTransferPage data is missing" in {
-      val incompleteAnswers = completeUserAnswers.remove(DetailsOfThisTransferPage).success.value
-
-      val application = applicationBuilder(userAnswers = Some(incompleteAnswers)).build()
-
-      running(application) {
-        val request = FakeRequest(GET, routes.CheckYourAnswersController.onPageLoad().url)
-        val result = route(application, request).value
-
-        status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual routes.DetailsOfThisTransferController.onPageLoad(CheckMode).url
-      }
-    }
-  }
-
-  "CheckYourAnswersController methods" - {
-    val application = applicationBuilder(userAnswers = Some(emptyUserAnswers)).build()
-    
-    running(application) {
-      val controller = application.injector.instanceOf[uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.individuals.single.CheckYourAnswersController]
-      implicit val msgs = messages(application)
-
-      "buildYourDetailsRows" - {
-        "must use ConfirmAddressPage when available" in {
-          val userAnswers = buildStfUserAnswers(
-            buyerAddress = Some(base.Fixtures.confirmableAddress)
+    "onPageLoad" - {
+      "must return OK and the correct view" in {
+        val stubNavigator = new StubPersistentNavigator(testNextPage, completeUserAnswers, "stf", "")
+
+        val application = applicationBuilder(userAnswers = Some(completeUserAnswers))
+          .overrides(
+            bind[Navigator].qualifiedWith(Names.named("individuals")).toInstance(stubNavigator)
           )
+          .build()
 
-          val rows = controller.buildYourDetailsRows(userAnswers)
+        running(application) {
+          val request = FakeRequest(GET, routes.CheckYourAnswersController.onPageLoad().url)
+          val result = route(application, request).value
 
-          rows.size mustBe 1
-        }
-
-        "must use StfBuyersAddressPage when ConfirmAddressPage not available" in {
-          val userAnswers = buildStfUserAnswers(
-            stfBuyerAddress = Some(base.Fixtures.fakeAlfConfirmedAddress)
-          )
-
-          val rows = controller.buildYourDetailsRows(userAnswers)
-
-          rows.size mustBe 1
-        }
-
-        "must fallback to ConfirmAddressSummary when neither page available" in {
-          val userAnswers = emptyUserAnswers
-
-          val rows = controller.buildYourDetailsRows(userAnswers)
-
-          rows.size mustBe 1
+          status(result) mustEqual OK
+          contentAsString(result) must include("Check your answers")
         }
       }
 
-      "buildSellerDetailsRows" - {
-        "must return seller name and address rows" in {
-          val userAnswers = buildStfUserAnswers(
-            sellerName = Some("Test Seller"),
-            sellerAddress = Some(base.Fixtures.fakeAlfConfirmedAddress)
-          )
+      "must redirect to Journey Recovery if no existing data is found" in {
+        val application = applicationBuilder(userAnswers = None).build()
 
-          val rows = controller.buildSellerDetailsRows(userAnswers)
+        running(application) {
+          val request = FakeRequest(GET, routes.CheckYourAnswersController.onPageLoad().url)
+          val result = route(application, request).value
 
-          rows.size mustBe 2
+          status(result) mustEqual SEE_OTHER
+          redirectLocation(result).value mustEqual uk.gov.hmrc.securitiestransferchargefrontend.controllers.routes.JourneyRecoveryController.onPageLoad().url
         }
       }
 
-      "buildTransferDetailsRows" - {
-        "must include relief row when applying for relief" in {
-          val userAnswers = buildStfUserAnswers(
-            connectedPersons = Some(true),
-            applyingForRelief = Some(true),
-            reliefName = Some("Test Relief"),
-            securitiesTarget = Some(SecuritiesTarget("Test Company", Some("12345678")))
-          )
+      "must redirect to NameOfSellerPage when NameOfSellerPage data is missing" in {
+        val incompleteAnswers = completeUserAnswers.remove(NameOfSellerPage).success.value
 
-          val rows = controller.buildTransferDetailsRows(userAnswers)
+        val application = applicationBuilder(userAnswers = Some(incompleteAnswers)).build()
 
-          rows.size must be >= 5
-        }
+        running(application) {
+          val request = FakeRequest(GET, routes.CheckYourAnswersController.onPageLoad().url)
+          val result = route(application, request).value
 
-        "must exclude relief row when not applying for relief" in {
-          val userAnswers = buildStfUserAnswers(
-            connectedPersons = Some(true),
-            applyingForRelief = Some(false),
-            securitiesTarget = Some(SecuritiesTarget("Test Company", Some("12345678")))
-          )
-
-          val rows = controller.buildTransferDetailsRows(userAnswers)
-
-          rows.size must be >= 4
+          status(result) mustEqual SEE_OTHER
+          redirectLocation(result).value mustEqual routes.NameOfSellerController.onPageLoad(CheckMode).url
         }
       }
 
-      "buildSecuritiesDetailsRows" - {
-        "must build shares details with market value for connected persons" in {
-          val detailsOfTransfer = DetailsOfThisTransfer(100, "Ordinary", BigDecimal("10000"), Some(BigDecimal("12000")))
-          val userAnswers = emptyUserAnswers
-            .set(PurchasingSharesPage, true).success.value
-            .set(ConnectedPersonsPage, true).success.value
-            .set(DetailsOfThisTransferPage, detailsOfTransfer).success.value
+      "must redirect to StfSellerAddressPage when StfSellerAddressPage data is missing" in {
+        val incompleteAnswers = completeUserAnswers.remove(StfSellerAddressPage).success.value
 
-          val rows = controller.buildSecuritiesDetailsRows(userAnswers)
+        val application = applicationBuilder(userAnswers = Some(incompleteAnswers)).build()
 
-          rows.size mustBe 5
+        running(application) {
+          val request = FakeRequest(GET, routes.CheckYourAnswersController.onPageLoad().url)
+          val result = route(application, request).value
+
+          status(result) mustEqual SEE_OTHER
+          redirectLocation(result).value mustEqual routes.StfSellerAddressController.onPageLoad(CheckMode).url
+        }
+      }
+
+      "must redirect to ConnectedPersonsPage when ConnectedPersonsPage data is missing" in {
+        val incompleteAnswers = completeUserAnswers.remove(ConnectedPersonsPage).success.value
+
+        val application = applicationBuilder(userAnswers = Some(incompleteAnswers)).build()
+
+        running(application) {
+          val request = FakeRequest(GET, routes.CheckYourAnswersController.onPageLoad().url)
+          val result = route(application, request).value
+
+          status(result) mustEqual SEE_OTHER
+          redirectLocation(result).value mustEqual routes.ConnectedPersonsController.onPageLoad(CheckMode).url
+        }
+      }
+
+      "must redirect to ApplyingForReliefPage when ApplyingForReliefPage data is missing" in {
+        val incompleteAnswers = completeUserAnswers.remove(ApplyingForReliefPage).success.value
+
+        val application = applicationBuilder(userAnswers = Some(incompleteAnswers)).build()
+
+        running(application) {
+          val request = FakeRequest(GET, routes.CheckYourAnswersController.onPageLoad().url)
+          val result = route(application, request).value
+
+          status(result) mustEqual SEE_OTHER
+          redirectLocation(result).value mustEqual routes.ApplyingForReliefController.onPageLoad(CheckMode).url
+        }
+      }
+
+      "must redirect to SecuritiesTargetPage when SecuritiesTargetPage data is missing" in {
+        val incompleteAnswers = completeUserAnswers.remove(SecuritiesTargetPage).success.value
+
+        val application = applicationBuilder(userAnswers = Some(incompleteAnswers)).build()
+
+        running(application) {
+          val request = FakeRequest(GET, routes.CheckYourAnswersController.onPageLoad().url)
+          val result = route(application, request).value
+
+          status(result) mustEqual SEE_OTHER
+          redirectLocation(result).value mustEqual routes.SecuritiesTargetController.onPageLoad(CheckMode).url
+        }
+      }
+
+      "must redirect to ChargingPointPage when ChargingPointPage data is missing" in {
+        val incompleteAnswers = completeUserAnswers.remove(ChargingPointPage).success.value
+
+        val application = applicationBuilder(userAnswers = Some(incompleteAnswers)).build()
+
+        running(application) {
+          val request = FakeRequest(GET, routes.CheckYourAnswersController.onPageLoad().url)
+          val result = route(application, request).value
+
+          status(result) mustEqual SEE_OTHER
+          redirectLocation(result).value mustEqual routes.ChargingPointController.onPageLoad(CheckMode).url
+        }
+      }
+
+      "must redirect to TaxRatePage when TaxRatePage data is missing" in {
+        val incompleteAnswers = completeUserAnswers.remove(TaxRatePage).success.value
+
+        val application = applicationBuilder(userAnswers = Some(incompleteAnswers)).build()
+
+        running(application) {
+          val request = FakeRequest(GET, routes.CheckYourAnswersController.onPageLoad().url)
+          val result = route(application, request).value
+
+          status(result) mustEqual SEE_OTHER
+          redirectLocation(result).value mustEqual routes.TaxRateController.onPageLoad(CheckMode).url
+        }
+      }
+
+      "must redirect to PurchasingSharesPage when PurchasingSharesPage data is missing" in {
+        val incompleteAnswers = completeUserAnswers.remove(PurchasingSharesPage).success.value
+
+        val application = applicationBuilder(userAnswers = Some(incompleteAnswers)).build()
+
+        running(application) {
+          val request = FakeRequest(GET, routes.CheckYourAnswersController.onPageLoad().url)
+          val result = route(application, request).value
+
+          status(result) mustEqual SEE_OTHER
+          redirectLocation(result).value mustEqual routes.PurchasingSharesController.onPageLoad(CheckMode).url
+        }
+      }
+
+      "must redirect to DetailsOfThisTransferPage when ConnectedPersons is true but marketValue is missing" in {
+        val incompleteAnswers = completeUserAnswers
+          .set(DetailsOfThisTransferPage, DetailsOfThisTransfer(
+            numberOfShares = 100,
+            typeOfShares = "ordinary shares",
+            amountPaid = BigDecimal("8000.00"),
+            marketValue = None
+          )).success.value
+
+        val application = applicationBuilder(userAnswers = Some(incompleteAnswers)).build()
+
+        running(application) {
+          val request = FakeRequest(GET, routes.CheckYourAnswersController.onPageLoad().url)
+          val result = route(application, request).value
+
+          status(result) mustEqual SEE_OTHER
+          redirectLocation(result).value mustEqual routes.DetailsOfThisTransferController.onPageLoad(CheckMode).url
+        }
+      }
+
+      "must redirect to SecuritiesTargetPage when SecuritiesTarget businessName is empty" in {
+        val incompleteAnswers = completeUserAnswers
+          .set(SecuritiesTargetPage, SecuritiesTarget("", Some("12345678"))).success.value
+
+        val application = applicationBuilder(userAnswers = Some(incompleteAnswers)).build()
+
+        running(application) {
+          val request = FakeRequest(GET, routes.CheckYourAnswersController.onPageLoad().url)
+          val result = route(application, request).value
+
+          status(result) mustEqual SEE_OTHER
+          redirectLocation(result).value mustEqual routes.SecuritiesTargetController.onPageLoad(CheckMode).url
+        }
+      }
+
+      "must return OK when SecuritiesTarget has businessName but CRN is None (CRN is optional)" in {
+        val answersWithNoCRN = completeUserAnswers
+          .set(ConnectedPersonsPage, false).success.value
+          .set(SecuritiesTargetPage, SecuritiesTarget("Company ABC Ltd", None)).success.value
+          .set(DetailsOfThisTransferPage, DetailsOfThisTransfer(
+            numberOfShares = 100,
+            typeOfShares = "ordinary shares",
+            amountPaid = BigDecimal("8000.00"),
+            marketValue = None
+          )).success.value
+
+        val stubNavigator = new StubPersistentNavigator(testNextPage, answersWithNoCRN, "stf", "")
+
+        val application = applicationBuilder(userAnswers = Some(answersWithNoCRN))
+          .overrides(
+            bind[Navigator].qualifiedWith(Names.named("individuals")).toInstance(stubNavigator)
+          )
+          .build()
+
+        running(application) {
+          val request = FakeRequest(GET, routes.CheckYourAnswersController.onPageLoad().url)
+          val result = route(application, request).value
+
+          status(result) mustEqual OK
+          contentAsString(result) must include("Check your answers")
+        }
+      }
+
+      "must redirect to DetailsOfThisTransferPage when DetailsOfThisTransferPage data is missing" in {
+        val incompleteAnswers = completeUserAnswers.remove(DetailsOfThisTransferPage).success.value
+
+        val application = applicationBuilder(userAnswers = Some(incompleteAnswers)).build()
+
+        running(application) {
+          val request = FakeRequest(GET, routes.CheckYourAnswersController.onPageLoad().url)
+          val result = route(application, request).value
+
+          status(result) mustEqual SEE_OTHER
+          redirectLocation(result).value mustEqual routes.DetailsOfThisTransferController.onPageLoad(CheckMode).url
+        }
+      }
+    }
+
+    "onSubmit" - {
+      "must redirect to next page upon successful submission" in {
+        val stubNavigator = new StubPersistentNavigator(testNextPage, completeUserAnswers, "stf", "")
+        val stubEtmpSubmissionClient = new StubEtmpSubmissionClient()
+
+        val application = applicationBuilder(userAnswers = Some(completeUserAnswers))
+          .overrides(
+            bind[Navigator].qualifiedWith(Names.named("individuals")).toInstance(stubNavigator),
+            bind[EtmpSubmissionClient].toInstance(stubEtmpSubmissionClient)
+          )
+          .build()
+
+        running(application) {
+          val request = FakeRequest(POST, routes.CheckYourAnswersController.onSubmit().url)
+          val result = route(application, request).value
+
+          status(result) mustEqual SEE_OTHER
+          redirectLocation(result).value mustEqual testNextPage.url
+        }
+      }
+
+      "must return to the dashboard without submitting when Save and return button is clicked" in {
+        val mockNavigator = mock[Navigator]
+        val mockTransactionSubmissionService = mock[TransactionSubmissionService]
+        val testDashboardCall = Call("GET", "/test-dashboard")
+
+        when(mockNavigator.returnToDashboard(any())).thenReturn(Future.successful(testDashboardCall))
+
+        val application = applicationBuilder(userAnswers = Some(completeUserAnswers))
+          .overrides(
+            bind[Navigator].qualifiedWith(Names.named("individuals")).toInstance(mockNavigator),
+            bind[TransactionSubmissionService].toInstance(mockTransactionSubmissionService)
+          )
+          .build()
+
+        running(application) {
+          val request =
+            FakeRequest(POST, routes.CheckYourAnswersController.onSubmit().url)
+              .withFormUrlEncodedBody(saveAndReturnButtonName -> "")
+
+          val result = route(application, request).value
+
+          status(result) mustEqual SEE_OTHER
+          redirectLocation(result).value mustEqual testDashboardCall.url
+
+          verify(mockNavigator).returnToDashboard(any())
+          verify(mockNavigator, never()).nextPage(any(), any(), any(), anyBoolean())(any())
+          verify(mockTransactionSubmissionService, never()).submitSingleStf(using any[StcDataRequest[?]]())
+        }
+      }
+
+      "must redirect to the error page when the submission fails" in {
+        val mockNavigator = mock[Navigator]
+        val mockTransactionSubmissionService = mock[TransactionSubmissionService]
+
+        when(mockTransactionSubmissionService.submitSingleStf(using any[StcDataRequest[?]]()))
+          .thenReturn(Future.successful(false))
+        when(mockNavigator.errorPage(any())).thenReturn(testErrorPage)
+
+        val application = applicationBuilder(userAnswers = Some(completeUserAnswers))
+          .overrides(
+            bind[Navigator].qualifiedWith(Names.named("individuals")).toInstance(mockNavigator),
+            bind[TransactionSubmissionService].toInstance(mockTransactionSubmissionService)
+          )
+          .build()
+
+        running(application) {
+          val request = FakeRequest(POST, routes.CheckYourAnswersController.onSubmit().url)
+          val result = route(application, request).value
+
+          status(result) mustEqual SEE_OTHER
+          redirectLocation(result).value mustEqual testErrorPage.url
+
+          verify(mockTransactionSubmissionService).submitSingleStf(using any[StcDataRequest[?]]())
+          verify(mockNavigator).errorPage(eqTo(CheckYourAnswersPage))
+          verify(mockNavigator, never()).nextPage(any(), any(), any(), anyBoolean())(any())
+          verify(mockNavigator, never()).returnToDashboard(any())
+        }
+      }
+
+      "must redirect to Journey Recovery if no existing data is found" in {
+        val application = applicationBuilder(userAnswers = None).build()
+
+        running(application) {
+          val request = FakeRequest(POST, routes.CheckYourAnswersController.onSubmit().url)
+          val result = route(application, request).value
+
+          status(result) mustEqual SEE_OTHER
+          redirectLocation(result).value mustEqual uk.gov.hmrc.securitiestransferchargefrontend.controllers.routes.JourneyRecoveryController.onPageLoad().url
+        }
+      }
+    }
+
+    "CheckYourAnswersController methods" - {
+      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers)).build()
+
+      running(application) {
+        val controller = application.injector.instanceOf[uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.individuals.single.CheckYourAnswersController]
+        implicit val msgs = messages(application)
+
+        "buildYourDetailsRows" - {
+          "must use ConfirmAddressPage when available" in {
+            val userAnswers = buildStfUserAnswers(
+              buyerAddress = Some(base.Fixtures.confirmableAddress)
+            )
+
+            val rows = controller.buildYourDetailsRows(userAnswers)
+
+            rows.size mustBe 1
+          }
+
+          "must use StfBuyersAddressPage when ConfirmAddressPage not available" in {
+            val userAnswers = buildStfUserAnswers(
+              stfBuyerAddress = Some(base.Fixtures.fakeAlfConfirmedAddress)
+            )
+
+            val rows = controller.buildYourDetailsRows(userAnswers)
+
+            rows.size mustBe 1
+          }
+
+          "must fallback to ConfirmAddressSummary when neither page available" in {
+            val userAnswers = emptyUserAnswers
+
+            val rows = controller.buildYourDetailsRows(userAnswers)
+
+            rows.size mustBe 1
+          }
         }
 
-        "must build shares details without market value for non-connected persons" in {
-          val detailsOfTransfer = DetailsOfThisTransfer(100, "Ordinary", BigDecimal("10000"), None)
-          val userAnswers = emptyUserAnswers
-            .set(PurchasingSharesPage, true).success.value
-            .set(ConnectedPersonsPage, false).success.value
-            .set(DetailsOfThisTransferPage, detailsOfTransfer).success.value
+        "buildSellerDetailsRows" - {
+          "must return seller name and address rows" in {
+            val userAnswers = buildStfUserAnswers(
+              sellerName = Some("Test Seller"),
+              sellerAddress = Some(base.Fixtures.fakeAlfConfirmedAddress)
+            )
 
-          val rows = controller.buildSecuritiesDetailsRows(userAnswers)
+            val rows = controller.buildSellerDetailsRows(userAnswers)
 
-          rows.size mustBe 4
+            rows.size mustBe 2
+          }
         }
 
-        "must build other securities details with market value for connected persons" in {
-          val userAnswers = emptyUserAnswers
-            .set(PurchasingSharesPage, false).success.value
-            .set(ConnectedPersonsPage, true).success.value
-            .set(OtherSecuritiesTypePage, "Bonds").success.value
-            .set(AmountPaidForSecuritiesPage, BigDecimal("5000")).success.value
-            .set(TotalMarketValuePage, BigDecimal("6000")).success.value
+        "buildTransferDetailsRows" - {
+          "must include relief row when applying for relief" in {
+            val userAnswers = buildStfUserAnswers(
+              connectedPersons = Some(true),
+              applyingForRelief = Some(true),
+              reliefName = Some("Test Relief"),
+              securitiesTarget = Some(SecuritiesTarget("Test Company", Some("12345678")))
+            )
 
-          val rows = controller.buildSecuritiesDetailsRows(userAnswers)
+            val rows = controller.buildTransferDetailsRows(userAnswers)
 
-          rows.size mustBe 4
+            rows.size must be >= 5
+          }
+
+          "must exclude relief row when not applying for relief" in {
+            val userAnswers = buildStfUserAnswers(
+              connectedPersons = Some(true),
+              applyingForRelief = Some(false),
+              securitiesTarget = Some(SecuritiesTarget("Test Company", Some("12345678")))
+            )
+
+            val rows = controller.buildTransferDetailsRows(userAnswers)
+
+            rows.size must be >= 4
+          }
         }
 
-        "must build other securities details without market value for non-connected persons" in {
-          val userAnswers = emptyUserAnswers
-            .set(PurchasingSharesPage, false).success.value
-            .set(ConnectedPersonsPage, false).success.value
-            .set(OtherSecuritiesTypePage, "Bonds").success.value
-            .set(AmountPaidForSecuritiesPage, BigDecimal("5000")).success.value
+        "buildSecuritiesDetailsRows" - {
+          "must build shares details with market value for connected persons" in {
+            val detailsOfTransfer = DetailsOfThisTransfer(100, "Ordinary", BigDecimal("10000"), Some(BigDecimal("12000")))
+            val userAnswers = emptyUserAnswers
+              .set(PurchasingSharesPage, true).success.value
+              .set(ConnectedPersonsPage, true).success.value
+              .set(DetailsOfThisTransferPage, detailsOfTransfer).success.value
 
-          val rows = controller.buildSecuritiesDetailsRows(userAnswers)
+            val rows = controller.buildSecuritiesDetailsRows(userAnswers)
 
-          rows.size mustBe 3
+            rows.size mustBe 5
+          }
+
+          "must build shares details without market value for non-connected persons" in {
+            val detailsOfTransfer = DetailsOfThisTransfer(100, "Ordinary", BigDecimal("10000"), None)
+            val userAnswers = emptyUserAnswers
+              .set(PurchasingSharesPage, true).success.value
+              .set(ConnectedPersonsPage, false).success.value
+              .set(DetailsOfThisTransferPage, detailsOfTransfer).success.value
+
+            val rows = controller.buildSecuritiesDetailsRows(userAnswers)
+
+            rows.size mustBe 4
+          }
+
+          "must build other securities details with market value for connected persons" in {
+            val userAnswers = emptyUserAnswers
+              .set(PurchasingSharesPage, false).success.value
+              .set(ConnectedPersonsPage, true).success.value
+              .set(OtherSecuritiesTypePage, "Bonds").success.value
+              .set(AmountPaidForSecuritiesPage, BigDecimal("5000")).success.value
+              .set(TotalMarketValuePage, BigDecimal("6000")).success.value
+
+            val rows = controller.buildSecuritiesDetailsRows(userAnswers)
+
+            rows.size mustBe 4
+          }
+
+          "must build other securities details without market value for non-connected persons" in {
+            val userAnswers = emptyUserAnswers
+              .set(PurchasingSharesPage, false).success.value
+              .set(ConnectedPersonsPage, false).success.value
+              .set(OtherSecuritiesTypePage, "Bonds").success.value
+              .set(AmountPaidForSecuritiesPage, BigDecimal("5000")).success.value
+
+            val rows = controller.buildSecuritiesDetailsRows(userAnswers)
+
+            rows.size mustBe 3
+          }
         }
       }
     }

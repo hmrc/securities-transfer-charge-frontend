@@ -28,6 +28,8 @@ import scala.concurrent.{ExecutionContext, Future}
 trait Navigator:
   def nextPage(page: Page, mode: Mode, userAnswers: UserAnswers, isReturn: Boolean = false)(implicit request: Request[?]): Future[Call]
 
+  def returnToDashboard(userAnswers: UserAnswers): Future[Call]
+
   def previousPage(page: Page, mode: Mode, userAnswers: UserAnswers): Call
 
   def previousPage(page: Page, mode: Mode, userAnswers: Option[UserAnswers]): Call
@@ -45,14 +47,15 @@ abstract class AbstractModeNavigator(implicit ex: ExecutionContext) extends Navi
   lazy val dashboardPage: Call
   val sessionRepository: SessionRepository
 
+  def returnToDashboard(userAnswers: UserAnswers): Future[Call] =
+    sessionRepository.clear(userAnswers.userId).map(_ => dashboardPage)
+    
   def nextPage(page: Page, mode: Mode, userAnswers: UserAnswers, isReturn: Boolean)(implicit request: Request[?]): Future[Call] = {
     implicit lazy val hc: HeaderCarrier = HeaderCarrierConverter.fromRequestAndSession(request, request.session)
-
-    val maybeRedirectToDashboard: Call => Future[Call] =
-      if (isReturn) _ => sessionRepository.clear(userAnswers.userId).map(_ => dashboardPage)
-      else call => Future.successful(call)
-
-    forwardRoutes(page, mode)(hc)(userAnswers).flatMap(maybeRedirectToDashboard)
+    
+    forwardRoutes(page, mode)(hc)(userAnswers).flatMap { call =>
+      if (isReturn) then returnToDashboard(userAnswers) else Future.successful(call)
+    }
   }
 
   override def previousPage(page: Page, mode: Mode, userAnswers: UserAnswers): Call =

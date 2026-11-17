@@ -20,13 +20,19 @@ import base.SpecBase
 import base.stubs.StubPersistentNavigator
 import clients.StubEtmpSubmissionClient
 import com.google.inject.name.Names
+import org.mockito.ArgumentMatchers.{any, anyBoolean}
+import org.mockito.Mockito.{never, verify, when}
+import org.scalatestplus.mockito.MockitoSugar.mock
 import play.api.inject.bind
 import play.api.libs.json.JsPath
 import play.api.mvc.{Call, Request}
 import play.api.test.FakeRequest
 import play.api.test.Helpers.*
 import uk.gov.hmrc.securitiestransferchargefrontend.clients.EtmpSubmissionClient
+import uk.gov.hmrc.securitiestransferchargefrontend.controllers.actions.requests.StcDataRequest
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.sh03.agents.single.routes
+import uk.gov.hmrc.securitiestransferchargefrontend.controllers.dashboard.routes as dashboardRoutes
+import uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.shared.SaveAndReturnButton.saveAndReturnButtonName
 import uk.gov.hmrc.securitiestransferchargefrontend.models.sh03.HowToNotifyAboutShareBuyback
 import uk.gov.hmrc.securitiestransferchargefrontend.models.sh03.shared.{CompanyDetails, DetailsOfThisSharePurchase, ReasonForPurchase, RoleAtPurchasingCompany}
 import uk.gov.hmrc.securitiestransferchargefrontend.models.shared.AgentReference
@@ -35,6 +41,7 @@ import uk.gov.hmrc.securitiestransferchargefrontend.navigation.{Navigator, PageC
 import uk.gov.hmrc.securitiestransferchargefrontend.pages.sh03.*
 import uk.gov.hmrc.securitiestransferchargefrontend.pages.{CyaPage, ErrorPage, Page}
 import uk.gov.hmrc.securitiestransferchargefrontend.queries.Gettable
+import uk.gov.hmrc.securitiestransferchargefrontend.services.TransactionSubmissionService
 
 import java.time.LocalDate
 import scala.concurrent.Future
@@ -49,6 +56,8 @@ class CheckYourAnswersControllerSpec extends SpecBase {
     override def nextPage(page: Page, mode: Mode, userAnswers: UserAnswers, isReturn: Boolean = false)(implicit request: Request[_]): Future[Call] =
       Future.successful(testNextPage)
 
+    override def returnToDashboard(userAnswers: UserAnswers): Future[Call] = Future.successful(dashboardRoutes.DashboardController.onPageLoad())
+    
     override def previousPage(page: Page, mode: Mode, userAnswers: UserAnswers): Call = testBackLinkRoute
 
     override def previousPage(page: Page, mode: Mode, userAnswers: Option[UserAnswers]): Call = testBackLinkRoute
@@ -163,6 +172,36 @@ class CheckYourAnswersControllerSpec extends SpecBase {
 
           status(result) mustEqual SEE_OTHER
           redirectLocation(result).value mustEqual testNextPage.url
+        }
+      }
+
+      "must return to the dashboard without submitting when Save and return is clicked" in {
+        val mockNavigator = mock[Navigator]
+        val mockTransactionSubmissionService = mock[TransactionSubmissionService]
+        val testDashboardCall = dashboardRoutes.DashboardController.onPageLoad()
+
+        when(mockNavigator.returnToDashboard(any())).thenReturn(Future.successful(testDashboardCall))
+
+        val application = applicationBuilder(userAnswers = Some(completeUserAnswers))
+          .overrides(
+            bind[Navigator].qualifiedWith(Names.named("agentsSh03")).toInstance(mockNavigator),
+            bind[TransactionSubmissionService].toInstance(mockTransactionSubmissionService)
+          )
+          .build()
+
+        running(application) {
+          val request =
+            FakeRequest(POST, routes.CheckYourAnswersController.onSubmit().url)
+              .withFormUrlEncodedBody(saveAndReturnButtonName -> "")
+
+          val result = route(application, request).value
+
+          status(result) mustEqual SEE_OTHER
+          redirectLocation(result).value mustEqual testDashboardCall.url
+
+          verify(mockNavigator).returnToDashboard(any())
+          verify(mockNavigator, never()).nextPage(any(), any(), any(), anyBoolean())(any())
+          verify(mockTransactionSubmissionService, never()).submitSingleSh03(using any[StcDataRequest[?]]())
         }
       }
     }
