@@ -75,12 +75,17 @@ object ViewTransferResponse:
 
   private val derivedContingentReads: Reads[ViewTransferContingentDetails] = Json.reads[ViewTransferContingentDetails]
 
+  private val UnascertainableKey = "isAmountUnascertainable"
+
+  // Use the correctly spelt key when present; fall back to the backend's spelling otherwise.
   given Reads[ViewTransferContingentDetails] = Reads {
     case obj: JsObject =>
-      val renamed = (obj \ BackendUnascertainableKey).toOption.fold(obj) { value =>
-        (obj - BackendUnascertainableKey) + ("isAmountUnascertainable" -> value)
+      val normalised = (obj \ UnascertainableKey, obj \ BackendUnascertainableKey) match {
+        case (JsDefined(_), _)            => obj - BackendUnascertainableKey
+        case (_, JsDefined(backendValue)) => (obj - BackendUnascertainableKey) + (UnascertainableKey -> backendValue)
+        case _                            => obj
       }
-      derivedContingentReads.reads(renamed)
+      derivedContingentReads.reads(normalised)
     case other => JsError(s"Expected a JSON object for contingent details, got: $other")
   }
 
@@ -92,3 +97,5 @@ enum GetTransactionResult:
   case Found(transaction: ViewTransferResponse)
   case StcIdNotFound
   case UtrnNotFound
+  /** The submissions service rejected the request as invalid, e.g. a malformed UTRN. */
+  case InvalidRequest

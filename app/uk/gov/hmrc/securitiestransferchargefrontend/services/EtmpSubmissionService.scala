@@ -36,6 +36,7 @@ import java.time.format.DateTimeFormatter
 import java.util.Locale
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
+import scala.util.Success
 
 trait EtmpSubmissionService:
   def submitSingleStf(subscriptionId: SubscriptionId, userAnswers: UserAnswers, affinityData: AffinityData)(implicit hc: HeaderCarrier): Future[SubmissionCreateResponse]
@@ -179,13 +180,9 @@ class EtmpSubmissionServiceImpl @Inject() (etmpSubmissionsClient: EtmpSubmission
 
   override def getTransaction(subscriptionId: SubscriptionId, utrn: String)
                              (implicit hc: HeaderCarrier): Future[GetTransactionResult] =
-    etmpSubmissionsClient.getTransaction(subscriptionId, utrn).map { result =>
-      result match {
-        case GetTransactionResult.StcIdNotFound => logger.warn(s"Transaction $utrn not found: STC ID does not exist")
-        case GetTransactionResult.UtrnNotFound  => logger.warn(s"Transaction $utrn not found: UTRN not found")
-        case GetTransactionResult.Found(_)      => ()
-      }
-      result
+    etmpSubmissionsClient.getTransaction(subscriptionId, utrn).andThen {
+      case Success(GetTransactionResult.StcIdNotFound) => logger.warn(s"Transaction $utrn not found: STC ID does not exist")
+      case Success(GetTransactionResult.UtrnNotFound)  => logger.warn(s"Transaction $utrn not found: UTRN not found")
     }
 
   def getSubmissionDataStf(userAnswers: UserAnswers, affinityData: AffinityData): Option[(SingleTransferDeclaration, SingleTransferRequest, StfTransaction)] = {

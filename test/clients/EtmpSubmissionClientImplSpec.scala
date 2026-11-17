@@ -24,7 +24,7 @@ import play.api.Application
 import play.api.inject.guice.GuiceApplicationBuilder
 import play.api.libs.json.{JsObject, Json}
 import uk.gov.hmrc.http.HeaderCarrier
-import uk.gov.hmrc.securitiestransferchargefrontend.clients.EtmpSubmissionClientImpl
+import uk.gov.hmrc.securitiestransferchargefrontend.clients.{EtmpSubmissionClientImpl, SubmissionResponseException, SubmissionResponseParsingException}
 import uk.gov.hmrc.securitiestransferchargefrontend.domain.{SubscriptionId, TransferType}
 import uk.gov.hmrc.securitiestransferchargefrontend.models.Headers
 import uk.gov.hmrc.securitiestransferchargefrontend.models.submission.*
@@ -39,10 +39,10 @@ class EtmpSubmissionClientImplSpec extends SpecBase with BeforeAndAfterAll with 
 
   private implicit val hc: HeaderCarrier = HeaderCarrier()
 
-  // Started here rather than in beforeAll so the app below can be configured with its port.
-  startWireMock()
+  // Built in beforeAll, once WireMock is running and its port is known.
+  private var app: Application = _
 
-  private lazy val app: Application =
+  private def buildApp(): Application =
     GuiceApplicationBuilder()
       .configure(
         "auditing.enabled" -> false,
@@ -51,11 +51,17 @@ class EtmpSubmissionClientImplSpec extends SpecBase with BeforeAndAfterAll with 
       )
       .build()
 
-  private lazy val client = app.injector.instanceOf[EtmpSubmissionClientImpl]
+  private def client = app.injector.instanceOf[EtmpSubmissionClientImpl]
 
   private val subscriptionId = SubscriptionId("XASTC0000123456")
   private val utrn           = "900459020010"
   private val path           = s"/securities-transfer-charge-submissions/submission/$utrn"
+
+  override def beforeAll(): Unit = {
+    super.beforeAll()
+    startWireMock()
+    app = buildApp()
+  }
 
   override def beforeEach(): Unit = {
     super.beforeEach()
@@ -63,14 +69,19 @@ class EtmpSubmissionClientImplSpec extends SpecBase with BeforeAndAfterAll with 
   }
 
   override def afterAll(): Unit = {
-    stopWireMock()
-    super.afterAll()
+    try {
+      if (app != null) app.stop().futureValue
+      stopWireMock()
+    } finally super.afterAll()
   }
 
   private def stub(status: Int, body: JsObject): Unit =
+    stubRaw(status, body.toString, "application/json")
+
+  private def stubRaw(status: Int, body: String, contentType: String): Unit =
     wireMockServer.stubFor(
       get(urlPathEqualTo(path))
-        .willReturn(aResponse().withStatus(status).withHeader("Content-Type", "application/json").withBody(body.toString))
+        .willReturn(aResponse().withStatus(status).withHeader("Content-Type", contentType).withBody(body))
     )
 
   // Shape returned by the submissions service, including its "isAmountUnasertainable" spelling.
@@ -151,40 +162,74 @@ class EtmpSubmissionClientImplSpec extends SpecBase with BeforeAndAfterAll with 
       )
     }
 
-    "return UtrnNotFound for a 404 with the UTRN message" in {
-      stub(404, Json.obj("error" -> "UTRN not found"))
+    "return UtrnNotFound for a 404 with the UTRN_NOT_FOUND code" in {
+      stub(404, Json.obj("error" -> "UTRN not found", "code" -> "UTRN_NOT_FOUND"))
 
       client.getTransaction(subscriptionId, utrn).futureValue mustBe GetTransactionResult.UtrnNotFound
     }
 
-    "return StcIdNotFound for a 404 with the STC ID message" in {
-      stub(404, Json.obj("error" -> "STC ID not found"))
+    "return StcIdNotFound for a 404 with the STC_ID_NOT_FOUND code" in {
+      stub(404, Json.obj("error" -> "STC ID not found", "code" -> "STC_ID_NOT_FOUND"))
 
       client.getTransaction(subscriptionId, utrn).futureValue mustBe GetTransactionResult.StcIdNotFound
     }
 
-    "fail for a 404 with an unrecognised message" in {
-      stub(404, Json.obj("error" -> "something else"))
+    "match on the code, not the human-readable message" in {
+      stub(404, Json.obj("error" -> "reworded message", "code" -> "UTRN_NOT_FOUND"))
 
-      client.getTransaction(subscriptionId, utrn).failed.futureValue mustBe a[RuntimeException]
+      client.getTransaction(subscriptionId, utrn).futureValue mustBe GetTransactionResult.UtrnNotFound
     }
 
-    "fail for a 400" in {
+    "fail with SubmissionResponseException for a 404 without a recognised code" in {
+      stub(404, Json.obj("error" -> "UTRN not found"))
+
+      client.getTransaction(subscriptionId, utrn).failed.futureValue mustBe a[SubmissionResponseException]
+    }
+
+    "fail with SubmissionResponseException for a 404 whose body is not JSON" in {
+      stubRaw(404, "<html><body>Not Found</body></html>", "text/html")
+
+      client.getTransaction(subscriptionId, utrn).failed.futureValue mustBe a[SubmissionResponseException]
+    }
+
+    "return InvalidRequest for a 400" in {
       stub(400, Json.obj("error" -> "invalid request"))
 
-      client.getTransaction(subscriptionId, utrn).failed.futureValue mustBe a[RuntimeException]
+      client.getTransaction(subscriptionId, utrn).futureValue mustBe GetTransactionResult.InvalidRequest
     }
 
-    "fail for a 500" in {
+    "fail with SubmissionResponseException for a 500" in {
       stub(500, Json.obj("error" -> "failed to retrieve transaction"))
 
-      client.getTransaction(subscriptionId, utrn).failed.futureValue mustBe a[RuntimeException]
+      client.getTransaction(subscriptionId, utrn).failed.futureValue mustBe a[SubmissionResponseException]
     }
 
-    "fail when a 200 body cannot be parsed" in {
+    "fail with SubmissionResponseParsingException when a 200 body is missing fields" in {
       stub(200, Json.obj("processingDate" -> "2026-03-31T12:00:00Z"))
 
-      client.getTransaction(subscriptionId, utrn).failed.futureValue mustBe a[RuntimeException]
+      client.getTransaction(subscriptionId, utrn).failed.futureValue mustBe a[SubmissionResponseParsingException]
+    }
+
+    "fail with SubmissionResponseParsingException when a 200 body is not JSON" in {
+      stubRaw(200, "not json", "text/plain")
+
+      client.getTransaction(subscriptionId, utrn).failed.futureValue mustBe a[SubmissionResponseParsingException]
+    }
+
+    "prefer the correctly spelt isAmountUnascertainable key when both spellings are present" in {
+      val contingent = Json.obj(
+        "provisionalId"           -> "1",
+        "provisionalDate"         -> "2026-03-30",
+        "isAmountUnasertainable"  -> false,
+        "isAmountUnascertainable" -> true,
+        "defermentOfPayment"      -> false
+      )
+      stub(200, transactionJson ++ Json.obj("contingentDetails" -> Json.arr(contingent)))
+
+      whenReady(client.getTransaction(subscriptionId, utrn)) {
+        case GetTransactionResult.Found(t) => t.contingentDetails.head.isAmountUnascertainable mustBe true
+        case other                         => fail(s"Unexpected result: $other")
+      }
     }
   }
 }

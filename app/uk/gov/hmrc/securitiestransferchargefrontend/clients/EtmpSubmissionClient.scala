@@ -34,6 +34,10 @@ import uk.gov.hmrc.securitiestransferchargefrontend.utils.CommonHelpers
 import java.util.UUID
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
+import scala.util.Try
+
+final class SubmissionResponseParsingException(s: String) extends RuntimeException(s)
+final class SubmissionResponseException(s: String) extends RuntimeException(s)
 
 trait EtmpSubmissionClient:
   def submitBatchTransfer(
@@ -45,9 +49,11 @@ trait EtmpSubmissionClient:
   /**
    * Looks up a previously submitted transaction by UTRN.
    *
-   * Returns [[GetTransactionResult.Found]] on 200, and [[GetTransactionResult.StcIdNotFound]] or
-   * [[GetTransactionResult.UtrnNotFound]] on 404 depending on which the submissions service reports.
-   * Fails for any other response, or a body that cannot be parsed.
+   * Returns [[GetTransactionResult.Found]] on 200, [[GetTransactionResult.StcIdNotFound]] or
+   * [[GetTransactionResult.UtrnNotFound]] on 404 depending on the `code` the submissions service
+   * reports, and [[GetTransactionResult.InvalidRequest]] on 400. Fails with
+   * [[SubmissionResponseException]] for any other response, or [[SubmissionResponseParsingException]]
+   * for a body that cannot be parsed.
    */
   def getTransaction(
     subscriptionId: SubscriptionId,
@@ -61,16 +67,17 @@ class EtmpSubmissionClientImpl @Inject()(
   implicit ec: ExecutionContext                                      
 ) extends EtmpSubmissionClient with Logging:
 
-  final class SubmissionResponseParsingException(s: String) extends RuntimeException(s)
-  final class SubmissionResponseException(s: String) extends RuntimeException(s)
-
   private val logInfoAndFail = CommonHelpers.logInfoAndFail(logger = logger)
   private val logInfoAndFailParsing = (s: String) => logInfoAndFail(new SubmissionResponseParsingException(s))
   private val logInfoAndFailNon201 = (s: String) => logInfoAndFail(new SubmissionResponseException(s))
 
-  // Error messages the submissions service returns with a 404 from GET /submission/:utrn.
-  private val StcIdNotFoundMessage = "STC ID not found"
-  private val UtrnNotFoundMessage  = "UTRN not found"
+  private val logWarnAndFail = CommonHelpers.logWarnAndFail(logger = logger)
+  private val logWarnAndFailParsing = (s: String) => logWarnAndFail(new SubmissionResponseParsingException(s))
+  private val logWarnAndFailUnexpected = (s: String) => logWarnAndFail(new SubmissionResponseException(s))
+
+  // Stable `code` values the submissions service returns with a 404 from GET /submission/:utrn.
+  private val StcIdNotFoundCode = "STC_ID_NOT_FOUND"
+  private val UtrnNotFoundCode  = "UTRN_NOT_FOUND"
   
   def submitBatchTransfer(subscriptionId: SubscriptionId, submissionId: SubmissionId, payload: SubmissionBatchPayload)
                          (implicit hc: HeaderCarrier): Future[StcTransactionCreateResponse] = {
@@ -108,21 +115,30 @@ class EtmpSubmissionClientImpl @Inject()(
           case OK =>
             parseJson[ViewTransferResponse](response).map(GetTransactionResult.Found(_))
           case NOT_FOUND =>
-            (response.json \ "error").asOpt[String] match {
-              case Some(StcIdNotFoundMessage) => Future.successful(GetTransactionResult.StcIdNotFound)
-              case Some(UtrnNotFoundMessage)  => Future.successful(GetTransactionResult.UtrnNotFound)
-              case other => logInfoAndFailParsing(s"Unrecognised 404 when getting transaction $utrn: $other")
+            (jsonBody(response) \ "code").asOpt[String] match {
+              case Some(StcIdNotFoundCode) => Future.successful(GetTransactionResult.StcIdNotFound)
+              case Some(UtrnNotFoundCode)  => Future.successful(GetTransactionResult.UtrnNotFound)
+              case _ => logWarnAndFailUnexpected(
+                s"Received unrecognised 404 when getting transaction $utrn: ${response.body.take(200)}"
+              )
             }
-          case otherResponse => logInfoAndFailNon201(
+          case BAD_REQUEST =>
+            logger.warn(s"Submissions service rejected the request to get transaction $utrn: ${response.body.take(200)}")
+            Future.successful(GetTransactionResult.InvalidRequest)
+          case otherResponse => logWarnAndFailUnexpected(
             s"Received unexpected $otherResponse response when getting transaction $utrn"
           )
         }
       }
 
+  /** The body as JSON, or JsNull when it isn't JSON (e.g. an HTML 404 from a router or gateway). */
+  private def jsonBody(response: HttpResponse): JsValue =
+    Try(response.json).getOrElse(JsNull)
+
   private def parseJson[A](response: HttpResponse)(implicit reads: Reads[A]): Future[A] =
-    response.json.validate[A] match {
+    jsonBody(response).validate[A] match {
       case JsSuccess(value, _) => Future.successful(value)
-      case JsError(errors)     => logInfoAndFailParsing("Parse errors: " + errors.toString())
+      case JsError(errors)     => logWarnAndFailParsing("Parse errors: " + errors.toString())
     }
 
   private def parseResponse[A <: StcTransactionCreateResponse](response: HttpResponse)
