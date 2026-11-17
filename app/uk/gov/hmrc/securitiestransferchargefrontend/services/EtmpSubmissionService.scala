@@ -43,6 +43,8 @@ trait EtmpSubmissionService:
   def submitBulkStf(subscriptionId: SubscriptionId, rows: Seq[ValidatedStcRow], userAnswers: UserAnswers, affinityData: AffinityData)(implicit hc: HeaderCarrier): Future[SubmissionCreateResponse]
   def submitBulkSH03(subscriptionId: SubscriptionId, rows: Seq[ValidatedStcRow], userAnswers: UserAnswers, affinityData: AffinityData)(implicit hc: HeaderCarrier): Future[SubmissionCreateResponse]
 
+  def getTransaction(subscriptionId: SubscriptionId, utrn: String)(implicit hc: HeaderCarrier): Future[GetTransactionResult]
+
   def getSubmissionDataStf(userAnswers: UserAnswers, affinityData: AffinityData): Option[(SingleTransferDeclaration, SingleTransferRequest, StfTransaction)]
   def getSubmissionDataSh03(userAnswers: UserAnswers, affinityData: AffinityData): Option[(SingleTransferDeclaration, SingleTransferRequest)]
 
@@ -174,6 +176,17 @@ class EtmpSubmissionServiceImpl @Inject() (etmpSubmissionsClient: EtmpSubmission
     etmpSubmissionsClient
       .submitBatchTransfer(subscriptionId, userAnswers.submissionId, etmpPayload)
       .map(toSubmissionCreateResponse(userAnswers))
+
+  override def getTransaction(subscriptionId: SubscriptionId, utrn: String)
+                             (implicit hc: HeaderCarrier): Future[GetTransactionResult] =
+    etmpSubmissionsClient.getTransaction(subscriptionId, utrn).map { result =>
+      result match {
+        case GetTransactionResult.StcIdNotFound => logger.warn(s"Transaction $utrn not found: STC ID does not exist")
+        case GetTransactionResult.UtrnNotFound  => logger.warn(s"Transaction $utrn not found: UTRN not found")
+        case GetTransactionResult.Found(_)      => ()
+      }
+      result
+    }
 
   def getSubmissionDataStf(userAnswers: UserAnswers, affinityData: AffinityData): Option[(SingleTransferDeclaration, SingleTransferRequest, StfTransaction)] = {
     userAnswers.get(StfTransaction).map { stfSingleReq =>

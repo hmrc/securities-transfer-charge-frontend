@@ -27,6 +27,7 @@ import uk.gov.hmrc.securitiestransferchargefrontend.config.FrontendAppConfig
 import uk.gov.hmrc.securitiestransferchargefrontend.domain.{SubmissionId, SubscriptionId}
 import uk.gov.hmrc.securitiestransferchargefrontend.models.Headers
 import uk.gov.hmrc.securitiestransferchargefrontend.models.submission.StcTransactionCreateResponse.given
+import uk.gov.hmrc.securitiestransferchargefrontend.models.submission.ViewTransferResponse.given
 import uk.gov.hmrc.securitiestransferchargefrontend.models.submission.*
 import uk.gov.hmrc.securitiestransferchargefrontend.utils.CommonHelpers
 
@@ -41,6 +42,18 @@ trait EtmpSubmissionClient:
     payload: SubmissionBatchPayload
   )(implicit hc: HeaderCarrier): Future[StcTransactionCreateResponse]
 
+  /**
+   * Looks up a previously submitted transaction by UTRN.
+   *
+   * Returns [[GetTransactionResult.Found]] on 200, and [[GetTransactionResult.StcIdNotFound]] or
+   * [[GetTransactionResult.UtrnNotFound]] on 404 depending on which the submissions service reports.
+   * Fails for any other response, or a body that cannot be parsed.
+   */
+  def getTransaction(
+    subscriptionId: SubscriptionId,
+    utrn: String
+  )(implicit hc: HeaderCarrier): Future[GetTransactionResult]
+
 
 class EtmpSubmissionClientImpl @Inject()(
   http: HttpClientV2,
@@ -54,6 +67,10 @@ class EtmpSubmissionClientImpl @Inject()(
   private val logInfoAndFail = CommonHelpers.logInfoAndFail(logger = logger)
   private val logInfoAndFailParsing = (s: String) => logInfoAndFail(new SubmissionResponseParsingException(s))
   private val logInfoAndFailNon201 = (s: String) => logInfoAndFail(new SubmissionResponseException(s))
+
+  // Error messages the submissions service returns with a 404 from GET /submission/:utrn.
+  private val StcIdNotFoundMessage = "STC ID not found"
+  private val UtrnNotFoundMessage  = "UTRN not found"
   
   def submitBatchTransfer(subscriptionId: SubscriptionId, submissionId: SubmissionId, payload: SubmissionBatchPayload)
                          (implicit hc: HeaderCarrier): Future[StcTransactionCreateResponse] = {
@@ -75,6 +92,37 @@ class EtmpSubmissionClientImpl @Inject()(
           )
         }
       }
+    }
+
+  def getTransaction(subscriptionId: SubscriptionId, utrn: String)
+                    (implicit hc: HeaderCarrier): Future[GetTransactionResult] =
+    http
+      .get(url"${appConfig.submissionsServiceUrl}/submission/$utrn")
+      .setHeader(
+        (Headers.CorrelationId, UUID.randomUUID().toString),
+        (Headers.SubscriptionId, subscriptionId.value)
+      )
+      .execute[HttpResponse]
+      .flatMap { response =>
+        response.status match {
+          case OK =>
+            parseJson[ViewTransferResponse](response).map(GetTransactionResult.Found(_))
+          case NOT_FOUND =>
+            (response.json \ "error").asOpt[String] match {
+              case Some(StcIdNotFoundMessage) => Future.successful(GetTransactionResult.StcIdNotFound)
+              case Some(UtrnNotFoundMessage)  => Future.successful(GetTransactionResult.UtrnNotFound)
+              case other => logInfoAndFailParsing(s"Unrecognised 404 when getting transaction $utrn: $other")
+            }
+          case otherResponse => logInfoAndFailNon201(
+            s"Received unexpected $otherResponse response when getting transaction $utrn"
+          )
+        }
+      }
+
+  private def parseJson[A](response: HttpResponse)(implicit reads: Reads[A]): Future[A] =
+    response.json.validate[A] match {
+      case JsSuccess(value, _) => Future.successful(value)
+      case JsError(errors)     => logInfoAndFailParsing("Parse errors: " + errors.toString())
     }
 
   private def parseResponse[A <: StcTransactionCreateResponse](response: HttpResponse)
