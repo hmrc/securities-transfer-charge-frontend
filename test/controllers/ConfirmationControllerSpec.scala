@@ -16,6 +16,8 @@
 
 package controllers
 
+import uk.gov.hmrc.securitiestransferchargefrontend.utils.DateTimeFormats
+import uk.gov.hmrc.securitiestransferchargefrontend.config.CurrencyFormatter
 import base.SpecBase
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.*
@@ -29,7 +31,6 @@ import uk.gov.hmrc.securitiestransferchargefrontend.controllers.routes
 import uk.gov.hmrc.securitiestransferchargefrontend.models.{ConfirmationViewModel, JourneyType}
 import uk.gov.hmrc.securitiestransferchargefrontend.repositories.TransactionResponseRepository
 import uk.gov.hmrc.securitiestransferchargefrontend.services.SubmissionCreateResponseSuccess
-import uk.gov.hmrc.securitiestransferchargefrontend.services.stf.shared.FormattingService
 import uk.gov.hmrc.securitiestransferchargefrontend.views.html.shared.ConfirmationView
 
 import java.time.LocalDate
@@ -61,7 +62,6 @@ class ConfirmationControllerSpec extends SpecBase with MockitoSugar with BeforeA
           bind[TransactionResponseRepository].toInstance(mockTransactionResponseRepository)
         )
         .build()
-      val formatter = application.injector.instanceOf[FormattingService]
 
       running(application) {
         implicit val msgs: Messages = messages(application)
@@ -73,9 +73,9 @@ class ConfirmationControllerSpec extends SpecBase with MockitoSugar with BeforeA
 
         val viewModel = ConfirmationViewModel(
           submissionId = submissionId.value,
-          paymentDueBy = formatter.formatPaymentDueDate(paymentDueBy),
+          paymentDueBy = DateTimeFormats.formatDate(paymentDueBy),
           reference = None,
-          taxDue = formatter.formatCurrency(taxDue),
+          taxDue = CurrencyFormatter.currencyFormat(taxDue),
           journeyType = JourneyType.STF,
           isAgent = false,
           isBulk = false

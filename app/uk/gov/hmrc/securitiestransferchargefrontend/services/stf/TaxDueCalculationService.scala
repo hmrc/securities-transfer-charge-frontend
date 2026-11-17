@@ -74,15 +74,4 @@ class TaxDueCalculationService @Inject()(reliefsDataSource: ReliefsDataSource) {
   def calculatePaymentDueDate(userAnswers: UserAnswers): Option[LocalDate] = {
     userAnswers.get(ChargingPointPage).map(_.plusDays(30))
   }
-
-  def formatTaxDue(taxDue: BigDecimal): String = {
-    f"£$taxDue%.2f"
-  }
-
-  def formatDate(date: LocalDate): String = {
-    val day = date.getDayOfMonth
-    val month = date.getMonth.toString.toLowerCase.capitalize
-    val year = date.getYear
-    s"$day $month $year"
-  }
 }

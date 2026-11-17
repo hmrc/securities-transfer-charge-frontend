@@ -16,12 +16,13 @@
 
 package uk.gov.hmrc.securitiestransferchargefrontend.services.sh03.organisations.bulk
 
+import uk.gov.hmrc.securitiestransferchargefrontend.utils.DateTimeFormats
+import uk.gov.hmrc.securitiestransferchargefrontend.config.CurrencyFormatter
 import com.google.inject.Inject
 import play.api.i18n.{Lang, Messages}
 import uk.gov.hmrc.securitiestransferchargefrontend.models.UserAnswers
 import uk.gov.hmrc.securitiestransferchargefrontend.models.stf.fileupload.ParsedStcRowsDocument
 import uk.gov.hmrc.securitiestransferchargefrontend.services.sh03.bulk.TaxDueCalculationService
-import uk.gov.hmrc.securitiestransferchargefrontend.services.stf.shared.FormattingService
 import uk.gov.hmrc.securitiestransferchargefrontend.utils.CommonHelpers
 import uk.gov.hmrc.securitiestransferchargefrontend.viewmodels.sh03.organisations.bulk.{CheckYourAnswersViewModel, CompanyDetailsSummary, RoleAtPurchasingCompanySummary, Sh03Transfer}
 
@@ -29,8 +30,7 @@ import java.time.LocalDate
 import scala.util.Try
 
 class CheckYourAnswersService @Inject()(
-                                         taxDueCalculationService: TaxDueCalculationService,
-                                         formattingService: FormattingService
+                                         taxDueCalculationService: TaxDueCalculationService
                                        ) {
 
   def buildViewModel(parsedStcRowsDocument: ParsedStcRowsDocument, userAnswers: UserAnswers)(implicit lang: Lang, messages: Messages): CheckYourAnswersViewModel = {
@@ -40,8 +40,8 @@ class CheckYourAnswersService @Inject()(
       companyDetailsRows = CompanyDetailsSummary.rows(userAnswers),
       fileName           = parsedStcRowsDocument.fileName,
       numberOfTransfers  = transfers.size,
-      taxDue             = taxDueCalculationService.formatCurrency(transfers.map(_.taxDue).sum),
-      paymentDueBy       = formattingService.formatPaymentDueDate(paymentDueBy(parsedStcRowsDocument)),
+      taxDue             = CurrencyFormatter.currencyFormat(transfers.map(_.taxDue).sum),
+      paymentDueBy       = DateTimeFormats.formatDate(paymentDueBy(parsedStcRowsDocument)),
       transfers          = transfers,
       declarationRows    = RoleAtPurchasingCompanySummary.rows(userAnswers)
     )

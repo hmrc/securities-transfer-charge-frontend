@@ -60,9 +60,5 @@ class TaxDueCalculationService @Inject()(reliefsDataSource: ReliefsDataSource) {
         .getOrElse(BigDecimal(0))
     } else BigDecimal(0)
   }
-
-  def formatCurrency(amount: BigDecimal): String = {
-    f"£$amount%,.2f"
-  }
   
 }

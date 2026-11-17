@@ -22,7 +22,6 @@ import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.actions.*
 import uk.gov.hmrc.securitiestransferchargefrontend.domain.SubmissionId
 import uk.gov.hmrc.securitiestransferchargefrontend.services.DashboardService
-import uk.gov.hmrc.securitiestransferchargefrontend.services.stf.shared.FormattingService
 import uk.gov.hmrc.securitiestransferchargefrontend.viewmodels.dashboard.SubmissionDetailsViewModel
 import uk.gov.hmrc.securitiestransferchargefrontend.views.html.dashboard.SubmissionDetailsView
 
@@ -35,8 +34,7 @@ class SubmissionDetailsController @Inject()(
                                        getData: StcDataRetrievalAction,
                                        val controllerComponents: MessagesControllerComponents,
                                        view: SubmissionDetailsView,
-                                       dashboardService: DashboardService,
-                                       formattingService: FormattingService 
+                                       dashboardService: DashboardService
                                      )(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport {
 
   def onPageLoad(submissionId: String): Action[AnyContent] = (auth andThen getData).async {
@@ -46,7 +44,7 @@ class SubmissionDetailsController @Inject()(
       val isAgent = request.request.isAgent
 
       dashboardService.getSubmission(subscriptionId, subId).map {sttSubmission =>
-        val viewModel = SubmissionDetailsViewModel.build(submission = sttSubmission, formattingService, isAgent)
+        val viewModel = SubmissionDetailsViewModel.build(submission = sttSubmission, isAgent)
         
         Ok(view(viewModel))
       }

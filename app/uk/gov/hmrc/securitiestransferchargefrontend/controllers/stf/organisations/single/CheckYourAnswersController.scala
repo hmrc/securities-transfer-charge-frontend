@@ -16,6 +16,8 @@
 
 package uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.organisations.single
 
+import uk.gov.hmrc.securitiestransferchargefrontend.utils.DateTimeFormats
+import uk.gov.hmrc.securitiestransferchargefrontend.config.CurrencyFormatter
 import com.google.inject.Inject
 import play.api.i18n.{I18nSupport, Lang, Messages, MessagesApi}
 import play.api.mvc.{Action, AnyContent, Call, MessagesControllerComponents}
@@ -31,7 +33,6 @@ import uk.gov.hmrc.securitiestransferchargefrontend.pages.stf.single.*
 import uk.gov.hmrc.securitiestransferchargefrontend.repositories.{CyaHtmlData, CyaHtmlRepository}
 import uk.gov.hmrc.securitiestransferchargefrontend.services.TransactionSubmissionService
 import uk.gov.hmrc.securitiestransferchargefrontend.services.stf.TaxDueCalculationService
-import uk.gov.hmrc.securitiestransferchargefrontend.services.stf.shared.FormattingService
 import uk.gov.hmrc.securitiestransferchargefrontend.viewmodels.govuk.summarylist.*
 import uk.gov.hmrc.securitiestransferchargefrontend.viewmodels.stf.organisations.*
 import uk.gov.hmrc.securitiestransferchargefrontend.viewmodels.stf.shared.single.CheckYourAnswersViewModel
@@ -49,7 +50,6 @@ class CheckYourAnswersController @Inject()(
                                             val controllerComponents: MessagesControllerComponents,
                                             view: CheckYourAnswersView,
                                             taxDueCalculationService: TaxDueCalculationService,
-                                            formattingService: FormattingService,
                                             transactionSubmissionService: TransactionSubmissionService,
                                             cyaHtmlRepository: CyaHtmlRepository
                                           )(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport {
@@ -76,10 +76,10 @@ class CheckYourAnswersController @Inject()(
     ).map(rows => SummaryListViewModel(rows = rows))
 
     val taxDueFormatted = taxDueCalculationService.calculateTaxDue(userAnswers)
-      .map(formattingService.formatTaxDue)
+      .map(CurrencyFormatter.currencyFormat)
 
     val paymentDueDateFormatted = taxDueCalculationService.calculatePaymentDueDate(userAnswers)
-      .map(date => formattingService.formatPaymentDueDate(date)(lang))
+      .map(date => DateTimeFormats.formatDate(date)(lang))
 
     val viewModel = CheckYourAnswersViewModel.fromSummaryLists(
       summaryLists = summaryLists,

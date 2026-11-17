@@ -16,6 +16,8 @@
 
 package uk.gov.hmrc.securitiestransferchargefrontend.services.sh03.agents.bulk
 
+import uk.gov.hmrc.securitiestransferchargefrontend.utils.DateTimeFormats
+import uk.gov.hmrc.securitiestransferchargefrontend.config.CurrencyFormatter
 import play.api.i18n.Messages
 import uk.gov.hmrc.govukfrontend.views.Aliases.SummaryList
 import uk.gov.hmrc.securitiestransferchargefrontend.models.UserAnswers
@@ -35,9 +37,9 @@ class CheckYourAnswersService @Inject()(
   def buildViewModel(userAnswers: UserAnswers, doc: ParsedStcRowsDocument)(implicit messages: Messages): CheckYourAnswersViewModel = {
     val taxDueSummaryRows = taxDueCalculationService.buildTransferRows(doc.rows)
     val taxDue = taxDueSummaryRows.map(_.taxDue).sum
-    val formattedTaxDue = taxDueCalculationService.formatCurrency(taxDue)
+    val formattedTaxDue = CurrencyFormatter.currencyFormat(taxDue)
     val taxDueDate = taxDueCalculationService.calculatePaymentDueDate(doc.rows)
-    val formattedTaxDueDate = taxDueCalculationService.formatDate(taxDueDate)
+    val formattedTaxDueDate = DateTimeFormats.formatDate(taxDueDate)(messages.lang)
 
     val yourDetailsList = SummaryList(rows = Sh03AgentRowBuilder.buildYourDetailsRows(userAnswers))
     val buyerDetailsList = SummaryList(rows = Sh03AgentRowBuilder.buildBuyerDetailsRows(userAnswers))

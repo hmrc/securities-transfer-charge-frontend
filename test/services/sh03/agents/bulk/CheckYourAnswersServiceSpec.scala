@@ -78,19 +78,13 @@ class CheckYourAnswersServiceSpec extends SpecBase with FileUploadFixtures {
       when(taxDueCalculationService.buildTransferRows(document.rows))
         .thenReturn(transferRows)
 
-      when(taxDueCalculationService.formatCurrency(BigDecimal(150)))
-        .thenReturn("£150.00")
-
       when(taxDueCalculationService.calculatePaymentDueDate(document.rows))
         .thenReturn(taxDueDate)
-
-      when(taxDueCalculationService.formatDate(taxDueDate))
-        .thenReturn("15 June 2025")
 
       val result = service.buildViewModel(emptyUserAnswers, document)
 
       result shouldBe CheckYourAnswersViewModel.agentBulkSummaryLists(
-        summaryLists, transferRows, "£150.00", "15 June 2025", declarationList)
+        summaryLists, transferRows, "£150", "15 June 2025", declarationList)
     }
 
     "correctly sum tax due across multiple rows before formatting" in {
@@ -103,9 +97,7 @@ class CheckYourAnswersServiceSpec extends SpecBase with FileUploadFixtures {
       )
 
       when(taxDueCalculationService.buildTransferRows(document.rows)).thenReturn(transferRows)
-      when(taxDueCalculationService.formatCurrency(BigDecimal("38.25"))).thenReturn("£38.25")
       when(taxDueCalculationService.calculatePaymentDueDate(document.rows)).thenReturn(taxDueDate)
-      when(taxDueCalculationService.formatDate(taxDueDate)).thenReturn("15 June 2025")
 
       val result = service.buildViewModel(emptyUserAnswers, document)
 

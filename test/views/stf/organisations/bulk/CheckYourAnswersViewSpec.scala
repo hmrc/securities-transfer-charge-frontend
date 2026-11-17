@@ -185,8 +185,8 @@ class CheckYourAnswersViewSpec extends ViewBaseSpec {
 
       row.select("td").get(0).text() mustBe "John Smith"
       row.select("td").get(1).text() mustBe "ABC Shares"
-      row.select("td").get(2).text() mustBe "£10,000.00"
-      row.select("td").get(3).text() mustBe "£50.00"
+      row.select("td").get(2).text() mustBe "£10,000"
+      row.select("td").get(3).text() mustBe "£50"
     }
 
     "should display the second transfer correctly" in {
@@ -197,8 +197,8 @@ class CheckYourAnswersViewSpec extends ViewBaseSpec {
 
       row.select("td").get(0).text() mustBe "Jane Doe"
       row.select("td").get(1).text() mustBe "XYZ Shares"
-      row.select("td").get(2).text() mustBe "£20,000.00"
-      row.select("td").get(3).text() mustBe "£100.00"
+      row.select("td").get(2).text() mustBe "£20,000"
+      row.select("td").get(3).text() mustBe "£100"
     }
 
     "should have the declaration heading" in {
