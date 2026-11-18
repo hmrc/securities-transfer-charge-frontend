@@ -218,6 +218,17 @@ class ConfirmationViewSpec extends ViewBaseSpec {
             referenceRow(view(emptyRefVm)).map(_.select(".govuk-table__cell").text()) mustBe Some(ExpectedContent.notProvided)
           }
 
+          "should wrap a max length reference with no spaces" in {
+            val longReference = ("abcdefghijklmnopqrstuvwxyz0123456789" * 8).take(255)
+            val longRefVm = viewModel(journeyType = scenario.journeyType, isBulk = scenario.isBulk, isAgent = true, reference = Some(longReference))
+            val doc = view(longRefVm)
+            val cell = referenceRow(doc).map(_.select(".govuk-table__cell"))
+
+            cell.map(_.text()) mustBe Some(longReference)
+            cell.exists(_.hasClass("govuk-!-text-break-word")) mustBe true
+            doc.select("table.govuk-table").hasClass("stc-table--fixed") mustBe true
+          }
+
         } else {
 
           "should not show the 'Your reference' row, even if a reference is present" in {
