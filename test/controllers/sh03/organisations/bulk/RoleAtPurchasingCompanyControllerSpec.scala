@@ -363,6 +363,7 @@ class RoleAtPurchasingCompanyControllerSpec extends SpecBase with MockitoSugar {
           val saved = savedAnswers(mockAnswerPersistenceService)
           saved.get(BulkRoleAtPurchasingCompanyPage) mustBe None
           saved.fileUploadReference mustBe Some(testReference)
+          saved.nextPage mustBe Some(routes.CannotSubmitFormErrorController.onPageLoad())
           verify(mockSessionRepository).clear(userAnswersWithRef.userId)
         }
       }

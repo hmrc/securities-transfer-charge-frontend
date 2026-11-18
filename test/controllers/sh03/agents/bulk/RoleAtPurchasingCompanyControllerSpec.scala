@@ -349,6 +349,7 @@ class RoleAtPurchasingCompanyControllerSpec extends SpecBase {
           val saved = savedAnswers(answerPersistenceService)
           saved.get(BulkRoleAtPurchasingCompanyPage) mustBe None
           saved.fileUploadReference mustBe Some(reference)
+          saved.nextPage mustBe Some(routes.CannotSubmitFormErrorController.onPageLoad())
           verify(sessionRepository).clear(userAnswersWithRef.userId)
         }
       }

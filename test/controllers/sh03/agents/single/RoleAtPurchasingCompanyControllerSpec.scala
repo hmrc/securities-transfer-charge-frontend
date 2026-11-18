@@ -294,7 +294,9 @@ class RoleAtPurchasingCompanyControllerSpec extends SpecBase {
           status(result) mustEqual SEE_OTHER
           redirectLocation(result).value mustEqual dashboardRoutes.DashboardController.onPageLoad().url
 
-          savedAnswers(answerPersistenceService).get(RoleAtPurchasingCompanyPage) mustBe None
+          val saved = savedAnswers(answerPersistenceService)
+          saved.get(RoleAtPurchasingCompanyPage) mustBe None
+          saved.nextPage mustBe Some(routes.CannotSubmitFormErrorController.onPageLoad())
           verify(sessionRepository).clear(emptyUserAnswers.userId)
         }
       }
