@@ -36,12 +36,15 @@ import java.time.format.DateTimeFormatter
 import java.util.Locale
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
+import scala.util.Success
 
 trait EtmpSubmissionService:
   def submitSingleStf(subscriptionId: SubscriptionId, userAnswers: UserAnswers, affinityData: AffinityData)(implicit hc: HeaderCarrier): Future[SubmissionCreateResponse]
   def submitSingleSh03(subscriptionId: SubscriptionId, userAnswers: UserAnswers, affinityData: AffinityData)(implicit hc: HeaderCarrier): Future[SubmissionCreateResponse]
   def submitBulkStf(subscriptionId: SubscriptionId, rows: Seq[ValidatedStcRow], userAnswers: UserAnswers, affinityData: AffinityData)(implicit hc: HeaderCarrier): Future[SubmissionCreateResponse]
   def submitBulkSH03(subscriptionId: SubscriptionId, rows: Seq[ValidatedStcRow], userAnswers: UserAnswers, affinityData: AffinityData)(implicit hc: HeaderCarrier): Future[SubmissionCreateResponse]
+
+  def getTransaction(subscriptionId: SubscriptionId, utrn: String)(implicit hc: HeaderCarrier): Future[GetTransactionResult]
 
   def getSubmissionDataStf(userAnswers: UserAnswers, affinityData: AffinityData): Option[(SingleTransferDeclaration, SingleTransferRequest, StfTransaction)]
   def getSubmissionDataSh03(userAnswers: UserAnswers, affinityData: AffinityData): Option[(SingleTransferDeclaration, SingleTransferRequest)]
@@ -174,6 +177,13 @@ class EtmpSubmissionServiceImpl @Inject() (etmpSubmissionsClient: EtmpSubmission
     etmpSubmissionsClient
       .submitBatchTransfer(subscriptionId, userAnswers.submissionId, etmpPayload)
       .map(toSubmissionCreateResponse(userAnswers))
+
+  override def getTransaction(subscriptionId: SubscriptionId, utrn: String)
+                             (implicit hc: HeaderCarrier): Future[GetTransactionResult] =
+    etmpSubmissionsClient.getTransaction(subscriptionId, utrn).andThen {
+      case Success(GetTransactionResult.StcIdNotFound) => logger.warn(s"Transaction $utrn not found: STC ID does not exist")
+      case Success(GetTransactionResult.UtrnNotFound)  => logger.warn(s"Transaction $utrn not found: UTRN not found")
+    }
 
   def getSubmissionDataStf(userAnswers: UserAnswers, affinityData: AffinityData): Option[(SingleTransferDeclaration, SingleTransferRequest, StfTransaction)] = {
     userAnswers.get(StfTransaction).map { stfSingleReq =>

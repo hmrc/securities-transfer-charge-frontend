@@ -19,13 +19,20 @@ package clients
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.securitiestransferchargefrontend.clients.EtmpSubmissionClient
 import uk.gov.hmrc.securitiestransferchargefrontend.domain.{SubmissionId, SubscriptionId}
-import uk.gov.hmrc.securitiestransferchargefrontend.models.submission.{StcTransactionCreateResponse, SubmissionBatchPayload}
+import uk.gov.hmrc.securitiestransferchargefrontend.models.submission.{GetTransactionResult, StcTransactionCreateResponse, SubmissionBatchPayload}
 
 import scala.concurrent.Future
 
-class FakeEtmpSubmissionClient(toReturn: StcTransactionCreateResponse) extends EtmpSubmissionClient:
+class FakeEtmpSubmissionClient(
+  toReturn: StcTransactionCreateResponse,
+  getTransactionResult: Future[GetTransactionResult] =
+    Future.failed(new UnsupportedOperationException("getTransaction not stubbed"))
+) extends EtmpSubmissionClient:
   def submitBatchTransfer(
     subscriptionId: SubscriptionId,
     submissionId: SubmissionId,
     payload: SubmissionBatchPayload
   )(implicit hc: HeaderCarrier): Future[StcTransactionCreateResponse] = Future.successful(toReturn)
+
+  def getTransaction(subscriptionId: SubscriptionId, utrn: String)(implicit hc: HeaderCarrier): Future[GetTransactionResult] =
+    getTransactionResult

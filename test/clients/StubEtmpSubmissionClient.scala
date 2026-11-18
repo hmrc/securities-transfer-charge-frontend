@@ -19,7 +19,7 @@ package clients
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.securitiestransferchargefrontend.clients.EtmpSubmissionClient
 import uk.gov.hmrc.securitiestransferchargefrontend.domain.{SubmissionId, SubscriptionId}
-import uk.gov.hmrc.securitiestransferchargefrontend.models.submission.{StcCharge, StcChargeSuccess, StcTransactionCreateProcessed, StcTransactionCreateProcessedBody, StcTransactionCreateResponse, SubmissionBatchPayload}
+import uk.gov.hmrc.securitiestransferchargefrontend.models.submission.{GetTransactionResult, StcCharge, StcChargeSuccess, StcTransactionCreateProcessed, StcTransactionCreateProcessedBody, StcTransactionCreateResponse, SubmissionBatchPayload}
 
 import scala.concurrent.Future
 
@@ -43,3 +43,6 @@ class StubEtmpSubmissionClient extends EtmpSubmissionClient:
         )
       )
     )
+
+  override def getTransaction(subscriptionId: SubscriptionId, utrn: String)(implicit hc: HeaderCarrier): Future[GetTransactionResult] =
+    Future.successful(GetTransactionResult.UtrnNotFound)
