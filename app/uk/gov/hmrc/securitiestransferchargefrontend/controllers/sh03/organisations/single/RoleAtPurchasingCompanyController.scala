@@ -17,15 +17,19 @@
 package uk.gov.hmrc.securitiestransferchargefrontend.controllers.sh03.organisations.single
 
 import play.api.i18n.{I18nSupport, MessagesApi}
-import play.api.mvc.{Action, AnyContent, Call, MessagesControllerComponents}
+import play.api.mvc.{Action, AnyContent, Call, MessagesControllerComponents, Result}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.actions.*
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.actions.requests.StcDataRequest
+import uk.gov.hmrc.securitiestransferchargefrontend.controllers.dashboard.routes as dashboardRoutes
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.shared.SaveAndReturnButton.isReturn
 import uk.gov.hmrc.securitiestransferchargefrontend.forms.sh03.shared.RoleAtPurchasingCompanyFormProvider
+import uk.gov.hmrc.securitiestransferchargefrontend.models.sh03.shared.RoleAtPurchasingCompany
 import uk.gov.hmrc.securitiestransferchargefrontend.models.{Mode, UserAnswers}
 import uk.gov.hmrc.securitiestransferchargefrontend.navigation.Navigator
 import uk.gov.hmrc.securitiestransferchargefrontend.pages.sh03.RoleAtPurchasingCompanyPage
+import uk.gov.hmrc.securitiestransferchargefrontend.repositories.SessionRepository
+import uk.gov.hmrc.securitiestransferchargefrontend.services.AnswerPersistenceService
 import uk.gov.hmrc.securitiestransferchargefrontend.views.html.sh03.organisations.single.RoleAtPurchasingCompanyView
 
 import javax.inject.{Inject, Named}
@@ -39,7 +43,9 @@ class RoleAtPurchasingCompanyController @Inject()(
                                                    requireData: StcDataRequiredAction,
                                                    formProvider: RoleAtPurchasingCompanyFormProvider,
                                                    val controllerComponents: MessagesControllerComponents,
-                                                   view: RoleAtPurchasingCompanyView
+                                                   view: RoleAtPurchasingCompanyView,
+                                                   answerPersistenceService: AnswerPersistenceService,
+                                                   sessionRepository: SessionRepository
                                                  )(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport {
 
   private def form(implicit request: StcDataRequest[_]) =
@@ -66,10 +72,20 @@ class RoleAtPurchasingCompanyController @Inject()(
           Future.successful(BadRequest(view(formWithErrors, mode, backLinkCall(mode)(request.userAnswers)))),
 
         value =>
-          for {
+          if (value.role == RoleAtPurchasingCompany.unsupportedRole) removeRoleAndRedirect
+          else for {
             updatedAnswers <- Future.fromTry(request.userAnswers.set(RoleAtPurchasingCompanyPage, value))
             nextPage <- navigator.nextPage(RoleAtPurchasingCompanyPage, mode, updatedAnswers, isReturn(request))
           } yield Redirect(nextPage)
       )
+  }
+
+  private def removeRoleAndRedirect(implicit request: StcDataRequest[AnyContent]): Future[Result] = {
+    val cannotSubmitPage = routes.CannotSubmitFormErrorController.onPageLoad()
+    for {
+      updatedAnswers <- Future.fromTry(request.userAnswers.remove(RoleAtPurchasingCompanyPage))
+      _              <- answerPersistenceService.save(updatedAnswers.setNextPage(cannotSubmitPage))
+      _              <- if (isReturn(request)) sessionRepository.clear(updatedAnswers.userId) else Future.unit
+    } yield Redirect(if (isReturn(request)) dashboardRoutes.DashboardController.onPageLoad() else cannotSubmitPage)
   }
 }
