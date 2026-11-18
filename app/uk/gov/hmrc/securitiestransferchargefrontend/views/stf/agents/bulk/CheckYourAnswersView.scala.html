@@ -18,9 +18,8 @@
 @import uk.gov.hmrc.securitiestransferchargefrontend.viewmodels.stf.agents.bulk.CheckYourAnswersViewModel
 @import uk.gov.hmrc.securitiestransferchargefrontend.views.html.components.SaveAndReturnButton
 @import uk.gov.hmrc.securitiestransferchargefrontend.views.html.templates.Layout
-@import uk.gov.hmrc.securitiestransferchargefrontend.viewmodels.stf.agents.bulk.CurrencyFormatter
+@import uk.gov.hmrc.securitiestransferchargefrontend.config.CurrencyFormatter
 @import uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.agents.bulk.routes as agentRoutes
-@import uk.gov.hmrc.securitiestransferchargefrontend.controllers.dashboard.routes as dashboardRoutes
 @import views.html.helper.CSPNonce
 
 @this(
@@ -66,8 +65,8 @@
         Seq(
          TableRow(content = Text(row.buyerName)),
          TableRow(content = Text(row.sellerName)),
-         TableRow(content = Text(CurrencyFormatter.formatCurrency(row.consideration)), format = Some("numeric")),
-         TableRow(content = Text(CurrencyFormatter.formatCurrency(row.taxDue)), format = Some("numeric"))
+         TableRow(content = Text(CurrencyFormatter.currencyFormat(row.consideration)), format = Some("numeric")),
+         TableRow(content = Text(CurrencyFormatter.currencyFormat(row.taxDue)), format = Some("numeric"))
         )
       }
      ))
@@ -101,7 +100,7 @@
                 )
             )
 
-            <a class="govuk-link govuk-!-margin-top-2" href="@dashboardRoutes.DashboardController.onPageLoad().url">
+            <a class="govuk-link govuk-!-margin-top-2" href="@agentRoutes.CheckYourAnswersController.onReturnToDashboard().url">
             @messages("return-to-dashboard.link")
             </a>
         }

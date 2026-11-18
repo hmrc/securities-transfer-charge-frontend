@@ -16,6 +16,7 @@
 
 package uk.gov.hmrc.securitiestransferchargefrontend.viewmodels.dashboard
 
+import uk.gov.hmrc.securitiestransferchargefrontend.utils.DateTimeFormats
 import play.api.i18n.Messages
 import uk.gov.hmrc.govukfrontend.views.Aliases.{HeadCell, TableRow}
 import uk.gov.hmrc.govukfrontend.views.viewmodels.content.{HtmlContent, Text}
@@ -25,7 +26,6 @@ import uk.gov.hmrc.securitiestransferchargefrontend.domain.TransferType.{SH03, S
 import uk.gov.hmrc.securitiestransferchargefrontend.models.search.SubmissionStatus.{Overdue, ReadyToPay}
 import uk.gov.hmrc.securitiestransferchargefrontend.models.search.{SttSubmission, SttTransfer, SubmissionStatus}
 import uk.gov.hmrc.securitiestransferchargefrontend.models.submission.SubmissionDetailsSummary
-import uk.gov.hmrc.securitiestransferchargefrontend.services.stf.shared.FormattingService
 
 case class TransferTab(id: String, label: String, heading: String, emptyText: String, table: Option[Table])
 
@@ -44,7 +44,7 @@ object SubmissionDetailsViewModel {
     )
   }
 
-  private def transfersTable(transfers: Seq[SttTransfer], formatter: FormattingService, isAgent: Boolean, submissionType: TransferType)(implicit messages: Messages): Table = {
+  private def transfersTable(transfers: Seq[SttTransfer], isAgent: Boolean, submissionType: TransferType)(implicit messages: Messages): Table = {
     val middleKeys = submissionType match {
       case SH03         => Seq("shares", "for")
       case STF if isAgent => Seq("buyer", "seller")
@@ -75,7 +75,7 @@ object SubmissionDetailsViewModel {
           TableRow(content = Text(transfer.utrn)),
           TableRow(content = Text(second)),
           TableRow(content = Text(third)),
-          TableRow(content = Text(formatter.formatDate(transfer.paymentDueByDate))),
+          TableRow(content = Text(DateTimeFormats.formatDate(transfer.paymentDueByDate)(messages.lang))),
           TableRow(content = StatusTag.tagHtml(transfer.status)),
           TableRow(content = viewLink(transfer.utrn))
         )
@@ -84,13 +84,13 @@ object SubmissionDetailsViewModel {
   }
 
 
-  private def buildTabs(all: Seq[SttTransfer], formatter: FormattingService, isAgent: Boolean, submissionType: TransferType)(implicit messages: Messages): Seq[TransferTab] = Seq(
-    buildTab("allTransfers", all, status = None, formatter, isAgent, submissionType),
-    buildTab("readyToPay", all.filter(_.status == ReadyToPay), Some(ReadyToPay), formatter, isAgent, submissionType),
-    buildTab("overdue", all.filter(_.status == Overdue), Some(Overdue), formatter, isAgent, submissionType)
+  private def buildTabs(all: Seq[SttTransfer], isAgent: Boolean, submissionType: TransferType)(implicit messages: Messages): Seq[TransferTab] = Seq(
+    buildTab("allTransfers", all, status = None, isAgent, submissionType),
+    buildTab("readyToPay", all.filter(_.status == ReadyToPay), Some(ReadyToPay), isAgent, submissionType),
+    buildTab("overdue", all.filter(_.status == Overdue), Some(Overdue), isAgent, submissionType)
   )
 
-  private def buildTab(id: String, transfers: Seq[SttTransfer], status: Option[SubmissionStatus], formatter: FormattingService, isAgent: Boolean, submissionType: TransferType)
+  private def buildTab(id: String, transfers: Seq[SttTransfer], status: Option[SubmissionStatus], isAgent: Boolean, submissionType: TransferType)
                       (implicit messages: Messages): TransferTab = {
     val label = messages(s"submissionDetails.$id.panel.label")
 
@@ -99,17 +99,17 @@ object SubmissionDetailsViewModel {
       label = status.fold(label)(status => StatusTag.labelWithTag(label, transfers.size, status)),
       heading = messages(s"submissionDetails.$id.panel.heading"),
       emptyText = messages(s"submissionDetails.$id.empty"),
-      table = Option.when(transfers.nonEmpty)(transfersTable(transfers, formatter, isAgent, submissionType))
+      table = Option.when(transfers.nonEmpty)(transfersTable(transfers, isAgent, submissionType))
     )
   }
 
-  def build(submission: SttSubmission, formatter: FormattingService, isAgent: Boolean = false)(implicit messages: Messages): SubmissionDetailsViewModel = {
+  def build(submission: SttSubmission, isAgent: Boolean = false)(implicit messages: Messages): SubmissionDetailsViewModel = {
     val submissionType = submission.submissionType
     val transfers = SttTransfer.sorted(submission.transfers)
     SubmissionDetailsViewModel(
       submissionId = submission.submissionId,
-      summary = SubmissionDetailsSummary.getSummary(submission, formatter, isAgent),
-      tabs = buildTabs(transfers, formatter, isAgent, submissionType)
+      summary = SubmissionDetailsSummary.getSummary(submission, isAgent),
+      tabs = buildTabs(transfers, isAgent, submissionType)
     )
   }
 }

@@ -21,7 +21,7 @@ import org.jsoup.nodes.Document
 import play.api.Application
 import play.api.mvc.Call
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.sh03.organisations.bulk.routes
-import uk.gov.hmrc.securitiestransferchargefrontend.controllers.sh03.shared.bulk.routes.YourFileWillNotBeSavedController
+import uk.gov.hmrc.securitiestransferchargefrontend.controllers.routes.YourFileWillNotBeSavedController
 import uk.gov.hmrc.securitiestransferchargefrontend.viewmodels.sh03.organisations.bulk.{CheckYourAnswersViewModel, Sh03Transfer}
 import uk.gov.hmrc.securitiestransferchargefrontend.views.html.sh03.organisations.bulk.CheckYourAnswersView
 import views.ViewBaseSpec
@@ -170,8 +170,8 @@ class CheckYourAnswersViewSpec extends ViewBaseSpec {
 
       row.select("td").get(0).text() mustBe "10,000"
       row.select("td").get(1).text() mustBe "Cancellation"
-      row.select("td").get(2).text() mustBe "£10,000.00"
-      row.select("td").get(3).text() mustBe "£50.00"
+      row.select("td").get(2).text() mustBe "£10,000"
+      row.select("td").get(3).text() mustBe "£50"
     }
 
     "should display the second transfer row correctly" in {
@@ -179,8 +179,8 @@ class CheckYourAnswersViewSpec extends ViewBaseSpec {
 
       row.select("td").get(0).text() mustBe "20,000"
       row.select("td").get(1).text() mustBe "Treasury"
-      row.select("td").get(2).text() mustBe "£20,000.00"
-      row.select("td").get(3).text() mustBe "£100.00"
+      row.select("td").get(2).text() mustBe "£20,000"
+      row.select("td").get(3).text() mustBe "£100"
     }
 
     "should have the declaration heading" in {

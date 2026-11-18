@@ -26,10 +26,11 @@ import play.api.i18n.Lang
 import play.api.inject.bind
 import play.api.test.FakeRequest
 import play.api.test.Helpers.*
-import uk.gov.hmrc.securitiestransferchargefrontend.clients.SubmissionIdClient
+import uk.gov.hmrc.securitiestransferchargefrontend.clients.{SaveAndReturnClient, SubmissionIdClient}
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.actions.requests.StcDataRequest
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.routes
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.organisations.bulk.routes as bulkRoutes
+import uk.gov.hmrc.securitiestransferchargefrontend.controllers.dashboard.routes as dashboardRoutes
 import uk.gov.hmrc.securitiestransferchargefrontend.domain.SubmissionId
 import uk.gov.hmrc.securitiestransferchargefrontend.models.JourneyType.STF
 import uk.gov.hmrc.securitiestransferchargefrontend.models.{NormalMode, UserAnswers}
@@ -51,6 +52,7 @@ class CheckYourAnswersControllerSpec extends SpecBase with MockitoSugar with Fil
 
   lazy val checkYourAnswersRoute: String = bulkRoutes.CheckYourAnswersController.onPageLoad(reference).url
   lazy val onSubmitRoute: String = bulkRoutes.CheckYourAnswersController.onSubmit().url
+  lazy val onReturnToDashboardRoute: String = bulkRoutes.CheckYourAnswersController.onReturnToDashboard().url
 
   val row1: ParsedStcRow = parsedStcRow(1)
   val testFileName: String = "test-file.csv"
@@ -62,6 +64,7 @@ class CheckYourAnswersControllerSpec extends SpecBase with MockitoSugar with Fil
   private val mockNavigator = mock[Navigator]
   private val mockCyaHtmlRepository = mock[CyaHtmlRepository]
   private val mockAnswerPersistenceService = mock[AnswerPersistenceService]
+  private val mockSaveAndReturnClient = mock[SaveAndReturnClient]
 
   private val parsedStcRowsDocument = ParsedStcRowsDocument(
     _id = reference,
@@ -91,13 +94,9 @@ class CheckYourAnswersControllerSpec extends SpecBase with MockitoSugar with Fil
   private val testPaymentDueBy: LocalDate = LocalDate.of(2026, 3, 22)
   private val testTaxDue: BigDecimal = BigDecimal(100.00)
 
-        val parsedStcRowsRepository = mock[ParsedStcRowsRepository]
-        when(parsedStcRowsRepository.findDocumentByReference(reference))
-          .thenReturn(Future.successful(Some(parsedStcRowsDocument)))
-
   override def beforeEach(): Unit = {
     super.beforeEach()
-    reset(mockRepository, mockCyaService, mockTransactionSubmissionService, mockSubmissionIdClient, mockNavigator, mockCyaHtmlRepository, mockAnswerPersistenceService)
+    reset(mockRepository, mockCyaService, mockTransactionSubmissionService, mockSubmissionIdClient, mockNavigator, mockCyaHtmlRepository, mockAnswerPersistenceService, mockSaveAndReturnClient)
     when(mockCyaHtmlRepository.store(any[CyaHtmlData]())).thenReturn(Future.successful(()))
     when(mockAnswerPersistenceService.save(any[UserAnswers]())(any())).thenReturn(Future.successful(()))
     when(mockSubmissionIdClient.nextSubmissionId()(any())).thenReturn(Future.successful(newSubmissionId))
@@ -116,7 +115,7 @@ class CheckYourAnswersControllerSpec extends SpecBase with MockitoSugar with Fil
       .build()
 
   private def submitApplication(userAnswers: Option[UserAnswers]) =
-    applicationBuilder(userAnswers = userAnswers, affinityGroup = orgAffinity)
+    applicationBuilder(userAnswers = userAnswers, affinityGroup = orgAffinity, saveAndReturnClient = mockSaveAndReturnClient)
       .overrides(
         bind[Navigator].qualifiedWith("organisations").toInstance(mockNavigator),
         bind[ParsedStcRowsRepository].toInstance(mockRepository),
@@ -129,7 +128,7 @@ class CheckYourAnswersControllerSpec extends SpecBase with MockitoSugar with Fil
 
   private def capturedNavigatorAnswers(): UserAnswers = {
     val captor = ArgumentCaptor.forClass(classOf[UserAnswers])
-    verify(mockNavigator).nextPage(eqTo(BulkCheckYourAnswersPage), eqTo(NormalMode), captor.capture(), anyBoolean())(any())
+    verify(mockNavigator).nextPage(eqTo(BulkCheckYourAnswersPage), eqTo(NormalMode), captor.capture(), eqTo(false))(any())
     captor.getValue
   }
 
@@ -288,6 +287,44 @@ class CheckYourAnswersControllerSpec extends SpecBase with MockitoSugar with Fil
 
           verify(mockNavigator, never()).nextPage(any(), any(), any(), anyBoolean())(any())
           verify(mockTransactionSubmissionService, never()).submitBulkStf(any())(using any[StcDataRequest[?]]())
+        }
+      }
+    }
+
+    "onReturnToDashboard" - {
+      val testDashboardCall = dashboardRoutes.DashboardController.onPageLoad()
+
+      "must delete the draft and redirect to the dashboard when user answers exist" in {
+        when(mockSaveAndReturnClient.deleteDraft(any())(using any())).thenReturn(Future.unit)
+        when(mockNavigator.returnToDashboard(any())).thenReturn(Future.successful(testDashboardCall))
+
+        val application = submitApplication(Some(answersForThisUpload))
+
+        running(application) {
+          val request = FakeRequest(GET, onReturnToDashboardRoute)
+          val result = route(application, request).value
+
+          status(result) mustEqual SEE_OTHER
+          redirectLocation(result).value mustEqual testDashboardCall.url
+
+          verify(mockSaveAndReturnClient).deleteDraft(eqTo(answersForThisUpload.submissionId))(using any())
+          verify(mockNavigator).returnToDashboard(eqTo(answersForThisUpload))
+          verify(mockTransactionSubmissionService, never()).submitBulkStf(any())(using any[StcDataRequest[?]]())
+        }
+      }
+
+      "must redirect to the journey recovery page when there are no user answers" in {
+        val application = submitApplication(None)
+
+        running(application) {
+          val request = FakeRequest(GET, onReturnToDashboardRoute)
+          val result = route(application, request).value
+
+          status(result) mustEqual SEE_OTHER
+          redirectLocation(result).value mustEqual routes.JourneyRecoveryController.onPageLoad().url
+
+          verify(mockSaveAndReturnClient, never()).deleteDraft(any())(using any())
+          verify(mockNavigator, never()).returnToDashboard(any())
         }
       }
     }

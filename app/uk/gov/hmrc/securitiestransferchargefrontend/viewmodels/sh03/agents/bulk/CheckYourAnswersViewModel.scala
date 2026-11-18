@@ -98,6 +98,5 @@ object CheckYourAnswersViewModel {
 }
 
 object Formatter {
-  def formatCurrency(amount: BigDecimal): String = f"£$amount%,.2f"
   def formatAmount(amount: BigDecimal): String = f"$amount%,.0f"
 }

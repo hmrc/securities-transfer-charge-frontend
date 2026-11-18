@@ -19,6 +19,7 @@
 @import uk.gov.hmrc.securitiestransferchargefrontend.views.html.components.SaveAndReturnButton
 @import uk.gov.hmrc.securitiestransferchargefrontend.views.html.templates.Layout
 @import uk.gov.hmrc.securitiestransferchargefrontend.viewmodels.sh03.agents.bulk.Formatter
+@import uk.gov.hmrc.securitiestransferchargefrontend.config.CurrencyFormatter
 @import uk.gov.hmrc.securitiestransferchargefrontend.controllers.sh03.agents.bulk.routes as agentRoutes
 @import uk.gov.hmrc.securitiestransferchargefrontend.controllers.routes as sharedRoutes
 @import views.html.helper.CSPNonce
@@ -66,8 +67,8 @@
         Seq(
          TableRow(content = Text(Formatter.formatAmount(row.amount)), format = Some("numeric")),
          TableRow(content = Text(row.reason)),
-         TableRow(content = Text(Formatter.formatCurrency(row.consideration)), format = Some("numeric")),
-         TableRow(content = Text(Formatter.formatCurrency(row.taxDue)), format = Some("numeric"))
+         TableRow(content = Text(CurrencyFormatter.currencyFormat(row.consideration)), format = Some("numeric")),
+         TableRow(content = Text(CurrencyFormatter.currencyFormat(row.taxDue)), format = Some("numeric"))
         )
       }
      ))
@@ -90,22 +91,9 @@
     </ul>
     </div>
 
-    <div class="govuk-button-group">
+    @formHelper(action = agentRoutes.CheckYourAnswersController.onSubmit()) {
 
-        @formHelper(action = agentRoutes.CheckYourAnswersController.onSubmit()) {
-
-            @govukButton(
-                ButtonViewModel(
-                    messages(CheckYourAnswersViewModel.MessageKeys.acceptAndSend)
-                )
-            )
-            @govukButton(
-                ButtonViewModel(
-                    messages(CheckYourAnswersViewModel.MessageKeys.saveAndReturn)
-                )
-                .asSecondaryButton()
-                .asLink(sharedRoutes.YourFileWillNotBeSavedController.onPageLoad().url)
-            )
-        }
-    </div>
+            @govukButton(ButtonViewModel(messages(CheckYourAnswersViewModel.MessageKeys.acceptAndSend)))
+            @saveAndReturnButton()
+    }
 }

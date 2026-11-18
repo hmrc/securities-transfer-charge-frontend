@@ -20,11 +20,10 @@ import com.google.inject.Inject
 import play.api.i18n.{I18nSupport, Lang, Messages, MessagesApi}
 import play.api.mvc.{Action, AnyContent, Call, MessagesControllerComponents}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
-import uk.gov.hmrc.securitiestransferchargefrontend.clients.SubmissionIdClient
+import uk.gov.hmrc.securitiestransferchargefrontend.clients.{SaveAndReturnClient, SubmissionIdClient}
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.actions.*
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.actions.requests.StcDataRequest
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.routes
-import uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.shared.SaveAndReturnButton.isReturn
 import uk.gov.hmrc.securitiestransferchargefrontend.domain.{GroupIdentifier, UserId}
 import uk.gov.hmrc.securitiestransferchargefrontend.models.JourneyType.STF
 import uk.gov.hmrc.securitiestransferchargefrontend.models.stf.fileupload.ValidatedStcRow
@@ -53,6 +52,7 @@ class CheckYourAnswersController @Inject()(
                                             parsedStcRowsRepository: ParsedStcRowsRepository,
                                             transactionSubmissionService: TransactionSubmissionService,
                                             idClient: SubmissionIdClient,
+                                            saveAndReturnClient: SaveAndReturnClient,
                                             cyaHtmlRepository: CyaHtmlRepository,
                                             answerPersistenceService: AnswerPersistenceService
                                           )(implicit ec: ExecutionContext)
@@ -98,11 +98,18 @@ class CheckYourAnswersController @Inject()(
 
           for {
             answers  <- Future.fromTry(request.userAnswers.set(BulkConfirmationDetailsPage, details))
-            nextPage <- navigator.nextPage(BulkCheckYourAnswersPage, NormalMode, answers, isReturn(request))
+            nextPage <- navigator.nextPage(BulkCheckYourAnswersPage, NormalMode, answers)
             _         = transactionSubmissionService.submitBulkStf(rows)(using StcDataRequest(request.request, answers))
           } yield Redirect(nextPage)
 
         case _ => Future.successful(Redirect(routes.JourneyRecoveryController.onPageLoad()))
       }
+  }
+
+  def onReturnToDashboard(): Action[AnyContent] = (stcAuthEnrolled andThen getData andThen requireData).async { implicit request =>
+    for {
+      _         <- saveAndReturnClient.deleteDraft(request.userAnswers.submissionId)
+      dashboard <- navigator.returnToDashboard(request.userAnswers)
+    } yield Redirect(dashboard)
   }
 }

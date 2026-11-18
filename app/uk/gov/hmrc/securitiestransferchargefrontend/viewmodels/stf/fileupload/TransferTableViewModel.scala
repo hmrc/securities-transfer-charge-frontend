@@ -16,6 +16,7 @@
 
 package uk.gov.hmrc.securitiestransferchargefrontend.viewmodels.stf.fileupload
 
+import uk.gov.hmrc.securitiestransferchargefrontend.config.CurrencyFormatter
 import uk.gov.hmrc.govukfrontend.views.viewmodels.table.TableRow
 import uk.gov.hmrc.securitiestransferchargefrontend.viewmodels.govuk.table._
 import uk.gov.hmrc.securitiestransferchargefrontend.viewmodels.stf.fileupload.Transfer
@@ -36,14 +37,11 @@ object TransferTableViewModel {
           content = Text(transfer.securitiesBoughtIn)
         ),
         TableRowViewModel(
-          content = HtmlContent(formatCurrency(transfer.consideration))
+          content = HtmlContent(CurrencyFormatter.currencyFormat(transfer.consideration))
         ).withCssClass("govuk-table__cell--numeric"),
         TableRowViewModel(
-          content = HtmlContent(formatCurrency(transfer.taxDue))
+          content = HtmlContent(CurrencyFormatter.currencyFormat(transfer.taxDue))
         ).withCssClass("govuk-table__cell--numeric")
       )
     }
-
-  private def formatCurrency(value: BigDecimal): String =
-    f"£${value.setScale(2)}%,.2f"
 }

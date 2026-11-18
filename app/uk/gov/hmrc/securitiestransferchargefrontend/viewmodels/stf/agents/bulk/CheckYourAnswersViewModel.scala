@@ -91,7 +91,3 @@ object CheckYourAnswersViewModel {
   }
   
 }
-
-object CurrencyFormatter {
-  def formatCurrency(amount: BigDecimal): String = f"£$amount%,.2f"
-}

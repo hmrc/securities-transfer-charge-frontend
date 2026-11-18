@@ -29,6 +29,8 @@ class FakeNavigator(desiredRoute: Call)(implicit ec: ExecutionContext) extends N
   override def nextPage(page: Page, mode: Mode, userAnswers: UserAnswers, isReturn: Boolean = false)(implicit request: Request[?]): Future[Call] =
     Future.successful(desiredRoute)
 
+  override def returnToDashboard(userAnswers: UserAnswers): Future[Call] = Future.successful(desiredRoute)
+
   override def errorPage(forPage: Page): Call = desiredRoute
 
   override def previousPage(page: Page, mode: Mode, userAnswers: UserAnswers): Call = desiredRoute

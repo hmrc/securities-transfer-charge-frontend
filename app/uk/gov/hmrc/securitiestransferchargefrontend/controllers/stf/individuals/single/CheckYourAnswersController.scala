@@ -16,6 +16,8 @@
 
 package uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.individuals.single
 
+import uk.gov.hmrc.securitiestransferchargefrontend.utils.DateTimeFormats
+import uk.gov.hmrc.securitiestransferchargefrontend.config.CurrencyFormatter
 import com.google.inject.Inject
 import play.api.i18n.{I18nSupport, Lang, Messages, MessagesApi}
 import play.api.mvc.{Action, AnyContent, Call, MessagesControllerComponents}
@@ -24,6 +26,7 @@ import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.SummaryListRow
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.actions.*
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.actions.requests.StcDataRequest
+import uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.shared.SaveAndReturnButton.isReturn
 import uk.gov.hmrc.securitiestransferchargefrontend.models.{Mode, NormalMode, UserAnswers}
 import uk.gov.hmrc.securitiestransferchargefrontend.navigation.Navigator
 import uk.gov.hmrc.securitiestransferchargefrontend.pages.stf.shared.*
@@ -31,7 +34,6 @@ import uk.gov.hmrc.securitiestransferchargefrontend.pages.stf.single.*
 import uk.gov.hmrc.securitiestransferchargefrontend.repositories.{CyaHtmlData, CyaHtmlRepository}
 import uk.gov.hmrc.securitiestransferchargefrontend.services.TransactionSubmissionService
 import uk.gov.hmrc.securitiestransferchargefrontend.services.stf.TaxDueCalculationService
-import uk.gov.hmrc.securitiestransferchargefrontend.services.stf.shared.FormattingService
 import uk.gov.hmrc.securitiestransferchargefrontend.viewmodels.govuk.summarylist.*
 import uk.gov.hmrc.securitiestransferchargefrontend.viewmodels.stf.individuals.*
 import uk.gov.hmrc.securitiestransferchargefrontend.viewmodels.stf.shared.single.CheckYourAnswersViewModel
@@ -49,7 +51,6 @@ class CheckYourAnswersController @Inject()(
                                             val controllerComponents: MessagesControllerComponents,
                                             view: CheckYourAnswersView,
                                             taxDueCalculationService: TaxDueCalculationService,
-                                            formattingService: FormattingService,
                                             transactionSubmissionService: TransactionSubmissionService,
                                             cyaHtmlRepository: CyaHtmlRepository
                                           )(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport {
@@ -77,10 +78,10 @@ class CheckYourAnswersController @Inject()(
     ).map(rows => SummaryListViewModel(rows = rows))
 
     val taxDueFormatted = taxDueCalculationService.calculateTaxDue(userAnswers)
-      .map(formattingService.formatTaxDue)
+      .map(CurrencyFormatter.currencyFormat)
 
     val paymentDueDateFormatted = taxDueCalculationService.calculatePaymentDueDate(userAnswers)
-      .map(date => formattingService.formatPaymentDueDate(date)(lang))
+      .map(date => DateTimeFormats.formatDate(date)(lang))
 
     val viewModel = CheckYourAnswersViewModel.fromSummaryLists(
       summaryLists = summaryLists,
@@ -100,18 +101,19 @@ class CheckYourAnswersController @Inject()(
   }
   
   def onSubmit(): Action[AnyContent] = (stcAuthEnrolled andThen getData andThen requireData).async { implicit request =>
-    transactionSubmissionService
-      .submitSingleStf
-      .flatMap(nextUrl)
-      .map(Redirect)
+    if isReturn(request) then
+      navigator.returnToDashboard(request.userAnswers).map(Redirect)
+    else
+      transactionSubmissionService
+        .submitSingleStf
+        .flatMap(nextUrl)
+        .map(Redirect)
   }
   
   private def nextUrl(success: Boolean)(implicit request: StcDataRequest[?]): Future[Call] =
     if success then navigator.nextPage(CheckYourAnswersPage, NormalMode, TransactionSubmissionService.clearedUserAnswers(request))
     else Future.successful(navigator.errorPage(CheckYourAnswersPage))
-  
-  
-  
+
   def buildYourDetailsRows(userAnswers: UserAnswers)(implicit messages: Messages): Seq[SummaryListRow] = {
     val addressRow = userAnswers.get(ConfirmAddressPage)
       .map(_ => ConfirmAddressSummary.row(userAnswers))

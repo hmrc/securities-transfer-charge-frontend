@@ -19,7 +19,6 @@
 @import uk.gov.hmrc.govukfrontend.views.viewmodels.table._
 @import uk.gov.hmrc.securitiestransferchargefrontend.viewmodels.stf.fileupload.CheckYourAnswersViewModel
 @import uk.gov.hmrc.securitiestransferchargefrontend.viewmodels.stf.fileupload.TransferTableViewModel
-@import uk.gov.hmrc.securitiestransferchargefrontend.controllers.dashboard.routes as dashboardRoutes
 @import uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.individuals.bulk.routes
 
 @this(
@@ -126,7 +125,7 @@
                     messages("checkYourAnswers.acceptAndSend")
                 )
             )
-        <a class="govuk-link govuk-!-margin-top-2" href="@dashboardRoutes.DashboardController.onPageLoad().url" style="margin-left: -11px">
+        <a class="govuk-link govuk-!-margin-top-2" href="@routes.CheckYourAnswersController.onReturnToDashboard().url" style="margin-left: -11px">
             @messages("checkYourAnswers.returnToDashboard")
         </a>
         }

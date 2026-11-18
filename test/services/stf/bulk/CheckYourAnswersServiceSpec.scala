@@ -25,7 +25,6 @@ import play.api.i18n.Lang
 import uk.gov.hmrc.securitiestransferchargefrontend.models.stf.fileupload.ParsedValue.Valid
 import uk.gov.hmrc.securitiestransferchargefrontend.models.stf.fileupload.{ParsedStcRow, ParsedStcRowsDocument}
 import uk.gov.hmrc.securitiestransferchargefrontend.services.stf.bulk.{CheckYourAnswersService, TaxDueCalculationService}
-import uk.gov.hmrc.securitiestransferchargefrontend.services.stf.shared.FormattingService
 import uk.gov.hmrc.securitiestransferchargefrontend.viewmodels.stf.fileupload.{CheckYourAnswersViewModel, Transfer}
 
 import java.time.LocalDate
@@ -35,10 +34,9 @@ class CheckYourAnswersServiceSpec extends SpecBase with FileUploadFixtures {
   implicit val lang: Lang = Lang("en")
 
   private val taxDueCalculationService = mock[TaxDueCalculationService]
-  private val formattingService = mock[FormattingService]
   val chargingPoint: Valid[LocalDate] = Valid(LocalDate.of(2025, 5, 16))
 
-  private val service = new CheckYourAnswersService(taxDueCalculationService, formattingService)
+  private val service = new CheckYourAnswersService(taxDueCalculationService)
   val row1: ParsedStcRow = parsedStcRow(1).copy(chargingPoint =
     chargingPoint,
     sellerName = Some("Seller 1"),
@@ -65,19 +63,13 @@ class CheckYourAnswersServiceSpec extends SpecBase with FileUploadFixtures {
       when(taxDueCalculationService.calculateTaxDue(row2))
         .thenReturn(Some(BigDecimal("20000.00")))
 
-      when(taxDueCalculationService.formatCurrency(BigDecimal("30000.00")))
-        .thenReturn("£30,000.00")
-
-      when(formattingService.formatPaymentDueDate(any[LocalDate])(any()))
-        .thenReturn("3 March 2026")
-
       val result = service.buildViewModel(document)
 
       result shouldBe CheckYourAnswersViewModel(
         fileName = "test.csv",
         numberOfTransfers = 2,
-        taxDue = "£30,000.00",
-        paymentDueBy = "3 March 2026",
+        taxDue = "£30,000",
+        paymentDueBy = "15 June 2025",
         transfers = Seq(
           Transfer(
             seller = "Seller 1",
@@ -95,9 +87,9 @@ class CheckYourAnswersServiceSpec extends SpecBase with FileUploadFixtures {
       )
     }
 
-    "use the latest charging point date and add 30 days to determine the payment due date" in {
+    "use the earliest charging point date and add 30 days to determine the payment due date" in {
 
-      val chargingPoint = Valid(LocalDate.of(2026, 1, 1))
+      val chargingPoint = Valid(LocalDate.of(2025, 1, 1))
       val row = row1.copy(chargingPoint = chargingPoint)
 
 
@@ -110,15 +102,9 @@ class CheckYourAnswersServiceSpec extends SpecBase with FileUploadFixtures {
       when(taxDueCalculationService.calculateTaxDue(any()))
         .thenReturn(Some(BigDecimal("10.00")))
 
-      when(formattingService.formatTaxDue(BigDecimal("20.00")))
-        .thenReturn("£20.00")
-
-      when(formattingService.formatPaymentDueDate(any[LocalDate])(any()))
-        .thenReturn("31 January 2026")
-
       val result = service.buildViewModel(document)
 
-      result.paymentDueBy shouldBe "31 January 2026"
+      result.paymentDueBy shouldBe "31 January 2025"
     }
 
     "sum the tax due for all valid transfers" in {
@@ -134,12 +120,6 @@ class CheckYourAnswersServiceSpec extends SpecBase with FileUploadFixtures {
 
       when(taxDueCalculationService.calculateTaxDue(row2))
         .thenReturn(Some(BigDecimal("25.75")))
-
-      when(taxDueCalculationService.formatCurrency(BigDecimal("38.25")))
-        .thenReturn("£38.25")
-
-      when(formattingService.formatPaymentDueDate(LocalDate.of(2026, 1, 31)))
-        .thenReturn("31 January 2026")
 
       val result = service.buildViewModel(document)
 

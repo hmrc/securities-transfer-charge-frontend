@@ -67,6 +67,7 @@ class UserAnswersValidatorSpec extends AnyFreeSpec with Matchers with ScalaFutur
   }
 
   // Test calls
+  val dashboardPageCall: Call = Call("GET", "/dashboardPage")
   val startPageCall: Call = Call("GET", "/start")
   val page1Call: Call = Call("GET", "/page1")
   val page2Call: Call = Call("GET", "/page2")
@@ -86,6 +87,8 @@ class UserAnswersValidatorSpec extends AnyFreeSpec with Matchers with ScalaFutur
     override def nextPage(page: Page, mode: Mode, userAnswers: UserAnswers, isReturn: Boolean = false)(implicit request: Request[_]): Future[Call] = {
       Future.successful(nextPageMap.getOrElse(page, recoveryPageCall))
     }
+
+    override def returnToDashboard(userAnswers: UserAnswers): Future[Call] = Future.successful(dashboardPageCall)
 
     override def previousPage(page: Page, mode: Mode, userAnswers: UserAnswers): Call = {
       recoveryPageCall

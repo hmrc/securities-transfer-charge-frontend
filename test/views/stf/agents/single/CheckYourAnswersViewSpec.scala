@@ -24,6 +24,7 @@ import uk.gov.hmrc.govukfrontend.views.viewmodels.content.Text
 import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.{Key, SummaryList, SummaryListRow, Value}
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.agents.single.routes as agentRoutes
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.dashboard.routes as dashboardRoutes
+import uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.shared.SaveAndReturnButton.saveAndReturnButtonName
 import uk.gov.hmrc.securitiestransferchargefrontend.viewmodels.stf.shared.single.{CheckYourAnswersViewModel, SummarySection}
 import uk.gov.hmrc.securitiestransferchargefrontend.views.html.stf.agents.single.CheckYourAnswersView
 import views.ViewBaseSpec
@@ -195,11 +196,7 @@ class CheckYourAnswersViewSpec extends ViewBaseSpec {
     }
 
     "should have a save and return button" in {
-      view().select(".govuk-button-group a.govuk-link").text() mustBe ExpectedContent.saveAndReturn
-    }
-
-    "should have the correct save and return link" in {
-      view().select(".govuk-button-group a.govuk-link").attr("href") mustBe dashboardRoutes.DashboardController.onPageLoad().url
+      view().select(s"button[name=$saveAndReturnButtonName]").text() mustBe ExpectedContent.saveAndReturn
     }
 
     "should have the correct back link" in {
@@ -213,7 +210,6 @@ class CheckYourAnswersViewSpec extends ViewBaseSpec {
     "should submit to the check your answers endpoint" in {
       view().select("form").attr("action") mustBe agentRoutes.CheckYourAnswersController.onSubmit().url
     }
-
 
     "should render summary sections" in {
       val headings =

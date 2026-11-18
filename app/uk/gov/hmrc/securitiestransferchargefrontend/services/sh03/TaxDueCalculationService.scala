@@ -94,17 +94,6 @@ class TaxDueCalculationService @Inject()(
     }
   }
 
-  def formatCurrency(amount: BigDecimal): String = {
-    f"£$amount%,.2f"
-  }
-  
-  def formatDate(date: LocalDate): String = {
-    val day = date.getDayOfMonth
-    val month = date.getMonth.toString.toLowerCase.capitalize
-    val year = date.getYear
-    s"$day $month $year"
-  }
-
   private def getReliefPercentageForRow(row: ParsedStcRow): Option[BigDecimal] = {
     for {
       applyingForRelief <- row.applyingForRelief
