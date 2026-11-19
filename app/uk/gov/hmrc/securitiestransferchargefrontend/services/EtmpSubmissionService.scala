@@ -24,7 +24,7 @@ import uk.gov.hmrc.securitiestransferchargefrontend.domain.{SubmissionId, Subscr
 import uk.gov.hmrc.securitiestransferchargefrontend.models.UserAnswers
 import uk.gov.hmrc.securitiestransferchargefrontend.models.sh03.bulk.CompanyDetails
 import uk.gov.hmrc.securitiestransferchargefrontend.models.shared.AgentReference
-import uk.gov.hmrc.securitiestransferchargefrontend.models.stf.fileupload.{ParsedStcRow, ValidatedStcRow}
+import uk.gov.hmrc.securitiestransferchargefrontend.models.stf.fileupload.ValidatedStcRow
 import uk.gov.hmrc.securitiestransferchargefrontend.models.submission.*
 import uk.gov.hmrc.securitiestransferchargefrontend.pages.sh03.RoleAtPurchasingCompanyPage
 import uk.gov.hmrc.securitiestransferchargefrontend.pages.sh03.bulk.BulkCompanyDetailsPage
@@ -43,7 +43,7 @@ trait EtmpSubmissionService:
   def submitBulkStf(subscriptionId: SubscriptionId, rows: Seq[ValidatedStcRow], userAnswers: UserAnswers, affinityData: AffinityData)(implicit hc: HeaderCarrier): Future[SubmissionCreateResponse]
   def submitBulkSH03(subscriptionId: SubscriptionId, rows: Seq[ValidatedStcRow], userAnswers: UserAnswers, affinityData: AffinityData)(implicit hc: HeaderCarrier): Future[SubmissionCreateResponse]
 
-  def getSubmissionDataStf(userAnswers: UserAnswers, affinityData: AffinityData): Option[(SingleTransferDeclaration, SingleTransferRequest, StfTransaction)]
+  def getSubmissionDataStf(userAnswers: UserAnswers, affinityData: AffinityData): Option[(SingleTransferRequest, StfTransaction)]
   def getSubmissionDataSh03(userAnswers: UserAnswers, affinityData: AffinityData): Option[(SingleTransferDeclaration, SingleTransferRequest)]
 
 class EtmpSubmissionServiceImpl @Inject() (etmpSubmissionsClient: EtmpSubmissionClient)(implicit ec: ExecutionContext) extends EtmpSubmissionService with Logging:
@@ -51,7 +51,8 @@ class EtmpSubmissionServiceImpl @Inject() (etmpSubmissionsClient: EtmpSubmission
                                (implicit hc: HeaderCarrier): Future[SubmissionCreateResponse] = {
     userAnswers.get(StfTransaction).map { stfSingleReq =>
       val stfReq = UserAnswersTransforms.toStfRequest(stfSingleReq, affinityData)
-      submitSingle(stfReq, subscriptionId, userAnswers)
+      val etmpPayload = SubmissionBatchPayload.stfPayload(List(stfReq))
+      submitBatchTransfer(subscriptionId, userAnswers, etmpPayload)
     }.getOrElse(handleSubmitSingleFailure(STF, userAnswers.submissionId))
   }
 
@@ -59,15 +60,10 @@ class EtmpSubmissionServiceImpl @Inject() (etmpSubmissionsClient: EtmpSubmission
                                (implicit hc: HeaderCarrier): Future[SubmissionCreateResponse] = {
     userAnswers.get(Sh03Transaction).map { sh03SingleReq =>
       val sh03Req = UserAnswersTransforms.toSh03Request(sh03SingleReq, affinityData)
-      submitSingle(sh03Req, subscriptionId, userAnswers)
+      val declaration = createDeclaration(userAnswers)
+      val etmpPayload = SubmissionBatchPayload.sh03Payload(declaration, List(sh03Req))
+      submitBatchTransfer(subscriptionId, userAnswers, etmpPayload)
     }.getOrElse(handleSubmitSingleFailure(SH03, userAnswers.submissionId))
-  }
-
-  private def submitSingle(req: SingleTransferRequest, subscriptionId: SubscriptionId, userAnswers: UserAnswers)
-                  (implicit hc: HeaderCarrier): Future[SubmissionCreateResponse] = {
-    val declaration = createDeclaration(userAnswers)
-    val etmpPayload = SubmissionBatchPayload(declaration, List(req))
-    submitBatchTransfer(subscriptionId, userAnswers, etmpPayload)
   }
 
   private val submissionFailure = Future.successful(SubmissionCreateResponseFailure)
@@ -79,26 +75,23 @@ class EtmpSubmissionServiceImpl @Inject() (etmpSubmissionsClient: EtmpSubmission
   
   override def submitBulkStf(subscriptionId: SubscriptionId, rows: Seq[ValidatedStcRow], userAnswers: UserAnswers, affinityData: AffinityData)
                             (implicit hc: HeaderCarrier): Future[SubmissionCreateResponse] =
-    submitBulk(RowTransforms.fromValidatedStcRowToStfRequest)(subscriptionId, rows, userAnswers, affinityData)
+    val agentReference = getAgentReference(userAnswers)
+    val requests = rows.map(r => RowTransforms.fromValidatedStcRowToStfRequest(r.parsedRow, affinityData, agentReference))
+    val etmpPayload = SubmissionBatchPayload.stfPayload(requests)
+    submitBatchTransfer(subscriptionId, userAnswers, etmpPayload)
 
   override def submitBulkSH03(subscriptionId: SubscriptionId, rows: Seq[ValidatedStcRow], userAnswers: UserAnswers, affinityData: AffinityData)
                              (implicit hc: HeaderCarrier): Future[SubmissionCreateResponse] = {
     getCompanyDetails(userAnswers).map { companyDetails =>
-      submitBulk(RowTransforms.fromValidatedStcRowToSh03Request(companyDetails))(subscriptionId, rows, userAnswers, affinityData)
+      val declaration = createDeclaration(userAnswers)
+      val agentReference = getAgentReference(userAnswers)
+      val requests = rows.map(r => RowTransforms.fromValidatedStcRowToSh03Request(companyDetails)(r.parsedRow, affinityData, agentReference))
+      val etmpPayload = SubmissionBatchPayload.sh03Payload(declaration, requests)
+      submitBatchTransfer(subscriptionId, userAnswers, etmpPayload) 
     }.getOrElse {
       logger.warn(s"Failed to submit bulks SH03 transaction ${userAnswers.submissionId} - could not get company details.")
       submissionFailure
     }
-  }
-
-  private type TransformFunction = (ParsedStcRow, AffinityData, Option[String]) =>  SingleTransferRequest
-  private def submitBulk(transformFunction: TransformFunction)(subscriptionId: SubscriptionId, rows: Seq[ValidatedStcRow], userAnswers: UserAnswers, affinityData: AffinityData)
-                        (implicit hc: HeaderCarrier): Future[SubmissionCreateResponse] = {
-    val agentReference = getAgentReference(userAnswers)
-    val requests = rows.map { row => transformFunction(row.parsedRow, affinityData, agentReference) }
-    val declaration = createDeclaration(userAnswers)
-    val etmpPayload = SubmissionBatchPayload(declaration, requests)
-    submitBatchTransfer(subscriptionId, userAnswers, etmpPayload)
   }
  
   private def getAgentReference(userAnswers: UserAnswers): Option[String] =
@@ -175,11 +168,10 @@ class EtmpSubmissionServiceImpl @Inject() (etmpSubmissionsClient: EtmpSubmission
       .submitBatchTransfer(subscriptionId, userAnswers.submissionId, etmpPayload)
       .map(toSubmissionCreateResponse(userAnswers))
 
-  def getSubmissionDataStf(userAnswers: UserAnswers, affinityData: AffinityData): Option[(SingleTransferDeclaration, SingleTransferRequest, StfTransaction)] = {
+  def getSubmissionDataStf(userAnswers: UserAnswers, affinityData: AffinityData): Option[(SingleTransferRequest, StfTransaction)] = {
     userAnswers.get(StfTransaction).map { stfSingleReq =>
       val stfRequest = UserAnswersTransforms.toStfRequest(stfSingleReq, affinityData)
-      val declaration = createDeclaration(userAnswers)
-      (declaration, stfRequest, stfSingleReq)
+      (stfRequest, stfSingleReq)
     }
   }
 
