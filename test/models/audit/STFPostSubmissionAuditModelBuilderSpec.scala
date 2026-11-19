@@ -194,7 +194,6 @@ class STFPostSubmissionAuditModelBuilderSpec extends SpecBase {
 
     "must build audit model for single transfer" in {
       val result = STFPostSubmissionAuditModelBuilder.buildSubmissionAuditModel(
-        declaration = testDeclaration,
         agentDetails = testAgentDetails,
         stfRequests = Seq(testSTFRequest),
         etmpResponses = Seq(testEtmpResponse),
@@ -209,7 +208,6 @@ class STFPostSubmissionAuditModelBuilderSpec extends SpecBase {
         chargeTypeDescription = "tax"
       )
 
-      result.auditDetail.declarantName mustBe "Jane Smith"
       result.auditDetail.subscriptionId mustBe testSubscriptionId.value
       result.auditDetail.submissionId mustBe testSubmissionId.value
       result.auditDetail.affinityGroup mustBe "Individual"
@@ -221,7 +219,6 @@ class STFPostSubmissionAuditModelBuilderSpec extends SpecBase {
 
     "must build audit model for multiple transfers" in {
       val result = STFPostSubmissionAuditModelBuilder.buildSubmissionAuditModel(
-        declaration = testDeclaration,
         agentDetails = testAgentDetails,
         stfRequests = Seq(testSTFRequest, testSTFRequest.copy(recordId = 2)),
         etmpResponses = Seq(testEtmpResponse, testEtmpResponse.copy(utrn = "UTRN124")),
@@ -242,7 +239,6 @@ class STFPostSubmissionAuditModelBuilderSpec extends SpecBase {
 
     "must build audit model without agent details" in {
       val result = STFPostSubmissionAuditModelBuilder.buildSubmissionAuditModel(
-        declaration = testDeclaration,
         agentDetails = None,
         stfRequests = Seq(testSTFRequest),
         etmpResponses = Seq(testEtmpResponse),
@@ -260,7 +256,6 @@ class STFPostSubmissionAuditModelBuilderSpec extends SpecBase {
 
     "must correctly map tax rate from HalfPercent to BigDecimal" in {
       val result = STFPostSubmissionAuditModelBuilder.buildSubmissionAuditModel(
-        declaration = testDeclaration,
         agentDetails = None,
         stfRequests = Seq(testSTFRequest),
         etmpResponses = Seq(testEtmpResponse),
@@ -281,7 +276,6 @@ class STFPostSubmissionAuditModelBuilderSpec extends SpecBase {
       val requestWithHigherRate = testSTFRequest.copy(mainBuyerDetails = buyerWithHigherRate)
 
       val result = STFPostSubmissionAuditModelBuilder.buildSubmissionAuditModel(
-        declaration = testDeclaration,
         agentDetails = None,
         stfRequests = Seq(requestWithHigherRate),
         etmpResponses = Seq(testEtmpResponse),
@@ -299,7 +293,6 @@ class STFPostSubmissionAuditModelBuilderSpec extends SpecBase {
 
     "must handle seller in UK correctly" in {
       val result = STFPostSubmissionAuditModelBuilder.buildSubmissionAuditModel(
-        declaration = testDeclaration,
         agentDetails = None,
         stfRequests = Seq(testSTFRequest),
         etmpResponses = Seq(testEtmpResponse),
@@ -321,7 +314,6 @@ class STFPostSubmissionAuditModelBuilderSpec extends SpecBase {
       val requestWithNonUkSeller = testSTFRequest.copy(mainSellerDetails = nonUkSeller)
 
       val result = STFPostSubmissionAuditModelBuilder.buildSubmissionAuditModel(
-        declaration = testDeclaration,
         agentDetails = None,
         stfRequests = Seq(requestWithNonUkSeller),
         etmpResponses = Seq(testEtmpResponse),
@@ -340,7 +332,6 @@ class STFPostSubmissionAuditModelBuilderSpec extends SpecBase {
 
     "must handle batch processing with correct transfer numbers" in {
       val result = STFPostSubmissionAuditModelBuilder.buildSubmissionAuditModel(
-        declaration = testDeclaration,
         agentDetails = None,
         stfRequests = Seq(testSTFRequest, testSTFRequest.copy(recordId = 2)),
         etmpResponses = Seq(testEtmpResponse, testEtmpResponse.copy(utrn = "UTRN124")),
@@ -362,7 +353,6 @@ class STFPostSubmissionAuditModelBuilderSpec extends SpecBase {
 
     "must have correct auditType" in {
       val result = STFPostSubmissionAuditModelBuilder.buildSubmissionAuditModel(
-        declaration = testDeclaration,
         agentDetails = None,
         stfRequests = Seq(testSTFRequest),
         etmpResponses = Seq(testEtmpResponse),

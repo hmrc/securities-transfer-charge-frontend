@@ -82,13 +82,6 @@ class STFPostSubmissionAuditModelSpec extends SpecBase {
     )
 
     val testAuditDetail = STFPostSubmissionAuditDetail(
-      declarantName = "Jane Smith",
-      declarantAddressLine1 = "10 Main Road",
-      declarantAddressLine2 = "Area",
-      declarantAddressLine3 = "Region",
-      declarantAddressLine4 = "London",
-      declarantAddressPostcode = "SW1A 1AA",
-      declarantCountry = "GB",
       transferMethod = "OneAtATime",
       subscriptionId = "SUB123",
       submissionId = "STC-123456789",
@@ -98,8 +91,6 @@ class STFPostSubmissionAuditModelSpec extends SpecBase {
       totalTransfers = 1,
       currentBatch = 1,
       versionNumber = 1,
-      declarantRole1 = "Buyer",
-      declarantRole2 = "Director",
       reference = "REF123",
       transfers = Seq(testTransfer)
     )
@@ -165,8 +156,6 @@ class STFPostSubmissionAuditModelSpec extends SpecBase {
     "must serialize STFPostSubmissionAuditDetail to JSON correctly" in {
       val json = Json.toJson(testAuditDetail)
       
-      (json \ "declarantName").as[String] mustBe "Jane Smith"
-      (json \ "declarantAddressLine1").as[String] mustBe "10 Main Road"
       (json \ "transferMethod").as[String] mustBe "OneAtATime"
       (json \ "subscriptionId").as[String] mustBe "SUB123"
       (json \ "submissionId").as[String] mustBe "STC-123456789"
@@ -196,7 +185,7 @@ class STFPostSubmissionAuditModelSpec extends SpecBase {
       val model = STFPostSubmissionAuditModel(auditDetail = testAuditDetail)
       val detail = model.detail
       
-      detail.keys must contain allOf("declarantName", "submissionId", "transfers")
+      detail.keys must contain allOf("submissionId", "transfers")
     }
 
     "must handle multiple transfers" in {
@@ -237,9 +226,6 @@ class STFPostSubmissionAuditModelSpec extends SpecBase {
       )
       val minimalTransfer = testTransfer.copy(transferDetails = minimalTransferDetails)
       val minimalAuditDetail = testAuditDetail.copy(
-        declarantAddressLine2 = "",
-        declarantAddressLine3 = "",
-        declarantRole2 = "",
         reference = "",
         transfers = Seq(minimalTransfer)
       )
