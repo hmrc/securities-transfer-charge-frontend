@@ -263,4 +263,29 @@ class EtmpSubmissionServiceSpec extends AnyFreeSpec with Matchers with SpecBase 
       result mustBe None
     }
   }
+
+  "getTransaction" - {
+
+    val subscriptionId = uk.gov.hmrc.securitiestransferchargefrontend.domain.SubscriptionId("XASTC0000123456")
+
+    "return what the client returns" in {
+      val fakeClient = new FakeEtmpSubmissionClient(
+        StcTransactionCreateProcessed(StcTransactionCreateProcessedBody("2026-03-31", Nil)),
+        scala.concurrent.Future.successful(GetTransactionResult.StcIdNotFound)
+      )
+      val service = new EtmpSubmissionServiceImpl(fakeClient)
+
+      service.getTransaction(subscriptionId, "900459020010").futureValue mustBe GetTransactionResult.StcIdNotFound
+    }
+
+    "propagate client failures" in {
+      val fakeClient = new FakeEtmpSubmissionClient(
+        StcTransactionCreateProcessed(StcTransactionCreateProcessedBody("2026-03-31", Nil)),
+        scala.concurrent.Future.failed(new RuntimeException("boom"))
+      )
+      val service = new EtmpSubmissionServiceImpl(fakeClient)
+
+      service.getTransaction(subscriptionId, "900459020010").failed.futureValue.getMessage mustBe "boom"
+    }
+  }
 }
