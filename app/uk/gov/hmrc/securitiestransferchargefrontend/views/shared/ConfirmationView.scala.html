@@ -94,7 +94,7 @@ s"""<a class="govuk-link" rel="noreferrer noopener" target="_blank" href="${dash
                 ),
                 TableRow(
                     content = Text(viewModel.reference.filter(_.nonEmpty).getOrElse(messages("site.notProvided"))),
-                    classes = "govuk-table__cell"
+                    classes = "govuk-table__cell govuk-!-text-break-word"
                 )
             )
         ) else Seq.empty) ++ Seq(
@@ -113,7 +113,8 @@ s"""<a class="govuk-link" rel="noreferrer noopener" target="_blank" href="${dash
         head = None,
         caption = Some(messages("confirmation.table.caption")),
         captionClasses = "govuk-table__caption govuk-visually-hidden",
-        firstCellIsHeader = true
+        firstCellIsHeader = true,
+        classes = "stc-table--fixed"
     ))
 
     @formHelper(action = formAction) {
