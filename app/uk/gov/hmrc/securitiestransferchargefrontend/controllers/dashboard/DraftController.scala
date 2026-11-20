@@ -16,13 +16,19 @@
 
 package uk.gov.hmrc.securitiestransferchargefrontend.controllers.dashboard
 
+import play.api.Logging
 import play.api.i18n.{I18nSupport, MessagesApi}
-import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
+import play.api.mvc.{Action, AnyContent, MessagesControllerComponents, Result}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import uk.gov.hmrc.securitiestransferchargefrontend.clients.SaveAndReturnClient
+import uk.gov.hmrc.securitiestransferchargefrontend.config.FrontendAppConfig
+import uk.gov.hmrc.securitiestransferchargefrontend.config.SaveAndReturnRetrievalType.{UserAndGroup, UserOnly}
+import uk.gov.hmrc.securitiestransferchargefrontend.controllers.actions.requests.StcAuthorisedRequest
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.actions.*
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.routes
 import uk.gov.hmrc.securitiestransferchargefrontend.domain.{SubmissionId, UserId}
+import uk.gov.hmrc.securitiestransferchargefrontend.handlers.ErrorHandler
+import uk.gov.hmrc.securitiestransferchargefrontend.models.UserAnswers
 import uk.gov.hmrc.securitiestransferchargefrontend.services.AnswerPersistenceService
 import uk.gov.hmrc.securitiestransferchargefrontend.viewmodels.dashboard.DraftViewModel
 import uk.gov.hmrc.securitiestransferchargefrontend.views.html.dashboard.DraftView
@@ -30,7 +36,7 @@ import uk.gov.hmrc.securitiestransferchargefrontend.controllers.dashboard.routes
 
 import java.time.Clock
 import javax.inject.{Inject, Named}
-import scala.concurrent.ExecutionContext
+import scala.concurrent.{ExecutionContext, Future}
 
 class DraftController @Inject()(
                                  override val messagesApi: MessagesApi,
@@ -39,14 +45,15 @@ class DraftController @Inject()(
                                  answerPersistenceService: AnswerPersistenceService,
                                  val controllerComponents: MessagesControllerComponents,
                                  view: DraftView,
-                                 clock: Clock
-                               )(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport {
+                                 clock: Clock,
+                                 appConfig: FrontendAppConfig,
+                                 errorHandler: ErrorHandler
+                               )(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport with Logging {
 
   def onPageLoad(submissionId: String): Action[AnyContent] = auth.async { implicit request =>
-    val subId = SubmissionId(submissionId)
-    saveAndReturnClient.retrieve(subId).map { userAnswers =>
+    withOwnDraft(SubmissionId(submissionId)) { userAnswers =>
       val model = DraftViewModel.build(userAnswers, request.affinityGroupKey, clock, userAnswers.journeyType)
-      Ok(view(model))
+      Future.successful(Ok(view(model)))
     }
   }
 
@@ -64,9 +71,28 @@ class DraftController @Inject()(
   def onDeleteDraft(submissionId: String): Action[AnyContent] = auth.async {
     implicit request =>
       val subId = SubmissionId(submissionId)
-      saveAndReturnClient.deleteDraft(subId).map { _ =>
-        Redirect(dashboardRoutes.DashboardController.onPageLoad())
+      withOwnDraft(subId) { _ =>
+        saveAndReturnClient.deleteDraft(subId).map { _ =>
+          Redirect(dashboardRoutes.DashboardController.onPageLoad())
+        }
       }
   }
+
+  // Only lets a user act on a draft the dashboard would list for them; anything else is a 404,
+  // so another user's draft can't be viewed or deleted by putting its ID in the URL.
+  private def withOwnDraft(submissionId: SubmissionId)(block: UserAnswers => Future[Result])(implicit request: StcAuthorisedRequest[AnyContent]): Future[Result] =
+    saveAndReturnClient.retrieve(submissionId).flatMap { userAnswers =>
+      if (ownsDraft(userAnswers)) block(userAnswers)
+      else {
+        logger.warn(s"Draft $submissionId does not belong to the requesting user; returning 404")
+        errorHandler.notFoundTemplate.map(NotFound(_))
+      }
+    }
+
+  private def ownsDraft(userAnswers: UserAnswers)(implicit request: StcAuthorisedRequest[AnyContent]): Boolean =
+    appConfig.saveAndReturnRetrieval match {
+      case UserOnly     => userAnswers.userId.value == request.internalId
+      case UserAndGroup => userAnswers.groupIdentifier.value == request.groupIdentifier
+    }
 }
 

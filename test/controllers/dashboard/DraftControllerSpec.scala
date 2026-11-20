@@ -19,7 +19,7 @@ package controllers.dashboard
 import base.SpecBase
 import base.Fixtures.*
 import org.mockito.ArgumentMatchers.{any, eq as eqTo}
-import org.mockito.Mockito.{times, verify, when}
+import org.mockito.Mockito.{never, times, verify, when}
 import org.scalatestplus.mockito.MockitoSugar.mock
 import play.api.inject.bind
 import play.api.mvc.Call
@@ -29,6 +29,7 @@ import uk.gov.hmrc.auth.core.AffinityGroup
 import uk.gov.hmrc.securitiestransferchargefrontend.clients.SaveAndReturnClient
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.dashboard.routes
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.routes as appRoutes
+import uk.gov.hmrc.securitiestransferchargefrontend.domain.{GroupIdentifier, UserId}
 import uk.gov.hmrc.securitiestransferchargefrontend.models.JourneyType.SH03
 import uk.gov.hmrc.securitiestransferchargefrontend.services.AnswerPersistenceService
 import uk.gov.hmrc.securitiestransferchargefrontend.viewmodels.dashboard.DraftViewModel
@@ -41,6 +42,11 @@ class DraftControllerSpec extends SpecBase {
 
   private val fixedClock: Clock = Clock.fixed(Instant.parse("2026-11-19T10:00:00Z"), ZoneOffset.UTC)
   private val draftAnswers = testUserAnswers.copy(journeyType = SH03, createdAt = Instant.parse("2026-11-01T09:00:00Z"))
+
+  private val otherGroupsDraft = draftAnswers.copy(userId = UserId("another-user"), groupIdentifier = GroupIdentifier("another-group"))
+  private val sameGroupOtherUsersDraft = draftAnswers.copy(userId = UserId("another-user"))
+
+  private val userIdOnly = "microservice.save-and-return-uses-user-id-only"
 
   "Draft Controller" - {
 
@@ -76,6 +82,64 @@ class DraftControllerSpec extends SpecBase {
             status(result) mustEqual OK
             contentAsString(result) mustEqual view(viewModel)(request, messages(application)).toString
           }
+        }
+      }
+
+      "must return NOT_FOUND when the draft belongs to another group" in {
+
+        val mockSaveAndReturnClient = mock[SaveAndReturnClient]
+
+        when(mockSaveAndReturnClient.retrieve(eqTo(testSubmissionId))(any()))
+          .thenReturn(Future.successful(otherGroupsDraft))
+
+        val application = applicationBuilder(saveAndReturnClient = mockSaveAndReturnClient).build()
+
+        running(application) {
+          val request = FakeRequest(GET, routes.DraftController.onPageLoad(testSubmissionId.value).url)
+
+          val result = route(application, request).value
+
+          status(result) mustEqual NOT_FOUND
+        }
+      }
+
+      "must return OK for another user's draft in the same group" in {
+
+        val mockSaveAndReturnClient = mock[SaveAndReturnClient]
+
+        when(mockSaveAndReturnClient.retrieve(eqTo(testSubmissionId))(any()))
+          .thenReturn(Future.successful(sameGroupOtherUsersDraft))
+
+        val application = applicationBuilder(saveAndReturnClient = mockSaveAndReturnClient)
+          .overrides(bind[Clock].toInstance(fixedClock))
+          .build()
+
+        running(application) {
+          val request = FakeRequest(GET, routes.DraftController.onPageLoad(testSubmissionId.value).url)
+
+          val result = route(application, request).value
+
+          status(result) mustEqual OK
+        }
+      }
+
+      "must return NOT_FOUND for another user's draft in the same group when drafts are per user" in {
+
+        val mockSaveAndReturnClient = mock[SaveAndReturnClient]
+
+        when(mockSaveAndReturnClient.retrieve(eqTo(testSubmissionId))(any()))
+          .thenReturn(Future.successful(sameGroupOtherUsersDraft))
+
+        val application = applicationBuilder(saveAndReturnClient = mockSaveAndReturnClient)
+          .configure(userIdOnly -> true)
+          .build()
+
+        running(application) {
+          val request = FakeRequest(GET, routes.DraftController.onPageLoad(testSubmissionId.value).url)
+
+          val result = route(application, request).value
+
+          status(result) mustEqual NOT_FOUND
         }
       }
 
@@ -150,6 +214,8 @@ class DraftControllerSpec extends SpecBase {
 
         val mockSaveAndReturnClient = mock[SaveAndReturnClient]
 
+        when(mockSaveAndReturnClient.retrieve(eqTo(testSubmissionId))(any()))
+          .thenReturn(Future.successful(draftAnswers))
         when(mockSaveAndReturnClient.deleteDraft(eqTo(testSubmissionId))(any()))
           .thenReturn(Future.successful(()))
 
@@ -163,6 +229,46 @@ class DraftControllerSpec extends SpecBase {
           status(result) mustEqual SEE_OTHER
           redirectLocation(result).value mustEqual routes.DashboardController.onPageLoad().url
           verify(mockSaveAndReturnClient, times(1)).deleteDraft(eqTo(testSubmissionId))(any())
+        }
+      }
+
+      "must return NOT_FOUND and not delete a draft that belongs to another group" in {
+
+        val mockSaveAndReturnClient = mock[SaveAndReturnClient]
+
+        when(mockSaveAndReturnClient.retrieve(eqTo(testSubmissionId))(any()))
+          .thenReturn(Future.successful(otherGroupsDraft))
+
+        val application = applicationBuilder(saveAndReturnClient = mockSaveAndReturnClient).build()
+
+        running(application) {
+          val request = FakeRequest(GET, routes.DraftController.onDeleteDraft(testSubmissionId.value).url)
+
+          val result = route(application, request).value
+
+          status(result) mustEqual NOT_FOUND
+          verify(mockSaveAndReturnClient, never()).deleteDraft(any())(any())
+        }
+      }
+
+      "must return NOT_FOUND and not delete another user's draft when drafts are per user" in {
+
+        val mockSaveAndReturnClient = mock[SaveAndReturnClient]
+
+        when(mockSaveAndReturnClient.retrieve(eqTo(testSubmissionId))(any()))
+          .thenReturn(Future.successful(sameGroupOtherUsersDraft))
+
+        val application = applicationBuilder(saveAndReturnClient = mockSaveAndReturnClient)
+          .configure(userIdOnly -> true)
+          .build()
+
+        running(application) {
+          val request = FakeRequest(GET, routes.DraftController.onDeleteDraft(testSubmissionId.value).url)
+
+          val result = route(application, request).value
+
+          status(result) mustEqual NOT_FOUND
+          verify(mockSaveAndReturnClient, never()).deleteDraft(any())(any())
         }
       }
     }
