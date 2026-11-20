@@ -19,19 +19,17 @@ package controllers.dashboard
 import base.SpecBase
 import base.Fixtures.*
 import org.mockito.ArgumentMatchers.{any, eq as eqTo}
-import org.mockito.Mockito.{never, times, verify, when}
+import org.mockito.Mockito.{never, verify, when}
 import org.scalatestplus.mockito.MockitoSugar.mock
 import play.api.inject.bind
-import play.api.mvc.Call
 import play.api.test.FakeRequest
 import play.api.test.Helpers.*
 import uk.gov.hmrc.auth.core.AffinityGroup
+import uk.gov.hmrc.http.UpstreamErrorResponse
 import uk.gov.hmrc.securitiestransferchargefrontend.clients.SaveAndReturnClient
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.dashboard.routes
-import uk.gov.hmrc.securitiestransferchargefrontend.controllers.routes as appRoutes
 import uk.gov.hmrc.securitiestransferchargefrontend.domain.{GroupIdentifier, UserId}
 import uk.gov.hmrc.securitiestransferchargefrontend.models.JourneyType.SH03
-import uk.gov.hmrc.securitiestransferchargefrontend.services.AnswerPersistenceService
 import uk.gov.hmrc.securitiestransferchargefrontend.viewmodels.dashboard.DraftViewModel
 import uk.gov.hmrc.securitiestransferchargefrontend.views.html.dashboard.DraftView
 
@@ -47,6 +45,8 @@ class DraftControllerSpec extends SpecBase {
   private val sameGroupOtherUsersDraft = draftAnswers.copy(userId = UserId("another-user"))
 
   private val userIdOnly = "microservice.save-and-return-uses-user-id-only"
+
+  private val draftNotFound = UpstreamErrorResponse("draft not found", NOT_FOUND)
 
   "Draft Controller" - {
 
@@ -75,13 +75,38 @@ class DraftControllerSpec extends SpecBase {
             val request = FakeRequest(GET, routes.DraftController.onPageLoad(testSubmissionId.value).url)
 
             val view = application.injector.instanceOf[DraftView]
-            val viewModel = DraftViewModel.build(draftAnswers, affinityKey, fixedClock, SH03)
+            val viewModel = DraftViewModel.build(draftAnswers, affinityKey, fixedClock, draftTtlDays = 30)(messages(application))
 
             val result = route(application, request).value
 
             status(result) mustEqual OK
             contentAsString(result) mustEqual view(viewModel)(request, messages(application)).toString
           }
+        }
+      }
+
+      "must use the configured draft time to live" in {
+
+        val mockSaveAndReturnClient = mock[SaveAndReturnClient]
+
+        when(mockSaveAndReturnClient.retrieve(eqTo(testSubmissionId))(any()))
+          .thenReturn(Future.successful(draftAnswers))
+
+        val application = applicationBuilder(saveAndReturnClient = mockSaveAndReturnClient)
+          .configure("microservice.services.securities-transfer-charge-save-and-return.draftTimeToLiveInDays" -> 60)
+          .overrides(bind[Clock].toInstance(fixedClock))
+          .build()
+
+        running(application) {
+          val request = FakeRequest(GET, routes.DraftController.onPageLoad(testSubmissionId.value).url)
+
+          val view = application.injector.instanceOf[DraftView]
+          val viewModel = DraftViewModel.build(draftAnswers, affinityGroupKeyInd, fixedClock, draftTtlDays = 60)(messages(application))
+
+          val result = route(application, request).value
+
+          status(result) mustEqual OK
+          contentAsString(result) mustEqual view(viewModel)(request, messages(application)).toString
         }
       }
 
@@ -143,12 +168,12 @@ class DraftControllerSpec extends SpecBase {
         }
       }
 
-      "must fail when the draft cannot be retrieved" in {
+      "must return NOT_FOUND when the draft has been deleted or has expired" in {
 
         val mockSaveAndReturnClient = mock[SaveAndReturnClient]
 
         when(mockSaveAndReturnClient.retrieve(any())(any()))
-          .thenReturn(Future.failed(new RuntimeException("draft not found")))
+          .thenReturn(Future.failed(draftNotFound))
 
         val application = applicationBuilder(saveAndReturnClient = mockSaveAndReturnClient).build()
 
@@ -157,67 +182,37 @@ class DraftControllerSpec extends SpecBase {
 
           val result = route(application, request).value
 
-          result.failed.futureValue mustBe a[RuntimeException]
-        }
-      }
-    }
-
-    "onContinueSubmission" - {
-
-      "must redirect to the next page saved on the draft" in {
-
-        val mockAnswerPersistenceService = mock[AnswerPersistenceService]
-        val savedNextPage = Call("GET", "/saved-next-page")
-
-        when(mockAnswerPersistenceService.load(eqTo(testSubmissionId), eqTo(testInternalId))(any()))
-          .thenReturn(Future.successful(testUserAnswers.setNextPage(savedNextPage)))
-
-        val application = applicationBuilder()
-          .overrides(bind[AnswerPersistenceService].toInstance(mockAnswerPersistenceService))
-          .build()
-
-        running(application) {
-          val request = FakeRequest(GET, routes.DraftController.onContinueSubmission(testSubmissionId.value).url)
-
-          val result = route(application, request).value
-
-          status(result) mustEqual SEE_OTHER
-          redirectLocation(result).value mustEqual savedNextPage.url
+          status(result) mustEqual NOT_FOUND
         }
       }
 
-      "must redirect to Journey Recovery when the draft has no next page" in {
+      "must fail when the draft service returns another error" in {
 
-        val mockAnswerPersistenceService = mock[AnswerPersistenceService]
+        val mockSaveAndReturnClient = mock[SaveAndReturnClient]
 
-        when(mockAnswerPersistenceService.load(any(), any())(any()))
-          .thenReturn(Future.successful(testUserAnswers))
+        when(mockSaveAndReturnClient.retrieve(any())(any()))
+          .thenReturn(Future.failed(UpstreamErrorResponse("service unavailable", SERVICE_UNAVAILABLE)))
 
-        val application = applicationBuilder()
-          .overrides(bind[AnswerPersistenceService].toInstance(mockAnswerPersistenceService))
-          .build()
+        val application = applicationBuilder(saveAndReturnClient = mockSaveAndReturnClient).build()
 
         running(application) {
-          val request = FakeRequest(GET, routes.DraftController.onContinueSubmission(testSubmissionId.value).url)
+          val request = FakeRequest(GET, routes.DraftController.onPageLoad(testSubmissionId.value).url)
 
           val result = route(application, request).value
 
-          status(result) mustEqual SEE_OTHER
-          redirectLocation(result).value mustEqual appRoutes.JourneyRecoveryController.onPageLoad().url
+          result.failed.futureValue mustBe an[UpstreamErrorResponse]
         }
       }
     }
 
     "onDeleteDraft" - {
 
-      "must delete the draft and redirect to the dashboard" in {
+      "must return OK and not delete the draft" in {
 
         val mockSaveAndReturnClient = mock[SaveAndReturnClient]
 
         when(mockSaveAndReturnClient.retrieve(eqTo(testSubmissionId))(any()))
           .thenReturn(Future.successful(draftAnswers))
-        when(mockSaveAndReturnClient.deleteDraft(eqTo(testSubmissionId))(any()))
-          .thenReturn(Future.successful(()))
 
         val application = applicationBuilder(saveAndReturnClient = mockSaveAndReturnClient).build()
 
@@ -226,9 +221,28 @@ class DraftControllerSpec extends SpecBase {
 
           val result = route(application, request).value
 
-          status(result) mustEqual SEE_OTHER
-          redirectLocation(result).value mustEqual routes.DashboardController.onPageLoad().url
-          verify(mockSaveAndReturnClient, times(1)).deleteDraft(eqTo(testSubmissionId))(any())
+          status(result) mustEqual OK
+          contentAsString(result) mustEqual "success"
+          verify(mockSaveAndReturnClient, never()).deleteDraft(any())(any())
+        }
+      }
+
+      "must return NOT_FOUND and not delete when the draft has been deleted or has expired" in {
+
+        val mockSaveAndReturnClient = mock[SaveAndReturnClient]
+
+        when(mockSaveAndReturnClient.retrieve(any())(any()))
+          .thenReturn(Future.failed(draftNotFound))
+
+        val application = applicationBuilder(saveAndReturnClient = mockSaveAndReturnClient).build()
+
+        running(application) {
+          val request = FakeRequest(GET, routes.DraftController.onDeleteDraft(testSubmissionId.value).url)
+
+          val result = route(application, request).value
+
+          status(result) mustEqual NOT_FOUND
+          verify(mockSaveAndReturnClient, never()).deleteDraft(any())(any())
         }
       }
 

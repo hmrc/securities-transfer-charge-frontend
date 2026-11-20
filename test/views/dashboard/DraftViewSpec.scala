@@ -21,16 +21,17 @@ import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
 import play.api.Application
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.dashboard.routes
+import uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.shared.routes as stfSharedRoutes
 import uk.gov.hmrc.securitiestransferchargefrontend.models.JourneyType.SH03
 import uk.gov.hmrc.securitiestransferchargefrontend.models.UserAnswers
 import uk.gov.hmrc.securitiestransferchargefrontend.models.sh03.shared.CompanyDetails
 import uk.gov.hmrc.securitiestransferchargefrontend.models.shared.AgentReference
 import uk.gov.hmrc.securitiestransferchargefrontend.pages.sh03.{AgentReferencePage, CompanyDetailsPage}
-import uk.gov.hmrc.securitiestransferchargefrontend.viewmodels.dashboard.{DraftDeletion, DraftSummary, DraftViewModel}
+import uk.gov.hmrc.securitiestransferchargefrontend.viewmodels.dashboard.{DraftDeletion, DraftViewModel}
 import uk.gov.hmrc.securitiestransferchargefrontend.views.html.dashboard.DraftView
 import views.ViewBaseSpec
 
-import java.time.LocalTime
+import java.time.{Clock, LocalTime}
 import scala.jdk.CollectionConverters.*
 
 class DraftViewSpec extends ViewBaseSpec {
@@ -55,13 +56,9 @@ class DraftViewSpec extends ViewBaseSpec {
                          affinityKey: String = affinityGroupKeyOrg,
                          deletion: DraftDeletion = DraftDeletion.InDays(12)
                        ): DraftViewModel =
-    DraftViewModel(
-      deletion = deletion,
-      submissionId = userAnswers.submissionId.value,
-      answers = DraftSummary.getSummary(userAnswers),
-      affinityKey = affinityKey,
-      journeyType = userAnswers.journeyType
-    )
+    DraftViewModel
+      .build(userAnswers, affinityKey, Clock.systemUTC(), draftTtlDays = 30)
+      .copy(deletion = deletion)
 
   def view(model: DraftViewModel): Document = Jsoup.parse(
     viewInstance(model)(fakeRequest, messages).body
@@ -118,13 +115,21 @@ class DraftViewSpec extends ViewBaseSpec {
       doc.select(".govuk-notification-banner__content").text() mustBe expected.deletionMessage
     }
 
-    "have the submission heading" in {
-      doc.select("h2.govuk-heading-m").asScala.map(_.text()) must contain(expected.submissionHeading)
+    "put the heading class on the banner message, not the banner" in {
+      doc.select(".govuk-notification-banner").hasClass("govuk-notification-banner__heading") mustBe false
+      doc.select(".govuk-notification-banner__content p.govuk-notification-banner__heading").text() mustBe expected.deletionMessage
+    }
+
+    "have the submission ID as the only h1" in {
+      val h1s = doc.select("h1")
+      h1s.size() mustBe 1
+      h1s.first().text() mustBe expected.submissionHeading
+      h1s.first().hasClass("govuk-heading-l") mustBe true
     }
 
     "only show the sections that have answers" in {
       val headings = doc.select("h2.govuk-heading-m").asScala.map(_.text()).toList
-      headings mustBe List(expected.submissionHeading, expected.buyerDetailsHeading)
+      headings mustBe List(expected.buyerDetailsHeading)
       doc.select(".govuk-summary-list").size() mustBe 1
     }
 
@@ -148,7 +153,7 @@ class DraftViewSpec extends ViewBaseSpec {
 
     "have a continue submission button linking to the correct destination" in {
       buttons.get(0).text() mustBe expected.continueSubmission
-      buttons.get(0).attr("href") mustBe routes.DraftController.onContinueSubmission(model.submissionId).url
+      buttons.get(0).attr("href") mustBe stfSharedRoutes.SaveAndReturnController.restore(model.submissionId).url
       buttons.get(0).hasClass("govuk-button--secondary") mustBe false
     }
 

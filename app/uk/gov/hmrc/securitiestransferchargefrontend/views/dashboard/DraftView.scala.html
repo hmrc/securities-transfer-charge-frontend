@@ -16,9 +16,10 @@
 
 @import uk.gov.hmrc.securitiestransferchargefrontend.views.html.templates
 @import uk.gov.hmrc.securitiestransferchargefrontend.models.NormalMode
-@import uk.gov.hmrc.securitiestransferchargefrontend.viewmodels.dashboard.{DraftViewModel, DraftSummaryList}
+@import uk.gov.hmrc.securitiestransferchargefrontend.viewmodels.dashboard.DraftViewModel
 @import uk.gov.hmrc.govukfrontend.views.html.components._
 @import uk.gov.hmrc.securitiestransferchargefrontend.controllers.dashboard.routes as dashboardRoutes
+@import uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.shared.routes
 
 
 @this(
@@ -44,30 +45,28 @@
     @govukNotificationBanner(
         NotificationBanner(
             title = HtmlContent(messages("confirmation.banner.title")),
-            content = HtmlContent(draft.deletion.message),
-            classes = "govuk-notification-banner__heading govuk-!-margin-bottom-8"
+            content = Text(draft.deletion.message),
+            classes = "govuk-!-margin-bottom-8"
         )
     )
 
-    <h2 class="govuk-heading-m">
+    <h1 class="govuk-heading-l">
         @messages("draft.submission", draft.submissionId)
-    </h2>
+    </h1>
 
-    @for((heading, summaryList) <- DraftSummaryList.build(draft.answers, draft.affinityKey, draft.journeyType)) {
-        @if(summaryList.rows.nonEmpty) {
-            <h2 class="govuk-heading-m">
-                @heading
-            </h2>
+    @for((heading, summaryList) <- draft.sections) {
+        <h2 class="govuk-heading-m">
+            @heading
+        </h2>
 
-            @govUkSummaryList(summaryList)
-        }
+        @govUkSummaryList(summaryList)
     }
 
     <div class="govuk-button-group">
     @govukButton(
         Button(
             content = Text(messages("draft.continueSubmission")),
-            href = Some(dashboardRoutes.DraftController.onContinueSubmission(draft.submissionId).url)
+            href = Some(routes.SaveAndReturnController.restore(draft.submissionId).url)
         )
     )
 

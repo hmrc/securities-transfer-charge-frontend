@@ -31,6 +31,8 @@ class DraftsViewModelSpec extends AnyWordSpec with Matchers {
 
   private val uk = ZoneId.of("Europe/London")
 
+  private val ttlDays = 30
+
   private def at(dateTime: String) = LocalDateTime.parse(dateTime).atZone(uk).toInstant
 
   private def clockAt(dateTime: String) = Clock.fixed(at(dateTime), uk)
@@ -50,31 +52,35 @@ class DraftsViewModelSpec extends AnyWordSpec with Matchers {
   "deletion" should {
 
     "show 30 days on the day the draft is saved" in {
-      DraftViewModel.deletion(answersCreatedAt("2026-11-01T09:00"), clockAt("2026-11-01T23:00")) shouldBe InDays(30)
+      DraftViewModel.deletion(answersCreatedAt("2026-11-01T09:00"), clockAt("2026-11-01T23:00"), ttlDays) shouldBe InDays(30)
     }
 
     "count full calendar days, not hours" in {
-      DraftViewModel.deletion(answersCreatedAt("2026-11-01T23:00"), clockAt("2026-11-02T01:00")) shouldBe InDays(29)
+      DraftViewModel.deletion(answersCreatedAt("2026-11-01T23:00"), clockAt("2026-11-02T01:00"), ttlDays) shouldBe InDays(29)
     }
 
     "show 2 days the day before tomorrow" in {
-      DraftViewModel.deletion(answersCreatedAt("2026-11-01T09:00"), clockAt("2026-11-29T09:00")) shouldBe InDays(2)
+      DraftViewModel.deletion(answersCreatedAt("2026-11-01T09:00"), clockAt("2026-11-29T09:00"), ttlDays) shouldBe InDays(2)
     }
 
     "show tomorrow with the deletion time" in {
-      val result = DraftViewModel.deletion(answersCreatedAt("2026-11-01T09:00"), clockAt("2026-11-30T15:00"))
+      val result = DraftViewModel.deletion(answersCreatedAt("2026-11-01T09:00"), clockAt("2026-11-30T15:00"), ttlDays)
       result shouldBe Tomorrow(LocalTime.of(9, 0))
       result.message shouldBe "Your draft will be deleted tomorrow at 9:00am."
     }
 
     "show today with the deletion time" in {
-      val result = DraftViewModel.deletion(answersCreatedAt("2026-11-01T14:30"), clockAt("2026-12-01T08:00"))
+      val result = DraftViewModel.deletion(answersCreatedAt("2026-11-01T14:30"), clockAt("2026-12-01T08:00"), ttlDays)
       result shouldBe Today(LocalTime.of(14, 30))
       result.message shouldBe "Your draft will be deleted today at 2:30pm."
     }
 
     "show today rather than a negative number once the deletion time has passed" in {
-      DraftViewModel.deletion(answersCreatedAt("2026-11-01T09:00"), clockAt("2026-12-03T10:00")) shouldBe a[Today]
+      DraftViewModel.deletion(answersCreatedAt("2026-11-01T09:00"), clockAt("2026-12-03T10:00"), ttlDays) shouldBe a[Today]
+    }
+
+    "use the configured time to live" in {
+      DraftViewModel.deletion(answersCreatedAt("2026-11-01T09:00"), clockAt("2026-11-01T23:00"), 14) shouldBe InDays(14)
     }
 
     "show 30 days message" in {

@@ -17,7 +17,8 @@
 package uk.gov.hmrc.securitiestransferchargefrontend.viewmodels.dashboard
 
 import play.api.i18n.Messages
-import uk.gov.hmrc.securitiestransferchargefrontend.models.{JourneyType, UserAnswers}
+import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.SummaryList
+import uk.gov.hmrc.securitiestransferchargefrontend.models.UserAnswers
 
 import java.time.format.DateTimeFormatter
 import java.time.temporal.ChronoUnit
@@ -47,24 +48,26 @@ object DraftDeletion {
   }
 }
 
-case class DraftViewModel(deletion: DraftDeletion, submissionId: String, answers: DraftSummary, affinityKey: String, journeyType: JourneyType)
+case class DraftViewModel(
+                           deletion: DraftDeletion,
+                           submissionId: String,
+                           sections: Seq[(String, SummaryList)]
+                         )
 
 object DraftViewModel {
 
-  private val retentionPeriodDays = 30
   private val ukZone: ZoneId      = ZoneId.of("Europe/London")
 
-  def build(userAnswers: UserAnswers, affinityKey: String, clock: Clock, journeyType: JourneyType): DraftViewModel =
+  def build(userAnswers: UserAnswers, affinityKey: String, clock: Clock, draftTtlDays: Int)(implicit messages: Messages): DraftViewModel =
     DraftViewModel(
-      deletion     = deletion(userAnswers, clock),
+      deletion     = deletion(userAnswers, clock, draftTtlDays),
       submissionId = userAnswers.submissionId.value,
-      answers      = DraftSummary.getSummary(userAnswers),
-      affinityKey  = affinityKey,
-      journeyType = journeyType
+      sections     = DraftSummaryList.build(DraftSummary.getSummary(userAnswers), affinityKey, userAnswers.journeyType)
+                       .filter { case (_, summaryList) => summaryList.rows.nonEmpty }
     )
 
-  private[dashboard] def deletion(userAnswers: UserAnswers, clock: Clock): DraftDeletion = {
-    val deletionAt = userAnswers.createdAt.atZone(ukZone).plusDays(retentionPeriodDays)
+  private[dashboard] def deletion(userAnswers: UserAnswers, clock: Clock, draftTtlDays: Int): DraftDeletion = {
+    val deletionAt = userAnswers.createdAt.atZone(ukZone).plusDays(draftTtlDays)
     val today      = LocalDate.now(clock.withZone(ukZone))
     val daysLeft   = ChronoUnit.DAYS.between(today, deletionAt.toLocalDate)
 

@@ -17,8 +17,7 @@
 package uk.gov.hmrc.securitiestransferchargefrontend.viewmodels.dashboard
 
 import play.api.i18n.{Lang, Messages}
-import play.twirl.api.HtmlFormat
-import uk.gov.hmrc.govukfrontend.views.Aliases.{HtmlContent, Key, SummaryListRow, Text, Value}
+import uk.gov.hmrc.govukfrontend.views.Aliases.{Key, SummaryListRow, Text, Value}
 import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.SummaryList
 import uk.gov.hmrc.securitiestransferchargefrontend.config.CurrencyFormatter.currencyFormat
 import uk.gov.hmrc.securitiestransferchargefrontend.models.JourneyType
@@ -33,13 +32,7 @@ object DraftSummaryList {
     def row(key: String, value: String): SummaryListRow = SummaryListRow(key = Key(Text(messages(key))), value = Value(Text(value)))
 
     def yesNo(value: Boolean): String = if (value) messages("site.yes") else messages("site.no")
-
-    def addressRow(key: String, lines: Seq[String]): SummaryListRow =
-      SummaryListRow(
-        key = Key(Text(messages(key))),
-        value = Value(HtmlContent(lines.map(HtmlFormat.escape(_).toString).mkString("<br>")))
-      )
-
+    
     def agentReferenceRows(agentReference: Option[AgentReference]): Seq[SummaryListRow] = {
       val reference = agentReference.flatMap(_.agentReference)
       if (affinityKey == "agent")
@@ -89,75 +82,10 @@ object DraftSummaryList {
         messages("draft.transferDetails.heading") -> SummaryList(rows = transferDetailsRows)
       )
     }
-
-    lazy val stfSummary = {
-
-      def stfKey(base: String): String = if (affinityKey == "individual") base else s"$affinityKey.$base"
-
-      def agentOr(agentKey: String, otherKey: String): String = if (affinityKey == "agent") agentKey else otherKey
-
-      val yourDetailsRows = agentReferenceRows(summary.stfAgentReference)
-
-      val buyerAddress: Option[Seq[String]] =
-        summary.stfConfirmedAddress
-          .map(a => a.lines ++ Seq(a.postcode) ++ a.country.map(_.name).toSeq)
-          .orElse(summary.stfBuyerAddress.map(a => a.address.lines ++ Seq(a.address.postcode, a.address.country.name)))
-
-      val buyerDetailsRows =
-        summary.stfNameOfBuyer.map(row("agent.nameOfBuyer.checkYourAnswersLabel", _)).toSeq ++
-          buyerAddress.map(addressRow(agentOr("agent.checkYourAnswers.buyerAddress", "checkYourAnswers.confirmAddress"), _)).toSeq
-
-      val sellerDetailsRows =
-        summary.stfNameOfSeller.map(row(agentOr("agent.nameOfSeller.checkYourAnswersLabel", "nameOfSeller.checkYourAnswersLabel"), _)).toSeq ++
-          summary.stfSellerAddress.map { a =>
-            addressRow(
-              agentOr("agent.checkYourAnswers.sellerAddress", "checkYourAnswers.sellerAddress"),
-              a.address.lines ++ Seq(a.address.postcode, a.address.country.name)
-            )
-          }.toSeq
-
-      val transferDetailsRows =
-        summary.stfConnectedPersons.map(v => row(stfKey("connectedPersons.checkYourAnswersLabel"), yesNo(v))).toSeq ++
-          summary.stfApplyingForRelief.map(v => row(stfKey("applyingForRelief.checkYourAnswersLabel"), yesNo(v))).toSeq ++
-          summary.stfWhatReliefAreYouApplyingFor.map(row(agentOr("agent.whatReliefAreYouApplyingFor.checkYourAnswersLabel", "whatReliefAreYouApplyingFor.checkYourAnswersLabel"), _)).toSeq ++
-          summary.stfSecuritiesTarget.toSeq.flatMap { target =>
-            val businessNameKey = if (affinityKey == "org") "org.checkYourAnswers.businessName" else "checkYourAnswers.businessName"
-            Seq(row(businessNameKey, target.businessName)) ++
-              target.crn.map(row("checkYourAnswers.companyCrn", _)).toSeq
-          } ++
-          summary.stfChargingPoint.map(v => row(stfKey("chargingPoint.checkYourAnswersLabel"), v.format(dateTimeFormat()))).toSeq ++
-          summary.stfTaxRate.map(v => row("taxRate.checkYourAnswersLabel", messages(s"taxRate.$v"))).toSeq ++
-          summary.stfPurchasingShares.map(v => row(s"$affinityKey.purchasingShares.checkYourAnswersLabel", yesNo(v))).toSeq ++
-          summary.stfDetailsOfThisTransfer.toSeq.flatMap { details =>
-            val amountPaidKey = if (affinityKey == "org") "org.detailsOfThisTransfer.amountPaid.checkYourAnswersLabel" else "checkYourAnswers.amountPaidForShares"
-            Seq(
-              row("checkYourAnswers.numberOfShares", details.numberOfShares.toString),
-              row("checkYourAnswers.typeOfShares", details.typeOfShares),
-              row(amountPaidKey, currencyFormat(details.amountPaid))
-            ) ++ details.marketValue.map(v => row("checkYourAnswers.marketValueOfShares", currencyFormat(v))).toSeq
-          } ++
-          summary.stfOtherSecuritiesType.map(row(stfKey("otherSecuritiesType.checkYourAnswersLabel"), _)).toSeq ++
-          summary.stfAmountPaidForSecurities.map(v => row(stfKey("amountPaidForSecurities.checkYourAnswersLabel"), currencyFormat(v))).toSeq ++
-          summary.stfTotalMarketValue.map(v => row(stfKey("totalMarketValue.checkYourAnswersLabel"), currencyFormat(v))).toSeq
-
-      val buyerSections =
-        if (affinityKey == "individual")
-          Seq(messages("draft.yourDetails.heading") -> SummaryList(rows = yourDetailsRows ++ buyerDetailsRows))
-        else
-          Seq(
-            messages("draft.yourDetails.heading") -> SummaryList(rows = yourDetailsRows),
-            messages("draft.buyerDetails.heading") -> SummaryList(rows = buyerDetailsRows)
-          )
-
-      buyerSections ++ Seq(
-        messages("draft.sellerDetails.heading") -> SummaryList(rows = sellerDetailsRows),
-        messages("draft.transferDetails.heading") -> SummaryList(rows = transferDetailsRows)
-      )
-    }
-
+    
     journeyType match {
       case JourneyType.SH03 => sh03Summary
-      case JourneyType.STF => stfSummary
+      case JourneyType.STF => ???
     }
   }
 }

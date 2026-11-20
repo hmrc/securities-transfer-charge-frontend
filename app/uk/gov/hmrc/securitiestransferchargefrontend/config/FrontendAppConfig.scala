@@ -124,6 +124,9 @@ class FrontendAppConfig @Inject() (configuration: Configuration, servicesConfig:
   lazy val saveAndReturnUrl: String =
     s"$saveAndReturnBaseUrl$saveAndReturnBasePath"
 
+  val draftTtlDays: Int =
+    configuration.get[Int]("microservice.services.securities-transfer-charge-save-and-return.draftTimeToLiveInDays")
+
   val saveAndReturnRetrieval: SaveAndReturnRetrievalType =
     if (configuration.get[Boolean]("microservice.save-and-return-uses-user-id-only"))
       SaveAndReturnRetrievalType.UserOnly else SaveAndReturnRetrievalType.UserAndGroup
