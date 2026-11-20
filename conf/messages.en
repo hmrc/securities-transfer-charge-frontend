@@ -1456,3 +1456,16 @@ submissionDetails.transferType.sh03 = Share buyback (SH03)
 
 submissionDetails.reasonForPurchase.cancellation = Cancellation
 submissionDetails.reasonForPurchase.treasury = Treasury
+
+# Draft
+draft.deletion.p1 = Your draft will be deleted in {0} days.
+draft.deletion.today = Your draft will be deleted today at {0}.
+draft.deletion.tomorrow = Your draft will be deleted tomorrow at {0}.
+draft.submission = Submission {0}
+draft.yourDetails.heading = Your details
+draft.buyerDetails.heading = Buyer details
+draft.sellerDetails.heading = Seller details
+draft.transferDetails.heading = Transfer details
+draft.continueSubmission = Continue submission
+draft.deleteDraft = Delete draft
+draft.title = Draft of Submission {0}

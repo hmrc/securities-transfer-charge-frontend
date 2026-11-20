@@ -503,7 +503,10 @@ GET       /dashboard/start-sh03                         uk.gov.hmrc.securitiestr
 
 GET        /recent-submissions                          uk.gov.hmrc.securitiestransferchargefrontend.controllers.dashboard.RecentSubmissionsController.onPageLoad()
 
-GET        /submission-details/:submissionId                       uk.gov.hmrc.securitiestransferchargefrontend.controllers.dashboard.SubmissionDetailsController.onPageLoad(submissionId: String)
+GET        /submission-details/:submissionId            uk.gov.hmrc.securitiestransferchargefrontend.controllers.dashboard.SubmissionDetailsController.onPageLoad(submissionId: String)
+
+GET        /draft-submission/:submissionId                         uk.gov.hmrc.securitiestransferchargefrontend.controllers.dashboard.DraftController.onPageLoad(submissionId: String)
+GET        /draft-submission/delete/:submissionId                         uk.gov.hmrc.securitiestransferchargefrontend.controllers.dashboard.DraftController.onDeleteDraft(submissionId: String)
 
 # Payment Journey Routes
 GET        /dashboard/submissions/:submissionId/pay       uk.gov.hmrc.securitiestransferchargefrontend.controllers.pay.PaymentController.startPayment(submissionId: String)

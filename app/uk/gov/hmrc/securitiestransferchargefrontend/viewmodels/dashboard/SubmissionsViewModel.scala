@@ -48,10 +48,12 @@ object SubmissionsViewModel {
   private def formatDate(dateStr: String): String =
     Try(LocalDate.parse(dateStr).format(govUkDateFormatter)).getOrElse(dateStr)
 
-  private def viewLink(submissionId: String)(implicit messages: Messages): HtmlContent = {
+  private def viewLink(submissionId: String, isDraft:Boolean)(implicit messages: Messages): HtmlContent = {
     val view = messages("submissions.action.view")
     val hiddenText = messages("submissions.action.view.hidden", submissionId)
-    val href = routes.SubmissionDetailsController.onPageLoad(submissionId).url
+    val submissionDetailsRoute = routes.SubmissionDetailsController.onPageLoad(submissionId).url
+    val draftRoutes = routes.DraftController.onPageLoad(submissionId).url
+    val href = if (isDraft) draftRoutes else submissionDetailsRoute
 
     HtmlContent(
       s"""<a class="govuk-link" href="$href">$view<span class="govuk-visually-hidden">$hiddenText</span></a>"""
@@ -88,12 +90,14 @@ object SubmissionsViewModel {
         val yourReferenceCell: Seq[TableRow] =
           if (isAgent) Seq(TableRow(content = Text(summary.agentReference))) else Seq.empty
 
+        val isDraft = summary.maybePaymentDueBy.isEmpty
+
         Seq(TableRow(content = Text(summary.submissionId))) ++
           yourReferenceCell ++
           paymentDueByCell ++
           Seq(
             TableRow(content = StatusTag.tagHtml(summary.status)),
-            TableRow(content = viewLink(summary.submissionId))
+            TableRow(content = viewLink(summary.submissionId,isDraft))
           )
       }
     )
