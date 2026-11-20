@@ -79,7 +79,7 @@ class DraftViewSpec extends ViewBaseSpec {
     val deleteDraft: String = messages("draft.deleteDraft")
   }
 
-  "The DraftView with company details should answered" - {
+  "The DraftView with company details answered should" - {
     val model = viewModel()
     val expected = ExpectedContent(model)
     val doc = view(model)
