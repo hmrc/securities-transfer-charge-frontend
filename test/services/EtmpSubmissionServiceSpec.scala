@@ -216,8 +216,7 @@ class EtmpSubmissionServiceSpec extends AnyFreeSpec with Matchers with SpecBase 
       val result = service.getSubmissionDataStf(mockUserAnswers, affinityData)
       
       result mustBe defined
-      result.foreach { case (declaration, request, transaction) =>
-        declaration mustBe a[SingleTransferDeclaration]
+      result.foreach { case (request, transaction) =>
         request mustBe a[SingleTransferRequest]
         transaction mustBe stfTransaction
       }

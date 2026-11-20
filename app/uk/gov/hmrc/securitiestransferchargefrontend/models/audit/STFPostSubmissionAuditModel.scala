@@ -96,13 +96,6 @@ object Transfer {
 }
 
 case class STFPostSubmissionAuditDetail(
-  declarantName: String,
-  declarantAddressLine1: String,
-  declarantAddressLine2: String,
-  declarantAddressLine3: String,
-  declarantAddressLine4: String,
-  declarantAddressPostcode: String,
-  declarantCountry: String,
   transferMethod: String,
   subscriptionId: String,
   submissionId: String,
@@ -112,8 +105,6 @@ case class STFPostSubmissionAuditDetail(
   totalTransfers: Int,
   currentBatch: Int,
   versionNumber: Int,
-  declarantRole1: String,
-  declarantRole2: String,
   reference: String,
   transfers: Seq[Transfer]
 )

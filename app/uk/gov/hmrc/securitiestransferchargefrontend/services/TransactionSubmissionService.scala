@@ -246,10 +246,10 @@ final class TransactionSubmissionServiceImpl @Inject()(
     transferType match {
       case STF =>
         etmpSubmissionService.getSubmissionDataStf(request.userAnswers, affinityData).foreach {
-          case (declaration, stfRequest, stfTransaction) =>
+          case (stfRequest, stfTransaction) =>
             val stfRequests = (0 until totalTransfers).map(_ => stfRequest)
             val etmpResponses = (0 until totalTransfers).map(_ => successResponse)
-            sendAuditSTF(stfRequests, etmpResponses, declaration, stfRequest.agentDetails, stfTransaction)
+            sendAuditSTF(stfRequests, etmpResponses, stfRequest.agentDetails, stfTransaction)
         }
       case SH03 =>
         etmpSubmissionService.getSubmissionDataSh03(request.userAnswers, affinityData).foreach {
@@ -265,7 +265,6 @@ final class TransactionSubmissionServiceImpl @Inject()(
   private def sendAuditSTF(
     stfRequests: Seq[SingleTransferRequest],
     etmpResponses: Seq[SubmissionCreateResponseSuccess],
-    declaration: SingleTransferDeclaration,
     agentDetails: Option[SingleTransferAgentDetails],
     stfTransaction: StfTransaction
   )(implicit hc: HeaderCarrier, request: StcDataRequest[?]): Unit = {
@@ -281,7 +280,6 @@ final class TransactionSubmissionServiceImpl @Inject()(
       val currentBatch = batchIndex + 1
       
       val auditModel = STFPostSubmissionAuditModelBuilder.buildSubmissionAuditModel(
-        declaration = declaration,
         agentDetails = agentDetails,
         stfRequests = batchRequests,
         etmpResponses = batchResponses,

@@ -18,7 +18,7 @@ package uk.gov.hmrc.securitiestransferchargefrontend.models.submission
 
 import play.api.libs.json.{Json, OWrites, Reads}
 
-final case class SubmissionBatchPayload(
+final case class SubmissionBatchPayload private(
   declaration: SingleTransferDeclaration,
   transfers: Seq[SingleTransferRequest]
 )
@@ -27,3 +27,30 @@ object SubmissionBatchPayload:
   import SingleTransferRequest.given
   given Reads[SubmissionBatchPayload] = Json.reads[SubmissionBatchPayload]
   given OWrites[SubmissionBatchPayload] = Json.writes[SubmissionBatchPayload]
+
+  /*
+   * STOSB-2607: While we wait for the ETMP EPID to be updated to allow the declaration
+   * to be empty for STF, we are introducing a temporary declaration as a placeholder.
+   * Once the EPID and OAS are updated, this can be removed and the stfPayload constructor
+   * will be able to pass None as the declaration.
+   */
+  private val tempDeclaration =
+    SingleTransferDeclaration(
+      role1 = None,
+      role2 = None,
+      name = "Unknown",
+      addr1 = "Unknown",
+      addr2 = None,
+      addr3 = None,
+      addr4 = None,
+      postcode = "Unknown",
+      country = "Unknown",
+      selfDeclarationAgent = None,
+      isCorrectInfo = true
+    )
+  
+  def stfPayload(transfers: Seq[SingleTransferRequest]): SubmissionBatchPayload =
+    new SubmissionBatchPayload(tempDeclaration, transfers)
+
+  def sh03Payload(declaration: SingleTransferDeclaration, transfers: Seq[SingleTransferRequest]) =
+    new SubmissionBatchPayload(declaration, transfers)

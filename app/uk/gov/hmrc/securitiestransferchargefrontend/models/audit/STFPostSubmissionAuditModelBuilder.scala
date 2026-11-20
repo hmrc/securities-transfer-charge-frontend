@@ -30,7 +30,6 @@ object STFPostSubmissionAuditModelBuilder {
   private val dateFormatter = DateTimeFormatter.ISO_LOCAL_DATE
 
   def buildSubmissionAuditModel(
-    declaration: SingleTransferDeclaration,
     agentDetails: Option[SingleTransferAgentDetails],
     stfRequests: Seq[SingleTransferRequest],
     etmpResponses: Seq[SubmissionCreateResponseSuccess],
@@ -62,13 +61,6 @@ object STFPostSubmissionAuditModelBuilder {
       .getOrElse("")
 
     val auditDetail = STFPostSubmissionAuditDetail(
-      declarantName = declaration.name,
-      declarantAddressLine1 = declaration.addr1,
-      declarantAddressLine2 = declaration.addr2.getOrElse(""),
-      declarantAddressLine3 = declaration.addr3.getOrElse(""),
-      declarantAddressLine4 = declaration.addr4.getOrElse(""),
-      declarantAddressPostcode = declaration.postcode,
-      declarantCountry = declaration.country,
       transferMethod = transferMethod,
       subscriptionId = request.request.subscriptionId.value,
       submissionId = request.userAnswers.submissionId.value,
@@ -78,8 +70,6 @@ object STFPostSubmissionAuditModelBuilder {
       totalTransfers = totalTransfers,
       currentBatch = currentBatch,
       versionNumber = versionNumber,
-      declarantRole1 = declaration.role1.map(_.toString).getOrElse(""),
-      declarantRole2 = declaration.role2.getOrElse(""),
       reference = agentDetails.flatMap(_.clientReference).getOrElse(""),
       transfers = transfers
     )
