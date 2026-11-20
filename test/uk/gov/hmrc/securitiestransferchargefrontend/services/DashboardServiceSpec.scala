@@ -30,7 +30,8 @@ import uk.gov.hmrc.securitiestransferchargefrontend.models.UserAnswersSummary
 import uk.gov.hmrc.securitiestransferchargefrontend.models.search.SubmissionStatus.{Draft, Overdue, ReadyToPay}
 import uk.gov.hmrc.securitiestransferchargefrontend.models.search.{DashboardCounts, EtmpTransactionDetail, EtmpTransactionSummaryResponse, SttSubmission, SubmissionSummary}
 
-import java.time.Instant
+import java.time.{Instant, LocalDate}
+import uk.gov.hmrc.securitiestransferchargefrontend.utils.DateTimeFormats
 import scala.concurrent.Future
 
 class DashboardServiceSpec extends SpecBase with ScalaFutures with MockitoSugar {
@@ -142,6 +143,67 @@ class DashboardServiceSpec extends SpecBase with ScalaFutures with MockitoSugar 
       }
     }
   }
+  "getDrafts should" - {
+    "order drafts updated on the same day by most recently updated first" in new TestSetup {
+      def draft(id: String, lastUpdated: String): UserAnswersSummary =
+        UserAnswersSummary(
+          submissionId = SubmissionId(id),
+          maybeAgentReference = None,
+          journeyType = STF,
+          createdAt = Instant.parse("2026-11-12T08:00:00Z"),
+          lastUpdated = Instant.parse(lastUpdated)
+        )
+
+      when(mockSaveAndReturnClient.getDraftSummaries(Fixtures.testInternalId, Fixtures.testGroupIdentifier)(mockHc))
+        .thenReturn(
+          Future.successful(
+            List(
+              draft("STC-00000001", "2026-11-12T09:15:00Z"),
+              draft("STC-00000002", "2026-11-12T16:45:30Z"),
+              draft("STC-00000003", "2026-11-12T12:00:00Z"),
+              draft("STC-00000004", "2026-11-11T23:59:59Z")
+            )
+          )
+        )
+
+      whenReady(dashboardService.getDrafts(Fixtures.testInternalId, Fixtures.testGroupIdentifier)) { summaries =>
+        summaries.map(_.submissionId) mustEqual Seq("STC-00000002", "STC-00000003", "STC-00000001", "STC-00000004")
+      }
+    }
+  }
+
+  "getRecent should" - {
+    "order same-day drafts by last updated, ahead of submissions made that day" in new TestSetup {
+      val submittedId: SubmissionId = SubmissionId("STC-01020300")
+      val submittedDetail = buildSubmissionDetails(submissionId = submittedId, isPast = false, utrn = Fixtures.testUtrn)
+      val submittedDate: LocalDate = submittedDetail.submissionDate
+      def onSubmittedDay(hour: Int): Instant = submittedDate.atTime(hour, 0).atZone(DateTimeFormats.ukZoneId).toInstant
+
+      def draft(id: String, lastUpdated: Instant): UserAnswersSummary =
+        UserAnswersSummary(SubmissionId(id), None, STF, createdAt = lastUpdated, lastUpdated = lastUpdated)
+
+      when(mockSaveAndReturnClient.getDraftSummaries(Fixtures.testInternalId, Fixtures.testGroupIdentifier)(mockHc))
+        .thenReturn(Future.successful(List(draft("STC-00000001", onSubmittedDay(9)), draft("STC-00000002", onSubmittedDay(15)))))
+      when(mockDashboardClient.getRecentTransactions(Fixtures.testSubscriptionId))
+        .thenReturn(
+          Future.successful(
+            EtmpTransactionSummaryResponse(
+              success = buildEtmpSuccessResponse(
+                transactionDetails = List(submittedDetail),
+                chargeDetails = List(buildTaxCharge(Fixtures.testUtrn, false, false))
+              )
+            )
+          )
+        )
+
+      whenReady(dashboardService.getRecent(Fixtures.testInternalId, Fixtures.testGroupIdentifier, Fixtures.testSubscriptionId)) { summaries =>
+        summaries.map(_.submissionId) mustEqual Seq("STC-00000002", "STC-00000001", submittedId.value)
+        summaries.last.sortDate mustEqual submittedDate
+        summaries.last.lastUpdated mustBe None
+      }
+    }
+  }
+
   "getSubmission should" - {
     "return the submission with its transfers" in new TestSetup {
       stubSubmission(baseDetail)

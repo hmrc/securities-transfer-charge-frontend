@@ -16,19 +16,20 @@
 
 package uk.gov.hmrc.securitiestransferchargefrontend.models.search
 
-import java.time.LocalDate
+import java.time.{Instant, LocalDate}
 
 final case class SubmissionSummary(
   submissionId        : String,
   maybePaymentDueBy   : Option[String],
   maybeAgentReference : Option[String],
   status              : SubmissionStatus,
-  sortDate            : LocalDate
+  sortDate            : LocalDate,
+  lastUpdated         : Option[Instant] = None
 ) {
   def paymentDueBy: String = maybePaymentDueBy.getOrElse("Not submitted")
   def agentReference: String = maybeAgentReference.getOrElse("Not provided")
 }
 
 object SubmissionSummary:
-  val sorted: Seq[SubmissionSummary] => Seq[SubmissionSummary] = 
-    summaries => summaries.sortBy(_.sortDate)(Ordering[LocalDate].reverse)
+  val sorted: Seq[SubmissionSummary] => Seq[SubmissionSummary] =
+    summaries => summaries.sortBy(s => (s.sortDate, s.lastUpdated))(Ordering[(LocalDate, Option[Instant])].reverse)
