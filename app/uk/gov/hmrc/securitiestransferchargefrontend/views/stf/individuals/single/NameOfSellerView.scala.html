@@ -34,15 +34,15 @@
 @(form: Form[_], mode: Mode, backLinkCall: Call)(implicit request: Request[_], messages: Messages)
 
 @layout(pageTitle = title(form, messages("nameOfSeller.title")), backLinkUrl = Some(backLinkCall.url)) {
-    <div id="caption-heading" class="govuk-caption-l">
-        @messages("seller.details.caption")
-    </div>
-
     @formHelper(action = routes.NameOfSellerController.onSubmit(mode)) {
 
         @if(form.errors.nonEmpty) {
             @govukErrorSummary(ErrorSummaryViewModel(form))
         }
+
+        <div id="caption-heading" class="govuk-caption-l">
+            @messages("seller.details.caption")
+        </div>
 
         @govukInput(
             InputViewModel(

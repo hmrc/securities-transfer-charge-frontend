@@ -1,0 +1,81 @@
+@*
+ * Copyright 2026 HM Revenue & Customs
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *@
+
+@import uk.gov.hmrc.securitiestransferchargefrontend.views.html.templates
+@import uk.gov.hmrc.securitiestransferchargefrontend.models.NormalMode
+@import uk.gov.hmrc.securitiestransferchargefrontend.viewmodels.dashboard.DraftViewModel
+@import uk.gov.hmrc.govukfrontend.views.html.components._
+@import uk.gov.hmrc.securitiestransferchargefrontend.controllers.dashboard.routes as dashboardRoutes
+@import uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.shared.routes
+
+
+@this(
+    layout: templates.Layout,
+    govUkSummaryList: GovukSummaryList,
+    govukNotificationBanner: GovukNotificationBanner,
+    govukBreadcrumbs: GovukBreadcrumbs,
+    govukButton: GovukButton
+)
+
+@(draft: DraftViewModel)(implicit request: Request[_], messages: Messages)
+
+@layout(pageTitle = s"${messages("draft.title", draft.submissionId)} - ${messages("reportAndPay.title")} - ${messages("site.govuk")}",showBackLink = false) {
+
+     @govukBreadcrumbs(
+        Breadcrumbs(items = Seq(
+            BreadcrumbsItem(content = Text(messages("breadcrumbs.dashboard")), href = Some(dashboardRoutes.DashboardController.onPageLoad().url)),
+            BreadcrumbsItem(content = Text(messages("breadcrumbs.submissions")), href = Some(dashboardRoutes.SubmissionsController.onPageLoad().url))
+            )
+        )
+    )
+
+    @govukNotificationBanner(
+        NotificationBanner(
+            title = HtmlContent(messages("confirmation.banner.title")),
+            content = Text(draft.deletion.message),
+            classes = "govuk-!-margin-bottom-8"
+        )
+    )
+
+    <h1 class="govuk-heading-l">
+        @messages("draft.submission", draft.submissionId)
+    </h1>
+
+    @for((heading, summaryList) <- draft.sections) {
+        <h2 class="govuk-heading-m">
+            @heading
+        </h2>
+
+        @govUkSummaryList(summaryList)
+    }
+
+    <div class="govuk-button-group">
+    @govukButton(
+        Button(
+            content = Text(messages("draft.continueSubmission")),
+            href = Some(routes.SaveAndReturnController.restore(draft.submissionId).url)
+        )
+    )
+
+    @govukButton(
+        Button(
+            content = Text(messages("draft.deleteDraft")),
+            href = Some(dashboardRoutes.DraftController.onDeleteDraft(draft.submissionId).url)
+        ).asSecondaryButton()
+    )
+    </div>
+
+}
