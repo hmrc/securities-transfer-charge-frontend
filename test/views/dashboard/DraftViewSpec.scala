@@ -73,7 +73,7 @@ class DraftViewSpec extends ViewBaseSpec {
     val bannerTitle: String = messages("confirmation.banner.title")
     val deletionMessage: String = model.deletion.message
     val submissionHeading: String = messages("draft.submission", model.submissionId)
-    val buyerDetailsHeading: String = messages("draft.buyerDetails.heading")
+    val yourDetailsHeading: String = messages("draft.yourDetails.heading")
     val continueSubmission: String = messages("draft.continueSubmission")
     val deleteDraft: String = messages("draft.deleteDraft")
   }
@@ -131,11 +131,11 @@ class DraftViewSpec extends ViewBaseSpec {
 
     "only show the sections that have answers" in {
       val headings = doc.select("h2.govuk-heading-m").asScala.map(_.text()).toList
-      headings mustBe List(expected.buyerDetailsHeading)
+      headings mustBe List(expected.yourDetailsHeading)
       doc.select(".govuk-summary-list").size() mustBe 1
     }
 
-    "show the company details in the buyer details summary list" in {
+    "show the company details in the your details summary list" in {
       val rows = doc.select(".govuk-summary-list__row")
       rows.size() mustBe 3
 
@@ -252,11 +252,17 @@ class DraftViewSpec extends ViewBaseSpec {
     val answers = bulkAnswers.remove(BulkRoleAtPurchasingCompanyPage).success.value
     val doc = view(viewModel(userAnswers = answers, affinityKey = affinityGroupKeyOrg))
 
-    "hide the empty declaration section" in {
+    "show the company details under your details and hide the empty declaration section" in {
       doc.select("h2.govuk-heading-m").asScala.map(_.text()).toList mustBe List(
         messages("draft.yourDetails.heading"),
-        messages("draft.buyerDetails.heading"),
         messages("draft.fileDetails.heading")
+      )
+    }
+
+    "show the company name and CRN under your details" in {
+      rowsUnder(doc, messages("draft.yourDetails.heading")) must contain allOf(
+        messages("org.sh03.companyDetails.companyName.label") -> "Bulk Co Ltd",
+        messages("org.sh03.companyDetails.crn.label") -> "87654321"
       )
     }
   }

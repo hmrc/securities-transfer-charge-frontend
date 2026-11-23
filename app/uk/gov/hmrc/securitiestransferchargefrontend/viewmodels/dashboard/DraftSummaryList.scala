@@ -57,15 +57,25 @@ object DraftSummaryList {
             role.uksOrgan.map(row(sh03Key("roleAtPurchasingCompany.uksOrgan.label"), _)).toSeq
         }
 
+      // An organisation is the buyer, so its company details sit under "Your details" (with any agent reference)
+      // rather than a separate "Buyer details" section.
+      def detailsSections(agentReference: Option[AgentReference], companyDetailsRows: Seq[SummaryListRow]): Seq[(String, SummaryList)] =
+        if (affinityKey == "org")
+          Seq(messages("draft.yourDetails.heading") -> SummaryList(rows = agentReferenceRows(agentReference) ++ companyDetailsRows))
+        else
+          Seq(
+            messages("draft.yourDetails.heading") -> SummaryList(rows = agentReferenceRows(agentReference)),
+            messages("draft.buyerDetails.heading") -> SummaryList(rows = companyDetailsRows)
+          )
+
       val isBulk = summary.sh03BulkCompanyDetails.isDefined || summary.sh03BulkAgentReference.isDefined
       val fileNotUploaded = messages("draft.fileDetails.fileName.value")
 
       if (isBulk) {
-        Seq(
-          messages("draft.yourDetails.heading") -> SummaryList(rows = agentReferenceRows(summary.sh03BulkAgentReference)),
-          messages("draft.buyerDetails.heading") -> SummaryList(rows =
-            summary.sh03BulkCompanyDetails.toSeq.flatMap(details => companyRows(details.companyName, details.companyRegistrationNumber))
-          ),
+        detailsSections(
+          summary.sh03BulkAgentReference,
+          summary.sh03BulkCompanyDetails.toSeq.flatMap(details => companyRows(details.companyName, details.companyRegistrationNumber))
+        ) ++ Seq(
           messages("draft.fileDetails.heading") -> SummaryList(rows = Seq(row("draft.fileDetails.fileName.key", fileNotUploaded))),
           messages("draft.declaration.heading") -> SummaryList(rows = roleRows(summary.sh03BulkRoleAtPurchasingCompany))
         )
@@ -94,9 +104,7 @@ object DraftSummaryList {
             summary.sh03ChargingPoint.map(v => row(sh03Key("chargingPoint.checkYourAnswersLabel"), v.format(dateTimeFormat()))).toSeq ++
             roleRows(summary.sh03RoleAtPurchasingCompany)
 
-        Seq(
-          messages("draft.yourDetails.heading") -> SummaryList(rows = agentReferenceRows(summary.sh03AgentReference)),
-          messages("draft.buyerDetails.heading") -> SummaryList(rows = buyerDetailsRows),
+        detailsSections(summary.sh03AgentReference, buyerDetailsRows) ++ Seq(
           messages("draft.transferDetails.heading") -> SummaryList(rows = transferDetailsRows)
         )
       }
