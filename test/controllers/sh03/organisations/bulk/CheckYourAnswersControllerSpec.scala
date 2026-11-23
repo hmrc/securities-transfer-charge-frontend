@@ -31,12 +31,14 @@ import uk.gov.hmrc.securitiestransferchargefrontend.controllers.actions.requests
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.routes
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.sh03.organisations.bulk.routes as sh03OrgBulkRoutes
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.shared.SaveAndReturnButton.saveAndReturnButtonName
-import uk.gov.hmrc.securitiestransferchargefrontend.models.{NormalMode, UserAnswers}
+import uk.gov.hmrc.securitiestransferchargefrontend.models.{CheckMode, NormalMode, UserAnswers}
 import uk.gov.hmrc.securitiestransferchargefrontend.models.stf.fileupload.{ParsedStcRow, ParsedStcRowsDocument, ValidatedStcRow}
 import uk.gov.hmrc.securitiestransferchargefrontend.models.submission.BulkConfirmationDetails
 import uk.gov.hmrc.securitiestransferchargefrontend.navigation.Navigator
 import uk.gov.hmrc.securitiestransferchargefrontend.pages.BulkConfirmationDetailsPage
-import uk.gov.hmrc.securitiestransferchargefrontend.pages.sh03.bulk.BulkCheckYourAnswersPage
+import uk.gov.hmrc.securitiestransferchargefrontend.models.sh03.bulk.CompanyDetails
+import uk.gov.hmrc.securitiestransferchargefrontend.models.sh03.shared.RoleAtPurchasingCompany
+import uk.gov.hmrc.securitiestransferchargefrontend.pages.sh03.bulk.{BulkCheckYourAnswersPage, BulkCompanyDetailsPage, BulkRoleAtPurchasingCompanyPage}
 import uk.gov.hmrc.securitiestransferchargefrontend.repositories.{ParsedStcRowsRepository, SessionRepository}
 import uk.gov.hmrc.securitiestransferchargefrontend.services.TransactionSubmissionService
 import uk.gov.hmrc.securitiestransferchargefrontend.services.sh03.organisations.bulk.CheckYourAnswersService
@@ -60,7 +62,11 @@ class CheckYourAnswersControllerSpec extends SpecBase with MockitoSugar with Fil
   private val mockNavigator = mock[Navigator]
   private val mockSessionRepository = mock[SessionRepository]
 
-  private val userAnswersWithFileRef: UserAnswers = emptyUserAnswers.setFileUploadReference(reference)
+  private val userAnswersWithFileRef: UserAnswers =
+    emptyUserAnswers
+      .set(BulkCompanyDetailsPage, CompanyDetails("Test Ltd", "12345678")).success.value
+      .set(BulkRoleAtPurchasingCompanyPage, RoleAtPurchasingCompany("director", None)).success.value
+      .setFileUploadReference(reference)
 
   private val parsedStcRowsDocument = ParsedStcRowsDocument(
     _id = reference,
@@ -83,8 +89,8 @@ class CheckYourAnswersControllerSpec extends SpecBase with MockitoSugar with Fil
     captor.getValue
   }
 
-  private def onPageLoadApp() =
-    applicationBuilder(userAnswers = Some(userAnswersWithFileRef), affinityGroup = organisationAffinity)
+  private def onPageLoadApp(answers: UserAnswers = userAnswersWithFileRef) =
+    applicationBuilder(userAnswers = Some(answers), affinityGroup = organisationAffinity)
       .overrides(
         bind[Navigator].qualifiedWith("orgSh03").toInstance(getNavigator),
         bind[CheckYourAnswersService].toInstance(mockCyaService),
@@ -135,6 +141,35 @@ class CheckYourAnswersControllerSpec extends SpecBase with MockitoSugar with Fil
 
           status(result) mustEqual OK
           contentAsString(result) mustEqual view(viewModel, testBackLinkRoute)(request, messages(application)).toString
+        }
+      }
+
+      Seq(
+        "company details are missing" -> (
+          userAnswersWithFileRef.remove(BulkCompanyDetailsPage).success.value,
+          sh03OrgBulkRoutes.CompanyDetailsController.onPageLoad(CheckMode).url
+        ),
+        "the file reference is missing" -> (
+          userAnswersWithFileRef.copy(fileUploadReference = None),
+          sh03OrgBulkRoutes.TemplateInstructionsController.onPageLoad().url
+        ),
+        "the role at the purchasing company is missing" -> (
+          userAnswersWithFileRef.remove(BulkRoleAtPurchasingCompanyPage).success.value,
+          sh03OrgBulkRoutes.RoleAtPurchasingCompanyController.onPageLoad(CheckMode).url
+        )
+      ).foreach { case (missing, (answers, expectedPage)) =>
+
+        s"must redirect to the page to answer it when $missing" in {
+          val application = onPageLoadApp(answers)
+
+          running(application) {
+            val request = FakeRequest(GET, checkYourAnswersRoute)
+            val result = route(application, request).value
+
+            status(result) mustEqual SEE_OTHER
+            redirectLocation(result).value mustEqual expectedPage
+            verify(mockRepository, never()).findDocumentByReference(anyString())
+          }
         }
       }
 

@@ -24,5 +24,5 @@ case object BulkRoleAtPurchasingCompanyPage extends QuestionPage[RoleAtPurchasin
 
   override def path: JsPath = JsPath \ toString
 
-  override def toString: String = "roleAtPurchasingCompany"
+  override def toString: String = "bulkRoleAtPurchasingCompany"
 }

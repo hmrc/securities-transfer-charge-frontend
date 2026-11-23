@@ -27,6 +27,7 @@ import uk.gov.hmrc.securitiestransferchargefrontend.models.stf.fileupload.Valida
 import uk.gov.hmrc.securitiestransferchargefrontend.models.submission.BulkConfirmationDetails
 import uk.gov.hmrc.securitiestransferchargefrontend.models.{Mode, NormalMode, UserAnswers}
 import uk.gov.hmrc.securitiestransferchargefrontend.navigation.Navigator
+import uk.gov.hmrc.securitiestransferchargefrontend.navigation.sh03.Sh03BulkAnswersValidator
 import uk.gov.hmrc.securitiestransferchargefrontend.pages.BulkConfirmationDetailsPage
 import uk.gov.hmrc.securitiestransferchargefrontend.pages.sh03.bulk.BulkCheckYourAnswersPage
 import uk.gov.hmrc.securitiestransferchargefrontend.pages.sh03.bulk.BulkAgentReferencePage
@@ -57,15 +58,20 @@ class CheckYourAnswersController @Inject()(
   
   def onPageLoad(): Action[AnyContent] = (stcAuthEnrolled andThen getData andThen requireData).async {
     implicit request =>
-      val fileUploadRef = request.userAnswers.getFileUploadReference()
-      parsedStcRowsRepository.findDocumentByReference(fileUploadRef).map {
-        case Some(doc) => 
-          val viewModel = checkYourAnswersService.buildViewModel(request.userAnswers, doc)
-          Ok(view(viewModel, backLinkCall(NormalMode)(request.userAnswers)))
-        
-        case _ => 
-          Redirect(routes.JourneyRecoveryController.onPageLoad())
-        
+      Sh03BulkAnswersValidator.agents.missingAnswer(request.userAnswers) match {
+        case Some(missingAnswerPage) =>
+          Future.successful(Redirect(missingAnswerPage))
+
+        case None =>
+          val fileUploadRef = request.userAnswers.getFileUploadReference()
+          parsedStcRowsRepository.findDocumentByReference(fileUploadRef).map {
+            case Some(doc) =>
+              val viewModel = checkYourAnswersService.buildViewModel(request.userAnswers, doc)
+              Ok(view(viewModel, backLinkCall(NormalMode)(request.userAnswers)))
+
+            case _ =>
+              Redirect(routes.JourneyRecoveryController.onPageLoad())
+          }
       }
   }
 

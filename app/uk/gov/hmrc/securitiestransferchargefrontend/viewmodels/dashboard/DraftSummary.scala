@@ -20,6 +20,8 @@ import uk.gov.hmrc.securitiestransferchargefrontend.models.sh03.shared.{CompanyD
 import uk.gov.hmrc.securitiestransferchargefrontend.models.shared.AgentReference
 import uk.gov.hmrc.securitiestransferchargefrontend.models.{JourneyType, UserAnswers}
 import uk.gov.hmrc.securitiestransferchargefrontend.pages.sh03
+import uk.gov.hmrc.securitiestransferchargefrontend.pages.sh03.bulk._
+import uk.gov.hmrc.securitiestransferchargefrontend.models.sh03.bulk.CompanyDetails as BulkCompanyDetails
 
 import java.time.LocalDate
 
@@ -35,7 +37,10 @@ case class DraftSummary(
                          sh03MaximumAmountPaid: Option[BigDecimal] = None,
                          sh03MinimumAmountPaid: Option[BigDecimal] = None,
                          sh03ChargingPoint: Option[LocalDate] = None,
-                         sh03RoleAtPurchasingCompany: Option[RoleAtPurchasingCompany] = None
+                         sh03RoleAtPurchasingCompany: Option[RoleAtPurchasingCompany] = None,
+                         sh03BulkAgentReference: Option[AgentReference] = None,
+                         sh03BulkCompanyDetails: Option[BulkCompanyDetails]=None,
+                         sh03BulkRoleAtPurchasingCompany: Option[RoleAtPurchasingCompany] = None
                        )
 
 object DraftSummary {
@@ -52,7 +57,11 @@ object DraftSummary {
     sh03MaximumAmountPaid = userAnswers.get(sh03.MaximumAmountPaidPage),
     sh03MinimumAmountPaid = userAnswers.get(sh03.MinimumAmountPaidPage),
     sh03ChargingPoint = userAnswers.get(sh03.ChargingPointPage),
-    sh03RoleAtPurchasingCompany = userAnswers.get(sh03.RoleAtPurchasingCompanyPage))
+    sh03RoleAtPurchasingCompany = userAnswers.get(sh03.RoleAtPurchasingCompanyPage),
+    sh03BulkAgentReference = userAnswers.get(BulkAgentReferencePage),
+    sh03BulkCompanyDetails = userAnswers.get(BulkCompanyDetailsPage),
+    sh03BulkRoleAtPurchasingCompany = userAnswers.get(BulkRoleAtPurchasingCompanyPage)
+  )
 
   def getSummary(userAnswers: UserAnswers): DraftSummary =
     userAnswers.journeyType match {
