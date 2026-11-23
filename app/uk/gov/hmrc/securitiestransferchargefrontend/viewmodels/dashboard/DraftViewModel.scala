@@ -40,7 +40,7 @@ object DraftDeletion {
   }
 
   final case class Tomorrow(at: LocalTime) extends DraftDeletion {
-    def message(implicit messages: Messages): String = messages("draft.deletion.tomorrow", formatTime(at))
+    def message(implicit messages: Messages): String = messages("draft.deletion.tomorrow")
   }
 
   final case class Today(at: LocalTime) extends DraftDeletion {

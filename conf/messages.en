@@ -1460,7 +1460,7 @@ submissionDetails.reasonForPurchase.treasury = Treasury
 # Draft
 draft.deletion.p1 = Your draft will be deleted in {0} days.
 draft.deletion.today = Your draft will be deleted today at {0}.
-draft.deletion.tomorrow = Your draft will be deleted tomorrow at {0}.
+draft.deletion.tomorrow = Your draft will be deleted tomorrow.
 draft.submission = Submission {0}
 draft.yourDetails.heading = Your details
 draft.buyerDetails.heading = Buyer details
