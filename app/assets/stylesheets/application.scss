@@ -26,3 +26,11 @@
 .stc-table--fixed {
     table-layout: fixed;
 }
+
+// Transfer details charges: the Pay link column is only as wide as the link.
+// Summary lists use table-layout: fixed, so this needs a real width rather than shrink-to-fit.
+@media (min-width: 40.0625em) {
+    .stc-charges-list .govuk-summary-list__actions {
+        width: 3em;
+    }
+}

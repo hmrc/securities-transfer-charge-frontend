@@ -504,6 +504,10 @@ GET       /dashboard/start-sh03                         uk.gov.hmrc.securitiestr
 GET        /recent-submissions                          uk.gov.hmrc.securitiestransferchargefrontend.controllers.dashboard.RecentSubmissionsController.onPageLoad()
 
 GET        /submission-details/:submissionId                       uk.gov.hmrc.securitiestransferchargefrontend.controllers.dashboard.SubmissionDetailsController.onPageLoad(submissionId: String)
+GET        /submission-details/:submissionId/transfer-$transferNumber<[0-9]+>              uk.gov.hmrc.securitiestransferchargefrontend.controllers.dashboard.TransferDetailsController.onPageLoad(submissionId: String, transferNumber: Int)
+GET        /submission-details/:submissionId/transfer-$transferNumber<[0-9]+>/paid-charges uk.gov.hmrc.securitiestransferchargefrontend.controllers.dashboard.PaidChargesController.onPageLoad(submissionId: String, transferNumber: Int)
 
 # Payment Journey Routes
 GET        /dashboard/submissions/:submissionId/pay       uk.gov.hmrc.securitiestransferchargefrontend.controllers.pay.PaymentController.startPayment(submissionId: String)
+GET        /dashboard/submissions/:submissionId/transfer-$transferNumber<[0-9]+>/pay           uk.gov.hmrc.securitiestransferchargefrontend.controllers.pay.PaymentController.startTransferPayment(submissionId: String, transferNumber: Int)
+GET        /dashboard/submissions/:submissionId/transfer-$transferNumber<[0-9]+>/pay/:chargeRef uk.gov.hmrc.securitiestransferchargefrontend.controllers.pay.PaymentController.startChargePayment(submissionId: String, transferNumber: Int, chargeRef: String)

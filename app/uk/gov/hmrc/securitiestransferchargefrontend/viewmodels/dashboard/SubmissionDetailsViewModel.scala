@@ -21,7 +21,7 @@ import play.api.i18n.Messages
 import uk.gov.hmrc.govukfrontend.views.Aliases.{HeadCell, TableRow}
 import uk.gov.hmrc.govukfrontend.views.viewmodels.content.{HtmlContent, Text}
 import uk.gov.hmrc.govukfrontend.views.viewmodels.table.Table
-import uk.gov.hmrc.securitiestransferchargefrontend.domain.TransferType
+import uk.gov.hmrc.securitiestransferchargefrontend.controllers.dashboard.routes as dashboardRoutes
 import uk.gov.hmrc.securitiestransferchargefrontend.domain.TransferType.{SH03, STF}
 import uk.gov.hmrc.securitiestransferchargefrontend.models.search.SubmissionStatus.{Overdue, ReadyToPay}
 import uk.gov.hmrc.securitiestransferchargefrontend.models.search.{SttSubmission, SttTransfer, SubmissionStatus}
@@ -35,16 +35,26 @@ object SubmissionDetailsViewModel {
 
   private val maxRecords = 10
 
-  private def viewLink(transferRef: String)(implicit messages: Messages): HtmlContent = {
+  private def viewLink(transferRef: String, href: String)(implicit messages: Messages): HtmlContent = {
     val view = messages("submissionDetails.transfers.action.view")
     val hiddenText = messages("submissionDetails.transfers.action.view.hidden", transferRef)
 
     HtmlContent(
-      s"""<a class="govuk-link" href="#">$view <span class="govuk-visually-hidden">$hiddenText</span></a>"""
+      s"""<a class="govuk-link" href="$href">$view <span class="govuk-visually-hidden">$hiddenText</span></a>"""
     )
   }
 
-  private def transfersTable(transfers: Seq[SttTransfer], isAgent: Boolean, submissionType: TransferType)(implicit messages: Messages): Table = {
+  // Only the STF transfer details page exists so far; SH03 keeps a placeholder link until its page is built.
+  // The number comes from the transfer's UTRN order, not the order the table is displayed in.
+  private def viewHref(submission: SttSubmission, transfer: SttTransfer): String =
+    (submission.submissionType, submission.transferNumber(transfer)) match {
+      case (STF, Some(number)) =>
+        dashboardRoutes.TransferDetailsController.onPageLoad(submission.submissionId, number).url
+      case _ => "#"
+    }
+
+  private def transfersTable(submission: SttSubmission, transfers: Seq[SttTransfer], isAgent: Boolean)(implicit messages: Messages): Table = {
+    val submissionType = submission.submissionType
     val middleKeys = submissionType match {
       case SH03         => Seq("shares", "for")
       case STF if isAgent => Seq("buyer", "seller")
@@ -77,20 +87,20 @@ object SubmissionDetailsViewModel {
           TableRow(content = Text(third)),
           TableRow(content = Text(DateTimeFormats.formatDate(transfer.paymentDueByDate)(messages.lang))),
           TableRow(content = StatusTag.tagHtml(transfer.status)),
-          TableRow(content = viewLink(transfer.utrn))
+          TableRow(content = viewLink(transfer.utrn, viewHref(submission, transfer)))
         )
       }
     )
   }
 
 
-  private def buildTabs(all: Seq[SttTransfer], isAgent: Boolean, submissionType: TransferType)(implicit messages: Messages): Seq[TransferTab] = Seq(
-    buildTab("allTransfers", all, status = None, isAgent, submissionType),
-    buildTab("readyToPay", all.filter(_.status == ReadyToPay), Some(ReadyToPay), isAgent, submissionType),
-    buildTab("overdue", all.filter(_.status == Overdue), Some(Overdue), isAgent, submissionType)
+  private def buildTabs(submission: SttSubmission, all: Seq[SttTransfer], isAgent: Boolean)(implicit messages: Messages): Seq[TransferTab] = Seq(
+    buildTab(submission, "allTransfers", all, status = None, isAgent),
+    buildTab(submission, "readyToPay", all.filter(_.status == ReadyToPay), Some(ReadyToPay), isAgent),
+    buildTab(submission, "overdue", all.filter(_.status == Overdue), Some(Overdue), isAgent)
   )
 
-  private def buildTab(id: String, transfers: Seq[SttTransfer], status: Option[SubmissionStatus], isAgent: Boolean, submissionType: TransferType)
+  private def buildTab(submission: SttSubmission, id: String, transfers: Seq[SttTransfer], status: Option[SubmissionStatus], isAgent: Boolean)
                       (implicit messages: Messages): TransferTab = {
     val label = messages(s"submissionDetails.$id.panel.label")
 
@@ -99,17 +109,16 @@ object SubmissionDetailsViewModel {
       label = status.fold(label)(status => StatusTag.labelWithTag(label, transfers.size, status)),
       heading = messages(s"submissionDetails.$id.panel.heading"),
       emptyText = messages(s"submissionDetails.$id.empty"),
-      table = Option.when(transfers.nonEmpty)(transfersTable(transfers, isAgent, submissionType))
+      table = Option.when(transfers.nonEmpty)(transfersTable(submission, transfers, isAgent))
     )
   }
 
   def build(submission: SttSubmission, isAgent: Boolean = false)(implicit messages: Messages): SubmissionDetailsViewModel = {
-    val submissionType = submission.submissionType
     val transfers = SttTransfer.sorted(submission.transfers)
     SubmissionDetailsViewModel(
       submissionId = submission.submissionId,
       summary = SubmissionDetailsSummary.getSummary(submission, isAgent),
-      tabs = buildTabs(transfers, isAgent, submissionType)
+      tabs = buildTabs(submission, transfers, isAgent)
     )
   }
 }

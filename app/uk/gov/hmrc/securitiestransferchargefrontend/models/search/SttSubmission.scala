@@ -44,6 +44,23 @@ final case class SttSubmission(
   def paymentDueByDate  : LocalDate         = transfers.map(_.paymentDueByDate).min
   def numberOfTransfers : Int               = transfers.length
   def submissionStatus  : SubmissionStatus  = SubmissionStatus.aggregateStatus(transfers.map(_.status))
+
+  /*
+   * Transfers are numbered 1, 2, 3... in UTRN order. Every transfer has a unique UTRN, so a transfer keeps
+   * the same number every time we fetch the submission, whatever order the search service returns them in
+   * (which isn't guaranteed). This means the number in a View link finds the same transfer on the transfer
+   * details page and when paying.
+   * UTRNs are strings, so sorting them alone would put "10" before "9". Sorting by length first, then by
+   * value, puts them in numeric order.
+   */
+  private lazy val numberedTransfers: Seq[SttTransfer] =
+    transfers.sortBy(transfer => (transfer.utrn.length, transfer.utrn))
+
+  def transferNumber(transfer: SttTransfer): Option[Int] =
+    Some(numberedTransfers.indexOf(transfer)).filter(_ >= 0).map(_ + 1)
+
+  def transferAt(transferNumber: Int): Option[SttTransfer] =
+    Option.when(transferNumber > 0)(numberedTransfers.lift(transferNumber - 1)).flatten
 }
 
 object SttSubmission:

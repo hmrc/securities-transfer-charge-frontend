@@ -1456,3 +1456,39 @@ submissionDetails.transferType.sh03 = Share buyback (SH03)
 
 submissionDetails.reasonForPurchase.cancellation = Cancellation
 submissionDetails.reasonForPurchase.treasury = Treasury
+
+
+transferDetails.title = Transfer {0}
+transferDetails.heading = Transfer {0}
+transferDetails.breadcrumb.submission = Submission {0}
+transferDetails.balance.heading = Balance to pay: {0}
+transferDetails.payFullBalance = Pay full balance
+transferDetails.charges.heading = Charges
+transferDetails.charges.tax = Tax on transfer
+transferDetails.charges.lateFilingPenalty = Late filing penalty
+transferDetails.charges.latePaymentPenalty = Late payment penalty
+transferDetails.charges.latePaymentInterest = Late payment interest
+transferDetails.charges.dueBy = {0} due by {1}
+transferDetails.charges.wasDueBy = {0} was due by {1}
+transferDetails.charges.due = {0} due
+transferDetails.charges.pay = Pay
+transferDetails.charges.pay.hidden.tax = tax due on transfer
+transferDetails.charges.pay.hidden.lateFilingPenalty = late filing penalty
+transferDetails.charges.pay.hidden.latePaymentPenalty = late payment penalty
+transferDetails.charges.pay.hidden.latePaymentInterest = late payment interest
+transferDetails.viewPaidCharges = View paid charges
+transferDetails.transferReference = Transfer reference
+transferDetails.noData = No data
+transferDetails.partOfSubmission = Part of submission
+transferDetails.submissionDate = Submission date
+transferDetails.buyer.heading = Buyer details
+transferDetails.seller.heading = Seller details
+transferDetails.name = Name
+transferDetails.address = Address
+transferDetails.transfer.heading = Transfer details
+transferDetails.businessName = Business name
+transferDetails.crn = Company registration number (CRN)
+transferDetails.numberOfSecurities = Number of securities
+
+paidCharges.title = Paid charges
+paidCharges.heading = Paid charges
