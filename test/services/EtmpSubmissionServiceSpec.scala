@@ -28,11 +28,17 @@ import uk.gov.hmrc.securitiestransferchargefrontend.models.UserAnswers
 import uk.gov.hmrc.securitiestransferchargefrontend.models.sh03.shared.{ReasonForPurchase, RoleAtPurchasingCompany}
 import uk.gov.hmrc.securitiestransferchargefrontend.models.stf.*
 import uk.gov.hmrc.securitiestransferchargefrontend.models.submission.*
+import uk.gov.hmrc.http.HeaderCarrier
+import uk.gov.hmrc.securitiestransferchargefrontend.clients.EtmpSubmissionClient
+import uk.gov.hmrc.securitiestransferchargefrontend.domain.{SubmissionId, SubscriptionId}
+import uk.gov.hmrc.securitiestransferchargefrontend.models.sh03.bulk.CompanyDetails as BulkCompanyDetails
 import uk.gov.hmrc.securitiestransferchargefrontend.pages.sh03.RoleAtPurchasingCompanyPage
+import uk.gov.hmrc.securitiestransferchargefrontend.pages.sh03.bulk.{BulkCompanyDetailsPage, BulkRoleAtPurchasingCompanyPage}
 import uk.gov.hmrc.securitiestransferchargefrontend.pages.stf.shared.AgentReferencePage
 import uk.gov.hmrc.securitiestransferchargefrontend.services.*
 
 import java.time.LocalDate
+import scala.concurrent.Future
 
 class EtmpSubmissionServiceSpec extends AnyFreeSpec with Matchers with SpecBase with ScalaFutures with MockitoSugar {
 
@@ -261,6 +267,48 @@ class EtmpSubmissionServiceSpec extends AnyFreeSpec with Matchers with SpecBase 
       val result = service.getSubmissionDataSh03(mockEmptyUserAnswers, affinityData)
       
       result mustBe None
+    }
+  }
+
+  "submitBulkSH03" - {
+
+    class CapturingEtmpSubmissionClient(toReturn: StcTransactionCreateResponse) extends EtmpSubmissionClient {
+      var payload: Option[SubmissionBatchPayload] = None
+
+      def submitBatchTransfer(subscriptionId: SubscriptionId, submissionId: SubmissionId, payload: SubmissionBatchPayload)
+                             (implicit hc: HeaderCarrier): Future[StcTransactionCreateResponse] = {
+        this.payload = Some(payload)
+        Future.successful(toReturn)
+      }
+
+      def getTransaction(subscriptionId: SubscriptionId, utrn: String)(implicit hc: HeaderCarrier): Future[GetTransactionResult] =
+        Future.failed(new UnsupportedOperationException("getTransaction not stubbed"))
+    }
+
+    def declarationSentFor(userAnswers: UserAnswers): SingleTransferDeclaration = {
+      val client = new CapturingEtmpSubmissionClient(successfulChargesResponseGen.sample.get)
+      val service = new EtmpSubmissionServiceImpl(client)
+      service.submitBulkSH03(subscriptionId, Seq(Fixtures.testValidatedStcRow), userAnswers, affinityData).futureValue
+      client.payload.value.declaration
+    }
+
+    val bulkAnswers =
+      emptyUserAnswers
+        .set(BulkCompanyDetailsPage, BulkCompanyDetails("Bulk Co Ltd", "87654321")).success.value
+        .set(BulkRoleAtPurchasingCompanyPage, RoleAtPurchasingCompany("ukSocietas", Some("Board"))).success.value
+
+    "send the role and UKS organ from the bulk role page in the declaration" in {
+      val declaration = declarationSentFor(bulkAnswers)
+      declaration.role1 mustBe Some(DeclarationRole.UkSocietas)
+      declaration.role2 mustBe Some("Board")
+    }
+
+    "not use a role saved on the single SH03 role page" in {
+      val answers = bulkAnswers
+        .remove(BulkRoleAtPurchasingCompanyPage).success.value
+        .set(RoleAtPurchasingCompanyPage, RoleAtPurchasingCompany("director", None)).success.value
+
+      declarationSentFor(answers).role1 mustBe None
     }
   }
 
