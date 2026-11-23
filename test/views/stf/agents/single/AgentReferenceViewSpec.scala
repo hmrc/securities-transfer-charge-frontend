@@ -51,6 +51,16 @@ class AgentReferenceViewSpec extends ViewBaseSpec {
   }
 
   "The AgentReferenceView" - {
+
+    "place the error summary above the caption when the form has errors" in {
+      val errorView = Jsoup.parse(
+        viewInstance(form.bind(Map.empty[String, String]), NormalMode, testBackLinkRoute)(fakeRequest, messages).body
+      )
+      val ordered = errorView.select(".govuk-error-summary, .govuk-caption-l")
+      ordered.size() mustBe 2
+      ordered.first().hasClass("govuk-error-summary") mustBe true
+    }
+
     
       val agentReferenceView = view()
 

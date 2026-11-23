@@ -33,15 +33,15 @@
 @(form: Form[_], mode: Mode, backLinkCall: Call)(implicit request: Request[_], messages: Messages)
 
 @layout(pageTitle = title(form, messages("org.securitiesTarget.title")), backLinkUrl = Some(backLinkCall.url)) {
-    <div id="caption-heading" class="govuk-caption-l">
-        @messages("transfer.details.caption")
-    </div>
-
     @formHelper(action = routes.SecuritiesTargetController.onSubmit(mode), Symbol("autoComplete") -> "off") {
 
         @if(form.errors.nonEmpty) {
             @govukErrorSummary(ErrorSummaryViewModel(form))
         }
+
+        <div id="caption-heading" class="govuk-caption-l">
+            @messages("transfer.details.caption")
+        </div>
 
         <h1 class="govuk-heading-l">@messages("org.securitiesTarget.heading")</h1>
 

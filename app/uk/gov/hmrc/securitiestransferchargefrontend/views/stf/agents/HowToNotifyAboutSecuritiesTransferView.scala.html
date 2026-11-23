@@ -32,15 +32,15 @@
 @(form: Form[_], mode: Mode, affinityGroupKey: String, backLinkCall: Call)(implicit request: Request[_], messages: Messages)
 
 @layout(pageTitle = title(form, messages("agent.howToNotifyAboutSecuritiesTransfer.title")), backLinkUrl = Some(backLinkCall.url)) {
-    <div id="caption-heading" class="govuk-caption-l">
-        @messages("transfer.details.caption")
-    </div>
-
     @formHelper(action = agentsRoutes.HowToNotifyAboutSecuritiesTransferController.onSubmit(), Symbol("autoComplete") -> "off") {
 
         @if(form.errors.nonEmpty) {
             @govukErrorSummary(ErrorSummaryViewModel(form,  errorLinkOverrides = Map("value" -> "value_0")))
         }
+
+        <div id="caption-heading" class="govuk-caption-l">
+            @messages("transfer.details.caption")
+        </div>
 
         @govukRadios(
             RadiosViewModel(
