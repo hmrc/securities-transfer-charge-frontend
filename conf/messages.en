@@ -1468,4 +1468,4 @@ draft.sellerDetails.heading = Seller details
 draft.transferDetails.heading = Transfer details
 draft.continueSubmission = Continue submission
 draft.deleteDraft = Delete draft
-draft.title = Draft of Submission {0}
+draft.title = Draft of submission {0}
