@@ -67,7 +67,7 @@ object DraftViewModel {
     )
 
   private[dashboard] def deletion(userAnswers: UserAnswers, clock: Clock, draftTtlDays: Int): DraftDeletion = {
-    val deletionAt = userAnswers.createdAt.atZone(ukZone).plusDays(draftTtlDays)
+    val deletionAt = userAnswers.createdAt.plus(draftTtlDays.toLong, ChronoUnit.DAYS).atZone(ukZone)
     val today      = LocalDate.now(clock.withZone(ukZone))
     val daysLeft   = ChronoUnit.DAYS.between(today, deletionAt.toLocalDate)
 

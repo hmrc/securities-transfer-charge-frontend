@@ -83,6 +83,18 @@ class DraftsViewModelSpec extends AnyWordSpec with Matchers {
       DraftViewModel.deletion(answersCreatedAt("2026-11-01T09:00"), clockAt("2026-11-01T23:00"), 14) shouldBe InDays(14)
     }
 
+    "show the GMT deletion time when the TTL period crosses the end of BST" in {
+      DraftViewModel.deletion(answersCreatedAt("2026-10-20T10:00"), clockAt("2026-11-19T08:00"), ttlDays) shouldBe Today(LocalTime.of(9, 0))
+    }
+
+    "show the BST deletion time when the TTL period crosses the start of BST" in {
+      DraftViewModel.deletion(answersCreatedAt("2026-03-01T10:00"), clockAt("2026-03-31T08:00"), ttlDays) shouldBe Today(LocalTime.of(11, 0))
+    }
+
+    "show today rather than tomorrow when the clock change moves the deletion back before midnight" in {
+      DraftViewModel.deletion(answersCreatedAt("2026-10-20T00:30"), clockAt("2026-11-18T10:00"), ttlDays) shouldBe Today(LocalTime.of(23, 30))
+    }
+
     "show 30 days message" in {
       InDays(12).message shouldBe "Your draft will be deleted in 12 days."
     }
