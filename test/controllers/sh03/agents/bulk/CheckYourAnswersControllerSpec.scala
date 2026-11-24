@@ -33,14 +33,16 @@ import uk.gov.hmrc.securitiestransferchargefrontend.controllers.routes.YourFileW
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.routes.JourneyRecoveryController
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.shared.SaveAndReturnButton.saveAndReturnButtonName
 import uk.gov.hmrc.securitiestransferchargefrontend.models.JourneyType.SH03
-import uk.gov.hmrc.securitiestransferchargefrontend.models.{NormalMode, UserAnswers}
+import uk.gov.hmrc.securitiestransferchargefrontend.models.{CheckMode, NormalMode, UserAnswers}
 import uk.gov.hmrc.securitiestransferchargefrontend.models.shared.AgentReference
 import uk.gov.hmrc.securitiestransferchargefrontend.models.stf.HowToNotifyAboutSecuritiesTransfer
 import uk.gov.hmrc.securitiestransferchargefrontend.models.stf.fileupload.{ParsedStcRow, ParsedStcRowsDocument, ParsedValue, ValidatedStcRow}
 import uk.gov.hmrc.securitiestransferchargefrontend.models.submission.BulkConfirmationDetails
 import uk.gov.hmrc.securitiestransferchargefrontend.navigation.Navigator
 import uk.gov.hmrc.securitiestransferchargefrontend.pages.BulkConfirmationDetailsPage
-import uk.gov.hmrc.securitiestransferchargefrontend.pages.sh03.bulk.{BulkAgentReferencePage, BulkCheckYourAnswersPage}
+import uk.gov.hmrc.securitiestransferchargefrontend.models.sh03.bulk.CompanyDetails
+import uk.gov.hmrc.securitiestransferchargefrontend.models.sh03.shared.RoleAtPurchasingCompany
+import uk.gov.hmrc.securitiestransferchargefrontend.pages.sh03.bulk.{BulkAgentReferencePage, BulkCheckYourAnswersPage, BulkCompanyDetailsPage, BulkRoleAtPurchasingCompanyPage}
 import uk.gov.hmrc.securitiestransferchargefrontend.pages.stf.shared.HowToNotifyAboutSecuritiesTransferPage
 import uk.gov.hmrc.securitiestransferchargefrontend.repositories.{ParsedStcRowsRepository, SessionRepository}
 import uk.gov.hmrc.securitiestransferchargefrontend.services.TransactionSubmissionService
@@ -60,6 +62,8 @@ class CheckYourAnswersControllerSpec extends SpecBase with FileUploadFixtures wi
   private def answersWithoutAgentRef: UserAnswers =
     UserAnswers.empty(testUserId)(testGroupIdentifier)(submissionId)(SH03)
       .set(HowToNotifyAboutSecuritiesTransferPage, HowToNotifyAboutSecuritiesTransfer.MoreThanOneAtATime).success.value
+      .set(BulkCompanyDetailsPage, CompanyDetails("Test Ltd", "12345678")).success.value
+      .set(BulkRoleAtPurchasingCompanyPage, RoleAtPurchasingCompany("director", None)).success.value
       .setFileUploadReference(reference)
 
   private def completeUserAnswers: UserAnswers =
@@ -173,6 +177,39 @@ class CheckYourAnswersControllerSpec extends SpecBase with FileUploadFixtures wi
 
           status(result) mustEqual SEE_OTHER
           redirectLocation(result).value mustEqual JourneyRecoveryController.onPageLoad().url
+        }
+      }
+
+      Seq(
+        "company details are missing" -> (
+          completeUserAnswers.remove(BulkCompanyDetailsPage).success.value,
+          routes.CompanyDetailsController.onPageLoad(CheckMode).url
+        ),
+        "the file reference is missing" -> (
+          completeUserAnswers.copy(fileUploadReference = None),
+          routes.TemplateInstructionsController.onPageLoad().url
+        ),
+        "the role at the purchasing company is missing" -> (
+          completeUserAnswers.remove(BulkRoleAtPurchasingCompanyPage).success.value,
+          routes.RoleAtPurchasingCompanyController.onPageLoad(CheckMode).url
+        )
+      ).foreach { case (missing, (answers, expectedPage)) =>
+
+        s"must redirect to the page to answer it when $missing" in {
+          val application = applicationBuilder(userAnswers = Some(answers))
+            .overrides(
+              bind[Navigator].qualifiedWith(Names.named("agentsSh03")).toInstance(stubNavigator),
+              bind[ParsedStcRowsRepository].toInstance(mockRepository)
+            ).build()
+
+          running(application) {
+            val request = FakeRequest(GET, routes.CheckYourAnswersController.onPageLoad().url)
+            val result = route(application, request).value
+
+            status(result) mustEqual SEE_OTHER
+            redirectLocation(result).value mustEqual expectedPage
+            verify(mockRepository, never()).findDocumentByReference(anyString())
+          }
         }
       }
 

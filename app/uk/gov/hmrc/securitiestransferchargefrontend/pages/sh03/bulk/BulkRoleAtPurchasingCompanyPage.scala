@@ -17,12 +17,24 @@
 package uk.gov.hmrc.securitiestransferchargefrontend.pages.sh03.bulk
 
 import play.api.libs.json.JsPath
+import uk.gov.hmrc.securitiestransferchargefrontend.models.UserAnswers
 import uk.gov.hmrc.securitiestransferchargefrontend.models.sh03.shared.RoleAtPurchasingCompany
 import uk.gov.hmrc.securitiestransferchargefrontend.pages.QuestionPage
+
+import scala.util.Try
 
 case object BulkRoleAtPurchasingCompanyPage extends QuestionPage[RoleAtPurchasingCompany] {
 
   override def path: JsPath = JsPath \ toString
 
-  override def toString: String = "roleAtPurchasingCompany"
+  override def toString: String = "bulkRoleAtPurchasingCompany"
+
+  override def cleanup(value: Option[RoleAtPurchasingCompany], userAnswers: UserAnswers): Try[UserAnswers] =
+    value match {
+
+      case Some(details) if details.role != "ukSocietas" && details.uksOrgan.isDefined =>
+        userAnswers.set(BulkRoleAtPurchasingCompanyPage, details.copy(uksOrgan = None))
+
+      case _ => super.cleanup(value, userAnswers)
+    }
 }

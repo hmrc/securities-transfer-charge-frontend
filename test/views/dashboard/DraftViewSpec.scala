@@ -24,9 +24,11 @@ import uk.gov.hmrc.securitiestransferchargefrontend.controllers.dashboard.routes
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.shared.routes as stfSharedRoutes
 import uk.gov.hmrc.securitiestransferchargefrontend.models.JourneyType.SH03
 import uk.gov.hmrc.securitiestransferchargefrontend.models.UserAnswers
-import uk.gov.hmrc.securitiestransferchargefrontend.models.sh03.shared.CompanyDetails
+import uk.gov.hmrc.securitiestransferchargefrontend.models.sh03.bulk.CompanyDetails as BulkCompanyDetails
+import uk.gov.hmrc.securitiestransferchargefrontend.models.sh03.shared.{CompanyDetails, RoleAtPurchasingCompany}
 import uk.gov.hmrc.securitiestransferchargefrontend.models.shared.AgentReference
 import uk.gov.hmrc.securitiestransferchargefrontend.pages.sh03.{AgentReferencePage, CompanyDetailsPage}
+import uk.gov.hmrc.securitiestransferchargefrontend.pages.sh03.bulk.{BulkAgentReferencePage, BulkCompanyDetailsPage, BulkRoleAtPurchasingCompanyPage}
 import uk.gov.hmrc.securitiestransferchargefrontend.viewmodels.dashboard.{DraftDeletion, DraftViewModel}
 import uk.gov.hmrc.securitiestransferchargefrontend.views.html.dashboard.DraftView
 import views.ViewBaseSpec
@@ -71,7 +73,7 @@ class DraftViewSpec extends ViewBaseSpec {
     val bannerTitle: String = messages("confirmation.banner.title")
     val deletionMessage: String = model.deletion.message
     val submissionHeading: String = messages("draft.submission", model.submissionId)
-    val buyerDetailsHeading: String = messages("draft.buyerDetails.heading")
+    val yourDetailsHeading: String = messages("draft.yourDetails.heading")
     val continueSubmission: String = messages("draft.continueSubmission")
     val deleteDraft: String = messages("draft.deleteDraft")
   }
@@ -129,11 +131,11 @@ class DraftViewSpec extends ViewBaseSpec {
 
     "only show the sections that have answers" in {
       val headings = doc.select("h2.govuk-heading-m").asScala.map(_.text()).toList
-      headings mustBe List(expected.buyerDetailsHeading)
+      headings mustBe List(expected.yourDetailsHeading)
       doc.select(".govuk-summary-list").size() mustBe 1
     }
 
-    "show the company details in the buyer details summary list" in {
+    "show the company details in the your details summary list" in {
       val rows = doc.select(".govuk-summary-list__row")
       rows.size() mustBe 3
 
@@ -187,6 +189,81 @@ class DraftViewSpec extends ViewBaseSpec {
       rows.size() mustBe 1
       rows.get(0).select(".govuk-summary-list__key").text() mustBe messages("agentReference.checkYourAnswersLabel")
       rows.get(0).select(".govuk-summary-list__value").text() mustBe messages("REF-12345")
+    }
+  }
+
+  private val bulkAnswers: UserAnswers =
+    sh03Answers
+      .set(BulkAgentReferencePage, AgentReference(Some("BULK-REF"))).success.value
+      .set(BulkCompanyDetailsPage, BulkCompanyDetails("Bulk Co Ltd", "87654321")).success.value
+      .set(BulkRoleAtPurchasingCompanyPage, RoleAtPurchasingCompany("ukSocietas", Some("Board"))).success.value
+
+  private def rowsUnder(doc: org.jsoup.nodes.Document, heading: String): List[(String, String)] = {
+    val h2 = doc.select("h2.govuk-heading-m").asScala.find(_.text() == heading).get
+    h2.nextElementSibling().select(".govuk-summary-list__row").asScala.toList.map { row =>
+      row.select(".govuk-summary-list__key").text() -> row.select(".govuk-summary-list__value").text()
+    }
+  }
+
+  "The DraftView for a bulk SH03 draft should" - {
+    val doc = view(viewModel(userAnswers = bulkAnswers, affinityKey = affinityGroupKeyAgent))
+
+    "show the your details, buyer details, file details and declaration sections in order" in {
+      doc.select("h2.govuk-heading-m").asScala.map(_.text()).toList mustBe List(
+        messages("draft.yourDetails.heading"),
+        messages("draft.buyerDetails.heading"),
+        messages("draft.fileDetails.heading"),
+        messages("draft.declaration.heading")
+      )
+    }
+
+    "show that no file has been uploaded under file details" in {
+      rowsUnder(doc, messages("draft.fileDetails.heading")) mustBe List(
+        messages("draft.fileDetails.fileName.key") -> messages("draft.fileDetails.fileName.value")
+      )
+    }
+
+    "show the agent reference under your details" in {
+      rowsUnder(doc, messages("draft.yourDetails.heading")) mustBe List(
+        messages("agentReference.checkYourAnswersLabel") -> "BULK-REF"
+      )
+    }
+
+    "show the company name and CRN, but not PLC, under buyer details" in {
+      rowsUnder(doc, messages("draft.buyerDetails.heading")) mustBe List(
+        messages("agent.sh03.companyDetails.companyName.label") -> "Bulk Co Ltd",
+        messages("agent.sh03.companyDetails.crn.label") -> "87654321"
+      )
+    }
+
+    "show the role at the purchasing company under declaration" in {
+      rowsUnder(doc, messages("draft.declaration.heading")) mustBe List(
+        messages("agent.sh03.roleAtPurchasingCompany.checkYourAnswersLabel") -> messages("agent.sh03.roleAtPurchasingCompany.ukSocietas"),
+        messages("agent.sh03.roleAtPurchasingCompany.uksOrgan.label") -> "Board"
+      )
+    }
+
+    "not show a transfer details section" in {
+      doc.select("h2.govuk-heading-m").asScala.map(_.text()) must not contain messages("draft.transferDetails.heading")
+    }
+  }
+
+  "The DraftView for a bulk SH03 draft for an organisation with no role yet should" - {
+    val answers = bulkAnswers.remove(BulkRoleAtPurchasingCompanyPage).success.value
+    val doc = view(viewModel(userAnswers = answers, affinityKey = affinityGroupKeyOrg))
+
+    "show the company details under your details and hide the empty declaration section" in {
+      doc.select("h2.govuk-heading-m").asScala.map(_.text()).toList mustBe List(
+        messages("draft.yourDetails.heading"),
+        messages("draft.fileDetails.heading")
+      )
+    }
+
+    "show the company name and CRN under your details" in {
+      rowsUnder(doc, messages("draft.yourDetails.heading")) must contain allOf(
+        messages("org.sh03.companyDetails.companyName.label") -> "Bulk Co Ltd",
+        messages("org.sh03.companyDetails.crn.label") -> "87654321"
+      )
     }
   }
 

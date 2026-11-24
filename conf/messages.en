@@ -1466,9 +1466,13 @@ draft.yourDetails.heading = Your details
 draft.buyerDetails.heading = Buyer details
 draft.sellerDetails.heading = Seller details
 draft.transferDetails.heading = Transfer details
+draft.declaration.heading = Declaration
+draft.fileDetails.heading = File details
 draft.continueSubmission = Continue submission
 draft.deleteDraft = Delete draft
 draft.title = Draft of submission {0}
+draft.fileDetails.fileName.key = File name
+draft.fileDetails.fileName.value = No file uploaded
 
 transferDetails.title = Transfer {0}
 transferDetails.heading = Transfer {0}
