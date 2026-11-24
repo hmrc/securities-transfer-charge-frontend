@@ -104,8 +104,34 @@ class SttSubmissionSpec extends AnyPropSpec with ScalaCheckPropertyChecks with M
       sub.submissionStatus mustEqual expected
     }
   }
-}
 
+  property("Transfer numbers do not depend on the order the search service returns transfers in") {
+    forAll(genSttSubmission) { sub =>
+      val reordered = sub.copy(transfers = sub.transfers.reverse)
+      sub.transfers.foreach { transfer =>
+        reordered.transferNumber(transfer) mustBe sub.transferNumber(transfer)
+      }
+    }
+  }
+
+  property("Transfers are numbered 1 to N, and transferAt finds the transfer with that number") {
+    forAll(genSttSubmission) { sub =>
+      val unique = sub.copy(transfers = sub.transfers.distinctBy(_.utrn))
+      unique.transfers.flatMap(unique.transferNumber).sorted mustBe (1 to unique.transfers.size)
+      unique.transfers.foreach { transfer =>
+        unique.transferNumber(transfer).flatMap(unique.transferAt) mustBe Some(transfer)
+      }
+    }
+  }
+
+  property("transferAt returns nothing for numbers outside 1 to N") {
+    forAll(genSttSubmission) { sub =>
+      sub.transferAt(0) mustBe None
+      sub.transferAt(-1) mustBe None
+      sub.transferAt(sub.transfers.size + 1) mustBe None
+    }
+  }
+}
 
 object SttSubmissionSpec {
   def genSubmissionId: Gen[String] = for {

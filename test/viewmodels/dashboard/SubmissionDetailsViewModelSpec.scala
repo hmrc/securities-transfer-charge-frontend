@@ -27,6 +27,7 @@ import uk.gov.hmrc.securitiestransferchargefrontend.models.search.*
 import uk.gov.hmrc.securitiestransferchargefrontend.models.search.SubmissionStatus.{Overdue, ReadyToPay}
 import uk.gov.hmrc.securitiestransferchargefrontend.models.submission.SubmissionDetailsSummary
 import uk.gov.hmrc.securitiestransferchargefrontend.viewmodels.dashboard.*
+import uk.gov.hmrc.securitiestransferchargefrontend.controllers.dashboard.routes as dashboardRoutes
 
 class SubmissionDetailsViewModelSpec extends SpecBase with GuiceOneAppPerSuite {
 
@@ -412,6 +413,35 @@ class SubmissionDetailsViewModelSpec extends SpecBase with GuiceOneAppPerSuite {
           readyToPayTransfer.utrn
         )
       )
+    }
+
+    "link View to the transfer details page for agent STF submissions" in {
+      val content = tab(build(isAgent = true), "allTransfers").table.get.rows.head(5).content.asHtml.toString
+
+      content must include(
+        s"""href="${dashboardRoutes.TransferDetailsController.onPageLoad(Fixtures.testSubmissionId.toString, 1).url}""""
+      )
+    }
+
+    "number View links in UTRN order, not the table order or the order the search service returns them" in {
+      // Returned as [B, A], displayed overdue-first as [A, B], numbered by UTRN as A=2, B=1.
+      val first = readyToPayTransfer.copy(utrn = "900459000001")
+      val second = overdueTransfer.copy(utrn = "900459000002")
+      val model = build(transfers = Seq(first, second), isAgent = true)
+      val rows = tab(model, "allTransfers").table.get.rows
+
+      rows.head(0).content mustBe Text(second.utrn)
+      rows.head(5).content.asHtml.toString must include("/transfer-2\"")
+      rows(1)(5).content.asHtml.toString must include("/transfer-1\"")
+
+      val reversed = tab(build(transfers = Seq(second, first), isAgent = true), "allTransfers").table.get.rows
+      reversed.map(_(5).content.asHtml.toString) mustBe rows.map(_(5).content.asHtml.toString)
+    }
+
+    "keep a placeholder View link for SH03 submissions" in {
+      Seq(build(isAgent = false, transferType = SH03), build(isAgent = true, transferType = SH03)).foreach { model =>
+        tab(model, "allTransfers").table.get.rows.head(5).content.asHtml.toString must include("""href="#"""")
+      }
     }
   }
 }

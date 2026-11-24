@@ -21,6 +21,7 @@ import play.api.Configuration
 import play.api.i18n.Lang
 import play.api.mvc.RequestHeader
 import uk.gov.hmrc.play.bootstrap.config.ServicesConfig
+import uk.gov.hmrc.securitiestransferchargefrontend.controllers.dashboard.routes as dashboardRoutes
 
 import java.time.LocalDate
 
@@ -174,5 +175,8 @@ class FrontendAppConfig @Inject() (configuration: Configuration, servicesConfig:
   lazy val payApiBaseUrl: String = servicesConfig.baseUrl("pay-api")
 
   def paymentReturnUrl: String = s"$host$basePath/dashboard"
-  def paymentBackUrl(submissionId: String): String = s"$host$basePath/submission-details/$submissionId"
+  def paymentBackUrl(submissionId: String): String =
+    s"$host${dashboardRoutes.SubmissionDetailsController.onPageLoad(submissionId).url}"
+  def paymentBackUrl(submissionId: String, transferNumber: Int): String =
+    s"$host${dashboardRoutes.TransferDetailsController.onPageLoad(submissionId, transferNumber).url}"
 }
