@@ -671,4 +671,37 @@ class StcConditionalRowValidatorSpec extends SpecBase {
       result.exists(_.fieldName == "purchasedForCancellation") mustBe false
     }
   }
+
+  "StcConditionalRowValidator total market value error messages" - {
+
+    val journeys = Seq(
+      (StcTemplate.STF, affinityGroupKeyInd, STF, "securities"),
+      (StcTemplate.STF, affinityGroupKeyOrg, STF, "securities"),
+      (StcTemplate.STFAgent, affinityGroupKeyAgent, STF, "securities"),
+      (StcTemplate.SH03, affinityGroupKeyOrg, SH03, "shares"),
+      (StcTemplate.SH03, affinityGroupKeyAgent, SH03, "shares")
+    )
+
+    val scenarios = Seq(
+      ("missing", None, (noun: String) => s"Enter the market value of the $noun in pounds"),
+      ("non-numeric", Some("abc"), (noun: String) => s"The market value of the $noun must be a number and can include up to two decimal places, like £30 or £28.60"),
+      ("more than two decimal places", Some("100.123"), (noun: String) => s"The market value of the $noun must be a number and can include up to two decimal places, like £30 or £28.60"),
+      ("negative", Some("-1"), (noun: String) => s"The market value of the $noun must be £0.01 or more"),
+      ("below the minimum", Some("0"), (noun: String) => s"The market value of the $noun must be £0.01 or more"),
+      ("above the maximum", Some("1000000000"), (noun: String) => s"The market value of the $noun must be £999,999,999 or below")
+    )
+
+    journeys.foreach { case (template, affinityKey, journeyType, noun) =>
+      scenarios.foreach { case (description, value, expected) =>
+        s"show the correct message for $affinityKey $journeyType when the value is $description" in {
+          val result = validator.validate(
+            validParsedRow.copy(connectedPersons = Some(true), totalMarketValue = value),
+            template, affinityKey, journeyType
+          )
+
+          result.filter(_.fieldName == "totalMarketValue").map(_.message) mustBe Seq(expected(noun))
+        }
+      }
+    }
+  }
 }

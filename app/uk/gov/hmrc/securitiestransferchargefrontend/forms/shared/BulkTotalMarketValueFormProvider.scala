@@ -33,13 +33,13 @@ class BulkTotalMarketValueFormProvider @Inject() extends Mappings {
 
     Form(
       "value" -> currency(
-        s"$affinityKey.$journeyKey.totalMarketValue.error.required",
-        s"$affinityKey.$journeyKey.totalMarketValue.error.invalidNumeric",
-        s"$affinityKey.$journeyKey.totalMarketValue.error.nonNumeric",
-        s"$affinityKey.$journeyKey.totalMarketValue.error.negative"
+        s"$affinityKey.$journeyKey.bulk.totalMarketValue.error.required",
+        s"$affinityKey.$journeyKey.bulk.totalMarketValue.error.invalidNumeric",
+        s"$affinityKey.$journeyKey.bulk.totalMarketValue.error.nonNumeric",
+        s"$affinityKey.$journeyKey.bulk.totalMarketValue.error.negative"
       )
-        .verifying(maximumCurrency(maxValue, s"$affinityKey.$journeyKey.totalMarketValue.error.aboveMaximum"))
-        .verifying(minimumCurrency(minValue, s"$affinityKey.$journeyKey.totalMarketValue.error.belowMinimum"))
+        .verifying(maximumCurrency(maxValue, s"$affinityKey.$journeyKey.bulk.totalMarketValue.error.aboveMaximum"))
+        .verifying(minimumCurrency(minValue, s"$affinityKey.$journeyKey.bulk.totalMarketValue.error.belowMinimum"))
     )
   }
 }
