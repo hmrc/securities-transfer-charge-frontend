@@ -26,8 +26,10 @@ import uk.gov.hmrc.securitiestransferchargefrontend.models.sh03.bulk.CompanyDeta
 import uk.gov.hmrc.securitiestransferchargefrontend.models.shared.AgentReference
 import uk.gov.hmrc.securitiestransferchargefrontend.models.stf.fileupload.ValidatedStcRow
 import uk.gov.hmrc.securitiestransferchargefrontend.models.submission.*
+import uk.gov.hmrc.securitiestransferchargefrontend.models.sh03.shared.RoleAtPurchasingCompany
+import uk.gov.hmrc.securitiestransferchargefrontend.pages.QuestionPage
 import uk.gov.hmrc.securitiestransferchargefrontend.pages.sh03.RoleAtPurchasingCompanyPage
-import uk.gov.hmrc.securitiestransferchargefrontend.pages.sh03.bulk.BulkCompanyDetailsPage
+import uk.gov.hmrc.securitiestransferchargefrontend.pages.sh03.bulk.{BulkCompanyDetailsPage, BulkRoleAtPurchasingCompanyPage}
 import uk.gov.hmrc.securitiestransferchargefrontend.pages.stf.bulk.BulkAgentReferencePage
 import uk.gov.hmrc.securitiestransferchargefrontend.pages.stf.shared.AgentReferencePage
 
@@ -86,7 +88,7 @@ class EtmpSubmissionServiceImpl @Inject() (etmpSubmissionsClient: EtmpSubmission
   override def submitBulkSH03(subscriptionId: SubscriptionId, rows: Seq[ValidatedStcRow], userAnswers: UserAnswers, affinityData: AffinityData)
                              (implicit hc: HeaderCarrier): Future[SubmissionCreateResponse] = {
     getCompanyDetails(userAnswers).map { companyDetails =>
-      val declaration = createDeclaration(userAnswers)
+      val declaration = createDeclaration(userAnswers, BulkRoleAtPurchasingCompanyPage)
       val agentReference = getAgentReference(userAnswers)
       val requests = rows.map(r => RowTransforms.fromValidatedStcRowToSh03Request(companyDetails)(r.parsedRow, affinityData, agentReference))
       val etmpPayload = SubmissionBatchPayload.sh03Payload(declaration, requests)
@@ -151,10 +153,12 @@ class EtmpSubmissionServiceImpl @Inject() (etmpSubmissionsClient: EtmpSubmission
   }
 
   // ToDo: We do not currently have the information to create a declaration.
-  private val createDeclaration: UserAnswers => SingleTransferDeclaration = userAnswers =>
+  // Single and bulk SH03 store the role under different keys, so the caller says which page to read it from.
+  private def createDeclaration(userAnswers: UserAnswers, rolePage: QuestionPage[RoleAtPurchasingCompany] = RoleAtPurchasingCompanyPage): SingleTransferDeclaration = {
+    val role = userAnswers.get(rolePage)
     SingleTransferDeclaration(
-      userAnswers.get(RoleAtPurchasingCompanyPage).map(_.role).flatMap(DeclarationRole.fromString),
-      userAnswers.get(RoleAtPurchasingCompanyPage).flatMap(_.uksOrgan),
+      role.map(_.role).flatMap(DeclarationRole.fromString),
+      role.flatMap(_.uksOrgan),
       "John Bull",
       "10 High Street",
       Some("Bolton"),
@@ -165,6 +169,7 @@ class EtmpSubmissionServiceImpl @Inject() (etmpSubmissionsClient: EtmpSubmission
       None,
       true
     )
+  }
 
   private def submitBatchTransfer(subscriptionId: SubscriptionId, userAnswers: UserAnswers, etmpPayload: SubmissionBatchPayload)(implicit hc: HeaderCarrier): Future[SubmissionCreateResponse] =
     etmpSubmissionsClient

@@ -27,6 +27,7 @@ import uk.gov.hmrc.securitiestransferchargefrontend.models.stf.fileupload.Valida
 import uk.gov.hmrc.securitiestransferchargefrontend.models.submission.BulkConfirmationDetails
 import uk.gov.hmrc.securitiestransferchargefrontend.models.{Mode, NormalMode, UserAnswers}
 import uk.gov.hmrc.securitiestransferchargefrontend.navigation.Navigator
+import uk.gov.hmrc.securitiestransferchargefrontend.navigation.sh03.Sh03BulkAnswersValidator
 import uk.gov.hmrc.securitiestransferchargefrontend.pages.BulkConfirmationDetailsPage
 import uk.gov.hmrc.securitiestransferchargefrontend.pages.sh03.bulk.BulkCheckYourAnswersPage
 import uk.gov.hmrc.securitiestransferchargefrontend.repositories.{ParsedStcRowsRepository, SessionRepository}
@@ -57,14 +58,20 @@ class CheckYourAnswersController @Inject()(
     implicit val messages: Messages = messagesApi.preferred(request)
     implicit val lang: Lang = messages.lang
 
-    parsedStcRowsRepository.findDocumentByReference(reference).map {
-      case Some(parsedStcRowsDocument) =>
-        val viewModel = checkYourAnswersService.buildViewModel(parsedStcRowsDocument, request.userAnswers)
-
-        Ok(view(viewModel, backLinkCall(NormalMode)(Some(request.userAnswers))))
+    Sh03BulkAnswersValidator.organisations.missingAnswer(request.userAnswers) match {
+      case Some(missingAnswerPage) =>
+        Future.successful(Redirect(missingAnswerPage))
 
       case None =>
-        Redirect(routes.JourneyRecoveryController.onPageLoad())
+        parsedStcRowsRepository.findDocumentByReference(reference).map {
+          case Some(parsedStcRowsDocument) =>
+            val viewModel = checkYourAnswersService.buildViewModel(parsedStcRowsDocument, request.userAnswers)
+
+            Ok(view(viewModel, backLinkCall(NormalMode)(Some(request.userAnswers))))
+
+          case None =>
+            Redirect(routes.JourneyRecoveryController.onPageLoad())
+        }
     }
   }
 
