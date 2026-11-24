@@ -511,6 +511,6 @@ GET        /draft-submission/:submissionId                         uk.gov.hmrc.s
 GET        /draft-submission/delete/:submissionId                         uk.gov.hmrc.securitiestransferchargefrontend.controllers.dashboard.DraftController.onDeleteDraft(submissionId: String)
 
 # Payment Journey Routes
-GET        /dashboard/submissions/:submissionId/pay       uk.gov.hmrc.securitiestransferchargefrontend.controllers.pay.PaymentController.startPayment(submissionId: String)
-GET        /dashboard/submissions/:submissionId/transfer-$transferNumber<[0-9]+>/pay           uk.gov.hmrc.securitiestransferchargefrontend.controllers.pay.PaymentController.startTransferPayment(submissionId: String, transferNumber: Int)
-GET        /dashboard/submissions/:submissionId/transfer-$transferNumber<[0-9]+>/pay/:chargeRef uk.gov.hmrc.securitiestransferchargefrontend.controllers.pay.PaymentController.startChargePayment(submissionId: String, transferNumber: Int, chargeRef: String)
+GET        /dashboard/submissions/:submissionId/pay                                                 uk.gov.hmrc.securitiestransferchargefrontend.controllers.pay.PaymentController.startPayment(submissionId: String)
+GET        /dashboard/submissions/:submissionId/transfer-$transferNumber<[0-9]+>/pay                uk.gov.hmrc.securitiestransferchargefrontend.controllers.pay.PaymentController.startTransferPayment(submissionId: String, transferNumber: Int)
+GET        /dashboard/submissions/:submissionId/transfer-$transferNumber<[0-9]+>/pay/:chargeRef     uk.gov.hmrc.securitiestransferchargefrontend.controllers.pay.PaymentController.startChargePayment(submissionId: String, transferNumber: Int, chargeRef: String)
