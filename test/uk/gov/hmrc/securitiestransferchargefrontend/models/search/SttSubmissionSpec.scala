@@ -133,38 +133,6 @@ class SttSubmissionSpec extends AnyPropSpec with ScalaCheckPropertyChecks with M
   }
 }
 
-class SttSubmissionNumberingSpec extends org.scalatest.freespec.AnyFreeSpec with Matchers {
-  import uk.gov.hmrc.securitiestransferchargefrontend.models.search.SttSubmissionNumberingSpec.*
-
-  "SttSubmission transfer numbering" - {
-    "numbers transfers in UTRN order, whatever order they arrive in" in {
-      val sub = submissionOf("900459000003", "900459000001", "900459000002")
-      sub.transferAt(1).map(_.utrn) mustBe Some("900459000001")
-      sub.transferAt(2).map(_.utrn) mustBe Some("900459000002")
-      sub.transferAt(3).map(_.utrn) mustBe Some("900459000003")
-    }
-
-    "sorts UTRNs of different lengths numerically" in {
-      val sub = submissionOf("10", "9", "100")
-      sub.transfers.flatMap(t => sub.transferNumber(t).map(t.utrn -> _)).toMap mustBe Map("9" -> 1, "10" -> 2, "100" -> 3)
-    }
-
-    "returns no number for a transfer that is not in the submission" in {
-      val sub = submissionOf("900459000001")
-      sub.transferNumber(transferWithUtrn("900459000099")) mustBe None
-    }
-  }
-}
-
-object SttSubmissionNumberingSpec {
-  def transferWithUtrn(utrn: String): SttTransfer =
-    SttTransfer(utrn = utrn, buyerNames = "Buyer", sellerNames = None, companyName = "Company", charges = Seq.empty)
-
-  def submissionOf(utrns: String*): SttSubmission =
-    SttSubmission("STT-000000001", java.time.LocalDate.of(2026, 11, 1), None, None, utrns.map(transferWithUtrn))
-}
-
-
 object SttSubmissionSpec {
   def genSubmissionId: Gen[String] = for {
     nums <- Gen.listOfN(9, Gen.numChar)

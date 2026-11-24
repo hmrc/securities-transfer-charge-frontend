@@ -54,8 +54,8 @@ class PaymentController @Inject()(
   }
 
   /** Pays every outstanding charge on one transfer ("Pay full balance" on the Transfer details page). */
-  def startTransferPayment(submissionId: String, transferNumber: Int): Action[AnyContent] = (auth andThen getData).async { implicit request =>
-    val subscriptionId = request.request.subscriptionId
+  def startTransferPayment(submissionId: String, transferNumber: Int): Action[AnyContent] = auth.async { implicit request =>
+    val subscriptionId = request.subscriptionId
     dashboardService.getSubmission(subscriptionId, SubmissionId(submissionId)).flatMap { sttSubmission =>
       sttSubmission.transferAt(transferNumber).map(basketItems(_, _ => true)) match {
         case Some(items) if items.nonEmpty =>
@@ -67,8 +67,8 @@ class PaymentController @Inject()(
 
   /** Pays a single charge on one transfer (a "Pay" link on the Transfer details page). */
   def startChargePayment(submissionId: String, transferNumber: Int, chargeRef: String): Action[AnyContent] =
-    (auth andThen getData).async { implicit request =>
-      val subscriptionId = request.request.subscriptionId
+    auth.async { implicit request =>
+      val subscriptionId = request.subscriptionId
       dashboardService.getSubmission(subscriptionId, SubmissionId(submissionId)).flatMap { sttSubmission =>
         sttSubmission.transferAt(transferNumber).map(basketItems(_, _.chargeReference == chargeRef)) match {
           case Some(items) if items.nonEmpty =>

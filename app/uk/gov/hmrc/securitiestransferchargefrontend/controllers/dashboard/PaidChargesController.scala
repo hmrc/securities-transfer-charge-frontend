@@ -28,12 +28,11 @@ import javax.inject.{Inject, Named}
 class PaidChargesController @Inject()(
                                        override val messagesApi: MessagesApi,
                                        @Named("any") auth: StcAuthEnrolledAction,
-                                       getData: StcDataRetrievalAction,
                                        val controllerComponents: MessagesControllerComponents,
                                        view: PaidChargesView
                                      ) extends FrontendBaseController with I18nSupport {
 
-  def onPageLoad(submissionId: String, transferNumber: Int): Action[AnyContent] = (auth andThen getData) {
+  def onPageLoad(submissionId: String, transferNumber: Int): Action[AnyContent] = auth {
     implicit request =>
       Ok(view(submissionId, transferNumber))
   }

@@ -73,7 +73,6 @@ class TransferDetailsViewModelSpec extends SpecBase with GuiceOneAppPerSuite {
 
   private def keys(list: SummaryList): Seq[String] = list.rows.map(_.key.content.asHtml.toString)
   private def value(row: SummaryListRow): String = row.value.content.asHtml.toString
-  private def keyText(row: SummaryListRow): String = row.key.content.asHtml.toString
   private def rowFor(list: SummaryList, key: String): Option[SummaryListRow] =
     list.rows.find(_.key.content.asHtml.toString == messages(key))
   private def valueOf(list: SummaryList, key: String): String = value(rowFor(list, key).get)
@@ -229,37 +228,13 @@ class TransferDetailsViewModelSpec extends SpecBase with GuiceOneAppPerSuite {
       "show the main buyer's name and address" in {
         val model = build(transferWith(tax()))
         valueOf(model.buyerList, "transferDetails.name") mustBe "Northbridge Healthcare"
-        valueOf(model.buyerList, "transferDetails.address") mustBe "50 Medical Park,<br>London,<br>W0 4DD"
+        valueOf(model.buyerList, "transferDetails.address") mustBe "50 Medical Park<br>London<br>W0 4DD"
       }
 
       "show the main seller's name and address" in {
         val model = build(transferWith(tax()))
         valueOf(model.sellerList, "transferDetails.name") mustBe "CardioNova Therapeutics"
-        valueOf(model.sellerList, "transferDetails.address") mustBe "20 Discovery campus,<br>Cambridge,<br>CB0 5EE"
-      }
-
-      "list the main party's name and address, then a name row for each other buyer and seller" in {
-        val model = build(transferWith(tax()), transaction = Fixtures.viewTransferResponseWithOtherParties)
-        val name = messages("transferDetails.name")
-        val address = messages("transferDetails.address")
-
-        model.buyerList.rows.map(r => keyText(r) -> value(r)) mustBe Seq(
-          name    -> "Northbridge Healthcare",
-          address -> "50 Medical Park,<br>London,<br>W0 4DD",
-          name    -> "Second Buyer"
-        )
-        model.sellerList.rows.map(r => keyText(r) -> value(r)) mustBe Seq(
-          name    -> "CardioNova Therapeutics",
-          address -> "20 Discovery campus,<br>Cambridge,<br>CB0 5EE",
-          name    -> "Second Seller",
-          name    -> "Third Seller"
-        )
-      }
-
-      "still list other sellers' names when ETMP has no main seller" in {
-        val transaction = Fixtures.viewTransferResponseWithOtherParties.copy(mainSellerDetails = None)
-        val model = build(transferWith(tax()), transaction = transaction)
-        model.sellerList.rows.map(value) mustBe Seq("Second Seller", "Third Seller")
+        valueOf(model.sellerList, "transferDetails.address") mustBe "20 Discovery campus<br>Cambridge<br>CB0 5EE"
       }
 
       "use a narrow key column like the design" in {
@@ -331,6 +306,12 @@ class TransferDetailsViewModelSpec extends SpecBase with GuiceOneAppPerSuite {
         rowFor(list, "agent.whatReliefAreYouApplyingFor.checkYourAnswersLabel") mustBe None
         rowFor(list, "transferDetails.crn") mustBe None
         rowFor(list, "agent.totalMarketValue.checkYourAnswersLabel") mustBe None
+      }
+
+      "show the number of securities with thousands separators" in {
+        val details = Fixtures.viewTransferResponse.transactionDetails.copy(numberOfShares = 1234567)
+        val list = build(transferWith(tax()), transaction = Fixtures.viewTransferResponse.copy(transactionDetails = details)).transferList
+        valueOf(list, "transferDetails.numberOfSecurities") mustBe "1,234,567"
       }
 
       "show the 1.5% tax rate" in {

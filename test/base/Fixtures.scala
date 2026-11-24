@@ -36,7 +36,7 @@ import uk.gov.hmrc.securitiestransferchargefrontend.models.sh03.shared.{CompanyD
 import uk.gov.hmrc.securitiestransferchargefrontend.models.shared.AgentReference
 import uk.gov.hmrc.securitiestransferchargefrontend.models.stf.fileupload.{ParsedStcRow, ParsedValue, ValidatedStcRow}
 import uk.gov.hmrc.securitiestransferchargefrontend.models.submission.ReasonForPurchase.PurchasedForCancellation
-import uk.gov.hmrc.securitiestransferchargefrontend.models.submission.{Agent, BuyerTaxRate, Individual, Organisation, SingleTransferBuyerDetails, SingleTransferDeclaration, SingleTransferOtherBuyerName, SingleTransferOtherSellerName, SingleTransferSellerDetails, SingleTransferTransactionDetails, ViewTransferResponse}
+import uk.gov.hmrc.securitiestransferchargefrontend.models.submission.{Agent, BuyerTaxRate, Individual, Organisation, SingleTransferBuyerDetails, SingleTransferDeclaration, SingleTransferSellerDetails, SingleTransferTransactionDetails, ViewTransferResponse}
 import uk.gov.hmrc.securitiestransferchargefrontend.domain.TransferType
 
 import java.time.LocalDate
@@ -453,10 +453,5 @@ object Fixtures {
       postcode = "Unknown", country = "Unknown", selfDeclarationAgent = None, isCorrectInfo = true
     ),
     charges = Seq.empty
-  )
-
-  val viewTransferResponseWithOtherParties: ViewTransferResponse = viewTransferResponse.copy(
-    otherBuyers = Seq(SingleTransferOtherBuyerName("Second Buyer")),
-    otherSellers = Seq(SingleTransferOtherSellerName("Second Seller"), SingleTransferOtherSellerName("Third Seller"))
   )
 }

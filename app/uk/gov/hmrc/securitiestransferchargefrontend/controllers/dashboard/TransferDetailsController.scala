@@ -34,16 +34,15 @@ import scala.concurrent.{ExecutionContext, Future}
 class TransferDetailsController @Inject()(
                                            override val messagesApi: MessagesApi,
                                            @Named("any") auth: StcAuthEnrolledAction,
-                                           getData: StcDataRetrievalAction,
                                            val controllerComponents: MessagesControllerComponents,
                                            view: TransferDetailsView,
                                            dashboardService: DashboardService,
                                            etmpSubmissionService: EtmpSubmissionService
                                          )(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport with Logging {
 
-  def onPageLoad(submissionId: String, transferNumber: Int): Action[AnyContent] = (auth andThen getData).async {
+  def onPageLoad(submissionId: String, transferNumber: Int): Action[AnyContent] = auth.async {
     implicit request =>
-      val subscriptionId = request.request.subscriptionId
+      val subscriptionId = request.subscriptionId
       lazy val journeyRecovery = Redirect(routes.JourneyRecoveryController.onPageLoad())
 
       dashboardService.getSubmission(subscriptionId, SubmissionId(submissionId)).flatMap { submission =>

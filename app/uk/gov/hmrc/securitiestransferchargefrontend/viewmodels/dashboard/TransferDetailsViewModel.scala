@@ -26,7 +26,7 @@ import uk.gov.hmrc.securitiestransferchargefrontend.controllers.pay.routes as pa
 import uk.gov.hmrc.securitiestransferchargefrontend.models.search.EtmpSuccessResponseExtensions.*
 import uk.gov.hmrc.securitiestransferchargefrontend.models.search.{EtmpChargeDetail, SttSubmission, SttTransfer}
 import uk.gov.hmrc.securitiestransferchargefrontend.models.submission.{BuyerTaxRate, ViewTransferResponse}
-import uk.gov.hmrc.securitiestransferchargefrontend.utils.DateTimeFormats
+import uk.gov.hmrc.securitiestransferchargefrontend.utils.{CommonHelpers, DateTimeFormats}
 import uk.gov.hmrc.securitiestransferchargefrontend.viewmodels.govuk.summarylist.*
 
 /**
@@ -129,28 +129,24 @@ object TransferDetailsViewModel {
   }
 
   private def address(lines: Seq[Option[String]]): String =
-    lines.flatten.filter(_.trim.nonEmpty).map(HtmlFormat.escape(_).toString).mkString(",<br>")
+    lines.flatten.filter(_.trim.nonEmpty).map(HtmlFormat.escape(_).toString).mkString("<br>")
 
-  // The main party's name and address come first, then a name row for each other party (ETMP holds no address for them).
-  private def partyList(main: Option[(String, String)], otherNames: Seq[String])(implicit messages: Messages): SummaryList = {
-    val mainRows = main.toSeq.flatMap { case (name, addressHtml) =>
+  // Only the main buyer and main seller are shown: the service doesn't support multiple buyers or sellers yet.
+  private def partyList(main: Option[(String, String)])(implicit messages: Messages): SummaryList =
+    SummaryList(rows = main.toSeq.flatMap { case (name, addressHtml) =>
       Seq(row("transferDetails.name", name), htmlRow("transferDetails.address", addressHtml))
-    }
-    SummaryList(rows = mainRows ++ otherNames.map(row("transferDetails.name", _)))
-  }
+    })
 
   private def buyerList(transaction: ViewTransferResponse)(implicit messages: Messages): SummaryList = {
     val main = transaction.mainBuyerDetails
     val addressHtml = address(Seq(Some(main.addr1), main.addr2, main.addr3, main.addr4, Some(main.postcode)))
-    partyList(Some(main.buyerName -> addressHtml), transaction.otherBuyers.map(_.buyerName))
+    partyList(Some(main.buyerName -> addressHtml))
   }
 
-  private def sellerList(transaction: ViewTransferResponse)(implicit messages: Messages): SummaryList = {
-    val main = transaction.mainSellerDetails.map { s =>
+  private def sellerList(transaction: ViewTransferResponse)(implicit messages: Messages): SummaryList =
+    partyList(transaction.mainSellerDetails.map { s =>
       s.sellerName -> address(Seq(Some(s.addr1), s.addr2, s.addr3, s.addr4, Some(s.postcode)))
-    }
-    partyList(main, transaction.otherSellers.map(_.sellerName))
-  }
+    })
 
   private def transferList(transaction: ViewTransferResponse)(implicit messages: Messages): SummaryList = {
     val details = transaction.transactionDetails
@@ -170,7 +166,7 @@ object TransferDetailsViewModel {
       Some(row("taxRate.checkYourAnswersLabel", taxRate)),
       // ETMP doesn't hold the purchasing-shares answer, so this shows the type of security as agreed with the team.
       Some(row("agent.purchasingShares.checkYourAnswersLabel", details.typeOfSecurity)),
-      Some(row("transferDetails.numberOfSecurities", details.numberOfShares.toString)),
+      Some(row("transferDetails.numberOfSecurities", CommonHelpers.formatWithCommas(details.numberOfShares))),
       Some(row("agent.amountPaidForSecurities.checkYourAnswersLabel", CurrencyFormatter.currencyFormat(details.considerationActual))),
       details.marketValue.map(v => row("agent.totalMarketValue.checkYourAnswersLabel", CurrencyFormatter.currencyFormat(v)))
     ).flatten
