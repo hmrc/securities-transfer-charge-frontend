@@ -179,7 +179,7 @@ object TransferDetailsViewModel {
   }
 
   /**
-   * @param transferNumber the transfer's position in the submission (1-based), as returned by the search service.
+   * @param transferNumber the transfer's number in the submission (1-based, in UTRN order; see SttSubmission.transferNumber).
    */
   def build(submission: SttSubmission, transferNumber: Int, transfer: SttTransfer, transaction: ViewTransferResponse)
            (implicit messages: Messages): TransferDetailsViewModel = {

@@ -29,6 +29,7 @@ import uk.gov.hmrc.http.UpstreamErrorResponse
 import uk.gov.hmrc.securitiestransferchargefrontend.connectors.PayApiConnector
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.pay.routes
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.routes as appRoutes
+import uk.gov.hmrc.securitiestransferchargefrontend.controllers.dashboard.routes as dashboardRoutes
 import uk.gov.hmrc.securitiestransferchargefrontend.models.pay.{BasketItem, OPSChargeType, StartPaymentJourneyRequest, StartPaymentJourneyResponse}
 import uk.gov.hmrc.securitiestransferchargefrontend.models.search.{EtmpChargeDetail, SttSubmission}
 import uk.gov.hmrc.securitiestransferchargefrontend.services.DashboardService
@@ -149,7 +150,7 @@ class PaymentControllerSpec extends SpecBase {
       )
       val submission: SttSubmission = singleSubmissionReadyToPay.copy(transfers = Seq(otherTransfer, transfer))
 
-      def run(url: String) = {
+      def run(url: String, submission: SttSubmission = submission) = {
         val mockDashboardService = mock[DashboardService]
         val mockPayApiConnector  = mock[PayApiConnector]
         when(mockDashboardService.getSubmission(any(), any())(any())).thenReturn(Future.successful(submission))
@@ -169,10 +170,36 @@ class PaymentControllerSpec extends SpecBase {
         }
       }
 
-      def sentBasket(connector: PayApiConnector): Seq[BasketItem] = {
+      def sentRequest(connector: PayApiConnector): StartPaymentJourneyRequest = {
         val captor = ArgumentCaptor.forClass(classOf[StartPaymentJourneyRequest])
         verify(connector).startPaymentJourney(captor.capture())(any())
-        captor.getValue.basketDetails.basketItems
+        captor.getValue
+      }
+
+      def sentBasket(connector: PayApiConnector): Seq[BasketItem] = sentRequest(connector).basketDetails.basketItems
+
+      // The host comes from application.conf; the path is what OPS's back link should return to.
+      val host = "http://localhost:30036"
+      val submissionId = testSubmissionId.toString
+
+      "OPS's back link returns to the page the payment started from" - {
+        "the transfer details page, for pay full balance" in {
+          val (_, _, connector) = run(routes.PaymentController.startTransferPayment(submissionId, 2).url)
+          sentRequest(connector).backUrl mustBe
+            host + dashboardRoutes.TransferDetailsController.onPageLoad(submissionId, 2).url
+        }
+
+        "the transfer details page, for a single charge" in {
+          val (_, _, connector) = run(routes.PaymentController.startChargePayment(submissionId, 2, "LPI-2").url)
+          sentRequest(connector).backUrl mustBe
+            host + dashboardRoutes.TransferDetailsController.onPageLoad(submissionId, 2).url
+        }
+
+        "the submission details page, for paying the whole submission" in {
+          val (_, _, connector) = run(routes.PaymentController.startPayment(submissionId).url)
+          sentRequest(connector).backUrl mustBe
+            host + dashboardRoutes.SubmissionDetailsController.onPageLoad(submissionId).url
+        }
       }
 
       "pay full balance sends only the outstanding charges on that transfer" in {
@@ -229,6 +256,18 @@ class PaymentControllerSpec extends SpecBase {
         val (_, _, connector) = run(routes.PaymentController.startPayment(testSubmissionId.toString).url)
 
         sentBasket(connector).map(_.chargeReference) mustBe Seq("OTHER-TAX", "LFP-2", "LPI-2")
+      }
+
+      "paying a submission with nothing left to pay goes to Journey Recovery without calling OPS" in {
+        val fullyPaid = submission.copy(transfers = submission.transfers.map { t =>
+          t.copy(charges = t.charges.map(_.copy(chargeAmountPending = 0)))
+        })
+        val (status, location, connector) =
+          run(routes.PaymentController.startPayment(testSubmissionId.toString).url, fullyPaid)
+
+        status mustEqual SEE_OTHER
+        location.value mustEqual appRoutes.JourneyRecoveryController.onPageLoad().url
+        verify(connector, never()).startPaymentJourney(any())(any())
       }
     }
   }

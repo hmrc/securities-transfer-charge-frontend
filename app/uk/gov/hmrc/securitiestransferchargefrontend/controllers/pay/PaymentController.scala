@@ -46,7 +46,10 @@ class PaymentController @Inject()(
   def startPayment(submissionId: String): Action[AnyContent] = (auth andThen getData).async { implicit request =>
     val subscriptionId = request.request.subscriptionId
     dashboardService.getSubmission(subscriptionId, SubmissionId(submissionId)).flatMap { sttSubmission =>
-      startJourney(subscriptionId, submissionId, sttSubmission.transfers.flatMap(basketItems(_, _ => true)))
+      sttSubmission.transfers.flatMap(basketItems(_, _ => true)) match {
+        case items if items.nonEmpty => startJourney(subscriptionId, submissionId, items, appConfig.paymentBackUrl(submissionId))
+        case _                       => nothingToPay(submissionId, "submission")
+      }
     }
   }
 
@@ -55,8 +58,9 @@ class PaymentController @Inject()(
     val subscriptionId = request.request.subscriptionId
     dashboardService.getSubmission(subscriptionId, SubmissionId(submissionId)).flatMap { sttSubmission =>
       sttSubmission.transferAt(transferNumber).map(basketItems(_, _ => true)) match {
-        case Some(items) if items.nonEmpty => startJourney(subscriptionId, submissionId, items)
-        case _                             => nothingToPay(submissionId, s"transfer $transferNumber")
+        case Some(items) if items.nonEmpty =>
+          startJourney(subscriptionId, submissionId, items, appConfig.paymentBackUrl(submissionId, transferNumber))
+        case _ => nothingToPay(submissionId, s"transfer $transferNumber")
       }
     }
   }
@@ -67,8 +71,9 @@ class PaymentController @Inject()(
       val subscriptionId = request.request.subscriptionId
       dashboardService.getSubmission(subscriptionId, SubmissionId(submissionId)).flatMap { sttSubmission =>
         sttSubmission.transferAt(transferNumber).map(basketItems(_, _.chargeReference == chargeRef)) match {
-          case Some(items) if items.nonEmpty => startJourney(subscriptionId, submissionId, items)
-          case _                             => nothingToPay(submissionId, s"charge $chargeRef on transfer $transferNumber")
+          case Some(items) if items.nonEmpty =>
+            startJourney(subscriptionId, submissionId, items, appConfig.paymentBackUrl(submissionId, transferNumber))
+          case _ => nothingToPay(submissionId, s"charge $chargeRef on transfer $transferNumber")
         }
       }
     }
@@ -85,11 +90,12 @@ class PaymentController @Inject()(
       )
     }
 
-  private def startJourney(subscriptionId: SubscriptionId, submissionId: String, items: Seq[BasketItem])
+  // backUrl is the page the user paid from, so OPS's back link returns them there.
+  private def startJourney(subscriptionId: SubscriptionId, submissionId: String, items: Seq[BasketItem], backUrl: String)
                           (implicit hc: HeaderCarrier): Future[Result] = {
     val paymentRequest = StartPaymentJourneyRequest(
       returnUrl = appConfig.paymentReturnUrl,
-      backUrl = appConfig.paymentBackUrl(submissionId),
+      backUrl = backUrl,
       customerId = subscriptionId.value,
       submissionId = submissionId,
       basketDetails = BasketDetails(items)

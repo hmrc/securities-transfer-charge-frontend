@@ -55,7 +55,8 @@ class TransferDetailsController @Inject()(
             etmpSubmissionService.getTransaction(subscriptionId, transfer.utrn).map {
               case GetTransactionResult.Found(transaction) =>
                 Ok(view(TransferDetailsViewModel.build(submission, transferNumber, transfer, transaction)))
-              case _ =>
+              case notFound =>
+                logger.warn(s"Could not get transfer $transferNumber in submission $submissionId: $notFound")
                 journeyRecovery
             }
         }
