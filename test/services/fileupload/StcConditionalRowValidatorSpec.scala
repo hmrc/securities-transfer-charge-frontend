@@ -676,7 +676,7 @@ class StcConditionalRowValidatorSpec extends SpecBase {
 
     val journeys = Seq(
       (StcTemplate.STF, affinityGroupKeyInd, STF, "securities"),
-      (StcTemplate.STF, affinityGroupKeyOrg, STF, "securities"),
+      (StcTemplate.STF, affinityGroupKeyOrg, STF, "shares"),
       (StcTemplate.STFAgent, affinityGroupKeyAgent, STF, "securities"),
       (StcTemplate.SH03, affinityGroupKeyOrg, SH03, "shares"),
       (StcTemplate.SH03, affinityGroupKeyAgent, SH03, "shares")
