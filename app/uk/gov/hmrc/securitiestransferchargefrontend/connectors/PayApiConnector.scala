@@ -36,7 +36,7 @@ class PayApiConnector @Inject()(
 
   import uk.gov.hmrc.http.HttpReads.Implicits._
 
-  private val startJourneyUrl = url"${appConfig.payApiBaseUrl}/pay-api/stamp-taxes-on-shares/journey/start"
+  private val startJourneyUrl = url"${appConfig.payApiBaseUrl}/pay-api/securities-transfer-tax/journey/start"
 
   def startPaymentJourney(request: StartPaymentJourneyRequest)(
     implicit hc: HeaderCarrier
