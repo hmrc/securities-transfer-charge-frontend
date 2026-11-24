@@ -1,0 +1,87 @@
+@*
+ * Copyright 2026 HM Revenue & Customs
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *@
+
+@import uk.gov.hmrc.securitiestransferchargefrontend.views.html.templates
+@import uk.gov.hmrc.securitiestransferchargefrontend.controllers.dashboard.routes as dashboardRoutes
+@import uk.gov.hmrc.securitiestransferchargefrontend.viewmodels.dashboard.TransferDetailsViewModel
+@import uk.gov.hmrc.hmrcfrontend.views.viewmodels.hmrcstandardpage.TemplateOverrides
+
+@this(
+        layout: templates.Layout,
+        govukBreadcrumbs: GovukBreadcrumbs,
+        govukButton: GovukButton,
+        govukSummaryList: GovukSummaryList
+)
+
+@(viewModel: TransferDetailsViewModel)(implicit request: Request[_], messages: Messages)
+
+@layout(
+    pageTitle = s"${messages("transferDetails.title", viewModel.transferNumber)} - ${messages("reportAndPay.title")} - ${messages("site.govuk")}",
+    showBackLink = false,
+    mainContentLayout = Some(TemplateOverrides.noMainContentLayout)
+) {
+
+    @govukBreadcrumbs(
+        Breadcrumbs(items = Seq(
+            BreadcrumbsItem(content = Text(messages("breadcrumbs.dashboard")), href = Some(dashboardRoutes.DashboardController.onPageLoad().url)),
+            BreadcrumbsItem(content = Text(messages("breadcrumbs.submissions")), href = Some(dashboardRoutes.SubmissionsController.onPageLoad().url)),
+            BreadcrumbsItem(
+                content = Text(messages("transferDetails.breadcrumb.submission", viewModel.submissionId)),
+                href = Some(dashboardRoutes.SubmissionDetailsController.onPageLoad(viewModel.submissionId).url)
+            )
+        ))
+    )
+
+    <h1 class="govuk-heading-l">@messages("transferDetails.heading", viewModel.transferNumber)</h1>
+
+    <div class="govuk-grid-row">
+        <div class="govuk-grid-column-two-thirds">
+            <div class="tax-card govuk-!-margin-bottom-7">
+                <h2 class="govuk-heading-m">@messages("transferDetails.balance.heading", viewModel.balanceToPay)</h2>
+
+                @viewModel.payFullBalanceUrl.map { url =>
+                    @govukButton(Button(href = Some(url), content = Text(messages("transferDetails.payFullBalance"))))
+                }
+
+                @viewModel.chargesList.map { charges =>
+                    <h3 class="govuk-heading-s">@messages("transferDetails.charges.heading")</h3>
+                    @govukSummaryList(charges)
+                }
+
+                @viewModel.paidChargesUrl.map { url =>
+                    <p class="govuk-body govuk-!-margin-bottom-0">
+                        <a class="govuk-link" id="view-paid-charges" href="@url">@messages("transferDetails.viewPaidCharges")</a>
+                    </p>
+                }
+            </div>
+        </div>
+    </div>
+
+    <div class="govuk-grid-row">
+        <div class="govuk-grid-column-three-quarters">
+            @govukSummaryList(viewModel.referenceList)
+
+            <h2 class="govuk-heading-m">@messages("transferDetails.buyer.heading")</h2>
+            @govukSummaryList(viewModel.buyerList)
+
+            <h2 class="govuk-heading-m">@messages("transferDetails.seller.heading")</h2>
+            @govukSummaryList(viewModel.sellerList)
+
+            <h2 class="govuk-heading-m">@messages("transferDetails.transfer.heading")</h2>
+            @govukSummaryList(viewModel.transferList)
+        </div>
+    </div>
+}

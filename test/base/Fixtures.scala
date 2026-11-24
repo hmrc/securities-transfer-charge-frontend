@@ -36,7 +36,8 @@ import uk.gov.hmrc.securitiestransferchargefrontend.models.sh03.shared.{CompanyD
 import uk.gov.hmrc.securitiestransferchargefrontend.models.shared.AgentReference
 import uk.gov.hmrc.securitiestransferchargefrontend.models.stf.fileupload.{ParsedStcRow, ParsedValue, ValidatedStcRow}
 import uk.gov.hmrc.securitiestransferchargefrontend.models.submission.ReasonForPurchase.PurchasedForCancellation
-import uk.gov.hmrc.securitiestransferchargefrontend.models.submission.{Agent, Individual, Organisation}
+import uk.gov.hmrc.securitiestransferchargefrontend.models.submission.{Agent, BuyerTaxRate, Individual, Organisation, SingleTransferBuyerDetails, SingleTransferDeclaration, SingleTransferSellerDetails, SingleTransferTransactionDetails, ViewTransferResponse}
+import uk.gov.hmrc.securitiestransferchargefrontend.domain.TransferType
 
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
@@ -397,4 +398,60 @@ object Fixtures {
       transfers = Seq(overDueSttTransferWithPenaltiesAndInterest)
     )
 
+  // Transfer details from the submissions service "get transaction" call, as seen on the agent STF Transfer details page.
+  val viewTransferResponse: ViewTransferResponse = ViewTransferResponse(
+    processingDate = "2026-11-06T12:00:00Z",
+    submissionId = testSubmissionId.toString,
+    submissionDate = LocalDate.of(2026, 11, 6),
+    recordId = 1,
+    transactionDetails = SingleTransferTransactionDetails(
+      transactionType = TransferType.STF,
+      reasonForPurchase = None,
+      typeOfSecurity = "Ordinary",
+      numberOfShares = 100,
+      nominalValue = None,
+      marketValue = Some(BigDecimal(12500000)),
+      qualifyAsTreasuryShares = None,
+      maxPricePaid = None,
+      minPricePaid = None,
+      originalChargingPoint = LocalDate.of(2026, 7, 1),
+      considerationActual = BigDecimal(12000000),
+      isConnectedPartiesTransactions = false,
+      companyName = "CardioNova Therapeutics",
+      companyRegistrationNumber = Some("12345678"),
+      reliefClaimedName = Some("Intra-group relief"),
+      reliefPercentage = Some(100)
+    ),
+    contingentDetails = Seq.empty,
+    mainSellerDetails = Some(SingleTransferSellerDetails(
+      sellerName = "CardioNova Therapeutics",
+      addr1 = "20 Discovery campus",
+      addr2 = Some("Cambridge"),
+      addr3 = None,
+      addr4 = None,
+      postcode = "CB0 5EE",
+      country = "GB"
+    )),
+    otherSellers = Seq.empty,
+    mainBuyerDetails = SingleTransferBuyerDetails(
+      buyerName = "Northbridge Healthcare",
+      addr1 = "50 Medical Park",
+      addr2 = Some("London"),
+      addr3 = None,
+      addr4 = None,
+      postcode = "W0 4DD",
+      country = "GB",
+      email = "buyer@example.com",
+      uniqueId = None,
+      taxRate = BuyerTaxRate.HalfPercent,
+      isPLC = None
+    ),
+    otherBuyers = Seq.empty,
+    agentDetails = None,
+    declaration = SingleTransferDeclaration(
+      role1 = None, role2 = None, name = "Unknown", addr1 = "Unknown", addr2 = None, addr3 = None, addr4 = None,
+      postcode = "Unknown", country = "Unknown", selfDeclarationAgent = None, isCorrectInfo = true
+    ),
+    charges = Seq.empty
+  )
 }
