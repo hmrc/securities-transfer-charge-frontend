@@ -20,6 +20,8 @@ import base.{Fixtures, SpecBase}
 import play.api.i18n.Messages
 import play.api.test.Helpers.stubMessagesApi
 import uk.gov.hmrc.govukfrontend.views.Aliases.Text
+import uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.agents.single.routes as agentSingleRoutes
+import uk.gov.hmrc.securitiestransferchargefrontend.models.CheckMode
 import uk.gov.hmrc.securitiestransferchargefrontend.models.shared.AgentReference
 import uk.gov.hmrc.securitiestransferchargefrontend.models.stf.TaxRate.HalfPercent
 import uk.gov.hmrc.securitiestransferchargefrontend.models.stf.cya.StfAgentRowBuilder
@@ -121,6 +123,35 @@ class StfAgentRowBuilderSpec extends SpecBase {
         val rows = StfAgentRowBuilder.buildSecuritiesDetailsRows(userAnswers)
 
         rows.size mustBe 4
+      }
+
+      "must point shares details change links to the agent share details page" in {
+        val detailsOfTransfer = DetailsOfThisTransfer(100, "Ordinary", BigDecimal("10000"), Some(BigDecimal("12000")))
+        val userAnswers = emptyUserAnswers
+          .set(PurchasingSharesPage, true).success.value
+          .set(ConnectedPersonsPage, true).success.value
+          .set(DetailsOfThisTransferPage, detailsOfTransfer).success.value
+
+        val rows = StfAgentRowBuilder.buildSecuritiesDetailsRows(userAnswers)
+        val hrefs = rows.flatMap(_.actions.toSeq.flatMap(_.items.map(_.href)))
+
+        hrefs.size mustBe 4
+        hrefs.distinct mustBe Seq(agentSingleRoutes.DetailsOfThisTransferController.onPageLoad(CheckMode).url)
+      }
+
+      "must point other securities change links to the agent pages" in {
+        val userAnswers = emptyUserAnswers
+          .set(PurchasingSharesPage, false).success.value
+          .set(ConnectedPersonsPage, true).success.value
+          .set(OtherSecuritiesTypePage, "Bonds").success.value
+          .set(AmountPaidForSecuritiesPage, BigDecimal("5000")).success.value
+          .set(TotalMarketValuePage, BigDecimal("6000")).success.value
+
+        val rows = StfAgentRowBuilder.buildSecuritiesDetailsRows(userAnswers)
+        val hrefs = rows.flatMap(_.actions.toSeq.flatMap(_.items.map(_.href)))
+
+        hrefs must contain(agentSingleRoutes.AmountPaidForSecuritiesController.onPageLoad(CheckMode).url)
+        hrefs must contain(agentSingleRoutes.TotalMarketValueController.onPageLoad(CheckMode).url)
       }
 
       "must build shares details without market value for non-connected persons" in {
