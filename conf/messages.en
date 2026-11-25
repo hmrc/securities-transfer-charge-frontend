@@ -305,6 +305,13 @@ individual.totalMarketValue.error.invalidNumeric = The market value of the secur
 individual.totalMarketValue.error.aboveMaximum = The market value of the securities must be £999,999,999 or below
 individual.totalMarketValue.error.negative = The market value of the securities must be £0 or more
 
+individual.stf.totalMarketValue.error.nonNumeric = The market value of the securities must be a number and can include up to two decimal places, like £30 or £28.60
+individual.stf.totalMarketValue.error.required = Enter the market value of the securities in pounds
+individual.stf.totalMarketValue.error.invalidNumeric = The market value of the securities must be a number and can include up to two decimal places, like £30 or £28.60
+individual.stf.totalMarketValue.error.aboveMaximum = The market value of the securities must be £999,999,999 or below
+individual.stf.totalMarketValue.error.belowMinimum = The market value of the securities must be £0.01 or more
+individual.stf.totalMarketValue.error.negative = The market value of the securities must be £0.01 or more
+
 individual.detailsOfThisTransfer.error.numberOfShares.required = Enter the number of shares you are buying
 individual.detailsOfThisTransfer.error.numberOfShares.nonNumeric = The number of shares must be a whole number between 1 and 999,999,999
 individual.detailsOfThisTransfer.error.typeOfShares.required = Enter the type or class of shares you are buying
@@ -494,6 +501,13 @@ org.stf.bulk.totalMarketValue.error.invalidNumeric = The market value of the sha
 org.stf.bulk.totalMarketValue.error.aboveMaximum = The market value of the shares must be £999,999,999 or below
 org.stf.bulk.totalMarketValue.error.belowMinimum = The market value of the shares must be £0.01 or more
 org.stf.bulk.totalMarketValue.error.negative = The market value of the shares must be £0.01 or more
+
+org.stf.totalMarketValue.error.nonNumeric = The market value of the shares must be a number and can include up to two decimal places, like £30 or £28.60
+org.stf.totalMarketValue.error.required = Enter the market value of the shares in pounds
+org.stf.totalMarketValue.error.invalidNumeric = The market value of the shares must be a number and can include up to two decimal places, like £30 or £28.60
+org.stf.totalMarketValue.error.aboveMaximum = The market value of the shares must be £999,999,999 or below
+org.stf.totalMarketValue.error.belowMinimum = The market value of the shares must be £0.01 or more
+org.stf.totalMarketValue.error.negative = The market value of the shares must be £0.01 or more
 
 org.sh03.totalMarketValue.title = What is the total market value of these securities?
 org.sh03.totalMarketValue.heading = What is the total market value of these securities?
@@ -890,6 +904,13 @@ agent.totalMarketValue.hint = For example, £600 or £193.54
 agent.totalMarketValue.error.negative = The market value of the securities must be £0.01 or more
 agent.totalMarketValue.checkYourAnswersLabel = Total market value of the securities
 
+agent.stf.totalMarketValue.error.nonNumeric = The market value of the securities must be a number and can include up to two decimal places, like £30 or £28.60
+agent.stf.totalMarketValue.error.required = Enter the market value of the securities in pounds
+agent.stf.totalMarketValue.error.invalidNumeric = The market value of the securities must be a number and can include up to two decimal places, like £30 or £28.60
+agent.stf.totalMarketValue.error.aboveMaximum = The market value of the securities must be £999,999,999 or below
+agent.stf.totalMarketValue.error.belowMinimum = The market value of the securities must be £0.01 or more
+agent.stf.totalMarketValue.error.negative = The market value of the securities must be £0.01 or more
+
 agent.sh03.bulk.totalMarketValue.title = What is the total market value of the shares?
 agent.sh03.bulk.totalMarketValue.heading = What is the total market value of the shares?
 agent.sh03.bulk.totalMarketValue.checkYourAnswersLabel = What is the total market value of the shares?
@@ -902,6 +923,13 @@ agent.sh03.bulk.totalMarketValue.change.hidden = Change the market value of the 
 agent.sh03.bulk.totalMarketValue.hint = For example, £600 or £193.54
 agent.sh03.bulk.totalMarketValue.error.negative = The market value of the shares must be £0.01 or more
 agent.sh03.bulk.totalMarketValue.checkYourAnswersLabel = What is the total market value of the shares?
+
+agent.sh03.totalMarketValue.error.nonNumeric = The market value of the shares must be a number and can include up to two decimal places, like £30 or £28.60
+agent.sh03.totalMarketValue.error.required = Enter the market value of the shares in pounds
+agent.sh03.totalMarketValue.error.invalidNumeric = The market value of the shares must be a number and can include up to two decimal places, like £30 or £28.60
+agent.sh03.totalMarketValue.error.aboveMaximum = The market value of the shares must be £999,999,999 or below
+agent.sh03.totalMarketValue.error.belowMinimum = The market value of the shares must be £0.01 or more
+agent.sh03.totalMarketValue.error.negative = The market value of the shares must be £0.01 or more
 
 fileUploaded.error.encryptedFile.title = There was a problem uploading your file
 fileUploaded.error.encryptedFile.heading = There was a problem uploading your file
