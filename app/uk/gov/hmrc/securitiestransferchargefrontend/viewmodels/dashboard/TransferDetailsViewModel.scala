@@ -176,7 +176,6 @@ object TransferDetailsViewModel {
 
   /**
    * @param transferNumber the transfer's number in the submission (1-based, in UTRN order; see SttSubmission.transferNumber).
-   * @param isAgent buyer details are only shown to agents; individuals and organisations are the buyer themselves.
    * @param affinityKey the message key prefix for the transfer details rows ("individual", "org" or "agent").
    */
   def build(
