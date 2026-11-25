@@ -51,11 +51,10 @@ class TransferDetailsViewSpec extends ViewBaseSpec {
   private def view(
     transfer: SttTransfer,
     transferNumber: Int = 1,
-    isAgent: Boolean = true,
     affinityKey: String = "agent"
   ): Document = Jsoup.parse(
     viewInstance(
-      TransferDetailsViewModel.build(submission.copy(transfers = Seq(transfer)), transferNumber, transfer, Fixtures.viewTransferResponse, isAgent, affinityKey)
+      TransferDetailsViewModel.build(submission.copy(transfers = Seq(transfer)), transferNumber, transfer, Fixtures.viewTransferResponse, affinityKey)
     )(fakeRequest, messages).body
   )
 
@@ -131,7 +130,7 @@ class TransferDetailsViewSpec extends ViewBaseSpec {
     }
 
     "show the buyer, seller and transfer details sections for an agent" in {
-      view(unpaidTransfer, isAgent = true, affinityKey = "agent").select("h2.govuk-heading-m").asScala.map(_.text).drop(1) mustBe Seq(
+      view(unpaidTransfer, affinityKey = "agent").select("h2.govuk-heading-m").asScala.map(_.text).drop(1) mustBe Seq(
         messages("transferDetails.buyer.heading"),
         messages("transferDetails.seller.heading"),
         messages("transferDetails.transfer.heading")
@@ -140,7 +139,7 @@ class TransferDetailsViewSpec extends ViewBaseSpec {
 
     Seq("an organisation" -> "org", "an individual" -> "individual").foreach { case (userType, affinityKey) =>
       s"not show the buyer section for $userType" in {
-        view(unpaidTransfer, isAgent = false, affinityKey = affinityKey).select("h2.govuk-heading-m").asScala.map(_.text).drop(1) mustBe Seq(
+        view(unpaidTransfer, affinityKey = affinityKey).select("h2.govuk-heading-m").asScala.map(_.text).drop(1) mustBe Seq(
           messages("transferDetails.seller.heading"),
           messages("transferDetails.transfer.heading")
         )

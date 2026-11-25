@@ -159,7 +159,7 @@ object TransferDetailsViewModel {
     val rows = Seq(
       Some(row(s"$affinityKey.connectedPersons.checkYourAnswersLabel", yesNo(details.isConnectedPartiesTransactions))),
       Some(row(s"$affinityKey.applyingForRelief.checkYourAnswersLabel", yesNo(relief.isDefined))),
-      relief.map(row(s"$affinityKey.whatReliefAreYouApplyingFor.checkYourAnswersLabel", _)),
+      relief.map(row("whatReliefAreYouApplyingFor.checkYourAnswersLabel", _)),
       Some(row("transferDetails.businessName", details.companyName)),
       details.companyRegistrationNumber.filter(_.trim.nonEmpty).map(row("transferDetails.crn", _)),
       Some(row(s"$affinityKey.chargingPoint.checkYourAnswersLabel", formatDate(details.originalChargingPoint))),
@@ -184,12 +184,12 @@ object TransferDetailsViewModel {
     transferNumber: Int,
     transfer: SttTransfer,
     transaction: ViewTransferResponse,
-    isAgent: Boolean,
     affinityKey: String
   )(implicit messages: Messages): TransferDetailsViewModel = {
     val submissionId = submission.submissionId
     val balance = transfer.totalToPay
     val anyPaid = transfer.charges.exists(_.isPaid)
+    val isAgent = affinityKey == "agent"
 
     TransferDetailsViewModel(
       submissionId      = submissionId,

@@ -75,7 +75,7 @@ class TransferDetailsControllerSpec extends SpecBase {
         val result = route(application, request).value
 
         val view = application.injector.instanceOf[TransferDetailsView]
-        val viewModel = TransferDetailsViewModel.build(bulkSubmission, 2, secondTransfer, viewTransferResponse, isAgent = false, affinityGroupKeyInd)(messages(application))
+        val viewModel = TransferDetailsViewModel.build(bulkSubmission, 2, secondTransfer, viewTransferResponse, affinityGroupKeyInd)(messages(application))
 
         status(result) mustEqual OK
         contentAsString(result) mustEqual view(viewModel)(request, messages(application)).toString
@@ -92,7 +92,7 @@ class TransferDetailsControllerSpec extends SpecBase {
         val result = route(application, request).value
 
         val view = application.injector.instanceOf[TransferDetailsView]
-        val viewModel = TransferDetailsViewModel.build(bulkSubmission, 2, secondTransfer, viewTransferResponse, isAgent = true, affinityGroupKeyAgent)(messages(application))
+        val viewModel = TransferDetailsViewModel.build(bulkSubmission, 2, secondTransfer, viewTransferResponse, affinityGroupKeyAgent)(messages(application))
 
         status(result) mustEqual OK
         viewModel.buyerList mustBe defined
@@ -110,7 +110,7 @@ class TransferDetailsControllerSpec extends SpecBase {
         val result = route(application, request).value
 
         val view = application.injector.instanceOf[TransferDetailsView]
-        val viewModel = TransferDetailsViewModel.build(bulkSubmission, 2, secondTransfer, viewTransferResponse, isAgent = false, affinityGroupKeyOrg)(messages(application))
+        val viewModel = TransferDetailsViewModel.build(bulkSubmission, 2, secondTransfer, viewTransferResponse, affinityGroupKeyOrg)(messages(application))
 
         status(result) mustEqual OK
         viewModel.buyerList mustBe None

@@ -63,7 +63,6 @@ class TransferDetailsViewModelSpec extends SpecBase with GuiceOneAppPerSuite {
     transfer: SttTransfer,
     transferNumber: Int = 1,
     transaction: ViewTransferResponse = Fixtures.viewTransferResponse,
-    isAgent: Boolean = true,
     affinityKey: String = "agent"
   ): TransferDetailsViewModel =
     TransferDetailsViewModel.build(
@@ -71,7 +70,6 @@ class TransferDetailsViewModelSpec extends SpecBase with GuiceOneAppPerSuite {
       transferNumber,
       transfer,
       transaction,
-      isAgent,
       affinityKey
     )
 
@@ -258,12 +256,12 @@ class TransferDetailsViewModelSpec extends SpecBase with GuiceOneAppPerSuite {
       }
 
       "show buyer details for an agent" in {
-        build(transferWith(tax()), isAgent = true, affinityKey = "agent").buyerList mustBe defined
+        build(transferWith(tax()), affinityKey = "agent").buyerList mustBe defined
       }
 
       "not show buyer details for an organisation or an individual" in {
-        build(transferWith(tax()), isAgent = false, affinityKey = "org").buyerList mustBe None
-        build(transferWith(tax()), isAgent = false, affinityKey = "individual").buyerList mustBe None
+        build(transferWith(tax()), affinityKey = "org").buyerList mustBe None
+        build(transferWith(tax()), affinityKey = "individual").buyerList mustBe None
       }
 
       "omit the seller address when ETMP has no main seller" in {
@@ -279,7 +277,7 @@ class TransferDetailsViewModelSpec extends SpecBase with GuiceOneAppPerSuite {
         keys(list) mustBe Seq(
           "agent.connectedPersons.checkYourAnswersLabel",
           "agent.applyingForRelief.checkYourAnswersLabel",
-          "agent.whatReliefAreYouApplyingFor.checkYourAnswersLabel",
+          "whatReliefAreYouApplyingFor.checkYourAnswersLabel",
           "transferDetails.businessName",
           "transferDetails.crn",
           "agent.chargingPoint.checkYourAnswersLabel",
@@ -316,7 +314,7 @@ class TransferDetailsViewModelSpec extends SpecBase with GuiceOneAppPerSuite {
 
         valueOf(list, "agent.applyingForRelief.checkYourAnswersLabel") mustBe messages("site.no")
         valueOf(list, "agent.connectedPersons.checkYourAnswersLabel") mustBe messages("site.yes")
-        rowFor(list, "agent.whatReliefAreYouApplyingFor.checkYourAnswersLabel") mustBe None
+        rowFor(list, "whatReliefAreYouApplyingFor.checkYourAnswersLabel") mustBe None
         rowFor(list, "transferDetails.crn") mustBe None
         rowFor(list, "agent.totalMarketValue.checkYourAnswersLabel") mustBe None
       }
