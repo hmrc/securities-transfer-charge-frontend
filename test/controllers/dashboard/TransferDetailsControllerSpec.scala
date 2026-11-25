@@ -22,6 +22,7 @@ import org.mockito.ArgumentMatchers.{any, eq as eqTo}
 import org.mockito.Mockito.{never, verify, when}
 import org.scalatestplus.mockito.MockitoSugar.mock
 import play.api.inject.bind
+import uk.gov.hmrc.auth.core.AffinityGroup
 import play.api.test.FakeRequest
 import play.api.test.Helpers.*
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.dashboard.routes
@@ -40,13 +41,17 @@ class TransferDetailsControllerSpec extends SpecBase {
   private val secondTransfer = readyToPaySttTransferWithLateFilingCharge.copy(utrn = "900459000002")
   private val bulkSubmission: SttSubmission = singleSubmissionReadyToPay.copy(transfers = Seq(firstTransfer, secondTransfer))
 
-  private def setUp(submission: Future[SttSubmission], transaction: Future[GetTransactionResult]) = {
+  private def setUp(
+                     submission: Future[SttSubmission],
+                     transaction: Future[GetTransactionResult],
+                     affinityGroup: AffinityGroup = AffinityGroup.Individual
+                   ) = {
     val dashboardService = mock[DashboardService]
     val etmpSubmissionService = mock[EtmpSubmissionService]
     when(dashboardService.getSubmission(any(), any())(any())).thenReturn(submission)
     when(etmpSubmissionService.getTransaction(any(), any())(any())).thenReturn(transaction)
 
-    val application = applicationBuilder(userAnswers = Some(emptyUserAnswers))
+    val application = applicationBuilder(userAnswers = Some(emptyUserAnswers), affinityGroup = affinityGroup)
       .overrides(
         bind[DashboardService].toInstance(dashboardService),
         bind[EtmpSubmissionService].toInstance(etmpSubmissionService)
@@ -70,11 +75,47 @@ class TransferDetailsControllerSpec extends SpecBase {
         val result = route(application, request).value
 
         val view = application.injector.instanceOf[TransferDetailsView]
-        val viewModel = TransferDetailsViewModel.build(bulkSubmission, 2, secondTransfer, viewTransferResponse)(messages(application))
+        val viewModel = TransferDetailsViewModel.build(bulkSubmission, 2, secondTransfer, viewTransferResponse, affinityGroupKeyInd)(messages(application))
 
         status(result) mustEqual OK
         contentAsString(result) mustEqual view(viewModel)(request, messages(application)).toString
         verify(etmpSubmissionService).getTransaction(any(), eqTo(secondTransfer.utrn))(any())
+      }
+    }
+
+    "must show the buyer details for an agent" in {
+      val (application, _) =
+        setUp(Future.successful(bulkSubmission), Future.successful(GetTransactionResult.Found(viewTransferResponse)), AffinityGroup.Agent)
+
+      running(application) {
+        val request = FakeRequest(GET, url(2))
+        val result = route(application, request).value
+
+        val view = application.injector.instanceOf[TransferDetailsView]
+        val viewModel = TransferDetailsViewModel.build(bulkSubmission, 2, secondTransfer, viewTransferResponse, affinityGroupKeyAgent)(messages(application))
+
+        status(result) mustEqual OK
+        viewModel.buyerList mustBe defined
+        contentAsString(result) mustEqual view(viewModel)(request, messages(application)).toString
+        contentAsString(result) must include(messages(application)("transferDetails.buyer.heading"))
+      }
+    }
+
+    "must not show the buyer details for an organisation" in {
+      val (application, _) =
+        setUp(Future.successful(bulkSubmission), Future.successful(GetTransactionResult.Found(viewTransferResponse)), AffinityGroup.Organisation)
+
+      running(application) {
+        val request = FakeRequest(GET, url(2))
+        val result = route(application, request).value
+
+        val view = application.injector.instanceOf[TransferDetailsView]
+        val viewModel = TransferDetailsViewModel.build(bulkSubmission, 2, secondTransfer, viewTransferResponse, affinityGroupKeyOrg)(messages(application))
+
+        status(result) mustEqual OK
+        viewModel.buyerList mustBe None
+        contentAsString(result) mustEqual view(viewModel)(request, messages(application)).toString
+        contentAsString(result) must not include messages(application)("transferDetails.buyer.heading")
       }
     }
 

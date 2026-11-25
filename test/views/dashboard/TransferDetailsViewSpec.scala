@@ -48,9 +48,13 @@ class TransferDetailsViewSpec extends ViewBaseSpec {
     charges = Seq(Fixtures.buildTaxCharge(utrn, false, true))
   )
 
-  private def view(transfer: SttTransfer, transferNumber: Int = 1): Document = Jsoup.parse(
+  private def view(
+    transfer: SttTransfer,
+    transferNumber: Int = 1,
+    affinityKey: String = "agent"
+  ): Document = Jsoup.parse(
     viewInstance(
-      TransferDetailsViewModel.build(submission.copy(transfers = Seq(transfer)), transferNumber, transfer, Fixtures.viewTransferResponse)
+      TransferDetailsViewModel.build(submission.copy(transfers = Seq(transfer)), transferNumber, transfer, Fixtures.viewTransferResponse, affinityKey)
     )(fakeRequest, messages).body
   )
 
@@ -125,12 +129,21 @@ class TransferDetailsViewSpec extends ViewBaseSpec {
       }
     }
 
-    "show the buyer, seller and transfer details sections" in {
-      view(unpaidTransfer).select("h2.govuk-heading-m").asScala.map(_.text).drop(1) mustBe Seq(
+    "show the buyer, seller and transfer details sections for an agent" in {
+      view(unpaidTransfer, affinityKey = "agent").select("h2.govuk-heading-m").asScala.map(_.text).drop(1) mustBe Seq(
         messages("transferDetails.buyer.heading"),
         messages("transferDetails.seller.heading"),
         messages("transferDetails.transfer.heading")
       )
+    }
+
+    Seq("an organisation" -> "org", "an individual" -> "individual").foreach { case (userType, affinityKey) =>
+      s"not show the buyer section for $userType" in {
+        view(unpaidTransfer, affinityKey = affinityKey).select("h2.govuk-heading-m").asScala.map(_.text).drop(1) mustBe Seq(
+          messages("transferDetails.seller.heading"),
+          messages("transferDetails.transfer.heading")
+        )
+      }
     }
   }
 }
