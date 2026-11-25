@@ -62,13 +62,17 @@ class TransferDetailsViewModelSpec extends SpecBase with GuiceOneAppPerSuite {
   private def build(
     transfer: SttTransfer,
     transferNumber: Int = 1,
-    transaction: ViewTransferResponse = Fixtures.viewTransferResponse
+    transaction: ViewTransferResponse = Fixtures.viewTransferResponse,
+    isAgent: Boolean = true,
+    affinityKey: String = "agent"
   ): TransferDetailsViewModel =
     TransferDetailsViewModel.build(
       Fixtures.singleSubmissionReadyToPay.copy(transfers = Seq(transfer)),
       transferNumber,
       transfer,
-      transaction
+      transaction,
+      isAgent,
+      affinityKey
     )
 
   private def keys(list: SummaryList): Seq[String] = list.rows.map(_.key.content.asHtml.toString)
@@ -227,8 +231,8 @@ class TransferDetailsViewModelSpec extends SpecBase with GuiceOneAppPerSuite {
     "buyer and seller details" - {
       "show the main buyer's name and address" in {
         val model = build(transferWith(tax()))
-        valueOf(model.buyerList, "transferDetails.name") mustBe "Northbridge Healthcare"
-        valueOf(model.buyerList, "transferDetails.address") mustBe "50 Medical Park<br>London<br>W0 4DD"
+        valueOf(model.buyerList.value, "transferDetails.name") mustBe "Northbridge Healthcare"
+        valueOf(model.buyerList.value, "transferDetails.address") mustBe "50 Medical Park<br>London<br>W0 4DD"
       }
 
       "show the main seller's name and address" in {
@@ -239,7 +243,7 @@ class TransferDetailsViewModelSpec extends SpecBase with GuiceOneAppPerSuite {
 
       "use a narrow key column like the design" in {
         val model = build(transferWith(tax()))
-        Seq(model.referenceList, model.buyerList, model.sellerList, model.transferList).flatMap(_.rows).foreach { r =>
+        Seq(model.referenceList, model.buyerList.value, model.sellerList, model.transferList).flatMap(_.rows).foreach { r =>
           r.key.classes must include("govuk-!-width-one-third")
         }
       }
@@ -249,8 +253,17 @@ class TransferDetailsViewModelSpec extends SpecBase with GuiceOneAppPerSuite {
           mainBuyerDetails = Fixtures.viewTransferResponse.mainBuyerDetails.copy(buyerName = "<b>Buyer</b>", addr1 = "1 & 2 Road")
         )
         val model = build(transferWith(tax()), transaction = transaction)
-        valueOf(model.buyerList, "transferDetails.name") mustBe "&lt;b&gt;Buyer&lt;/b&gt;"
-        valueOf(model.buyerList, "transferDetails.address") must startWith("1 &amp; 2 Road")
+        valueOf(model.buyerList.value, "transferDetails.name") mustBe "&lt;b&gt;Buyer&lt;/b&gt;"
+        valueOf(model.buyerList.value, "transferDetails.address") must startWith("1 &amp; 2 Road")
+      }
+
+      "show buyer details for an agent" in {
+        build(transferWith(tax()), isAgent = true, affinityKey = "agent").buyerList mustBe defined
+      }
+
+      "not show buyer details for an organisation or an individual" in {
+        build(transferWith(tax()), isAgent = false, affinityKey = "org").buyerList mustBe None
+        build(transferWith(tax()), isAgent = false, affinityKey = "individual").buyerList mustBe None
       }
 
       "omit the seller address when ETMP has no main seller" in {

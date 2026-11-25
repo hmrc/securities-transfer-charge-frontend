@@ -44,7 +44,7 @@ final case class TransferDetailsViewModel(
   chargesList       : Option[SummaryList],
   paidChargesUrl    : Option[String],
   referenceList     : SummaryList,
-  buyerList         : SummaryList,
+  buyerList         : Option[SummaryList],
   sellerList        : SummaryList,
   transferList      : SummaryList
 )
@@ -148,7 +148,7 @@ object TransferDetailsViewModel {
       s.sellerName -> address(Seq(Some(s.addr1), s.addr2, s.addr3, s.addr4, Some(s.postcode)))
     })
 
-  private def transferList(transaction: ViewTransferResponse)(implicit messages: Messages): SummaryList = {
+  private def transferList(transaction: ViewTransferResponse, affinityKey: String)(implicit messages: Messages): SummaryList = {
     val details = transaction.transactionDetails
     val taxRate = transaction.mainBuyerDetails.taxRate match {
       case BuyerTaxRate.HalfPercent       => messages("taxRate.half")
@@ -157,18 +157,18 @@ object TransferDetailsViewModel {
     val relief = details.reliefClaimedName.filter(_.trim.nonEmpty)
 
     val rows = Seq(
-      Some(row("agent.connectedPersons.checkYourAnswersLabel", yesNo(details.isConnectedPartiesTransactions))),
-      Some(row("agent.applyingForRelief.checkYourAnswersLabel", yesNo(relief.isDefined))),
-      relief.map(row("agent.whatReliefAreYouApplyingFor.checkYourAnswersLabel", _)),
+      Some(row(s"$affinityKey.connectedPersons.checkYourAnswersLabel", yesNo(details.isConnectedPartiesTransactions))),
+      Some(row(s"$affinityKey.applyingForRelief.checkYourAnswersLabel", yesNo(relief.isDefined))),
+      relief.map(row(s"$affinityKey.whatReliefAreYouApplyingFor.checkYourAnswersLabel", _)),
       Some(row("transferDetails.businessName", details.companyName)),
       details.companyRegistrationNumber.filter(_.trim.nonEmpty).map(row("transferDetails.crn", _)),
-      Some(row("agent.chargingPoint.checkYourAnswersLabel", formatDate(details.originalChargingPoint))),
+      Some(row(s"$affinityKey.chargingPoint.checkYourAnswersLabel", formatDate(details.originalChargingPoint))),
       Some(row("taxRate.checkYourAnswersLabel", taxRate)),
       // ETMP doesn't hold the purchasing-shares answer, so this shows the type of security as agreed with the team.
-      Some(row("agent.purchasingShares.checkYourAnswersLabel", details.typeOfSecurity)),
+      Some(row(s"$affinityKey.purchasingShares.checkYourAnswersLabel", details.typeOfSecurity)),
       Some(row("transferDetails.numberOfSecurities", CommonHelpers.formatWithCommas(details.numberOfShares))),
-      Some(row("agent.amountPaidForSecurities.checkYourAnswersLabel", CurrencyFormatter.currencyFormat(details.considerationActual))),
-      details.marketValue.map(v => row("agent.totalMarketValue.checkYourAnswersLabel", CurrencyFormatter.currencyFormat(v)))
+      Some(row(s"$affinityKey.amountPaidForSecurities.checkYourAnswersLabel", CurrencyFormatter.currencyFormat(details.considerationActual))),
+      details.marketValue.map(v => row(s"$affinityKey.totalMarketValue.checkYourAnswersLabel", CurrencyFormatter.currencyFormat(v)))
     ).flatten
 
     SummaryList(rows = rows)
@@ -176,9 +176,17 @@ object TransferDetailsViewModel {
 
   /**
    * @param transferNumber the transfer's number in the submission (1-based, in UTRN order; see SttSubmission.transferNumber).
+   * @param isAgent buyer details are only shown to agents; individuals and organisations are the buyer themselves.
+   * @param affinityKey the message key prefix for the transfer details rows ("individual", "org" or "agent").
    */
-  def build(submission: SttSubmission, transferNumber: Int, transfer: SttTransfer, transaction: ViewTransferResponse)
-           (implicit messages: Messages): TransferDetailsViewModel = {
+  def build(
+    submission: SttSubmission,
+    transferNumber: Int,
+    transfer: SttTransfer,
+    transaction: ViewTransferResponse,
+    isAgent: Boolean,
+    affinityKey: String
+  )(implicit messages: Messages): TransferDetailsViewModel = {
     val submissionId = submission.submissionId
     val balance = transfer.totalToPay
     val anyPaid = transfer.charges.exists(_.isPaid)
@@ -191,9 +199,9 @@ object TransferDetailsViewModel {
       chargesList       = chargesList(submissionId, transferNumber, transfer),
       paidChargesUrl    = Option.when(anyPaid)(dashboardRoutes.PaidChargesController.onPageLoad(submissionId, transferNumber).url),
       referenceList     = referenceList(submission, transfer),
-      buyerList         = buyerList(transaction),
+      buyerList         = Option.when(isAgent)(buyerList(transaction)),
       sellerList        = sellerList(transaction),
-      transferList      = transferList(transaction)
+      transferList      = transferList(transaction, affinityKey)
     )
   }
 }
