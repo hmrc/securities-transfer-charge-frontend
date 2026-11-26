@@ -24,7 +24,7 @@ import javax.inject.Inject
 class AmountPaidForSecuritiesFormProvider @Inject() extends Mappings {
 
   private val min = BigDecimal(0)
-  private val max = BigDecimal("999999999.99")
+  private val max = BigDecimal("999999999999.99")
 
   def apply(): Form[BigDecimal] =
     Form(
