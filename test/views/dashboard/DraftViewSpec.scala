@@ -252,11 +252,14 @@ class DraftViewSpec extends ViewBaseSpec {
     val answers = bulkAnswers.remove(BulkRoleAtPurchasingCompanyPage).success.value
     val doc = view(viewModel(userAnswers = answers, affinityKey = affinityGroupKeyOrg))
 
-    "show the company details under your details and hide the empty declaration section" in {
+    "show the company details under your details and hide the file details and empty declaration sections" in {
       doc.select("h2.govuk-heading-m").asScala.map(_.text()).toList mustBe List(
-        messages("draft.yourDetails.heading"),
-        messages("draft.fileDetails.heading")
+        messages("draft.yourDetails.heading")
       )
+    }
+
+    "not show the file name row" in {
+      doc.select(".govuk-summary-list__key").asScala.map(_.text()) must not contain messages("draft.fileDetails.fileName.key")
     }
 
     "show the company name and CRN under your details" in {
