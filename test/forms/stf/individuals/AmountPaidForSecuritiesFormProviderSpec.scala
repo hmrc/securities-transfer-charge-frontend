@@ -33,7 +33,7 @@ class AmountPaidForSecuritiesFormProviderSpec extends CurrencyFieldBehaviours {
     val fieldName = "value"
 
     val minimum = 0
-    val maximum = 999999999999.99
+    val maximum = BigDecimal("999999999.99")
 
     val validDataGenerator =
       Gen.choose[BigDecimal](minimum, maximum)
@@ -59,6 +59,17 @@ class AmountPaidForSecuritiesFormProviderSpec extends CurrencyFieldBehaviours {
       maximum,
       FormError(fieldName, "amountPaidForSecurities.error.aboveMaximum", Seq(currencyFormat(maximum)))
     )
+
+    "must bind the maximum value of 999999999.99" in {
+      val result = form.bind(Map(fieldName -> "999999999.99"))
+      result.errors mustBe empty
+      result.value mustBe Some(BigDecimal("999999999.99"))
+    }
+
+    "must not bind 999999999999.99" in {
+      val result = form.bind(Map(fieldName -> "999999999999.99")).apply(fieldName)
+      result.errors mustEqual Seq(FormError(fieldName, "amountPaidForSecurities.error.aboveMaximum", Seq(currencyFormat(maximum))))
+    }
 
     behave like mandatoryField(
       form,
