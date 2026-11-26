@@ -361,6 +361,16 @@ individual.chargingPoint.error.futureDate = The day you bought the securities mu
 individual.chargingPoint.error.invalid = The date you bought the securities must be a real date
 individual.amountPaidForSecurities.error.required = Enter the amount you paid for the securities
 
+individual.connectedPersons.checkYourAnswersLabel = Are you and the seller of these securities connected?
+individual.applyingForRelief.checkYourAnswersLabel = Are you applying for a relief?
+individual.chargingPoint.checkYourAnswersLabel = When did you buy these securities?
+individual.amountPaidForSecurities.checkYourAnswersLabel = Amount paid for securities
+individual.totalMarketValue.checkYourAnswersLabel = Total market value of the securities
+individual.transferDetails.businessName = Business the securities are in
+individual.otherSecuritiesType.checkYourAnswersLabel = Type of securities
+agent.transferDetails.businessName = Business name
+org.transferDetails.businessName = Business name
+
 detailsOfThisTransfer.title = What are the details of this transfer?
 detailsOfThisTransfer.numberOfShares.checkYourAnswersLabel = Number of shares
 detailsOfThisTransfer.typeOfShares.checkYourAnswersLabel = Type or class of shares

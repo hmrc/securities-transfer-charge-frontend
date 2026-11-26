@@ -278,7 +278,7 @@ class TransferDetailsViewModelSpec extends SpecBase with GuiceOneAppPerSuite {
           "agent.connectedPersons.checkYourAnswersLabel",
           "agent.applyingForRelief.checkYourAnswersLabel",
           "whatReliefAreYouApplyingFor.checkYourAnswersLabel",
-          "transferDetails.businessName",
+          "agent.transferDetails.businessName",
           "transferDetails.crn",
           "agent.chargingPoint.checkYourAnswersLabel",
           "taxRate.checkYourAnswersLabel",
@@ -329,6 +329,38 @@ class TransferDetailsViewModelSpec extends SpecBase with GuiceOneAppPerSuite {
           valueOf(list, s"$key.otherSecuritiesType.checkYourAnswersLabel") mustBe "Preference"
           labels.indexOf(messages(s"$key.otherSecuritiesType.checkYourAnswersLabel")) mustBe
             labels.indexOf(messages(s"$key.purchasingShares.checkYourAnswersLabel")) + 1
+        }
+      }
+
+      Seq("an organisation" -> "org", "an individual" -> "individual").foreach { case (userType, key) =>
+        s"use the $key labels for $userType" in {
+          val list = build(transferWith(tax()), affinityKey = key).transferList
+
+          val expectedKeys = Seq(
+            s"$key.connectedPersons.checkYourAnswersLabel",
+            s"$key.applyingForRelief.checkYourAnswersLabel",
+            "whatReliefAreYouApplyingFor.checkYourAnswersLabel",
+            s"$key.transferDetails.businessName",
+            "transferDetails.crn",
+            s"$key.chargingPoint.checkYourAnswersLabel",
+            "taxRate.checkYourAnswersLabel",
+            s"$key.purchasingShares.checkYourAnswersLabel",
+            s"$key.otherSecuritiesType.checkYourAnswersLabel",
+            "transferDetails.numberOfSecurities",
+            s"$key.amountPaidForSecurities.checkYourAnswersLabel",
+            s"$key.totalMarketValue.checkYourAnswersLabel"
+          )
+
+          // messages() falls back to the key itself, so check every label really exists
+          expectedKeys.filterNot(messages.isDefinedAt) mustBe empty
+          keys(list) mustBe expectedKeys.map(messages(_))
+        }
+      }
+
+      "show the business name with the label for each user type" in {
+        Seq("agent", "org", "individual").foreach { key =>
+          val list = build(transferWith(tax()), affinityKey = key).transferList
+          valueOf(list, s"$key.transferDetails.businessName") mustBe "CardioNova Therapeutics"
         }
       }
 
