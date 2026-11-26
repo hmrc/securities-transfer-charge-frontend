@@ -95,7 +95,7 @@ class TransferDetailsControllerSpec extends SpecBase {
         val viewModel = TransferDetailsViewModel.build(bulkSubmission, 2, secondTransfer, viewTransferResponse, affinityGroupKeyAgent)(messages(application))
 
         status(result) mustEqual OK
-        viewModel.buyerList mustBe defined
+        viewModel.sections.map(_.heading) must contain(messages(application)("transferDetails.buyer.heading"))
         contentAsString(result) mustEqual view(viewModel)(request, messages(application)).toString
         contentAsString(result) must include(messages(application)("transferDetails.buyer.heading"))
       }
@@ -113,7 +113,7 @@ class TransferDetailsControllerSpec extends SpecBase {
         val viewModel = TransferDetailsViewModel.build(bulkSubmission, 2, secondTransfer, viewTransferResponse, affinityGroupKeyOrg)(messages(application))
 
         status(result) mustEqual OK
-        viewModel.buyerList mustBe None
+        viewModel.sections.map(_.heading) must not contain messages(application)("transferDetails.buyer.heading")
         contentAsString(result) mustEqual view(viewModel)(request, messages(application)).toString
         contentAsString(result) must not include messages(application)("transferDetails.buyer.heading")
       }

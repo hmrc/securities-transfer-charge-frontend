@@ -51,10 +51,13 @@ class TransferDetailsViewSpec extends ViewBaseSpec {
   private def view(
     transfer: SttTransfer,
     transferNumber: Int = 1,
-    affinityKey: String = "agent"
+    affinityKey: String = "agent",
+    declareeName: Option[String] = None
   ): Document = Jsoup.parse(
     viewInstance(
-      TransferDetailsViewModel.build(submission.copy(transfers = Seq(transfer)), transferNumber, transfer, Fixtures.viewTransferResponse, affinityKey)
+      TransferDetailsViewModel.build(
+        submission.copy(transfers = Seq(transfer), declareeName = declareeName), transferNumber, transfer, Fixtures.viewTransferResponse, affinityKey
+      )
     )(fakeRequest, messages).body
   )
 
@@ -144,6 +147,16 @@ class TransferDetailsViewSpec extends ViewBaseSpec {
           messages("transferDetails.transfer.heading")
         )
       }
+    }
+
+    "show the your details, transfer details and declaration sections for a business SH03" in {
+      val doc = view(unpaidTransfer, affinityKey = "org", declareeName = Some("James White"))
+      doc.select("h2.govuk-heading-m").asScala.map(_.text).drop(1) mustBe Seq(
+        messages("transferDetails.yourDetails.heading"),
+        messages("transferDetails.transfer.heading"),
+        messages("transferDetails.declaration.heading")
+      )
+      doc.select(".govuk-grid-column-three-quarters .govuk-summary-list").size mustBe 4
     }
   }
 }

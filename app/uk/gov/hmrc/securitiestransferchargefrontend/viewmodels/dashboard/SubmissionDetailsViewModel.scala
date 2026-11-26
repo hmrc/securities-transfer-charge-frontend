@@ -44,13 +44,11 @@ object SubmissionDetailsViewModel {
     )
   }
 
-  // Only the STF transfer details page exists so far; SH03 keeps a placeholder link until its page is built.
   // The number comes from the transfer's UTRN order, not the order the table is displayed in.
   private def viewHref(submission: SttSubmission, transfer: SttTransfer): String =
-    (submission.submissionType, submission.transferNumber(transfer)) match {
-      case (STF, Some(number)) =>
-        dashboardRoutes.TransferDetailsController.onPageLoad(submission.submissionId, number).url
-      case _ => "#"
+    submission.transferNumber(transfer) match {
+      case Some(number) => dashboardRoutes.TransferDetailsController.onPageLoad(submission.submissionId, number).url
+      case None         => "#"
     }
 
   private def transfersTable(submission: SttSubmission, transfers: Seq[SttTransfer], isAgent: Boolean)(implicit messages: Messages): Table = {
