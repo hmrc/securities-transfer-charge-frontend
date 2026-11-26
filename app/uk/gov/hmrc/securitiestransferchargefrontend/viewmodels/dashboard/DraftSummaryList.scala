@@ -72,11 +72,16 @@ object DraftSummaryList {
       val fileNotUploaded = messages("draft.fileDetails.fileName.value")
 
       if (isBulk) {
+        // The file details are only shown once the user has reached the declaration (role) page.
+        val fileDetailsRows =
+          if (summary.sh03BulkRoleAtPurchasingCompany.isDefined) Seq(row("draft.fileDetails.fileName.key", fileNotUploaded))
+          else Seq.empty
+
         detailsSections(
           summary.sh03BulkAgentReference,
           summary.sh03BulkCompanyDetails.toSeq.flatMap(details => companyRows(details.companyName, details.companyRegistrationNumber))
         ) ++ Seq(
-          messages("draft.fileDetails.heading") -> SummaryList(rows = Seq(row("draft.fileDetails.fileName.key", fileNotUploaded))),
+          messages("draft.fileDetails.heading") -> SummaryList(rows = fileDetailsRows),
           messages("draft.declaration.heading") -> SummaryList(rows = roleRows(summary.sh03BulkRoleAtPurchasingCompany))
         )
       } else {
