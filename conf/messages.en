@@ -288,9 +288,9 @@ amountPaidForSecurities.p2 = You do not need to provide details about conversion
 amountPaidForSecurities.hint = For example, £600 or £193.54
 amountPaidForSecurities.error.nonNumeric = The amount you paid for the securities must be a number
 amountPaidForSecurities.error.required = Enter the amount you paid for the securities
-amountPaidForSecurities.error.invalidNumeric = Enter your amountPaidForSecurities using up to two decimal places
-amountPaidForSecurities.error.aboveMaximum = amountPaidForSecurities must be {0} or less
-amountPaidForSecurities.error.belowMinimum = amountPaidForSecurities must be {0} or more
+amountPaidForSecurities.error.invalidNumeric = Enter the amount you paid for the securities using up to two decimal places
+amountPaidForSecurities.error.aboveMaximum = The amount you paid for the securities must be {0} or below
+amountPaidForSecurities.error.belowMinimum = The amount you paid for the securities must be {0} or more
 amountPaidForSecurities.change.hidden = Change amount paid for securities
 
 individual.amountPaidForSecurities.error.nonNumeric = The amount you paid for the securities must be a number

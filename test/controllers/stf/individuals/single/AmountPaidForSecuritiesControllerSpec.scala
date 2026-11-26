@@ -102,6 +102,25 @@ class AmountPaidForSecuritiesControllerSpec extends SpecBase with MockitoSugar {
       }
     }
 
+    "must return a Bad Request with the above maximum error message when the amount is over £999,999,999.99" in {
+
+      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers))
+        .overrides(bind[Navigator].qualifiedWith("individuals").toInstance(getNavigator))
+        .build()
+
+      running(application) {
+        val request =
+          FakeRequest(POST, amountPaidForSecuritiesRoute)
+            .withFormUrlEncodedBody(("value", "1000000000"))
+
+        val result = route(application, request).value
+
+        status(result) mustEqual BAD_REQUEST
+        contentAsString(result) must include("The amount you paid for the securities must be £999,999,999.99 or below")
+        contentAsString(result) must not include "amountPaidForSecurities must be"
+      }
+    }
+
     "must redirect to Journey Recovery for a GET if no existing data is found" in {
 
       val application = applicationBuilder(userAnswers = None).build()
