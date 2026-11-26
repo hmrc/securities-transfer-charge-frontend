@@ -16,6 +16,7 @@
 
 package uk.gov.hmrc.securitiestransferchargefrontend.viewmodels.stf.fileupload
 
+import uk.gov.hmrc.securitiestransferchargefrontend.models.JourneyType
 import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.{Card, SummaryListRow}
 import uk.gov.hmrc.securitiestransferchargefrontend.viewmodels.stf.fileupload.{FileNameSummary, NumberOfFilesSummary}
 import play.api.i18n.Messages
@@ -27,7 +28,7 @@ case class CheckYourAnswersViewModel(fileName: String, numberOfTransfers: Int, t
 
   def fileDetailsSummaryRows(implicit messages: Messages): Seq[SummaryListRow] =
     Seq(
-      FileNameSummary.row(fileName),
+      FileNameSummary.row(fileName, JourneyType.STF),
       NumberOfFilesSummary.row(CommonHelpers.formatWithCommas(numberOfTransfers))
     )
 

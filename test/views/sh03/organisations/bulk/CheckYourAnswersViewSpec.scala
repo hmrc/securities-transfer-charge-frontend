@@ -22,6 +22,8 @@ import play.api.Application
 import play.api.mvc.Call
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.sh03.organisations.bulk.routes
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.routes.YourFileWillNotBeSavedController
+import uk.gov.hmrc.securitiestransferchargefrontend.controllers.fileUpload.routes as fileUploadRoutes
+import uk.gov.hmrc.securitiestransferchargefrontend.models.JourneyType
 import uk.gov.hmrc.securitiestransferchargefrontend.viewmodels.sh03.organisations.bulk.{CheckYourAnswersViewModel, Sh03Transfer}
 import uk.gov.hmrc.securitiestransferchargefrontend.views.html.sh03.organisations.bulk.CheckYourAnswersView
 import views.ViewBaseSpec
@@ -121,6 +123,18 @@ class CheckYourAnswersViewSpec extends ViewBaseSpec {
         .select(".govuk-summary-list__value")
         .get(0)
         .text() mustBe fileName
+    }
+
+    "should link the file name change action to the SH03 file upload page" in {
+      val changeLink = view()
+        .select(".govuk-summary-list")
+        .get(1)
+        .select(".govuk-summary-list__row")
+        .get(0)
+        .select(".govuk-summary-list__actions a")
+
+      changeLink.attr("href") mustBe fileUploadRoutes.FileUploadController.onPageLoad(JourneyType.SH03).url
+      changeLink.attr("href") must not be fileUploadRoutes.FileUploadController.onPageLoad(JourneyType.STF).url
     }
 
     "should display the number of transfers in the file details summary card" in {
