@@ -43,7 +43,7 @@ case class UserAnswers(userId: UserId,
 
   def exists[A](page: Gettable[A])(implicit rds: Reads[A]): Boolean =
     Reads.optionNoError(Reads.at(page.path)).reads(data).isSuccess
-    
+
   def set[A](page: Settable[A], value: A)(implicit writes: Writes[A]): Try[UserAnswers] = {
 
     val updatedData = data.setObject(page.path, Json.toJson(value)) match {
@@ -62,6 +62,7 @@ case class UserAnswers(userId: UserId,
 
   def setFileUploadReference(reference: String): UserAnswers = this.copy(fileUploadReference = Some(reference))
 
+  def clearFileUploadReference(): UserAnswers = this.copy(fileUploadReference = None)
   def getFileUploadReference(): String = this.fileUploadReference.getOrElse(throw new IllegalStateException("fileUploadReference missing "))
 
   def remove[A](page: Settable[A]): Try[UserAnswers] = {
@@ -75,21 +76,21 @@ case class UserAnswers(userId: UserId,
 
     updatedData.flatMap {
       d =>
-        val updatedAnswers = copy (data = d)
+        val updatedAnswers = copy(data = d)
         page.cleanup(None, updatedAnswers)
     }
   }
-  
+
   def clear: UserAnswers = this.copy(data = Json.obj())
 }
 
 object UserAnswers {
 
   import play.api.libs.functional.syntax.*
-  
+
   val empty: UserId => GroupIdentifier => SubmissionId => JourneyType => UserAnswers =
     userId => groupIdentifier => submissionId => journeyType =>
-      UserAnswers(userId = userId, groupIdentifier = groupIdentifier, submissionId = submissionId, journeyType = journeyType)  
+      UserAnswers(userId = userId, groupIdentifier = groupIdentifier, submissionId = submissionId, journeyType = journeyType)
 
   implicit val callFormat: Format[Call] = new Format[Call] {
 
@@ -100,16 +101,16 @@ object UserAnswers {
 
     override def writes(call: Call): JsValue = {
       Json.obj(
-        "method"    -> call.method,
-        "url"       -> call.url,
-        "fragment"  -> Option(call.fragment)
+        "method" -> call.method,
+        "url" -> call.url,
+        "fragment" -> Option(call.fragment)
       )
     }
 
     override def reads(json: JsValue): JsResult[Call] = for {
-      method    <- (json \ "method").validate[String]
-      url       <- (json \ "url").validate[String]
-      fragment  <- (json \ "fragment").validateOpt[String]
+      method <- (json \ "method").validate[String]
+      url <- (json \ "url").validate[String]
+      fragment <- (json \ "fragment").validateOpt[String]
     } yield Call(method, url, fragment.orNull)
 
   }
@@ -136,7 +137,7 @@ object UserAnswers {
       (__ \ "data").write[JsObject] and
       (__ \ "createdAt").write(MongoJavatimeFormats.instantFormat) and
       (__ \ "lastUpdated").write(MongoJavatimeFormats.instantFormat)
-    )(ua => (ua.userId, ua.groupIdentifier, ua.submissionId, ua.journeyType,ua.fileUploadReference, ua.nextPage, ua.data, ua.createdAt, ua.lastUpdated))
+    )(ua => (ua.userId, ua.groupIdentifier, ua.submissionId, ua.journeyType, ua.fileUploadReference, ua.nextPage, ua.data, ua.createdAt, ua.lastUpdated))
 
   implicit val format: OFormat[UserAnswers] = OFormat(reads, writes)
 }

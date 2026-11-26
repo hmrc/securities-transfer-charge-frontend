@@ -89,9 +89,10 @@ class RoleAtPurchasingCompanyController @Inject()(
 
             case Some(_) =>
               for {
-                updatedAnswers <- Future.fromTry(request.userAnswers.set(BulkRoleAtPurchasingCompanyPage, value))
-                _ <- answerPersistenceService.save(updatedAnswers)
-                nextPage <- navigator.nextPage(BulkRoleAtPurchasingCompanyPage, mode, updatedAnswers, isReturn(request))
+                answers        <- Future.fromTry(request.userAnswers.set(BulkRoleAtPurchasingCompanyPage, value))
+                updatedAnswers  = clearReferenceIfReturning(answers)
+                _              <- answerPersistenceService.save(updatedAnswers)
+                nextPage       <- navigator.nextPage(BulkRoleAtPurchasingCompanyPage, mode, updatedAnswers, isReturn(request))
               } yield Redirect(nextPage)
 
             case None =>
@@ -101,11 +102,14 @@ class RoleAtPurchasingCompanyController @Inject()(
       )
   }
 
+  private def clearReferenceIfReturning(userAnswers: UserAnswers)(implicit request: StcDataRequest[AnyContent]): UserAnswers =
+    if (isReturn(request)) userAnswers.clearFileUploadReference() else userAnswers
+
   private def removeRoleAndRedirect(implicit request: StcDataRequest[AnyContent]): Future[Result] = {
     val cannotSubmitPage = routes.CannotSubmitFormErrorController.onPageLoad()
     for {
       updatedAnswers <- Future.fromTry(request.userAnswers.remove(BulkRoleAtPurchasingCompanyPage))
-      _              <- answerPersistenceService.save(updatedAnswers.setNextPage(cannotSubmitPage))
+      _              <- answerPersistenceService.save(clearReferenceIfReturning(updatedAnswers.setNextPage(cannotSubmitPage)))
       _              <- if (isReturn(request)) sessionRepository.clear(updatedAnswers.userId) else Future.unit
     } yield Redirect(if (isReturn(request)) dashboardRoutes.DashboardController.onPageLoad() else cannotSubmitPage)
   }
