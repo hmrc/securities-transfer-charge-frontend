@@ -283,6 +283,7 @@ class TransferDetailsViewModelSpec extends SpecBase with GuiceOneAppPerSuite {
           "agent.chargingPoint.checkYourAnswersLabel",
           "taxRate.checkYourAnswersLabel",
           "agent.purchasingShares.checkYourAnswersLabel",
+          "agent.otherSecuritiesType.checkYourAnswersLabel",
           "transferDetails.numberOfSecurities",
           "agent.amountPaidForSecurities.checkYourAnswersLabel",
           "agent.totalMarketValue.checkYourAnswersLabel"
@@ -296,6 +297,7 @@ class TransferDetailsViewModelSpec extends SpecBase with GuiceOneAppPerSuite {
           "12345678",
           "1 July 2026",
           messages("taxRate.half"),
+          "Ordinary",
           "Ordinary",
           "100",
           "£12,000,000",
@@ -317,6 +319,17 @@ class TransferDetailsViewModelSpec extends SpecBase with GuiceOneAppPerSuite {
         rowFor(list, "whatReliefAreYouApplyingFor.checkYourAnswersLabel") mustBe None
         rowFor(list, "transferDetails.crn") mustBe None
         rowFor(list, "agent.totalMarketValue.checkYourAnswersLabel") mustBe None
+      }
+
+      "show the type of securities from ETMP, straight after the purchasing shares row" in {
+        val details = Fixtures.viewTransferResponse.transactionDetails.copy(typeOfSecurity = "Preference")
+        Seq("agent", "org").foreach { key =>
+          val list = build(transferWith(tax()), transaction = Fixtures.viewTransferResponse.copy(transactionDetails = details), affinityKey = key).transferList
+          val labels = keys(list)
+          valueOf(list, s"$key.otherSecuritiesType.checkYourAnswersLabel") mustBe "Preference"
+          labels.indexOf(messages(s"$key.otherSecuritiesType.checkYourAnswersLabel")) mustBe
+            labels.indexOf(messages(s"$key.purchasingShares.checkYourAnswersLabel")) + 1
+        }
       }
 
       "show the number of securities with thousands separators" in {

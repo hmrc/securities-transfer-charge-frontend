@@ -45,7 +45,7 @@ class DraftsViewModelSpec extends AnyWordSpec with Matchers {
     new DefaultMessagesApi(Map("en" -> Map(
       "draft.deletion.p1"       -> "Your draft will be deleted in {0} days.",
       "draft.deletion.today"    -> "Your draft will be deleted today at {0}.",
-      "draft.deletion.tomorrow" -> "Your draft will be deleted tomorrow."
+      "draft.deletion.tomorrow" -> "Your draft will be deleted tomorrow at {0}."
     )))
   )
 
@@ -63,10 +63,10 @@ class DraftsViewModelSpec extends AnyWordSpec with Matchers {
       DraftViewModel.deletion(answersCreatedAt("2026-11-01T09:00"), clockAt("2026-11-29T09:00"), ttlDays) shouldBe InDays(2)
     }
 
-    "show tomorrow" in {
+    "show tomorrow with the deletion time" in {
       val result = DraftViewModel.deletion(answersCreatedAt("2026-11-01T09:00"), clockAt("2026-11-30T15:00"), ttlDays)
       result shouldBe Tomorrow(LocalTime.of(9, 0))
-      result.message shouldBe "Your draft will be deleted tomorrow."
+      result.message shouldBe "Your draft will be deleted tomorrow at 9:00am."
     }
 
     "show today with the deletion time" in {

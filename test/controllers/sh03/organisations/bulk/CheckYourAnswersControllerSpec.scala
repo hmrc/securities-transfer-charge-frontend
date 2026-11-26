@@ -16,6 +16,8 @@
 
 package controllers.sh03.organisations.bulk
 
+import uk.gov.hmrc.securitiestransferchargefrontend.services.AnswerPersistenceService
+import uk.gov.hmrc.http.HeaderCarrier
 import base.Fixtures.organisationAffinity
 import base.{FileUploadFixtures, SpecBase}
 import org.mockito.ArgumentCaptor
@@ -216,11 +218,22 @@ class CheckYourAnswersControllerSpec extends SpecBase with MockitoSugar with Fil
         }
       }
 
-      "must clear the user answers and redirect to Your File Will Not Be Saved when Save and return is clicked, without submitting" in {
+      "must save the answers without the fileUploadReference, clear the session and redirect to Your File Will Not Be Saved when Save and return is clicked, without submitting" in {
         //TODO: This test will need updated when the deletion of user answers is moved to the YourFileWillNotBeSavedController - see ticket STOSB-2156
         when(mockSessionRepository.clear(any())).thenReturn(Future.successful(()))
 
-        val application = onSubmitApp(Some(userAnswersWithFileRef))
+        val answerPersistenceService = mock[AnswerPersistenceService]
+        when(answerPersistenceService.save(any[UserAnswers])(any[HeaderCarrier])).thenReturn(Future.unit)
+
+        val application = applicationBuilder(userAnswers = Some(userAnswersWithFileRef), affinityGroup = organisationAffinity, sessionRepository = mockSessionRepository)
+          .overrides(
+            bind[Navigator].qualifiedWith("orgSh03").toInstance(mockNavigator),
+            bind[ParsedStcRowsRepository].toInstance(mockRepository),
+            bind[CheckYourAnswersService].toInstance(mockCyaService),
+            bind[TransactionSubmissionService].toInstance(mockTransactionSubmissionService),
+            bind[AnswerPersistenceService].toInstance(answerPersistenceService)
+          )
+          .build()
 
         running(application) {
           val request =
@@ -231,6 +244,12 @@ class CheckYourAnswersControllerSpec extends SpecBase with MockitoSugar with Fil
 
           status(result) mustEqual SEE_OTHER
           redirectLocation(result).value mustEqual routes.YourFileWillNotBeSavedController.onPageLoad().url
+
+          val captor = ArgumentCaptor.forClass(classOf[UserAnswers])
+          verify(answerPersistenceService).save(captor.capture())(any[HeaderCarrier])
+          userAnswersWithFileRef.fileUploadReference mustBe defined
+          captor.getValue.fileUploadReference mustBe None
+          captor.getValue.data mustEqual userAnswersWithFileRef.data
 
           verify(mockSessionRepository).clear(eqTo(userAnswersWithFileRef.userId))
           verify(mockRepository, never()).findDocumentByReference(anyString())

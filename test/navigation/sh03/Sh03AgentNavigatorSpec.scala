@@ -17,7 +17,7 @@
 package navigation.sh03
 
 import base.SpecBase
-import base.stubs.{StubAnswerPersistenceService, StubSessionRepository}
+import base.stubs.{RecordingAnswerPersistenceService, StubAnswerPersistenceService, StubSessionRepository}
 import org.mockito.Mockito.when
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatestplus.mockito.MockitoSugar.mock
@@ -84,6 +84,32 @@ class Sh03AgentNavigatorSpec extends SpecBase with ScalaFutures {
         val result = navigator.nextPage(AnyPage, NormalMode, UserAnswers(testUserId, testGroupIdentifier, submissionId,SH03), true)(fakeRequest)
         whenReady(result) { res =>
           res mustBe navigator.dashboardPage
+        }
+      }
+
+      "must persist the answers without the fileUploadReference when isReturn is true" - {
+        Seq(BulkAgentReferencePage, BulkCompanyDetailsPage, BulkRoleAtPurchasingCompanyPage).foreach { page =>
+          s"from $page" in {
+            val persistence = new RecordingAnswerPersistenceService
+            val recordingNavigator = new Sh03AgentNavigator(persistence, mockConfig, StubSessionRepository())
+            val answers = emptyUserAnswers.setFileUploadReference("test-ref")
+
+            whenReady(recordingNavigator.nextPage(page, NormalMode, answers, isReturn = true)(fakeRequest)) { res =>
+              res mustBe recordingNavigator.dashboardPage
+              persistence.saved must not be empty
+              persistence.saved.foreach(_.fileUploadReference mustBe None)
+            }
+          }
+        }
+      }
+
+      "must keep the fileUploadReference when isReturn is false" in {
+        val persistence = new RecordingAnswerPersistenceService
+        val recordingNavigator = new Sh03AgentNavigator(persistence, mockConfig, StubSessionRepository())
+        val answers = emptyUserAnswers.setFileUploadReference("test-ref")
+
+        whenReady(recordingNavigator.nextPage(BulkCompanyDetailsPage, NormalMode, answers)(fakeRequest)) { _ =>
+          persistence.saved.foreach(_.fileUploadReference mustBe Some("test-ref"))
         }
       }
 

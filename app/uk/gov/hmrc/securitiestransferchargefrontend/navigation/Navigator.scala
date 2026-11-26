@@ -50,11 +50,19 @@ abstract class AbstractModeNavigator(implicit ex: ExecutionContext) extends Navi
   def returnToDashboard(userAnswers: UserAnswers): Future[Call] =
     sessionRepository.clear(userAnswers.userId).map(_ => dashboardPage)
     
+  /*
+   * Applied to the UserAnswers before they are persisted when the user chooses
+   * Save and return to dashboard. Override to drop data that must not survive a return.
+   */
+  protected def prepareForReturn(userAnswers: UserAnswers): UserAnswers = userAnswers
+
   def nextPage(page: Page, mode: Mode, userAnswers: UserAnswers, isReturn: Boolean)(implicit request: Request[?]): Future[Call] = {
     implicit lazy val hc: HeaderCarrier = HeaderCarrierConverter.fromRequestAndSession(request, request.session)
-    
-    forwardRoutes(page, mode)(hc)(userAnswers).flatMap { call =>
-      if (isReturn) then returnToDashboard(userAnswers) else Future.successful(call)
+
+    val answers = if (isReturn) prepareForReturn(userAnswers) else userAnswers
+
+    forwardRoutes(page, mode)(hc)(answers).flatMap { call =>
+      if (isReturn) then returnToDashboard(answers) else Future.successful(call)
     }
   }
 

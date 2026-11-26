@@ -31,7 +31,7 @@ import uk.gov.hmrc.securitiestransferchargefrontend.navigation.sh03.Sh03BulkAnsw
 import uk.gov.hmrc.securitiestransferchargefrontend.pages.BulkConfirmationDetailsPage
 import uk.gov.hmrc.securitiestransferchargefrontend.pages.sh03.bulk.BulkCheckYourAnswersPage
 import uk.gov.hmrc.securitiestransferchargefrontend.repositories.{ParsedStcRowsRepository, SessionRepository}
-import uk.gov.hmrc.securitiestransferchargefrontend.services.TransactionSubmissionService
+import uk.gov.hmrc.securitiestransferchargefrontend.services.{AnswerPersistenceService, TransactionSubmissionService}
 import uk.gov.hmrc.securitiestransferchargefrontend.services.sh03.organisations.bulk.CheckYourAnswersService
 import uk.gov.hmrc.securitiestransferchargefrontend.views.html.sh03.organisations.bulk.CheckYourAnswersView
 
@@ -49,7 +49,8 @@ class CheckYourAnswersController @Inject()(
                                             checkYourAnswersService: CheckYourAnswersService,
                                             parsedStcRowsRepository: ParsedStcRowsRepository,
                                             sessionRepository: SessionRepository,
-                                            transactionSubmissionService: TransactionSubmissionService
+                                            transactionSubmissionService: TransactionSubmissionService,
+                                            answerPersistenceService: AnswerPersistenceService
                                           )(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport {
 
   lazy val backLinkCall: Mode => Option[UserAnswers] => Call = mode => userAnswers => navigator.previousPage(BulkCheckYourAnswersPage, mode, userAnswers)
@@ -78,9 +79,10 @@ class CheckYourAnswersController @Inject()(
   def onSubmit(): Action[AnyContent] = (stcAuthEnrolled andThen getData andThen requireData).async {
     implicit request =>
       if isReturn(request) then
-        sessionRepository
-          .clear(request.userAnswers.userId) // TODO: clearing the user answers will need to be moved to the YourFileWillNotBeSavedController see ticket STOSB-2156
-          .map(_ => Redirect(routes.YourFileWillNotBeSavedController.onPageLoad()))
+        for {
+          _ <- answerPersistenceService.save(request.userAnswers.clearFileUploadReference())
+          _ <- sessionRepository.clear(request.userAnswers.userId) // TODO: clearing the user answers will need to be moved to the YourFileWillNotBeSavedController see ticket STOSB-2156
+        } yield Redirect(routes.YourFileWillNotBeSavedController.onPageLoad())
       else {
         val fileUploadRef = request.userAnswers.getFileUploadReference()
 

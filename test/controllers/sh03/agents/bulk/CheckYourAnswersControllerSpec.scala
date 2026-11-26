@@ -16,6 +16,8 @@
 
 package controllers.sh03.agents.bulk
 
+import uk.gov.hmrc.securitiestransferchargefrontend.services.AnswerPersistenceService
+import uk.gov.hmrc.http.HeaderCarrier
 import base.{FileUploadFixtures, SpecBase}
 import base.stubs.StubPersistentNavigator
 import com.google.inject.name.Names
@@ -294,11 +296,22 @@ class CheckYourAnswersControllerSpec extends SpecBase with FileUploadFixtures wi
         }
       }
 
-      "must clear the user answers and redirect to Your File Will Not Be Saved when Save and return is clicked, without submitting" in {
+      "must save the answers without the fileUploadReference, clear the session and redirect to Your File Will Not Be Saved when Save and return is clicked, without submitting" in {
         //TODO: This test will need updated when the deletion of user answers is moved to the YourFileWillNotBeSavedController - see ticket STOSB-2156
         when(mockSessionRepository.clear(any())).thenReturn(Future.successful(()))
 
-        val application = onSubmitApp(Some(completeUserAnswers))
+        val answerPersistenceService = mock[AnswerPersistenceService]
+        when(answerPersistenceService.save(any[UserAnswers])(any[HeaderCarrier])).thenReturn(Future.unit)
+
+        val application = applicationBuilder(userAnswers = Some(completeUserAnswers), sessionRepository = mockSessionRepository)
+          .overrides(
+            bind[Navigator].qualifiedWith(Names.named("agentsSh03")).toInstance(mockNavigator),
+            bind[ParsedStcRowsRepository].toInstance(mockRepository),
+            bind[CheckYourAnswersService].toInstance(mockCyaService),
+            bind[TransactionSubmissionService].toInstance(mockTransactionSubmissionService),
+            bind[AnswerPersistenceService].toInstance(answerPersistenceService)
+          )
+          .build()
 
         running(application) {
           val request =
@@ -309,6 +322,12 @@ class CheckYourAnswersControllerSpec extends SpecBase with FileUploadFixtures wi
 
           status(result) mustEqual SEE_OTHER
           redirectLocation(result).value mustEqual YourFileWillNotBeSavedController.onPageLoad().url
+
+          val captor = ArgumentCaptor.forClass(classOf[UserAnswers])
+          verify(answerPersistenceService).save(captor.capture())(any[HeaderCarrier])
+          completeUserAnswers.fileUploadReference mustBe defined
+          captor.getValue.fileUploadReference mustBe None
+          captor.getValue.data mustEqual completeUserAnswers.data
 
           verify(mockSessionRepository).clear(eqTo(completeUserAnswers.userId))
           verify(mockRepository, never()).findDocumentByReference(anyString())
