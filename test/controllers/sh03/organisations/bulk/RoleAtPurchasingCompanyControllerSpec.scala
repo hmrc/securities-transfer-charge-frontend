@@ -334,7 +334,7 @@ class RoleAtPurchasingCompanyControllerSpec extends SpecBase with MockitoSugar {
         }
       }
 
-      "must remove the role, clear the session and redirect to the dashboard with Save and return to dashboard" in {
+      "must remove the role, clear the fileUploadReference and the session and redirect to the dashboard with Save and return to dashboard" in {
 
         val mockAnswerPersistenceService = mock[AnswerPersistenceService]
         when(mockAnswerPersistenceService.save(any[UserAnswers])(any[HeaderCarrier])).thenReturn(Future.unit)
@@ -362,7 +362,7 @@ class RoleAtPurchasingCompanyControllerSpec extends SpecBase with MockitoSugar {
 
           val saved = savedAnswers(mockAnswerPersistenceService)
           saved.get(BulkRoleAtPurchasingCompanyPage) mustBe None
-          saved.fileUploadReference mustBe Some(testReference)
+          saved.fileUploadReference mustBe None
           saved.nextPage mustBe Some(routes.CannotSubmitFormErrorController.onPageLoad())
           verify(mockSessionRepository).clear(userAnswersWithRef.userId)
         }

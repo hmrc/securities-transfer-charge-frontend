@@ -320,7 +320,7 @@ class RoleAtPurchasingCompanyControllerSpec extends SpecBase {
         }
       }
 
-      "must remove the role, clear the session and redirect to the dashboard with Save and return to dashboard" in {
+      "must remove the role, clear the fileUploadReference and the session and redirect to the dashboard with Save and return to dashboard" in {
 
         val answerPersistenceService = mock[AnswerPersistenceService]
         when(answerPersistenceService.save(any[UserAnswers])(any[HeaderCarrier])).thenReturn(Future.unit)
@@ -348,7 +348,7 @@ class RoleAtPurchasingCompanyControllerSpec extends SpecBase {
 
           val saved = savedAnswers(answerPersistenceService)
           saved.get(BulkRoleAtPurchasingCompanyPage) mustBe None
-          saved.fileUploadReference mustBe Some(reference)
+          saved.fileUploadReference mustBe None
           saved.nextPage mustBe Some(routes.CannotSubmitFormErrorController.onPageLoad())
           verify(sessionRepository).clear(userAnswersWithRef.userId)
         }

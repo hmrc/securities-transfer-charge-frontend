@@ -62,6 +62,8 @@ case class UserAnswers(userId: UserId,
 
   def setFileUploadReference(reference: String): UserAnswers = this.copy(fileUploadReference = Some(reference))
 
+  def clearFileUploadReference(): UserAnswers = this.copy(fileUploadReference = None)
+
   def getFileUploadReference(): String = this.fileUploadReference.getOrElse(throw new IllegalStateException("fileUploadReference missing "))
 
   def remove[A](page: Settable[A]): Try[UserAnswers] = {
