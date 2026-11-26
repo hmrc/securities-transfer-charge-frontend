@@ -166,6 +166,7 @@ object TransferDetailsViewModel {
       Some(row("taxRate.checkYourAnswersLabel", taxRate)),
       // ETMP doesn't hold the purchasing-shares answer, so this shows the type of security as agreed with the team.
       Some(row(s"$affinityKey.purchasingShares.checkYourAnswersLabel", details.typeOfSecurity)),
+      Some(row(s"$affinityKey.otherSecuritiesType.checkYourAnswersLabel", details.typeOfSecurity)),
       Some(row("transferDetails.numberOfSecurities", CommonHelpers.formatWithCommas(details.numberOfShares))),
       Some(row(s"$affinityKey.amountPaidForSecurities.checkYourAnswersLabel", CurrencyFormatter.currencyFormat(details.considerationActual))),
       details.marketValue.map(v => row(s"$affinityKey.totalMarketValue.checkYourAnswersLabel", CurrencyFormatter.currencyFormat(v)))
