@@ -90,8 +90,7 @@ class RoleAtPurchasingCompanyController @Inject()(
 
             case Some(_) =>
               for {
-                answers        <- Future.fromTry(request.userAnswers.set(BulkRoleAtPurchasingCompanyPage, value))
-                updatedAnswers  = clearReferenceIfReturning(answers)
+                updatedAnswers <- Future.fromTry(request.userAnswers.set(BulkRoleAtPurchasingCompanyPage, value))
                 _              <- answerPersistenceService.save(updatedAnswers)
                 nextPage       <- navigator.nextPage(BulkRoleAtPurchasingCompanyPage, mode, updatedAnswers, isReturn(request))
               } yield Redirect(nextPage)

@@ -48,6 +48,10 @@ class Sh03AgentNavigator @Inject()(answerPersistenceService: AnswerPersistenceSe
   val defaultPage: Call = routes.JourneyRecoveryController.onPageLoad()
   val errorPages: List[Call] = List(defaultPage)
 
+  // A bulk upload is not kept on Save and return, so the draft must not point at it.
+  override protected def prepareForReturn(userAnswers: UserAnswers): UserAnswers =
+    userAnswers.clearFileUploadReference()
+
   val forwardRoutes: ForwardRoutes = new ForwardRoutes(answerPersistenceService, defaultPage, errorPages,appConfig)
   val backwardsRoutes: BackwardsRoutes = new BackwardsRoutes(defaultPage)
 
