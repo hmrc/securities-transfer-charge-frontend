@@ -95,10 +95,7 @@ class TransferDetailsViewSpec extends ViewBaseSpec {
         val doc = view(unpaidTransfer)
         doc.select(".tax-card h3").text mustBe messages("transferDetails.charges.heading")
         val payLinks = doc.select(".tax-card .govuk-summary-list__actions a").asScala.toSeq
-        payLinks.map(_.select(".govuk-visually-hidden").text) mustBe Seq(
-          messages("transferDetails.charges.pay.hidden.tax"),
-          messages("transferDetails.charges.pay.hidden.lateFilingPenalty")
-        )
+        payLinks.map(_.select(".govuk-visually-hidden").text) mustBe Seq("Pay tax due on transfer", "Pay late filing penalty")
       }
 
       "not show the view paid charges link when nothing has been paid" in {
@@ -109,7 +106,8 @@ class TransferDetailsViewSpec extends ViewBaseSpec {
     "when some charges are paid" - {
       "show the view paid charges link" in {
         val link = view(partPaidTransfer, transferNumber = 2).select("#view-paid-charges")
-        link.text mustBe messages("transferDetails.viewPaidCharges")
+        link.text mustBe s"${messages("transferDetails.viewPaidCharges")} ${messages("transferDetails.viewPaidCharges.hidden")}"
+        link.select(".govuk-visually-hidden").text mustBe "View paid charges"
         link.attr("href") mustBe routes.PaidChargesController.onPageLoad(subId, 2).url
       }
 
