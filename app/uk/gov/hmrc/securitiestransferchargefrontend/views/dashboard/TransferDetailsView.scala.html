@@ -63,7 +63,7 @@
 
                 @viewModel.paidChargesUrl.map { url =>
                     <p class="govuk-body govuk-!-margin-bottom-0">
-                        <a class="govuk-link" id="view-paid-charges" href="@url">@messages("transferDetails.viewPaidCharges")</a>
+                        <a class="govuk-link" id="view-paid-charges" href="@url">@messages("transferDetails.viewPaidCharges")<span class="govuk-visually-hidden"> @messages("transferDetails.viewPaidCharges.hidden")</span></a>
                     </p>
                 }
             </div>
