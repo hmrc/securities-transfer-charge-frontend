@@ -160,7 +160,7 @@ object TransferDetailsViewModel {
       Some(row(s"$affinityKey.connectedPersons.checkYourAnswersLabel", yesNo(details.isConnectedPartiesTransactions))),
       Some(row(s"$affinityKey.applyingForRelief.checkYourAnswersLabel", yesNo(relief.isDefined))),
       relief.map(row("whatReliefAreYouApplyingFor.checkYourAnswersLabel", _)),
-      Some(row("transferDetails.businessName", details.companyName)),
+      Some(row(s"$affinityKey.transferDetails.businessName", details.companyName)),
       details.companyRegistrationNumber.filter(_.trim.nonEmpty).map(row("transferDetails.crn", _)),
       Some(row(s"$affinityKey.chargingPoint.checkYourAnswersLabel", formatDate(details.originalChargingPoint))),
       Some(row("taxRate.checkYourAnswersLabel", taxRate)),
