@@ -538,6 +538,20 @@ class TransferDetailsViewModelSpec extends SpecBase with GuiceOneAppPerSuite {
         }
       }
 
+      "show the company details under buyer details, not your details, for agents" in {
+        val model = build(transferWith(tax()), transaction = sh03Transaction, affinityKey = "agent", declareeName = Some("James White"))
+        model.sections.map(_.heading) mustBe Seq(
+          messages("transferDetails.buyer.heading"),
+          messages("transferDetails.transfer.heading"),
+          messages("transferDetails.declaration.heading")
+        )
+        keys(section(model, "transferDetails.buyer.heading")) mustBe Seq(
+          "agent.sh03.companyDetails.companyName.label",
+          "agent.sh03.companyDetails.crn.label",
+          "agent.sh03.companyDetails.isPlc.label"
+        ).map(messages(_))
+      }
+
       "show the declaration role with the agent wording for agents" in {
         val list = section(
           build(transferWith(tax()), transaction = sh03Transaction, affinityKey = "agent", declareeName = Some("James White")),

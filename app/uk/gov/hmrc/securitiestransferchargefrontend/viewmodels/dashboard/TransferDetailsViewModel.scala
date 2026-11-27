@@ -207,7 +207,7 @@ object TransferDetailsViewModel {
   }
 
   // Business SH03 sections, grouped as on the business SH03 check your answers page.
-  private def sh03Sections(transaction: ViewTransferResponse, affinityKey: String)(implicit messages: Messages): Seq[TransferDetailsSection] = {
+  private def sh03Sections(transaction: ViewTransferResponse, isAgent: Boolean, affinityKey: String)(implicit messages: Messages): Seq[TransferDetailsSection] = {
     val details = transaction.transactionDetails
     val relief = details.reliefClaimedName.filter(_.trim.nonEmpty)
     val reason = details.reasonForPurchase
@@ -240,7 +240,11 @@ object TransferDetailsViewModel {
     ).flatten
 
     Seq(
-      TransferDetailsSection(messages("transferDetails.yourDetails.heading"), SummaryList(rows = yourDetails)),
+      // An agent is not the buyer, so the company details are the buyer's.
+      TransferDetailsSection(
+        messages(if (isAgent) "transferDetails.buyer.heading" else "transferDetails.yourDetails.heading"),
+        SummaryList(rows = yourDetails)
+      ),
       TransferDetailsSection(messages("transferDetails.transfer.heading"), SummaryList(rows = transferDetails)),
       TransferDetailsSection(messages("transferDetails.declaration.heading"), SummaryList(rows = declarationRows))
     )
@@ -271,7 +275,7 @@ object TransferDetailsViewModel {
       paidChargesUrl    = Option.when(anyPaid)(dashboardRoutes.PaidChargesController.onPageLoad(submissionId, transferNumber).url),
       referenceList     = referenceList(submission, transfer),
       sections          = submission.submissionType match {
-        case TransferType.SH03 => sh03Sections(transaction, affinityKey)
+        case TransferType.SH03 => sh03Sections(transaction, isAgent, affinityKey)
         case _                 => stfSections(transaction, isAgent, affinityKey)
       }
     )
