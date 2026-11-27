@@ -14,11 +14,23 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.securitiestransferchargefrontend.services.fileupload
+package base.stubs
 
-object StcReliefOptions {
+import uk.gov.hmrc.http.HeaderCarrier
+import uk.gov.hmrc.securitiestransferchargefrontend.models.Relief
+import uk.gov.hmrc.securitiestransferchargefrontend.services.ReliefsService
+import uk.gov.hmrc.securitiestransferchargefrontend.services.fileupload.ReliefNames
 
-  val allowedValues: Set[String] = Set(
+import scala.concurrent.Future
+
+/** Supplies a fixed list of reliefs, so tests don't need Mongo or the submissions service. */
+class StubReliefsService(reliefs: Seq[Relief] = StubReliefsService.reliefs) extends ReliefsService {
+  override def getReliefs()(implicit hc: HeaderCarrier): Future[Seq[Relief]] = Future.successful(reliefs)
+}
+
+object StubReliefsService {
+  // The reliefs the frontend used before they came from the submissions service.
+  val reliefs: Seq[Relief] = Seq(
     "Charities Relief",
     "Demutualisation of Insurance Companies",
     "Financial Institutions in Resolution Exemption",
@@ -34,14 +46,8 @@ object StcReliefOptions {
     "Share Incentive Plans",
     "Stock borrowing and repurchase arrangements",
     "UK Listing Relief"
-  )
+  ).map(Relief(_, 100))
 
-  private val normalisedAllowedValues: Set[String] =
-    allowedValues.map(normalise)
-
-  def isAllowed(value: String): Boolean =
-    normalisedAllowedValues.contains(normalise(value))
-
-  private def normalise(value: String): String =
-    value.trim.toLowerCase
+  // In the form the upload validator expects: see ReliefNames.from.
+  val names: Set[String] = ReliefNames.from(reliefs)
 }

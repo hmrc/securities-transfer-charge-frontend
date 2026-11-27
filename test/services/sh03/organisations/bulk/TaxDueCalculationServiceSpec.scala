@@ -22,17 +22,17 @@ import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpec
 import org.scalatestplus.mockito.MockitoSugar.mock
 import uk.gov.hmrc.securitiestransferchargefrontend.config.FrontendAppConfig
-import uk.gov.hmrc.securitiestransferchargefrontend.models.{Relief, ReliefsDataSource}
+import uk.gov.hmrc.securitiestransferchargefrontend.models.Relief
 import uk.gov.hmrc.securitiestransferchargefrontend.services.sh03.bulk.TaxDueCalculationService
 
 class TaxDueCalculationServiceSpec extends AnyWordSpec with Matchers with FileUploadFixtures {
 
-  private val mockReliefsDataSource: ReliefsDataSource = mock[ReliefsDataSource]
+  private val noReliefs: Seq[Relief] = Seq.empty
   private val mockAppConfig: FrontendAppConfig = mock[FrontendAppConfig]
 
   when(mockAppConfig.taxRateSH03).thenReturn(BigDecimal("0.005"))
 
-  private val service = new TaxDueCalculationService(mockReliefsDataSource, mockAppConfig)
+  private val service = new TaxDueCalculationService(mockAppConfig)
 
   "TaxDueCalculationService.calculateTaxDue" should {
 
@@ -44,7 +44,7 @@ class TaxDueCalculationServiceSpec extends AnyWordSpec with Matchers with FileUp
         whatReliefAreYouApplyingFor = None
       )
 
-      service.calculateTaxDue(row) shouldBe BigDecimal("60.00")
+      service.calculateTaxDue(row, noReliefs) shouldBe BigDecimal("60.00")
     }
 
     "calculate tax using the amount paid when it is higher than the market value" in {
@@ -55,7 +55,7 @@ class TaxDueCalculationServiceSpec extends AnyWordSpec with Matchers with FileUp
         whatReliefAreYouApplyingFor = None
       )
 
-      service.calculateTaxDue(row) shouldBe BigDecimal("60.00")
+      service.calculateTaxDue(row, noReliefs) shouldBe BigDecimal("60.00")
     }
 
     "calculate tax without relief when relief is not being applied for" in {
@@ -66,12 +66,12 @@ class TaxDueCalculationServiceSpec extends AnyWordSpec with Matchers with FileUp
         whatReliefAreYouApplyingFor = Some("Charity")
       )
 
-      service.calculateTaxDue(row) shouldBe BigDecimal("60.00")
+      service.calculateTaxDue(row, noReliefs) shouldBe BigDecimal("60.00")
     }
 
     "apply the correct relief percentage when relief is being applied for" in {
       val relief = Relief(name = "Charity", rate = 50)
-      when(mockReliefsDataSource.reliefs).thenReturn(Seq(relief))
+      val reliefs: Seq[Relief] = Seq(relief)
 
       val row = parsedStcRow(4).copy(
         amountPaidForSecurities = Some("10000"),
@@ -80,12 +80,12 @@ class TaxDueCalculationServiceSpec extends AnyWordSpec with Matchers with FileUp
         whatReliefAreYouApplyingFor = Some("Charity")
       )
 
-      service.calculateTaxDue(row) shouldBe BigDecimal("30.00")
+      service.calculateTaxDue(row, reliefs) shouldBe BigDecimal("30.00")
     }
 
     "return the full tax amount when the relief name is not found" in {
       val relief = Relief(name = "test relief", rate = 50)
-      when(mockReliefsDataSource.reliefs).thenReturn(Seq(relief))
+      val reliefs: Seq[Relief] = Seq(relief)
 
       val row = parsedStcRow(5).copy(
         amountPaidForSecurities = Some("10000"),
@@ -94,7 +94,7 @@ class TaxDueCalculationServiceSpec extends AnyWordSpec with Matchers with FileUp
         whatReliefAreYouApplyingFor = Some("Unknown Relief")
       )
 
-      service.calculateTaxDue(row) shouldBe BigDecimal("60.00")
+      service.calculateTaxDue(row, reliefs) shouldBe BigDecimal("60.00")
     }
 
     "return the full tax amount when not applying for a specific relief (whatReliefAreYouApplyingFor is None)" in {
@@ -105,7 +105,7 @@ class TaxDueCalculationServiceSpec extends AnyWordSpec with Matchers with FileUp
         whatReliefAreYouApplyingFor = None
       )
 
-      service.calculateTaxDue(row) shouldBe BigDecimal("60.00")
+      service.calculateTaxDue(row, noReliefs) shouldBe BigDecimal("60.00")
     }
 
     "round the calculated tax to two decimal places" in {
@@ -116,7 +116,7 @@ class TaxDueCalculationServiceSpec extends AnyWordSpec with Matchers with FileUp
         whatReliefAreYouApplyingFor = None
       )
 
-      service.calculateTaxDue(row) shouldBe BigDecimal("50.01")
+      service.calculateTaxDue(row, noReliefs) shouldBe BigDecimal("50.01")
     }
 
     "round half up when the third decimal place is 5 or greater" in {
@@ -127,7 +127,7 @@ class TaxDueCalculationServiceSpec extends AnyWordSpec with Matchers with FileUp
         whatReliefAreYouApplyingFor = None
       )
 
-      service.calculateTaxDue(row) shouldBe BigDecimal("50.03")
+      service.calculateTaxDue(row, noReliefs) shouldBe BigDecimal("50.03")
     }
 
     "return 0.00 when both amount paid and total market value are missing" in {
@@ -138,7 +138,7 @@ class TaxDueCalculationServiceSpec extends AnyWordSpec with Matchers with FileUp
         whatReliefAreYouApplyingFor = None
       )
 
-      service.calculateTaxDue(row) shouldBe BigDecimal("0.00")
+      service.calculateTaxDue(row, noReliefs) shouldBe BigDecimal("0.00")
     }
 
     "return 0.00 when invalid alphanumeric characters are passed in the amount fields" in {
@@ -149,7 +149,7 @@ class TaxDueCalculationServiceSpec extends AnyWordSpec with Matchers with FileUp
         whatReliefAreYouApplyingFor = None
       )
 
-      service.calculateTaxDue(row) shouldBe BigDecimal("0.00")
+      service.calculateTaxDue(row, noReliefs) shouldBe BigDecimal("0.00")
     }
   }
 

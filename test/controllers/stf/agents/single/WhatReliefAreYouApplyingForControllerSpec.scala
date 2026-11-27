@@ -16,6 +16,7 @@
 
 package controllers.stf.agents.single
 
+import base.stubs.StubReliefsService
 import base.SpecBase
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.when
@@ -29,7 +30,7 @@ import uk.gov.hmrc.securitiestransferchargefrontend.clients.SaveAndReturnClient
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.routes
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.agents.single.routes as agentSingleRoutes
 import uk.gov.hmrc.securitiestransferchargefrontend.forms.stf.agents.WhatReliefAreYouApplyingForFormProvider
-import uk.gov.hmrc.securitiestransferchargefrontend.models.{NormalMode, ReliefsDataSource, UserAnswers}
+import uk.gov.hmrc.securitiestransferchargefrontend.models.{NormalMode, UserAnswers}
 import uk.gov.hmrc.securitiestransferchargefrontend.navigation.Navigator
 import uk.gov.hmrc.securitiestransferchargefrontend.pages.stf.single.WhatReliefAreYouApplyingForPage
 import uk.gov.hmrc.securitiestransferchargefrontend.views.html.stf.agents.single.WhatReliefAreYouApplyingForView
@@ -59,10 +60,8 @@ class WhatReliefAreYouApplyingForControllerSpec extends SpecBase with MockitoSug
 
         val view = application.injector.instanceOf[WhatReliefAreYouApplyingForView]
 
-        val reliefsDataSource = application.injector.instanceOf[ReliefsDataSource]
-
         status(result) mustEqual OK
-        contentAsString(result) mustEqual view(form, NormalMode,reliefsDataSource.reliefs, testBackLinkRoute)(request, messages(application)).toString
+        contentAsString(result) mustEqual view(form, NormalMode,StubReliefsService.reliefs, testBackLinkRoute)(request, messages(application)).toString
       }
     }
 
@@ -79,12 +78,10 @@ class WhatReliefAreYouApplyingForControllerSpec extends SpecBase with MockitoSug
 
         val view = application.injector.instanceOf[WhatReliefAreYouApplyingForView]
 
-        val reliefsDataSource = application.injector.instanceOf[ReliefsDataSource]
-
         val result = route(application, request).value
 
         status(result) mustEqual OK
-        contentAsString(result) mustEqual view(form.fill("answer"), NormalMode,reliefsDataSource.reliefs, testBackLinkRoute)(request, messages(application)).toString
+        contentAsString(result) mustEqual view(form.fill("answer"), NormalMode,StubReliefsService.reliefs, testBackLinkRoute)(request, messages(application)).toString
       }
     }
 
@@ -123,13 +120,12 @@ class WhatReliefAreYouApplyingForControllerSpec extends SpecBase with MockitoSug
         val boundForm = form.bind(Map("reliefs" -> ""))
 
         val view = application.injector.instanceOf[WhatReliefAreYouApplyingForView]
-        val reliefsDataSource = application.injector.instanceOf[ReliefsDataSource]
 
 
         val result = route(application, request).value
 
         status(result) mustEqual BAD_REQUEST
-        contentAsString(result) mustEqual view(boundForm, NormalMode,reliefsDataSource.reliefs, testBackLinkRoute)(request, messages(application)).toString
+        contentAsString(result) mustEqual view(boundForm, NormalMode,StubReliefsService.reliefs, testBackLinkRoute)(request, messages(application)).toString
       }
     }
 

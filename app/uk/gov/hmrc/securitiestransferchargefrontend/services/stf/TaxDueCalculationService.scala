@@ -16,7 +16,7 @@
 
 package uk.gov.hmrc.securitiestransferchargefrontend.services.stf
 
-import uk.gov.hmrc.securitiestransferchargefrontend.models.{ReliefsDataSource, UserAnswers}
+import uk.gov.hmrc.securitiestransferchargefrontend.models.{Relief, UserAnswers}
 import uk.gov.hmrc.securitiestransferchargefrontend.models.stf.TaxRate
 import uk.gov.hmrc.securitiestransferchargefrontend.pages.stf.single._
 
@@ -25,14 +25,14 @@ import javax.inject.{Inject, Singleton}
 import scala.math.BigDecimal.RoundingMode
 
 @Singleton
-class TaxDueCalculationService @Inject()(reliefsDataSource: ReliefsDataSource) {
+class TaxDueCalculationService @Inject()() {
 
   private def getTaxRateValue(taxRate: TaxRate): BigDecimal = taxRate match {
     case TaxRate.HalfPercent => BigDecimal("0.005")
     case TaxRate.OneAndHalfPercent => BigDecimal("0.015")
   }
 
-  def calculateTaxDue(userAnswers: UserAnswers): Option[BigDecimal] = {
+  def calculateTaxDue(userAnswers: UserAnswers, reliefs: Seq[Relief]): Option[BigDecimal] = {
     for {
       amountPaidValue <- getAmountPaid(userAnswers)
       marketValue <- getMarketValue(userAnswers)
@@ -40,7 +40,7 @@ class TaxDueCalculationService @Inject()(reliefsDataSource: ReliefsDataSource) {
     } yield {
       val higherValue = amountPaidValue.max(marketValue)
       val taxBeforeRelief = higherValue * getTaxRateValue(taxRate)
-      val reliefPercentage = getReliefPercentage(userAnswers).getOrElse(BigDecimal(0))
+      val reliefPercentage = getReliefPercentage(userAnswers, reliefs).getOrElse(BigDecimal(0))
       val reliefAmount = taxBeforeRelief * reliefPercentage
       val taxAfterRelief = (taxBeforeRelief - reliefAmount).max(BigDecimal(0))
       
@@ -62,12 +62,12 @@ class TaxDueCalculationService @Inject()(reliefsDataSource: ReliefsDataSource) {
     Some(marketValueOfShares.max(totalMarketValueOfSecurities))
   }
 
-  private def getReliefPercentage(userAnswers: UserAnswers): Option[BigDecimal] = {
+  private def getReliefPercentage(userAnswers: UserAnswers, reliefs: Seq[Relief]): Option[BigDecimal] = {
     for {
       applyingForRelief <- userAnswers.get(ApplyingForReliefPage)
       if applyingForRelief
       reliefName <- userAnswers.get(WhatReliefAreYouApplyingForPage)
-      reliefData <- reliefsDataSource.reliefs.find(_.name == reliefName)
+      reliefData <- reliefs.find(_.name == reliefName)
     } yield BigDecimal(reliefData.rate) / 100
   }
 

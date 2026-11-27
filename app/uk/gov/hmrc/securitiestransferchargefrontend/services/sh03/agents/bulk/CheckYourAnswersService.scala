@@ -26,6 +26,8 @@ import uk.gov.hmrc.securitiestransferchargefrontend.models.stf.fileupload.Parsed
 import uk.gov.hmrc.securitiestransferchargefrontend.services.sh03.TaxDueCalculationService
 import uk.gov.hmrc.securitiestransferchargefrontend.viewmodels.sh03.agents.bulk.CheckYourAnswersViewModel
 
+import uk.gov.hmrc.securitiestransferchargefrontend.models.Relief
+
 import java.time.LocalDate
 import javax.inject.{Inject, Singleton}
 
@@ -34,8 +36,8 @@ class CheckYourAnswersService @Inject()(
                                          taxDueCalculationService: TaxDueCalculationService
                                        ) {
 
-  def buildViewModel(userAnswers: UserAnswers, doc: ParsedStcRowsDocument)(implicit messages: Messages): CheckYourAnswersViewModel = {
-    val taxDueSummaryRows = taxDueCalculationService.buildTransferRows(doc.rows)
+  def buildViewModel(userAnswers: UserAnswers, doc: ParsedStcRowsDocument, reliefs: Seq[Relief])(implicit messages: Messages): CheckYourAnswersViewModel = {
+    val taxDueSummaryRows = taxDueCalculationService.buildTransferRows(doc.rows, reliefs)
     val taxDue = taxDueSummaryRows.map(_.taxDue).sum
     val formattedTaxDue = CurrencyFormatter.currencyFormat(taxDue)
     val taxDueDate = taxDueCalculationService.calculatePaymentDueDate(doc.rows)
@@ -58,8 +60,8 @@ class CheckYourAnswersService @Inject()(
     
   }
   
-  def totalTaxDue(doc: ParsedStcRowsDocument): BigDecimal =
-    doc.rows.flatMap(taxDueCalculationService.calculateTaxDueForRow).sum
+  def totalTaxDue(doc: ParsedStcRowsDocument, reliefs: Seq[Relief]): BigDecimal =
+    doc.rows.flatMap(taxDueCalculationService.calculateTaxDueForRow(_, reliefs)).sum
 
   def paymentDueBy(doc: ParsedStcRowsDocument): LocalDate =
     taxDueCalculationService.calculatePaymentDueDate(doc.rows)

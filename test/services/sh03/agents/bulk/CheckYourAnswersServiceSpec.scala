@@ -31,6 +31,7 @@ import uk.gov.hmrc.securitiestransferchargefrontend.services.sh03.TaxDueCalculat
 import uk.gov.hmrc.securitiestransferchargefrontend.viewmodels.sh03.agents.bulk.{CheckYourAnswersViewModel, TransferRow}
 
 import java.time.LocalDate
+import base.stubs.StubReliefsService
 
 class CheckYourAnswersServiceSpec extends SpecBase with FileUploadFixtures {
 
@@ -75,13 +76,13 @@ class CheckYourAnswersServiceSpec extends SpecBase with FileUploadFixtures {
         TransferRow(amount = BigDecimal(50000), reason = "Cancellation", consideration = BigDecimal(20000), taxDue = BigDecimal(100)),
       )
 
-      when(taxDueCalculationService.buildTransferRows(document.rows))
+      when(taxDueCalculationService.buildTransferRows(document.rows, StubReliefsService.reliefs))
         .thenReturn(transferRows)
 
       when(taxDueCalculationService.calculatePaymentDueDate(document.rows))
         .thenReturn(taxDueDate)
 
-      val result = service.buildViewModel(emptyUserAnswers, document)
+      val result = service.buildViewModel(emptyUserAnswers, document, StubReliefsService.reliefs)
 
       result shouldBe CheckYourAnswersViewModel.agentBulkSummaryLists(
         summaryLists, transferRows, "£150", "15 June 2025", declarationList)
@@ -96,10 +97,10 @@ class CheckYourAnswersServiceSpec extends SpecBase with FileUploadFixtures {
         TransferRow(amount = BigDecimal(50000), reason = "Cancellation", consideration = BigDecimal(20000), taxDue = BigDecimal(25.75)),
       )
 
-      when(taxDueCalculationService.buildTransferRows(document.rows)).thenReturn(transferRows)
+      when(taxDueCalculationService.buildTransferRows(document.rows, StubReliefsService.reliefs)).thenReturn(transferRows)
       when(taxDueCalculationService.calculatePaymentDueDate(document.rows)).thenReturn(taxDueDate)
 
-      val result = service.buildViewModel(emptyUserAnswers, document)
+      val result = service.buildViewModel(emptyUserAnswers, document, StubReliefsService.reliefs)
 
       result.taxDueFormatted shouldBe "£38.25"
     }

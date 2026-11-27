@@ -48,6 +48,7 @@ import uk.gov.hmrc.securitiestransferchargefrontend.views.html.stf.individuals.b
 
 import java.time.LocalDate
 import scala.concurrent.Future
+import base.stubs.StubReliefsService
 
 class CheckYourAnswersControllerSpec extends SpecBase with MockitoSugar with FileUploadFixtures with BeforeAndAfterEach {
 
@@ -150,7 +151,7 @@ class CheckYourAnswersControllerSpec extends SpecBase with MockitoSugar with Fil
 
     "onPageLoad" - {
       "must return OK and the correct view for a GET when a document exists" in {
-        when(mockCyaService.buildViewModel(any())(any[Lang])).thenReturn(viewModel)
+        when(mockCyaService.buildViewModel(any(), any())(any[Lang])).thenReturn(viewModel)
         when(mockRepository.findDocumentByReference(reference)).thenReturn(Future.successful(Some(parsedStcRowsDocument)))
 
         val application = pageLoadApplication(userAnswers = None)
@@ -166,7 +167,7 @@ class CheckYourAnswersControllerSpec extends SpecBase with MockitoSugar with Fil
       }
 
       "must create and save user answers with a new submission ID when there are none, and store the CYA HTML against it" in {
-        when(mockCyaService.buildViewModel(any())(any[Lang])).thenReturn(viewModel)
+        when(mockCyaService.buildViewModel(any(), any())(any[Lang])).thenReturn(viewModel)
         when(mockRepository.findDocumentByReference(reference)).thenReturn(Future.successful(Some(parsedStcRowsDocument)))
 
         val application = pageLoadApplication(userAnswers = None)
@@ -188,7 +189,7 @@ class CheckYourAnswersControllerSpec extends SpecBase with MockitoSugar with Fil
       }
 
       "must not generate a new submissionId if user answers are already present" in {
-        when(mockCyaService.buildViewModel(any())(any[Lang])).thenReturn(viewModel)
+        when(mockCyaService.buildViewModel(any(), any())(any[Lang])).thenReturn(viewModel)
         when(mockRepository.findDocumentByReference(reference)).thenReturn(Future.successful(Some(parsedStcRowsDocument)))
 
 
@@ -228,7 +229,7 @@ class CheckYourAnswersControllerSpec extends SpecBase with MockitoSugar with Fil
       "must save the bulk confirmation details against the submission ID from page load, start the STF submission and redirect to the next page" in {
         when(mockRepository.findDocumentByReference(reference)).thenReturn(Future.successful(Some(parsedStcRowsDocument)))
         when(mockCyaService.paymentDueBy(parsedStcRowsDocument)).thenReturn(testPaymentDueBy)
-        when(mockCyaService.totalTaxDue(parsedStcRowsDocument)).thenReturn(testTaxDue)
+        when(mockCyaService.totalTaxDue(parsedStcRowsDocument, StubReliefsService.reliefs)).thenReturn(testTaxDue)
         when(mockNavigator.nextPage(any(), any(), any(), anyBoolean())(any())).thenReturn(Future.successful(testNextPage))
         when(mockTransactionSubmissionService.submitBulkStf(any())(using any[StcDataRequest[?]]())).thenReturn(Future.successful(true))
 

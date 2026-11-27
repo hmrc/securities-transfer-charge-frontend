@@ -16,16 +16,16 @@
 
 package uk.gov.hmrc.securitiestransferchargefrontend.services.stf.bulk
 
-import uk.gov.hmrc.securitiestransferchargefrontend.models.ReliefsDataSource
+import uk.gov.hmrc.securitiestransferchargefrontend.models.Relief
 import uk.gov.hmrc.securitiestransferchargefrontend.models.stf.fileupload.ParsedStcRow
 
 import javax.inject.{Inject, Singleton}
 import scala.math.BigDecimal.RoundingMode
 
 @Singleton
-class TaxDueCalculationService @Inject()(reliefsDataSource: ReliefsDataSource) {
+class TaxDueCalculationService @Inject()() {
 
-  def calculateTaxDue(row: ParsedStcRow): Option[BigDecimal] = {
+  def calculateTaxDue(row: ParsedStcRow, reliefs: Seq[Relief]): Option[BigDecimal] = {
     for {
       amountPaidValue <- getAmountPaid(row)
       taxRate <- getTaxRate(row)
@@ -33,7 +33,7 @@ class TaxDueCalculationService @Inject()(reliefsDataSource: ReliefsDataSource) {
       val marketValue = getMarketValue(row)
       val higherValue = amountPaidValue.max(marketValue)
       val taxBeforeRelief = higherValue * taxRate
-      val reliefPercentage = getReliefPercentage(row)
+      val reliefPercentage = getReliefPercentage(row, reliefs)
       val reliefAmount = taxBeforeRelief * reliefPercentage
       val taxAfterRelief = (taxBeforeRelief - reliefAmount).max(BigDecimal(0))
 
@@ -52,10 +52,10 @@ class TaxDueCalculationService @Inject()(reliefsDataSource: ReliefsDataSource) {
     row.totalMarketValue.map(BigDecimal(_)).getOrElse(BigDecimal(0))
   }
 
-  private def getReliefPercentage(row: ParsedStcRow): BigDecimal = {
+  private def getReliefPercentage(row: ParsedStcRow, reliefs: Seq[Relief]): BigDecimal = {
     if (row.applyingForRelief.contains(true)) {
       row.whatReliefAreYouApplyingFor
-        .flatMap(value => reliefsDataSource.reliefs.find(_.name == value))
+        .flatMap(value => reliefs.find(_.name == value))
         .map(relief => BigDecimal(relief.rate) / 100)
         .getOrElse(BigDecimal(0))
     } else BigDecimal(0)

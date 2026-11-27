@@ -17,9 +17,8 @@
 package services.stf
 
 import base.SpecBase
-import org.mockito.Mockito.when
 import org.scalatestplus.mockito.MockitoSugar
-import uk.gov.hmrc.securitiestransferchargefrontend.models.{Relief, ReliefsDataSource}
+import uk.gov.hmrc.securitiestransferchargefrontend.models.Relief
 import uk.gov.hmrc.securitiestransferchargefrontend.models.stf.{DetailsOfThisTransfer, TaxRate}
 import uk.gov.hmrc.securitiestransferchargefrontend.pages.stf.single._
 import uk.gov.hmrc.securitiestransferchargefrontend.services.stf.TaxDueCalculationService
@@ -28,8 +27,8 @@ import java.time.LocalDate
 
 class TaxDueCalculationServiceSpec extends SpecBase with MockitoSugar {
 
-  val mockReliefsDataSource: ReliefsDataSource = mock[ReliefsDataSource]
-  val service = new TaxDueCalculationService(mockReliefsDataSource)
+  private val noReliefs: Seq[Relief] = Seq.empty
+  val service = new TaxDueCalculationService()
 
   "TaxDueCalculationService" - {
 
@@ -41,7 +40,7 @@ class TaxDueCalculationServiceSpec extends SpecBase with MockitoSugar {
           .set(TaxRatePage, TaxRate.HalfPercent).success.value
           .set(ApplyingForReliefPage, false).success.value
 
-        val result = service.calculateTaxDue(userAnswers)
+        val result = service.calculateTaxDue(userAnswers, noReliefs)
 
         result mustBe Some(BigDecimal("50.00"))
       }
@@ -53,7 +52,7 @@ class TaxDueCalculationServiceSpec extends SpecBase with MockitoSugar {
           .set(TaxRatePage, TaxRate.HalfPercent).success.value
           .set(ApplyingForReliefPage, false).success.value
 
-        val result = service.calculateTaxDue(userAnswers)
+        val result = service.calculateTaxDue(userAnswers, noReliefs)
 
         result mustBe Some(BigDecimal("50.00"))
       }
@@ -65,7 +64,7 @@ class TaxDueCalculationServiceSpec extends SpecBase with MockitoSugar {
           .set(TaxRatePage, TaxRate.OneAndHalfPercent).success.value
           .set(ApplyingForReliefPage, false).success.value
 
-        val result = service.calculateTaxDue(userAnswers)
+        val result = service.calculateTaxDue(userAnswers, noReliefs)
 
         result mustBe Some(BigDecimal("150.00"))
       }
@@ -77,7 +76,7 @@ class TaxDueCalculationServiceSpec extends SpecBase with MockitoSugar {
           .set(TaxRatePage, TaxRate.HalfPercent).success.value
           .set(ApplyingForReliefPage, false).success.value
 
-        val result = service.calculateTaxDue(userAnswers)
+        val result = service.calculateTaxDue(userAnswers, noReliefs)
 
         result mustBe Some(BigDecimal("25.00"))
       }
@@ -89,14 +88,14 @@ class TaxDueCalculationServiceSpec extends SpecBase with MockitoSugar {
           .set(TaxRatePage, TaxRate.HalfPercent).success.value
           .set(ApplyingForReliefPage, false).success.value
 
-        val result = service.calculateTaxDue(userAnswers)
+        val result = service.calculateTaxDue(userAnswers, noReliefs)
 
         result mustBe Some(BigDecimal("25.00"))
       }
 
       "must apply relief when relief is selected" in {
         val testRelief = Relief("Test Relief", 50)
-        when(mockReliefsDataSource.reliefs).thenReturn(Seq(testRelief))
+        val reliefs: Seq[Relief] = Seq(testRelief)
 
         val detailsOfTransfer = DetailsOfThisTransfer(100, "Ordinary", BigDecimal("10000"), Some(BigDecimal("10000")))
         val userAnswers = emptyUserAnswers
@@ -105,14 +104,14 @@ class TaxDueCalculationServiceSpec extends SpecBase with MockitoSugar {
           .set(ApplyingForReliefPage, true).success.value
           .set(WhatReliefAreYouApplyingForPage, "Test Relief").success.value
 
-        val result = service.calculateTaxDue(userAnswers)
+        val result = service.calculateTaxDue(userAnswers, reliefs)
 
         result mustBe Some(BigDecimal("25.00"))
       }
 
       "must apply 100% relief correctly" in {
         val testRelief = Relief("Full Relief", 100)
-        when(mockReliefsDataSource.reliefs).thenReturn(Seq(testRelief))
+        val reliefs: Seq[Relief] = Seq(testRelief)
 
         val detailsOfTransfer = DetailsOfThisTransfer(100, "Ordinary", BigDecimal("10000"), Some(BigDecimal("10000")))
         val userAnswers = emptyUserAnswers
@@ -121,14 +120,14 @@ class TaxDueCalculationServiceSpec extends SpecBase with MockitoSugar {
           .set(ApplyingForReliefPage, true).success.value
           .set(WhatReliefAreYouApplyingForPage, "Full Relief").success.value
 
-        val result = service.calculateTaxDue(userAnswers)
+        val result = service.calculateTaxDue(userAnswers, reliefs)
 
         result mustBe Some(BigDecimal("0.00"))
       }
 
       "must not apply negative tax" in {
         val testRelief = Relief("Over Relief", 150)
-        when(mockReliefsDataSource.reliefs).thenReturn(Seq(testRelief))
+        val reliefs: Seq[Relief] = Seq(testRelief)
 
         val detailsOfTransfer = DetailsOfThisTransfer(100, "Ordinary", BigDecimal("10000"), Some(BigDecimal("10000")))
         val userAnswers = emptyUserAnswers
@@ -137,7 +136,7 @@ class TaxDueCalculationServiceSpec extends SpecBase with MockitoSugar {
           .set(ApplyingForReliefPage, true).success.value
           .set(WhatReliefAreYouApplyingForPage, "Over Relief").success.value
 
-        val result = service.calculateTaxDue(userAnswers)
+        val result = service.calculateTaxDue(userAnswers, reliefs)
 
         result mustBe Some(BigDecimal("0.00"))
       }
@@ -145,7 +144,7 @@ class TaxDueCalculationServiceSpec extends SpecBase with MockitoSugar {
       "must return None when required data is missing" in {
         val userAnswers = emptyUserAnswers
 
-        val result = service.calculateTaxDue(userAnswers)
+        val result = service.calculateTaxDue(userAnswers, noReliefs)
 
         result mustBe None
       }
@@ -157,7 +156,7 @@ class TaxDueCalculationServiceSpec extends SpecBase with MockitoSugar {
           .set(TaxRatePage, TaxRate.HalfPercent).success.value
           .set(ApplyingForReliefPage, false).success.value
 
-        val result = service.calculateTaxDue(userAnswers)
+        val result = service.calculateTaxDue(userAnswers, noReliefs)
 
         result mustBe Some(BigDecimal("50.01"))
       }

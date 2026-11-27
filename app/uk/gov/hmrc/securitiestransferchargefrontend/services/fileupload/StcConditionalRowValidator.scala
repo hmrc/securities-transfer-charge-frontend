@@ -37,28 +37,30 @@ class StcConditionalRowValidator @Inject()(
                 row: ParsedStcRow,
                 template: StcTemplate,
                 affinityKey: String,
-                journeyType: JourneyType
+                journeyType: JourneyType,
+                reliefNames: Set[String]
               )(implicit cols: ColumnIndexBuilder): Seq[StcRowValidationError] = {
 
     template match {
 
       case StcTemplate.STF =>
-        validateSTF(row, affinityKey, journeyType)
+        validateSTF(row, affinityKey, journeyType, reliefNames)
 
       case StcTemplate.SH03 =>
-        validateSH03(row, affinityKey, journeyType)
+        validateSH03(row, affinityKey, journeyType, reliefNames)
 
       case StcTemplate.STFAgent =>
-        validateAgentSTF(row, affinityKey, journeyType)
+        validateAgentSTF(row, affinityKey, journeyType, reliefNames)
     }
   }
 
   def validateAgentSTF(
                         row: ParsedStcRow,
                         affinityKey: String,
-                        journeyType: JourneyType
+                        journeyType: JourneyType,
+                        reliefNames: Set[String]
                       )(implicit cols: ColumnIndexBuilder): Seq[StcRowValidationError] =
-    validateReliefType(row, affinityKey) ++
+    validateReliefType(row, affinityKey, reliefNames) ++
       validateTypeOfSecurities(row, affinityKey) ++
       validateBuyerAddress(row) ++
       validateSellerAddress(row) ++
@@ -69,9 +71,10 @@ class StcConditionalRowValidator @Inject()(
   def validateSTF(
                    row: ParsedStcRow,
                    affinityKey: String,
-                   journeyType: JourneyType
+                   journeyType: JourneyType,
+                        reliefNames: Set[String]
                  )(implicit cols: ColumnIndexBuilder): Seq[StcRowValidationError] =
-    validateReliefType(row, affinityKey) ++
+    validateReliefType(row, affinityKey, reliefNames) ++
       validateTypeOfSecurities(row, affinityKey) ++
       validateSellerAddress(row) ++
       validateTotalMarketValue(row, affinityKey, journeyType) ++
@@ -80,9 +83,10 @@ class StcConditionalRowValidator @Inject()(
   def validateSH03(
                     row: ParsedStcRow,
                     affinityKey: String,
-                    journeyType: JourneyType
+                    journeyType: JourneyType,
+                        reliefNames: Set[String]
                   )(implicit cols: ColumnIndexBuilder): Seq[StcRowValidationError] =
-    validateReliefType(row, affinityKey) ++
+    validateReliefType(row, affinityKey, reliefNames) ++
       validateTotalMarketValue(row, affinityKey, journeyType) ++
       validatePurchasedForCancellation(row)
 
@@ -110,7 +114,8 @@ class StcConditionalRowValidator @Inject()(
 
   private def validateReliefType(
                                   row: ParsedStcRow,
-                                  affinityKey: String
+                                  affinityKey: String,
+                                  reliefNames: Set[String]
                                 )(implicit cols: ColumnIndexBuilder): Seq[StcRowValidationError] = {
 
     row.applyingForRelief match {
@@ -137,7 +142,7 @@ class StcConditionalRowValidator @Inject()(
               )
             )
 
-          case Some(value) if !StcReliefOptions.isAllowed(value) =>
+          case Some(value) if !ReliefNames.isAllowed(value, reliefNames) =>
             Seq(
               support.error(
                 row.rowNumber,

@@ -18,17 +18,16 @@ package services.stf.agents
 
 import base.SpecBase
 import org.scalatestplus.mockito.MockitoSugar
-import org.mockito.Mockito.when
 import uk.gov.hmrc.securitiestransferchargefrontend.models.stf.fileupload.{ParsedStcRow, ParsedValue}
-import uk.gov.hmrc.securitiestransferchargefrontend.models.{Relief, ReliefsDataSource}
+import uk.gov.hmrc.securitiestransferchargefrontend.models.Relief
 import uk.gov.hmrc.securitiestransferchargefrontend.services.stf.agents.TaxDueCalculationService
 
 import java.time.LocalDate
 
 class TaxDueCalculationServiceSpec extends SpecBase with MockitoSugar {
 
-  val mockReliefsDataSource: ReliefsDataSource = mock[ReliefsDataSource]
-  val service = new TaxDueCalculationService(mockReliefsDataSource)
+  private val noReliefs: Seq[Relief] = Seq.empty
+  val service = new TaxDueCalculationService()
   private val validRow: ParsedStcRow =
     ParsedStcRow(
       rowNumber = 3,
@@ -72,20 +71,20 @@ class TaxDueCalculationServiceSpec extends SpecBase with MockitoSugar {
     "calculateTaxDueForRow" - {
       "must calculate tax at 0.05% for shares when amount paid is higher" in {
 
-        val result = service.calculateTaxDueForRow(validRow)
+        val result = service.calculateTaxDueForRow(validRow, noReliefs)
         result mustBe Some(BigDecimal("50.00"))
       }
 
       "must calculate tax at 0.5% for shares when market value is higher" in {
         val anotherValidRow = validRow.copy(amountPaidForSecurities = Some("8000"), totalMarketValue = Some("10000"))
-        val result = service.calculateTaxDueForRow(anotherValidRow)
+        val result = service.calculateTaxDueForRow(anotherValidRow, noReliefs)
 
         result mustBe Some(BigDecimal("50.00"))
       }
 
       "must calculate tax at 1.5% for shares" in {
         val anotherValidRow = validRow.copy(taxRate = Some(BigDecimal("1.5")), amountPaidForSecurities = Some("10000"), totalMarketValue = Some("10000"))
-        val result = service.calculateTaxDueForRow(anotherValidRow)
+        val result = service.calculateTaxDueForRow(anotherValidRow, noReliefs)
 
         result mustBe Some(BigDecimal("150.00"))
       }
@@ -93,7 +92,7 @@ class TaxDueCalculationServiceSpec extends SpecBase with MockitoSugar {
       "must calculate tax for other securities when amount paid is higher" in {
         val anotherValidRow = validRow.copy(amountPaidForSecurities = Some("5000"), totalMarketValue = Some("4000"))
 
-        val result = service.calculateTaxDueForRow(anotherValidRow)
+        val result = service.calculateTaxDueForRow(anotherValidRow, noReliefs)
         result mustBe Some(BigDecimal("25.00"))
       }
 
@@ -101,8 +100,8 @@ class TaxDueCalculationServiceSpec extends SpecBase with MockitoSugar {
       "must apply relief when relief is selected" in {
         val anotherValidRow = validRow.copy(applyingForRelief = Some(true), whatReliefAreYouApplyingFor = Some("Test Relief"))
         val testRelief = Relief("Test Relief", 50)
-        when(mockReliefsDataSource.reliefs).thenReturn(Seq(testRelief))
-        val result = service.calculateTaxDueForRow(anotherValidRow)
+        val reliefs: Seq[Relief] = Seq(testRelief)
+        val result = service.calculateTaxDueForRow(anotherValidRow, reliefs)
 
         result mustBe Some(BigDecimal("25.00"))
       }
@@ -110,8 +109,8 @@ class TaxDueCalculationServiceSpec extends SpecBase with MockitoSugar {
       "must apply 100% relief correctly" in {
         val anotherValidRow = validRow.copy(applyingForRelief = Some(true), whatReliefAreYouApplyingFor = Some("Full Relief"))
         val testRelief = Relief("Full Relief", 100)
-        when(mockReliefsDataSource.reliefs).thenReturn(Seq(testRelief))
-        val result = service.calculateTaxDueForRow(anotherValidRow)
+        val reliefs: Seq[Relief] = Seq(testRelief)
+        val result = service.calculateTaxDueForRow(anotherValidRow, reliefs)
 
         result mustBe Some(BigDecimal("0.00"))
       }
@@ -119,23 +118,23 @@ class TaxDueCalculationServiceSpec extends SpecBase with MockitoSugar {
       "must not apply negative tax" in {
         val testRelief = Relief("Over Relief", 150)
         val anotherValidRow = validRow.copy(applyingForRelief = Some(true), whatReliefAreYouApplyingFor = Some("Over Relief"))
-        when(mockReliefsDataSource.reliefs).thenReturn(Seq(testRelief))
+        val reliefs: Seq[Relief] = Seq(testRelief)
 
-        val result = service.calculateTaxDueForRow(anotherValidRow)
+        val result = service.calculateTaxDueForRow(anotherValidRow, reliefs)
 
         result mustBe Some(BigDecimal("0.00"))
       }
 
       "must return None when required data is missing" in {
         val invalidRow = validRow.copy(amountPaidForSecurities = None, totalMarketValue = None, taxRate = None)
-        val result = service.calculateTaxDueForRow(invalidRow)
+        val result = service.calculateTaxDueForRow(invalidRow, noReliefs)
 
         result mustBe None
       }
 
       "must round to 2 decimal places correctly" in {
         val anotherValidRow = validRow.copy(amountPaidForSecurities = Some("10001"), totalMarketValue = Some("10001"))
-        val result = service.calculateTaxDueForRow(anotherValidRow)
+        val result = service.calculateTaxDueForRow(anotherValidRow, noReliefs)
 
         result mustBe Some(BigDecimal("50.01"))
       }

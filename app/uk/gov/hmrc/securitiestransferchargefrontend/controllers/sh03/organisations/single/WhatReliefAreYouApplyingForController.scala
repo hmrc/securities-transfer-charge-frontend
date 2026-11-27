@@ -22,10 +22,11 @@ import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.actions.*
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.stf.shared.SaveAndReturnButton.isReturn
 import uk.gov.hmrc.securitiestransferchargefrontend.forms.sh03.organisations.single.WhatReliefAreYouApplyingForFormProvider
-import uk.gov.hmrc.securitiestransferchargefrontend.models.{Mode, ReliefsDataSource, UserAnswers}
+import uk.gov.hmrc.securitiestransferchargefrontend.models.{Mode, UserAnswers}
 import uk.gov.hmrc.securitiestransferchargefrontend.navigation.Navigator
 import uk.gov.hmrc.securitiestransferchargefrontend.pages.sh03.WhatReliefAreYouApplyingForPage
 import uk.gov.hmrc.securitiestransferchargefrontend.views.html.sh03.organisations.single.WhatReliefAreYouApplyingForView
+import uk.gov.hmrc.securitiestransferchargefrontend.services.ReliefsService
 
 import javax.inject.{Inject, Named}
 import scala.concurrent.{ExecutionContext, Future}
@@ -38,7 +39,7 @@ class WhatReliefAreYouApplyingForController @Inject()(
                                                        requireData: StcDataRequiredAction,
                                                        formProvider: WhatReliefAreYouApplyingForFormProvider,
                                                        val controllerComponents: MessagesControllerComponents,
-                                                       reliefsDataSource: ReliefsDataSource,
+                                                       reliefsService: ReliefsService,
                                                        view: WhatReliefAreYouApplyingForView
                                     )(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport {
 
@@ -47,7 +48,7 @@ class WhatReliefAreYouApplyingForController @Inject()(
   lazy val backLinkCall: Mode => UserAnswers => Call =
     mode => userAnswers => navigator.previousPage(WhatReliefAreYouApplyingForPage, mode, userAnswers)
 
-  def onPageLoad(mode: Mode): Action[AnyContent] = (stcAuthEnrolled andThen getData andThen requireData) {
+  def onPageLoad(mode: Mode): Action[AnyContent] = (stcAuthEnrolled andThen getData andThen requireData).async {
     implicit request =>
 
       val preparedForm = request.userAnswers.get(WhatReliefAreYouApplyingForPage) match {
@@ -55,7 +56,11 @@ class WhatReliefAreYouApplyingForController @Inject()(
         case Some(value) => form.fill(value)
       }
 
-      Ok(view(preparedForm, mode, reliefsDataSource.reliefs, backLinkCall(mode)(request.userAnswers)))
+      reliefsService.getReliefs().map { reliefs =>
+
+        Ok(view(preparedForm, mode, reliefs, backLinkCall(mode)(request.userAnswers)))
+
+      }
   }
 
   def onSubmit(mode: Mode): Action[AnyContent] = (stcAuthEnrolled andThen getData andThen requireData).async {
@@ -63,7 +68,7 @@ class WhatReliefAreYouApplyingForController @Inject()(
 
       form.bindFromRequest().fold(
         formWithErrors =>
-          Future.successful(BadRequest(view(formWithErrors, mode, reliefsDataSource.reliefs, backLinkCall(mode)(request.userAnswers)))),
+          reliefsService.getReliefs().map(reliefs => BadRequest(view(formWithErrors, mode, reliefs, backLinkCall(mode)(request.userAnswers)))),
 
         relief =>
           for {

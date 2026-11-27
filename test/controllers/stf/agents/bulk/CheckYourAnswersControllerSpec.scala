@@ -47,6 +47,7 @@ import uk.gov.hmrc.securitiestransferchargefrontend.services.stf.agents.bulk.Che
 
 import java.time.{Instant, LocalDate}
 import scala.concurrent.Future
+import base.stubs.StubReliefsService
 
 class CheckYourAnswersControllerSpec extends SpecBase with BeforeAndAfterEach {
 
@@ -199,7 +200,7 @@ class CheckYourAnswersControllerSpec extends SpecBase with BeforeAndAfterEach {
       "must save the bulk confirmation details, start the STF submission and redirect to the next page" in {
         when(mockRepository.findDocumentByReference("testReference")).thenReturn(Future.successful(Some(someTestDoc)))
         when(mockCyaService.paymentDueBy(someTestDoc)).thenReturn(testPaymentDueBy)
-        when(mockCyaService.totalTaxDue(someTestDoc)).thenReturn(testTaxDue)
+        when(mockCyaService.totalTaxDue(someTestDoc, StubReliefsService.reliefs)).thenReturn(testTaxDue)
         when(mockNavigator.nextPage(any(), any(), any(), anyBoolean())(any())).thenReturn(Future.successful(testNextPage))
         when(mockTransactionSubmissionService.submitBulkStf(any())(using any[StcDataRequest[?]]())).thenReturn(Future.successful(true))
 
@@ -228,7 +229,7 @@ class CheckYourAnswersControllerSpec extends SpecBase with BeforeAndAfterEach {
       "must save no agent reference when one has not been provided" in {
         when(mockRepository.findDocumentByReference("testReference")).thenReturn(Future.successful(Some(someTestDoc)))
         when(mockCyaService.paymentDueBy(someTestDoc)).thenReturn(testPaymentDueBy)
-        when(mockCyaService.totalTaxDue(someTestDoc)).thenReturn(testTaxDue)
+        when(mockCyaService.totalTaxDue(someTestDoc, StubReliefsService.reliefs)).thenReturn(testTaxDue)
         when(mockNavigator.nextPage(any(), any(), any(), anyBoolean())(any())).thenReturn(Future.successful(testNextPage))
         when(mockTransactionSubmissionService.submitBulkStf(any())(using any[StcDataRequest[?]]())).thenReturn(Future.successful(true))
 

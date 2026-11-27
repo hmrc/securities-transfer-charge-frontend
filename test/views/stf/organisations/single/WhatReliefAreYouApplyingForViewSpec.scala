@@ -16,12 +16,13 @@
 
 package views.stf.organisations.single
 
+import base.stubs.StubReliefsService
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
 import play.api.Application
 import play.api.mvc.Call
 import uk.gov.hmrc.securitiestransferchargefrontend.forms.stf.organisations.WhatReliefAreYouApplyingForFormProvider
-import uk.gov.hmrc.securitiestransferchargefrontend.models.{NormalMode, ReliefsDataSource}
+import uk.gov.hmrc.securitiestransferchargefrontend.models.NormalMode
 import uk.gov.hmrc.securitiestransferchargefrontend.views.html.stf.organisations.single.WhatReliefAreYouApplyingForView
 import views.ViewBaseSpec
 
@@ -32,14 +33,13 @@ class WhatReliefAreYouApplyingForViewSpec extends ViewBaseSpec {
     applicationBuilder().build()
 
   private val viewInstance = app.injector.instanceOf[WhatReliefAreYouApplyingForView]
-  private val source = app.injector.instanceOf[ReliefsDataSource]
   private val formProvider = new WhatReliefAreYouApplyingForFormProvider()
   private val testBackLinkRoute: Call = Call("GET", "/back-link")
 
   private val form = formProvider()
 
   def view(): Document = Jsoup.parse(
-    viewInstance(form, NormalMode, source.reliefs, testBackLinkRoute)(fakeRequest, messages).body
+    viewInstance(form, NormalMode, StubReliefsService.reliefs, testBackLinkRoute)(fakeRequest, messages).body
   )
 
   object ExpectedContent {
