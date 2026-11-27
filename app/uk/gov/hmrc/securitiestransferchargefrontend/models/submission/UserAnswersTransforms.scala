@@ -17,13 +17,15 @@
 package uk.gov.hmrc.securitiestransferchargefrontend.models.submission
 
 import uk.gov.hmrc.securitiestransferchargefrontend.domain.TransferType.{SH03, STF}
+import uk.gov.hmrc.securitiestransferchargefrontend.models.Relief
+import uk.gov.hmrc.securitiestransferchargefrontend.models.submission.DataExtractors.reliefPercentageFor
 import uk.gov.hmrc.securitiestransferchargefrontend.models.stf.{Address, AlfAddress, TaxRate}
 import uk.gov.hmrc.securitiestransferchargefrontend.models.sh03.shared.ReasonForPurchase
 import uk.gov.hmrc.securitiestransferchargefrontend.models.submission.ReasonForPurchase as etmpReasonForPurchase
 
 object UserAnswersTransforms {
 
-  def toStfRequest(stfTransaction: StfTransaction, affinityData: AffinityData): SingleTransferRequest = {
+  def toStfRequest(stfTransaction: StfTransaction, affinityData: AffinityData, reliefs: Seq[Relief]): SingleTransferRequest = {
 
     val agentDetails: PartialFunction[AffinityData, SingleTransferAgentDetails] =
       case Agent(name, address, phone, email) => SingleTransferAgentDetails(
@@ -75,7 +77,7 @@ object UserAnswersTransforms {
         companyName = stfTransaction.securitiesTarget.businessName,
         companyRegistrationNumber = stfTransaction.securitiesTarget.crn,
         reliefClaimedName = stfTransaction.whatReliefAreYouApplyingFor,
-        reliefPercentage = if (stfTransaction.applyingForRelief) Some(100) else None // TODO: Get correct percentage based on what relief is being claimed
+        reliefPercentage = reliefPercentageFor(stfTransaction.applyingForRelief, stfTransaction.whatReliefAreYouApplyingFor, reliefs, "in the single STF transaction")
       ),
       contingentDetails = None,
       mainSellerDetails = Some(SingleTransferSellerDetails(
@@ -103,7 +105,7 @@ object UserAnswersTransforms {
     )
   }
 
-  def toSh03Request(sh03Transaction: Sh03Transaction, affinityData: AffinityData): SingleTransferRequest = {
+  def toSh03Request(sh03Transaction: Sh03Transaction, affinityData: AffinityData, reliefs: Seq[Relief]): SingleTransferRequest = {
 
     val address = Address(addressLine1 = "1 Street",
       addressLine2 = None,
@@ -162,7 +164,7 @@ object UserAnswersTransforms {
         companyName = sh03Transaction.companyDetails.companyName,
         companyRegistrationNumber = Some(sh03Transaction.companyDetails.companyRegistrationNumber),
         reliefClaimedName = sh03Transaction.whatReliefAreYouApplyingFor,
-        reliefPercentage = if (sh03Transaction.applyingForRelief) Some(100) else None // TODO: Get correct percentage based on what relief is being claimed
+        reliefPercentage = reliefPercentageFor(sh03Transaction.applyingForRelief, sh03Transaction.whatReliefAreYouApplyingFor, reliefs, "in the single SH03 transaction")
       ),
       contingentDetails = None,
       mainSellerDetails = None, //seller details are not required for sh03

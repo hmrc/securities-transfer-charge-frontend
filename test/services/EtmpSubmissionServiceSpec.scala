@@ -16,6 +16,7 @@
 
 package services
 
+import base.stubs.StubReliefsService
 import base.{Fixtures, SpecBase}
 import clients.FakeEtmpSubmissionClient
 import org.mockito.Mockito.*
@@ -24,12 +25,12 @@ import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.freespec.AnyFreeSpec
 import org.scalatest.matchers.must.Matchers
 import org.scalatestplus.mockito.MockitoSugar
-import uk.gov.hmrc.securitiestransferchargefrontend.models.UserAnswers
+import uk.gov.hmrc.securitiestransferchargefrontend.models.{Relief, UserAnswers}
 import uk.gov.hmrc.securitiestransferchargefrontend.models.sh03.shared.{ReasonForPurchase, RoleAtPurchasingCompany}
 import uk.gov.hmrc.securitiestransferchargefrontend.models.stf.*
 import uk.gov.hmrc.securitiestransferchargefrontend.models.submission.*
 import uk.gov.hmrc.http.HeaderCarrier
-import uk.gov.hmrc.securitiestransferchargefrontend.clients.EtmpSubmissionClient
+import uk.gov.hmrc.securitiestransferchargefrontend.clients.{EtmpSubmissionClient, ReliefsUnavailableException}
 import uk.gov.hmrc.securitiestransferchargefrontend.domain.{SubmissionId, SubscriptionId}
 import uk.gov.hmrc.securitiestransferchargefrontend.models.sh03.bulk.CompanyDetails as BulkCompanyDetails
 import uk.gov.hmrc.securitiestransferchargefrontend.pages.sh03.RoleAtPurchasingCompanyPage
@@ -160,7 +161,7 @@ class EtmpSubmissionServiceSpec extends AnyFreeSpec with Matchers with SpecBase 
     "return success if ETMP returns only successful responses" in {
       val resp = successfulChargesResponseGen.sample.get
       val fakeClient = FakeEtmpSubmissionClient(resp)
-      val service = new EtmpSubmissionServiceImpl(fakeClient)
+      val service = new EtmpSubmissionServiceImpl(fakeClient, new StubReliefsService())
       val result = service.submitSingleStf(subscriptionId, mockUserAnswers, affinityData)
         whenReady(result) { r =>
           r mustBe a[SubmissionCreateResponseSuccess]
@@ -170,7 +171,7 @@ class EtmpSubmissionServiceSpec extends AnyFreeSpec with Matchers with SpecBase 
     "return partial success if ETMP returns a mix of successful and unsuccessful responses" in {
       val resp = mixedChargesResponseGen.sample.get
       val fakeClient = FakeEtmpSubmissionClient(resp)
-      val service = new EtmpSubmissionServiceImpl(fakeClient)
+      val service = new EtmpSubmissionServiceImpl(fakeClient, new StubReliefsService())
       val result = service.submitSingleStf(subscriptionId, mockUserAnswers, affinityData)
       whenReady(result) { r =>
         r mustBe a[SubmissionCreateResponsePartialFailure]
@@ -179,7 +180,7 @@ class EtmpSubmissionServiceSpec extends AnyFreeSpec with Matchers with SpecBase 
     "return failure if ETMP returns only unsuccessful responses" in {
       val resp = failedChargesResponseGen.sample.get
       val fakeClient = FakeEtmpSubmissionClient(resp)
-      val service = new EtmpSubmissionServiceImpl(fakeClient)
+      val service = new EtmpSubmissionServiceImpl(fakeClient, new StubReliefsService())
       val result = service.submitSingleStf(subscriptionId, mockUserAnswers, affinityData)
       whenReady(result) { r =>
         r mustBe SubmissionCreateResponseFailure
@@ -189,7 +190,7 @@ class EtmpSubmissionServiceSpec extends AnyFreeSpec with Matchers with SpecBase 
     "return success if ETMP returns only successful responses (SH03)" in {
       val resp = successfulChargesResponseGen.sample.get
       val fakeClient = FakeEtmpSubmissionClient(resp)
-      val service = new EtmpSubmissionServiceImpl(fakeClient)
+      val service = new EtmpSubmissionServiceImpl(fakeClient, new StubReliefsService())
       val result = service.submitSingleSh03(subscriptionId, mockUserAnswers, affinityData)
       whenReady(result) { r =>
         r mustBe a[SubmissionCreateResponseSuccess]
@@ -199,7 +200,7 @@ class EtmpSubmissionServiceSpec extends AnyFreeSpec with Matchers with SpecBase 
     "return partial success if ETMP returns a mix of successful and unsuccessful responses (SH03)" in {
       val resp = mixedChargesResponseGen.sample.get
       val fakeClient = FakeEtmpSubmissionClient(resp)
-      val service = new EtmpSubmissionServiceImpl(fakeClient)
+      val service = new EtmpSubmissionServiceImpl(fakeClient, new StubReliefsService())
       val result = service.submitSingleSh03(subscriptionId, mockUserAnswers, affinityData)
       whenReady(result) { r =>
         r mustBe a[SubmissionCreateResponsePartialFailure]
@@ -209,7 +210,7 @@ class EtmpSubmissionServiceSpec extends AnyFreeSpec with Matchers with SpecBase 
     "return failure if ETMP returns only unsuccessful responses (SH03)" in {
       val resp = failedChargesResponseGen.sample.get
       val fakeClient = FakeEtmpSubmissionClient(resp)
-      val service = new EtmpSubmissionServiceImpl(fakeClient)
+      val service = new EtmpSubmissionServiceImpl(fakeClient, new StubReliefsService())
       val result = service.submitSingleSh03(subscriptionId, mockUserAnswers, affinityData)
       whenReady(result) { r =>
         r mustBe SubmissionCreateResponseFailure
@@ -218,8 +219,8 @@ class EtmpSubmissionServiceSpec extends AnyFreeSpec with Matchers with SpecBase 
 
     "getSubmissionDataStf should return Some with correct data when StfTransaction exists" in {
       val fakeClient = FakeEtmpSubmissionClient(successfulChargesResponseGen.sample.get)
-      val service = new EtmpSubmissionServiceImpl(fakeClient)
-      val result = service.getSubmissionDataStf(mockUserAnswers, affinityData)
+      val service = new EtmpSubmissionServiceImpl(fakeClient, new StubReliefsService())
+      val result = service.getSubmissionDataStf(mockUserAnswers, affinityData, StubReliefsService.reliefs)
       
       result mustBe defined
       result.foreach { case (request, transaction) =>
@@ -236,16 +237,16 @@ class EtmpSubmissionServiceSpec extends AnyFreeSpec with Matchers with SpecBase 
       when(mockEmptyUserAnswers.submissionId).thenReturn(submissionId)
       
       val fakeClient = FakeEtmpSubmissionClient(successfulChargesResponseGen.sample.get)
-      val service = new EtmpSubmissionServiceImpl(fakeClient)
-      val result = service.getSubmissionDataStf(mockEmptyUserAnswers, affinityData)
+      val service = new EtmpSubmissionServiceImpl(fakeClient, new StubReliefsService())
+      val result = service.getSubmissionDataStf(mockEmptyUserAnswers, affinityData, StubReliefsService.reliefs)
       
       result mustBe None
     }
 
     "getSubmissionDataSh03 should return Some with correct data when Sh03Transaction exists" in {
       val fakeClient = FakeEtmpSubmissionClient(successfulChargesResponseGen.sample.get)
-      val service = new EtmpSubmissionServiceImpl(fakeClient)
-      val result = service.getSubmissionDataSh03(mockUserAnswers, affinityData)
+      val service = new EtmpSubmissionServiceImpl(fakeClient, new StubReliefsService())
+      val result = service.getSubmissionDataSh03(mockUserAnswers, affinityData, StubReliefsService.reliefs)
       
       result mustBe defined
       result.foreach { case (declaration, request) =>
@@ -263,8 +264,8 @@ class EtmpSubmissionServiceSpec extends AnyFreeSpec with Matchers with SpecBase 
       when(mockEmptyUserAnswers.submissionId).thenReturn(submissionId)
       
       val fakeClient = FakeEtmpSubmissionClient(successfulChargesResponseGen.sample.get)
-      val service = new EtmpSubmissionServiceImpl(fakeClient)
-      val result = service.getSubmissionDataSh03(mockEmptyUserAnswers, affinityData)
+      val service = new EtmpSubmissionServiceImpl(fakeClient, new StubReliefsService())
+      val result = service.getSubmissionDataSh03(mockEmptyUserAnswers, affinityData, StubReliefsService.reliefs)
       
       result mustBe None
     }
@@ -287,7 +288,8 @@ class EtmpSubmissionServiceSpec extends AnyFreeSpec with Matchers with SpecBase 
 
     def declarationSentFor(userAnswers: UserAnswers): SingleTransferDeclaration = {
       val client = new CapturingEtmpSubmissionClient(successfulChargesResponseGen.sample.get)
-      val service = new EtmpSubmissionServiceImpl(client)
+      // The fixture row claims "Group relief", so the list needs a relief with exactly that name.
+      val service = new EtmpSubmissionServiceImpl(client, new StubReliefsService(Seq(Relief("Group relief", 100))))
       service.submitBulkSH03(subscriptionId, Seq(Fixtures.testValidatedStcRow), userAnswers, affinityData).futureValue
       client.payload.value.declaration
     }
@@ -321,7 +323,7 @@ class EtmpSubmissionServiceSpec extends AnyFreeSpec with Matchers with SpecBase 
         StcTransactionCreateProcessed(StcTransactionCreateProcessedBody("2026-03-31", Nil)),
         scala.concurrent.Future.successful(GetTransactionResult.StcIdNotFound)
       )
-      val service = new EtmpSubmissionServiceImpl(fakeClient)
+      val service = new EtmpSubmissionServiceImpl(fakeClient, new StubReliefsService())
 
       service.getTransaction(subscriptionId, "900459020010").futureValue mustBe GetTransactionResult.StcIdNotFound
     }
@@ -331,9 +333,79 @@ class EtmpSubmissionServiceSpec extends AnyFreeSpec with Matchers with SpecBase 
         StcTransactionCreateProcessed(StcTransactionCreateProcessedBody("2026-03-31", Nil)),
         scala.concurrent.Future.failed(new RuntimeException("boom"))
       )
-      val service = new EtmpSubmissionServiceImpl(fakeClient)
+      val service = new EtmpSubmissionServiceImpl(fakeClient, new StubReliefsService())
 
       service.getTransaction(subscriptionId, "900459020010").failed.futureValue.getMessage mustBe "boom"
     }
   }
+
+  "relief percentage on submission" - {
+
+    val subscriptionId = SubscriptionId("XASTC0000123456")
+
+    class CapturingClient extends EtmpSubmissionClient {
+      var payload: Option[SubmissionBatchPayload] = None
+      def submitBatchTransfer(subscriptionId: SubscriptionId, submissionId: SubmissionId, payload: SubmissionBatchPayload)
+                             (implicit hc: HeaderCarrier): Future[StcTransactionCreateResponse] = {
+        this.payload = Some(payload)
+        Future.successful(successfulChargesResponseGen.sample.get)
+      }
+      def getTransaction(subscriptionId: SubscriptionId, utrn: String)(implicit hc: HeaderCarrier): Future[GetTransactionResult] =
+        Future.failed(new UnsupportedOperationException("getTransaction not stubbed"))
+    }
+
+    val claimingStf = stfTransaction.copy(applyingForRelief = true, whatReliefAreYouApplyingFor = Some("Charities Relief"))
+
+    def answersWith(transaction: StfTransaction): UserAnswers = {
+      val answers = mock[UserAnswers]
+      when(answers.get(StfTransaction)).thenReturn(Some(transaction))
+      when(answers.get(AgentReferencePage)).thenReturn(None)
+      when(answers.submissionId).thenReturn(submissionId)
+      answers
+    }
+
+    "submit the percentage from the list of reliefs" in {
+      val client  = new CapturingClient
+      val service = new EtmpSubmissionServiceImpl(client, new StubReliefsService(Seq(Relief("Charities Relief", 50))))
+
+      service.submitSingleStf(subscriptionId, answersWith(claimingStf), affinityData).futureValue
+
+      client.payload.value.transfers.head.transactionDetails.reliefPercentage mustBe Some(50)
+    }
+
+    "not submit, and fail, when the claimed relief is not in the list of reliefs" in {
+      val client  = new CapturingClient
+      val service = new EtmpSubmissionServiceImpl(client, new StubReliefsService(Seq(Relief("Another Relief", 50))))
+
+      service.submitSingleStf(subscriptionId, answersWith(claimingStf), affinityData).futureValue mustBe SubmissionCreateResponseFailure
+
+      client.payload mustBe None
+    }
+
+    "not submit, and fail, when the list of reliefs is unavailable" in {
+      val client = new CapturingClient
+      val unavailable = new ReliefsService {
+        override def getReliefs()(implicit hc: HeaderCarrier): Future[Seq[Relief]] =
+          Future.failed(new ReliefsUnavailableException("down"))
+      }
+      val service = new EtmpSubmissionServiceImpl(client, unavailable)
+
+      service.submitSingleStf(subscriptionId, answersWith(claimingStf), affinityData).futureValue mustBe SubmissionCreateResponseFailure
+
+      client.payload mustBe None
+    }
+
+    "submit a claimed relief's percentage for a bulk STF submission" in {
+      val client  = new CapturingClient
+      val service = new EtmpSubmissionServiceImpl(client, new StubReliefsService(Seq(Relief("Charities Relief", 50))))
+      val parsed  = Fixtures.testValidatedStcRow.parsedRow
+      val row     = Fixtures.testValidatedStcRow.copy(parsedRow = parsed.copy(
+        applyingForRelief = Some(true), whatReliefAreYouApplyingFor = Some("Charities Relief")))
+
+      service.submitBulkStf(subscriptionId, Seq(row), emptyUserAnswers, affinityData).futureValue
+
+      client.payload.value.transfers.head.transactionDetails.reliefPercentage mustBe Some(50)
+    }
+  }
+
 }
