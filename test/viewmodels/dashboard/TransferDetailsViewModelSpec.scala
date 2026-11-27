@@ -527,9 +527,24 @@ class TransferDetailsViewModelSpec extends SpecBase with GuiceOneAppPerSuite {
         }
       }
 
-      "only use labels that exist in the messages file" in {
-        val labels = sh03().sections.flatMap(_.list.rows.map(_.key.content.asHtml.toString))
-        labels.filter(_.startsWith("org.")) mustBe empty
+      Seq("org", "agent").foreach { affinityKey =>
+        s"only use labels and values that exist in the messages file for $affinityKey users" in {
+          DeclarationRole.values.foreach { role =>
+            val transaction = sh03Transaction.copy(declaration = sh03Transaction.declaration.copy(role1 = Some(role)))
+            val model = build(transferWith(tax()), transaction = transaction, affinityKey = affinityKey, declareeName = Some("James White"))
+            val text = model.sections.flatMap(_.list.rows.flatMap(r => Seq(r.key.content.asHtml.toString, value(r))))
+            text.filter(t => t.startsWith("org.") || t.startsWith("agent.")) mustBe empty
+          }
+        }
+      }
+
+      "show the declaration role with the agent wording for agents" in {
+        val list = section(
+          build(transferWith(tax()), transaction = sh03Transaction, affinityKey = "agent", declareeName = Some("James White")),
+          "transferDetails.declaration.heading"
+        )
+        valueOf(list, "agent.sh03.roleAtPurchasingCompany.checkYourAnswersLabel") mustBe
+          messages("agent.sh03.roleAtPurchasingCompany.ukSocietas")
       }
 
       "escape free-text answers" in {

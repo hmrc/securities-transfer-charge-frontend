@@ -201,13 +201,13 @@ object TransferDetailsViewModel {
   }
 
   // Message keys use the role name in camel case, e.g. PersonAuthorised -> personAuthorised.
-  private def sh03RoleText(role: DeclarationRole)(implicit messages: Messages): String = {
+  private def sh03RoleText(role: DeclarationRole, affinityKey: String)(implicit messages: Messages): String = {
     val name = role.toString
-    messages(s"org.sh03.roleAtPurchasingCompany.${name.head.toLower}${name.tail}")
+    messages(s"$affinityKey.sh03.roleAtPurchasingCompany.${name.head.toLower}${name.tail}")
   }
 
   // Business SH03 sections, grouped as on the business SH03 check your answers page.
-  private def sh03Sections(transaction: ViewTransferResponse,affinityKey: String)(implicit messages: Messages): Seq[TransferDetailsSection] = {
+  private def sh03Sections(transaction: ViewTransferResponse, affinityKey: String)(implicit messages: Messages): Seq[TransferDetailsSection] = {
     val details = transaction.transactionDetails
     val relief = details.reliefClaimedName.filter(_.trim.nonEmpty)
     val reason = details.reasonForPurchase
@@ -235,7 +235,7 @@ object TransferDetailsViewModel {
 
     val declaration = transaction.declaration
     val declarationRows = Seq(
-      declaration.role1.map(r => row(s"$affinityKey.sh03.roleAtPurchasingCompany.checkYourAnswersLabel", sh03RoleText(r))),
+      declaration.role1.map(r => row(s"$affinityKey.sh03.roleAtPurchasingCompany.checkYourAnswersLabel", sh03RoleText(r, affinityKey))),
       declaration.role2.filter(_.trim.nonEmpty).map(row(s"$affinityKey.sh03.roleAtPurchasingCompany.uksOrgan.label", _))
     ).flatten
 
@@ -271,7 +271,7 @@ object TransferDetailsViewModel {
       paidChargesUrl    = Option.when(anyPaid)(dashboardRoutes.PaidChargesController.onPageLoad(submissionId, transferNumber).url),
       referenceList     = referenceList(submission, transfer),
       sections          = submission.submissionType match {
-        case TransferType.SH03 => sh03Sections(transaction,affinityKey)
+        case TransferType.SH03 => sh03Sections(transaction, affinityKey)
         case _                 => stfSections(transaction, isAgent, affinityKey)
       }
     )

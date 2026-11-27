@@ -1549,7 +1549,11 @@ org.transferDetails.sh03.amountPaid = Amount paid for the shares
 org.transferDetails.sh03.detailsOfSharePurchase.marketValue = Market value of the shares
 org.transferDetails.sh03.maximumAmountPaid = Maximum amount paid for the shares
 org.transferDetails.sh03.minimumAmountPaid = Minimum amount paid for the shares
-
+# Agent wording for these rows is the same as business until STOSB-2684
+agent.transferDetails.sh03.amountPaid = Amount paid for the shares
+agent.transferDetails.sh03.detailsOfSharePurchase.marketValue = Market value of the shares
+agent.transferDetails.sh03.maximumAmountPaid = Maximum amount paid for the shares
+agent.transferDetails.sh03.minimumAmountPaid = Minimum amount paid for the shares
 
 paidCharges.title = Paid charges
 paidCharges.heading = Paid charges
