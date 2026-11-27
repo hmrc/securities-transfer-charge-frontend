@@ -156,5 +156,15 @@ class TransferDetailsViewSpec extends ViewBaseSpec {
       )
       doc.select(".govuk-grid-column-three-quarters .govuk-summary-list").size mustBe 4
     }
+
+    "show the buyer details, transfer details and declaration sections for an agent SH03" in {
+      val doc = view(unpaidTransfer, affinityKey = "agent", declareeName = Some("James White"))
+      doc.select("h2.govuk-heading-m").asScala.map(_.text).drop(1) mustBe Seq(
+        messages("transferDetails.buyer.heading"),
+        messages("transferDetails.transfer.heading"),
+        messages("transferDetails.declaration.heading")
+      )
+      doc.select(".govuk-grid-column-three-quarters .govuk-summary-list").size mustBe 4
+    }
   }
 }
