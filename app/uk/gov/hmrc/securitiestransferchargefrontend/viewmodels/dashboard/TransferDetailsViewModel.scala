@@ -23,9 +23,10 @@ import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.{SummaryList, Summ
 import uk.gov.hmrc.securitiestransferchargefrontend.config.CurrencyFormatter
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.dashboard.routes as dashboardRoutes
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.pay.routes as payRoutes
+import uk.gov.hmrc.securitiestransferchargefrontend.domain.TransferType
 import uk.gov.hmrc.securitiestransferchargefrontend.models.search.EtmpSuccessResponseExtensions.*
 import uk.gov.hmrc.securitiestransferchargefrontend.models.search.{EtmpChargeDetail, SttSubmission, SttTransfer}
-import uk.gov.hmrc.securitiestransferchargefrontend.models.submission.{BuyerTaxRate, ViewTransferResponse}
+import uk.gov.hmrc.securitiestransferchargefrontend.models.submission.{BuyerTaxRate, DeclarationRole, ReasonForPurchase, ViewTransferResponse}
 import uk.gov.hmrc.securitiestransferchargefrontend.utils.{CommonHelpers, DateTimeFormats}
 import uk.gov.hmrc.securitiestransferchargefrontend.viewmodels.govuk.summarylist.*
 
@@ -35,6 +36,7 @@ import uk.gov.hmrc.securitiestransferchargefrontend.viewmodels.govuk.summarylist
  * @param chargesList unpaid charges only, each with a pay link; empty when everything is paid
  * @param payFullBalanceUrl only present when there is something left to pay
  * @param paidChargesUrl only present when at least one charge has been paid
+ * @param sections the headed summary lists under the reference list, which depend on the type of transfer
  */
 final case class TransferDetailsViewModel(
   submissionId      : String,
@@ -44,10 +46,10 @@ final case class TransferDetailsViewModel(
   chargesList       : Option[SummaryList],
   paidChargesUrl    : Option[String],
   referenceList     : SummaryList,
-  buyerList         : Option[SummaryList],
-  sellerList        : SummaryList,
-  transferList      : SummaryList
+  sections          : Seq[TransferDetailsSection]
 )
+
+final case class TransferDetailsSection(heading: String, list: SummaryList)
 
 object TransferDetailsViewModel {
 
@@ -175,6 +177,75 @@ object TransferDetailsViewModel {
     SummaryList(rows = rows)
   }
 
+  // Buyer details are only shown to agents; individuals and organisations are the buyer themselves.
+  private def stfSections(transaction: ViewTransferResponse, isAgent: Boolean, affinityKey: String)
+                         (implicit messages: Messages): Seq[TransferDetailsSection] =
+    Option.when(isAgent)(TransferDetailsSection(messages("transferDetails.buyer.heading"), buyerList(transaction))).toSeq ++ Seq(
+      TransferDetailsSection(messages("transferDetails.seller.heading"), sellerList(transaction)),
+      TransferDetailsSection(messages("transferDetails.transfer.heading"), transferList(transaction, affinityKey))
+    )
+
+  private def currency(amount: BigDecimal): String = CurrencyFormatter.currencyFormat(amount)
+
+  // "Both" means purchased for cancellation and the shares also qualify as treasury shares (see UserAnswersTransforms).
+  private def sh03ReasonText(reason: ReasonForPurchase)(implicit messages: Messages): String = reason match {
+    case ReasonForPurchase.PurchasedToPlaceIntoTreasury => messages("reasonForPurchase.treasury")
+    case _                                              => messages("reasonForPurchase.cancellation")
+  }
+
+  // The treasury shares question is only asked for shares purchased for cancellation.
+  private def sh03TreasuryShares(reason: ReasonForPurchase): Option[Boolean] = reason match {
+    case ReasonForPurchase.PurchasedForCancellation     => Some(false)
+    case ReasonForPurchase.Both                         => Some(true)
+    case ReasonForPurchase.PurchasedToPlaceIntoTreasury => None
+  }
+
+  // Message keys use the role name in camel case, e.g. PersonAuthorised -> personAuthorised.
+  private def sh03RoleText(role: DeclarationRole, affinityKey: String)(implicit messages: Messages): String = {
+    val name = role.toString
+    messages(s"$affinityKey.sh03.roleAtPurchasingCompany.${name.head.toLower}${name.tail}")
+  }
+
+  // Business SH03 sections, grouped as on the business SH03 check your answers page.
+  private def sh03Sections(transaction: ViewTransferResponse, affinityKey: String)(implicit messages: Messages): Seq[TransferDetailsSection] = {
+    val details = transaction.transactionDetails
+    val relief = details.reliefClaimedName.filter(_.trim.nonEmpty)
+    val reason = details.reasonForPurchase
+
+    val yourDetails = Seq(
+      Some(row(s"$affinityKey.sh03.companyDetails.companyName.label", details.companyName)),
+      details.companyRegistrationNumber.filter(_.trim.nonEmpty).map(row(s"$affinityKey.sh03.companyDetails.crn.label", _)),
+      transaction.mainBuyerDetails.isPLC.map(isPlc => row(s"$affinityKey.sh03.companyDetails.isPlc.label", yesNo(isPlc)))
+    ).flatten
+
+    val transferDetails = Seq(
+      reason.map(r => row(s"$affinityKey.sh03.reasonForPurchase.checkYourAnswersLabel", sh03ReasonText(r))),
+      reason.flatMap(sh03TreasuryShares).map(t => row(s"$affinityKey.sh03.treasuryShares.checkYourAnswersLabel", yesNo(t))),
+      Some(row(s"$affinityKey.sh03.connectedPersons.checkYourAnswersLabel", yesNo(details.isConnectedPartiesTransactions))),
+      Some(row(s"$affinityKey.sh03.applyingForRelief.checkYourAnswersLabel", yesNo(relief.isDefined))),
+      relief.map(row(s"$affinityKey.sh03.whatReliefAreYouApplyingFor.checkYourAnswersLabel", _)),
+      Some(row(s"$affinityKey.sh03.detailsOfSharePurchase.numberOfShares", CommonHelpers.formatWithCommas(details.numberOfShares))),
+      Some(row(s"$affinityKey.sh03.detailsOfSharePurchase.typeOfShares", details.typeOfSecurity)),
+      Some(row(s"$affinityKey.transferDetails.sh03.amountPaid", currency(details.considerationActual))),
+      details.marketValue.map(v => row(s"$affinityKey.transferDetails.sh03.detailsOfSharePurchase.marketValue", currency(v))),
+      details.maxPricePaid.map(v => row(s"$affinityKey.transferDetails.sh03.maximumAmountPaid", currency(v))),
+      details.minPricePaid.map(v => row(s"$affinityKey.transferDetails.sh03.minimumAmountPaid", currency(v))),
+      Some(row(s"$affinityKey.sh03.chargingPoint.checkYourAnswersLabel", formatDate(details.originalChargingPoint)))
+    ).flatten
+
+    val declaration = transaction.declaration
+    val declarationRows = Seq(
+      declaration.role1.map(r => row(s"$affinityKey.sh03.roleAtPurchasingCompany.checkYourAnswersLabel", sh03RoleText(r, affinityKey))),
+      declaration.role2.filter(_.trim.nonEmpty).map(row(s"$affinityKey.sh03.roleAtPurchasingCompany.uksOrgan.label", _))
+    ).flatten
+
+    Seq(
+      TransferDetailsSection(messages("transferDetails.yourDetails.heading"), SummaryList(rows = yourDetails)),
+      TransferDetailsSection(messages("transferDetails.transfer.heading"), SummaryList(rows = transferDetails)),
+      TransferDetailsSection(messages("transferDetails.declaration.heading"), SummaryList(rows = declarationRows))
+    )
+  }
+
   /**
    * @param transferNumber the transfer's number in the submission (1-based, in UTRN order; see SttSubmission.transferNumber).
    * @param affinityKey the message key prefix for the transfer details rows ("individual", "org" or "agent").
@@ -199,9 +270,10 @@ object TransferDetailsViewModel {
       chargesList       = chargesList(submissionId, transferNumber, transfer),
       paidChargesUrl    = Option.when(anyPaid)(dashboardRoutes.PaidChargesController.onPageLoad(submissionId, transferNumber).url),
       referenceList     = referenceList(submission, transfer),
-      buyerList         = Option.when(isAgent)(buyerList(transaction)),
-      sellerList        = sellerList(transaction),
-      transferList      = transferList(transaction, affinityKey)
+      sections          = submission.submissionType match {
+        case TransferType.SH03 => sh03Sections(transaction, affinityKey)
+        case _                 => stfSections(transaction, isAgent, affinityKey)
+      }
     )
   }
 }

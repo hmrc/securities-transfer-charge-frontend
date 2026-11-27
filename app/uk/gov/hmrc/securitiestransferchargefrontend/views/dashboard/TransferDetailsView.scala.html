@@ -74,16 +74,10 @@
         <div class="govuk-grid-column-three-quarters">
             @govukSummaryList(viewModel.referenceList)
 
-            @viewModel.buyerList.map { buyerList =>
-                <h2 class="govuk-heading-m">@messages("transferDetails.buyer.heading")</h2>
-                @govukSummaryList(buyerList)
+            @viewModel.sections.map { section =>
+                <h2 class="govuk-heading-m">@section.heading</h2>
+                @govukSummaryList(section.list)
             }
-
-            <h2 class="govuk-heading-m">@messages("transferDetails.seller.heading")</h2>
-            @govukSummaryList(viewModel.sellerList)
-
-            <h2 class="govuk-heading-m">@messages("transferDetails.transfer.heading")</h2>
-            @govukSummaryList(viewModel.transferList)
         </div>
     </div>
 }

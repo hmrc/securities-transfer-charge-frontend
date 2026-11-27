@@ -438,9 +438,11 @@ class SubmissionDetailsViewModelSpec extends SpecBase with GuiceOneAppPerSuite {
       reversed.map(_(5).content.asHtml.toString) mustBe rows.map(_(5).content.asHtml.toString)
     }
 
-    "keep a placeholder View link for SH03 submissions" in {
+    "link View to the transfer details page for SH03 submissions" in {
       Seq(build(isAgent = false, transferType = SH03), build(isAgent = true, transferType = SH03)).foreach { model =>
-        tab(model, "allTransfers").table.get.rows.head(5).content.asHtml.toString must include("""href="#"""")
+        tab(model, "allTransfers").table.get.rows.head(5).content.asHtml.toString must include(
+          s"""href="${dashboardRoutes.TransferDetailsController.onPageLoad(Fixtures.testSubmissionId.toString, 1).url}""""
+        )
       }
     }
   }

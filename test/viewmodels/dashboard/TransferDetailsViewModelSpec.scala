@@ -24,7 +24,8 @@ import uk.gov.hmrc.securitiestransferchargefrontend.config.CurrencyFormatter
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.dashboard.routes as dashboardRoutes
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.pay.routes as payRoutes
 import uk.gov.hmrc.securitiestransferchargefrontend.models.search.{EtmpChargeDetail, SttTransfer}
-import uk.gov.hmrc.securitiestransferchargefrontend.models.submission.{BuyerTaxRate, ViewTransferResponse}
+import uk.gov.hmrc.securitiestransferchargefrontend.domain.TransferType
+import uk.gov.hmrc.securitiestransferchargefrontend.models.submission.{BuyerTaxRate, DeclarationRole, ReasonForPurchase, ViewTransferResponse}
 import uk.gov.hmrc.securitiestransferchargefrontend.utils.DateTimeFormats
 import uk.gov.hmrc.securitiestransferchargefrontend.viewmodels.dashboard.TransferDetailsViewModel
 
@@ -63,10 +64,11 @@ class TransferDetailsViewModelSpec extends SpecBase with GuiceOneAppPerSuite {
     transfer: SttTransfer,
     transferNumber: Int = 1,
     transaction: ViewTransferResponse = Fixtures.viewTransferResponse,
-    affinityKey: String = "agent"
+    affinityKey: String = "agent",
+    declareeName: Option[String] = None
   ): TransferDetailsViewModel =
     TransferDetailsViewModel.build(
-      Fixtures.singleSubmissionReadyToPay.copy(transfers = Seq(transfer)),
+      Fixtures.singleSubmissionReadyToPay.copy(transfers = Seq(transfer), declareeName = declareeName),
       transferNumber,
       transfer,
       transaction,
@@ -78,6 +80,12 @@ class TransferDetailsViewModelSpec extends SpecBase with GuiceOneAppPerSuite {
   private def rowFor(list: SummaryList, key: String): Option[SummaryListRow] =
     list.rows.find(_.key.content.asHtml.toString == messages(key))
   private def valueOf(list: SummaryList, key: String): String = value(rowFor(list, key).get)
+
+  private def section(model: TransferDetailsViewModel, headingKey: String): SummaryList =
+    model.sections.find(_.heading == messages(headingKey)).map(_.list).get
+  private def buyerList(model: TransferDetailsViewModel): SummaryList = section(model, "transferDetails.buyer.heading")
+  private def sellerList(model: TransferDetailsViewModel): SummaryList = section(model, "transferDetails.seller.heading")
+  private def transferList(model: TransferDetailsViewModel): SummaryList = section(model, "transferDetails.transfer.heading")
 
   private def date(d: LocalDate): String = DateTimeFormats.formatDate(d)(messages.lang)
 
@@ -229,19 +237,19 @@ class TransferDetailsViewModelSpec extends SpecBase with GuiceOneAppPerSuite {
     "buyer and seller details" - {
       "show the main buyer's name and address" in {
         val model = build(transferWith(tax()))
-        valueOf(model.buyerList.value, "transferDetails.name") mustBe "Northbridge Healthcare"
-        valueOf(model.buyerList.value, "transferDetails.address") mustBe "50 Medical Park<br>London<br>W0 4DD"
+        valueOf(buyerList(model), "transferDetails.name") mustBe "Northbridge Healthcare"
+        valueOf(buyerList(model), "transferDetails.address") mustBe "50 Medical Park<br>London<br>W0 4DD"
       }
 
       "show the main seller's name and address" in {
         val model = build(transferWith(tax()))
-        valueOf(model.sellerList, "transferDetails.name") mustBe "CardioNova Therapeutics"
-        valueOf(model.sellerList, "transferDetails.address") mustBe "20 Discovery campus<br>Cambridge<br>CB0 5EE"
+        valueOf(sellerList(model), "transferDetails.name") mustBe "CardioNova Therapeutics"
+        valueOf(sellerList(model), "transferDetails.address") mustBe "20 Discovery campus<br>Cambridge<br>CB0 5EE"
       }
 
       "use a narrow key column like the design" in {
         val model = build(transferWith(tax()))
-        Seq(model.referenceList, model.buyerList.value, model.sellerList, model.transferList).flatMap(_.rows).foreach { r =>
+        (model.referenceList +: model.sections.map(_.list)).flatMap(_.rows).foreach { r =>
           r.key.classes must include("govuk-!-width-one-third")
         }
       }
@@ -251,28 +259,29 @@ class TransferDetailsViewModelSpec extends SpecBase with GuiceOneAppPerSuite {
           mainBuyerDetails = Fixtures.viewTransferResponse.mainBuyerDetails.copy(buyerName = "<b>Buyer</b>", addr1 = "1 & 2 Road")
         )
         val model = build(transferWith(tax()), transaction = transaction)
-        valueOf(model.buyerList.value, "transferDetails.name") mustBe "&lt;b&gt;Buyer&lt;/b&gt;"
-        valueOf(model.buyerList.value, "transferDetails.address") must startWith("1 &amp; 2 Road")
+        valueOf(buyerList(model), "transferDetails.name") mustBe "&lt;b&gt;Buyer&lt;/b&gt;"
+        valueOf(buyerList(model), "transferDetails.address") must startWith("1 &amp; 2 Road")
       }
 
       "show buyer details for an agent" in {
-        build(transferWith(tax()), affinityKey = "agent").buyerList mustBe defined
+        build(transferWith(tax()), affinityKey = "agent").sections.map(_.heading) must contain(messages("transferDetails.buyer.heading"))
       }
 
       "not show buyer details for an organisation or an individual" in {
-        build(transferWith(tax()), affinityKey = "org").buyerList mustBe None
-        build(transferWith(tax()), affinityKey = "individual").buyerList mustBe None
+        Seq("org", "individual").foreach { key =>
+          build(transferWith(tax()), affinityKey = key).sections.map(_.heading) must not contain messages("transferDetails.buyer.heading")
+        }
       }
 
       "omit the seller address when ETMP has no main seller" in {
         val model = build(transferWith(tax()), transaction = Fixtures.viewTransferResponse.copy(mainSellerDetails = None))
-        rowFor(model.sellerList, "transferDetails.address") mustBe None
+        rowFor(sellerList(model), "transferDetails.address") mustBe None
       }
     }
 
     "transfer details (AC15)" - {
       "show the answers ETMP holds for the transfer" in {
-        val list = build(transferWith(tax())).transferList
+        val list = transferList(build(transferWith(tax())))
 
         keys(list) mustBe Seq(
           "agent.connectedPersons.checkYourAnswersLabel",
@@ -312,7 +321,7 @@ class TransferDetailsViewModelSpec extends SpecBase with GuiceOneAppPerSuite {
           marketValue = None,
           isConnectedPartiesTransactions = true
         )
-        val list = build(transferWith(tax()), transaction = Fixtures.viewTransferResponse.copy(transactionDetails = details)).transferList
+        val list = transferList(build(transferWith(tax()), transaction = Fixtures.viewTransferResponse.copy(transactionDetails = details)))
 
         valueOf(list, "agent.applyingForRelief.checkYourAnswersLabel") mustBe messages("site.no")
         valueOf(list, "agent.connectedPersons.checkYourAnswersLabel") mustBe messages("site.yes")
@@ -324,7 +333,7 @@ class TransferDetailsViewModelSpec extends SpecBase with GuiceOneAppPerSuite {
       "show the type of securities from ETMP, straight after the purchasing shares row" in {
         val details = Fixtures.viewTransferResponse.transactionDetails.copy(typeOfSecurity = "Preference")
         Seq("agent", "org").foreach { key =>
-          val list = build(transferWith(tax()), transaction = Fixtures.viewTransferResponse.copy(transactionDetails = details), affinityKey = key).transferList
+          val list = transferList(build(transferWith(tax()), transaction = Fixtures.viewTransferResponse.copy(transactionDetails = details), affinityKey = key))
           val labels = keys(list)
           valueOf(list, s"$key.otherSecuritiesType.checkYourAnswersLabel") mustBe "Preference"
           labels.indexOf(messages(s"$key.otherSecuritiesType.checkYourAnswersLabel")) mustBe
@@ -334,7 +343,7 @@ class TransferDetailsViewModelSpec extends SpecBase with GuiceOneAppPerSuite {
 
       Seq("an organisation" -> "org", "an individual" -> "individual").foreach { case (userType, key) =>
         s"use the $key labels for $userType" in {
-          val list = build(transferWith(tax()), affinityKey = key).transferList
+          val list = transferList(build(transferWith(tax()), affinityKey = key))
 
           val expectedKeys = Seq(
             s"$key.connectedPersons.checkYourAnswersLabel",
@@ -359,14 +368,14 @@ class TransferDetailsViewModelSpec extends SpecBase with GuiceOneAppPerSuite {
 
       "show the business name with the label for each user type" in {
         Seq("agent", "org", "individual").foreach { key =>
-          val list = build(transferWith(tax()), affinityKey = key).transferList
+          val list = transferList(build(transferWith(tax()), affinityKey = key))
           valueOf(list, s"$key.transferDetails.businessName") mustBe "CardioNova Therapeutics"
         }
       }
 
       "show the number of securities with thousands separators" in {
         val details = Fixtures.viewTransferResponse.transactionDetails.copy(numberOfShares = 1234567)
-        val list = build(transferWith(tax()), transaction = Fixtures.viewTransferResponse.copy(transactionDetails = details)).transferList
+        val list = transferList(build(transferWith(tax()), transaction = Fixtures.viewTransferResponse.copy(transactionDetails = details)))
         valueOf(list, "transferDetails.numberOfSecurities") mustBe "1,234,567"
       }
 
@@ -374,9 +383,174 @@ class TransferDetailsViewModelSpec extends SpecBase with GuiceOneAppPerSuite {
         val transaction = Fixtures.viewTransferResponse.copy(
           mainBuyerDetails = Fixtures.viewTransferResponse.mainBuyerDetails.copy(taxRate = BuyerTaxRate.OneAndHalfPercent)
         )
-        valueOf(build(transferWith(tax()), transaction = transaction).transferList, "taxRate.checkYourAnswersLabel") mustBe
+        valueOf(transferList(build(transferWith(tax()), transaction = transaction)), "taxRate.checkYourAnswersLabel") mustBe
           messages("taxRate.oneAndHalf")
       }
     }
-  }
+  
+    "business SH03 transfer" - {
+      val sh03Transaction = Fixtures.viewTransferResponse.copy(
+        transactionDetails = Fixtures.viewTransferResponse.transactionDetails.copy(
+          transactionType = TransferType.SH03,
+          reasonForPurchase = Some(ReasonForPurchase.Both),
+          typeOfSecurity = "Ordinary shares",
+          numberOfShares = 1500,
+          marketValue = Some(BigDecimal(9000)),
+          maxPricePaid = Some(BigDecimal(6)),
+          minPricePaid = Some(BigDecimal(4)),
+          considerationActual = BigDecimal(7500),
+          isConnectedPartiesTransactions = true,
+          companyName = "Acme Holdings Ltd",
+          companyRegistrationNumber = Some("AB123456"),
+          reliefClaimedName = Some("Employee share scheme")
+        ),
+        mainSellerDetails = None,
+        mainBuyerDetails = Fixtures.viewTransferResponse.mainBuyerDetails.copy(isPLC = Some(true)),
+        declaration = Fixtures.viewTransferResponse.declaration.copy(role1 = Some(DeclarationRole.UkSocietas), role2 = Some("Board of directors"))
+      )
+
+      def sh03(transaction: ViewTransferResponse = sh03Transaction): TransferDetailsViewModel =
+        build(transferWith(tax()), transaction = transaction, affinityKey = "org", declareeName = Some("James White"))
+
+      def withDetails(f: uk.gov.hmrc.securitiestransferchargefrontend.models.submission.SingleTransferTransactionDetails =>
+        uk.gov.hmrc.securitiestransferchargefrontend.models.submission.SingleTransferTransactionDetails): ViewTransferResponse =
+        sh03Transaction.copy(transactionDetails = f(sh03Transaction.transactionDetails))
+
+      "show your details, transfer details and declaration sections, with no buyer or seller" in {
+        sh03().sections.map(_.heading) mustBe Seq(
+          messages("transferDetails.yourDetails.heading"),
+          messages("transferDetails.transfer.heading"),
+          messages("transferDetails.declaration.heading")
+        )
+      }
+
+      "show the company details under your details" in {
+        val list = section(sh03(), "transferDetails.yourDetails.heading")
+        keys(list) mustBe Seq(
+          "org.sh03.companyDetails.companyName.label",
+          "org.sh03.companyDetails.crn.label",
+          "org.sh03.companyDetails.isPlc.label"
+        ).map(messages(_))
+        list.rows.map(value) mustBe Seq("Acme Holdings Ltd", "AB123456", messages("site.yes"))
+      }
+
+      "show the transfer answers in the check your answers order" in {
+        val list = transferList(sh03())
+        keys(list) mustBe Seq(
+          "org.sh03.reasonForPurchase.checkYourAnswersLabel",
+          "org.sh03.treasuryShares.checkYourAnswersLabel",
+          "org.sh03.connectedPersons.checkYourAnswersLabel",
+          "org.sh03.applyingForRelief.checkYourAnswersLabel",
+          "org.sh03.whatReliefAreYouApplyingFor.checkYourAnswersLabel",
+          "org.sh03.detailsOfSharePurchase.numberOfShares",
+          "org.sh03.detailsOfSharePurchase.typeOfShares",
+          "org.transferDetails.sh03.amountPaid",
+          "org.transferDetails.sh03.detailsOfSharePurchase.marketValue",
+          "org.transferDetails.sh03.maximumAmountPaid",
+          "org.transferDetails.sh03.minimumAmountPaid",
+          "org.sh03.chargingPoint.checkYourAnswersLabel"
+        ).map(messages(_))
+        list.rows.map(value) mustBe Seq(
+          messages("reasonForPurchase.cancellation"),
+          messages("site.yes"),
+          messages("site.yes"),
+          messages("site.yes"),
+          "Employee share scheme",
+          "1,500",
+          "Ordinary shares",
+          "£7,500",
+          "£9,000",
+          "£6",
+          "£4",
+          "1 July 2026"
+        )
+      }
+
+      "show 'No' for treasury shares when purchased for cancellation only" in {
+        val list = transferList(sh03(withDetails(_.copy(reasonForPurchase = Some(ReasonForPurchase.PurchasedForCancellation)))))
+        valueOf(list, "org.sh03.reasonForPurchase.checkYourAnswersLabel") mustBe messages("reasonForPurchase.cancellation")
+        valueOf(list, "org.sh03.treasuryShares.checkYourAnswersLabel") mustBe messages("site.no")
+      }
+
+      "leave out the treasury shares row when purchased to place into treasury" in {
+        val list = transferList(sh03(withDetails(_.copy(reasonForPurchase = Some(ReasonForPurchase.PurchasedToPlaceIntoTreasury)))))
+        valueOf(list, "org.sh03.reasonForPurchase.checkYourAnswersLabel") mustBe messages("reasonForPurchase.treasury")
+        rowFor(list, "org.sh03.treasuryShares.checkYourAnswersLabel") mustBe None
+      }
+
+      "leave out the relief, market value and max/min rows when ETMP doesn't hold them" in {
+        val list = transferList(sh03(withDetails(_.copy(
+          reliefClaimedName = None, marketValue = None, maxPricePaid = None, minPricePaid = None, isConnectedPartiesTransactions = false
+        ))))
+        valueOf(list, "org.sh03.applyingForRelief.checkYourAnswersLabel") mustBe messages("site.no")
+        valueOf(list, "org.sh03.connectedPersons.checkYourAnswersLabel") mustBe messages("site.no")
+        Seq(
+          "org.sh03.whatReliefAreYouApplyingFor.checkYourAnswersLabel",
+          "org.transferDetails.sh03.detailsOfSharePurchase.marketValue",
+          "org.transferDetails.sh03.maximumAmountPaid",
+          "org.transferDetails.sh03.minimumAmountPaid"
+        ).foreach(key => rowFor(list, key) mustBe None)
+      }
+
+      "show the declaration role and UKS organ" in {
+        val list = section(sh03(), "transferDetails.declaration.heading")
+        keys(list) mustBe Seq(
+          "org.sh03.roleAtPurchasingCompany.checkYourAnswersLabel",
+          "org.sh03.roleAtPurchasingCompany.uksOrgan.label"
+        ).map(messages(_))
+        list.rows.map(value) mustBe Seq(messages("org.sh03.roleAtPurchasingCompany.ukSocietas"), "Board of directors")
+      }
+
+      "show each declaration role with the business wording" in {
+        DeclarationRole.values.foreach { role =>
+          val transaction = sh03Transaction.copy(declaration = sh03Transaction.declaration.copy(role1 = Some(role), role2 = None))
+          val label = valueOf(section(sh03(transaction), "transferDetails.declaration.heading"), "org.sh03.roleAtPurchasingCompany.checkYourAnswersLabel")
+          label must not startWith "org.sh03."
+        }
+      }
+
+      "leave out the role row if ETMP has no declaration role" in {
+        val transaction = sh03Transaction.copy(declaration = sh03Transaction.declaration.copy(role1 = None, role2 = None))
+        section(sh03(transaction), "transferDetails.declaration.heading").rows mustBe empty
+      }
+
+      "use the transfer details page labels for the amounts" in {
+        val list = transferList(sh03())
+        Seq(
+          "org.transferDetails.sh03.amountPaid" -> "£7,500",
+          "org.transferDetails.sh03.detailsOfSharePurchase.marketValue" -> "£9,000",
+          "org.transferDetails.sh03.maximumAmountPaid" -> "£6",
+          "org.transferDetails.sh03.minimumAmountPaid" -> "£4"
+        ).foreach { case (key, expected) =>
+          messages.isDefinedAt(key) mustBe true
+          valueOf(list, key) mustBe expected
+        }
+      }
+
+      Seq("org", "agent").foreach { affinityKey =>
+        s"only use labels and values that exist in the messages file for $affinityKey users" in {
+          DeclarationRole.values.foreach { role =>
+            val transaction = sh03Transaction.copy(declaration = sh03Transaction.declaration.copy(role1 = Some(role)))
+            val model = build(transferWith(tax()), transaction = transaction, affinityKey = affinityKey, declareeName = Some("James White"))
+            val text = model.sections.flatMap(_.list.rows.flatMap(r => Seq(r.key.content.asHtml.toString, value(r))))
+            text.filter(t => t.startsWith("org.") || t.startsWith("agent.")) mustBe empty
+          }
+        }
+      }
+
+      "show the declaration role with the agent wording for agents" in {
+        val list = section(
+          build(transferWith(tax()), transaction = sh03Transaction, affinityKey = "agent", declareeName = Some("James White")),
+          "transferDetails.declaration.heading"
+        )
+        valueOf(list, "agent.sh03.roleAtPurchasingCompany.checkYourAnswersLabel") mustBe
+          messages("agent.sh03.roleAtPurchasingCompany.ukSocietas")
+      }
+
+      "escape free-text answers" in {
+        val list = section(sh03(withDetails(_.copy(companyName = "<b>Acme</b>"))), "transferDetails.yourDetails.heading")
+        valueOf(list, "org.sh03.companyDetails.companyName.label") mustBe "&lt;b&gt;Acme&lt;/b&gt;"
+      }
+    }
+}
 }
