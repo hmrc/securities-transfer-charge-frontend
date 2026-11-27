@@ -28,8 +28,9 @@ import uk.gov.hmrc.securitiestransferchargefrontend.models.Relief
 
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
+import scala.util.control.NonFatal
 
-final class ReliefsUnavailableException(message: String) extends RuntimeException(message)
+final class ReliefsUnavailableException(message: String, cause: Throwable = null) extends RuntimeException(message, cause)
 
 trait ReliefsClient:
   /** Gets the current list of reliefs from the submissions service. Fails with [[ReliefsUnavailableException]]. */
@@ -46,6 +47,12 @@ class ReliefsClientImpl @Inject()(
     http
       .get(url"${appConfig.submissionsServiceUrl}/reliefs")
       .execute[HttpResponse]
+      .recoverWith {
+        // Connection refused, timeouts and similar: report them the same way as a bad response.
+        case NonFatal(e) =>
+          logger.warn("Could not reach the submissions service for reliefs", e)
+          Future.failed(new ReliefsUnavailableException("Could not reach the submissions service for reliefs", e))
+      }
       .map { response =>
         if response.status != OK then
           logger.warn(s"Submissions service returned ${response.status} for reliefs")

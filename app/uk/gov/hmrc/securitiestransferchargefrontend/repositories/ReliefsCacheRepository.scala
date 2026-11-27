@@ -16,7 +16,7 @@
 
 package uk.gov.hmrc.securitiestransferchargefrontend.repositories
 
-import org.mongodb.scala.model.{Filters, ReplaceOptions}
+import org.mongodb.scala.model.{Filters, IndexModel, IndexOptions, Indexes, ReplaceOptions}
 import play.api.libs.json.{Format, Json, OFormat}
 import uk.gov.hmrc.mongo.MongoComponent
 import uk.gov.hmrc.mongo.play.json.PlayMongoRepository
@@ -43,6 +43,8 @@ trait ReliefsCache:
 
 // There is deliberately no TTL index. How long data stays "fresh" is decided by ReliefsService, and expired data is kept
 // so that it can be used as a backup when the submissions service cannot supply the reliefs.
+// The unique index on "key" stops concurrent first writes (for example several instances starting at once) from
+// inserting more than one document.
 @Singleton
 class ReliefsCacheRepository @Inject() (
   mongoComponent: MongoComponent
@@ -51,7 +53,13 @@ class ReliefsCacheRepository @Inject() (
     collectionName = "reliefs-cache",
     mongoComponent = mongoComponent,
     domainFormat   = CachedReliefs.given_OFormat_CachedReliefs,
-    indexes        = Seq.empty
+    indexes        = Seq(
+      IndexModel(
+        Indexes.ascending("key"),
+        IndexOptions().name("key_unique_idx").unique(true)
+      )
+    ),
+    replaceIndexes = true
   ) with ReliefsCache {
 
   private[repositories] def dropCollection(): Future[Unit] =

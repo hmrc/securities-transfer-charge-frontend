@@ -93,6 +93,22 @@ class ReliefsClientImplSpec extends SpecBase with BeforeAndAfterAll with BeforeA
       client.getReliefs().failed.futureValue mustBe a[ReliefsUnavailableException]
     }
 
+    "must report an unreachable submissions service as ReliefsUnavailableException" in {
+      // Nothing listens on this port, so the connection is refused.
+      val unreachableApp = GuiceApplicationBuilder()
+        .configure(
+          "auditing.enabled" -> false,
+          "microservice.services.securities-transfer-charge-submissions.host" -> "localhost",
+          "microservice.services.securities-transfer-charge-submissions.port" -> 1
+        )
+        .build()
+
+      try {
+        val unreachable = unreachableApp.injector.instanceOf[ReliefsClientImpl]
+        unreachable.getReliefs().failed.futureValue mustBe a[ReliefsUnavailableException]
+      } finally unreachableApp.stop().futureValue
+    }
+
     "must fail when the body is not in the expected shape" in {
       stub(200, """[{"name": "No percentage"}]""")
 

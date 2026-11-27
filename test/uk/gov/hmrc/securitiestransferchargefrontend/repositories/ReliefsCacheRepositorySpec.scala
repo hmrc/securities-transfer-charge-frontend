@@ -17,6 +17,7 @@
 package uk.gov.hmrc.securitiestransferchargefrontend.repositories
 
 import base.SpecBase
+import org.mongodb.scala.{ObservableFuture, SingleObservableFuture}
 import org.scalatest.BeforeAndAfterEach
 import play.api.Application
 import play.api.test.Helpers.{await, defaultAwaitTimeout}
@@ -36,6 +37,8 @@ class ReliefsCacheRepositorySpec extends SpecBase with BeforeAndAfterEach {
   override protected def beforeEach(): Unit = {
     super.beforeEach()
     await(repository.dropCollection())
+    // Dropping the collection also drops its indexes, so recreate them.
+    await(repository.ensureIndexes())
   }
 
   private val fetchedAt = Instant.parse("2026-11-27T12:00:00Z")
@@ -51,6 +54,23 @@ class ReliefsCacheRepositorySpec extends SpecBase with BeforeAndAfterEach {
       await(repository.store(reliefs, fetchedAt))
 
       await(repository.retrieve()) mustBe Some(CachedReliefs(reliefs, fetchedAt))
+    }
+
+    "have a unique index on key" in {
+      val indexes = await(repository.collection.listIndexes().toFuture())
+      val keyIndex = indexes.find(_.get("name").exists(_.asString.getValue == "key_unique_idx"))
+
+      keyIndex.flatMap(_.get("unique")).map(_.asBoolean.getValue) mustBe Some(true)
+    }
+
+    "reject a second document with the same key, so concurrent first writes cannot leave duplicates" in {
+      // Two writers that both find the collection empty each try to insert. The index makes the second one fail.
+      await(repository.collection.insertOne(CachedReliefs(reliefs, fetchedAt)).toFuture())
+
+      val second = repository.collection.insertOne(CachedReliefs(Seq(Relief("PISCES", 100)), fetchedAt)).toFuture()
+
+      second.failed.futureValue mustBe a[com.mongodb.MongoWriteException]
+      await(repository.collection.countDocuments().toFuture()) mustBe 1L
     }
 
     "replace the stored reliefs rather than adding to them" in {
