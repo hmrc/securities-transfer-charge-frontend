@@ -28,7 +28,13 @@ import uk.gov.hmrc.securitiestransferchargefrontend.models.Relief
 import uk.gov.hmrc.securitiestransferchargefrontend.repositories.{CachedReliefs, ReliefsCache}
 import uk.gov.hmrc.securitiestransferchargefrontend.services.ReliefsServiceImpl
 
+import ch.qos.logback.classic.spi.ILoggingEvent
+import ch.qos.logback.classic.{Level, Logger}
+import ch.qos.logback.core.read.ListAppender
+import org.slf4j.LoggerFactory
+
 import java.time.{Clock, Duration, Instant, ZoneOffset}
+import scala.jdk.CollectionConverters.*
 import scala.concurrent.Future
 
 class ReliefsServiceImplSpec extends SpecBase with MockitoSugar with BeforeAndAfterEach {
@@ -57,6 +63,27 @@ class ReliefsServiceImplSpec extends SpecBase with MockitoSugar with BeforeAndAf
 
   private def cachedAt(fetchedAt: Instant): Unit =
     when(cache.retrieve()).thenReturn(Future.successful(Some(CachedReliefs(cachedReliefs, fetchedAt))))
+
+  // Captures what ReliefsServiceImpl logs at WARN or above while `block` runs. The test logback config turns
+  // logging off, so the logger's level is set to WARN for the duration and restored afterwards.
+  private def logsDuring(block: => Any): Seq[ILoggingEvent] = {
+    val logger        = LoggerFactory.getLogger(classOf[ReliefsServiceImpl]).asInstanceOf[Logger]
+    val originalLevel = logger.getLevel
+    val appender      = new ListAppender[ILoggingEvent]()
+    appender.start()
+    logger.setLevel(Level.WARN)
+    logger.addAppender(appender)
+    try {
+      block
+      appender.list.asScala.toSeq
+    } finally {
+      logger.detachAppender(appender)
+      logger.setLevel(originalLevel)
+    }
+  }
+
+  private def warnings(events: Seq[ILoggingEvent]): Seq[String] =
+    events.filter(_.getLevel == Level.WARN).map(_.getFormattedMessage)
 
   "ReliefsServiceImpl.getReliefs" - {
 
@@ -95,11 +122,65 @@ class ReliefsServiceImplSpec extends SpecBase with MockitoSugar with BeforeAndAf
       verify(cache, never()).store(any(), any())
     }
 
-    "must fail when nothing is cached and the reliefs cannot be fetched" in {
+    "must fail, and log a warning, when nothing is cached and the reliefs cannot be fetched" in {
       when(cache.retrieve()).thenReturn(Future.successful(None))
       when(client.getReliefs()(any())).thenReturn(Future.failed(new ReliefsUnavailableException("down")))
 
+      val events = logsDuring {
+        service.getReliefs().failed.futureValue mustBe a[ReliefsUnavailableException]
+      }
+
+      warnings(events) must contain("Could not get reliefs and none are cached")
+    }
+
+    "must drop reliefs whose percentage is outside 1 to 100, with a warning, and cache the rest" in {
+      when(cache.retrieve()).thenReturn(Future.successful(None))
+      val received = Seq(
+        Relief("Valid Low", 1),
+        Relief("Zero", 0),
+        Relief("Negative", -5),
+        Relief("Valid High", 100),
+        Relief("Too High", 101)
+      )
+      when(client.getReliefs()(any())).thenReturn(Future.successful(received))
+
+      val events = logsDuring {
+        service.getReliefs().futureValue mustBe Seq(Relief("Valid Low", 1), Relief("Valid High", 100))
+      }
+
+      verify(cache).store(Seq(Relief("Valid Low", 1), Relief("Valid High", 100)), now)
+      warnings(events) must contain allOf(
+        "Dropping relief 'Zero': percentage 0 is not between 1 and 100",
+        "Dropping relief 'Negative': percentage -5 is not between 1 and 100",
+        "Dropping relief 'Too High': percentage 101 is not between 1 and 100"
+      )
+    }
+
+    "must keep the cached reliefs, and not overwrite them, when an empty list is received" in {
+      cachedAt(now.minus(Duration.ofHours(25)))
+      when(client.getReliefs()(any())).thenReturn(Future.successful(Seq.empty))
+
+      service.getReliefs().futureValue mustBe cachedReliefs
+
+      verify(cache, never()).store(any(), any())
+    }
+
+    "must keep the cached reliefs, and not overwrite them, when every received relief is invalid" in {
+      cachedAt(now.minus(Duration.ofHours(25)))
+      when(client.getReliefs()(any())).thenReturn(Future.successful(Seq(Relief("Zero", 0), Relief("Too High", 101))))
+
+      service.getReliefs().futureValue mustBe cachedReliefs
+
+      verify(cache, never()).store(any(), any())
+    }
+
+    "must fail, and not cache anything, when an empty list is received and nothing is cached" in {
+      when(cache.retrieve()).thenReturn(Future.successful(None))
+      when(client.getReliefs()(any())).thenReturn(Future.successful(Seq.empty))
+
       service.getReliefs().failed.futureValue mustBe a[ReliefsUnavailableException]
+
+      verify(cache, never()).store(any(), any())
     }
 
     "must still return the reloaded reliefs when saving them to the cache fails" in {
