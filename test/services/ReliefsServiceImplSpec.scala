@@ -26,7 +26,7 @@ import uk.gov.hmrc.securitiestransferchargefrontend.clients.{ReliefsClient, Reli
 import uk.gov.hmrc.securitiestransferchargefrontend.config.FrontendAppConfig
 import uk.gov.hmrc.securitiestransferchargefrontend.models.Relief
 import uk.gov.hmrc.securitiestransferchargefrontend.repositories.{CachedReliefs, ReliefsCache}
-import uk.gov.hmrc.securitiestransferchargefrontend.services.ReliefsServiceImpl
+import uk.gov.hmrc.securitiestransferchargefrontend.services.{BundledReliefs, ReliefsServiceImpl}
 
 import ch.qos.logback.classic.spi.ILoggingEvent
 import ch.qos.logback.classic.{Level, Logger}
@@ -52,7 +52,11 @@ class ReliefsServiceImplSpec extends SpecBase with MockitoSugar with BeforeAndAf
   private val cache     = mock[ReliefsCache]
   private val appConfig = mock[FrontendAppConfig]
 
-  private val service = new ReliefsServiceImpl(client, cache, appConfig, clock)
+  // What the bundled file holds in tests: two reliefs, so a fallback is recognisable.
+  private val bundledList = Seq(Relief("Bundled One", 100), Relief("Bundled Two", 50))
+  private val bundled     = new BundledReliefs { override val reliefs: Seq[Relief] = bundledList }
+
+  private val service = new ReliefsServiceImpl(client, cache, appConfig, bundled, clock)
 
   override def beforeEach(): Unit = {
     super.beforeEach()
@@ -122,15 +126,36 @@ class ReliefsServiceImplSpec extends SpecBase with MockitoSugar with BeforeAndAf
       verify(cache, never()).store(any(), any())
     }
 
-    "must fail, and log a warning, when nothing is cached and the reliefs cannot be fetched" in {
+    "must use the bundled reliefs, with a warning, when nothing is cached and the reliefs cannot be fetched" in {
       when(cache.retrieve()).thenReturn(Future.successful(None))
       when(client.getReliefs()(any())).thenReturn(Future.failed(new ReliefsUnavailableException("down")))
 
       val events = logsDuring {
-        service.getReliefs().failed.futureValue mustBe a[ReliefsUnavailableException]
+        service.getReliefs().futureValue mustBe bundledList
       }
 
-      warnings(events) must contain("Could not get reliefs and none are cached")
+      warnings(events) must contain allOf(
+        "Could not get reliefs and none are cached",
+        "Using the 2 reliefs bundled with the service"
+      )
+    }
+
+    "must not cache the bundled reliefs, so the submissions service is asked again next time" in {
+      when(cache.retrieve()).thenReturn(Future.successful(None))
+      when(client.getReliefs()(any())).thenReturn(Future.failed(new ReliefsUnavailableException("down")))
+
+      service.getReliefs().futureValue mustBe bundledList
+
+      verify(cache, never()).store(any(), any())
+    }
+
+    "must fail when nothing is cached, the reliefs cannot be fetched and there are no bundled reliefs" in {
+      val empty = new BundledReliefs { override val reliefs: Seq[Relief] = Seq.empty }
+      val noBundled = new ReliefsServiceImpl(client, cache, appConfig, empty, clock)
+      when(cache.retrieve()).thenReturn(Future.successful(None))
+      when(client.getReliefs()(any())).thenReturn(Future.failed(new ReliefsUnavailableException("down")))
+
+      noBundled.getReliefs().failed.futureValue mustBe a[ReliefsUnavailableException]
     }
 
     "must drop reliefs whose percentage is outside 1 to 100, with a warning, and cache the rest" in {
@@ -174,11 +199,11 @@ class ReliefsServiceImplSpec extends SpecBase with MockitoSugar with BeforeAndAf
       verify(cache, never()).store(any(), any())
     }
 
-    "must fail, and not cache anything, when an empty list is received and nothing is cached" in {
+    "must use the bundled reliefs, and not cache anything, when an empty list is received and nothing is cached" in {
       when(cache.retrieve()).thenReturn(Future.successful(None))
       when(client.getReliefs()(any())).thenReturn(Future.successful(Seq.empty))
 
-      service.getReliefs().failed.futureValue mustBe a[ReliefsUnavailableException]
+      service.getReliefs().futureValue mustBe bundledList
 
       verify(cache, never()).store(any(), any())
     }

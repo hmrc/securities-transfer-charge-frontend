@@ -89,6 +89,9 @@ class FrontendAppConfig @Inject() (configuration: Configuration, servicesConfig:
   // Older reliefs are kept as a backup in case the refresh fails.
   val reliefsCacheTtl: java.time.Duration = configuration.get[java.time.Duration]("reliefs.cache-ttl")
 
+  // Last-resort reliefs, used only when none are cached and the submissions service cannot supply them.
+  val bundledReliefsFile: String = configuration.get[String]("reliefs.bundled-file")
+
   private val exitSurveyBaseUrl: String = configuration.get[String]("feedback-frontend.url")
   val exitSurveyUrl: String             = s"$exitSurveyBaseUrl/securities-transfer-charge-frontend"
 

@@ -32,10 +32,13 @@ import scala.util.control.NonFatal
   *
   * Reliefs are cached in Mongo and refreshed from the submissions service once they are older than
   * `appConfig.reliefsCacheTtl`. Expired reliefs are kept: if the refresh fails they are used as a backup. Only when
-  * nothing has ever been cached and the submissions service fails does the failure reach the caller.
+  * nothing has ever been cached and the submissions service fails do the bundled reliefs come into play.
   *
   * Reliefs with a rate outside 1 to 100 are dropped with a warning. An empty list never replaces the cached reliefs:
   * it is treated like a failed refresh.
+  *
+  * If nothing has ever been cached and the submissions service cannot supply the reliefs, the reliefs bundled with the
+  * service are used instead. They are not cached, so the submissions service is tried again on the next request.
   */
 trait ReliefsService:
   def getReliefs()(implicit hc: HeaderCarrier): Future[Seq[Relief]]
@@ -45,6 +48,7 @@ class ReliefsServiceImpl @Inject()(
   client: ReliefsClient,
   cache: ReliefsCache,
   appConfig: FrontendAppConfig,
+  bundled: BundledReliefs,
   clock: Clock
 )(implicit ec: ExecutionContext) extends ReliefsService with Logging:
 
@@ -74,8 +78,18 @@ class ReliefsServiceImpl @Inject()(
           Future.successful(stale.reliefs)
         case None =>
           logger.warn("Could not get reliefs and none are cached", e)
-          Future.failed(e)
+          bundledReliefs(e)
     }
+
+  // Last resort. Not cached, so the submissions service is asked again next time.
+  private def bundledReliefs(cause: Throwable): Future[Seq[Relief]] =
+    val reliefs = validReliefs(bundled.reliefs)
+    if reliefs.isEmpty then
+      logger.warn("No bundled reliefs are available either")
+      Future.failed(cause)
+    else
+      logger.warn(s"Using the ${reliefs.size} reliefs bundled with the service")
+      Future.successful(reliefs)
 
   import ReliefsServiceImpl.{MaxRate, MinRate}
 

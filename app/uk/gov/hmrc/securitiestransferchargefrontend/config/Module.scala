@@ -96,6 +96,7 @@ class Module extends AbstractModule {
     bind(classOf[ReliefsClient]).to(classOf[ReliefsClientImpl])
     bind(classOf[ReliefsCache]).to(classOf[ReliefsCacheRepository])
     bind(classOf[ReliefsService]).to(classOf[ReliefsServiceImpl])
+    bind(classOf[BundledReliefs]).to(classOf[BundledReliefsImpl])
     
     bind(classOf[Navigator])
       .annotatedWith(Names.named("organisations"))
