@@ -19,6 +19,7 @@ package services.fileupload.processing
 import base.{AuditTestSupport, FileUploadFixtures, Fixtures, SpecBase}
 import org.mockito.ArgumentMatchers
 import org.mockito.ArgumentMatchers.any
+import org.mockito.ArgumentMatchers.argThat
 import org.mockito.Mockito.{inOrder as mockitoInOrder, *}
 import org.scalatest.BeforeAndAfterEach
 import org.scalatestplus.mockito.MockitoSugar
@@ -27,6 +28,8 @@ import play.api.mvc.AnyContentAsEmpty
 import play.api.test.FakeRequest
 import play.api.test.Helpers.{await, defaultAwaitTimeout, running}
 import uk.gov.hmrc.http.HeaderCarrier
+import uk.gov.hmrc.securitiestransferchargefrontend.models.audit.BulkUploadProcessedAuditModel
+import uk.gov.hmrc.securitiestransferchargefrontend.clients.ReliefsUnavailableException
 import uk.gov.hmrc.securitiestransferchargefrontend.connectors.{SubscriptionConnector, UpscanDownloadException}
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.actions.requests.{AgentUniqueIdentifier, StcAuthorisedRequest}
 import uk.gov.hmrc.securitiestransferchargefrontend.domain.{CredentialId, SubscriptionId}
@@ -376,6 +379,36 @@ class ProcessingServiceSpec extends SpecBase with MockitoSugar with BeforeAndAft
 
         verify(mockUpscanJourneyRepository)
           .updateStatus(reference, Completed)
+      }
+    }
+
+    "must update status to UpscanDownloadError and audit a failure when the reliefs are unavailable" in {
+
+      stubStatusUpdates()
+
+      when(
+        mockUpscanProcessingService.process(any[FileUpload], any[String], any[JourneyType])(any())
+      ).thenReturn(
+        Future.failed(new ReliefsUnavailableException("submissions service down"))
+      )
+
+      running(fakeApplication()) {
+
+        await(
+          service.processReadyUpload(
+            reference,
+            fileUpload,
+            affinityKey,
+            STF
+          )
+        )
+
+        verify(mockUpscanJourneyRepository)
+          .updateStatus(reference, UpscanDownloadError)
+
+        verify(mockAuditService).audit(argThat[BulkUploadProcessedAuditModel](
+          m => m.fileUploadStatus == "Failure" && m.errorType.contains("reliefsUnavailable")
+        ))(any[HeaderCarrier])
       }
     }
 
