@@ -207,36 +207,36 @@ object TransferDetailsViewModel {
   }
 
   // Business SH03 sections, grouped as on the business SH03 check your answers page.
-  private def sh03Sections(transaction: ViewTransferResponse)(implicit messages: Messages): Seq[TransferDetailsSection] = {
+  private def sh03Sections(transaction: ViewTransferResponse,affinityKey: String)(implicit messages: Messages): Seq[TransferDetailsSection] = {
     val details = transaction.transactionDetails
     val relief = details.reliefClaimedName.filter(_.trim.nonEmpty)
     val reason = details.reasonForPurchase
 
     val yourDetails = Seq(
-      Some(row("org.sh03.companyDetails.companyName.label", details.companyName)),
-      details.companyRegistrationNumber.filter(_.trim.nonEmpty).map(row("org.sh03.companyDetails.crn.label", _)),
-      transaction.mainBuyerDetails.isPLC.map(isPlc => row("org.sh03.companyDetails.isPlc.label", yesNo(isPlc)))
+      Some(row(s"$affinityKey.sh03.companyDetails.companyName.label", details.companyName)),
+      details.companyRegistrationNumber.filter(_.trim.nonEmpty).map(row(s"$affinityKey.sh03.companyDetails.crn.label", _)),
+      transaction.mainBuyerDetails.isPLC.map(isPlc => row(s"$affinityKey.sh03.companyDetails.isPlc.label", yesNo(isPlc)))
     ).flatten
 
     val transferDetails = Seq(
-      reason.map(r => row("org.sh03.reasonForPurchase.checkYourAnswersLabel", sh03ReasonText(r))),
-      reason.flatMap(sh03TreasuryShares).map(t => row("org.sh03.treasuryShares.checkYourAnswersLabel", yesNo(t))),
-      Some(row("org.sh03.connectedPersons.checkYourAnswersLabel", yesNo(details.isConnectedPartiesTransactions))),
-      Some(row("org.sh03.applyingForRelief.checkYourAnswersLabel", yesNo(relief.isDefined))),
-      relief.map(row("org.sh03.whatReliefAreYouApplyingFor.checkYourAnswersLabel", _)),
-      Some(row("org.sh03.detailsOfSharePurchase.numberOfShares", CommonHelpers.formatWithCommas(details.numberOfShares))),
-      Some(row("org.sh03.detailsOfSharePurchase.typeOfShares", details.typeOfSecurity)),
-      Some(row("transferDetails.sh03.amountPaid", currency(details.considerationActual))),
-      details.marketValue.map(v => row("org.sh03.detailsOfSharePurchase.checkYourAnswersLabel.marketValue", currency(v))),
-      details.maxPricePaid.map(v => row("org.sh03.maximumAmountPaid.checkYourAnswersLabel", currency(v))),
-      details.minPricePaid.map(v => row("org.sh03.minimumAmountPaid.checkYourAnswersLabel", currency(v))),
-      Some(row("org.sh03.chargingPoint.checkYourAnswersLabel", formatDate(details.originalChargingPoint)))
+      reason.map(r => row(s"$affinityKey.sh03.reasonForPurchase.checkYourAnswersLabel", sh03ReasonText(r))),
+      reason.flatMap(sh03TreasuryShares).map(t => row(s"$affinityKey.sh03.treasuryShares.checkYourAnswersLabel", yesNo(t))),
+      Some(row(s"$affinityKey.sh03.connectedPersons.checkYourAnswersLabel", yesNo(details.isConnectedPartiesTransactions))),
+      Some(row(s"$affinityKey.sh03.applyingForRelief.checkYourAnswersLabel", yesNo(relief.isDefined))),
+      relief.map(row(s"$affinityKey.sh03.whatReliefAreYouApplyingFor.checkYourAnswersLabel", _)),
+      Some(row(s"$affinityKey.sh03.detailsOfSharePurchase.numberOfShares", CommonHelpers.formatWithCommas(details.numberOfShares))),
+      Some(row(s"$affinityKey.sh03.detailsOfSharePurchase.typeOfShares", details.typeOfSecurity)),
+      Some(row(s"$affinityKey.transferDetails.sh03.amountPaid", currency(details.considerationActual))),
+      details.marketValue.map(v => row(s"$affinityKey.transferDetails.sh03.detailsOfSharePurchase.marketValue", currency(v))),
+      details.maxPricePaid.map(v => row(s"$affinityKey.transferDetails.sh03.maximumAmountPaid", currency(v))),
+      details.minPricePaid.map(v => row(s"$affinityKey.transferDetails.sh03.minimumAmountPaid", currency(v))),
+      Some(row(s"$affinityKey.sh03.chargingPoint.checkYourAnswersLabel", formatDate(details.originalChargingPoint)))
     ).flatten
 
     val declaration = transaction.declaration
     val declarationRows = Seq(
-      declaration.role1.map(r => row("org.sh03.roleAtPurchasingCompany.checkYourAnswersLabel", sh03RoleText(r))),
-      declaration.role2.filter(_.trim.nonEmpty).map(row("org.sh03.roleAtPurchasingCompany.uksOrgan.label", _))
+      declaration.role1.map(r => row(s"$affinityKey.sh03.roleAtPurchasingCompany.checkYourAnswersLabel", sh03RoleText(r))),
+      declaration.role2.filter(_.trim.nonEmpty).map(row(s"$affinityKey.sh03.roleAtPurchasingCompany.uksOrgan.label", _))
     ).flatten
 
     Seq(
@@ -271,7 +271,7 @@ object TransferDetailsViewModel {
       paidChargesUrl    = Option.when(anyPaid)(dashboardRoutes.PaidChargesController.onPageLoad(submissionId, transferNumber).url),
       referenceList     = referenceList(submission, transfer),
       sections          = submission.submissionType match {
-        case TransferType.SH03 => sh03Sections(transaction)
+        case TransferType.SH03 => sh03Sections(transaction,affinityKey)
         case _                 => stfSections(transaction, isAgent, affinityKey)
       }
     )

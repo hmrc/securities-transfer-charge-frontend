@@ -444,10 +444,10 @@ class TransferDetailsViewModelSpec extends SpecBase with GuiceOneAppPerSuite {
           "org.sh03.whatReliefAreYouApplyingFor.checkYourAnswersLabel",
           "org.sh03.detailsOfSharePurchase.numberOfShares",
           "org.sh03.detailsOfSharePurchase.typeOfShares",
-          "transferDetails.sh03.amountPaid",
-          "org.sh03.detailsOfSharePurchase.checkYourAnswersLabel.marketValue",
-          "org.sh03.maximumAmountPaid.checkYourAnswersLabel",
-          "org.sh03.minimumAmountPaid.checkYourAnswersLabel",
+          "org.transferDetails.sh03.amountPaid",
+          "org.transferDetails.sh03.detailsOfSharePurchase.marketValue",
+          "org.transferDetails.sh03.maximumAmountPaid",
+          "org.transferDetails.sh03.minimumAmountPaid",
           "org.sh03.chargingPoint.checkYourAnswersLabel"
         ).map(messages(_))
         list.rows.map(value) mustBe Seq(
@@ -486,9 +486,9 @@ class TransferDetailsViewModelSpec extends SpecBase with GuiceOneAppPerSuite {
         valueOf(list, "org.sh03.connectedPersons.checkYourAnswersLabel") mustBe messages("site.no")
         Seq(
           "org.sh03.whatReliefAreYouApplyingFor.checkYourAnswersLabel",
-          "org.sh03.detailsOfSharePurchase.checkYourAnswersLabel.marketValue",
-          "org.sh03.maximumAmountPaid.checkYourAnswersLabel",
-          "org.sh03.minimumAmountPaid.checkYourAnswersLabel"
+          "org.transferDetails.sh03.detailsOfSharePurchase.marketValue",
+          "org.transferDetails.sh03.maximumAmountPaid",
+          "org.transferDetails.sh03.minimumAmountPaid"
         ).foreach(key => rowFor(list, key) mustBe None)
       }
 
@@ -512,6 +512,24 @@ class TransferDetailsViewModelSpec extends SpecBase with GuiceOneAppPerSuite {
       "leave out the role row if ETMP has no declaration role" in {
         val transaction = sh03Transaction.copy(declaration = sh03Transaction.declaration.copy(role1 = None, role2 = None))
         section(sh03(transaction), "transferDetails.declaration.heading").rows mustBe empty
+      }
+
+      "use the transfer details page labels for the amounts" in {
+        val list = transferList(sh03())
+        Seq(
+          "org.transferDetails.sh03.amountPaid" -> "£7,500",
+          "org.transferDetails.sh03.detailsOfSharePurchase.marketValue" -> "£9,000",
+          "org.transferDetails.sh03.maximumAmountPaid" -> "£6",
+          "org.transferDetails.sh03.minimumAmountPaid" -> "£4"
+        ).foreach { case (key, expected) =>
+          messages.isDefinedAt(key) mustBe true
+          valueOf(list, key) mustBe expected
+        }
+      }
+
+      "only use labels that exist in the messages file" in {
+        val labels = sh03().sections.flatMap(_.list.rows.map(_.key.content.asHtml.toString))
+        labels.filter(_.startsWith("org.")) mustBe empty
       }
 
       "escape free-text answers" in {

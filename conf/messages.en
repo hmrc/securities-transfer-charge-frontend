@@ -1545,7 +1545,11 @@ transferDetails.crn = Company registration number (CRN)
 transferDetails.numberOfSecurities = Number of securities
 transferDetails.yourDetails.heading = Your details
 transferDetails.declaration.heading = Declaration
-transferDetails.sh03.amountPaid = Amount paid for the shares
+org.transferDetails.sh03.amountPaid = Amount paid for the shares
+org.transferDetails.sh03.detailsOfSharePurchase.marketValue = Market value of the shares
+org.transferDetails.sh03.maximumAmountPaid = Maximum amount paid for the shares
+org.transferDetails.sh03.minimumAmountPaid = Minimum amount paid for the shares
+
 
 paidCharges.title = Paid charges
 paidCharges.heading = Paid charges
