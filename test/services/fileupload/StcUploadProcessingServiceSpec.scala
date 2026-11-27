@@ -25,6 +25,7 @@ import uk.gov.hmrc.securitiestransferchargefrontend.models.stf.fileupload.*
 import uk.gov.hmrc.securitiestransferchargefrontend.services.fileupload.{StcFileValidationService, StcUploadParsingService, StcUploadProcessingService}
 
 import java.io.ByteArrayInputStream
+import base.stubs.StubReliefsService
 
 class StcUploadProcessingServiceSpec extends SpecBase with MockitoSugar {
 
@@ -114,10 +115,10 @@ class StcUploadProcessingServiceSpec extends SpecBase with MockitoSugar {
         block(headers, rowStream)
       }
 
-      when(stcFileValidationService.validateStream(rowStream, headers, affinityGroupKeyInd, STF))
+      when(stcFileValidationService.validateStream(rowStream, headers, affinityGroupKeyInd, STF, StubReliefsService.names))
         .thenReturn(Right((validationResponse, validationTime)))
 
-      service.process(uploadedFile, affinityGroupKeyInd, STF) mustBe Right((validationResponse, validationTime))
+      service.process(uploadedFile, affinityGroupKeyInd, STF, StubReliefsService.names) mustBe Right((validationResponse, validationTime))
     }
 
     "return parse errors without validating" in {
@@ -129,7 +130,7 @@ class StcUploadProcessingServiceSpec extends SpecBase with MockitoSugar {
         )(any())
       ).thenReturn(Left((FileParseError.EmptyFile, 0L)))
 
-      service.process(uploadedFile, affinityGroupKeyInd, STF) mustBe Left((FileParseError.EmptyFile, 0L))
+      service.process(uploadedFile, affinityGroupKeyInd, STF, StubReliefsService.names) mustBe Left((FileParseError.EmptyFile, 0L))
     }
   }
 }

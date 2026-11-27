@@ -19,6 +19,7 @@ package models.submission
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpec
 import uk.gov.hmrc.securitiestransferchargefrontend.domain.TransferType
+import uk.gov.hmrc.securitiestransferchargefrontend.models.Relief
 import uk.gov.hmrc.securitiestransferchargefrontend.models.sh03.bulk.CompanyDetails
 import uk.gov.hmrc.securitiestransferchargefrontend.models.stf
 import uk.gov.hmrc.securitiestransferchargefrontend.models.stf.fileupload.{ParsedStcRow, ParsedValue}
@@ -27,6 +28,9 @@ import uk.gov.hmrc.securitiestransferchargefrontend.models.submission.*
 import java.time.LocalDate
 
 class RowTransformsSpec extends AnyWordSpec with Matchers {
+
+  // The fixture row claims "Group relief", and the expected requests below carry its percentage from this list.
+  private val reliefs = Seq(Relief("Group relief", 100), Relief("Other relief", 25))
 
   private val individualData = Individual(
     name = "John Doe",
@@ -81,7 +85,7 @@ class RowTransformsSpec extends AnyWordSpec with Matchers {
   "fromValidatedStcRow" should {
 
     "transform a validated row into a SingleTransferRequest (STF)" in {
-      RowTransforms.fromValidatedStcRowToStfRequest(parsedStcRow, individualData,None) shouldBe SingleTransferRequest(
+      RowTransforms.fromValidatedStcRowToStfRequest(parsedStcRow, individualData, reliefs, None) shouldBe SingleTransferRequest(
         recordId = 3,
         transactionDetails = SingleTransferTransactionDetails(
           transactionType = TransferType.STF,
@@ -134,7 +138,7 @@ class RowTransformsSpec extends AnyWordSpec with Matchers {
       val row = parsedStcRow.copy(whatTypeOfSecurities = Some("Ordinary"))
       val companyDetails = CompanyDetails(companyName = "Company", companyRegistrationNumber = "12345678")
       val agentReference = "REF-12345"
-      RowTransforms.fromValidatedStcRowToSh03Request(companyDetails)(row, individualData,Some(agentReference)) shouldBe SingleTransferRequest(
+      RowTransforms.fromValidatedStcRowToSh03Request(companyDetails)(row, individualData, reliefs, Some(agentReference)) shouldBe SingleTransferRequest(
         recordId = 3,
         transactionDetails = SingleTransferTransactionDetails(
           transactionType = TransferType.SH03,
@@ -179,7 +183,7 @@ class RowTransformsSpec extends AnyWordSpec with Matchers {
       val rowMissingBuyerPostcode = parsedStcRow.copy(sellerPostcode = None)
 
       an[IllegalArgumentException] shouldBe thrownBy {
-        RowTransforms.fromValidatedStcRowToStfRequest(rowMissingBuyerPostcode, individualData,None)
+        RowTransforms.fromValidatedStcRowToStfRequest(rowMissingBuyerPostcode, individualData, reliefs, None)
       }
     }
 
@@ -187,7 +191,7 @@ class RowTransformsSpec extends AnyWordSpec with Matchers {
       val rowMissingSellerCountry = parsedStcRow.copy(sellerCountry = None, sellerAddressInUK = Some(false))
 
       an[IllegalArgumentException] shouldBe thrownBy {
-        RowTransforms.fromValidatedStcRowToStfRequest(rowMissingSellerCountry, individualData,None)
+        RowTransforms.fromValidatedStcRowToStfRequest(rowMissingSellerCountry, individualData, reliefs, None)
       }
     }
 
@@ -195,14 +199,14 @@ class RowTransformsSpec extends AnyWordSpec with Matchers {
       val rowMissingMarketValue = parsedStcRow.copy(totalMarketValue = None)
 
       an[IllegalArgumentException] shouldBe thrownBy {
-        RowTransforms.fromValidatedStcRowToStfRequest(rowMissingMarketValue, individualData,None)
+        RowTransforms.fromValidatedStcRowToStfRequest(rowMissingMarketValue, individualData, reliefs, None)
       }
     }
 
     "use whatTypeOfSecurities as the type of security when not purchasing shares (STF)" in {
       val row = parsedStcRow.copy(purchasingShares = Some(false), whatTypeOfSecurities = Some("Bonds"))
 
-      RowTransforms.fromValidatedStcRowToStfRequest(row, individualData, None)
+      RowTransforms.fromValidatedStcRowToStfRequest(row, individualData, reliefs, None)
         .transactionDetails.typeOfSecurity shouldBe "Bonds"
     }
 
@@ -210,7 +214,7 @@ class RowTransformsSpec extends AnyWordSpec with Matchers {
       val row = parsedStcRow.copy(purchasingShares = Some(false), whatTypeOfSecurities = None)
 
       an[IllegalArgumentException] shouldBe thrownBy {
-        RowTransforms.fromValidatedStcRowToStfRequest(row, individualData, None)
+        RowTransforms.fromValidatedStcRowToStfRequest(row, individualData, reliefs, None)
       }
     }
 
@@ -218,7 +222,7 @@ class RowTransformsSpec extends AnyWordSpec with Matchers {
       val row = parsedStcRow.copy(purchasingShares = Some(true), typeOfShares = None)
 
       an[IllegalArgumentException] shouldBe thrownBy {
-        RowTransforms.fromValidatedStcRowToStfRequest(row, individualData, None)
+        RowTransforms.fromValidatedStcRowToStfRequest(row, individualData, reliefs, None)
       }
     }
 
@@ -226,7 +230,38 @@ class RowTransformsSpec extends AnyWordSpec with Matchers {
       val row = parsedStcRow.copy(purchasingShares = None)
 
       an[IllegalArgumentException] shouldBe thrownBy {
-        RowTransforms.fromValidatedStcRowToStfRequest(row, individualData, None)
+        RowTransforms.fromValidatedStcRowToStfRequest(row, individualData, reliefs, None)
+      }
+    }
+
+    "take the relief percentage from the list of reliefs (STF)" in {
+      val row = parsedStcRow.copy(whatReliefAreYouApplyingFor = Some("Other relief"))
+
+      RowTransforms.fromValidatedStcRowToStfRequest(row, individualData, reliefs, None)
+        .transactionDetails.reliefPercentage shouldBe Some(25)
+    }
+
+    "take the relief percentage from the list of reliefs (SH03)" in {
+      val row = parsedStcRow.copy(whatReliefAreYouApplyingFor = Some("Other relief"))
+
+      val companyDetails = CompanyDetails(companyName = "Company", companyRegistrationNumber = "12345678")
+
+      RowTransforms.fromValidatedStcRowToSh03Request(companyDetails)(row, individualData, reliefs, None)
+        .transactionDetails.reliefPercentage shouldBe Some(25)
+    }
+
+    "leave the relief percentage empty when no relief is claimed" in {
+      val row = parsedStcRow.copy(applyingForRelief = Some(false), whatReliefAreYouApplyingFor = None)
+
+      RowTransforms.fromValidatedStcRowToStfRequest(row, individualData, reliefs, None)
+        .transactionDetails.reliefPercentage shouldBe None
+    }
+
+    "throw when the claimed relief is not in the list of reliefs" in {
+      val row = parsedStcRow.copy(whatReliefAreYouApplyingFor = Some("Unknown relief"))
+
+      an[UnknownReliefException] shouldBe thrownBy {
+        RowTransforms.fromValidatedStcRowToStfRequest(row, individualData, reliefs, None)
       }
     }
   }

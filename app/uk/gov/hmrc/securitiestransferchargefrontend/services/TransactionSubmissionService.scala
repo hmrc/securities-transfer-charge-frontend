@@ -24,7 +24,7 @@ import uk.gov.hmrc.securitiestransferchargefrontend.clients.registration.Subscri
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.actions.requests.{StcDataRequest, UniqueIdentifier}
 import uk.gov.hmrc.securitiestransferchargefrontend.domain.TransferType.*
 import uk.gov.hmrc.securitiestransferchargefrontend.domain.{CredentialId, GroupIdentifier, SubmissionId, SubscriptionId, TransferType}
-import uk.gov.hmrc.securitiestransferchargefrontend.models.UserAnswers
+import uk.gov.hmrc.securitiestransferchargefrontend.models.{Relief, UserAnswers}
 import uk.gov.hmrc.securitiestransferchargefrontend.models.audit.JourneyStatus.{SubmissionFailure, SubmissionSuccess}
 import uk.gov.hmrc.securitiestransferchargefrontend.models.audit.{AuditModel, AuditType, SH03PostSubmissionAuditModelBuilder, STFPostSubmissionAuditModelBuilder}
 import uk.gov.hmrc.securitiestransferchargefrontend.models.stf.Address
@@ -38,6 +38,7 @@ import uk.gov.hmrc.securitiestransferchargefrontend.controllers.actions.requests
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 import scala.util.control.NonFatal
+import scala.util.{Failure, Success}
 
 trait TransactionSubmissionService:
   def submitSingleStf(implicit request: StcDataRequest[?]): Future[Boolean]
@@ -56,7 +57,8 @@ final class TransactionSubmissionServiceImpl @Inject()(
   subscriptionService           : SubscriptionService,
   auditService                  : AuditService,
   upscanJourneyRepository       : UpscanJourneyRepository,
-  checksumService               : ChecksumService)(
+  checksumService               : ChecksumService,
+  reliefsService                : ReliefsService)(
   implicit ec                   : ExecutionContext
 ) extends TransactionSubmissionService with Logging {
 
@@ -243,16 +245,32 @@ final class TransactionSubmissionServiceImpl @Inject()(
     successResponse: SubmissionCreateResponseSuccess,
     totalTransfers: Int = 1
   )(implicit hc: HeaderCarrier, request: StcDataRequest[?]): Unit = {
+    // The submission has already succeeded, so a failure to get the reliefs here only costs us the audit event.
+    reliefsService.getReliefs().onComplete {
+      case Success(reliefs) =>
+        sendSubmissionDataToAuditWith(transferType, affinityData, successResponse, totalTransfers, reliefs)
+      case Failure(e) =>
+        logger.warn(s"Could not audit the submission data for ${successResponse.submissionId}: the reliefs are unavailable", e)
+    }
+  }
+
+  private def sendSubmissionDataToAuditWith(
+    transferType: TransferType,
+    affinityData: AffinityData,
+    successResponse: SubmissionCreateResponseSuccess,
+    totalTransfers: Int,
+    reliefs: Seq[Relief]
+  )(implicit hc: HeaderCarrier, request: StcDataRequest[?]): Unit = {
     transferType match {
       case STF =>
-        etmpSubmissionService.getSubmissionDataStf(request.userAnswers, affinityData).foreach {
+        etmpSubmissionService.getSubmissionDataStf(request.userAnswers, affinityData, reliefs).foreach {
           case (stfRequest, stfTransaction) =>
             val stfRequests = (0 until totalTransfers).map(_ => stfRequest)
             val etmpResponses = (0 until totalTransfers).map(_ => successResponse)
             sendAuditSTF(stfRequests, etmpResponses, stfRequest.agentDetails, stfTransaction)
         }
       case SH03 =>
-        etmpSubmissionService.getSubmissionDataSh03(request.userAnswers, affinityData).foreach {
+        etmpSubmissionService.getSubmissionDataSh03(request.userAnswers, affinityData, reliefs).foreach {
           case (declaration, sh03Request) =>
             val sh03Requests = (0 until totalTransfers).map(_ => sh03Request)
             val etmpResponses = (0 until totalTransfers).map(_ => successResponse)

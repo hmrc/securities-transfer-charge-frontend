@@ -17,7 +17,7 @@
 package uk.gov.hmrc.securitiestransferchargefrontend.services.sh03.bulk
 
 import uk.gov.hmrc.securitiestransferchargefrontend.config.FrontendAppConfig
-import uk.gov.hmrc.securitiestransferchargefrontend.models.ReliefsDataSource
+import uk.gov.hmrc.securitiestransferchargefrontend.models.Relief
 import uk.gov.hmrc.securitiestransferchargefrontend.models.stf.fileupload.ParsedStcRow
 
 import javax.inject.{Inject, Singleton}
@@ -26,32 +26,31 @@ import scala.util.Try
 
 @Singleton
 class TaxDueCalculationService @Inject()(
-                                          reliefsDataSource: ReliefsDataSource,
                                           appConfig: FrontendAppConfig
                                         ) {
 
   private val taxRate = appConfig.taxRateSH03
 
-  def calculateTaxDue(row: ParsedStcRow): BigDecimal = {
+  def calculateTaxDue(row: ParsedStcRow, reliefs: Seq[Relief]): BigDecimal = {
     val amountPaid = row.amountPaidForSecurities.flatMap(s => Try(BigDecimal(s)).toOption).getOrElse(BigDecimal(0))
     val marketValue = row.totalMarketValue.flatMap(s => Try(BigDecimal(s)).toOption).getOrElse(BigDecimal(0))
     
     val higherValue = amountPaid.max(marketValue)
     val taxBeforeRelief = higherValue * taxRate
     
-    val reliefPercentage = getReliefPercentage(row).getOrElse(BigDecimal(0))
+    val reliefPercentage = getReliefPercentage(row, reliefs).getOrElse(BigDecimal(0))
     val reliefAmount = taxBeforeRelief * reliefPercentage
     val taxAfterRelief = (taxBeforeRelief - reliefAmount).max(BigDecimal(0))
     
     taxAfterRelief.setScale(2, RoundingMode.HALF_UP)
   }
 
-  private def getReliefPercentage(row: ParsedStcRow): Option[BigDecimal] = {
+  private def getReliefPercentage(row: ParsedStcRow, reliefs: Seq[Relief]): Option[BigDecimal] = {
     for {
       applyingForRelief <- row.applyingForRelief
       if applyingForRelief
       reliefName <- row.whatReliefAreYouApplyingFor
-      reliefData <- reliefsDataSource.reliefs.find(_.name == reliefName)
+      reliefData <- reliefs.find(_.name == reliefName)
     } yield BigDecimal(reliefData.rate) / 100
   }
 }

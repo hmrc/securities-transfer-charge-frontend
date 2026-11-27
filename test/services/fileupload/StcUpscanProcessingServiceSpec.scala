@@ -33,6 +33,7 @@ import java.io.ByteArrayInputStream
 import java.nio.charset.StandardCharsets
 import java.time.Instant
 import scala.concurrent.Future
+import base.stubs.StubReliefsService
 
 class StcUpscanProcessingServiceSpec extends SpecBase with EitherValues with MockitoSugar with OneInstancePerTest {
 
@@ -44,7 +45,8 @@ class StcUpscanProcessingServiceSpec extends SpecBase with EitherValues with Moc
   private val service = new StcUpscanProcessingServiceImpl(
     upscanFileDownloadConnector,
     stcUploadProcessingService,
-    fileParserSelector
+    fileParserSelector,
+    new StubReliefsService()
   )
 
   private val uploadDetails = UpscanCallbackRequest.UploadDetails(
@@ -79,7 +81,7 @@ class StcUpscanProcessingServiceSpec extends SpecBase with EitherValues with Moc
       when(upscanFileDownloadConnector.download(eqTo("https://example.com/download/ref-123"))(any[HeaderCarrier]))
         .thenReturn(Future.successful(inputStream))
 
-      when(stcUploadProcessingService.process(any[UploadedFile], eqTo(affinityGroupKeyInd), eqTo(STF)))
+      when(stcUploadProcessingService.process(any[UploadedFile], eqTo(affinityGroupKeyInd), eqTo(STF), eqTo(ReliefNames.from(StubReliefsService.reliefs))))
         .thenReturn(Right(validationResponse))
 
       val result = service.process(fileUpload, affinityGroupKeyInd, JourneyType.STF).futureValue
@@ -88,7 +90,7 @@ class StcUpscanProcessingServiceSpec extends SpecBase with EitherValues with Moc
 
       verify(fileParserSelector).select(eqTo("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"))
       verify(upscanFileDownloadConnector).download(eqTo("https://example.com/download/ref-123"))(any[HeaderCarrier])
-      verify(stcUploadProcessingService).process(any[UploadedFile], eqTo(affinityGroupKeyInd), eqTo(STF))
+      verify(stcUploadProcessingService).process(any[UploadedFile], eqTo(affinityGroupKeyInd), eqTo(STF), eqTo(ReliefNames.from(StubReliefsService.reliefs)))
     }
 
     "fail fast and return the parse error without downloading when MIME type is unsupported" in {
@@ -105,7 +107,7 @@ class StcUpscanProcessingServiceSpec extends SpecBase with EitherValues with Moc
       result.left.value mustBe (parseError, 0L)
 
       verify(upscanFileDownloadConnector, never()).download(any[String])(any[HeaderCarrier])
-      verify(stcUploadProcessingService, never()).process(any[UploadedFile], any[String], any[JourneyType])
+      verify(stcUploadProcessingService, never()).process(any[UploadedFile], any[String], any[JourneyType], any[Set[String]])
     }
 
     "fail when the upload status is not Ready" in {

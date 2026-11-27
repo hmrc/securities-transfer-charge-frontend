@@ -17,6 +17,7 @@
 package uk.gov.hmrc.securitiestransferchargefrontend.services.fileupload.processing
 
 import uk.gov.hmrc.http.HeaderCarrier
+import uk.gov.hmrc.securitiestransferchargefrontend.clients.ReliefsUnavailableException
 import uk.gov.hmrc.securitiestransferchargefrontend.connectors.{SubscriptionConnector, UpscanDownloadException}
 import uk.gov.hmrc.securitiestransferchargefrontend.controllers.actions.requests.StcAuthorisedRequest
 import uk.gov.hmrc.securitiestransferchargefrontend.models.JourneyType
@@ -28,6 +29,7 @@ import uk.gov.hmrc.securitiestransferchargefrontend.repositories.{ParsedStcRowsR
 import uk.gov.hmrc.securitiestransferchargefrontend.services.AuditService
 import uk.gov.hmrc.securitiestransferchargefrontend.services.fileupload.StcUpscanProcessingService
 
+import play.api.Logging
 import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -39,7 +41,7 @@ class ProcessingService @Inject()(
                                    subscriptionConnector: SubscriptionConnector,
                                    parsedStcRowsRepository:ParsedStcRowsRepository,
                                    auditService: AuditService
-                                 ) {
+                                 ) extends Logging {
 
   def processReadyUpload(
                           reference: String,
@@ -123,6 +125,16 @@ class ProcessingService @Inject()(
 
       }.recoverWith {
         case _: UpscanDownloadException =>
+          upscanJourneyRepository.updateStatus(reference, UpscanDownloadError)
+
+        // The reliefs are needed to check the file, and the submissions service could not supply them.
+        // Show the same "upload failed, try again" page as a download failure, and audit it.
+        case e: ReliefsUnavailableException =>
+          logger.warn(s"Bulk upload $reference could not be processed because reliefs are unavailable", e)
+          auditService.audit(auditBulkUploadFailure(
+            fileValidationTime = 0L,
+            errorType = "reliefsUnavailable",
+            volume = "0"))
           upscanJourneyRepository.updateStatus(reference, UpscanDownloadError)
       }
     }

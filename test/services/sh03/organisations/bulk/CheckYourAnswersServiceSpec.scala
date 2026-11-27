@@ -29,6 +29,7 @@ import uk.gov.hmrc.securitiestransferchargefrontend.services.sh03.organisations.
 import uk.gov.hmrc.securitiestransferchargefrontend.viewmodels.sh03.organisations.bulk.{CheckYourAnswersViewModel, CompanyDetailsSummary, RoleAtPurchasingCompanySummary, Sh03Transfer}
 
 import java.time.LocalDate
+import base.stubs.StubReliefsService
 
 class CheckYourAnswersServiceSpec extends SpecBase with FileUploadFixtures {
 
@@ -63,13 +64,13 @@ class CheckYourAnswersServiceSpec extends SpecBase with FileUploadFixtures {
 
       val document = ParsedStcRowsDocument(_id = "SomeRef", fileName = "test.csv", rows = Seq(row1, row2))
 
-      when(taxDueCalculationService.calculateTaxDue(row1))
+      when(taxDueCalculationService.calculateTaxDue(row1, StubReliefsService.reliefs))
         .thenReturn(BigDecimal("75.00"))
 
-      when(taxDueCalculationService.calculateTaxDue(row2))
+      when(taxDueCalculationService.calculateTaxDue(row2, StubReliefsService.reliefs))
         .thenReturn(BigDecimal("125.00"))
 
-      val result = service.buildViewModel(document, emptyUserAnswers)(lang, messages(applicationBuilder().build()))
+      val result = service.buildViewModel(document, emptyUserAnswers, StubReliefsService.reliefs)(lang, messages(applicationBuilder().build()))
 
       result shouldBe CheckYourAnswersViewModel(
         companyDetailsRows = CompanyDetailsSummary.rows(emptyUserAnswers)(messages(applicationBuilder().build())),
@@ -106,10 +107,10 @@ class CheckYourAnswersServiceSpec extends SpecBase with FileUploadFixtures {
         rows = Seq(rowEarliest, row2)
       )
 
-      when(taxDueCalculationService.calculateTaxDue(any()))
+      when(taxDueCalculationService.calculateTaxDue(any(), any()))
         .thenReturn(BigDecimal("10.00"))
 
-      val result = service.buildViewModel(document, emptyUserAnswers)(lang, messages(applicationBuilder().build()))
+      val result = service.buildViewModel(document, emptyUserAnswers, StubReliefsService.reliefs)(lang, messages(applicationBuilder().build()))
 
       result.paymentDueBy shouldBe "31 January 2026"
     }
@@ -122,13 +123,13 @@ class CheckYourAnswersServiceSpec extends SpecBase with FileUploadFixtures {
         rows = Seq(row1, row2)
       )
 
-      when(taxDueCalculationService.calculateTaxDue(row1))
+      when(taxDueCalculationService.calculateTaxDue(row1, StubReliefsService.reliefs))
         .thenReturn(BigDecimal("12.50"))
 
-      when(taxDueCalculationService.calculateTaxDue(row2))
+      when(taxDueCalculationService.calculateTaxDue(row2, StubReliefsService.reliefs))
         .thenReturn(BigDecimal("25.75"))
 
-      val result = service.buildViewModel(document, emptyUserAnswers)(lang, messages(applicationBuilder().build()))
+      val result = service.buildViewModel(document, emptyUserAnswers, StubReliefsService.reliefs)(lang, messages(applicationBuilder().build()))
 
       result.taxDue shouldBe "£38.25"
       result.transfers.map(_.taxDue).sum shouldBe BigDecimal("38.25")

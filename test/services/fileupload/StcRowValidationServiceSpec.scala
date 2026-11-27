@@ -25,6 +25,7 @@ import uk.gov.hmrc.securitiestransferchargefrontend.models.stf.fileupload.{FileP
 import uk.gov.hmrc.securitiestransferchargefrontend.services.fileupload.*
 import uk.gov.hmrc.securitiestransferchargefrontend.forms.stf.fileUpload.{AmountPaidForSecuritiesFormProvider, SecuritiesTargetFormProvider}
 import uk.gov.hmrc.securitiestransferchargefrontend.models.JourneyType.{SH03, STF}
+import base.stubs.StubReliefsService
 
 class StcRowValidationServiceSpec extends SpecBase {
 
@@ -102,7 +103,7 @@ class StcRowValidationServiceSpec extends SpecBase {
         )
       )
 
-      val result = service.validateStream(Seq(row).iterator, headers, affinityGroupKeyInd, STF, 25, 10000)
+      val result = service.validateStream(Seq(row).iterator, headers, affinityGroupKeyInd, STF, 25, 10000, reliefNames = StubReliefsService.names)
 
       result.isRight mustBe true
       result.toOption.get._1.head.validationErrors mustBe Seq.empty
@@ -132,7 +133,7 @@ class StcRowValidationServiceSpec extends SpecBase {
         )
       )
 
-      val result = service.validateStream(Seq(row).iterator, headers, affinityGroupKeyInd, STF, 25, 10000)
+      val result = service.validateStream(Seq(row).iterator, headers, affinityGroupKeyInd, STF, 25, 10000, reliefNames = StubReliefsService.names)
 
       result.isRight mustBe true
       val errors = result.toOption.get._1.head.validationErrors.map(_.fieldName)
@@ -180,7 +181,8 @@ class StcRowValidationServiceSpec extends SpecBase {
         affinityGroupKeyInd,
         STF,
         maxErrorsAllowed = 10,
-        maxRows = 10000
+        maxRows = 10000,
+        reliefNames = StubReliefsService.names
       )
 
       result.isRight mustBe true
@@ -199,7 +201,8 @@ class StcRowValidationServiceSpec extends SpecBase {
         affinityGroupKeyInd,
         STF,
         maxErrorsAllowed = 25,
-        maxRows = 1
+        maxRows = 1,
+        reliefNames = StubReliefsService.names
       )
       result.isLeft mustBe true
       result.left.toOption.get._1 mustBe FileParseError.RowLimitExceeded(2, 1)
@@ -214,7 +217,8 @@ class StcRowValidationServiceSpec extends SpecBase {
         affinityGroupKeyAgent,
         SH03,
         maxErrorsAllowed = 25,
-        maxRows = 10000
+        maxRows = 10000,
+        reliefNames = StubReliefsService.names
       )
 
       result.isRight mustBe true
@@ -236,7 +240,7 @@ class StcRowValidationServiceSpec extends SpecBase {
         )
       )
 
-      val result = service.validateStream(Seq(row).iterator, headers, affinityGroupKeyInd, STF, 25, 10000)
+      val result = service.validateStream(Seq(row).iterator, headers, affinityGroupKeyInd, STF, 25, 10000, reliefNames = StubReliefsService.names)
 
       result.isRight mustBe true
       val errors = result.toOption.get._1.head.validationErrors

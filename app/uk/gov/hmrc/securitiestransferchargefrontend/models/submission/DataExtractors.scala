@@ -16,13 +16,26 @@
 
 package uk.gov.hmrc.securitiestransferchargefrontend.models.submission
 
-import uk.gov.hmrc.securitiestransferchargefrontend.models.stf
+import uk.gov.hmrc.securitiestransferchargefrontend.models.{Relief, stf}
 import uk.gov.hmrc.securitiestransferchargefrontend.models.stf.fileupload.ParsedStcRow
 import uk.gov.hmrc.securitiestransferchargefrontend.models.submission.ReasonForPurchase.{Both, PurchasedForCancellation, PurchasedToPlaceIntoTreasury}
 
 import java.time.LocalDate
 
+/** A relief was claimed, but its percentage cannot be worked out, so the transaction must not be submitted. */
+final class UnknownReliefException(message: String) extends RuntimeException(message)
+
 object DataExtractors {
+
+  /** The percentage of the claimed relief, taken from the current list of reliefs. None when no relief is claimed. */
+  private[submission] def reliefPercentageFor(claimed: Boolean, name: Option[String], reliefs: Seq[Relief], where: => String): Option[Int] =
+    if !claimed then None
+    else
+      val reliefName = name.getOrElse(throw new UnknownReliefException(s"A relief is claimed but no relief name was given $where"))
+      // Exact name match, the same as the tax calculators, so the tax shown and the percentage submitted agree.
+      reliefs.find(_.name == reliefName) match
+        case Some(relief) => Some(relief.rate)
+        case None         => throw new UnknownReliefException(s"Relief '$reliefName' is not in the list of reliefs $where")
 
   private[submission] def required[A](value: Option[A], fieldName: String, rowNumber: Int): A =
     value.getOrElse(
@@ -65,8 +78,8 @@ object DataExtractors {
   private[submission] val reliefClaimed: DataExtractor[Boolean] =
     row => required(row.applyingForRelief, "applyingForRelief", row.rowNumber)
     
-  private[submission] val reliefPercentage: OptionalDataExtractor[Int] =
-    row => if reliefClaimed(row) then Some(100) else None // TODO: Get correct percentage based on what relief is being claimed
+  private[submission] def reliefPercentage(row: ParsedStcRow, reliefs: Seq[Relief]): Option[Int] =
+    reliefPercentageFor(reliefClaimed(row), row.whatReliefAreYouApplyingFor, reliefs, s"on row ${row.rowNumber}")
 
   private[submission] val getNumberOfShares: DataExtractor[Int] =
     row => required(row.securitiesQuantity, "securitiesQuantity", row.rowNumber).toInt

@@ -20,6 +20,7 @@ import uk.gov.hmrc.securitiestransferchargefrontend.utils.DateTimeFormats
 import uk.gov.hmrc.securitiestransferchargefrontend.config.CurrencyFormatter
 import com.google.inject.Inject
 import play.api.i18n.Lang
+import uk.gov.hmrc.securitiestransferchargefrontend.models.Relief
 import uk.gov.hmrc.securitiestransferchargefrontend.models.stf.fileupload.ParsedStcRowsDocument
 import uk.gov.hmrc.securitiestransferchargefrontend.viewmodels.stf.fileupload.{CheckYourAnswersViewModel, Transfer}
 
@@ -29,8 +30,8 @@ class CheckYourAnswersService @Inject()(
                                          taxDueCalculationService: TaxDueCalculationService
                                        ) {
 
-  def buildViewModel(parsedStcRowsDocument: ParsedStcRowsDocument)(implicit lang: Lang): CheckYourAnswersViewModel = {
-    val transfers = buildTransfers(parsedStcRowsDocument)
+  def buildViewModel(parsedStcRowsDocument: ParsedStcRowsDocument, reliefs: Seq[Relief])(implicit lang: Lang): CheckYourAnswersViewModel = {
+    val transfers = buildTransfers(parsedStcRowsDocument, reliefs)
 
     CheckYourAnswersViewModel(
       fileName = parsedStcRowsDocument.fileName,
@@ -41,8 +42,8 @@ class CheckYourAnswersService @Inject()(
     )
   }
 
-  def totalTaxDue(parsedStcRowsDocument: ParsedStcRowsDocument): BigDecimal =
-    buildTransfers(parsedStcRowsDocument).map(_.taxDue).sum
+  def totalTaxDue(parsedStcRowsDocument: ParsedStcRowsDocument, reliefs: Seq[Relief]): BigDecimal =
+    buildTransfers(parsedStcRowsDocument, reliefs).map(_.taxDue).sum
 
   def paymentDueBy(parsedStcRowsDocument: ParsedStcRowsDocument): LocalDate =
     parsedStcRowsDocument.rows
@@ -50,13 +51,13 @@ class CheckYourAnswersService @Inject()(
       .min
       .plusDays(30)
 
-  private def buildTransfers(parsedStcRowsDocument: ParsedStcRowsDocument): Seq[Transfer] =
+  private def buildTransfers(parsedStcRowsDocument: ParsedStcRowsDocument, reliefs: Seq[Relief]): Seq[Transfer] =
     parsedStcRowsDocument.rows.flatMap { row =>
       for {
         seller             <- row.sellerName
         securitiesBoughtIn <- row.securitiesTarget
         amountPaid         <- row.amountPaidForSecurities
-        taxDue             <- taxDueCalculationService.calculateTaxDue(row)
+        taxDue             <- taxDueCalculationService.calculateTaxDue(row, reliefs)
       } yield Transfer(
         seller = seller,
         securitiesBoughtIn = securitiesBoughtIn,

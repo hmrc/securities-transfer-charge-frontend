@@ -49,6 +49,7 @@ import uk.gov.hmrc.securitiestransferchargefrontend.pages.Page
 import uk.gov.hmrc.securitiestransferchargefrontend.pages.stf.shared.AgentReferencePage
 import uk.gov.hmrc.securitiestransferchargefrontend.pages.stf.single.*
 import uk.gov.hmrc.securitiestransferchargefrontend.repositories.SessionRepository
+import uk.gov.hmrc.securitiestransferchargefrontend.services.ReliefsService
 
 import java.time.LocalDate
 import scala.concurrent.{ExecutionContext, Future}
@@ -146,7 +147,8 @@ trait SpecBase
         bind[DataRetrievalAction].toInstance(new FakeDataRetrievalAction(userAnswers)),
         bind[SaveAndReturnClient].toInstance(saveAndReturnClient),
         bind[AlfAddressConnector].to[FakeAlfConnector],
-        bind[SessionRepository].toInstance(sessionRepository)
+        bind[SessionRepository].toInstance(sessionRepository),
+        bind[ReliefsService].toInstance(new StubReliefsService())
       )
 
   // Helper methods for creating common UserAnswers scenarios for STF

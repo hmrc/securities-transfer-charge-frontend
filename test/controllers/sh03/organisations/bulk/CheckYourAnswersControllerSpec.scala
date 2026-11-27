@@ -49,6 +49,7 @@ import uk.gov.hmrc.securitiestransferchargefrontend.views.html.sh03.organisation
 
 import java.time.LocalDate
 import scala.concurrent.Future
+import base.stubs.StubReliefsService
 
 class CheckYourAnswersControllerSpec extends SpecBase with MockitoSugar with FileUploadFixtures with BeforeAndAfterEach {
 
@@ -131,7 +132,7 @@ class CheckYourAnswersControllerSpec extends SpecBase with MockitoSugar with Fil
           declarationRows = Seq.empty
         )
 
-        when(mockCyaService.buildViewModel(any(), any())(any[Lang], any[Messages])).thenReturn(viewModel)
+        when(mockCyaService.buildViewModel(any(), any(), any())(any[Lang], any[Messages])).thenReturn(viewModel)
         when(mockRepository.findDocumentByReference(reference)).thenReturn(Future.successful(Some(parsedStcRowsDocument)))
 
         val application = onPageLoadApp()
@@ -194,7 +195,7 @@ class CheckYourAnswersControllerSpec extends SpecBase with MockitoSugar with Fil
       "must save the bulk confirmation details, start the SH03 submission and redirect to the next page" in {
         when(mockRepository.findDocumentByReference(reference)).thenReturn(Future.successful(Some(parsedStcRowsDocument)))
         when(mockCyaService.paymentDueBy(parsedStcRowsDocument)).thenReturn(testPaymentDueBy)
-        when(mockCyaService.totalTaxDue(parsedStcRowsDocument)).thenReturn(testTaxDue)
+        when(mockCyaService.totalTaxDue(parsedStcRowsDocument, StubReliefsService.reliefs)).thenReturn(testTaxDue)
         when(mockNavigator.nextPage(any(), any(), any(), anyBoolean())(any())).thenReturn(Future.successful(testNextPage))
         when(mockTransactionSubmissionService.submitBulkSh03(any())(using any[StcDataRequest[?]]())).thenReturn(Future.successful(true))
 

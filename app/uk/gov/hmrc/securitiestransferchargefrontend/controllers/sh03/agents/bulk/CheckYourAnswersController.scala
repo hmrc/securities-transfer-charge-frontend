@@ -35,6 +35,7 @@ import uk.gov.hmrc.securitiestransferchargefrontend.repositories.{ParsedStcRowsR
 import uk.gov.hmrc.securitiestransferchargefrontend.services.{AnswerPersistenceService, TransactionSubmissionService}
 import uk.gov.hmrc.securitiestransferchargefrontend.services.sh03.agents.bulk.CheckYourAnswersService
 import uk.gov.hmrc.securitiestransferchargefrontend.views.html.sh03.agents.bulk.CheckYourAnswersView
+import uk.gov.hmrc.securitiestransferchargefrontend.services.ReliefsService
 
 import javax.inject.Named
 import scala.concurrent.{ExecutionContext, Future}
@@ -50,6 +51,7 @@ class CheckYourAnswersController @Inject()(
                                             view: CheckYourAnswersView,
                                             parsedStcRowsRepository: ParsedStcRowsRepository,
                                             checkYourAnswersService: CheckYourAnswersService,
+                                            reliefsService: ReliefsService,
                                             sessionRepository: SessionRepository,
                                             transactionSubmissionService: TransactionSubmissionService,
                                             answerPersistenceService: AnswerPersistenceService
@@ -65,14 +67,16 @@ class CheckYourAnswersController @Inject()(
 
         case None =>
           val fileUploadRef = request.userAnswers.getFileUploadReference()
-          parsedStcRowsRepository.findDocumentByReference(fileUploadRef).map {
+          reliefsService.getReliefs().flatMap { reliefs =>
+        parsedStcRowsRepository.findDocumentByReference(fileUploadRef).map {
             case Some(doc) =>
-              val viewModel = checkYourAnswersService.buildViewModel(request.userAnswers, doc)
+              val viewModel = checkYourAnswersService.buildViewModel(request.userAnswers, doc, reliefs)
               Ok(view(viewModel, backLinkCall(NormalMode)(request.userAnswers)))
 
             case _ =>
               Redirect(routes.JourneyRecoveryController.onPageLoad())
           }
+      }
       }
   }
 
@@ -86,6 +90,7 @@ class CheckYourAnswersController @Inject()(
       else {
         val fileUploadRef = request.userAnswers.getFileUploadReference()
 
+        reliefsService.getReliefs().flatMap { reliefs =>
         parsedStcRowsRepository.findDocumentByReference(fileUploadRef).flatMap {
           case Some(doc) =>
             val rows = doc.rows.map(ValidatedStcRow.withNoErrors)
@@ -93,7 +98,7 @@ class CheckYourAnswersController @Inject()(
             val details = BulkConfirmationDetails(
               submissionId = request.userAnswers.submissionId,
               paymentDueBy = checkYourAnswersService.paymentDueBy(doc),
-              taxDue = checkYourAnswersService.totalTaxDue(doc),
+              taxDue = checkYourAnswersService.totalTaxDue(doc, reliefs),
               agentReference = request.userAnswers.get(BulkAgentReferencePage).flatMap(_.agentReference)
             )
 
@@ -105,6 +110,7 @@ class CheckYourAnswersController @Inject()(
 
           case None => Future.successful(Redirect(routes.JourneyRecoveryController.onPageLoad()))
         }
+      }
       }
   }
 }

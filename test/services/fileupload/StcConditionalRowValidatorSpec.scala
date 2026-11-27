@@ -17,6 +17,7 @@
 package services.fileupload
 
 import base.SpecBase
+import base.stubs.StubReliefsService
 import play.api.i18n.MessagesApi
 import uk.gov.hmrc.securitiestransferchargefrontend.forms.shared.BulkTotalMarketValueFormProvider
 import uk.gov.hmrc.securitiestransferchargefrontend.models.JourneyType.{SH03, STF}
@@ -81,7 +82,7 @@ class StcConditionalRowValidatorSpec extends SpecBase {
   "StcConditionalRowValidator.validate STF" - {
 
     "return no errors for a valid conditional row" in {
-      val result = validator.validate(validParsedRow, StcTemplate.STF,affinityGroupKeyInd, STF)
+      val result = validator.validate(validParsedRow, StcTemplate.STF,affinityGroupKeyInd, STF, StubReliefsService.names)
       result mustBe Seq.empty
     }
 
@@ -91,7 +92,7 @@ class StcConditionalRowValidatorSpec extends SpecBase {
           applyingForRelief = Some(true),
           whatReliefAreYouApplyingFor = None
         ), StcTemplate.STF,affinityGroupKeyInd, STF
-      )
+      , StubReliefsService.names)
 
       result.exists(_.fieldName == "whatReliefAreYouApplyingFor") mustBe true
     }
@@ -102,7 +103,7 @@ class StcConditionalRowValidatorSpec extends SpecBase {
           applyingForRelief = Some(true),
           whatReliefAreYouApplyingFor = Some("Made Up Relief")
         ), StcTemplate.STF,affinityGroupKeyInd, STF
-      )
+      , StubReliefsService.names)
 
       result.exists(_.fieldName == "whatReliefAreYouApplyingFor") mustBe true
     }
@@ -113,7 +114,7 @@ class StcConditionalRowValidatorSpec extends SpecBase {
           applyingForRelief = Some(false),
           whatReliefAreYouApplyingFor = Some("Made Up Relief")
         ), StcTemplate.STF,affinityGroupKeyInd, STF
-      )
+      , StubReliefsService.names)
 
       result.exists(_.fieldName == "whatReliefAreYouApplyingFor") mustBe false
     }
@@ -125,7 +126,7 @@ class StcConditionalRowValidatorSpec extends SpecBase {
           whatTypeOfSecurities = Some("Loan notes"),
           typeOfShares = None
         ), StcTemplate.STF,affinityGroupKeyInd, STF
-      )
+      , StubReliefsService.names)
 
       result.map(_.fieldName) must not contain "typeOfShares"
     }
@@ -136,7 +137,7 @@ class StcConditionalRowValidatorSpec extends SpecBase {
           sellerAddressInUK = Some(true),
           sellerAddressLine1 = None
         ), StcTemplate.STF,affinityGroupKeyInd, STF
-      )
+      , StubReliefsService.names)
 
       result.exists(_.fieldName == "sellerAddressLine1") mustBe true
     }
@@ -162,7 +163,7 @@ class StcConditionalRowValidatorSpec extends SpecBase {
           modifyRow(validParsedRow),
           StcTemplate.STF,
           affinityGroupKeyInd, STF
-        )
+        , StubReliefsService.names)
 
         result.exists(_.fieldName == fieldName) mustBe true
       }
@@ -220,7 +221,7 @@ class StcConditionalRowValidatorSpec extends SpecBase {
           modifyRow(validParsedRow),
           StcTemplate.STF,
           affinityGroupKeyInd, STF
-        )
+        , StubReliefsService.names)
 
         val error = result.find(_.fieldName == fieldName)
 
@@ -235,7 +236,7 @@ class StcConditionalRowValidatorSpec extends SpecBase {
           sellerAddressInUK = Some(true),
           sellerPostcode = None
         ), StcTemplate.STF,affinityGroupKeyInd, STF
-      )
+      , StubReliefsService.names)
 
       result.exists(_.fieldName == "sellerPostcode") mustBe true
     }
@@ -246,7 +247,7 @@ class StcConditionalRowValidatorSpec extends SpecBase {
           sellerAddressInUK = Some(true),
           sellerPostcode = Some("not a postcode")
         ), StcTemplate.STF,affinityGroupKeyInd, STF
-      )
+      , StubReliefsService.names)
 
       result.exists(_.fieldName == "sellerPostcode") mustBe true
     }
@@ -259,7 +260,7 @@ class StcConditionalRowValidatorSpec extends SpecBase {
           sellerAddressInUK = Some(false),
           sellerCountry = Some(longCountry)
         ), StcTemplate.STF,affinityGroupKeyInd, STF
-      )
+      , StubReliefsService.names)
 
       result.exists(_.fieldName == "sellerCountry") mustBe true
     }
@@ -270,7 +271,7 @@ class StcConditionalRowValidatorSpec extends SpecBase {
           connectedPersons = Some(true),
           totalMarketValue = None
         ), StcTemplate.STF,affinityGroupKeyInd, STF
-      )
+      , StubReliefsService.names)
 
       result.exists(_.fieldName == "totalMarketValue") mustBe true
     }
@@ -281,7 +282,7 @@ class StcConditionalRowValidatorSpec extends SpecBase {
           connectedPersons = Some(true),
           totalMarketValue = Some("1000000000")
         ), StcTemplate.STF,affinityGroupKeyInd, STF
-      )
+      , StubReliefsService.names)
 
       result.exists(_.fieldName == "totalMarketValue") mustBe true
     }
@@ -292,7 +293,7 @@ class StcConditionalRowValidatorSpec extends SpecBase {
           connectedPersons = Some(true),
           totalMarketValue = Some("0")
         ), StcTemplate.STF,affinityGroupKeyInd, STF
-      )
+      , StubReliefsService.names)
 
       result.exists(_.fieldName == "totalMarketValue") mustBe true
     }
@@ -303,7 +304,7 @@ class StcConditionalRowValidatorSpec extends SpecBase {
           connectedPersons = Some(true),
           totalMarketValue = Some("100.123")
         ), StcTemplate.STF,affinityGroupKeyInd, STF
-      )
+      , StubReliefsService.names)
 
       result.exists(_.fieldName == "totalMarketValue") mustBe true
     }
@@ -314,7 +315,7 @@ class StcConditionalRowValidatorSpec extends SpecBase {
           connectedPersons = Some(false),
           totalMarketValue = Some("NOT A NUMBER")
         ), StcTemplate.STF,affinityGroupKeyInd, STF
-      )
+      , StubReliefsService.names)
 
       result.exists(_.fieldName == "totalMarketValue") mustBe false
     }
@@ -325,7 +326,7 @@ class StcConditionalRowValidatorSpec extends SpecBase {
           purchasingShares = Some(true),
           typeOfShares = None
         ), StcTemplate.STF, affinityGroupKeyInd, STF
-      )
+      , StubReliefsService.names)
 
       result.exists(_.fieldName == "typeOfShares") mustBe true
     }
@@ -336,7 +337,7 @@ class StcConditionalRowValidatorSpec extends SpecBase {
           purchasingShares = Some(false),
           whatTypeOfSecurities = None
         ), StcTemplate.STF, affinityGroupKeyInd, STF
-      )
+      , StubReliefsService.names)
 
       result.exists(_.fieldName == "whatTypeOfSecurities") mustBe true
     }
@@ -348,7 +349,7 @@ class StcConditionalRowValidatorSpec extends SpecBase {
           purchasingShares = Some(false),
           whatTypeOfSecurities = Some(invalidSecurityTypeLength)
         ), StcTemplate.STF, affinityGroupKeyInd, STF
-      )
+      , StubReliefsService.names)
 
       result.exists(_.fieldName == "whatTypeOfSecurities") mustBe true
     }
@@ -364,7 +365,7 @@ class StcConditionalRowValidatorSpec extends SpecBase {
           sellerAddressInUK = Some(false),
           sellerCountry = Some(longCountry)
         ), StcTemplate.STFAgent, affinityGroupKeyAgent, STF
-      )
+      , StubReliefsService.names)
 
       result.exists(_.fieldName == "sellerCountry") mustBe true
     }
@@ -377,7 +378,7 @@ class StcConditionalRowValidatorSpec extends SpecBase {
           sellerAddressInUK = Some(false),
           sellerCountry = Some(invalidCountry)
         ), StcTemplate.STFAgent, affinityGroupKeyAgent, STF
-      )
+      , StubReliefsService.names)
 
       result.exists(_.fieldName == "sellerCountry") mustBe true
     }
@@ -389,7 +390,7 @@ class StcConditionalRowValidatorSpec extends SpecBase {
           sellerAddressInUK = Some(false),
           sellerCountry = None
         ), StcTemplate.STFAgent, affinityGroupKeyAgent, STF
-      )
+      , StubReliefsService.names)
 
       result.exists(_.fieldName == "sellerCountry") mustBe true
     }
@@ -402,7 +403,7 @@ class StcConditionalRowValidatorSpec extends SpecBase {
           buyerAddressInUK = Some(false),
           buyerCountry = Some(longCountry)
         ), StcTemplate.STFAgent, affinityGroupKeyAgent, STF
-      )
+      , StubReliefsService.names)
 
       result.exists(_.fieldName == "buyerCountry") mustBe true
     }
@@ -415,7 +416,7 @@ class StcConditionalRowValidatorSpec extends SpecBase {
           buyerAddressInUK = Some(false),
           buyerCountry = Some(invalidCountry)
         ), StcTemplate.STFAgent, affinityGroupKeyAgent, STF
-      )
+      , StubReliefsService.names)
 
       result.exists(_.fieldName == "buyerCountry") mustBe true
     }
@@ -427,7 +428,7 @@ class StcConditionalRowValidatorSpec extends SpecBase {
           buyerAddressInUK = Some(false),
           buyerCountry = None
         ), StcTemplate.STFAgent, affinityGroupKeyAgent, STF
-      )
+      , StubReliefsService.names)
 
       result.exists(_.fieldName == "buyerCountry") mustBe true
     }
@@ -439,7 +440,7 @@ class StcConditionalRowValidatorSpec extends SpecBase {
           buyerAddressInUK = Some(false),
           buyerPostcode = None
         ), StcTemplate.STFAgent, affinityGroupKeyAgent, STF
-      )
+      , StubReliefsService.names)
 
       result.exists(_.fieldName == "buyerPostcode") mustBe true
     }
@@ -451,7 +452,7 @@ class StcConditionalRowValidatorSpec extends SpecBase {
           buyerAddressInUK = Some(true),
           buyerPostcode = None
         ), StcTemplate.STFAgent, affinityGroupKeyAgent, STF
-      )
+      , StubReliefsService.names)
 
       result.exists(_.fieldName == "buyerPostcode") mustBe true
     }
@@ -463,7 +464,7 @@ class StcConditionalRowValidatorSpec extends SpecBase {
           sellerAddressInUK = Some(false),
           sellerPostcode = None
         ), StcTemplate.STFAgent, affinityGroupKeyAgent, STF
-      )
+      , StubReliefsService.names)
 
       result.exists(_.fieldName == "sellerPostcode") mustBe true
     }
@@ -475,7 +476,7 @@ class StcConditionalRowValidatorSpec extends SpecBase {
           sellerAddressInUK = Some(true),
           sellerPostcode = None
         ), StcTemplate.STFAgent, affinityGroupKeyAgent, STF
-      )
+      , StubReliefsService.names)
 
       result.exists(_.fieldName == "sellerPostcode") mustBe true
     }
@@ -487,7 +488,7 @@ class StcConditionalRowValidatorSpec extends SpecBase {
           sellerAddressInUK = Some(true),
           sellerPostcode = Some("%%%%")
         ), StcTemplate.STFAgent, affinityGroupKeyAgent, STF
-      )
+      , StubReliefsService.names)
 
       result.exists(_.fieldName == "sellerPostcode") mustBe true
     }
@@ -499,7 +500,7 @@ class StcConditionalRowValidatorSpec extends SpecBase {
           sellerAddressInUK = Some(false),
           sellerPostcode = Some("%%%%")
         ), StcTemplate.STFAgent, affinityGroupKeyAgent, STF
-      )
+      , StubReliefsService.names)
 
       result.exists(_.fieldName == "sellerPostcode") mustBe true
     }
@@ -511,7 +512,7 @@ class StcConditionalRowValidatorSpec extends SpecBase {
           buyerAddressInUK = Some(true),
           buyerPostcode = Some("%%%%")
         ), StcTemplate.STFAgent, affinityGroupKeyAgent, STF
-      )
+      , StubReliefsService.names)
 
       result.exists(_.fieldName == "buyerPostcode") mustBe true
     }
@@ -523,7 +524,7 @@ class StcConditionalRowValidatorSpec extends SpecBase {
           buyerAddressInUK = Some(false),
           buyerPostcode = Some("%%%%")
         ), StcTemplate.STFAgent, affinityGroupKeyAgent, STF
-      )
+      , StubReliefsService.names)
 
       result.exists(_.fieldName == "buyerPostcode") mustBe true
     }
@@ -534,7 +535,7 @@ class StcConditionalRowValidatorSpec extends SpecBase {
         validParsedRow.copy(applyingForRelief = Some(true),
           whatReliefAreYouApplyingFor = Some("invalid relief")
         ), StcTemplate.STFAgent, affinityGroupKeyAgent, STF
-      )
+      , StubReliefsService.names)
 
       result.exists(_.fieldName == "whatReliefAreYouApplyingFor") mustBe true
     }
@@ -548,7 +549,7 @@ class StcConditionalRowValidatorSpec extends SpecBase {
           typeOfShares = Some(invalidSecurityTypeLength)
 
         ), StcTemplate.STFAgent, affinityGroupKeyAgent, STF
-      )
+      , StubReliefsService.names)
 
       result.exists(_.fieldName == "typeOfShares") mustBe true
     }
@@ -560,7 +561,7 @@ class StcConditionalRowValidatorSpec extends SpecBase {
           whatTypeOfSecurities = Some("shares"),
           typeOfShares = None
         ), StcTemplate.STFAgent, affinityGroupKeyAgent, STF
-      )
+      , StubReliefsService.names)
       result.exists(_.fieldName == "typeOfShares") mustBe true
     }
 
@@ -570,7 +571,7 @@ class StcConditionalRowValidatorSpec extends SpecBase {
         validParsedRow.copy( connectedPersons = Some(true),
           totalMarketValue = None
         ), StcTemplate.STFAgent, affinityGroupKeyAgent, STF
-      )
+      , StubReliefsService.names)
       result.exists(_.fieldName == "totalMarketValue") mustBe true
     }
 
@@ -580,7 +581,7 @@ class StcConditionalRowValidatorSpec extends SpecBase {
           applyingForRelief = Some(true),
           whatReliefAreYouApplyingFor = None
         ), StcTemplate.STFAgent, affinityGroupKeyAgent, STF
-      )
+      , StubReliefsService.names)
 
       result.exists(_.fieldName == "whatReliefAreYouApplyingFor") mustBe true
     }
@@ -591,7 +592,7 @@ class StcConditionalRowValidatorSpec extends SpecBase {
           purchasingShares = Some(true),
           typeOfShares = None
         ), StcTemplate.STFAgent, affinityGroupKeyInd, STF
-      )
+      , StubReliefsService.names)
 
       result.exists(_.fieldName == "typeOfShares") mustBe true
     }
@@ -602,7 +603,7 @@ class StcConditionalRowValidatorSpec extends SpecBase {
           purchasingShares = Some(false),
           whatTypeOfSecurities = None
         ), StcTemplate.STFAgent, affinityGroupKeyInd, STF
-      )
+      , StubReliefsService.names)
 
       result.exists(_.fieldName == "whatTypeOfSecurities") mustBe true
     }
@@ -614,7 +615,7 @@ class StcConditionalRowValidatorSpec extends SpecBase {
           purchasingShares = Some(false),
           whatTypeOfSecurities = Some(invalidSecurityTypeLength)
         ), StcTemplate.STFAgent, affinityGroupKeyInd, STF
-      )
+      , StubReliefsService.names)
 
       result.exists(_.fieldName == "whatTypeOfSecurities") mustBe true
     }
@@ -623,7 +624,7 @@ class StcConditionalRowValidatorSpec extends SpecBase {
   "StcConditionalRowValidator.validate SH03" - {
 
     "return no errors for a valid conditional row" in {
-      val result = validator.validate(validParsedRow, StcTemplate.SH03,affinityGroupKeyInd, SH03)
+      val result = validator.validate(validParsedRow, StcTemplate.SH03,affinityGroupKeyInd, SH03, StubReliefsService.names)
       result mustBe Seq.empty
     }
 
@@ -633,7 +634,7 @@ class StcConditionalRowValidatorSpec extends SpecBase {
           applyingForRelief = Some(true),
           whatReliefAreYouApplyingFor = None
         ), StcTemplate.SH03,affinityGroupKeyInd, SH03
-      )
+      , StubReliefsService.names)
 
       result.exists(_.fieldName == "whatReliefAreYouApplyingFor") mustBe true
     }
@@ -644,7 +645,7 @@ class StcConditionalRowValidatorSpec extends SpecBase {
           connectedPersons = Some(true),
           totalMarketValue = None
         ), StcTemplate.SH03, affinityGroupKeyInd, SH03
-      )
+      , StubReliefsService.names)
 
       result.exists(_.fieldName == "totalMarketValue") mustBe true
     }
@@ -655,7 +656,7 @@ class StcConditionalRowValidatorSpec extends SpecBase {
           sharePurchaseReason = Some("cancellation"),
           purchaseForCancellation = None
         ), StcTemplate.SH03, affinityGroupKeyOrg, SH03
-      )
+      , StubReliefsService.names)
 
       result.exists(_.fieldName == "purchasedForCancellation") mustBe true
     }
@@ -666,7 +667,7 @@ class StcConditionalRowValidatorSpec extends SpecBase {
           sharePurchaseReason = Some("treasury"),
           purchaseForCancellation = None
         ), StcTemplate.SH03, affinityGroupKeyOrg, SH03
-      )
+      , StubReliefsService.names)
 
       result.exists(_.fieldName == "purchasedForCancellation") mustBe false
     }
@@ -697,7 +698,7 @@ class StcConditionalRowValidatorSpec extends SpecBase {
           val result = validator.validate(
             validParsedRow.copy(connectedPersons = Some(true), totalMarketValue = value),
             template, affinityKey, journeyType
-          )
+          , StubReliefsService.names)
 
           result.filter(_.fieldName == "totalMarketValue").map(_.message) mustBe Seq(expected(noun))
         }

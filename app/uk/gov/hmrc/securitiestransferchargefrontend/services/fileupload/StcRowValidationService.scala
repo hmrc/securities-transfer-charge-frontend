@@ -34,7 +34,8 @@ class StcRowValidationService @Inject()(
                       affinityKey: String,
                       journeyType: JourneyType,
                       maxErrorsAllowed: Int,
-                      maxRows: Int
+                      maxRows: Int,
+                      reliefNames: Set[String]
                     ): Either[(FileParseError, Long), (Seq[ValidatedStcRow], Long)] = {
 
     implicit val columnIndex: ColumnIndexBuilder = new ColumnIndexBuilder(headers)
@@ -69,7 +70,7 @@ class StcRowValidationService @Inject()(
 
           val errors =
             (stcBasicRowValidator.validate(parsedRow, template, affinityKey, journeyType) ++
-              stcConditionalRowValidator.validate(parsedRow, template, affinityKey, journeyType))
+              stcConditionalRowValidator.validate(parsedRow, template, affinityKey, journeyType, reliefNames))
                 .sortBy(_.columnIndex)
 
           val updatedErrorCount = blockingErrorCount + errors.count(_.blocking)

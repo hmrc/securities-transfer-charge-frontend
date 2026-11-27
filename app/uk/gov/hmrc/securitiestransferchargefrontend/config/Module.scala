@@ -30,7 +30,7 @@ import uk.gov.hmrc.securitiestransferchargefrontend.navigation.stf.agents.StfAge
 import uk.gov.hmrc.securitiestransferchargefrontend.navigation.stf.individuals.StfNavigator
 import uk.gov.hmrc.securitiestransferchargefrontend.navigation.stf.organisations.StfOrgNavigator
 import uk.gov.hmrc.securitiestransferchargefrontend.navigation.{Navigator, PersistentNavigator}
-import uk.gov.hmrc.securitiestransferchargefrontend.repositories.{ChecksumRepository, ChecksumRepositoryImpl, CyaHtmlRepository, CyaHtmlRepositoryImpl, DashboardClientDataRepository, ParsedStcRowsRepository, ParsedStcRowsRepositoryImpl, ProcessingStatusRepository, ProcessingStatusRepositoryImpl, SessionRepository, SessionRepositoryImpl, SubscriptionDataRepository, SubscriptionDataRepositoryImpl, TransactionResponseRepository, TransactionResponseRepositoryImpl, UpscanJourneyRepository, UpscanJourneyRepositoryImpl, ValidationErrorRepository, ValidationErrorRepositoryImpl}
+import uk.gov.hmrc.securitiestransferchargefrontend.repositories.{ChecksumRepository, ChecksumRepositoryImpl, CyaHtmlRepository, CyaHtmlRepositoryImpl, DashboardClientDataRepository, ParsedStcRowsRepository, ParsedStcRowsRepositoryImpl, ProcessingStatusRepository, ProcessingStatusRepositoryImpl, SessionRepository, SessionRepositoryImpl, SubscriptionDataRepository, SubscriptionDataRepositoryImpl, TransactionResponseRepository, TransactionResponseRepositoryImpl, UpscanJourneyRepository, UpscanJourneyRepositoryImpl, ValidationErrorRepository, ValidationErrorRepositoryImpl, ReliefsCache, ReliefsCacheRepository}
 import uk.gov.hmrc.securitiestransferchargefrontend.services.*
 import uk.gov.hmrc.securitiestransferchargefrontend.services.fileupload.*
 import uk.gov.hmrc.securitiestransferchargefrontend.services.fileupload.processing.{DefaultFileProcessingRefreshCounterFactory, FileProcessingRefreshCounterFactory}
@@ -93,6 +93,10 @@ class Module extends AbstractModule {
     bind(classOf[CyaHtmlRepository]).to(classOf[CyaHtmlRepositoryImpl])
     bind(classOf[NrsClient]).to(classOf[NrsClientImpl])
     bind(classOf[NrsService]).to(classOf[NrsServiceImpl])
+    bind(classOf[ReliefsClient]).to(classOf[ReliefsClientImpl])
+    bind(classOf[ReliefsCache]).to(classOf[ReliefsCacheRepository])
+    bind(classOf[ReliefsService]).to(classOf[ReliefsServiceImpl])
+    bind(classOf[BundledReliefs]).to(classOf[BundledReliefsImpl])
     
     bind(classOf[Navigator])
       .annotatedWith(Names.named("organisations"))

@@ -33,6 +33,7 @@ import uk.gov.hmrc.securitiestransferchargefrontend.repositories.{CyaHtmlData, C
 import uk.gov.hmrc.securitiestransferchargefrontend.services.TransactionSubmissionService
 import uk.gov.hmrc.securitiestransferchargefrontend.services.stf.agents.bulk.CheckYourAnswersService
 import uk.gov.hmrc.securitiestransferchargefrontend.views.html.stf.agents.bulk.CheckYourAnswersView
+import uk.gov.hmrc.securitiestransferchargefrontend.services.ReliefsService
 
 import javax.inject.Named
 import scala.concurrent.{ExecutionContext, Future}
@@ -47,6 +48,7 @@ class CheckYourAnswersController @Inject()(
                                             view: CheckYourAnswersView,
                                             parsedStcRowsRepository: ParsedStcRowsRepository,
                                             checkYourAnswersService: CheckYourAnswersService,
+                                            reliefsService: ReliefsService,
                                             transactionSubmissionService: TransactionSubmissionService,
                                             cyaHtmlRepository: CyaHtmlRepository
                                           )(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport {
@@ -57,9 +59,10 @@ class CheckYourAnswersController @Inject()(
     implicit request =>
       implicit val messages: Messages = messagesApi.preferred(request)
       val fileUploadRef = request.userAnswers.getFileUploadReference()
-      parsedStcRowsRepository.findDocumentByReference(fileUploadRef).map {
+      reliefsService.getReliefs().flatMap { reliefs =>
+        parsedStcRowsRepository.findDocumentByReference(fileUploadRef).map {
         case Some(doc) => 
-          val viewModel = checkYourAnswersService.buildViewModel(request.userAnswers, doc)
+          val viewModel = checkYourAnswersService.buildViewModel(request.userAnswers, doc, reliefs)
           val html = view(viewModel, backLinkCall(NormalMode)(request.userAnswers))
           cyaHtmlRepository.store(CyaHtmlData(request.userAnswers.submissionId,html))
           Ok(html)
@@ -68,20 +71,22 @@ class CheckYourAnswersController @Inject()(
           Redirect(JourneyRecoveryController.onPageLoad())
         
       }
+      }
   }
 
   def onSubmit(): Action[AnyContent] = (stcAuthEnrolled andThen getData andThen requireData).async {
     implicit request =>
       val fileUploadRef = request.userAnswers.getFileUploadReference()
 
-      parsedStcRowsRepository.findDocumentByReference(fileUploadRef).flatMap {
+      reliefsService.getReliefs().flatMap { reliefs =>
+        parsedStcRowsRepository.findDocumentByReference(fileUploadRef).flatMap {
         case Some(doc) =>
           val rows = doc.rows.map(ValidatedStcRow.withNoErrors)
 
           val details = BulkConfirmationDetails(
             submissionId = request.userAnswers.submissionId,
             paymentDueBy = checkYourAnswersService.paymentDueBy(doc),
-            taxDue = checkYourAnswersService.totalTaxDue(doc),
+            taxDue = checkYourAnswersService.totalTaxDue(doc, reliefs),
             agentReference = request.userAnswers.get(BulkAgentReferencePage).flatMap(_.agentReference)
           )
 
@@ -92,6 +97,7 @@ class CheckYourAnswersController @Inject()(
           } yield Redirect(nextPage)
 
         case None => Future.successful(Redirect(JourneyRecoveryController.onPageLoad()))
+      }
       }
   }
 

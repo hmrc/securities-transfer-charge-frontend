@@ -17,6 +17,7 @@
 package uk.gov.hmrc.securitiestransferchargefrontend.models.submission
 
 import uk.gov.hmrc.securitiestransferchargefrontend.domain.TransferType
+import uk.gov.hmrc.securitiestransferchargefrontend.models.Relief
 import uk.gov.hmrc.securitiestransferchargefrontend.models.sh03.bulk.CompanyDetails
 import uk.gov.hmrc.securitiestransferchargefrontend.models.stf.fileupload.ParsedStcRow
 
@@ -24,7 +25,7 @@ object RowTransforms {
 
   import DataExtractors.*
 
-  def fromValidatedStcRowToStfRequest(parsedRow: ParsedStcRow, affinityData: AffinityData, agentReference:Option[String]): SingleTransferRequest =
+  def fromValidatedStcRowToStfRequest(parsedRow: ParsedStcRow, affinityData: AffinityData, reliefs: Seq[Relief], agentReference:Option[String]): SingleTransferRequest =
 
     SingleTransferRequest(
       recordId = parsedRow.rowNumber,
@@ -44,7 +45,7 @@ object RowTransforms {
         companyName = required(parsedRow.securitiesTarget, "securitiesTarget", parsedRow.rowNumber),
         companyRegistrationNumber = parsedRow.companyRegistrationNumber,
         reliefClaimedName = getReliefClaimedName(parsedRow),
-        reliefPercentage = reliefPercentage(parsedRow)
+        reliefPercentage = reliefPercentage(parsedRow, reliefs)
       ),
       contingentDetails = None, // Needed once we do C&D
       mainSellerDetails = Some(getMainSellerDetails(parsedRow)),
@@ -66,7 +67,7 @@ object RowTransforms {
       agentDetails = agentDetails(agentReference).lift(affinityData)
     )
 
-  def fromValidatedStcRowToSh03Request(companyDetails: CompanyDetails)(parsedRow: ParsedStcRow, affinityData: AffinityData,agentReference: Option[String] = None): SingleTransferRequest =
+  def fromValidatedStcRowToSh03Request(companyDetails: CompanyDetails)(parsedRow: ParsedStcRow, affinityData: AffinityData, reliefs: Seq[Relief], agentReference: Option[String] = None): SingleTransferRequest =
 
     SingleTransferRequest(
       recordId = parsedRow.rowNumber,
@@ -88,7 +89,7 @@ object RowTransforms {
         companyName = companyDetails.companyName,
         companyRegistrationNumber = Some(companyDetails.companyRegistrationNumber),
         reliefClaimedName = getReliefClaimedName(parsedRow),
-        reliefPercentage = reliefPercentage(parsedRow)
+        reliefPercentage = reliefPercentage(parsedRow, reliefs)
       ),
       contingentDetails = None, // Needed once we do C&D
       mainSellerDetails = None,

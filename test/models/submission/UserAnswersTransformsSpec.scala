@@ -20,6 +20,7 @@ import base.Fixtures.*
 import base.SpecBase
 import uk.gov.hmrc.securitiestransferchargefrontend.domain.TransferType
 import uk.gov.hmrc.securitiestransferchargefrontend.domain.TransferType.{SH03, STF}
+import uk.gov.hmrc.securitiestransferchargefrontend.models.Relief
 import uk.gov.hmrc.securitiestransferchargefrontend.models.sh03.shared.ReasonForPurchase.{ForCancellation, ToPlaceIntoTreasury}
 import uk.gov.hmrc.securitiestransferchargefrontend.models.sh03.shared.RoleAtPurchasingCompany
 import uk.gov.hmrc.securitiestransferchargefrontend.models.stf.ConfirmableAddress
@@ -29,6 +30,9 @@ import uk.gov.hmrc.securitiestransferchargefrontend.models.submission.{ReasonFor
 import java.time.LocalDate
 
 class UserAnswersTransformsSpec extends SpecBase {
+
+  // Percentages differ from 100 so the tests show the submitted value comes from the list.
+  private val reliefs = Seq(Relief("relief", 40), Relief("Another Relief", 75))
 
   private val baseStfTransaction = StfTransaction(
     agentReference = Some(agentReference),
@@ -69,7 +73,7 @@ class UserAnswersTransformsSpec extends SpecBase {
       val transaction = baseStfTransaction
       val affinityData = individualAffinityData
 
-      val result = UserAnswersTransforms.toStfRequest(transaction, affinityData)
+      val result = UserAnswersTransforms.toStfRequest(transaction, affinityData, reliefs)
 
       result.recordId mustBe 1
       result.transactionDetails.transactionType mustBe STF
@@ -85,7 +89,7 @@ class UserAnswersTransformsSpec extends SpecBase {
 
     "populate a request for an Organisation" in {
       val result =
-        UserAnswersTransforms.toStfRequest(baseStfTransaction, organisationAffinityData)
+        UserAnswersTransforms.toStfRequest(baseStfTransaction, organisationAffinityData, reliefs)
 
       result.mainBuyerDetails.uniqueId mustBe organisationAffinityData.utr
       result.agentDetails mustBe None
@@ -94,7 +98,7 @@ class UserAnswersTransformsSpec extends SpecBase {
 
      "populate a request for an Agent" ignore { //Todo update this test once we have a way to capture the buyer's email for agents
       val result =
-        UserAnswersTransforms.toStfRequest(baseStfTransaction, agentAffinityData)
+        UserAnswersTransforms.toStfRequest(baseStfTransaction, agentAffinityData, reliefs)
 
       result.mainBuyerDetails.buyerName mustBe baseStfTransaction.nameOfBuyer.get
       result.agentDetails mustBe defined
@@ -105,7 +109,7 @@ class UserAnswersTransformsSpec extends SpecBase {
       val confirmedAddress: ConfirmableAddress = confirmableAddress.copy(lines = List("1 Confirmed Address","Town"))
       val transaction = baseStfTransaction.copy(confirmedAddress = Some(confirmedAddress))
 
-      val result = UserAnswersTransforms.toStfRequest(transaction, individualAffinityData)
+      val result = UserAnswersTransforms.toStfRequest(transaction, individualAffinityData, reliefs)
 
       result.mainBuyerDetails.addr1 mustBe confirmedAddress.lines.head
     }
@@ -119,7 +123,7 @@ class UserAnswersTransformsSpec extends SpecBase {
         )
 
       val result =
-        UserAnswersTransforms.toStfRequest(transaction, individualAffinityData)
+        UserAnswersTransforms.toStfRequest(transaction, individualAffinityData, reliefs)
 
       result.mainBuyerDetails.addr1 mustBe buyerAddress.address.lines.head
     }
@@ -135,7 +139,7 @@ class UserAnswersTransformsSpec extends SpecBase {
         sellerAddress = longPostcodeSeller
       )
 
-      val result = UserAnswersTransforms.toStfRequest(transaction, individualAffinityData)
+      val result = UserAnswersTransforms.toStfRequest(transaction, individualAffinityData, reliefs)
 
       result.mainBuyerDetails.postcode mustBe "1234567890"
       result.mainBuyerDetails.postcode.length mustBe 10
@@ -154,7 +158,7 @@ class UserAnswersTransformsSpec extends SpecBase {
         sellerAddress = normalPostcodeSeller
       )
 
-      val result = UserAnswersTransforms.toStfRequest(transaction, individualAffinityData)
+      val result = UserAnswersTransforms.toStfRequest(transaction, individualAffinityData, reliefs)
 
       result.mainBuyerDetails.postcode mustBe "SW1A 1AA"
       result.mainSellerDetails.get.postcode mustBe "SW1A 1AA"
@@ -162,7 +166,7 @@ class UserAnswersTransformsSpec extends SpecBase {
 
     "derive the descriptionOfSecurity from detailsOfThisTransfer" in {
       val result =
-        UserAnswersTransforms.toStfRequest(baseStfTransaction, individualAffinityData)
+        UserAnswersTransforms.toStfRequest(baseStfTransaction, individualAffinityData, reliefs)
 
       result.transactionDetails.typeOfSecurity mustBe
         baseStfTransaction.detailsOfThisTransfer.get.typeOfShares
@@ -172,7 +176,7 @@ class UserAnswersTransformsSpec extends SpecBase {
       val transaction =
         baseStfTransaction.copy(detailsOfThisTransfer = None)
 
-      val result = UserAnswersTransforms.toStfRequest(transaction, individualAffinityData)
+      val result = UserAnswersTransforms.toStfRequest(transaction, individualAffinityData, reliefs)
 
       result.transactionDetails.typeOfSecurity mustBe baseStfTransaction.otherSecuritiesType.get
       result.transactionDetails.numberOfShares mustBe 1
@@ -186,7 +190,7 @@ class UserAnswersTransformsSpec extends SpecBase {
         )
 
       intercept[IllegalArgumentException] {
-        UserAnswersTransforms.toStfRequest(transaction, individualAffinityData)
+        UserAnswersTransforms.toStfRequest(transaction, individualAffinityData, reliefs)
       }
     }
 
@@ -195,7 +199,7 @@ class UserAnswersTransformsSpec extends SpecBase {
         baseStfTransaction.copy(nameOfBuyer = None)
 
       intercept[IllegalArgumentException] {
-        UserAnswersTransforms.toStfRequest(transaction, agentAffinityData)
+        UserAnswersTransforms.toStfRequest(transaction, agentAffinityData, reliefs)
       }
     }
 
@@ -207,7 +211,7 @@ class UserAnswersTransformsSpec extends SpecBase {
         )
 
       intercept[IllegalArgumentException] {
-        UserAnswersTransforms.toStfRequest(transaction, individualAffinityData)
+        UserAnswersTransforms.toStfRequest(transaction, individualAffinityData, reliefs)
       }
     }
 
@@ -219,7 +223,7 @@ class UserAnswersTransformsSpec extends SpecBase {
         )
 
       intercept[IllegalArgumentException] {
-        UserAnswersTransforms.toStfRequest(transaction, individualAffinityData)
+        UserAnswersTransforms.toStfRequest(transaction, individualAffinityData, reliefs)
       }
     }
   }
@@ -228,7 +232,7 @@ class UserAnswersTransformsSpec extends SpecBase {
 
     "create an SH03 request" in {
       val result =
-        UserAnswersTransforms.toSh03Request(baseSh03Transaction, organisationAffinityData)
+        UserAnswersTransforms.toSh03Request(baseSh03Transaction, organisationAffinityData, reliefs)
 
       result.recordId mustBe 1
       result.transactionDetails.transactionType mustBe SH03
@@ -238,7 +242,7 @@ class UserAnswersTransformsSpec extends SpecBase {
 
     "populate agent details for an Agent" ignore { //TODO update test once we have all the missing data for agent sh03
       val result =
-        UserAnswersTransforms.toSh03Request(baseSh03Transaction, agentAffinityData)
+        UserAnswersTransforms.toSh03Request(baseSh03Transaction, agentAffinityData, reliefs)
 
       result.agentDetails mustBe defined
     }
@@ -251,7 +255,7 @@ class UserAnswersTransformsSpec extends SpecBase {
         )
 
       val result =
-        UserAnswersTransforms.toSh03Request(transaction, organisationAffinityData)
+        UserAnswersTransforms.toSh03Request(transaction, organisationAffinityData, reliefs)
 
       result.transactionDetails.reasonForPurchase mustBe Some(etmpReasonForPurchase.Both)
     }
@@ -264,7 +268,7 @@ class UserAnswersTransformsSpec extends SpecBase {
         )
 
       val result =
-        UserAnswersTransforms.toSh03Request(transaction, organisationAffinityData)
+        UserAnswersTransforms.toSh03Request(transaction, organisationAffinityData, reliefs)
 
       result.transactionDetails.reasonForPurchase mustBe Some(etmpReasonForPurchase.PurchasedForCancellation)
     }
@@ -277,7 +281,7 @@ class UserAnswersTransformsSpec extends SpecBase {
         )
 
       val result =
-        UserAnswersTransforms.toSh03Request(transaction, organisationAffinityData)
+        UserAnswersTransforms.toSh03Request(transaction, organisationAffinityData, reliefs)
 
       result.transactionDetails.reasonForPurchase mustBe Some(etmpReasonForPurchase.PurchasedForCancellation)
     }
@@ -289,19 +293,19 @@ class UserAnswersTransformsSpec extends SpecBase {
         )
 
       val result =
-        UserAnswersTransforms.toSh03Request(transaction, organisationAffinityData)
+        UserAnswersTransforms.toSh03Request(transaction, organisationAffinityData, reliefs)
 
       result.transactionDetails.reasonForPurchase mustBe Some(etmpReasonForPurchase.PurchasedToPlaceIntoTreasury)
     }
 
-    "set relief percentage when applying for relief" in {
+    "set relief percentage from the list of reliefs when applying for relief" in {
       val transaction =
-        baseSh03Transaction.copy(applyingForRelief = true)
+        baseSh03Transaction.copy(applyingForRelief = true, whatReliefAreYouApplyingFor = Some("Another Relief"))
 
       val result =
-        UserAnswersTransforms.toSh03Request(transaction, organisationAffinityData)
+        UserAnswersTransforms.toSh03Request(transaction, organisationAffinityData, reliefs)
 
-      result.transactionDetails.reliefPercentage mustBe Some(100)
+      result.transactionDetails.reliefPercentage mustBe Some(75)
     }
 
     "leave relief percentage empty when not applying for relief" in {
@@ -309,9 +313,59 @@ class UserAnswersTransformsSpec extends SpecBase {
         baseSh03Transaction.copy(applyingForRelief = false)
 
       val result =
-        UserAnswersTransforms.toSh03Request(transaction, organisationAffinityData)
+        UserAnswersTransforms.toSh03Request(transaction, organisationAffinityData, reliefs)
 
       result.transactionDetails.reliefPercentage mustBe None
+    }
+
+    "fail when the claimed relief is not in the list of reliefs" in {
+      val transaction =
+        baseSh03Transaction.copy(applyingForRelief = true, whatReliefAreYouApplyingFor = Some("Unknown Relief"))
+
+      an[UnknownReliefException] must be thrownBy
+        UserAnswersTransforms.toSh03Request(transaction, organisationAffinityData, reliefs)
+    }
+
+    "fail when applying for relief but no relief name was given" in {
+      val transaction =
+        baseSh03Transaction.copy(applyingForRelief = true, whatReliefAreYouApplyingFor = None)
+
+      an[UnknownReliefException] must be thrownBy
+        UserAnswersTransforms.toSh03Request(transaction, organisationAffinityData, reliefs)
+    }
+  }
+
+  "toStfRequest relief percentage" - {
+
+    "be taken from the list of reliefs when applying for relief" in {
+      val transaction =
+        baseStfTransaction.copy(applyingForRelief = true, whatReliefAreYouApplyingFor = Some("relief"))
+
+      UserAnswersTransforms.toStfRequest(transaction, individualAffinityData, reliefs)
+        .transactionDetails.reliefPercentage mustBe Some(40)
+    }
+
+    "be empty when not applying for relief" in {
+      val transaction = baseStfTransaction.copy(applyingForRelief = false)
+
+      UserAnswersTransforms.toStfRequest(transaction, individualAffinityData, reliefs)
+        .transactionDetails.reliefPercentage mustBe None
+    }
+
+    "fail when the claimed relief is not in the list of reliefs" in {
+      val transaction =
+        baseStfTransaction.copy(applyingForRelief = true, whatReliefAreYouApplyingFor = Some("Unknown Relief"))
+
+      an[UnknownReliefException] must be thrownBy
+        UserAnswersTransforms.toStfRequest(transaction, individualAffinityData, reliefs)
+    }
+
+    "not match a relief name that differs only by case, as the tax calculators do not" in {
+      val transaction =
+        baseStfTransaction.copy(applyingForRelief = true, whatReliefAreYouApplyingFor = Some("RELIEF"))
+
+      an[UnknownReliefException] must be thrownBy
+        UserAnswersTransforms.toStfRequest(transaction, individualAffinityData, reliefs)
     }
   }
 }

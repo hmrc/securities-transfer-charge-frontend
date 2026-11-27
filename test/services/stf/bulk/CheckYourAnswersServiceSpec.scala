@@ -28,6 +28,7 @@ import uk.gov.hmrc.securitiestransferchargefrontend.services.stf.bulk.{CheckYour
 import uk.gov.hmrc.securitiestransferchargefrontend.viewmodels.stf.fileupload.{CheckYourAnswersViewModel, Transfer}
 
 import java.time.LocalDate
+import base.stubs.StubReliefsService
 
 class CheckYourAnswersServiceSpec extends SpecBase with FileUploadFixtures {
 
@@ -57,13 +58,13 @@ class CheckYourAnswersServiceSpec extends SpecBase with FileUploadFixtures {
 
       val document = ParsedStcRowsDocument(_id = "SomeRef", fileName = "test.csv", rows = Seq(row1, row2))
 
-      when(taxDueCalculationService.calculateTaxDue(row1))
+      when(taxDueCalculationService.calculateTaxDue(row1, StubReliefsService.reliefs))
         .thenReturn(Some(BigDecimal("10000.00")))
 
-      when(taxDueCalculationService.calculateTaxDue(row2))
+      when(taxDueCalculationService.calculateTaxDue(row2, StubReliefsService.reliefs))
         .thenReturn(Some(BigDecimal("20000.00")))
 
-      val result = service.buildViewModel(document)
+      val result = service.buildViewModel(document, StubReliefsService.reliefs)
 
       result shouldBe CheckYourAnswersViewModel(
         fileName = "test.csv",
@@ -99,10 +100,10 @@ class CheckYourAnswersServiceSpec extends SpecBase with FileUploadFixtures {
         rows = Seq(row, row2)
       )
 
-      when(taxDueCalculationService.calculateTaxDue(any()))
+      when(taxDueCalculationService.calculateTaxDue(any(), any()))
         .thenReturn(Some(BigDecimal("10.00")))
 
-      val result = service.buildViewModel(document)
+      val result = service.buildViewModel(document, StubReliefsService.reliefs)
 
       result.paymentDueBy shouldBe "31 January 2025"
     }
@@ -115,13 +116,13 @@ class CheckYourAnswersServiceSpec extends SpecBase with FileUploadFixtures {
         rows = Seq(row1, row2)
       )
 
-      when(taxDueCalculationService.calculateTaxDue(row1))
+      when(taxDueCalculationService.calculateTaxDue(row1, StubReliefsService.reliefs))
         .thenReturn(Some(BigDecimal("12.50")))
 
-      when(taxDueCalculationService.calculateTaxDue(row2))
+      when(taxDueCalculationService.calculateTaxDue(row2, StubReliefsService.reliefs))
         .thenReturn(Some(BigDecimal("25.75")))
 
-      val result = service.buildViewModel(document)
+      val result = service.buildViewModel(document, StubReliefsService.reliefs)
 
       result.taxDue shouldBe "£38.25"
       result.transfers.map(_.taxDue).sum shouldBe BigDecimal("38.25")

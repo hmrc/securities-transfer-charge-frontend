@@ -19,7 +19,7 @@ package services.sh03
 import base.SpecBase
 import org.mockito.Mockito.when
 import org.scalatestplus.mockito.MockitoSugar
-import uk.gov.hmrc.securitiestransferchargefrontend.models.{Relief, ReliefsDataSource}
+import uk.gov.hmrc.securitiestransferchargefrontend.models.Relief
 import uk.gov.hmrc.securitiestransferchargefrontend.models.sh03.shared.DetailsOfThisSharePurchase
 import uk.gov.hmrc.securitiestransferchargefrontend.pages.sh03._
 import uk.gov.hmrc.securitiestransferchargefrontend.services.sh03.TaxDueCalculationService
@@ -29,12 +29,12 @@ import java.time.LocalDate
 
 class TaxDueCalculationServiceSpec extends SpecBase with MockitoSugar {
 
-  val mockReliefsDataSource: ReliefsDataSource = mock[ReliefsDataSource]
+  private val noReliefs: Seq[Relief] = Seq.empty
   val mockAppConfig: FrontendAppConfig = mock[FrontendAppConfig]
   
   when(mockAppConfig.taxRateSH03).thenReturn(BigDecimal("0.005"))
   
-  val service = new TaxDueCalculationService(mockReliefsDataSource, mockAppConfig)
+  val service = new TaxDueCalculationService(mockAppConfig)
 
   "TaxDueCalculationService" - {
 
@@ -45,7 +45,7 @@ class TaxDueCalculationServiceSpec extends SpecBase with MockitoSugar {
           .set(DetailsOfThisSharePurchasePage, detailsOfPurchase).success.value
           .set(ApplyingForReliefPage, false).success.value
 
-        val result = service.calculateTaxDue(userAnswers)
+        val result = service.calculateTaxDue(userAnswers, noReliefs)
 
         result mustBe BigDecimal("50.00")
       }
@@ -56,14 +56,14 @@ class TaxDueCalculationServiceSpec extends SpecBase with MockitoSugar {
           .set(DetailsOfThisSharePurchasePage, detailsOfPurchase).success.value
           .set(ApplyingForReliefPage, false).success.value
 
-        val result = service.calculateTaxDue(userAnswers)
+        val result = service.calculateTaxDue(userAnswers, noReliefs)
 
         result mustBe BigDecimal("50.00")
       }
 
       "must apply relief when relief is selected" in {
         val testRelief = Relief("Test Relief", 50)
-        when(mockReliefsDataSource.reliefs).thenReturn(Seq(testRelief))
+        val reliefs: Seq[Relief] = Seq(testRelief)
 
         val detailsOfPurchase = DetailsOfThisSharePurchase(100, "Ordinary", BigDecimal("10000"), Some(BigDecimal("10000")))
         val userAnswers = emptyUserAnswers
@@ -71,14 +71,14 @@ class TaxDueCalculationServiceSpec extends SpecBase with MockitoSugar {
           .set(ApplyingForReliefPage, true).success.value
           .set(WhatReliefAreYouApplyingForPage, "Test Relief").success.value
 
-        val result = service.calculateTaxDue(userAnswers)
+        val result = service.calculateTaxDue(userAnswers, reliefs)
 
         result mustBe BigDecimal("25.00")
       }
 
       "must apply 100% relief correctly" in {
         val testRelief = Relief("Full Relief", 100)
-        when(mockReliefsDataSource.reliefs).thenReturn(Seq(testRelief))
+        val reliefs: Seq[Relief] = Seq(testRelief)
 
         val detailsOfPurchase = DetailsOfThisSharePurchase(100, "Ordinary", BigDecimal("10000"), Some(BigDecimal("10000")))
         val userAnswers = emptyUserAnswers
@@ -86,14 +86,14 @@ class TaxDueCalculationServiceSpec extends SpecBase with MockitoSugar {
           .set(ApplyingForReliefPage, true).success.value
           .set(WhatReliefAreYouApplyingForPage, "Full Relief").success.value
 
-        val result = service.calculateTaxDue(userAnswers)
+        val result = service.calculateTaxDue(userAnswers, reliefs)
 
         result mustBe BigDecimal("0.00")
       }
 
       "must not apply negative tax" in {
         val testRelief = Relief("Over Relief", 150)
-        when(mockReliefsDataSource.reliefs).thenReturn(Seq(testRelief))
+        val reliefs: Seq[Relief] = Seq(testRelief)
 
         val detailsOfPurchase = DetailsOfThisSharePurchase(100, "Ordinary", BigDecimal("10000"), Some(BigDecimal("10000")))
         val userAnswers = emptyUserAnswers
@@ -101,7 +101,7 @@ class TaxDueCalculationServiceSpec extends SpecBase with MockitoSugar {
           .set(ApplyingForReliefPage, true).success.value
           .set(WhatReliefAreYouApplyingForPage, "Over Relief").success.value
 
-        val result = service.calculateTaxDue(userAnswers)
+        val result = service.calculateTaxDue(userAnswers, reliefs)
 
         result mustBe BigDecimal("0.00")
       }
@@ -109,7 +109,7 @@ class TaxDueCalculationServiceSpec extends SpecBase with MockitoSugar {
       "must return Some(0.00) when required data is missing (defaults to 0)" in {
         val userAnswers = emptyUserAnswers
 
-        val result = service.calculateTaxDue(userAnswers)
+        val result = service.calculateTaxDue(userAnswers, noReliefs)
 
         result mustBe BigDecimal("0.00")
       }
@@ -120,7 +120,7 @@ class TaxDueCalculationServiceSpec extends SpecBase with MockitoSugar {
           .set(DetailsOfThisSharePurchasePage, detailsOfPurchase).success.value
           .set(ApplyingForReliefPage, false).success.value
 
-        val result = service.calculateTaxDue(userAnswers)
+        val result = service.calculateTaxDue(userAnswers, noReliefs)
 
         result mustBe BigDecimal("50.01")
       }

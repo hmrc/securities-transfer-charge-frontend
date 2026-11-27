@@ -35,6 +35,8 @@ import uk.gov.hmrc.securitiestransferchargefrontend.services.stf.TaxDueCalculati
 import uk.gov.hmrc.securitiestransferchargefrontend.viewmodels.govuk.summarylist.*
 import uk.gov.hmrc.securitiestransferchargefrontend.viewmodels.stf.shared.single.CheckYourAnswersViewModel
 import uk.gov.hmrc.securitiestransferchargefrontend.views.html.stf.agents.single.CheckYourAnswersView
+import uk.gov.hmrc.securitiestransferchargefrontend.services.ReliefsService
+import uk.gov.hmrc.securitiestransferchargefrontend.models.Relief
 
 import javax.inject.Named
 import scala.concurrent.{ExecutionContext, Future}
@@ -48,6 +50,7 @@ class CheckYourAnswersController @Inject()(
                                             val controllerComponents: MessagesControllerComponents,
                                             view: CheckYourAnswersView,
                                             taxDueCalculationService: TaxDueCalculationService,
+                                            reliefsService: ReliefsService,
                                             transactionSubmissionService: TransactionSubmissionService,
                                             cyaHtmlRepository: CyaHtmlRepository
                                           )(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport {
@@ -59,17 +62,17 @@ class CheckYourAnswersController @Inject()(
       implicit val messages: Messages = messagesApi.preferred(request)
       implicit val lang: Lang = messages.lang
 
-      navigator.userAnswersValidator.validate(request.userAnswers).map {
+      navigator.userAnswersValidator.validate(request.userAnswers).flatMap {
         case Left(redirectCall) =>
-          Redirect(redirectCall)
+          Future.successful(Redirect(redirectCall))
         case Right(true) =>
-          buildCheckYourAnswersPage(request.userAnswers)
+          reliefsService.getReliefs().map(reliefs => buildCheckYourAnswersPage(request.userAnswers, reliefs))
         case Right(false) =>
-          Redirect(navigator.errorPage(CheckYourAnswersPage))
+          Future.successful(Redirect(navigator.errorPage(CheckYourAnswersPage)))
       }
   }
 
-  private def buildCheckYourAnswersPage(userAnswers: UserAnswers)(implicit messages: Messages, lang: Lang, request: StcDataRequest[AnyContent]): play.api.mvc.Result = {
+  private def buildCheckYourAnswersPage(userAnswers: UserAnswers, reliefs: Seq[Relief])(implicit messages: Messages, lang: Lang, request: StcDataRequest[AnyContent]): play.api.mvc.Result = {
     val summaryLists = Seq(
       StfAgentRowBuilder.buildYourDetailsRows(userAnswers)(messages),
       StfAgentRowBuilder.buildBuyerDetailsRows(userAnswers)(messages),
@@ -77,7 +80,7 @@ class CheckYourAnswersController @Inject()(
       StfAgentRowBuilder.buildTransferDetailsRows(userAnswers)(messages)
     ).map(rows => SummaryListViewModel(rows = rows))
 
-    val taxDueFormatted = taxDueCalculationService.calculateTaxDue(userAnswers)
+    val taxDueFormatted = taxDueCalculationService.calculateTaxDue(userAnswers, reliefs)
       .map(CurrencyFormatter.currencyFormat)
     
     val paymentDueDateFormatted = taxDueCalculationService.calculatePaymentDueDate(userAnswers)

@@ -26,6 +26,8 @@ import uk.gov.hmrc.securitiestransferchargefrontend.services.sh03.bulk.TaxDueCal
 import uk.gov.hmrc.securitiestransferchargefrontend.utils.CommonHelpers
 import uk.gov.hmrc.securitiestransferchargefrontend.viewmodels.sh03.organisations.bulk.{CheckYourAnswersViewModel, CompanyDetailsSummary, RoleAtPurchasingCompanySummary, Sh03Transfer}
 
+import uk.gov.hmrc.securitiestransferchargefrontend.models.Relief
+
 import java.time.LocalDate
 import scala.util.Try
 
@@ -33,8 +35,8 @@ class CheckYourAnswersService @Inject()(
                                          taxDueCalculationService: TaxDueCalculationService
                                        ) {
 
-  def buildViewModel(parsedStcRowsDocument: ParsedStcRowsDocument, userAnswers: UserAnswers)(implicit lang: Lang, messages: Messages): CheckYourAnswersViewModel = {
-    val transfers = buildTransfers(parsedStcRowsDocument)
+  def buildViewModel(parsedStcRowsDocument: ParsedStcRowsDocument, userAnswers: UserAnswers, reliefs: Seq[Relief])(implicit lang: Lang, messages: Messages): CheckYourAnswersViewModel = {
+    val transfers = buildTransfers(parsedStcRowsDocument, reliefs)
 
     CheckYourAnswersViewModel(
       companyDetailsRows = CompanyDetailsSummary.rows(userAnswers),
@@ -47,8 +49,8 @@ class CheckYourAnswersService @Inject()(
     )
   }
 
-  def totalTaxDue(parsedStcRowsDocument: ParsedStcRowsDocument): BigDecimal =
-    parsedStcRowsDocument.rows.map(taxDueCalculationService.calculateTaxDue).sum
+  def totalTaxDue(parsedStcRowsDocument: ParsedStcRowsDocument, reliefs: Seq[Relief]): BigDecimal =
+    parsedStcRowsDocument.rows.map(taxDueCalculationService.calculateTaxDue(_, reliefs)).sum
 
   def paymentDueBy(parsedStcRowsDocument: ParsedStcRowsDocument): LocalDate =
     parsedStcRowsDocument.rows
@@ -56,7 +58,7 @@ class CheckYourAnswersService @Inject()(
       .min
       .plusDays(30)
 
-  private def buildTransfers(parsedStcRowsDocument: ParsedStcRowsDocument): Seq[Sh03Transfer] =
+  private def buildTransfers(parsedStcRowsDocument: ParsedStcRowsDocument, reliefs: Seq[Relief]): Seq[Sh03Transfer] =
     parsedStcRowsDocument.rows.map { row =>
       val amountOfShares = row.securitiesQuantity.getOrElse("0")
 
@@ -76,7 +78,7 @@ class CheckYourAnswersService @Inject()(
         amountOfShares = formatAmountOfShares(amountOfShares),
         reasonFor      = reasonFor,
         consideration  = consideration,
-        taxDue         = taxDueCalculationService.calculateTaxDue(row)
+        taxDue         = taxDueCalculationService.calculateTaxDue(row, reliefs)
       )
     }
 

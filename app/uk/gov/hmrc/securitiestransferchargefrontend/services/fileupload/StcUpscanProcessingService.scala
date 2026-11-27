@@ -21,6 +21,7 @@ import uk.gov.hmrc.securitiestransferchargefrontend.connectors.UpscanFileDownloa
 import uk.gov.hmrc.securitiestransferchargefrontend.models.JourneyType
 import uk.gov.hmrc.securitiestransferchargefrontend.models.stf.fileupload.{FileParseError, StcFileValidationResponse, UploadedFile}
 import uk.gov.hmrc.securitiestransferchargefrontend.models.stf.upscan.{FileUpload, UpscanJourneyStatus}
+import uk.gov.hmrc.securitiestransferchargefrontend.services.ReliefsService
 
 import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
@@ -33,7 +34,8 @@ trait StcUpscanProcessingService {
 class StcUpscanProcessingServiceImpl @Inject()(
                                                 upscanFileDownloadConnector: UpscanFileDownloadConnector,
                                                 stcUploadProcessingService: StcUploadProcessingService,
-                                                fileParserSelector: FileParserSelector
+                                                fileParserSelector: FileParserSelector,
+                                                reliefsService: ReliefsService
                                               )(implicit ec: ExecutionContext) extends StcUpscanProcessingService {
 
   override def process(fileUpload: FileUpload, affinityKey: String, journeyType: JourneyType)(implicit hc: HeaderCarrier): Future[Either[(FileParseError, Long), (StcFileValidationResponse, Long)]] = {
@@ -55,14 +57,17 @@ class StcUpscanProcessingServiceImpl @Inject()(
           val downloadUrl = fileUpload.downloadUrl.getOrElse(throw new RuntimeException("Missing download URL from Upscan payload"))
           val fileName = fileUpload.uploadDetails.map(_.fileName).getOrElse("unknown.xlsx")
 
-          upscanFileDownloadConnector.download(downloadUrl).map { inputStream =>
+          for {
+            reliefs     <- reliefsService.getReliefs()
+            inputStream <- upscanFileDownloadConnector.download(downloadUrl)
+          } yield {
             val uploadedFile = UploadedFile(
               fileName = fileName,
               mimeType = mimeType,
               inputStream = inputStream
             )
 
-            stcUploadProcessingService.process(uploadedFile, affinityKey, journeyType)
+            stcUploadProcessingService.process(uploadedFile, affinityKey, journeyType, ReliefNames.from(reliefs))
           }
       }
     }

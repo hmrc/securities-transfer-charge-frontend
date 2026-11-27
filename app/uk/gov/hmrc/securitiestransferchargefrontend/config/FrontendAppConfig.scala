@@ -85,7 +85,12 @@ class FrontendAppConfig @Inject() (configuration: Configuration, servicesConfig:
   val agentSellerAlfConfigFileLocation: String = configuration.get[String]("alf.stf-agent-seller-config-file")
 
   val sellerAlfConfigFileLocation: String = configuration.get[String]("alf.stf-seller-config-file")
-  val reliefsFileLocation: String = configuration.get[String]("reliefs.reliefs-config-file")
+  // Reliefs are cached in Mongo and refreshed from the submissions service when older than this.
+  // Older reliefs are kept as a backup in case the refresh fails.
+  val reliefsCacheTtl: java.time.Duration = configuration.get[java.time.Duration]("reliefs.cache-ttl")
+
+  // Last-resort reliefs, used only when none are cached and the submissions service cannot supply them.
+  val bundledReliefsFile: String = configuration.get[String]("reliefs.bundled-file")
 
   private val exitSurveyBaseUrl: String = configuration.get[String]("feedback-frontend.url")
   val exitSurveyUrl: String             = s"$exitSurveyBaseUrl/securities-transfer-charge-frontend"

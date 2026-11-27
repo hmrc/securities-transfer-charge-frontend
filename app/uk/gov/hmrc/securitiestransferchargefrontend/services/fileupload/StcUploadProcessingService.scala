@@ -27,8 +27,8 @@ class StcUploadProcessingService @Inject()(
                                             stcFileValidationService: StcFileValidationService
                                           ) {
 
-  def process(uploadedFile: UploadedFile, affinityKey: String, journeyType: JourneyType): Either[(FileParseError, Long), (StcFileValidationResponse, Long)] =
+  def process(uploadedFile: UploadedFile, affinityKey: String, journeyType: JourneyType, reliefNames: Set[String]): Either[(FileParseError, Long), (StcFileValidationResponse, Long)] =
     stcUploadParsingService.withVerifiedTemplateStream(uploadedFile, affinityKey, journeyType) { (headers, rowStream) =>
-      stcFileValidationService.validateStream(rowStream, headers, affinityKey, journeyType)
+      stcFileValidationService.validateStream(rowStream, headers, affinityKey, journeyType, reliefNames)
     }
 }

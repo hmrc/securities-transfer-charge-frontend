@@ -25,6 +25,7 @@ import uk.gov.hmrc.securitiestransferchargefrontend.models.JourneyType.STF
 import uk.gov.hmrc.securitiestransferchargefrontend.models.stf.fileupload.*
 import uk.gov.hmrc.securitiestransferchargefrontend.models.stf.fileupload.ParsedValue.Missing
 import uk.gov.hmrc.securitiestransferchargefrontend.services.fileupload.*
+import base.stubs.StubReliefsService
 
 class StcFileValidationServiceSpec extends SpecBase {
 
@@ -138,11 +139,12 @@ class StcFileValidationServiceSpec extends SpecBase {
 
       when(
         stcRowValidationService.validateStream(
-          any(), eqTo(headers), eqTo(affinityGroupKeyInd), eqTo(STF), eqTo(25), eqTo(10000)
+          any(), eqTo(headers), eqTo(affinityGroupKeyInd), eqTo(STF), eqTo(25), eqTo(10000),
+          eqTo(StubReliefsService.names)
         )
       ).thenReturn(Right(Seq(validatedRow1, validatedRow2), 0L))
 
-      val result = service.validateStream(rowStream, headers, affinityGroupKeyInd, STF)
+      val result = service.validateStream(rowStream, headers, affinityGroupKeyInd, STF, StubReliefsService.names)
 
       result.isRight mustBe true
       val response = result.toOption.get._1
